@@ -1,0 +1,199 @@
+from __future__ import annotations
+
+import json
+import os
+from collections.abc import Mapping
+from typing import Any
+
+from BaseClasses import Region
+from worlds.AutoWorld import World
+
+from . import Items, Locations, Regions, Rules, web_world
+from .Addresses import addresses
+from .Names import item_names, location_names, region_names
+from .Options import Goal, IncludedDifficulties, MarbleBalanceOptions, HardModeUnlock
+from .world_constants import BONUS_WORLDS, DIFFICULTIES, GAME_NAME, NORMAL_WORLDS
+
+
+class MarbleBalanceWorld(World):
+    """
+    Marble Saga Kororinpa / Marbles! Balance Challenge is a marble rolling puzzle game where AP controls
+    world access, AP-side Green Gem and Stump Temple Piece counters, marbles, recipes, vehicles, and optional checks.
+    """
+
+    game = GAME_NAME
+    web = web_world.MarbleBalanceWebWorld()
+    options_dataclass = MarbleBalanceOptions
+    options: MarbleBalanceOptions
+
+    item_name_to_id = Items.ITEM_NAME_TO_ID
+    location_name_to_id = Locations.LOCATION_NAME_TO_ID
+    item_name_groups = Items.item_groups
+    location_name_groups = Locations.location_name_groups
+
+    item_type = Items.MarbleBalanceItem
+    location_type = Locations.MarbleBalanceLocation
+
+    topology_present = False
+
+    enabled_difficulties: tuple[str, ...]
+    enabled_worlds_by_difficulty: dict[str, tuple[str, ...]]
+    active_location_names: list[str]
+    green_gem_location_count: int
+    stump_piece_location_count: int
+    starting_marble: str | None
+    uses_hard_mode_item: bool
+
+    def generate_early(self) -> None:
+        self.starting_marble = None
+        if self.options.included_difficulties == IncludedDifficulties.option_all:
+            difficulties = list(DIFFICULTIES)
+        elif self.options.included_difficulties == IncludedDifficulties.option_normal_and_hard:
+            difficulties = ["Normal", "Hard"]
+        elif self.options.included_difficulties == IncludedDifficulties.option_easy_and_normal:
+            difficulties = ["Easy", "Normal"]
+        else:
+            difficulties = ["Normal"]
+
+        if self.options.goal == Goal.option_hard_w7_l10 and "Hard" not in difficulties:
+            difficulties.append("Hard")
+
+        self.enabled_difficulties = tuple(difficulties)
+        self.enabled_worlds_by_difficulty = {difficulty: tuple(NORMAL_WORLDS) for difficulty in self.enabled_difficulties}
+        self.uses_hard_mode_item = (
+            "Hard" in self.enabled_difficulties
+            and self.options.hard_mode_unlock == HardModeUnlock.option_item
+        )
+
+    def create_regions(self) -> None:
+        Regions.create_and_connect_regions(self)
+        Locations.create_locations(self)
+        self._place_victory_item()
+        self.active_location_names = [location.name for location in self.get_locations()]
+        self.green_gem_location_count = sum(
+            1 for name in self.active_location_names if Locations.LOCATION_TABLE[name].category == "green_gem"
+        )
+        self.stump_piece_location_count = sum(
+            1 for name in self.active_location_names if Locations.LOCATION_TABLE[name].category == "stump_piece"
+        )
+
+    def set_rules(self) -> None:
+        Rules.set_all_rules(self)
+
+    def create_items(self) -> None:
+        Items.create_all_items(self)
+
+    def create_item(self, name: str) -> Items.MarbleBalanceItem:
+        return Items.create_item(self, name)
+
+    def _place_victory_item(self) -> None:
+        difficulty = "Hard" if self.options.goal == Goal.option_hard_w7_l10 else "Normal"
+        victory_location = self.get_location(location_names.goal_location_name(difficulty, "W7", 10))
+        victory_location.place_locked_item(self.create_item(item_names.VICTORY))
+
+    def get_filler_item_name(self) -> str:
+        return Items.get_filler_item_name(self)
+
+    def region_for_location_data(self, data: Locations.LocationData) -> Region:
+        if data.category == "tutorial":
+            return self.get_region(region_names.TUTORIALS)
+        if data.category == "balance_board":
+            return self.get_region(region_names.WII_BALANCE_BOARD)
+        if data.world in BONUS_WORLDS:
+            assert data.difficulty is not None
+            return self.get_region(region_names.world_region_name(data.difficulty, data.world))
+        assert data.difficulty is not None and data.world is not None
+        return self.get_region(region_names.world_region_name(data.difficulty, data.world))
+
+    def fill_slot_data(self) -> Mapping[str, Any]:
+        option_data = self.options.as_dict(
+            "goal",
+            "included_difficulties",
+            "green_gem_sanity",
+            "stump_piece_sanity",
+            "required_stump_pieces_for_w7",
+            "hard_mode_unlock",
+            "required_green_gems_for_hard",
+            "tutorial_checks",
+            "wii_balance_board_levels",
+            "recipe_and_junk_factory",
+            "trap_chance",
+            "split_vehicle_world_access",
+            "anthony_sanity",
+            "trophy_sanity",
+        )
+
+        active_location_data = {
+            name: self._slot_location_data(name)
+            for name in self.active_location_names
+            if name in Locations.LOCATION_TABLE
+        }
+
+        return {
+            "game": self.game,
+            "seed_name": self.multiworld.seed_name,
+            "player_name": self.multiworld.get_player_name(self.player),
+            "enabled_difficulties": list(self.enabled_difficulties),
+            "starting_marble": self.starting_marble,
+            "options": option_data,
+            "fixed_options": {
+                "bonus_levels": True,
+                "allow_free_mode_checks": True,
+                "marble_randomization": True,
+                "figure_roller_heads": True,
+                "junk_items": "filler",
+            },
+            "locations": active_location_data,
+            "static_addresses": addresses.STATIC_ADDRESSES,
+            "marble_unlock_flags": addresses.MARBLE_UNLOCK_FLAGS,
+            "figure_roller_head_unlock_flags": addresses.FIGURE_ROLLER_HEAD_UNLOCK_FLAGS,
+            "junk_live_flags": addresses.JUNK_LIVE_FLAGS,
+            "junk_saved_flags": addresses.JUNK_SAVED_FLAGS,
+            "vehicle_part_flags": addresses.VEHICLE_PART_FLAGS,
+            "recipe_unlock_flags": addresses.RECIPE_UNLOCK_FLAGS,
+            "vehicle_flags": {
+                "Submarine": addresses.SUBMARINE_FLAG,
+                "Rocket Ship": addresses.ROCKET_SHIP_FLAG,
+            },
+            "safety": {
+                "target_save_slot_index": 2,
+                "world_map_stage_mode": 0x1D,
+                "free_mode_stage_mode": 0x19,
+                "tutorial_stage_mode": 0x1F,
+                "balance_board_world_or_mode_index": 14,
+                "stage_cleared_values": [94, 95],
+            },
+        }
+
+    def _slot_location_data(self, name: str) -> dict[str, Any]:
+        data = Locations.LOCATION_TABLE[name]
+        output: dict[str, Any] = {
+            "id": data.code,
+            "category": data.category,
+            "difficulty": data.difficulty,
+            "world": data.world,
+            "level": data.level,
+        }
+        if data.address:
+            output["addresses"] = data.address
+        if data.difficulty and data.world and data.level:
+            output["stage_id"] = addresses.stage_id(data.difficulty, data.world, data.level)
+            output["world_index"] = addresses.WORLD_INDEX[data.world]
+            output["stage_index"] = data.level - 1
+        return output
+
+    def generate_output(self, output_directory: str) -> None:
+        output = {
+            "slot_data": self.fill_slot_data(),
+            "location_to_item": {
+                location.name: {
+                    "item": location.item.name if location.item else None,
+                    "player": location.item.player if location.item else None,
+                }
+                for location in self.multiworld.get_filled_locations(self.player)
+                if location.address is not None
+            },
+        }
+        filename = f"{self.multiworld.get_out_file_name_base(self.player)}.apmbc"
+        with open(os.path.join(output_directory, filename), "w", encoding="utf-8") as output_file:
+            json.dump(output, output_file, indent=2, sort_keys=True)
