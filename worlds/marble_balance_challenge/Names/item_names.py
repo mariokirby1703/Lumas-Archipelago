@@ -20,11 +20,11 @@ def bonus_level_unlock_name(difficulty: str, world: str, level: int) -> str:
 
 
 def marble_name(marble: str) -> str:
-    return f"Marble: {marble}"
+    return f"{marble}"
 
 
 def head_name(head: str) -> str:
-    return f"Figure Roller Head: {head}"
+    return f"{head}"
 
 
 def junk_name(junk: str) -> str:
@@ -32,8 +32,8 @@ def junk_name(junk: str) -> str:
 
 
 def vehicle_part_name(part: str) -> str:
-    return f"Vehicle Part: {part}"
+    return f"{part}"
 
 
 def recipe_name(recipe: str) -> str:
-    return f"Recipe: {recipe}"
+    return f"{recipe} Recipe"
