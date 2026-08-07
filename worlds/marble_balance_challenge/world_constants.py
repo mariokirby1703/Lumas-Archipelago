@@ -139,4 +139,4 @@ RECIPES = (
     "Basic Parts Set: Sizzlin' Desert",
 )
 
-TRAPS = ("Blackout Trap", "Mirror Trap", "Inverse Controls Trap", "Noclip Trap")
+TRAPS = ("Blackout Trap", "Mirror Trap", "Inverse Trap", "Noclip Trap")
