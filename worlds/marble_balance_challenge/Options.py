@@ -104,12 +104,6 @@ class WiiBalanceBoardLevels(Toggle):
     display_name = "Wii Balance Board Levels"
 
 
-class RecipeAndJunkFactory(Toggle):
-    """Shuffle confirmed recipe unlocks and Junk Factory access."""
-
-    display_name = "Recipes and Junk Factory"
-
-
 class TrapChance(Range):
     """Percentage chance for filler to become one of the experimental traps."""
 
@@ -143,7 +137,6 @@ class MarbleBalanceOptions(PerGameCommonOptions):
     extra_counter_item_percentage: ExtraCounterItemPercentage
     tutorial_checks: TutorialChecks
     wii_balance_board_levels: WiiBalanceBoardLevels
-    recipe_and_junk_factory: RecipeAndJunkFactory
     trap_chance: TrapChance
     split_vehicle_world_access: SplitVehicleWorldAccess
     random_starting_world: RandomStartingWorld
@@ -179,7 +172,6 @@ option_groups = [
     OptionGroup(
         "Item Pool",
         [
-            RecipeAndJunkFactory,
             TrapChance,
         ],
     ),
@@ -193,7 +185,6 @@ option_presets = {
         "stump_piece_sanity": False,
         "tutorial_checks": False,
         "wii_balance_board_levels": False,
-        "recipe_and_junk_factory": False,
         "random_starting_world": True,
         "extra_counter_item_percentage": 25,
         "anthony_sanity": False,

@@ -1,7 +1,6 @@
 {
   "game": "Marbles! Balance Challenge",
-  "minimum_ap_version": "0.6.8",
+  "minimum_ap_version": "0.6.7",
   "world_version": "0.1.0",
   "authors": ["TomGo", "Codex"]
 }
-

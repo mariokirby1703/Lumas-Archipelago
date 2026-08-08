@@ -17,7 +17,6 @@ from .world_constants import (
     MARBLES,
     BONUS_WORLDS,
     NORMAL_WORLDS,
-    RECIPES,
     TRAPS,
     VEHICLE_PARTS,
     GAME_NAME,
@@ -44,7 +43,6 @@ def build_item_table() -> dict[str, ItemData]:
         (names.HARD_MODE, ItemClassification.progression),
         (names.SUBMARINE, ItemClassification.progression),
         (names.ROCKET_SHIP, ItemClassification.progression),
-        (names.JUNK_FACTORY_ACCESS, ItemClassification.progression),
         (names.VICTORY, ItemClassification.progression),
     ]
 
@@ -68,9 +66,6 @@ def build_item_table() -> dict[str, ItemData]:
 
     for part in VEHICLE_PARTS:
         item_names.append((names.vehicle_part_name(part), ItemClassification.progression))
-
-    for recipe in RECIPES:
-        item_names.append((names.recipe_name(recipe), ItemClassification.useful))
 
     for trap in TRAPS:
         item_names.append((trap, ItemClassification.trap))
@@ -97,7 +92,6 @@ item_groups = {
     "Vehicles": {names.SUBMARINE, names.ROCKET_SHIP} | {names.vehicle_part_name(part) for part in VEHICLE_PARTS},
     "Marbles": {names.marble_name(marble) for marble in MARBLES},
     "Figure Roller Heads": {names.head_name(head) for head in FIGURE_ROLLER_HEADS},
-    "Recipes": {names.recipe_name(recipe) for recipe in RECIPES},
     "Junk": {names.junk_name(junk) for junk in JUNK_ITEMS},
     "Traps": set(TRAPS),
 }
@@ -141,9 +135,6 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
     ):
         items.append(world.create_item(names.ROCKET_SHIP))
 
-    if world.options.recipe_and_junk_factory:
-        items.append(world.create_item(names.JUNK_FACTORY_ACCESS))
-
     if world.uses_hard_mode_item:
         items.append(world.create_item(names.HARD_MODE))
 
@@ -180,10 +171,6 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
 
     for head in FIGURE_ROLLER_HEADS:
         items.append(world.create_item(names.head_name(head)))
-
-    if world.options.recipe_and_junk_factory:
-        for recipe in RECIPES:
-            items.append(world.create_item(names.recipe_name(recipe)))
 
     return items
 

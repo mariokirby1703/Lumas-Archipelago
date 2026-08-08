@@ -18,7 +18,7 @@ from .world_constants import BONUS_WORLDS, DIFFICULTIES, GAME_NAME, NORMAL_WORLD
 class MarbleBalanceWorld(World):
     """
     Marble Saga Kororinpa / Marbles! Balance Challenge is a marble rolling puzzle game where AP controls
-    world access, AP-side Green Gem and Stump Temple Piece counters, marbles, recipes, vehicles, and optional checks.
+    world access, AP-side Green Gem and Stump Temple Piece counters, marbles, vehicles, and optional checks.
     """
 
     game = GAME_NAME
@@ -138,7 +138,6 @@ class MarbleBalanceWorld(World):
             "extra_counter_item_percentage",
             "tutorial_checks",
             "wii_balance_board_levels",
-            "recipe_and_junk_factory",
             "trap_chance",
             "split_vehicle_world_access",
             "anthony_sanity",
@@ -173,7 +172,6 @@ class MarbleBalanceWorld(World):
             "junk_live_flags": addresses.JUNK_LIVE_FLAGS,
             "junk_saved_flags": addresses.JUNK_SAVED_FLAGS,
             "vehicle_part_flags": addresses.VEHICLE_PART_FLAGS,
-            "recipe_unlock_flags": addresses.RECIPE_UNLOCK_FLAGS,
             "vehicle_flags": {
                 "Easy": {
                     "Submarine": addresses.EASY_SUBMARINE_FLAG,
@@ -205,6 +203,14 @@ class MarbleBalanceWorld(World):
         }
         if data.address:
             location_addresses = dict(data.address)
+            if data.category == "green_gem":
+                location_addresses["temporary_pickup"] = addresses.GREEN_OR_ANT_TEMPORARY_PICKUP
+            if data.category == "stump_piece":
+                location_addresses["temporary_pickup"] = (
+                    addresses.JUNK_TEMPORARY_PICKUP
+                    if data.difficulty == "Hard" or data.world in BONUS_WORLDS
+                    else addresses.STUMP_TEMPORARY_PICKUP
+                )
             if data.category == "ant":
                 location_addresses["temporary_pickup"] = addresses.ANTHONY_TEMPORARY_PICKUP
             output["addresses"] = location_addresses

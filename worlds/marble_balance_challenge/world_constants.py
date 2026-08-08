@@ -117,26 +117,4 @@ JUNK_ITEMS = (
 
 VEHICLE_PARTS = ("Can", "Periscope", "Screw", "Rocket Engine", "Wing")
 
-RECIPES = (
-    "Moving Tile Set",
-    "Sliding Tile",
-    "Magnet Set",
-    "Drawbridge",
-    "Conveyor Belt",
-    "Turntable",
-    "Bumper Set",
-    "Gear",
-    "Moving Curve Set",
-    "Cannon",
-    "Thorn",
-    "Scissors",
-    "Magnifying Glass",
-    "Spring",
-    "Seesaw Set",
-    "Press",
-    "Punch",
-    "Basic Parts Set: Neighbor's House",
-    "Basic Parts Set: Sizzlin' Desert",
-)
-
 TRAPS = ("Blackout Trap", "Mirror Trap", "Inverse Trap", "Noclip Trap")

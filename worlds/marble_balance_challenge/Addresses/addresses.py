@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..world_constants import DIFFICULTIES, FIGURE_ROLLER_HEADS, JUNK_ITEMS, MARBLES, RECIPES, WORLD_INDEX
+from ..world_constants import DIFFICULTIES, FIGURE_ROLLER_HEADS, JUNK_ITEMS, MARBLES, WORLD_INDEX
 
 CURRENT_WORLD_OR_MODE_INDEX = 0x8049D945
 SELECTED_STAGE_INDEX = 0x8049D94D
@@ -11,10 +11,17 @@ CURRENT_GAME_MODE = 0x8049D96F
 CURRENT_HUB_SCREEN = 0x804E612F
 IN_GAME_INDICATOR = 0x804881AF
 STAGE_CLEARED_FLAG = 0x8048D1B5
+MIRROR_ACTIVE_SLOT = 0x8049D96B
+BLACKOUT_TRAP_FLAG = 0x80490A42
+NOCLIP_TRAP_FLAG = 0x80CBD6EB
 PAL_WORLD_MAP_STAGE_ID = 0x80474B2E
 PAL_FREE_MODE_STAGE_ID = 0x80474ACB
 PAL_STAGE_CRYSTAL_COUNT = 0x8079CC40
-ANTHONY_TEMPORARY_PICKUP = 0x804E10BF
+GREEN_OR_ANT_TEMPORARY_PICKUP = 0x804E10BF
+STUMP_TEMPORARY_PICKUP = 0x804E10B9
+JUNK_TEMPORARY_PICKUP = 0x804E10B8
+ANTHONY_TEMPORARY_PICKUP = GREEN_OR_ANT_TEMPORARY_PICKUP
+CURRENT_MARBLE = 0x804E6187
 
 HARD_MODE_FLAG = 0x804DF5F4
 EASY_SUBMARINE_FLAG = 0x804DF550
@@ -29,28 +36,6 @@ FIGURE_ROLLER_HEAD_UNLOCK_FLAGS = {name: 0x804DF521 + index for index, name in e
 
 JUNK_LIVE_FLAGS = {name: 0x804DF4A2 + index for index, name in enumerate(JUNK_ITEMS)}
 JUNK_SAVED_FLAGS = {name: 0x9046F74E + index for index, name in enumerate(JUNK_ITEMS)}
-
-RECIPE_UNLOCK_FLAGS = {
-    "Moving Tile Set": 0x804DF4E0,
-    "Sliding Tile": 0x804DF4E1,
-    "Magnet Set": 0x804DF4E2,
-    "Drawbridge": 0x804DF4E3,
-    "Conveyor Belt": 0x804DF4E4,
-    "Turntable": 0x804DF4E5,
-    "Bumper Set": 0x804DF4E6,
-    "Gear": 0x804DF4E7,
-    "Moving Curve Set": 0x804DF4E8,
-    "Cannon": 0x804DF4E9,
-    "Thorn": 0x804DF4EA,
-    "Scissors": 0x804DF4EB,
-    "Magnifying Glass": 0x804DF4EE,
-    "Spring": 0x804DF4EF,
-    "Seesaw Set": 0x804DF4F5,
-    "Press": 0x804DF4F9,
-    "Punch": 0x804DF4FA,
-    "Basic Parts Set: Neighbor's House": 0x804DF4FB,
-    "Basic Parts Set: Sizzlin' Desert": 0x804DF4FC,
-}
 
 VEHICLE_PART_FLAGS = {
     "Can": 0x804DF4BB,
@@ -132,10 +117,17 @@ STATIC_ADDRESSES = {
     "current_hub_screen": CURRENT_HUB_SCREEN,
     "in_game_indicator": IN_GAME_INDICATOR,
     "stage_cleared_flag": STAGE_CLEARED_FLAG,
+    "mirror_active_slot": MIRROR_ACTIVE_SLOT,
+    "blackout_trap_flag": BLACKOUT_TRAP_FLAG,
+    "noclip_trap_flag": NOCLIP_TRAP_FLAG,
     "pal_world_map_stage_id": PAL_WORLD_MAP_STAGE_ID,
     "pal_free_mode_stage_id": PAL_FREE_MODE_STAGE_ID,
     "pal_stage_crystal_count": PAL_STAGE_CRYSTAL_COUNT,
+    "green_or_ant_temporary_pickup": GREEN_OR_ANT_TEMPORARY_PICKUP,
+    "stump_temporary_pickup": STUMP_TEMPORARY_PICKUP,
+    "junk_temporary_pickup": JUNK_TEMPORARY_PICKUP,
     "anthony_temporary_pickup": ANTHONY_TEMPORARY_PICKUP,
+    "current_marble": CURRENT_MARBLE,
     "hard_mode_flag": HARD_MODE_FLAG,
     "easy_submarine_flag": EASY_SUBMARINE_FLAG,
     "easy_rocket_ship_flag": EASY_ROCKET_SHIP_FLAG,
@@ -145,7 +137,6 @@ STATIC_ADDRESSES = {
     "normal_vehicle_gate": NORMAL_VEHICLE_GATE,
 }
 
-assert set(RECIPE_UNLOCK_FLAGS) == set(RECIPES)
 assert set(JUNK_LIVE_FLAGS) == set(JUNK_ITEMS)
 assert set(MARBLE_UNLOCK_FLAGS) == set(MARBLES)
 assert set(FIGURE_ROLLER_HEAD_UNLOCK_FLAGS) == set(FIGURE_ROLLER_HEADS)

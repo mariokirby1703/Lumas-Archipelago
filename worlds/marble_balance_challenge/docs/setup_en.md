@@ -1,30 +1,67 @@
 # Marbles! Balance Challenge Setup Guide
 
-## Required software
+## Required Software
 
-- Archipelago built from this repository.
-- Dolphin with a PAL `Marbles! Balance Challenge` / RK6P18 copy.
-- An external client that can connect to Archipelago and read/write Dolphin RAM.
+- Archipelago 0.6.7 or newer
+- Dolphin Emulator
+- A PAL copy of Marbles! Balance Challenge, game ID `RK6P18`
+- The Marbles! Balance Challenge `.apworld` file
+- Dolphin Memory Engine support for the Archipelago client
+- Universal Tracker, optional
 
-## Before playing
+This world is made for the PAL version of the game. Do not use Marble Saga: Kororinpa, the US version.
 
-Use Save Slot 3 for AP testing and play. The RAM notes and slot data assume save slot index `2`.
+Universal Tracker does not need a separate Marbles! Balance Challenge integration for basic Archipelago tracking. It can
+use the generated Archipelago data like other worlds, but this release does not include a custom game-specific tracker
+layout.
 
-Generate a seed from the Archipelago launcher or command line using a player YAML for `Marbles! Balance Challenge`.
-The generator writes an `.apmbc` file containing slot data, location metadata, item placements, and PAL addresses for
-the client.
+## Installing the APWorld
 
-Bonus worlds and Free Mode checks are always enabled in V1. Tutorial checks and Wii Balance Board checks are optional
-and default off. Crystal Sanity is intentionally left out of V1.
+1. Download and install Archipelago.
+2. Download `marble_balance_challenge.apworld`.
+3. Double-click the `.apworld` file to install it into Archipelago's `custom_worlds` folder.
+4. If the Archipelago Launcher was already open, close it and reopen it.
+5. Open the Archipelago Launcher and check that `Marbles! Balance Challenge Client` appears in the launcher.
 
-## Safety notes
+If Archipelago asks to install missing Python requirements, allow it. The client needs Dolphin Memory Engine in order to
+connect to Dolphin.
 
-The client must not write AP received items to Green Gem, Stump Temple Piece, Trophy, or other check flags. Those flags
-are location detection sources. Writing them can create false checks or remove collectibles from levels.
+## Creating a YAML
 
-Submarine and Rocket Ship flags should not be written alone. When they are exposed in RAM, the matching safe target
-world levels must also be unlocked so the game cannot enter an empty/crashy world state. If Split Vehicle World Access
-is disabled, Submarine and Rocket Ship are not AP items and world access items alone control W5/W6 logic.
+Create your player YAML with either:
 
-Wii Balance Board checks are optional and should be detected through stage identity plus a goal reached latch, not
-through vanilla completion flags.
+- `Create Template Options` in the Archipelago Launcher
+- The Options Page in the Archipelago Launcher
+
+Make sure the player name in the YAML is the name you want to use when connecting to the Archipelago server.
+
+## Generating a Game
+
+Generate the seed through the Archipelago Launcher or with Archipelago's normal generation tools.
+
+
+## How to Play
+
+1. Open Dolphin.
+2. Start the PAL version of Marbles! Balance Challenge.
+3. Make sure Save Slot 3 is erased or empty before starting your AP save.
+4. Always play on Save Slot 3.
+5. Open `Marbles! Balance Challenge Client` from the Archipelago Launcher.
+6. Connect to the Archipelago server using the address and port given by the host.
+7. Enter the same player name that you used in your YAML.
+8. Once the client says Dolphin is connected successfully, start playing.
+
+Save Slot 3 is required. Locations may not send correctly and received items may not apply correctly on other save
+slots.
+
+## Client Notes
+
+The client connects to a running Dolphin instance through Dolphin Memory Engine. It checks for the PAL game ID `RK6P18`
+before reading locations or writing received unlocks.
+
+The client should not write received Green Gem, Stump Temple Piece, Trophy, Anthony, or goal checks into the game's save
+flags. Those are location checks. AP-side Green Gem and Stump Temple Piece items are counter items for logic.
+
+If Split Vehicle World Access is disabled, Submarine and Rocket Ship are not AP items and world unlocks control access
+for Ocean Treasure and Space Station. If Split Vehicle World Access is enabled, the matching vehicle item and world
+unlock are both required on Easy and Normal.

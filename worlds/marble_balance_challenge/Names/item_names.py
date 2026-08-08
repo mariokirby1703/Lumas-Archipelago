@@ -5,7 +5,6 @@ STUMP_TEMPLE_PIECE = "Stump Temple Piece"
 HARD_MODE = "Hard Mode"
 SUBMARINE = "Submarine"
 ROCKET_SHIP = "Rocket Ship"
-JUNK_FACTORY_ACCESS = "Junk Factory Access"
 VICTORY = "Victory"
 
 
@@ -34,6 +33,3 @@ def junk_name(junk: str) -> str:
 def vehicle_part_name(part: str) -> str:
     return f"{part}"
 
-
-def recipe_name(recipe: str) -> str:
-    return f"{recipe} Recipe"
