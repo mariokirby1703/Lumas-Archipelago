@@ -24,15 +24,34 @@ class IncludedDifficulties(Choice):
 
 
 class GreenGemSanity(Toggle):
-    """Add one Green Gem location to normal campaign levels that have a Green Gem flag."""
+    """Add one Green Gem location to normal difficulty campaign levels that have a Green Gem."""
 
     display_name = "Green Gem Sanity"
 
 
 class StumpPieceSanity(Toggle):
-    """Add Stump Temple Piece locations to W1-W6 levels and use AP-side pieces for W7 logic."""
+    """Add Stump Temple Piece locations to all stages that have a Stump Temple Piece."""
 
     display_name = "Stump Temple Piece Sanity"
+
+
+class AnthonySanity(Toggle):
+    """Add Anthony locations from Hard difficulty stages 01 through 10."""
+
+    display_name = "Anthony Sanity"
+
+
+class TrophySanity(Choice):
+    """Add trophy locations for the selected trophy tier."""
+
+    display_name = "Trophy Sanity"
+    option_off = 0
+    option_bronze = 1
+    option_silver = 2
+    option_gold = 3
+    option_platinum = 4
+    option_all = 5
+    default = option_off
 
 
 class RequiredStumpPiecesForW7(Range):
@@ -65,13 +84,13 @@ class RequiredGreenGemsForHard(Range):
 
 
 class TutorialChecks(Toggle):
-    """Include Tutorial 1 through Tutorial 10 as early checks."""
+    """Include Tutorial 01 through Tutorial 10 as early checks."""
 
     display_name = "Tutorial Checks"
 
 
 class WiiBalanceBoardLevels(Toggle):
-    """Include Wii Balance Board Level 1 through Level 100 checks."""
+    """Include Wii Balance Board Level 01 through Level 100 checks."""
 
     display_name = "Wii Balance Board Levels"
 
@@ -95,25 +114,6 @@ class SplitVehicleWorldAccess(DefaultOnToggle):
     """Require both the vehicle item and matching world access item for W5/W6 logic."""
 
     display_name = "Split Vehicle World Access"
-
-
-class AnthonySanity(Toggle):
-    """Add Ant locations from Hard difficulty stages."""
-
-    display_name = "Anthony Sanity"
-
-
-class TrophySanity(Choice):
-    """Add trophy locations for the selected trophy tier."""
-
-    display_name = "Trophy Sanity"
-    option_off = 0
-    option_bronze = 1
-    option_silver = 2
-    option_gold = 3
-    option_platinum = 4
-    option_all = 5
-    default = option_off
 
 
 @dataclass

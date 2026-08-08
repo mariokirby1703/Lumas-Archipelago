@@ -152,8 +152,14 @@ class MarbleBalanceWorld(World):
             "vehicle_part_flags": addresses.VEHICLE_PART_FLAGS,
             "recipe_unlock_flags": addresses.RECIPE_UNLOCK_FLAGS,
             "vehicle_flags": {
-                "Submarine": addresses.SUBMARINE_FLAG,
-                "Rocket Ship": addresses.ROCKET_SHIP_FLAG,
+                "Easy": {
+                    "Submarine": addresses.EASY_SUBMARINE_FLAG,
+                    "Rocket Ship": addresses.EASY_ROCKET_SHIP_FLAG,
+                },
+                "Normal": {
+                    "Submarine": addresses.NORMAL_SUBMARINE_FLAG,
+                    "Rocket Ship": addresses.NORMAL_ROCKET_SHIP_FLAG,
+                },
             },
             "safety": {
                 "target_save_slot_index": 2,
@@ -175,7 +181,10 @@ class MarbleBalanceWorld(World):
             "level": data.level,
         }
         if data.address:
-            output["addresses"] = data.address
+            location_addresses = dict(data.address)
+            if data.category == "ant":
+                location_addresses["temporary_pickup"] = addresses.ANTHONY_TEMPORARY_PICKUP
+            output["addresses"] = location_addresses
         if data.difficulty and data.world and data.level:
             output["stage_id"] = addresses.stage_id(data.difficulty, data.world, data.level)
             output["world_index"] = addresses.WORLD_INDEX[data.world]

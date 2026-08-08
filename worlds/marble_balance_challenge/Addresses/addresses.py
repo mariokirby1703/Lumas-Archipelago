@@ -14,10 +14,13 @@ STAGE_CLEARED_FLAG = 0x8048D1B5
 PAL_WORLD_MAP_STAGE_ID = 0x80474B2E
 PAL_FREE_MODE_STAGE_ID = 0x80474ACB
 PAL_STAGE_CRYSTAL_COUNT = 0x8079CC40
+ANTHONY_TEMPORARY_PICKUP = 0x804E10BF
 
 HARD_MODE_FLAG = 0x804DF5F4
-SUBMARINE_FLAG = 0x804DF57F
-ROCKET_SHIP_FLAG = 0x804DF580
+EASY_SUBMARINE_FLAG = 0x804DF550
+EASY_ROCKET_SHIP_FLAG = 0x804DF551
+NORMAL_SUBMARINE_FLAG = 0x804DF57F
+NORMAL_ROCKET_SHIP_FLAG = 0x804DF580
 EASY_VEHICLE_GATE = 0x804DF903
 NORMAL_VEHICLE_GATE = 0x804DF908
 
@@ -70,9 +73,9 @@ BONUS_TROPHY_ANCHORS = {
         "WC": 0x804D56EC,
     },
     "Hard": {
-        "WA": None,
-        "WB": None,
-        "WC": None,
+        "WA": 0x804D645C,
+        "WB": 0x804D5034,
+        "WC": 0x804D5DA4,
     },
 }
 
@@ -93,7 +96,12 @@ def bonus_level_record(difficulty: str, world: str, level: int) -> dict[str, int
     if anchor is None:
         return {"state": None, "stump_piece": None, "ant": None, "trophy": None}
     trophy = anchor + (level - 1) * 0xAC
-    return {"state": trophy - 0x0C, "stump_piece": None, "ant": None, "trophy": trophy}
+    return {
+        "state": trophy - 0x0C,
+        "stump_piece": None,
+        "ant": trophy - 0x05 if difficulty == "Hard" else None,
+        "trophy": trophy,
+    }
 
 
 def stage_id(difficulty: str, world: str, level: int) -> int | None:
@@ -127,9 +135,12 @@ STATIC_ADDRESSES = {
     "pal_world_map_stage_id": PAL_WORLD_MAP_STAGE_ID,
     "pal_free_mode_stage_id": PAL_FREE_MODE_STAGE_ID,
     "pal_stage_crystal_count": PAL_STAGE_CRYSTAL_COUNT,
+    "anthony_temporary_pickup": ANTHONY_TEMPORARY_PICKUP,
     "hard_mode_flag": HARD_MODE_FLAG,
-    "submarine_flag": SUBMARINE_FLAG,
-    "rocket_ship_flag": ROCKET_SHIP_FLAG,
+    "easy_submarine_flag": EASY_SUBMARINE_FLAG,
+    "easy_rocket_ship_flag": EASY_ROCKET_SHIP_FLAG,
+    "normal_submarine_flag": NORMAL_SUBMARINE_FLAG,
+    "normal_rocket_ship_flag": NORMAL_ROCKET_SHIP_FLAG,
     "easy_vehicle_gate": EASY_VEHICLE_GATE,
     "normal_vehicle_gate": NORMAL_VEHICLE_GATE,
 }

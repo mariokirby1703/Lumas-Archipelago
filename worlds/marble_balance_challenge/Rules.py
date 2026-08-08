@@ -28,7 +28,7 @@ def goal_difficulty(world: MarbleBalanceWorld) -> str:
 
 
 def can_access_w7(world: MarbleBalanceWorld, difficulty: str) -> Rule:
-    if world.options.stump_piece_sanity and difficulty == goal_difficulty(world):
+    if difficulty == goal_difficulty(world):
         return Has(items.STUMP_TEMPLE_PIECE, count=world.options.required_stump_pieces_for_w7.value)
     return Has(items.world_access_name(difficulty, "W7"))
 
