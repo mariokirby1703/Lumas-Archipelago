@@ -74,7 +74,7 @@ class MarbleBalanceWorld(World):
         starting_worlds: dict[str, str] = {}
         for difficulty in self.enabled_difficulties:
             candidates = list(NORMAL_WORLDS)
-            if difficulty == "Hard":
+            if difficulty == "Hard" or difficulty == "Normal" and "Easy" not in self.enabled_difficulties:
                 candidates += list(BONUS_WORLDS)
             if difficulty == "Normal" and self.options.goal == Goal.option_normal_w7_l10:
                 candidates.remove("W7")
@@ -135,6 +135,7 @@ class MarbleBalanceWorld(World):
             "required_stump_pieces_for_w7",
             "hard_mode_unlock",
             "required_green_gems_for_hard",
+            "extra_counter_item_percentage",
             "tutorial_checks",
             "wii_balance_board_levels",
             "recipe_and_junk_factory",

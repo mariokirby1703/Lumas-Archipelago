@@ -19,6 +19,8 @@ Important AP-side counter items:
 - `Stump Temple Piece`
 
 These are logic items only. They should not write the game's Green Gem or Stump Temple Piece collectible flags.
+The `extra_counter_item_percentage` option controls how many extra copies are added above the configured requirement
+for both counters. The default is `25`, meaning a requirement of `60` creates `75` counter items.
 
 ## Goal
 

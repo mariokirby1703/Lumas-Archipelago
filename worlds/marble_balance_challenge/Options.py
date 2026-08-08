@@ -83,6 +83,15 @@ class RequiredGreenGemsForHard(Range):
     default = 30
 
 
+class ExtraCounterItemPercentage(Range):
+    """Percent of extra AP-side Green Gem and Stump Temple Piece counter items added above the requirement."""
+
+    display_name = "Extra Counter Item Percentage"
+    range_start = 0
+    range_end = 100
+    default = 25
+
+
 class TutorialChecks(Toggle):
     """Include Tutorial 01 through Tutorial 10 as early checks."""
 
@@ -131,6 +140,7 @@ class MarbleBalanceOptions(PerGameCommonOptions):
     required_stump_pieces_for_w7: RequiredStumpPiecesForW7
     hard_mode_unlock: HardModeUnlock
     required_green_gems_for_hard: RequiredGreenGemsForHard
+    extra_counter_item_percentage: ExtraCounterItemPercentage
     tutorial_checks: TutorialChecks
     wii_balance_board_levels: WiiBalanceBoardLevels
     recipe_and_junk_factory: RecipeAndJunkFactory
@@ -160,6 +170,7 @@ option_groups = [
             RequiredStumpPiecesForW7,
             HardModeUnlock,
             RequiredGreenGemsForHard,
+            ExtraCounterItemPercentage,
             SplitVehicleWorldAccess,
             AnthonySanity,
             TrophySanity,
@@ -184,6 +195,7 @@ option_presets = {
         "wii_balance_board_levels": False,
         "recipe_and_junk_factory": False,
         "random_starting_world": True,
+        "extra_counter_item_percentage": 25,
         "anthony_sanity": False,
         "trophy_sanity": "off",
         "trap_chance": 10,
@@ -194,6 +206,7 @@ option_presets = {
         "green_gem_sanity": True,
         "stump_piece_sanity": True,
         "required_stump_pieces_for_w7": 60,
+        "extra_counter_item_percentage": 25,
         "random_starting_world": True,
     },
     "Hard Goal": {
@@ -203,6 +216,7 @@ option_presets = {
         "stump_piece_sanity": True,
         "hard_mode_unlock": "item",
         "required_stump_pieces_for_w7": 60,
+        "extra_counter_item_percentage": 25,
         "random_starting_world": True,
         "anthony_sanity": True,
     },

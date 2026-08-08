@@ -117,8 +117,8 @@ def get_filler_item_name(world: MarbleBalanceWorld) -> str:
     return names.junk_name(world.random.choice(JUNK_ITEMS))
 
 
-def requirement_item_count(required: int) -> int:
-    return required + (required + 3) // 4
+def requirement_item_count(required: int, extra_percentage: int) -> int:
+    return required + (required * extra_percentage + 99) // 100
 
 
 def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
@@ -147,7 +147,9 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
     if world.uses_hard_mode_item:
         items.append(world.create_item(names.HARD_MODE))
 
-    for _ in range(requirement_item_count(world.options.required_stump_pieces_for_w7.value)):
+    extra_counter_percentage = world.options.extra_counter_item_percentage.value
+
+    for _ in range(requirement_item_count(world.options.required_stump_pieces_for_w7.value, extra_counter_percentage)):
         items.append(world.create_item(names.STUMP_TEMPLE_PIECE))
 
     for difficulty in world.enabled_difficulties:
@@ -157,12 +159,13 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
             items.append(world.create_item(names.world_access_name(difficulty, "W7")))
 
     if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
-        for _ in range(requirement_item_count(world.options.required_green_gems_for_hard.value)):
+        for _ in range(requirement_item_count(world.options.required_green_gems_for_hard.value, extra_counter_percentage)):
             items.append(world.create_item(names.GREEN_GEM))
 
     for bonus_world in BONUS_WORLDS:
         for level in range(1, LEVELS_PER_WORLD[bonus_world] + 1):
-            items.append(world.create_item(names.bonus_level_unlock_name("Normal", bonus_world, level)))
+            if not (world.starting_worlds_by_difficulty.get("Normal") == bonus_world and level <= 5):
+                items.append(world.create_item(names.bonus_level_unlock_name("Normal", bonus_world, level)))
             if "Hard" in world.enabled_difficulties and not (
                 world.starting_worlds_by_difficulty.get("Hard") == bonus_world and level <= 5
             ):
