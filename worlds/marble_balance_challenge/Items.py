@@ -49,7 +49,7 @@ def build_item_table() -> dict[str, ItemData]:
     ]
 
     for difficulty in DIFFICULTIES:
-        for normal_world in NORMAL_WORLDS[1:]:
+        for normal_world in NORMAL_WORLDS:
             item_names.append((names.world_access_name(difficulty, normal_world), ItemClassification.progression))
 
     for bonus_world in BONUS_WORLDS:
@@ -86,7 +86,7 @@ ITEM_NAME_TO_ID = {name: data.code for name, data in ITEM_TABLE.items()}
 
 item_groups = {
     "World Access": {
-        names.world_access_name(difficulty, world) for difficulty in DIFFICULTIES for world in NORMAL_WORLDS[1:]
+        names.world_access_name(difficulty, world) for difficulty in DIFFICULTIES for world in NORMAL_WORLDS
     },
     "Bonus Level Access": {
         names.bonus_level_unlock_name(difficulty, world, level)
@@ -126,7 +126,9 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
     stump_locked_difficulty = "Hard" if world.options.goal == Goal.option_hard_w7_l10 else "Normal"
 
     for difficulty in world.enabled_difficulties:
-        for normal_world in NORMAL_WORLDS[1:6]:
+        for normal_world in NORMAL_WORLDS[:6]:
+            if world.starting_worlds_by_difficulty.get(difficulty) == normal_world:
+                continue
             items.append(world.create_item(names.world_access_name(difficulty, normal_world)))
 
     vehicle_difficulties = {"Easy", "Normal"} & set(world.enabled_difficulties)
@@ -150,6 +152,8 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
 
     for difficulty in world.enabled_difficulties:
         if difficulty != stump_locked_difficulty:
+            if world.starting_worlds_by_difficulty.get(difficulty) == "W7":
+                continue
             items.append(world.create_item(names.world_access_name(difficulty, "W7")))
 
     if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
@@ -159,7 +163,9 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
     for bonus_world in BONUS_WORLDS:
         for level in range(1, LEVELS_PER_WORLD[bonus_world] + 1):
             items.append(world.create_item(names.bonus_level_unlock_name("Normal", bonus_world, level)))
-            if "Hard" in world.enabled_difficulties:
+            if "Hard" in world.enabled_difficulties and not (
+                world.starting_worlds_by_difficulty.get("Hard") == bonus_world and level <= 5
+            ):
                 items.append(world.create_item(names.bonus_level_unlock_name("Hard", bonus_world, level)))
 
     starting_marble = world.random.choice(MARBLES)

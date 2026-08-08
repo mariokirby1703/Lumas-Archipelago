@@ -1,0 +1,47 @@
+name: Build Marble Balance APWorld
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-apworld:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Install Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "~3.12.7"
+          check-latest: true
+
+      - name: Install Archipelago dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python ModuleUpdate.py --yes
+
+      - name: Build APWorld
+        run: python Launcher.py "Build APWorlds" -- "Marbles! Balance Challenge" --skip_open_folder
+
+      - name: Upload APWorld artifact
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: marble_balance_challenge.apworld
+          path: build/apworlds/marble_balance_challenge.apworld
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach APWorld to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
+        with:
+          files: build/apworlds/marble_balance_challenge.apworld
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

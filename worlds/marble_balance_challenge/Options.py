@@ -116,6 +116,12 @@ class SplitVehicleWorldAccess(DefaultOnToggle):
     display_name = "Split Vehicle World Access"
 
 
+class RandomStartingWorld(DefaultOnToggle):
+    """Start with one random accessible world per enabled difficulty."""
+
+    display_name = "Random Starting World"
+
+
 @dataclass
 class MarbleBalanceOptions(PerGameCommonOptions):
     goal: Goal
@@ -130,6 +136,7 @@ class MarbleBalanceOptions(PerGameCommonOptions):
     recipe_and_junk_factory: RecipeAndJunkFactory
     trap_chance: TrapChance
     split_vehicle_world_access: SplitVehicleWorldAccess
+    random_starting_world: RandomStartingWorld
     anthony_sanity: AnthonySanity
     trophy_sanity: TrophySanity
 
@@ -142,6 +149,7 @@ option_groups = [
             IncludedDifficulties,
             TutorialChecks,
             WiiBalanceBoardLevels,
+            RandomStartingWorld,
         ],
     ),
     OptionGroup(
@@ -175,6 +183,7 @@ option_presets = {
         "tutorial_checks": False,
         "wii_balance_board_levels": False,
         "recipe_and_junk_factory": False,
+        "random_starting_world": True,
         "anthony_sanity": False,
         "trophy_sanity": "off",
         "trap_chance": 10,
@@ -185,6 +194,7 @@ option_presets = {
         "green_gem_sanity": True,
         "stump_piece_sanity": True,
         "required_stump_pieces_for_w7": 60,
+        "random_starting_world": True,
     },
     "Hard Goal": {
         "goal": "hard_w7_l10",
@@ -193,6 +203,7 @@ option_presets = {
         "stump_piece_sanity": True,
         "hard_mode_unlock": "item",
         "required_stump_pieces_for_w7": 60,
+        "random_starting_world": True,
         "anthony_sanity": True,
     },
 }

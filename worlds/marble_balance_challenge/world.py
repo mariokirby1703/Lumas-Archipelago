@@ -42,6 +42,7 @@ class MarbleBalanceWorld(World):
     green_gem_location_count: int
     stump_piece_location_count: int
     starting_marble: str | None
+    starting_worlds_by_difficulty: dict[str, str]
     uses_hard_mode_item: bool
 
     def generate_early(self) -> None:
@@ -60,10 +61,29 @@ class MarbleBalanceWorld(World):
 
         self.enabled_difficulties = tuple(difficulties)
         self.enabled_worlds_by_difficulty = {difficulty: tuple(NORMAL_WORLDS) for difficulty in self.enabled_difficulties}
+        self.starting_worlds_by_difficulty = self._choose_starting_worlds()
         self.uses_hard_mode_item = (
             "Hard" in self.enabled_difficulties
             and self.options.hard_mode_unlock == HardModeUnlock.option_item
         )
+
+    def _choose_starting_worlds(self) -> dict[str, str]:
+        if not self.options.random_starting_world:
+            return {difficulty: "W1" for difficulty in self.enabled_difficulties}
+
+        starting_worlds: dict[str, str] = {}
+        for difficulty in self.enabled_difficulties:
+            candidates = list(NORMAL_WORLDS)
+            if difficulty == "Hard":
+                candidates += list(BONUS_WORLDS)
+            if difficulty == "Normal" and self.options.goal == Goal.option_normal_w7_l10:
+                candidates.remove("W7")
+            if difficulty == "Hard" and self.options.goal == Goal.option_hard_w7_l10:
+                candidates.remove("W7")
+            if difficulty != "Hard" and self.options.split_vehicle_world_access:
+                candidates = [world for world in candidates if world not in {"W5", "W6"}]
+            starting_worlds[difficulty] = self.random.choice(candidates)
+        return starting_worlds
 
     def create_regions(self) -> None:
         Regions.create_and_connect_regions(self)
@@ -109,6 +129,7 @@ class MarbleBalanceWorld(World):
         option_data = self.options.as_dict(
             "goal",
             "included_difficulties",
+            "random_starting_world",
             "green_gem_sanity",
             "stump_piece_sanity",
             "required_stump_pieces_for_w7",
@@ -134,6 +155,7 @@ class MarbleBalanceWorld(World):
             "seed_name": self.multiworld.seed_name,
             "player_name": self.multiworld.get_player_name(self.player),
             "enabled_difficulties": list(self.enabled_difficulties),
+            "starting_worlds": self.starting_worlds_by_difficulty,
             "starting_marble": self.starting_marble,
             "options": option_data,
             "fixed_options": {

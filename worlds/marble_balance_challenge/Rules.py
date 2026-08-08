@@ -34,7 +34,7 @@ def can_access_w7(world: MarbleBalanceWorld, difficulty: str) -> Rule:
 
 
 def world_access_rule(world: MarbleBalanceWorld, difficulty: str, normal_world: str) -> Rule:
-    if normal_world == "W1":
+    if world.starting_worlds_by_difficulty.get(difficulty) == normal_world:
         rule: Rule = HasAll()
     elif normal_world == "W5":
         rule = Has(items.world_access_name(difficulty, normal_world))
@@ -73,9 +73,15 @@ def set_entrance_rules(world: MarbleBalanceWorld) -> None:
             "WC": Has(items.world_access_name("Normal", "W6")),
         }
     for bonus_world in BONUS_WORLDS:
-        world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), bonus_access[bonus_world])
+        if world.starting_worlds_by_difficulty.get("Normal") == bonus_world:
+            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), HasAll())
+        else:
+            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), bonus_access[bonus_world])
         if "Hard" in world.enabled_difficulties:
-            world.set_rule(world.get_entrance(f"Menu to Hard {bonus_world}"), can_access_hard_mode(world))
+            rule = HasAll() if world.starting_worlds_by_difficulty.get("Hard") == bonus_world else can_access_hard_mode(world)
+            if world.starting_worlds_by_difficulty.get("Hard") == bonus_world:
+                rule = rule & can_access_hard_mode(world)
+            world.set_rule(world.get_entrance(f"Menu to Hard {bonus_world}"), rule)
 
 
 def set_completion_condition(world: MarbleBalanceWorld) -> None:
@@ -89,6 +95,8 @@ def set_location_rules(world: MarbleBalanceWorld) -> None:
     for location in world.get_locations():
         data = Locations.LOCATION_TABLE.get(location.name)
         if data and data.world in BONUS_WORLDS and data.difficulty and data.level:
+            if world.starting_worlds_by_difficulty.get(data.difficulty) == data.world and data.level <= 5:
+                continue
             world.set_rule(
                 location,
                 Has(items.bonus_level_unlock_name(data.difficulty, data.world, data.level)),
