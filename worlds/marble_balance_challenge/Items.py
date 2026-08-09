@@ -111,11 +111,21 @@ def get_filler_item_name(world: MarbleBalanceWorld) -> str:
     return names.junk_name(world.random.choice(JUNK_ITEMS))
 
 
-def requirement_item_count(required: int, extra_percentage: int) -> int:
-    return required + (required * extra_percentage + 99) // 100
+def extra_requirement_item_count(required: int, extra_percentage: int) -> int:
+    return (required * extra_percentage + 99) // 100
 
 
-def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
+def extend_until_full(
+    items: list[MarbleBalanceItem],
+    candidates: list[MarbleBalanceItem],
+    location_count: int,
+) -> None:
+    remaining_space = location_count - len(items)
+    if remaining_space > 0:
+        items.extend(candidates[:remaining_space])
+
+
+def create_required_items(world: MarbleBalanceWorld, location_count: int) -> list[MarbleBalanceItem]:
     items: list[MarbleBalanceItem] = []
     stump_locked_difficulty = "Hard" if world.options.goal == Goal.option_hard_w7_l10 else "Normal"
 
@@ -140,7 +150,7 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
 
     extra_counter_percentage = world.options.extra_counter_item_percentage.value
 
-    for _ in range(requirement_item_count(world.options.required_stump_pieces_for_w7.value, extra_counter_percentage)):
+    for _ in range(world.options.required_stump_pieces_for_w7.value):
         items.append(world.create_item(names.STUMP_TEMPLE_PIECE))
 
     for difficulty in world.enabled_difficulties:
@@ -150,7 +160,7 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
             items.append(world.create_item(names.world_access_name(difficulty, "W7")))
 
     if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
-        for _ in range(requirement_item_count(world.options.required_green_gems_for_hard.value, extra_counter_percentage)):
+        for _ in range(world.options.required_green_gems_for_hard.value):
             items.append(world.create_item(names.GREEN_GEM))
 
     for bonus_world in BONUS_WORLDS:
@@ -165,18 +175,29 @@ def create_required_items(world: MarbleBalanceWorld) -> list[MarbleBalanceItem]:
     starting_marble = world.random.choice(MARBLES)
     world.starting_marble = starting_marble
     world.push_precollected(world.create_item(names.marble_name(starting_marble)))
+
+    optional_items: list[MarbleBalanceItem] = []
+    for _ in range(extra_requirement_item_count(world.options.required_stump_pieces_for_w7.value, extra_counter_percentage)):
+        optional_items.append(world.create_item(names.STUMP_TEMPLE_PIECE))
+
+    if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
+        for _ in range(extra_requirement_item_count(world.options.required_green_gems_for_hard.value, extra_counter_percentage)):
+            optional_items.append(world.create_item(names.GREEN_GEM))
+
     for marble in MARBLES:
         if marble != starting_marble:
-            items.append(world.create_item(names.marble_name(marble)))
+            optional_items.append(world.create_item(names.marble_name(marble)))
 
     for head in FIGURE_ROLLER_HEADS:
-        items.append(world.create_item(names.head_name(head)))
+        optional_items.append(world.create_item(names.head_name(head)))
+
+    extend_until_full(items, optional_items, location_count)
 
     return items
 
 
 def create_all_items(world: MarbleBalanceWorld) -> None:
-    itempool = create_required_items(world)
     unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
+    itempool = create_required_items(world, unfilled_locations)
     itempool += [world.create_filler() for _ in range(unfilled_locations - len(itempool))]
     world.multiworld.itempool += itempool

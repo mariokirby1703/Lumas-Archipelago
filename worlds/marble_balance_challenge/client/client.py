@@ -104,6 +104,7 @@ class MarbleBalanceContext(CommonContext):
         self.blackout_remaining = 0.0
         self.blackout_last_tick = time.monotonic()
         self.blackout_owned = False
+        self.blackout_active = False
         self.inverse_trap_pending = False
         self.inverse_trap_active = False
         self.inverse_remaining = 0.0
@@ -111,6 +112,7 @@ class MarbleBalanceContext(CommonContext):
         self.noclip_remaining = 0.0
         self.noclip_last_tick = time.monotonic()
         self.noclip_owned = False
+        self.noclip_active = False
 
         if patch_file:
             self.load_patch_file(patch_file)
@@ -510,6 +512,26 @@ def set_matching_levels(slot_data: dict[str, Any], difficulty: str, world: str, 
                 write_u8(address, value)
 
 
+def force_matching_level_states(
+    slot_data: dict[str, Any],
+    difficulty: str,
+    world: str,
+    levels: range,
+    from_values: set[int],
+    value: int,
+) -> None:
+    for location in slot_data.get("locations", {}).values():
+        if (
+            location.get("category") == "goal"
+            and location.get("difficulty") == difficulty
+            and location.get("world") == world
+            and location.get("level") in levels
+        ):
+            address = (location.get("addresses") or {}).get("state")
+            if address is not None and read_u8(address) in from_values:
+                write_u8(address, value)
+
+
 def received_item_names(ctx: MarbleBalanceContext) -> list[str]:
     names: list[str] = []
     for network_item in ctx.items_received:
@@ -560,6 +582,56 @@ def sync_normal_world_access(ctx: MarbleBalanceContext) -> None:
                 set_matching_levels(ctx.slot_data, difficulty, world, range(1, LEVELS_PER_WORLD[world] + 1), 0)
 
 
+def suppress_l11_world_unlock_side_effects(ctx: MarbleBalanceContext) -> None:
+    granted = granted_normal_worlds(ctx)
+    stage = current_stage(ctx.slot_data)
+    current_identity = stage_identity(stage) if in_level_active(ctx.slot_data) else None
+
+    for difficulty in ctx.slot_data.get("enabled_difficulties", []):
+        for index, world in enumerate(NORMAL_WORLDS[:-1]):
+            if LEVELS_PER_WORLD[world] < 11:
+                continue
+
+            if current_identity != ("stage", difficulty, world, 11):
+                force_matching_level_states(ctx.slot_data, difficulty, world, range(11, 12), {3}, 2)
+
+            next_world = NORMAL_WORLDS[index + 1]
+            if (difficulty, next_world) not in granted:
+                force_matching_level_states(ctx.slot_data, difficulty, next_world, range(1, 6), {1, 2, 3}, 0)
+
+
+def owned_bonus_levels(ctx: MarbleBalanceContext) -> set[tuple[str, str, int]]:
+    owned: set[tuple[str, str, int]] = set()
+    for difficulty, world in ctx.slot_data.get("starting_worlds", {}).items():
+        if world in BONUS_WORLDS:
+            for level in range(1, 6):
+                owned.add((difficulty, world, level))
+
+    for item_name in received_item_names(ctx):
+        if item_name in BONUS_UNLOCKS:
+            owned.add(BONUS_UNLOCKS[item_name])
+    return owned
+
+
+def sync_bonus_vehicle_gates(ctx: MarbleBalanceContext) -> None:
+    static = ctx.slot_data.get("static_addresses", {})
+    owned = owned_bonus_levels(ctx)
+    normal_owned = {(world, level) for difficulty, world, level in owned if difficulty == "Normal"}
+    submarine_side = any((world, 1) in normal_owned for world in BONUS_WORLDS)
+    rocket_side = any((world, 5) in normal_owned for world in ("WB", "WC"))
+    value = 15
+    if submarine_side and rocket_side:
+        value = 95
+    elif submarine_side:
+        value = 31
+    elif rocket_side:
+        value = 79
+
+    for difficulty, address_key in (("Easy", "easy_vehicle_gate"), ("Normal", "normal_vehicle_gate")):
+        if difficulty in ctx.slot_data.get("enabled_difficulties", []):
+            write_u8_if_changed(static.get(address_key), value)
+
+
 def enforce_marble_access(ctx: MarbleBalanceContext) -> None:
     slot_data = ctx.slot_data
     static = slot_data.get("static_addresses", {})
@@ -585,23 +657,27 @@ def enforce_marble_access(ctx: MarbleBalanceContext) -> None:
 def handle_traps(ctx: MarbleBalanceContext) -> None:
     static = ctx.slot_data.get("static_addresses", {})
     now = time.monotonic()
+    stage = current_stage(ctx.slot_data)
     mirror_address = static.get("mirror_active_slot")
     blackout_address = static.get("blackout_trap_flag")
     noclip_address = static.get("noclip_trap_flag")
-    safe_gameplay = in_level_active(ctx.slot_data) and not goal_or_result_active(ctx.slot_data)
+    inside_stage = stage is not None and in_level_active(ctx.slot_data)
+    safe_gameplay = inside_stage and not goal_or_result_active(ctx.slot_data)
 
     if blackout_address is not None:
         if ctx.blackout_owned and safe_gameplay and ctx.blackout_remaining > 0:
             elapsed = now - ctx.blackout_last_tick
             ctx.blackout_remaining = max(0.0, ctx.blackout_remaining - elapsed)
             ctx.blackout_last_tick = now
+            ctx.blackout_active = True
             write_u8_if_changed(blackout_address, 3)
         else:
             ctx.blackout_last_tick = now
-            if read_u8(blackout_address) == 3:
+            if ctx.blackout_active and inside_stage and read_u8(blackout_address) == 3:
                 write_u8(blackout_address, 0)
             if ctx.blackout_remaining <= 0:
                 ctx.blackout_owned = False
+                ctx.blackout_active = False
 
     if mirror_address is not None:
         if ctx.mirror_trap_active and goal_or_result_active(ctx.slot_data):
@@ -610,6 +686,8 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
 
         if ctx.mirror_trap_pending and not in_level_active(ctx.slot_data) and not goal_or_result_active(ctx.slot_data):
             write_u8_if_changed(mirror_address, 1)
+
+        if ctx.mirror_trap_pending and safe_gameplay:
             ctx.mirror_trap_pending = False
             ctx.mirror_trap_active = True
 
@@ -640,14 +718,16 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
             elapsed = now - ctx.noclip_last_tick
             ctx.noclip_remaining = max(0.0, ctx.noclip_remaining - elapsed)
             ctx.noclip_last_tick = now
+            ctx.noclip_active = True
             write_u8_if_changed(noclip_address, 0)
         else:
             ctx.noclip_last_tick = now
-            if read_u8(noclip_address) == 0:
+            if ctx.noclip_active and read_u8(noclip_address) == 0:
                 write_u8(noclip_address, 1)
             if ctx.noclip_remaining <= 0 or goal_or_result_active(ctx.slot_data):
                 ctx.noclip_owned = False
                 ctx.noclip_remaining = 0.0
+                ctx.noclip_active = False
 
 
 def apply_received_item(ctx: MarbleBalanceContext, item_name: str) -> None:
@@ -755,6 +835,8 @@ async def dolphin_sync_task(ctx: MarbleBalanceContext) -> None:
                     apply_starting_access(ctx.slot_data)
                     await process_received_items(ctx)
                     sync_normal_world_access(ctx)
+                    suppress_l11_world_unlock_side_effects(ctx)
+                    sync_bonus_vehicle_gates(ctx)
                     enforce_marble_access(ctx)
                     handle_traps(ctx)
                     await check_locations(ctx)
