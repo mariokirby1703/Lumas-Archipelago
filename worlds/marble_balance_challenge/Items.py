@@ -105,9 +105,20 @@ def create_item(world: MarbleBalanceWorld, name: str) -> MarbleBalanceItem:
     return MarbleBalanceItem(name, classification, data.code, world.player)
 
 
+def trap_weight(world: MarbleBalanceWorld, trap: str) -> int:
+    weight_values = {0: 1, 1: 2, 2: 4}
+    option_by_trap = {
+        "Blackout Trap": world.options.blackout_trap_weight,
+        "Mirror Trap": world.options.mirror_trap_weight,
+        "Inverse Trap": world.options.inverse_trap_weight,
+        "Noclip Trap": world.options.noclip_trap_weight,
+    }
+    return weight_values[option_by_trap[trap].value]
+
+
 def get_filler_item_name(world: MarbleBalanceWorld) -> str:
     if world.random.randint(1, 100) <= world.options.trap_chance.value:
-        return world.random.choice(TRAPS)
+        return world.random.choices(TRAPS, weights=[trap_weight(world, trap) for trap in TRAPS], k=1)[0]
     return names.junk_name(world.random.choice(JUNK_ITEMS))
 
 
@@ -172,7 +183,7 @@ def create_required_items(world: MarbleBalanceWorld, location_count: int) -> lis
             ):
                 items.append(world.create_item(names.bonus_level_unlock_name("Hard", bonus_world, level)))
 
-    starting_marble = world.random.choice(MARBLES)
+    starting_marble = world.starting_marble or world.random.choice(MARBLES)
     world.starting_marble = starting_marble
     world.push_precollected(world.create_item(names.marble_name(starting_marble)))
 

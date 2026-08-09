@@ -58,7 +58,10 @@ def set_entrance_rules(world: MarbleBalanceWorld) -> None:
     for difficulty in world.enabled_difficulties:
         for normal_world in NORMAL_WORLDS:
             entrance = world.get_entrance(f"Menu to {difficulty} {normal_world}")
-            world.set_rule(entrance, world_access_rule(world, difficulty, normal_world))
+            if world.starting_worlds_by_difficulty.get(difficulty) == normal_world:
+                world.set_rule(entrance, lambda state: True)
+            else:
+                world.set_rule(entrance, world_access_rule(world, difficulty, normal_world))
 
     if world.options.split_vehicle_world_access:
         bonus_access = {
@@ -74,7 +77,7 @@ def set_entrance_rules(world: MarbleBalanceWorld) -> None:
         }
     for bonus_world in BONUS_WORLDS:
         if world.starting_worlds_by_difficulty.get("Normal") == bonus_world:
-            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), HasAll())
+            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), lambda state: True)
         else:
             world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), bonus_access[bonus_world])
         if "Hard" in world.enabled_difficulties:
@@ -94,6 +97,16 @@ def set_completion_condition(world: MarbleBalanceWorld) -> None:
 def set_location_rules(world: MarbleBalanceWorld) -> None:
     for location in world.get_locations():
         data = Locations.LOCATION_TABLE.get(location.name)
+        if (
+            data
+            and data.difficulty
+            and data.world
+            and data.level
+            and world.starting_worlds_by_difficulty.get(data.difficulty) == data.world
+            and data.level <= 5
+        ):
+            world.set_rule(location, lambda state: True)
+            continue
         if data and data.world in BONUS_WORLDS and data.difficulty and data.level:
             if world.starting_worlds_by_difficulty.get(data.difficulty) == data.world and data.level <= 5:
                 continue

@@ -113,6 +113,40 @@ class TrapChance(Range):
     default = 10
 
 
+class TrapWeight(Choice):
+    """Relative weight for this trap when a filler item becomes a trap."""
+
+    option_low = 0
+    option_medium = 1
+    option_high = 2
+    default = option_medium
+
+
+class BlackoutTrapWeight(TrapWeight):
+    """Relative chance for Blackout Trap when a filler item becomes a trap."""
+
+    display_name = "Blackout Trap Weight"
+
+
+class MirrorTrapWeight(TrapWeight):
+    """Relative chance for Mirror Trap when a filler item becomes a trap."""
+
+    display_name = "Mirror Trap Weight"
+
+
+class InverseTrapWeight(TrapWeight):
+    """Relative chance for Inverse Trap when a filler item becomes a trap."""
+
+    display_name = "Inverse Trap Weight"
+    default = TrapWeight.option_low
+
+
+class NoclipTrapWeight(TrapWeight):
+    """Relative chance for Noclip Trap when a filler item becomes a trap."""
+
+    display_name = "Noclip Trap Weight"
+
+
 class SplitVehicleWorldAccess(DefaultOnToggle):
     """Require both the vehicle item and matching world access item for W5/W6 logic."""
 
@@ -138,6 +172,10 @@ class MarbleBalanceOptions(PerGameCommonOptions):
     tutorial_checks: TutorialChecks
     wii_balance_board_levels: WiiBalanceBoardLevels
     trap_chance: TrapChance
+    blackout_trap_weight: BlackoutTrapWeight
+    mirror_trap_weight: MirrorTrapWeight
+    inverse_trap_weight: InverseTrapWeight
+    noclip_trap_weight: NoclipTrapWeight
     split_vehicle_world_access: SplitVehicleWorldAccess
     random_starting_world: RandomStartingWorld
     anthony_sanity: AnthonySanity
@@ -173,6 +211,10 @@ option_groups = [
         "Item Pool",
         [
             TrapChance,
+            BlackoutTrapWeight,
+            MirrorTrapWeight,
+            InverseTrapWeight,
+            NoclipTrapWeight,
         ],
     ),
 ]
@@ -190,6 +232,10 @@ option_presets = {
         "anthony_sanity": False,
         "trophy_sanity": "off",
         "trap_chance": 10,
+        "blackout_trap_weight": "medium",
+        "mirror_trap_weight": "medium",
+        "inverse_trap_weight": "low",
+        "noclip_trap_weight": "medium",
     },
     "Counter Logic": {
         "goal": "normal_w7_l10",

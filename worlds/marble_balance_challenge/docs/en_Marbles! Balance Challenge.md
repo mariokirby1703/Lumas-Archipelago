@@ -75,6 +75,10 @@ RK6P18 release and uses an external Dolphin client.
 ## Item Pool Options
 
 - Trap Chance
+- Blackout Trap Weight
+- Mirror Trap Weight
+- Inverse Trap Weight
+- Noclip Trap Weight
 
 ## Notes
 

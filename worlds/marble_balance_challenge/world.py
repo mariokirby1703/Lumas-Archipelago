@@ -12,7 +12,15 @@ from . import Items, Locations, Regions, Rules, web_world
 from .Addresses import addresses
 from .Names import item_names, location_names, region_names
 from .Options import Goal, IncludedDifficulties, MarbleBalanceOptions, HardModeUnlock
-from .world_constants import BONUS_WORLDS, DIFFICULTIES, GAME_NAME, NORMAL_WORLDS
+from .world_constants import (
+    BONUS_WORLDS,
+    DIFFICULTIES,
+    GAME_NAME,
+    HARD_BONUS_WORLD_DISPLAY_NAMES,
+    MARBLES,
+    NORMAL_WORLDS,
+    WORLD_DISPLAY_NAMES,
+)
 
 
 class MarbleBalanceWorld(World):
@@ -46,7 +54,7 @@ class MarbleBalanceWorld(World):
     uses_hard_mode_item: bool
 
     def generate_early(self) -> None:
-        self.starting_marble = None
+        self.starting_marble = self.random.choice(MARBLES)
         if self.options.included_difficulties == IncludedDifficulties.option_all:
             difficulties = list(DIFFICULTIES)
         elif self.options.included_difficulties == IncludedDifficulties.option_normal_and_hard:
@@ -106,6 +114,17 @@ class MarbleBalanceWorld(World):
     def create_item(self, name: str) -> Items.MarbleBalanceItem:
         return Items.create_item(self, name)
 
+    def _spoiler_world_name(self, difficulty: str, world: str) -> str:
+        if difficulty == "Hard" and world in HARD_BONUS_WORLD_DISPLAY_NAMES:
+            return HARD_BONUS_WORLD_DISPLAY_NAMES[world]
+        return WORLD_DISPLAY_NAMES[world]
+
+    def write_spoiler_header(self, spoiler_handle) -> None:
+        spoiler_handle.write("\nStarting Worlds:\n\n")
+        for difficulty in self.enabled_difficulties:
+            world = self.starting_worlds_by_difficulty[difficulty]
+            spoiler_handle.write(f"World {difficulty}: {self._spoiler_world_name(difficulty, world)}\n")
+
     def _place_victory_item(self) -> None:
         difficulty = "Hard" if self.options.goal == Goal.option_hard_w7_l10 else "Normal"
         victory_location = self.get_location(location_names.goal_location_name(difficulty, "W7", 10))
@@ -139,6 +158,10 @@ class MarbleBalanceWorld(World):
             "tutorial_checks",
             "wii_balance_board_levels",
             "trap_chance",
+            "blackout_trap_weight",
+            "mirror_trap_weight",
+            "inverse_trap_weight",
+            "noclip_trap_weight",
             "split_vehicle_world_access",
             "anthony_sanity",
             "trophy_sanity",
