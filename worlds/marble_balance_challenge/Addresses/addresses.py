@@ -36,6 +36,7 @@ FIGURE_ROLLER_HEAD_UNLOCK_FLAGS = {name: 0x804DF521 + index for index, name in e
 
 JUNK_LIVE_FLAGS = {name: 0x804DF4A2 + index for index, name in enumerate(JUNK_ITEMS)}
 JUNK_SAVED_FLAGS = {name: 0x9046F74E + index for index, name in enumerate(JUNK_ITEMS)}
+JUNK_UNLOCK_FLAGS = {name: 0x804DF445 + index for index, name in enumerate(JUNK_ITEMS)}
 
 VEHICLE_PART_FLAGS = {
     "Can": 0x804DF4BB,
@@ -49,6 +50,12 @@ DIFFICULTY_TROPHY_ANCHORS = {
     "Easy": 0x804CA790,
     "Normal": 0x804CDB4C,
     "Hard": 0x804D0F08,
+}
+
+DIFFICULTY_MIRROR_TROPHY_ANCHORS = {
+    "Easy": 0x804CA7E0,
+    "Normal": 0x804CDB9C,
+    "Hard": 0x804D0F58,
 }
 
 BONUS_TROPHY_ANCHORS = {
@@ -67,12 +74,14 @@ BONUS_TROPHY_ANCHORS = {
 
 def normal_level_record(difficulty: str, world: str, level: int) -> dict[str, int | None]:
     trophy = DIFFICULTY_TROPHY_ANCHORS[difficulty] + WORLD_INDEX[world] * 0x764 + (level - 1) * 0xAC
+    mirror_trophy = DIFFICULTY_MIRROR_TROPHY_ANCHORS[difficulty] + WORLD_INDEX[world] * 0x764 + (level - 1) * 0xAC
     return {
         "state": trophy - 0x0C,
         "green_gem": trophy - 0x05,
         "stump_piece": None if world == "W7" else trophy,
         "ant": trophy - 0x05 if difficulty == "Hard" and level <= 10 else None,
         "trophy": trophy,
+        "mirror_trophy": mirror_trophy,
     }
 
 
@@ -138,5 +147,6 @@ STATIC_ADDRESSES = {
 }
 
 assert set(JUNK_LIVE_FLAGS) == set(JUNK_ITEMS)
+assert set(JUNK_UNLOCK_FLAGS) == set(JUNK_ITEMS)
 assert set(MARBLE_UNLOCK_FLAGS) == set(MARBLES)
 assert set(FIGURE_ROLLER_HEAD_UNLOCK_FLAGS) == set(FIGURE_ROLLER_HEADS)

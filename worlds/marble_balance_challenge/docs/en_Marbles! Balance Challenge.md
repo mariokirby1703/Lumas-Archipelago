@@ -5,8 +5,8 @@ RK6P18 release and uses an external Dolphin client.
 
 ## Goals
 
-- Normal Stump Temple Level 10
-- Hard Stump Temple Level 10
+- Stump Temple Level 10 Normal
+- Stump Temple Level 10 Hard
 
 ## Locations
 
@@ -35,8 +35,8 @@ RK6P18 release and uses an external Dolphin client.
 ## Campaign Options
 
 - Goal selection:
-  - Normal Stump Temple Level 10
-  - Hard Stump Temple Level 10
+  - Stump Temple Level 10 Normal
+  - Stump Temple Level 10 Hard
 
 - Included difficulties:
   - Normal

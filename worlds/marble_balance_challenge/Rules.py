@@ -19,22 +19,26 @@ def can_access_hard_mode(world: MarbleBalanceWorld) -> Rule:
     if world.options.hard_mode_unlock == HardModeUnlock.option_item:
         return Has(items.HARD_MODE)
     if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
-        return Has(items.GREEN_GEM, count=world.options.required_green_gems_for_hard.value)
+        return Has(items.HARD_MODE)
     return HasAll()
 
 
 def goal_difficulty(world: MarbleBalanceWorld) -> str:
-    return "Hard" if world.options.goal == Goal.option_hard_w7_l10 else "Normal"
+    return "Hard" if world.options.goal == Goal.option_stump_temple_level_10_hard else "Normal"
 
 
 def can_access_w7(world: MarbleBalanceWorld, difficulty: str) -> Rule:
-    if difficulty == goal_difficulty(world):
-        return Has(items.STUMP_TEMPLE_PIECE, count=world.options.required_stump_pieces_for_w7.value)
     return Has(items.world_access_name(difficulty, "W7"))
 
 
 def world_access_rule(world: MarbleBalanceWorld, difficulty: str, normal_world: str) -> Rule:
-    if world.starting_worlds_by_difficulty.get(difficulty) == normal_world:
+    is_starting_world = world.starting_worlds_by_difficulty.get(difficulty) == normal_world
+
+    if is_starting_world and not (
+        world.options.split_vehicle_world_access
+        and difficulty != "Hard"
+        and normal_world in {"W5", "W6"}
+    ):
         rule: Rule = HasAll()
     elif normal_world == "W5":
         rule = Has(items.world_access_name(difficulty, normal_world))
@@ -58,10 +62,7 @@ def set_entrance_rules(world: MarbleBalanceWorld) -> None:
     for difficulty in world.enabled_difficulties:
         for normal_world in NORMAL_WORLDS:
             entrance = world.get_entrance(f"Menu to {difficulty} {normal_world}")
-            if world.starting_worlds_by_difficulty.get(difficulty) == normal_world:
-                world.set_rule(entrance, lambda state: True)
-            else:
-                world.set_rule(entrance, world_access_rule(world, difficulty, normal_world))
+            world.set_rule(entrance, world_access_rule(world, difficulty, normal_world))
 
     if world.options.split_vehicle_world_access:
         bonus_access = {
@@ -76,14 +77,17 @@ def set_entrance_rules(world: MarbleBalanceWorld) -> None:
             "WC": Has(items.world_access_name("Normal", "W6")),
         }
     for bonus_world in BONUS_WORLDS:
+        first_level = Has(items.bonus_level_unlock_name("Normal", bonus_world, 1))
         if world.starting_worlds_by_difficulty.get("Normal") == bonus_world:
-            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), lambda state: True)
+            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), HasAll())
         else:
-            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), bonus_access[bonus_world])
+            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), bonus_access[bonus_world] & first_level)
         if "Hard" in world.enabled_difficulties:
-            rule = HasAll() if world.starting_worlds_by_difficulty.get("Hard") == bonus_world else can_access_hard_mode(world)
+            first_level = Has(items.bonus_level_unlock_name("Hard", bonus_world, 1))
             if world.starting_worlds_by_difficulty.get("Hard") == bonus_world:
-                rule = rule & can_access_hard_mode(world)
+                rule = can_access_hard_mode(world)
+            else:
+                rule = first_level & can_access_hard_mode(world)
             world.set_rule(world.get_entrance(f"Menu to Hard {bonus_world}"), rule)
 
 
@@ -94,6 +98,15 @@ def set_completion_condition(world: MarbleBalanceWorld) -> None:
     world.set_completion_rule(Has(items.VICTORY))
 
 
+def set_counter_event_rules(world: MarbleBalanceWorld) -> None:
+    difficulty = goal_difficulty(world)
+    w7_name = Locations.counter_stump_unlock_name(difficulty, world.options.required_stump_pieces_for_w7.value)
+    world.set_rule(world.get_location(w7_name), Has(items.STUMP_TEMPLE_PIECE, count=world.options.required_stump_pieces_for_w7.value))
+    if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
+        hard_name = Locations.counter_hard_mode_name(world.options.required_green_gems_for_hard.value)
+        world.set_rule(world.get_location(hard_name), Has(items.GREEN_GEM, count=world.options.required_green_gems_for_hard.value))
+
+
 def set_location_rules(world: MarbleBalanceWorld) -> None:
     for location in world.get_locations():
         data = Locations.LOCATION_TABLE.get(location.name)
@@ -102,21 +115,22 @@ def set_location_rules(world: MarbleBalanceWorld) -> None:
             and data.difficulty
             and data.world
             and data.level
-            and world.starting_worlds_by_difficulty.get(data.difficulty) == data.world
-            and data.level <= 5
+            and data.world not in BONUS_WORLDS
         ):
-            world.set_rule(location, lambda state: True)
-            continue
+            world.set_rule(location, world_access_rule(world, data.difficulty, data.world))
+
         if data and data.world in BONUS_WORLDS and data.difficulty and data.level:
             if world.starting_worlds_by_difficulty.get(data.difficulty) == data.world and data.level <= 5:
-                continue
-            world.set_rule(
-                location,
-                Has(items.bonus_level_unlock_name(data.difficulty, data.world, data.level)),
-            )
+                rule = HasAll()
+            else:
+                rule = Has(items.bonus_level_unlock_name(data.difficulty, data.world, data.level))
+            if data.difficulty == "Hard":
+                rule = rule & can_access_hard_mode(world)
+            world.set_rule(location, rule)
 
 
 def set_all_rules(world: MarbleBalanceWorld) -> None:
     set_entrance_rules(world)
     set_location_rules(world)
     set_completion_condition(world)
+    set_counter_event_rules(world)

@@ -36,8 +36,36 @@ WORLD_INDEX = {
     "W7": 6,
     "WA": 7,
     "WB": 8,
-    "WC": 9,
+    "WC": 10,
 }
+
+WORLD_INDEX_BY_DIFFICULTY = {
+    "Easy": {
+        **WORLD_INDEX,
+        "WA": 7,
+        "WB": 8,
+        "WC": 10,
+    },
+    "Normal": {
+        **WORLD_INDEX,
+        "WA": 7,
+        "WB": 8,
+        "WC": 10,
+    },
+    "Hard": {
+        **WORLD_INDEX,
+        "WA": 7,
+        "WB": 9,
+        "WC": 11,
+    },
+}
+
+
+def world_index_for(difficulty: str | None, world: str) -> int:
+    if difficulty in WORLD_INDEX_BY_DIFFICULTY:
+        return WORLD_INDEX_BY_DIFFICULTY[difficulty][world]
+    return WORLD_INDEX[world]
+
 
 LEVELS_PER_WORLD = {
     "W1": 11,
@@ -113,6 +141,7 @@ JUNK_ITEMS = (
     "Fear",
     "Noise",
     "Smoke",
+    "Part Base",
 )
 
 VEHICLE_PARTS = ("Can", "Periscope", "Screw", "Rocket Engine", "Wing")

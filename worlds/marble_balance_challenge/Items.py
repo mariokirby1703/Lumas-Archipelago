@@ -138,7 +138,7 @@ def extend_until_full(
 
 def create_required_items(world: MarbleBalanceWorld, location_count: int) -> list[MarbleBalanceItem]:
     items: list[MarbleBalanceItem] = []
-    stump_locked_difficulty = "Hard" if world.options.goal == Goal.option_hard_w7_l10 else "Normal"
+    stump_locked_difficulty = "Hard" if world.options.goal == Goal.option_stump_temple_level_10_hard else "Normal"
 
     for difficulty in world.enabled_difficulties:
         for normal_world in NORMAL_WORLDS[:6]:

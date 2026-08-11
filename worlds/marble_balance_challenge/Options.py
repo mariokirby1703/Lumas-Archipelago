@@ -7,9 +7,11 @@ class Goal(Choice):
     """Which stage completion should be required to finish the slot."""
 
     display_name = "Goal"
-    option_normal_w7_l10 = 0
-    option_hard_w7_l10 = 1
-    default = option_normal_w7_l10
+    option_stump_temple_level_10_normal = 0
+    option_stump_temple_level_10_hard = 1
+    alias_normal_w7_l10 = 0
+    alias_hard_w7_l10 = 1
+    default = option_stump_temple_level_10_normal
 
 
 class IncludedDifficulties(Choice):
@@ -58,7 +60,7 @@ class RequiredStumpPiecesForW7(Range):
     """Number of AP-side Stump Temple Pieces required to reach Stump Temple."""
 
     display_name = "Required Stump Temple Pieces for W7"
-    range_start = 30
+    range_start = 1
     range_end = 90
     default = 60
 
@@ -221,7 +223,7 @@ option_groups = [
 
 option_presets = {
     "Test Profile": {
-        "goal": "normal_w7_l10",
+        "goal": "stump_temple_level_10_normal",
         "included_difficulties": "normal",
         "green_gem_sanity": False,
         "stump_piece_sanity": False,
@@ -238,7 +240,7 @@ option_presets = {
         "noclip_trap_weight": "medium",
     },
     "Counter Logic": {
-        "goal": "normal_w7_l10",
+        "goal": "stump_temple_level_10_normal",
         "included_difficulties": "normal",
         "green_gem_sanity": True,
         "stump_piece_sanity": True,
@@ -247,7 +249,7 @@ option_presets = {
         "random_starting_world": True,
     },
     "Hard Goal": {
-        "goal": "hard_w7_l10",
+        "goal": "stump_temple_level_10_hard",
         "included_difficulties": "normal_and_hard",
         "green_gem_sanity": True,
         "stump_piece_sanity": True,

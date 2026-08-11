@@ -21,6 +21,16 @@ if TYPE_CHECKING:
     from .world import MarbleBalanceWorld
 
 
+def counter_stump_unlock_name(difficulty: str, required: int) -> str:
+    piece = "Piece" if required == 1 else "Pieces"
+    return f"Stump Temple {difficulty} Unlock ({required} Stump Temple {piece})"
+
+
+def counter_hard_mode_name(required: int) -> str:
+    gem = "Gem" if required == 1 else "Gems"
+    return f"Hard Mode ({required} Green {gem})"
+
+
 @dataclass(frozen=True)
 class LocationData:
     code: int
@@ -47,6 +57,12 @@ def iter_campaign_stage_names() -> list[LocationData]:
         next_id += 1
 
     LOCATION_TABLE.clear()
+
+    for required in range(1, 91):
+        add(counter_stump_unlock_name("Normal", required), "counter_stump_unlock", difficulty="Normal", world="W7")
+        add(counter_stump_unlock_name("Hard", required), "counter_stump_unlock", difficulty="Hard", world="W7")
+    for required in range(0, 61):
+        add(counter_hard_mode_name(required), "counter_hard_mode")
 
     for index in range(1, 11):
         add(names.tutorial_location_name(index), "tutorial", level=index)
@@ -161,6 +177,19 @@ def enabled_location_names(world: MarbleBalanceWorld) -> list[str]:
     for name, data in LOCATION_TABLE.items():
         if data.category == "tutorial":
             if world.options.tutorial_checks:
+                selected.append(name)
+            continue
+
+        if data.category == "counter_stump_unlock":
+            required = world.options.required_stump_pieces_for_w7.value
+            difficulty = "Hard" if world.options.goal.value == 1 else "Normal"
+            if name == counter_stump_unlock_name(difficulty, required):
+                selected.append(name)
+            continue
+
+        if data.category == "counter_hard_mode":
+            required = world.options.required_green_gems_for_hard.value
+            if world.options.hard_mode_unlock.value == 2 and name == counter_hard_mode_name(required):
                 selected.append(name)
             continue
 

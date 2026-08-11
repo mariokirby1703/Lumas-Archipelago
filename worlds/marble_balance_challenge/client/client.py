@@ -15,7 +15,15 @@ from CommonClient import ClientCommandProcessor, CommonContext, get_base_parser,
 from NetUtils import ClientStatus
 
 from ..Names import item_names, location_names
-from ..world_constants import BONUS_WORLDS, DIFFICULTIES, GAME_NAME, LEVELS_PER_WORLD, MARBLES, NORMAL_WORLDS
+from ..world_constants import (
+    BONUS_WORLDS,
+    DIFFICULTIES,
+    GAME_NAME,
+    LEVELS_PER_WORLD,
+    MARBLES,
+    NORMAL_WORLDS,
+    WORLD_INDEX_BY_DIFFICULTY,
+)
 
 ModuleUpdate.update()
 
@@ -60,6 +68,11 @@ GOAL_REACHED_CANDIDATES = (
 GOAL_ENTER_THRESHOLD = 5
 GOAL_EXIT_THRESHOLD = 1
 STAGE_CLEARED_VALUES = {94, 95}
+LEVEL_START_SEQUENCE_ADDRESS = 0x90155FDB
+BLACKOUT_TRAP_DURATION = 10.0
+INVERSE_TRAP_DURATION = 30.0
+NOCLIP_TRAP_DURATION = 3.0
+BONUS_VEHICLE_PICKUP_LEVELS = {("Normal", "WA", 1), ("Normal", "WB", 1), ("Normal", "WB", 5), ("Normal", "WC", 1), ("Normal", "WC", 5)}
 
 
 class MarbleBalanceCommandProcessor(ClientCommandProcessor):
@@ -96,9 +109,13 @@ class MarbleBalanceContext(CommonContext):
         self._stage_cleared_armed = True
         self._last_stage_identity: tuple[str, str | None, str | None, int] | None = None
         self._stage_entered_at = 0.0
+        self._countdown_stage_identity: tuple[str, str | None, str | None, int] | None = None
+        self._countdown_next_value = 0
+        self._countdown_ready = False
         self._previous_green_or_ant = 0
         self._previous_stump = 0
         self._previous_junk = 0
+        self._pickup_events_seen_this_stage: set[str] = set()
         self.mirror_trap_pending = False
         self.mirror_trap_active = False
         self.mirror_skip_stage: tuple[str, str | None, str | None, int] | None = None
@@ -107,6 +124,7 @@ class MarbleBalanceContext(CommonContext):
         self.blackout_owned = False
         self.blackout_active = False
         self.blackout_active_since = 0.0
+        self.blackout_next_log_at = 0.0
         self.blackout_delay_next_stage = False
         self.blackout_started = False
         self.inverse_trap_pending = False
@@ -114,14 +132,19 @@ class MarbleBalanceContext(CommonContext):
         self.inverse_remaining = 0.0
         self.inverse_last_tick = time.monotonic()
         self.inverse_active_since = 0.0
+        self.inverse_next_log_at = 0.0
         self.inverse_delay_next_stage = False
         self.noclip_remaining = 0.0
         self.noclip_last_tick = time.monotonic()
         self.noclip_owned = False
         self.noclip_active = False
         self.noclip_active_since = 0.0
+        self.noclip_next_log_at = 0.0
         self.noclip_delay_next_stage = False
         self.noclip_skip_stage: tuple[str, str | None, str | None, int] | None = None
+        self.noclip_rewrite_after_clear_until = 0.0
+        self.noclip_rewrite_after_clear_done = False
+        self.noclip_last_forced_zero_at = 0.0
         self.save_slot_ready = False
         self._save_slot_logged = False
 
@@ -134,7 +157,7 @@ class MarbleBalanceContext(CommonContext):
             self.patch_data = json.load(file)
         self.slot_data = self.patch_data.get("slot_data", {})
         self.auth = self.slot_data.get("player_name") or self.auth
-        logger.info(f"Loaded {path.name}.")
+        logger.debug(f"Loaded {path.name}.")
 
     async def server_auth(self, password_requested: bool = False) -> None:
         if password_requested and not self.password:
@@ -150,7 +173,7 @@ class MarbleBalanceContext(CommonContext):
             self.locations_checked = set()
             self.save_slot_ready = False
             self._save_slot_logged = False
-            logger.info("Connected to Archipelago as Marbles! Balance Challenge.")
+            logger.debug("Connected to Archipelago as Marbles! Balance Challenge.")
 
     async def disconnect(self, allow_autoreconnect: bool = False) -> None:
         self.slot_data = self.patch_data.get("slot_data", {})
@@ -211,9 +234,16 @@ def current_level_identity(slot_data: dict[str, Any]) -> tuple[str | None, str |
     except Exception:
         return None, None, None
 
-    world_lookup = {index: world for index, world in enumerate((*NORMAL_WORLDS, *BONUS_WORLDS))}
     difficulty_lookup = {value: name for name, value in DIFFICULTY_INDEX.items()}
-    return difficulty_lookup.get(difficulty_index), world_lookup.get(world_index), stage_index + 1
+    difficulty = difficulty_lookup.get(difficulty_index)
+    world_lookup = {
+        index: world
+        for world, index in WORLD_INDEX_BY_DIFFICULTY.get(difficulty, {}).items()
+    }
+    world = world_lookup.get(world_index)
+    if world in BONUS_WORLDS and difficulty != "Hard":
+        difficulty = "Normal"
+    return difficulty, world, stage_index + 1
 
 
 def current_stage(slot_data: dict[str, Any]) -> dict[str, Any] | None:
@@ -234,12 +264,17 @@ def current_stage(slot_data: dict[str, Any]) -> dict[str, Any] | None:
     if world_index == safety.get("balance_board_world_or_mode_index", 14):
         return {"kind": "balance_board", "difficulty": None, "world": None, "level": level}
 
-    world_lookup = {index: world for index, world in enumerate((*NORMAL_WORLDS, *BONUS_WORLDS))}
     difficulty_lookup = {value: name for name, value in DIFFICULTY_INDEX.items()}
-    world = world_lookup.get(world_index)
     difficulty = difficulty_lookup.get(difficulty_index)
+    world_lookup = {
+        index: world
+        for world, index in WORLD_INDEX_BY_DIFFICULTY.get(difficulty, {}).items()
+    }
+    world = world_lookup.get(world_index)
     if world is None or difficulty is None:
         return None
+    if world in BONUS_WORLDS and difficulty != "Hard":
+        difficulty = "Normal"
     return {"kind": "stage", "difficulty": difficulty, "world": world, "level": level}
 
 
@@ -256,6 +291,9 @@ def reset_stage_detectors(ctx: MarbleBalanceContext, stage: dict[str, Any] | Non
     ctx._goal_reached_latched = False
     ctx._goal_latched_stage = None
     ctx._goal_armed = goal_active_count() <= GOAL_EXIT_THRESHOLD
+    ctx._countdown_stage_identity = stage_identity(stage)
+    ctx._countdown_next_value = 0
+    ctx._countdown_ready = False
     stage_cleared_flag = static.get("stage_cleared_flag")
     try:
         ctx._stage_cleared_armed = stage_cleared_flag is None or read_u8(stage_cleared_flag) not in STAGE_CLEARED_VALUES
@@ -265,16 +303,27 @@ def reset_stage_detectors(ctx: MarbleBalanceContext, stage: dict[str, Any] | Non
         ctx._previous_green_or_ant = read_u8(static["green_or_ant_temporary_pickup"])
         ctx._previous_stump = read_u8(static["stump_temporary_pickup"])
         ctx._previous_junk = read_u8(static["junk_temporary_pickup"])
+        ctx._pickup_events_seen_this_stage = set()
     except Exception:
         ctx._previous_green_or_ant = 0
         ctx._previous_stump = 0
         ctx._previous_junk = 0
+        ctx._pickup_events_seen_this_stage = set()
 
 
 def in_level_active(slot_data: dict[str, Any]) -> bool:
     static = slot_data.get("static_addresses", {})
     try:
         return read_u8(static["in_game_indicator"]) == 1
+    except Exception:
+        return False
+
+
+def campaign_stage_active(slot_data: dict[str, Any]) -> bool:
+    static = slot_data.get("static_addresses", {})
+    safety = slot_data.get("safety", {})
+    try:
+        return read_u8(static["current_game_mode"]) == safety.get("world_map_stage_mode", 0x1D)
     except Exception:
         return False
 
@@ -291,18 +340,57 @@ def goal_or_result_active(slot_data: dict[str, Any]) -> bool:
     return goal_active_count() >= GOAL_ENTER_THRESHOLD
 
 
+def level_countdown_ready(ctx: MarbleBalanceContext, stage: dict[str, Any] | None) -> bool:
+    identity = stage_identity(stage)
+    if stage is None or not in_level_active(ctx.slot_data):
+        ctx._countdown_stage_identity = None
+        ctx._countdown_next_value = 0
+        ctx._countdown_ready = False
+        return False
+
+    if identity != ctx._countdown_stage_identity:
+        ctx._countdown_stage_identity = identity
+        ctx._countdown_next_value = 0
+        ctx._countdown_ready = False
+
+    try:
+        countdown = read_u8(LEVEL_START_SEQUENCE_ADDRESS)
+    except Exception:
+        return False
+
+    if ctx._countdown_ready:
+        return True
+
+    expected = ctx._countdown_next_value
+    if countdown == expected:
+        if expected == 3:
+            ctx._countdown_ready = True
+        else:
+            ctx._countdown_next_value = expected + 1
+    elif countdown == 0:
+        ctx._countdown_next_value = 1
+    elif countdown != max(0, expected - 1):
+        ctx._countdown_next_value = 0
+
+    if ctx._countdown_ready:
+        logger.debug(f"Level start sequence complete at 0x{LEVEL_START_SEQUENCE_ADDRESS:08X}=3; traps may fire.")
+        ctx._countdown_ready = True
+
+    return ctx._countdown_ready
+
+
 def trap_safe_gameplay(ctx: MarbleBalanceContext, stage: dict[str, Any] | None) -> bool:
     return (
         stage is not None
         and in_level_active(ctx.slot_data)
-        and time.monotonic() - ctx._stage_entered_at >= 1.0
+        and level_countdown_ready(ctx, stage)
         and not goal_or_result_active(ctx.slot_data)
         and goal_active_count() < GOAL_ENTER_THRESHOLD
     )
 
 
 def trap_delay_elapsed(ctx: MarbleBalanceContext) -> bool:
-    return time.monotonic() - ctx._stage_entered_at >= 10.0
+    return level_countdown_ready(ctx, current_stage(ctx.slot_data))
 
 
 def target_save_slot_active(slot_data: dict[str, Any]) -> bool:
@@ -333,23 +421,11 @@ def sync_save_slot_guard(ctx: MarbleBalanceContext) -> None:
 
 def is_current_location(location: dict[str, Any], slot_data: dict[str, Any]) -> bool:
     difficulty, world, level = current_level_identity(slot_data)
-    if (
+    return (
         location.get("difficulty") == difficulty
         and location.get("world") == world
         and location.get("level") == level
-    ):
-        return True
-
-    static = slot_data.get("static_addresses", {})
-    stage_id = location.get("stage_id")
-    try:
-        return (
-            stage_id is not None
-            and read_u8(static["current_game_mode"]) == slot_data.get("safety", {}).get("free_mode_stage_mode", 0x19)
-            and read_u16_be(static["pal_free_mode_stage_id"]) == stage_id
-        )
-    except Exception:
-        return False
+    )
 
 
 def goal_active_count() -> int:
@@ -421,6 +497,14 @@ def location_is_checked(
     if category in {"goal", "bonus_goal"}:
         if in_level_active(slot_data) and is_current_location(location, slot_data) and update_goal_reached(ctx, stage, now):
             return True
+        if (
+            is_current_location(location, slot_data)
+            and in_level_active(slot_data)
+            and location.get("level") == 11
+            and addresses.get("state") is not None
+            and read_u8(addresses["state"]) == 3
+        ):
+            return True
         return (
             is_current_location(location, slot_data)
             and in_level_active(slot_data)
@@ -430,18 +514,24 @@ def location_is_checked(
 
     if category in TROPHY_REQUIREMENTS:
         trophy = addresses.get("trophy")
+        mirror_trophy = addresses.get("mirror_trophy")
         requirement = TROPHY_REQUIREMENTS[category]
-        if trophy is not None and read_u8(trophy) >= requirement:
-            return True
-        mirror_trophy = slot_data.get("static_addresses", {}).get("mirror_active_slot")
         return (
-            mirror_trophy is not None
-            and is_current_location(location, slot_data)
-            and goal_or_result_active(slot_data)
-            and read_u8(mirror_trophy) >= requirement
+            trophy is not None and read_u8(trophy) >= requirement
+            or mirror_trophy is not None and read_u8(mirror_trophy) >= requirement
         )
 
+    if category == "counter_stump_unlock":
+        required = slot_data.get("options", {}).get("required_stump_pieces_for_w7", 60)
+        return received_item_names(ctx).count(item_names.STUMP_TEMPLE_PIECE) >= required
+
+    if category == "counter_hard_mode":
+        required = slot_data.get("options", {}).get("required_green_gems_for_hard", 30)
+        return received_item_names(ctx).count(item_names.GREEN_GEM) >= required
+
     if category in {"green_gem", "stump_piece"}:
+        if category == "stump_piece":
+            return False
         address = addresses.get(category)
         return address is not None and read_u8(address) > 0
 
@@ -470,18 +560,18 @@ def poll_pickup_locations(ctx: MarbleBalanceContext, stage: dict[str, Any] | Non
     level = stage["level"]
 
     if ctx._previous_green_or_ant == 0 and green_or_ant == 1 and stage["kind"] == "stage" and level <= 10:
-        if difficulty in {"Easy", "Normal"} and world in NORMAL_WORLDS[:6]:
+        if difficulty in {"Easy", "Normal"} and world in NORMAL_WORLDS:
             events.append(location_names.green_gem_location_name(difficulty, world, level))
         elif difficulty == "Hard":
             events.append(location_names.ant_location_name(difficulty, world, level))
 
-    if ctx._previous_stump == 0 and stump != 0 and stage["kind"] == "stage":
+    if stump != 0 and stage["kind"] == "stage":
         if difficulty in {"Easy", "Normal"} and world in NORMAL_WORLDS[:6] and level <= 10:
             expected = NORMAL_WORLDS.index(world) * 10 + level
             if stump == expected:
                 events.append(location_names.stump_piece_location_name(difficulty, world, level))
 
-    if ctx._previous_junk == 0 and junk != 0 and stage["kind"] == "stage" and level <= 10:
+    if junk != 0 and stage["kind"] == "stage" and level <= 10:
         if difficulty == "Hard" and world in NORMAL_WORLDS[:6]:
             events.append(location_names.stump_piece_location_name(difficulty, world, level))
         elif world in BONUS_WORLDS:
@@ -490,7 +580,13 @@ def poll_pickup_locations(ctx: MarbleBalanceContext, stage: dict[str, Any] | Non
     ctx._previous_green_or_ant = green_or_ant
     ctx._previous_stump = stump
     ctx._previous_junk = junk
-    return [event for event in events if event in ctx.slot_data.get("locations", {})]
+    valid_events = []
+    for event in events:
+        in_slot = event in ctx.slot_data.get("locations", {})
+        if in_slot and event not in ctx._pickup_events_seen_this_stage:
+            valid_events.append(event)
+            ctx._pickup_events_seen_this_stage.add(event)
+    return valid_events
 
 
 async def check_locations(ctx: MarbleBalanceContext) -> None:
@@ -501,6 +597,9 @@ async def check_locations(ctx: MarbleBalanceContext) -> None:
     stage = current_stage(ctx.slot_data)
     identity = stage_identity(stage)
     if identity != ctx._last_stage_identity or not in_level_active(ctx.slot_data):
+        reset_stage_detectors(ctx, stage, now)
+        return
+    if stage is not None and stage["kind"] == "stage" and not campaign_stage_active(ctx.slot_data):
         reset_stage_detectors(ctx, stage, now)
         return
 
@@ -519,7 +618,7 @@ async def check_locations(ctx: MarbleBalanceContext) -> None:
         if location_id and location_id not in ctx.locations_checked:
             ctx.locations_checked.add(location_id)
             newly_checked.add(location_id)
-            logger.info(f"Checked: {location_name}")
+            logger.debug(f"Checked: {location_name}")
 
     for location_name, location in ctx.slot_data.get("locations", {}).items():
         location_id = location.get("id")
@@ -529,7 +628,7 @@ async def check_locations(ctx: MarbleBalanceContext) -> None:
             if location_is_checked(ctx, location, ctx.slot_data, stage, now):
                 ctx.locations_checked.add(location_id)
                 newly_checked.add(location_id)
-                logger.info(f"Checked: {location_name}")
+                logger.debug(f"Checked: {location_name}")
                 if location.get("category") in TROPHY_REQUIREMENTS and location.get("level") == 11:
                     goal_name = location_names.goal_location_name(
                         location["difficulty"],
@@ -541,7 +640,7 @@ async def check_locations(ctx: MarbleBalanceContext) -> None:
                     if goal_id and goal_id not in ctx.locations_checked:
                         ctx.locations_checked.add(goal_id)
                         newly_checked.add(goal_id)
-                        logger.info(f"Checked: {goal_name}")
+                        logger.debug(f"Checked: {goal_name}")
         except Exception:
             logger.debug("Failed to read location %s.", location_name, exc_info=True)
 
@@ -637,7 +736,7 @@ def received_item_names(ctx: MarbleBalanceContext) -> list[str]:
 
 def goal_difficulty(slot_data: dict[str, Any]) -> str:
     goal = slot_data.get("options", {}).get("goal")
-    return "Hard" if goal in {"hard_w7_l10", 1} else "Normal"
+    return "Hard" if goal in {"hard_w7_l10", "stump_temple_level_10_hard", 1} else "Normal"
 
 
 def granted_normal_worlds(ctx: MarbleBalanceContext) -> set[tuple[str, str]]:
@@ -653,11 +752,14 @@ def granted_normal_worlds(ctx: MarbleBalanceContext) -> set[tuple[str, str]]:
         if item_name in WORLD_UNLOCKS:
             granted.add(WORLD_UNLOCKS[item_name])
 
-    required_stump_pieces = slot_data.get("options", {}).get("required_stump_pieces_for_w7", 60)
-    if item_names_received.count(item_names.STUMP_TEMPLE_PIECE) >= required_stump_pieces:
-        granted.add((goal_difficulty(slot_data), "W7"))
-
     return granted
+
+
+def vehicle_pickup_protection_active(ctx: MarbleBalanceContext) -> bool:
+    stage = current_stage(ctx.slot_data)
+    if stage is None or not in_level_active(ctx.slot_data):
+        return False
+    return (stage.get("difficulty"), stage.get("world"), stage.get("level")) in BONUS_VEHICLE_PICKUP_LEVELS
 
 
 def physically_granted_normal_worlds(ctx: MarbleBalanceContext) -> set[tuple[str, str]]:
@@ -687,8 +789,12 @@ def apply_starting_access(slot_data: dict[str, Any]) -> None:
 
 def sync_normal_world_access(ctx: MarbleBalanceContext) -> None:
     granted = physically_granted_normal_worlds(ctx)
+    protect_vehicle_pickups = vehicle_pickup_protection_active(ctx)
     for difficulty in ctx.slot_data.get("enabled_difficulties", []):
         for world in NORMAL_WORLDS:
+            if protect_vehicle_pickups and difficulty == "Normal" and world in {"W5", "W6"}:
+                set_matching_levels(ctx.slot_data, difficulty, world, range(1, LEVELS_PER_WORLD[world] + 1), 0)
+                continue
             if (difficulty, world) in granted:
                 set_matching_levels(ctx.slot_data, difficulty, world, range(1, 6), 1)
             else:
@@ -699,6 +805,7 @@ def sync_vehicle_access(ctx: MarbleBalanceContext) -> None:
     granted = granted_normal_worlds(ctx)
     received = set(received_item_names(ctx))
     split_vehicle_access = ctx.slot_data.get("options", {}).get("split_vehicle_world_access", True)
+    protect_vehicle_pickups = vehicle_pickup_protection_active(ctx)
 
     for difficulty, flags in ctx.slot_data.get("vehicle_flags", {}).items():
         if difficulty not in ctx.slot_data.get("enabled_difficulties", []):
@@ -708,6 +815,9 @@ def sync_vehicle_access(ctx: MarbleBalanceContext) -> None:
         if split_vehicle_access:
             submarine_allowed = submarine_allowed and item_names.SUBMARINE in received
             rocket_allowed = rocket_allowed and item_names.ROCKET_SHIP in received
+        if protect_vehicle_pickups and difficulty == "Normal":
+            submarine_allowed = False
+            rocket_allowed = False
         write_u8_if_changed(flags.get(item_names.SUBMARINE), 1 if submarine_allowed else 0)
         write_u8_if_changed(flags.get(item_names.ROCKET_SHIP), 1 if rocket_allowed else 0)
 
@@ -745,6 +855,12 @@ def owned_bonus_levels(ctx: MarbleBalanceContext) -> set[tuple[str, str, int]]:
 
 def sync_bonus_vehicle_gates(ctx: MarbleBalanceContext) -> None:
     static = ctx.slot_data.get("static_addresses", {})
+    if vehicle_pickup_protection_active(ctx):
+        for difficulty, address_key in (("Easy", "easy_vehicle_gate"), ("Normal", "normal_vehicle_gate")):
+            if difficulty in ctx.slot_data.get("enabled_difficulties", []):
+                write_u8_if_changed(static.get(address_key), 15)
+        return
+
     owned = owned_bonus_levels(ctx)
     normal_owned = {(world, level) for difficulty, world, level in owned if difficulty == "Normal"}
     submarine_side = any((world, 1) in normal_owned for world in BONUS_WORLDS)
@@ -781,6 +897,37 @@ def sync_bonus_level_access(ctx: MarbleBalanceContext) -> None:
             write_u8(address, 0)
 
 
+def sync_mirror_trophies(ctx: MarbleBalanceContext) -> None:
+    seen: set[tuple[int, int]] = set()
+    for location in ctx.slot_data.get("locations", {}).values():
+        addresses = location.get("addresses") or {}
+        trophy = addresses.get("trophy")
+        mirror_trophy = addresses.get("mirror_trophy")
+        if trophy is None or mirror_trophy is None or (trophy, mirror_trophy) in seen:
+            continue
+        seen.add((trophy, mirror_trophy))
+        normal_value = read_u8(trophy)
+        mirror_value = read_u8(mirror_trophy)
+        best = max(normal_value, mirror_value)
+        if best and normal_value != best:
+            write_u8(trophy, best)
+        if best and mirror_value != best:
+            write_u8(mirror_trophy, best)
+
+
+def sync_junk_inventory(ctx: MarbleBalanceContext) -> None:
+    received = received_item_names(ctx)
+    live_junk_flags = ctx.slot_data.get("junk_live_flags", {})
+    saved_junk_flags = ctx.slot_data.get("junk_saved_flags", {})
+    unlock_junk_flags = ctx.slot_data.get("junk_unlock_flags", {})
+
+    for junk_name in set(live_junk_flags) | set(saved_junk_flags) | set(unlock_junk_flags):
+        count = min(99, received.count(junk_name))
+        write_u8_if_changed(live_junk_flags.get(junk_name), count)
+        write_u8_if_changed(saved_junk_flags.get(junk_name), count)
+        write_u8_if_changed(unlock_junk_flags.get(junk_name), 1 if count else 0)
+
+
 def enforce_marble_access(ctx: MarbleBalanceContext) -> None:
     slot_data = ctx.slot_data
     static = slot_data.get("static_addresses", {})
@@ -795,6 +942,9 @@ def enforce_marble_access(ctx: MarbleBalanceContext) -> None:
 
     current_marble = static.get("current_marble")
     if current_marble is not None:
+        if in_level_active(slot_data):
+            write_u8_if_changed(current_marble, 2)
+            return
         current_index = read_u8(current_marble)
         if 0 <= current_index < len(MARBLES) and MARBLES[current_index] not in allowed:
             for index, name in enumerate(MARBLES):
@@ -816,38 +966,47 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
 
     if blackout_address is not None:
         if ctx.blackout_active and goal_or_result_active(ctx.slot_data):
-            if now - ctx.blackout_active_since < 2.0 and ctx.blackout_remaining > 0:
+            if ctx.blackout_remaining > 0:
                 ctx.blackout_delay_next_stage = True
-                logger.info("Blackout Trap hit goal/result immediately after activation; re-queued for next level after 10s intro delay.")
+                ctx.blackout_remaining = BLACKOUT_TRAP_DURATION
+                logger.debug("Blackout Trap hit goal/result immediately after activation; re-queued until the next countdown finishes.")
             else:
                 ctx.blackout_owned = False
                 ctx.blackout_remaining = 0.0
-            logger.info(f"Blackout Trap cleared: writing 0x{blackout_address:08X}=1.")
+            logger.debug(f"Blackout Trap cleared: writing 0x{blackout_address:08X}=1.")
             write_u8_if_changed(blackout_address, 1)
             ctx.blackout_active = False
             ctx.blackout_started = False
             ctx.blackout_last_tick = now
             return
 
-        blackout_ready = safe_gameplay and trap_delay_elapsed(ctx)
+        blackout_ready = safe_gameplay
         if ctx.blackout_owned and blackout_ready and ctx.blackout_remaining > 0:
             elapsed = now - ctx.blackout_last_tick
             ctx.blackout_remaining = max(0.0, ctx.blackout_remaining - elapsed)
             ctx.blackout_last_tick = now
             if not ctx.blackout_active:
-                logger.info(
+                logger.debug(
                     f"Blackout Trap active: writing 0x{blackout_address:08X}=2 "
                     f"for {ctx.blackout_remaining:.1f}s active gameplay."
                 )
                 ctx.blackout_active_since = now
+                ctx.blackout_next_log_at = now + 1.0
                 write_u8_if_changed(blackout_address, 2)
                 ctx.blackout_started = True
+            if now >= ctx.blackout_next_log_at:
+                logger.debug(
+                    f"Blackout Trap tick: writing 0x{blackout_address:08X}=3; "
+                    f"{ctx.blackout_remaining:.1f}s remaining."
+                )
+                write_u8(blackout_address, 3)
+                ctx.blackout_next_log_at = now + 1.0
             ctx.blackout_active = True
             ctx.blackout_delay_next_stage = False
         else:
             ctx.blackout_last_tick = now
             if ctx.blackout_active and inside_stage and read_u8(blackout_address) in {2, 3}:
-                logger.info(f"Blackout Trap cleared: writing 0x{blackout_address:08X}=1.")
+                logger.debug(f"Blackout Trap cleared: writing 0x{blackout_address:08X}=1.")
                 write_u8(blackout_address, 1)
             if ctx.blackout_remaining <= 0:
                 ctx.blackout_owned = False
@@ -856,26 +1015,27 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
 
     if mirror_address is not None:
         if ctx.mirror_trap_active and goal_or_result_active(ctx.slot_data):
+            logger.debug(f"Mirror Trap cleared at goal/result: writing 0x{mirror_address:08X}=0.")
             write_u8_if_changed(mirror_address, 0)
             ctx.mirror_trap_active = False
             ctx.mirror_skip_stage = None
 
         if ctx.mirror_trap_pending and not in_level_active(ctx.slot_data):
             if read_u8(mirror_address) != 1:
-                logger.info(f"Mirror Trap preparing next level: writing 0x{mirror_address:08X}=1.")
+                logger.debug(f"Mirror Trap preparing next level: writing 0x{mirror_address:08X}=1.")
             write_u8_if_changed(mirror_address, 1)
 
-        if ctx.mirror_trap_pending and safe_gameplay and identity != ctx.mirror_skip_stage:
-            logger.info(f"Mirror Trap active for this attempt: writing 0x{mirror_address:08X}=1 until goal/result.")
+        if ctx.mirror_trap_pending and inside_stage and identity != ctx.mirror_skip_stage:
+            logger.debug(f"Mirror Trap active for this attempt: holding 0x{mirror_address:08X}=1 until goal/result.")
             write_u8_if_changed(mirror_address, 1)
             ctx.mirror_trap_pending = False
             ctx.mirror_trap_active = True
             ctx.mirror_skip_stage = None
 
-        inverse_ready = safe_gameplay and (not ctx.inverse_delay_next_stage or trap_delay_elapsed(ctx))
+        inverse_ready = safe_gameplay
         if ctx.inverse_trap_pending and inverse_ready:
             inverse_value = 0 if ctx.mirror_trap_active else 1
-            logger.info(
+            logger.debug(
                 f"Inverse Trap active: writing 0x{mirror_address:08X}={inverse_value} "
                 "for 30.0s active gameplay or until goal/result."
             )
@@ -883,87 +1043,120 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
             ctx.inverse_trap_pending = False
             ctx.inverse_trap_active = True
             ctx.inverse_delay_next_stage = False
-            ctx.inverse_remaining = 30.0
+            ctx.inverse_remaining = INVERSE_TRAP_DURATION
             ctx.inverse_last_tick = now
             ctx.inverse_active_since = now
+            ctx.inverse_next_log_at = now
 
-        if ctx.mirror_trap_active and safe_gameplay and not ctx.inverse_trap_active:
+        if ctx.mirror_trap_active and inside_stage and not goal_or_result_active(ctx.slot_data) and not ctx.inverse_trap_active:
             write_u8_if_changed(mirror_address, 1)
 
         if ctx.inverse_trap_active and safe_gameplay and ctx.inverse_remaining > 0:
             elapsed = now - ctx.inverse_last_tick
             ctx.inverse_remaining = max(0.0, ctx.inverse_remaining - elapsed)
             ctx.inverse_last_tick = now
-            write_u8_if_changed(mirror_address, 0 if ctx.mirror_trap_active else 1)
+            inverse_value = 0 if ctx.mirror_trap_active else 1
+            if now >= ctx.inverse_next_log_at:
+                logger.debug(
+                    f"Inverse Trap tick: writing 0x{mirror_address:08X}={inverse_value}; "
+                    f"{ctx.inverse_remaining:.1f}s remaining."
+                )
+                write_u8(mirror_address, inverse_value)
+                ctx.inverse_next_log_at = now + 1.0
+            else:
+                write_u8_if_changed(mirror_address, inverse_value)
         else:
             ctx.inverse_last_tick = now
             if ctx.inverse_trap_active:
                 write_u8_if_changed(mirror_address, 1 if ctx.mirror_trap_active else 0)
 
         if ctx.inverse_trap_active and (goal_or_result_active(ctx.slot_data) or ctx.inverse_remaining <= 0):
-            if goal_or_result_active(ctx.slot_data) and now - ctx.inverse_active_since < 2.0 and ctx.inverse_remaining > 0:
+            if goal_or_result_active(ctx.slot_data) and ctx.inverse_remaining > 0:
                 ctx.inverse_trap_pending = True
                 ctx.inverse_delay_next_stage = True
-                logger.info("Inverse Trap hit goal/result immediately after activation; re-queued for next level after 10s intro delay.")
+                ctx.inverse_remaining = INVERSE_TRAP_DURATION
+                logger.debug("Inverse Trap hit goal/result immediately after activation; re-queued until the next countdown finishes.")
             write_u8_if_changed(mirror_address, 1 if ctx.mirror_trap_active and not goal_or_result_active(ctx.slot_data) else 0)
             ctx.inverse_trap_active = False
             if not ctx.inverse_trap_pending:
                 ctx.inverse_remaining = 0.0
 
     if noclip_address is not None:
-        noclip_waiting_for_next_stage = (
-            ctx.noclip_owned
-            and ctx.noclip_delay_next_stage
-            and inside_stage
-            and identity != ctx.noclip_skip_stage
-        )
-        if noclip_waiting_for_next_stage:
-            logger.info(
-                f"Noclip Trap one-shot on level entry: writing 0x{noclip_address:08X}=0. "
-                "The game owns clearing this value after resets/level changes."
+        if (
+            ctx.noclip_rewrite_after_clear_until > now
+            and not ctx.noclip_rewrite_after_clear_done
+            and read_u8(noclip_address) == 1
+            and now - ctx.noclip_last_forced_zero_at >= 1.0
+        ):
+            logger.debug(
+                f"Noclip Trap goal handoff: address returned to 1, writing 0x{noclip_address:08X}=0 once more."
             )
-            write_u8_if_changed(noclip_address, 0)
+            write_u8(noclip_address, 0)
+            ctx.noclip_rewrite_after_clear_done = True
+            ctx.noclip_rewrite_after_clear_until = 0.0
             ctx.noclip_owned = False
             ctx.noclip_active = False
             ctx.noclip_remaining = 0.0
             ctx.noclip_delay_next_stage = False
             ctx.noclip_skip_stage = None
             return
+        if ctx.noclip_rewrite_after_clear_until and ctx.noclip_rewrite_after_clear_until <= now:
+            ctx.noclip_rewrite_after_clear_until = 0.0
+            ctx.noclip_rewrite_after_clear_done = False
 
         if ctx.noclip_active and goal_or_result_active(ctx.slot_data):
-            if now - ctx.noclip_active_since < 2.0 and ctx.noclip_remaining > 0:
+            if ctx.noclip_remaining > 0:
                 ctx.noclip_delay_next_stage = True
                 ctx.noclip_skip_stage = None
-                logger.info("Noclip Trap hit goal/result immediately after activation; re-queued for next level after 10s intro delay.")
+                ctx.noclip_remaining = NOCLIP_TRAP_DURATION
+                logger.debug("Noclip Trap hit goal/result immediately after activation; re-queued until the next countdown finishes.")
             else:
                 ctx.noclip_owned = False
                 ctx.noclip_remaining = 0.0
-            logger.info(f"Noclip Trap cleared: writing 0x{noclip_address:08X}=1.")
+            logger.debug(f"Noclip Trap cleared: writing 0x{noclip_address:08X}=1.")
             write_u8_if_changed(noclip_address, 1)
             ctx.noclip_active = False
             ctx.noclip_last_tick = now
             return
 
-        noclip_ready = safe_gameplay and (not ctx.noclip_delay_next_stage or trap_delay_elapsed(ctx))
+        noclip_countdown_ready = (
+            stage is not None
+            and in_level_active(ctx.slot_data)
+            and level_countdown_ready(ctx, stage)
+        )
+        noclip_ready = noclip_countdown_ready and (
+            not ctx.noclip_delay_next_stage
+            or ctx.noclip_skip_stage is None
+            or identity != ctx.noclip_skip_stage
+        )
         if ctx.noclip_owned and noclip_ready and ctx.noclip_remaining > 0:
             elapsed = now - ctx.noclip_last_tick
             ctx.noclip_remaining = max(0.0, ctx.noclip_remaining - elapsed)
             ctx.noclip_last_tick = now
             if not ctx.noclip_active:
-                logger.info(
+                logger.debug(
                     f"Noclip Trap active: writing 0x{noclip_address:08X}=0 "
                     f"for {ctx.noclip_remaining:.1f}s active gameplay."
                 )
                 ctx.noclip_active_since = now
+                ctx.noclip_next_log_at = now
             ctx.noclip_active = True
             ctx.noclip_delay_next_stage = False
-            write_u8_if_changed(noclip_address, 0)
+            if now >= ctx.noclip_next_log_at:
+                logger.debug(
+                    f"Noclip Trap tick: writing 0x{noclip_address:08X}=0; "
+                    f"{ctx.noclip_remaining:.1f}s remaining."
+                )
+                write_u8(noclip_address, 0)
+                ctx.noclip_next_log_at = now + 1.0
+            else:
+                write_u8_if_changed(noclip_address, 0)
         else:
             ctx.noclip_last_tick = now
             if ctx.noclip_active and read_u8(noclip_address) == 0:
-                logger.info(f"Noclip Trap cleared: writing 0x{noclip_address:08X}=1.")
+                logger.debug(f"Noclip Trap cleared: writing 0x{noclip_address:08X}=1.")
                 write_u8(noclip_address, 1)
-            if ctx.noclip_remaining <= 0 or goal_or_result_active(ctx.slot_data):
+            if ctx.noclip_remaining <= 0:
                 ctx.noclip_owned = False
                 ctx.noclip_remaining = 0.0
                 ctx.noclip_active = False
@@ -994,52 +1187,55 @@ def apply_received_item(ctx: MarbleBalanceContext, item_name: str) -> None:
     if item_name == "Mirror Trap":
         ctx.mirror_trap_pending = True
         ctx.mirror_skip_stage = stage_identity(current_stage(slot_data)) if in_level_active(slot_data) else None
-        logger.info("Mirror Trap received: queued for the next level attempt.")
+        logger.debug("Mirror Trap received: queued for the next level attempt.")
         return
     if item_name == "Blackout Trap":
-        ctx.blackout_remaining += 10.0
+        ctx.blackout_remaining += BLACKOUT_TRAP_DURATION
         ctx.blackout_last_tick = time.monotonic()
         ctx.blackout_owned = True
         ctx.blackout_delay_next_stage = not trap_safe_gameplay(ctx, current_stage(slot_data))
-        logger.info(
+        logger.debug(
             "Blackout Trap received: "
-            + ("queued until the level-start delay has elapsed." if ctx.blackout_delay_next_stage else "queued until safe gameplay after level start.")
+            + ("queued until the countdown finishes." if ctx.blackout_delay_next_stage else "starts after the current countdown finishes.")
         )
         return
     if item_name == "Inverse Trap":
         ctx.inverse_trap_pending = True
         ctx.inverse_delay_next_stage = not trap_safe_gameplay(ctx, current_stage(slot_data))
-        logger.info(
+        logger.debug(
             "Inverse Trap received: "
-            + ("queued for next level after 10s intro delay." if ctx.inverse_delay_next_stage else "starts now.")
+            + ("queued until the countdown finishes." if ctx.inverse_delay_next_stage else "starts now.")
         )
         return
     if item_name == "Noclip Trap":
-        ctx.noclip_remaining += 3.0
+        ctx.noclip_remaining += NOCLIP_TRAP_DURATION
         ctx.noclip_last_tick = time.monotonic()
         ctx.noclip_owned = True
         stage = current_stage(slot_data)
         ctx.noclip_delay_next_stage = not trap_safe_gameplay(ctx, stage)
         ctx.noclip_skip_stage = (
             stage_identity(stage)
-            if ctx.noclip_delay_next_stage and in_level_active(slot_data) and not goal_or_result_active(slot_data)
+            if ctx.noclip_delay_next_stage and in_level_active(slot_data)
             else None
         )
-        logger.info(
+        logger.debug(
             "Noclip Trap received: "
-            + ("queued as one-shot for the next level entry." if ctx.noclip_delay_next_stage else "starts now.")
+            + ("queued until the countdown finishes." if ctx.noclip_delay_next_stage else "starts now.")
         )
         return
 
     live_junk_flags = slot_data.get("junk_live_flags", {})
     saved_junk_flags = slot_data.get("junk_saved_flags", {})
-    if item_name in live_junk_flags or item_name in saved_junk_flags:
+    unlock_junk_flags = slot_data.get("junk_unlock_flags", {})
+    if item_name in live_junk_flags or item_name in saved_junk_flags or item_name in unlock_junk_flags:
         live_value = add_u8(live_junk_flags.get(item_name))
         saved_value = add_u8(saved_junk_flags.get(item_name))
-        logger.info(
+        write_u8_if_changed(unlock_junk_flags.get(item_name), 1)
+        logger.debug(
             f"Junk item received: {item_name}; "
             f"live={live_value if live_value is not None else 'n/a'}, "
-            f"saved={saved_value if saved_value is not None else 'n/a'}."
+            f"saved={saved_value if saved_value is not None else 'n/a'}, "
+            f"unlock={hex(unlock_junk_flags[item_name]) if item_name in unlock_junk_flags else 'n/a'}."
         )
         return
 
@@ -1065,7 +1261,7 @@ def apply_received_item(ctx: MarbleBalanceContext, item_name: str) -> None:
             return
 
     if item_name not in ctx._logged_unsupported_items:
-        logger.info(f"No RAM write handler for received item: {item_name}")
+        logger.debug(f"No RAM write handler for received item: {item_name}")
         ctx._logged_unsupported_items.add(item_name)
 
 
@@ -1104,12 +1300,15 @@ async def dolphin_sync_task(ctx: MarbleBalanceContext) -> None:
                     continue
                 if ctx.slot_data:
                     apply_starting_access(ctx.slot_data)
+                    sync_bonus_vehicle_gates(ctx)
                     await process_received_items(ctx)
                     sync_vehicle_access(ctx)
                     sync_normal_world_access(ctx)
                     suppress_l11_world_unlock_side_effects(ctx)
                     sync_bonus_vehicle_gates(ctx)
                     sync_bonus_level_access(ctx)
+                    sync_mirror_trophies(ctx)
+                    sync_junk_inventory(ctx)
                     enforce_marble_access(ctx)
                     handle_traps(ctx)
                     sync_save_slot_guard(ctx)
