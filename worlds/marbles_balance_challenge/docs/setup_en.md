@@ -18,7 +18,7 @@ layout.
 ## Installing the APWorld
 
 1. Download and install Archipelago.
-2. Download `marble_balance_challenge.apworld`.
+2. Download `marbles_balance_challenge.apworld`.
 3. Double-click the `.apworld` file to install it into Archipelago's `custom_worlds` folder.
 4. If the Archipelago Launcher was already open, close it and reopen it.
 5. Open the Archipelago Launcher and check that `Marbles! Balance Challenge Client` appears in the launcher.
