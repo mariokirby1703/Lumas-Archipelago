@@ -139,7 +139,10 @@ def extend_until_full(
         items.extend(candidates[:remaining_space])
 
 
-def create_required_items(world: MarbleBalanceWorld, location_count: int) -> list[MarbleBalanceItem]:
+def create_required_items(  # noqa: C901
+    world: MarbleBalanceWorld,
+    location_count: int,
+) -> list[MarbleBalanceItem]:
     items: list[MarbleBalanceItem] = []
     stump_locked_difficulty = "Hard" if world.options.goal == Goal.option_stump_temple_level_10_hard else "Normal"
 
@@ -180,7 +183,10 @@ def create_required_items(world: MarbleBalanceWorld, location_count: int) -> lis
     for bonus_world in BONUS_WORLDS:
         if world.starting_worlds_by_difficulty.get("Normal") != bonus_world:
             items.append(world.create_item(names.world_access_name("Normal", bonus_world)))
-        if "Hard" in world.enabled_difficulties and world.starting_worlds_by_difficulty.get("Hard") != bonus_world:
+        if (
+            "Hard" in world.enabled_difficulties
+            and world.starting_worlds_by_difficulty.get("Hard") != bonus_world
+        ):
             items.append(world.create_item(names.world_access_name("Hard", bonus_world)))
 
     starting_marble = world.starting_marble or world.random.choice(MARBLES)
@@ -188,11 +194,21 @@ def create_required_items(world: MarbleBalanceWorld, location_count: int) -> lis
     world.push_precollected(world.create_item(names.marble_name(starting_marble)))
 
     optional_items: list[MarbleBalanceItem] = []
-    for _ in range(extra_requirement_item_count(world.options.required_stump_pieces_for_w7.value, extra_counter_percentage)):
+    for _ in range(
+        extra_requirement_item_count(
+            world.options.required_stump_pieces_for_w7.value,
+            extra_counter_percentage,
+        )
+    ):
         optional_items.append(world.create_item(names.STUMP_TEMPLE_PIECE))
 
     if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
-        for _ in range(extra_requirement_item_count(world.options.required_green_gems_for_hard.value, extra_counter_percentage)):
+        for _ in range(
+            extra_requirement_item_count(
+                world.options.required_green_gems_for_hard.value,
+                extra_counter_percentage,
+            )
+        ):
             optional_items.append(world.create_item(names.GREEN_GEM))
 
     for marble in MARBLES:

@@ -71,7 +71,10 @@ class MarbleBalanceWorld(World):
             difficulties.append("Hard")
 
         self.enabled_difficulties = tuple(difficulties)
-        self.enabled_worlds_by_difficulty = {difficulty: tuple(NORMAL_WORLDS) for difficulty in self.enabled_difficulties}
+        self.enabled_worlds_by_difficulty = {
+            difficulty: tuple(NORMAL_WORLDS)
+            for difficulty in self.enabled_difficulties
+        }
         self.starting_worlds_by_difficulty = getattr(
             self,
             "starting_worlds_by_difficulty",

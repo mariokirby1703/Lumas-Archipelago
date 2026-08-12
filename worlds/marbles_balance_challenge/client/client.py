@@ -11,7 +11,15 @@ from typing import Any
 
 import ModuleUpdate
 import Utils
-from CommonClient import ClientCommandProcessor, CommonContext, get_base_parser, gui_enabled, handle_url_arg, logger, server_loop
+from CommonClient import (
+    ClientCommandProcessor,
+    CommonContext,
+    get_base_parser,
+    gui_enabled,
+    handle_url_arg,
+    logger,
+    server_loop,
+)
 from NetUtils import ClientStatus
 
 from ..Names import item_names, location_names
@@ -72,7 +80,13 @@ LEVEL_START_SEQUENCE_ADDRESS = 0x90155FDB
 BLACKOUT_TRAP_DURATION = 10.0
 INVERSE_TRAP_DURATION = 30.0
 NOCLIP_TRAP_DURATION = 3.0
-BONUS_VEHICLE_PICKUP_LEVELS = {("Normal", "WA", 1), ("Normal", "WB", 1), ("Normal", "WB", 5), ("Normal", "WC", 1), ("Normal", "WC", 5)}
+BONUS_VEHICLE_PICKUP_LEVELS = {
+    ("Normal", "WA", 1),
+    ("Normal", "WB", 1),
+    ("Normal", "WB", 5),
+    ("Normal", "WC", 1),
+    ("Normal", "WC", 5),
+}
 
 
 class MarbleBalanceCommandProcessor(ClientCommandProcessor):
@@ -495,7 +509,11 @@ def location_is_checked(
         )
 
     if category in {"goal", "bonus_goal"}:
-        if in_level_active(slot_data) and is_current_location(location, slot_data) and update_goal_reached(ctx, stage, now):
+        if (
+            in_level_active(slot_data)
+            and is_current_location(location, slot_data)
+            and update_goal_reached(ctx, stage, now)
+        ):
             return True
         if (
             is_current_location(location, slot_data)
@@ -542,7 +560,10 @@ def location_is_checked(
     return False
 
 
-def poll_pickup_locations(ctx: MarbleBalanceContext, stage: dict[str, Any] | None) -> list[str]:
+def poll_pickup_locations(  # noqa: C901
+    ctx: MarbleBalanceContext,
+    stage: dict[str, Any] | None,
+) -> list[str]:
     if stage is None:
         return []
 
@@ -589,7 +610,7 @@ def poll_pickup_locations(ctx: MarbleBalanceContext, stage: dict[str, Any] | Non
     return valid_events
 
 
-async def check_locations(ctx: MarbleBalanceContext) -> None:
+async def check_locations(ctx: MarbleBalanceContext) -> None:  # noqa: C901
     if not ctx.slot_data or not ctx.save_slot_ready:
         return
 
@@ -872,6 +893,7 @@ def owned_bonus_levels(ctx: MarbleBalanceContext) -> set[tuple[str, str, int]]:
                 owned.add((difficulty, world, level))
     return owned
 
+
 def sync_bonus_vehicle_gates(ctx: MarbleBalanceContext) -> None:
     static = ctx.slot_data.get("static_addresses", {})
     if vehicle_pickup_protection_active(ctx):
@@ -971,7 +993,7 @@ def enforce_marble_access(ctx: MarbleBalanceContext) -> None:
                     break
 
 
-def handle_traps(ctx: MarbleBalanceContext) -> None:
+def handle_traps(ctx: MarbleBalanceContext) -> None:  # noqa: C901
     static = ctx.slot_data.get("static_addresses", {})
     now = time.monotonic()
     stage = current_stage(ctx.slot_data)
@@ -987,7 +1009,10 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
             if ctx.blackout_remaining > 0:
                 ctx.blackout_delay_next_stage = True
                 ctx.blackout_remaining = BLACKOUT_TRAP_DURATION
-                logger.debug("Blackout Trap hit goal/result immediately after activation; re-queued until the next countdown finishes.")
+                logger.debug(
+                    "Blackout Trap hit goal/result immediately after activation; "
+                    "re-queued until the next countdown finishes."
+                )
             else:
                 ctx.blackout_owned = False
                 ctx.blackout_remaining = 0.0
@@ -1066,7 +1091,12 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
             ctx.inverse_active_since = now
             ctx.inverse_next_log_at = now
 
-        if ctx.mirror_trap_active and inside_stage and not goal_or_result_active(ctx.slot_data) and not ctx.inverse_trap_active:
+        if (
+            ctx.mirror_trap_active
+            and inside_stage
+            and not goal_or_result_active(ctx.slot_data)
+            and not ctx.inverse_trap_active
+        ):
             write_u8_if_changed(mirror_address, 1)
 
         if ctx.inverse_trap_active and safe_gameplay and ctx.inverse_remaining > 0:
@@ -1093,8 +1123,17 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
                 ctx.inverse_trap_pending = True
                 ctx.inverse_delay_next_stage = True
                 ctx.inverse_remaining = INVERSE_TRAP_DURATION
-                logger.debug("Inverse Trap hit goal/result immediately after activation; re-queued until the next countdown finishes.")
-            write_u8_if_changed(mirror_address, 1 if ctx.mirror_trap_active and not goal_or_result_active(ctx.slot_data) else 0)
+                logger.debug(
+                    "Inverse Trap hit goal/result immediately after activation; "
+                    "re-queued until the next countdown finishes."
+                )
+            write_u8_if_changed(
+                mirror_address,
+                1
+                if ctx.mirror_trap_active
+                and not goal_or_result_active(ctx.slot_data)
+                else 0,
+            )
             ctx.inverse_trap_active = False
             if not ctx.inverse_trap_pending:
                 ctx.inverse_remaining = 0.0
@@ -1107,7 +1146,8 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
             and now - ctx.noclip_last_forced_zero_at >= 1.0
         ):
             logger.debug(
-                f"Noclip Trap goal handoff: address returned to 1, writing 0x{noclip_address:08X}=0 once more."
+                "Noclip Trap goal handoff: address returned to 1, "
+                f"writing 0x{noclip_address:08X}=0 once more."
             )
             write_u8(noclip_address, 0)
             ctx.noclip_rewrite_after_clear_done = True
@@ -1118,7 +1158,10 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
             ctx.noclip_delay_next_stage = False
             ctx.noclip_skip_stage = None
             return
-        if ctx.noclip_rewrite_after_clear_until and ctx.noclip_rewrite_after_clear_until <= now:
+        if (
+            ctx.noclip_rewrite_after_clear_until
+            and ctx.noclip_rewrite_after_clear_until <= now
+        ):
             ctx.noclip_rewrite_after_clear_until = 0.0
             ctx.noclip_rewrite_after_clear_done = False
 
@@ -1127,7 +1170,10 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
                 ctx.noclip_delay_next_stage = True
                 ctx.noclip_skip_stage = None
                 ctx.noclip_remaining = NOCLIP_TRAP_DURATION
-                logger.debug("Noclip Trap hit goal/result immediately after activation; re-queued until the next countdown finishes.")
+                logger.debug(
+                    "Noclip Trap hit goal/result immediately after activation; "
+                    "re-queued until the next countdown finishes."
+                )
             else:
                 ctx.noclip_owned = False
                 ctx.noclip_remaining = 0.0
@@ -1180,7 +1226,7 @@ def handle_traps(ctx: MarbleBalanceContext) -> None:
                 ctx.noclip_active = False
 
 
-def apply_received_item(ctx: MarbleBalanceContext, item_name: str) -> None:
+def apply_received_item(ctx: MarbleBalanceContext, item_name: str) -> None:  # noqa: C901
     slot_data = ctx.slot_data
 
     if item_name in {item_names.GREEN_GEM, item_names.STUMP_TEMPLE_PIECE, item_names.VICTORY}:
@@ -1204,7 +1250,11 @@ def apply_received_item(ctx: MarbleBalanceContext, item_name: str) -> None:
 
     if item_name == "Mirror Trap":
         ctx.mirror_trap_pending = True
-        ctx.mirror_skip_stage = stage_identity(current_stage(slot_data)) if in_level_active(slot_data) else None
+        ctx.mirror_skip_stage = (
+            stage_identity(current_stage(slot_data))
+            if in_level_active(slot_data)
+            else None
+        )
         logger.debug("Mirror Trap received: queued for the next level attempt.")
         return
     if item_name == "Blackout Trap":
@@ -1214,7 +1264,11 @@ def apply_received_item(ctx: MarbleBalanceContext, item_name: str) -> None:
         ctx.blackout_delay_next_stage = not trap_safe_gameplay(ctx, current_stage(slot_data))
         logger.debug(
             "Blackout Trap received: "
-            + ("queued until the countdown finishes." if ctx.blackout_delay_next_stage else "starts after the current countdown finishes.")
+            + (
+                "queued until the countdown finishes."
+                if ctx.blackout_delay_next_stage
+                else "starts after the current countdown finishes."
+            )
         )
         return
     if item_name == "Inverse Trap":

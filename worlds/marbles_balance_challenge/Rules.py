@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from itertools import combinations
 from typing import TYPE_CHECKING
 
-from rule_builder.rules import AtLeast, CanReachLocation, Has, HasAll, Rule
+from rule_builder.rules import CanReachLocation, Has, HasAll, Rule
 
 from . import Locations
 from .Names import item_names as items, location_names
@@ -69,13 +70,19 @@ def bonus_world_access_rule(world: MarbleBalanceWorld, difficulty: str, bonus_wo
 
 
 def bonus_world_late_levels_rule(difficulty: str, bonus_world: str) -> Rule:
-    return AtLeast(
-        3,
-        *(
-            CanReachLocation(location_names.goal_location_name(difficulty, bonus_world, level))
-            for level in range(1, 6)
-        ),
-    )
+    opening_goals = [
+        CanReachLocation(location_names.goal_location_name(difficulty, bonus_world, level))
+        for level in range(1, 6)
+    ]
+    rules: list[Rule] = []
+    for combo in combinations(opening_goals, 3):
+        rule = combo[0] & combo[1] & combo[2]
+        rules.append(rule)
+
+    combined = rules[0]
+    for rule in rules[1:]:
+        combined = combined | rule
+    return combined
 
 
 def set_entrance_rules(world: MarbleBalanceWorld) -> None:
@@ -105,11 +112,28 @@ def set_completion_condition(world: MarbleBalanceWorld) -> None:
 
 def set_counter_event_rules(world: MarbleBalanceWorld) -> None:
     difficulty = goal_difficulty(world)
-    w7_name = Locations.counter_stump_unlock_name(difficulty, world.options.required_stump_pieces_for_w7.value)
-    world.set_rule(world.get_location(w7_name), Has(items.STUMP_TEMPLE_PIECE, count=world.options.required_stump_pieces_for_w7.value))
+    w7_name = Locations.counter_stump_unlock_name(
+        difficulty,
+        world.options.required_stump_pieces_for_w7.value,
+    )
+    world.set_rule(
+        world.get_location(w7_name),
+        Has(
+            items.STUMP_TEMPLE_PIECE,
+            count=world.options.required_stump_pieces_for_w7.value,
+        ),
+    )
     if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
-        hard_name = Locations.counter_hard_mode_name(world.options.required_green_gems_for_hard.value)
-        world.set_rule(world.get_location(hard_name), Has(items.GREEN_GEM, count=world.options.required_green_gems_for_hard.value))
+        hard_name = Locations.counter_hard_mode_name(
+            world.options.required_green_gems_for_hard.value,
+        )
+        world.set_rule(
+            world.get_location(hard_name),
+            Has(
+                items.GREEN_GEM,
+                count=world.options.required_green_gems_for_hard.value,
+            ),
+        )
 
 
 def set_location_rules(world: MarbleBalanceWorld) -> None:

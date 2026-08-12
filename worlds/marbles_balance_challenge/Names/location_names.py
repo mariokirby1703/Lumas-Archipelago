@@ -1,8 +1,21 @@
-from ..world_constants import HARD_BONUS_WORLD_DISPLAY_NAMES, WORLD_DISPLAY_NAMES
+from ..world_constants import (
+    BONUS_WORLDS,
+    HARD_BONUS_WORLD_DISPLAY_NAMES,
+    WORLD_DISPLAY_NAMES,
+)
 
 
 def level_prefix(difficulty: str, world: str, level: int) -> str:
-    return f"{world_display_name(difficulty, world)} {level:02d} {difficulty}"
+    return (
+        f"{world_display_name(difficulty, world)} {level:02d} "
+        f"{difficulty_display_name(difficulty, world)}"
+    )
+
+
+def difficulty_display_name(difficulty: str, world: str) -> str:
+    if difficulty == "Normal" and world in BONUS_WORLDS:
+        return "Easy/Normal"
+    return difficulty
 
 
 def world_display_name(difficulty: str, world: str) -> str:
