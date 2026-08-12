@@ -13,7 +13,6 @@ from .world_constants import (
     FIGURE_ROLLER_HEADS,
     ITEM_ID_BASE,
     JUNK_ITEMS,
-    LEVELS_PER_WORLD,
     MARBLES,
     BONUS_WORLDS,
     NORMAL_WORLDS,
@@ -51,9 +50,8 @@ def build_item_table() -> dict[str, ItemData]:
             item_names.append((names.world_access_name(difficulty, normal_world), ItemClassification.progression))
 
     for bonus_world in BONUS_WORLDS:
-        for level in range(1, LEVELS_PER_WORLD[bonus_world] + 1):
-            item_names.append((names.bonus_level_unlock_name("Normal", bonus_world, level), ItemClassification.progression))
-            item_names.append((names.bonus_level_unlock_name("Hard", bonus_world, level), ItemClassification.progression))
+        item_names.append((names.world_access_name("Normal", bonus_world), ItemClassification.progression))
+        item_names.append((names.world_access_name("Hard", bonus_world), ItemClassification.progression))
 
     for marble in MARBLES:
         item_names.append((names.marble_name(marble), ItemClassification.useful))
@@ -81,13 +79,18 @@ ITEM_NAME_TO_ID = {name: data.code for name, data in ITEM_TABLE.items()}
 
 item_groups = {
     "World Access": {
-        names.world_access_name(difficulty, world) for difficulty in DIFFICULTIES for world in NORMAL_WORLDS
-    },
-    "Bonus Level Access": {
-        names.bonus_level_unlock_name(difficulty, world, level)
+        names.world_access_name(difficulty, world)
+        for difficulty in DIFFICULTIES
+        for world in NORMAL_WORLDS
+    } | {
+        names.world_access_name(difficulty, world)
         for difficulty in ("Normal", "Hard")
         for world in BONUS_WORLDS
-        for level in range(1, LEVELS_PER_WORLD[world] + 1)
+    },
+    "Bonus World Access": {
+        names.world_access_name(difficulty, world)
+        for difficulty in ("Normal", "Hard")
+        for world in BONUS_WORLDS
     },
     "Vehicles": {names.SUBMARINE, names.ROCKET_SHIP} | {names.vehicle_part_name(part) for part in VEHICLE_PARTS},
     "Marbles": {names.marble_name(marble) for marble in MARBLES},
@@ -175,13 +178,10 @@ def create_required_items(world: MarbleBalanceWorld, location_count: int) -> lis
             items.append(world.create_item(names.GREEN_GEM))
 
     for bonus_world in BONUS_WORLDS:
-        for level in range(1, LEVELS_PER_WORLD[bonus_world] + 1):
-            if not (world.starting_worlds_by_difficulty.get("Normal") == bonus_world and level <= 5):
-                items.append(world.create_item(names.bonus_level_unlock_name("Normal", bonus_world, level)))
-            if "Hard" in world.enabled_difficulties and not (
-                world.starting_worlds_by_difficulty.get("Hard") == bonus_world and level <= 5
-            ):
-                items.append(world.create_item(names.bonus_level_unlock_name("Hard", bonus_world, level)))
+        if world.starting_worlds_by_difficulty.get("Normal") != bonus_world:
+            items.append(world.create_item(names.world_access_name("Normal", bonus_world)))
+        if "Hard" in world.enabled_difficulties and world.starting_worlds_by_difficulty.get("Hard") != bonus_world:
+            items.append(world.create_item(names.world_access_name("Hard", bonus_world)))
 
     starting_marble = world.starting_marble or world.random.choice(MARBLES)
     world.starting_marble = starting_marble

@@ -17,12 +17,12 @@ RK6P18 release and uses an external Dolphin client.
 - Trophies
 - Tutorial levels
 - Wii Balance Board levels
-- Bonus world level goals
+- Bonus world level goals; levels 01-05 open with the world unlock, levels 06-10 open after clearing any 3 of the first 5 levels
 
 ## Items
 
 - World unlocks per difficulty
-- Bonus level unlocks
+- Bonus world unlocks
 - Hard Mode unlock
 - AP-side Stump Temple Piece counter items
 - AP-side Green Gem counter items
@@ -45,7 +45,7 @@ RK6P18 release and uses an external Dolphin client.
   - Easy + Normal + Hard
 
 - Random Starting World
-- Tutorial Checks
+- Tutorial Checks, default off
 - Wii Balance Board Levels
 
 ## Logic Options

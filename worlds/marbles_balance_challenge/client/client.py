@@ -655,25 +655,19 @@ def item_name_from_network(ctx: MarbleBalanceContext, item_id: int) -> str | Non
         return None
 
 
-def normal_world_unlocks() -> dict[str, tuple[str, str]]:
-    return {
+def world_unlocks() -> dict[str, tuple[str, str]]:
+    unlocks = {
         item_names.world_access_name(difficulty, world): (difficulty, world)
         for difficulty in DIFFICULTIES
         for world in NORMAL_WORLDS
     }
-
-
-def bonus_level_unlocks() -> dict[str, tuple[str, str, int]]:
-    unlocks: dict[str, tuple[str, str, int]] = {}
     for difficulty in ("Normal", "Hard"):
         for world in BONUS_WORLDS:
-            for level in range(1, LEVELS_PER_WORLD[world] + 1):
-                unlocks[item_names.bonus_level_unlock_name(difficulty, world, level)] = (difficulty, world, level)
+            unlocks[item_names.world_access_name(difficulty, world)] = (difficulty, world)
     return unlocks
 
 
-WORLD_UNLOCKS = normal_world_unlocks()
-BONUS_UNLOCKS = bonus_level_unlocks()
+WORLD_UNLOCKS = world_unlocks()
 
 
 def unlock_matching_levels(slot_data: dict[str, Any], difficulty: str, world: str, levels: range) -> None:
@@ -840,18 +834,43 @@ def suppress_l11_world_unlock_side_effects(ctx: MarbleBalanceContext) -> None:
                 force_matching_level_states(ctx.slot_data, difficulty, next_world, range(1, 6), {1, 2, 3}, 0)
 
 
-def owned_bonus_levels(ctx: MarbleBalanceContext) -> set[tuple[str, str, int]]:
-    owned: set[tuple[str, str, int]] = set()
-    for difficulty, world in ctx.slot_data.get("starting_worlds", {}).items():
-        if world in BONUS_WORLDS:
-            for level in range(1, 6):
-                owned.add((difficulty, world, level))
-
+def owned_bonus_worlds(ctx: MarbleBalanceContext) -> set[tuple[str, str]]:
+    owned: set[tuple[str, str]] = {
+        (difficulty, world)
+        for difficulty, world in ctx.slot_data.get("starting_worlds", {}).items()
+        if world in BONUS_WORLDS
+    }
     for item_name in received_item_names(ctx):
-        if item_name in BONUS_UNLOCKS:
-            owned.add(BONUS_UNLOCKS[item_name])
+        unlock = WORLD_UNLOCKS.get(item_name)
+        if unlock and unlock[1] in BONUS_WORLDS:
+            owned.add(unlock)
     return owned
 
+
+def completed_bonus_opening_levels(ctx: MarbleBalanceContext, difficulty: str, world: str) -> int:
+    completed = 0
+    for location in ctx.slot_data.get("locations", {}).values():
+        if (
+            location.get("category") == "bonus_goal"
+            and location.get("difficulty") == difficulty
+            and location.get("world") == world
+            and location.get("level") in range(1, 6)
+        ):
+            address = (location.get("addresses") or {}).get("state")
+            if address is not None and read_u8(address) == 3:
+                completed += 1
+    return completed
+
+
+def owned_bonus_levels(ctx: MarbleBalanceContext) -> set[tuple[str, str, int]]:
+    owned: set[tuple[str, str, int]] = set()
+    for difficulty, world in owned_bonus_worlds(ctx):
+        for level in range(1, 6):
+            owned.add((difficulty, world, level))
+        if completed_bonus_opening_levels(ctx, difficulty, world) >= 3:
+            for level in range(6, LEVELS_PER_WORLD[world] + 1):
+                owned.add((difficulty, world, level))
+    return owned
 
 def sync_bonus_vehicle_gates(ctx: MarbleBalanceContext) -> None:
     static = ctx.slot_data.get("static_addresses", {})
@@ -861,10 +880,9 @@ def sync_bonus_vehicle_gates(ctx: MarbleBalanceContext) -> None:
                 write_u8_if_changed(static.get(address_key), 15)
         return
 
-    owned = owned_bonus_levels(ctx)
-    normal_owned = {(world, level) for difficulty, world, level in owned if difficulty == "Normal"}
-    submarine_side = any((world, 1) in normal_owned for world in BONUS_WORLDS)
-    rocket_side = any((world, 5) in normal_owned for world in ("WB", "WC"))
+    normal_owned_worlds = {world for difficulty, world in owned_bonus_worlds(ctx) if difficulty == "Normal"}
+    submarine_side = bool(normal_owned_worlds)
+    rocket_side = any(world in normal_owned_worlds for world in ("WB", "WC"))
     value = 15
     if submarine_side and rocket_side:
         value = 95
@@ -1241,13 +1259,10 @@ def apply_received_item(ctx: MarbleBalanceContext, item_name: str) -> None:
 
     if item_name in WORLD_UNLOCKS:
         difficulty, world = WORLD_UNLOCKS[item_name]
-        if (difficulty, world) in physically_granted_normal_worlds(ctx):
+        if world in BONUS_WORLDS:
             unlock_matching_levels(slot_data, difficulty, world, range(1, 6))
-        return
-
-    if item_name in BONUS_UNLOCKS:
-        difficulty, world, level = BONUS_UNLOCKS[item_name]
-        unlock_matching_levels(slot_data, difficulty, world, range(level, level + 1))
+        elif (difficulty, world) in physically_granted_normal_worlds(ctx):
+            unlock_matching_levels(slot_data, difficulty, world, range(1, 6))
         return
 
     for flag_map_name in (

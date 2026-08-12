@@ -60,7 +60,7 @@ class RequiredStumpPiecesForW7(Range):
     """Number of AP-side Stump Temple Pieces required to reach Stump Temple."""
 
     display_name = "Required Stump Temple Pieces for W7"
-    range_start = 1
+    range_start = 20
     range_end = 90
     default = 60
 
@@ -80,7 +80,7 @@ class RequiredGreenGemsForHard(Range):
     """Number of AP-side Green Gems required when Hard Mode Unlock is set to Green Gems."""
 
     display_name = "Required Green Gems for Hard Mode"
-    range_start = 0
+    range_start = 10
     range_end = 60
     default = 30
 

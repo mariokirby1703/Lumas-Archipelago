@@ -184,11 +184,10 @@ class MarbleBalanceWorld(World):
                     self.push_precollected(self.create_item(item_name))
                     pushed.add(item_name)
             elif world in BONUS_WORLDS:
-                for level in range(1, 6):
-                    item_name = item_names.bonus_level_unlock_name(difficulty, world, level)
-                    if item_name not in pushed:
-                        self.push_precollected(self.create_item(item_name))
-                        pushed.add(item_name)
+                item_name = item_names.world_access_name(difficulty, world)
+                if item_name not in pushed:
+                    self.push_precollected(self.create_item(item_name))
+                    pushed.add(item_name)
 
     def get_filler_item_name(self) -> str:
         return Items.get_filler_item_name(self)
@@ -244,7 +243,7 @@ class MarbleBalanceWorld(World):
             "starting_marble": self.starting_marble,
             "options": option_data,
             "fixed_options": {
-                "bonus_levels": True,
+                "bonus_world_unlocks": True,
                 "allow_free_mode_checks": False,
                 "marble_randomization": True,
                 "figure_roller_heads": True,

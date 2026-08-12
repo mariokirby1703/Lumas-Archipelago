@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from rule_builder.rules import Has, HasAll, Rule
+from rule_builder.rules import AtLeast, CanReachLocation, Has, HasAll, Rule
 
 from . import Locations
-from .Names import item_names as items, location_names, region_names
+from .Names import item_names as items, location_names
 from .Options import Goal, HardModeUnlock
 from .world_constants import BONUS_WORLDS, NORMAL_WORLDS
 
@@ -58,37 +58,42 @@ def world_access_rule(world: MarbleBalanceWorld, difficulty: str, normal_world: 
     return rule
 
 
+def bonus_world_access_rule(world: MarbleBalanceWorld, difficulty: str, bonus_world: str) -> Rule:
+    if world.starting_worlds_by_difficulty.get(difficulty) == bonus_world:
+        rule: Rule = HasAll()
+    else:
+        rule = Has(items.world_access_name(difficulty, bonus_world))
+    if difficulty == "Hard":
+        rule = rule & can_access_hard_mode(world)
+    return rule
+
+
+def bonus_world_late_levels_rule(difficulty: str, bonus_world: str) -> Rule:
+    return AtLeast(
+        3,
+        *(
+            CanReachLocation(location_names.goal_location_name(difficulty, bonus_world, level))
+            for level in range(1, 6)
+        ),
+    )
+
+
 def set_entrance_rules(world: MarbleBalanceWorld) -> None:
     for difficulty in world.enabled_difficulties:
         for normal_world in NORMAL_WORLDS:
             entrance = world.get_entrance(f"Menu to {difficulty} {normal_world}")
             world.set_rule(entrance, world_access_rule(world, difficulty, normal_world))
 
-    if world.options.split_vehicle_world_access:
-        bonus_access = {
-            "WA": Has(items.SUBMARINE) & Has(items.world_access_name("Normal", "W5")),
-            "WB": Has(items.SUBMARINE) & Has(items.world_access_name("Normal", "W5")),
-            "WC": Has(items.ROCKET_SHIP) & Has(items.world_access_name("Normal", "W6")),
-        }
-    else:
-        bonus_access = {
-            "WA": Has(items.world_access_name("Normal", "W5")),
-            "WB": Has(items.world_access_name("Normal", "W5")),
-            "WC": Has(items.world_access_name("Normal", "W6")),
-        }
     for bonus_world in BONUS_WORLDS:
-        first_level = Has(items.bonus_level_unlock_name("Normal", bonus_world, 1))
-        if world.starting_worlds_by_difficulty.get("Normal") == bonus_world:
-            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), HasAll())
-        else:
-            world.set_rule(world.get_entrance(f"Menu to Normal {bonus_world}"), bonus_access[bonus_world] & first_level)
+        world.set_rule(
+            world.get_entrance(f"Menu to Normal {bonus_world}"),
+            bonus_world_access_rule(world, "Normal", bonus_world),
+        )
         if "Hard" in world.enabled_difficulties:
-            first_level = Has(items.bonus_level_unlock_name("Hard", bonus_world, 1))
-            if world.starting_worlds_by_difficulty.get("Hard") == bonus_world:
-                rule = can_access_hard_mode(world)
-            else:
-                rule = first_level & can_access_hard_mode(world)
-            world.set_rule(world.get_entrance(f"Menu to Hard {bonus_world}"), rule)
+            world.set_rule(
+                world.get_entrance(f"Menu to Hard {bonus_world}"),
+                bonus_world_access_rule(world, "Hard", bonus_world),
+            )
 
 
 def set_completion_condition(world: MarbleBalanceWorld) -> None:
@@ -120,12 +125,9 @@ def set_location_rules(world: MarbleBalanceWorld) -> None:
             world.set_rule(location, world_access_rule(world, data.difficulty, data.world))
 
         if data and data.world in BONUS_WORLDS and data.difficulty and data.level:
-            if world.starting_worlds_by_difficulty.get(data.difficulty) == data.world and data.level <= 5:
-                rule = HasAll()
-            else:
-                rule = Has(items.bonus_level_unlock_name(data.difficulty, data.world, data.level))
-            if data.difficulty == "Hard":
-                rule = rule & can_access_hard_mode(world)
+            rule = bonus_world_access_rule(world, data.difficulty, data.world)
+            if data.level > 5:
+                rule = rule & bonus_world_late_levels_rule(data.difficulty, data.world)
             world.set_rule(location, rule)
 
 

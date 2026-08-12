@@ -9,13 +9,12 @@ VICTORY = "Victory"
 
 
 def world_access_name(difficulty: str, world: str) -> str:
+    if world in HARD_BONUS_WORLD_DISPLAY_NAMES and difficulty == "Hard":
+        return f"{HARD_BONUS_WORLD_DISPLAY_NAMES[world]} Hard Unlock"
+    if world in HARD_BONUS_WORLD_DISPLAY_NAMES and difficulty == "Normal":
+        return f"{WORLD_DISPLAY_NAMES[world]} Easy/Normal Unlock"
     return f"{WORLD_DISPLAY_NAMES[world]} {difficulty} Unlock"
 
-
-def bonus_level_unlock_name(difficulty: str, world: str, level: int) -> str:
-    if difficulty == "Hard":
-        return f"{HARD_BONUS_WORLD_DISPLAY_NAMES[world]} {level:02d} Hard Unlock"
-    return f"{WORLD_DISPLAY_NAMES[world]} {level:02d} Unlock"
 
 
 def marble_name(marble: str) -> str:
@@ -32,4 +31,3 @@ def junk_name(junk: str) -> str:
 
 def vehicle_part_name(part: str) -> str:
     return f"{part}"
-
