@@ -1,3 +1,22 @@
+# Luma's Archipelago Integrations
+
+A repository for Archipelago integrations of multiple of my favourite childhood games.
+
+## Marbles! Balance Challenge
+
+An Archipelago implementation for Marbles! Balance Challenge *(European / PAL Version)*.
+The currently release does **NOT YET** include Marble Saga Kororinpa *(American / NTSC-U Version)*!
+
+Read first: [Setup Guide](worlds/marbles_balance_challenge/docs/setup_en.md)
+
+Then skim through the [Game Documentation](worlds/marbles_balance_challenge/docs/en_Marbles!%20Balance%20Challenge.md) for goals, locations, items, options, and notes about the current release.
+
+Latest release: [GitHub Releases](https://github.com/mariokirby1703/Lumas-Archipelago/releases)
+
+Source code: [worlds/marbles_balance_challenge](worlds/marbles_balance_challenge)
+
+
+
 # [Archipelago](https://archipelago.gg) ![Discord Shield](https://discordapp.com/api/guilds/731205301247803413/widget.png?style=shield) | [Install](https://github.com/ArchipelagoMW/Archipelago/releases)
 
 Archipelago provides a generic framework for developing multiworld capability for game randomizers. In all cases,
