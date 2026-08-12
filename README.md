@@ -5,7 +5,7 @@ A repository for Archipelago integrations of multiple of my favourite childhood 
 ## Marbles! Balance Challenge
 
 An Archipelago implementation for Marbles! Balance Challenge *(European / PAL Version)*.
-The currently release does **NOT YET** include Marble Saga Kororinpa *(American / NTSC-U Version)*!
+The current release does **NOT YET** include Marble Saga Kororinpa *(American / NTSC-U Version)*!
 
 Read first: [Setup Guide](worlds/marbles_balance_challenge/docs/setup_en.md)
 
