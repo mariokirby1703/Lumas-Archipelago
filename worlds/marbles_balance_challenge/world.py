@@ -174,7 +174,7 @@ class MarbleBalanceWorld(World):
         w7_name = Locations.counter_stump_unlock_name(difficulty, self.options.required_stump_pieces_for_w7.value)
         self.get_location(w7_name).place_locked_item(self.create_item(item_names.world_access_name(difficulty, "W7")))
 
-        if self.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
+        if "Hard" in self.enabled_difficulties and self.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
             hard_name = Locations.counter_hard_mode_name(self.options.required_green_gems_for_hard.value)
             self.get_location(hard_name).place_locked_item(self.create_item(item_names.HARD_MODE))
 
@@ -230,6 +230,7 @@ class MarbleBalanceWorld(World):
             "anthony_sanity",
             "trophy_sanity",
         )
+        option_data["stump_piece_sanity"] = True
 
         active_location_data = {
             name: self._slot_location_data(name)

@@ -19,7 +19,7 @@ def can_access_hard_mode(world: MarbleBalanceWorld) -> Rule:
         return HasAll()
     if world.options.hard_mode_unlock == HardModeUnlock.option_item:
         return Has(items.HARD_MODE)
-    if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
+    if "Hard" in world.enabled_difficulties and world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
         return Has(items.HARD_MODE)
     return HasAll()
 
@@ -69,9 +69,9 @@ def bonus_world_access_rule(world: MarbleBalanceWorld, difficulty: str, bonus_wo
     return rule
 
 
-def bonus_world_late_levels_rule(difficulty: str, bonus_world: str) -> Rule:
+def three_of_first_five_rule(difficulty: str, world_name: str) -> Rule:
     opening_goals = [
-        CanReachLocation(location_names.goal_location_name(difficulty, bonus_world, level))
+        CanReachLocation(location_names.goal_location_name(difficulty, world_name, level))
         for level in range(1, 6)
     ]
     rules: list[Rule] = []
@@ -106,7 +106,10 @@ def set_entrance_rules(world: MarbleBalanceWorld) -> None:
 def set_completion_condition(world: MarbleBalanceWorld) -> None:
     difficulty = goal_difficulty(world)
     goal_location = world.get_location(location_names.goal_location_name(difficulty, "W7", 10))
-    world.set_rule(goal_location, world_access_rule(world, difficulty, "W7"))
+    world.set_rule(
+        goal_location,
+        world_access_rule(world, difficulty, "W7") & three_of_first_five_rule(difficulty, "W7"),
+    )
     world.set_completion_rule(Has(items.VICTORY))
 
 
@@ -123,7 +126,7 @@ def set_counter_event_rules(world: MarbleBalanceWorld) -> None:
             count=world.options.required_stump_pieces_for_w7.value,
         ),
     )
-    if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
+    if "Hard" in world.enabled_difficulties and world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
         hard_name = Locations.counter_hard_mode_name(
             world.options.required_green_gems_for_hard.value,
         )
@@ -146,12 +149,15 @@ def set_location_rules(world: MarbleBalanceWorld) -> None:
             and data.level
             and data.world not in BONUS_WORLDS
         ):
-            world.set_rule(location, world_access_rule(world, data.difficulty, data.world))
+            rule = world_access_rule(world, data.difficulty, data.world)
+            if data.world == "W7" and data.level > 5:
+                rule = rule & three_of_first_five_rule(data.difficulty, data.world)
+            world.set_rule(location, rule)
 
         if data and data.world in BONUS_WORLDS and data.difficulty and data.level:
             rule = bonus_world_access_rule(world, data.difficulty, data.world)
             if data.level > 5:
-                rule = rule & bonus_world_late_levels_rule(data.difficulty, data.world)
+                rule = rule & three_of_first_five_rule(data.difficulty, data.world)
             world.set_rule(location, rule)
 
 

@@ -176,7 +176,7 @@ def create_required_items(  # noqa: C901
                 continue
             items.append(world.create_item(names.world_access_name(difficulty, "W7")))
 
-    if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
+    if "Hard" in world.enabled_difficulties and world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
         for _ in range(world.options.required_green_gems_for_hard.value):
             items.append(world.create_item(names.GREEN_GEM))
 
@@ -202,7 +202,7 @@ def create_required_items(  # noqa: C901
     ):
         optional_items.append(world.create_item(names.STUMP_TEMPLE_PIECE))
 
-    if world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
+    if "Hard" in world.enabled_difficulties and world.options.hard_mode_unlock == HardModeUnlock.option_green_gems:
         for _ in range(
             extra_requirement_item_count(
                 world.options.required_green_gems_for_hard.value,

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+﻿from dataclasses import dataclass
 
 from Options import Choice, DefaultOnToggle, OptionGroup, PerGameCommonOptions, Range, Toggle
 
@@ -31,10 +31,10 @@ class GreenGemSanity(Toggle):
     display_name = "Green Gem Sanity"
 
 
-class StumpPieceSanity(Toggle):
-    """Add Stump Temple Piece locations to all stages that have a Stump Temple Piece."""
+class StumpPieceSanity(DefaultOnToggle):
+    """Add Kororin Capsule locations to all stages that have a Kororin Capsule."""
 
-    display_name = "Stump Temple Piece Sanity"
+    display_name = "Kororin Capsule Sanity"
 
 
 class AnthonySanity(Toggle):
@@ -57,9 +57,9 @@ class TrophySanity(Choice):
 
 
 class RequiredStumpPiecesForW7(Range):
-    """Number of AP-side Stump Temple Pieces required to reach Stump Temple."""
+    """Number of AP-side Stump Temple Pieces required to reach Stump Temple in your selected Goal Difficulty."""
 
-    display_name = "Required Stump Temple Pieces for W7"
+    display_name = "Required Stump Temple Pieces for Stump Temple Goal World Unlock"
     range_start = 20
     range_end = 90
     default = 60
@@ -226,7 +226,7 @@ option_presets = {
         "goal": "stump_temple_level_10_normal",
         "included_difficulties": "normal",
         "green_gem_sanity": False,
-        "stump_piece_sanity": False,
+        "stump_piece_sanity": True,
         "tutorial_checks": False,
         "wii_balance_board_levels": False,
         "random_starting_world": True,

@@ -37,7 +37,7 @@ def green_gem_location_name(difficulty: str, world: str, level: int) -> str:
 
 
 def stump_piece_location_name(difficulty: str, world: str, level: int) -> str:
-    return f"{level_prefix(difficulty, world, level)} Stump Temple Piece"
+    return f"{level_prefix(difficulty, world, level)} Kororin Capsule"
 
 
 def ant_location_name(difficulty: str, world: str, level: int) -> str:

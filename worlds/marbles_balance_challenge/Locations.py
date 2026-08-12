@@ -152,7 +152,7 @@ location_name_groups = {
     "Gold Trophies": {name for name, data in LOCATION_TABLE.items() if data.category == "gold_trophy"},
     "Platinum Trophies": {name for name, data in LOCATION_TABLE.items() if data.category == "platinum_trophy"},
     "Green Gems": {name for name, data in LOCATION_TABLE.items() if data.category == "green_gem"},
-    "Stump Temple Pieces": {name for name, data in LOCATION_TABLE.items() if data.category == "stump_piece"},
+    "Kororin Capsules": {name for name, data in LOCATION_TABLE.items() if data.category == "stump_piece"},
     "Ants": {name for name, data in LOCATION_TABLE.items() if data.category == "ant"},
     "Bonus Worlds": {name for name, data in LOCATION_TABLE.items() if data.world in BONUS_WORLDS},
     "Tutorials": {name for name, data in LOCATION_TABLE.items() if data.category == "tutorial"},
@@ -189,7 +189,7 @@ def enabled_location_names(world: MarbleBalanceWorld) -> list[str]:
 
         if data.category == "counter_hard_mode":
             required = world.options.required_green_gems_for_hard.value
-            if world.options.hard_mode_unlock.value == 2 and name == counter_hard_mode_name(required):
+            if "Hard" in world.enabled_difficulties and world.options.hard_mode_unlock.value == 2 and name == counter_hard_mode_name(required):
                 selected.append(name)
             continue
 
@@ -200,8 +200,6 @@ def enabled_location_names(world: MarbleBalanceWorld) -> list[str]:
 
         if data.world in BONUS_WORLDS:
             if data.difficulty == "Hard" and "Hard" not in world.enabled_difficulties:
-                continue
-            if data.category == "stump_piece" and not world.options.stump_piece_sanity:
                 continue
             if data.category == "ant" and not world.options.anthony_sanity:
                 continue
@@ -217,8 +215,6 @@ def enabled_location_names(world: MarbleBalanceWorld) -> list[str]:
         if data.world not in world.enabled_worlds_by_difficulty.get(data.difficulty, ()):
             continue
         if data.category == "green_gem" and not world.options.green_gem_sanity:
-            continue
-        if data.category == "stump_piece" and not world.options.stump_piece_sanity:
             continue
         if data.category == "ant" and not world.options.anthony_sanity:
             continue
