@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..world_constants import DIFFICULTIES, FIGURE_ROLLER_HEADS, JUNK_ITEMS, MARBLES, WORLD_INDEX
+from ..world_constants import FIGURE_ROLLER_HEADS, JUNK_ITEMS, MARBLES, WORLD_INDEX
 
 CURRENT_WORLD_OR_MODE_INDEX = 0x8049D945
 SELECTED_STAGE_INDEX = 0x8049D94D
@@ -78,7 +78,7 @@ def normal_level_record(difficulty: str, world: str, level: int) -> dict[str, in
     return {
         "state": trophy - 0x0C,
         "green_gem": trophy - 0x05,
-        "stump_piece": None if world == "W7" else trophy,
+        "stump_piece": None if world == "W7" else trophy - 0x01,
         "ant": trophy - 0x05 if difficulty == "Hard" and level <= 10 else None,
         "trophy": trophy,
         "mirror_trophy": mirror_trophy,

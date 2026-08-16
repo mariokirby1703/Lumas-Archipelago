@@ -61,7 +61,7 @@ def iter_campaign_stage_names() -> list[LocationData]:
     for required in range(1, 91):
         add(counter_stump_unlock_name("Normal", required), "counter_stump_unlock", difficulty="Normal", world="W7")
         add(counter_stump_unlock_name("Hard", required), "counter_stump_unlock", difficulty="Hard", world="W7")
-    for required in range(0, 61):
+    for required in range(0, 71):
         add(counter_hard_mode_name(required), "counter_hard_mode")
 
     for index in range(1, 11):
@@ -81,7 +81,7 @@ def iter_campaign_stage_names() -> list[LocationData]:
                         level,
                         record,
                     )
-                if difficulty != "Hard" and level <= 10:
+                if difficulty == "Normal" and level <= 10:
                     add(names.green_gem_location_name(difficulty, world, level), "green_gem", difficulty, world, level, record)
                 if record["stump_piece"] is not None and level <= 10:
                     add(names.stump_piece_location_name(difficulty, world, level), "stump_piece", difficulty, world, level, record)

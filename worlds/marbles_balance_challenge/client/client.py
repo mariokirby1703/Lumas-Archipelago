@@ -395,6 +395,20 @@ def write_collectible_save_flag(location: dict[str, Any]) -> None:
         write_u8_if_changed(address, 1)
 
 
+def write_stage_collectible_save_flag(difficulty: str, world: str, level: int, category: str) -> None:
+    if level > 10:
+        return
+    if world in NORMAL_WORLDS:
+        record = ram_addresses.normal_level_record(difficulty, world, level)
+    elif world in BONUS_WORLDS:
+        record = ram_addresses.bonus_level_record(difficulty, world, level)
+    else:
+        return
+    address = record.get(category)
+    if address is not None:
+        write_u8_if_changed(address, 1)
+
+
 def counter_overlay_addresses_and_count(ctx: MarbleBalanceContext) -> list[tuple[list[int], int]]:
     received = received_item_names(ctx)
     return [
@@ -677,8 +691,14 @@ def poll_pickup_locations(  # noqa: C901
     world = stage.get("world")
     level = stage["level"]
 
+    if green_or_ant != 0 and stage["kind"] == "stage" and level <= 10:
+        if difficulty == "Normal" and world in NORMAL_WORLDS:
+            write_stage_collectible_save_flag(difficulty, world, level, "green_gem")
+        elif difficulty == "Hard":
+            write_stage_collectible_save_flag(difficulty, world, level, "ant")
+
     if ctx._previous_green_or_ant == 0 and green_or_ant == 1 and stage["kind"] == "stage" and level <= 10:
-        if difficulty in {"Easy", "Normal"} and world in NORMAL_WORLDS:
+        if difficulty == "Normal" and world in NORMAL_WORLDS:
             events.append(location_names.green_gem_location_name(difficulty, world, level))
         elif difficulty == "Hard":
             events.append(location_names.ant_location_name(difficulty, world, level))
@@ -687,12 +707,15 @@ def poll_pickup_locations(  # noqa: C901
         if difficulty in {"Easy", "Normal"} and world in NORMAL_WORLDS[:6] and level <= 10:
             expected = NORMAL_WORLDS.index(world) * 10 + level
             if stump == expected:
+                write_stage_collectible_save_flag(difficulty, world, level, "stump_piece")
                 events.append(location_names.stump_piece_location_name(difficulty, world, level))
 
     if junk != 0 and stage["kind"] == "stage" and level <= 10:
         if difficulty == "Hard" and world in NORMAL_WORLDS[:6]:
+            write_stage_collectible_save_flag(difficulty, world, level, "stump_piece")
             events.append(location_names.stump_piece_location_name(difficulty, world, level))
         elif world in BONUS_WORLDS:
+            write_stage_collectible_save_flag(difficulty, world, level, "stump_piece")
             events.append(location_names.stump_piece_location_name(difficulty, world, level))
 
     ctx._previous_green_or_ant = green_or_ant
