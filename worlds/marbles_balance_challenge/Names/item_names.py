@@ -24,7 +24,7 @@ def marble_name(marble: str) -> str:
 
 
 def head_name(head: str) -> str:
-    return f"{head}"
+    return f"{head} Head"
 
 
 def junk_name(junk: str) -> str:

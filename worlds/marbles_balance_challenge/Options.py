@@ -1,4 +1,4 @@
-﻿from dataclasses import dataclass
+from dataclasses import dataclass
 
 from Options import Choice, DefaultOnToggle, OptionGroup, PerGameCommonOptions, Range, Toggle
 
@@ -61,7 +61,7 @@ class RequiredStumpPiecesForW7(Range):
 
     display_name = "Required Stump Temple Pieces for Stump Temple Goal World Unlock"
     range_start = 20
-    range_end = 90
+    range_end = 60
     default = 60
 
 
@@ -81,7 +81,7 @@ class RequiredGreenGemsForHard(Range):
 
     display_name = "Required Green Gems for Hard Mode"
     range_start = 10
-    range_end = 60
+    range_end = 70
     default = 30
 
 

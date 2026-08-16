@@ -256,7 +256,10 @@ class MarbleBalanceWorld(World):
             "locations": active_location_data,
             "static_addresses": addresses.STATIC_ADDRESSES,
             "marble_unlock_flags": addresses.MARBLE_UNLOCK_FLAGS,
-            "figure_roller_head_unlock_flags": addresses.FIGURE_ROLLER_HEAD_UNLOCK_FLAGS,
+            "figure_roller_head_unlock_flags": {
+                item_names.head_name(name): address
+                for name, address in addresses.FIGURE_ROLLER_HEAD_UNLOCK_FLAGS.items()
+            },
             "junk_live_flags": addresses.JUNK_LIVE_FLAGS,
             "junk_saved_flags": addresses.JUNK_SAVED_FLAGS,
             "junk_unlock_flags": addresses.JUNK_UNLOCK_FLAGS,

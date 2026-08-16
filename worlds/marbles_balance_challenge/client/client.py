@@ -22,6 +22,7 @@ from CommonClient import (
 )
 from NetUtils import ClientStatus
 
+from ..Addresses import addresses as ram_addresses
 from ..Names import item_names, location_names
 from ..world_constants import (
     BONUS_WORLDS,
@@ -43,6 +44,21 @@ CONNECTION_REFUSED_GAME_STATUS = "Dolphin connected, but RK6P18 is not running. 
 
 GAME_ID_ADDRESS = 0x80000000
 GAME_ID = b"RK6P18"
+
+STUMP_COUNTER_OVERLAY_ADDRESSES = [
+    address
+    for world in NORMAL_WORLDS[:6]
+    for level in range(1, 11)
+    for address in [ram_addresses.normal_level_record("Normal", world, level)["stump_piece"]]
+    if address is not None
+]
+GREEN_GEM_COUNTER_OVERLAY_ADDRESSES = [
+    address
+    for world in NORMAL_WORLDS
+    for level in range(1, 11)
+    for address in [ram_addresses.normal_level_record("Normal", world, level)["green_gem"]]
+    if address is not None
+]
 
 DIFFICULTY_INDEX = {"Easy": 0, "Normal": 1, "Hard": 2}
 TROPHY_REQUIREMENTS = {
@@ -131,6 +147,8 @@ class MarbleBalanceContext(CommonContext):
         self._previous_stump = 0
         self._previous_junk = 0
         self._pickup_events_seen_this_stage: set[str] = set()
+        self._counter_overlay_active = False
+        self._counter_overlay_originals: dict[int, int] = {}
         self.mirror_trap_pending = False
         self.mirror_trap_active = False
         self.mirror_active_since = 0.0
@@ -346,6 +364,75 @@ def campaign_stage_active(slot_data: dict[str, Any]) -> bool:
         return read_u8(static["current_game_mode"]) == safety.get("world_map_stage_mode", 0x1D)
     except Exception:
         return False
+
+
+def world_map_active(slot_data: dict[str, Any]) -> bool:
+    static = slot_data.get("static_addresses", {})
+    try:
+        return (
+            not in_level_active(slot_data)
+            and read_u8(static["current_hub_screen"]) == 0xFF
+        )
+    except Exception:
+        return False
+
+
+def collectible_save_address(location: dict[str, Any]) -> int | None:
+    addresses = location.get("addresses") or {}
+    category = location.get("category")
+    if category == "green_gem":
+        return addresses.get("green_gem")
+    if category == "stump_piece":
+        return addresses.get("stump_piece")
+    if category == "ant":
+        return addresses.get("ant")
+    return None
+
+
+def write_collectible_save_flag(location: dict[str, Any]) -> None:
+    address = collectible_save_address(location)
+    if address is not None:
+        write_u8_if_changed(address, 1)
+
+
+def counter_overlay_addresses_and_count(ctx: MarbleBalanceContext) -> list[tuple[list[int], int]]:
+    received = received_item_names(ctx)
+    return [
+        (
+            STUMP_COUNTER_OVERLAY_ADDRESSES,
+            min(received.count(item_names.STUMP_TEMPLE_PIECE), len(STUMP_COUNTER_OVERLAY_ADDRESSES)),
+        ),
+        (
+            GREEN_GEM_COUNTER_OVERLAY_ADDRESSES,
+            min(received.count(item_names.GREEN_GEM), len(GREEN_GEM_COUNTER_OVERLAY_ADDRESSES)),
+        ),
+    ]
+
+
+def restore_counter_overlay(ctx: MarbleBalanceContext) -> None:
+    if not ctx._counter_overlay_active:
+        return
+    for address, value in ctx._counter_overlay_originals.items():
+        write_u8_if_changed(address, value)
+    ctx._counter_overlay_originals = {}
+    ctx._counter_overlay_active = False
+
+
+def sync_ap_counter_overlays(ctx: MarbleBalanceContext) -> None:
+    overlay_sets = counter_overlay_addresses_and_count(ctx)
+    overlay_addresses = [address for addresses, _ in overlay_sets for address in addresses]
+    if not world_map_active(ctx.slot_data):
+        restore_counter_overlay(ctx)
+        return
+    if not ctx._counter_overlay_active:
+        ctx._counter_overlay_originals = {
+            address: read_u8(address)
+            for address in overlay_addresses
+        }
+        ctx._counter_overlay_active = True
+    for addresses, count in overlay_sets:
+        for index, address in enumerate(addresses):
+            write_u8_if_changed(address, 1 if index < count else 0)
 
 
 def goal_or_result_active(slot_data: dict[str, Any]) -> bool:
@@ -649,6 +736,7 @@ async def check_locations(ctx: MarbleBalanceContext) -> None:  # noqa: C901
         if location_id and location_id not in ctx.locations_checked:
             ctx.locations_checked.add(location_id)
             newly_checked.add(location_id)
+            write_collectible_save_flag(location)
             logger.debug(f"Checked: {location_name}")
 
     for location_name, location in ctx.slot_data.get("locations", {}).items():
@@ -659,6 +747,7 @@ async def check_locations(ctx: MarbleBalanceContext) -> None:  # noqa: C901
             if location_is_checked(ctx, location, ctx.slot_data, stage, now):
                 ctx.locations_checked.add(location_id)
                 newly_checked.add(location_id)
+                write_collectible_save_flag(location)
                 logger.debug(f"Checked: {location_name}")
                 if location.get("category") in TROPHY_REQUIREMENTS and location.get("level") == 11:
                     goal_name = location_names.goal_location_name(
@@ -1419,6 +1508,7 @@ async def dolphin_sync_task(ctx: MarbleBalanceContext) -> None:
                     sync_bonus_level_access(ctx)
                     sync_mirror_trophies(ctx)
                     sync_junk_inventory(ctx)
+                    sync_ap_counter_overlays(ctx)
                     enforce_marble_access(ctx)
                     handle_traps(ctx)
                     sync_save_slot_guard(ctx)
