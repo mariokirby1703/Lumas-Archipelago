@@ -146,9 +146,14 @@ class MarbleBalanceContext(CommonContext):
         self._previous_green_or_ant = 0
         self._previous_stump = 0
         self._previous_junk = 0
+        self._green_or_ant_pickup_armed = False
+        self._stump_pickup_armed = False
+        self._junk_pickup_armed = False
         self._pickup_events_seen_this_stage: set[str] = set()
         self._counter_overlay_active = False
         self._counter_overlay_originals: dict[int, int] = {}
+        self._bonus_state_overlay_active = False
+        self._bonus_state_overlay_originals: dict[int, int] = {}
         self.mirror_trap_pending = False
         self.mirror_trap_active = False
         self.mirror_active_since = 0.0
@@ -341,11 +346,17 @@ def reset_stage_detectors(ctx: MarbleBalanceContext, stage: dict[str, Any] | Non
         ctx._previous_green_or_ant = read_u8(static["green_or_ant_temporary_pickup"])
         ctx._previous_stump = read_u8(static["stump_temporary_pickup"])
         ctx._previous_junk = read_u8(static["junk_temporary_pickup"])
+        ctx._green_or_ant_pickup_armed = False
+        ctx._stump_pickup_armed = False
+        ctx._junk_pickup_armed = False
         ctx._pickup_events_seen_this_stage = set()
     except Exception:
         ctx._previous_green_or_ant = 0
         ctx._previous_stump = 0
         ctx._previous_junk = 0
+        ctx._green_or_ant_pickup_armed = False
+        ctx._stump_pickup_armed = False
+        ctx._junk_pickup_armed = False
         ctx._pickup_events_seen_this_stage = set()
 
 
@@ -691,26 +702,39 @@ def poll_pickup_locations(  # noqa: C901
     world = stage.get("world")
     level = stage["level"]
 
-    if green_or_ant != 0 and stage["kind"] == "stage" and level <= 10:
+    if stage["kind"] != "stage" or not level_countdown_ready(ctx, stage):
+        ctx._previous_green_or_ant = green_or_ant
+        ctx._previous_stump = stump
+        ctx._previous_junk = junk
+        return []
+
+    if green_or_ant == 0:
+        ctx._green_or_ant_pickup_armed = True
+    if stump == 0:
+        ctx._stump_pickup_armed = True
+    if junk == 0:
+        ctx._junk_pickup_armed = True
+
+    if ctx._green_or_ant_pickup_armed and green_or_ant != 0 and level <= 10:
         if difficulty == "Normal" and world in NORMAL_WORLDS:
             write_stage_collectible_save_flag(difficulty, world, level, "green_gem")
         elif difficulty == "Hard":
             write_stage_collectible_save_flag(difficulty, world, level, "ant")
 
-    if ctx._previous_green_or_ant == 0 and green_or_ant == 1 and stage["kind"] == "stage" and level <= 10:
+    if ctx._green_or_ant_pickup_armed and ctx._previous_green_or_ant == 0 and green_or_ant == 1 and level <= 10:
         if difficulty == "Normal" and world in NORMAL_WORLDS:
             events.append(location_names.green_gem_location_name(difficulty, world, level))
         elif difficulty == "Hard":
             events.append(location_names.ant_location_name(difficulty, world, level))
 
-    if stump != 0 and stage["kind"] == "stage":
+    if ctx._stump_pickup_armed and stump != 0:
         if difficulty in {"Easy", "Normal"} and world in NORMAL_WORLDS[:6] and level <= 10:
             expected = NORMAL_WORLDS.index(world) * 10 + level
             if stump == expected:
                 write_stage_collectible_save_flag(difficulty, world, level, "stump_piece")
                 events.append(location_names.stump_piece_location_name(difficulty, world, level))
 
-    if junk != 0 and stage["kind"] == "stage" and level <= 10:
+    if ctx._junk_pickup_armed and junk != 0 and level <= 10:
         if difficulty == "Hard" and world in NORMAL_WORLDS[:6]:
             write_stage_collectible_save_flag(difficulty, world, level, "stump_piece")
             events.append(location_names.stump_piece_location_name(difficulty, world, level))
@@ -1019,6 +1043,71 @@ def owned_bonus_levels(ctx: MarbleBalanceContext) -> set[tuple[str, str, int]]:
     return owned
 
 
+def restore_bonus_state_overlay(ctx: MarbleBalanceContext) -> None:
+    if not ctx._bonus_state_overlay_active:
+        return
+    for address, value in ctx._bonus_state_overlay_originals.items():
+        write_u8_if_changed(address, value)
+    ctx._bonus_state_overlay_originals = {}
+    ctx._bonus_state_overlay_active = False
+
+
+def effective_bonus_opening_completion_count(
+    ctx: MarbleBalanceContext,
+    difficulty: str,
+    world: str,
+    current: tuple[str, str | None, str | None, int] | None,
+) -> int:
+    completed = completed_opening_levels(ctx, difficulty, world, "bonus_goal")
+    if current != ("stage", difficulty, world, 5):
+        return completed
+    for location in ctx.slot_data.get("locations", {}).values():
+        if (
+            location.get("category") == "bonus_goal"
+            and location.get("difficulty") == difficulty
+            and location.get("world") == world
+            and location.get("level") == 5
+        ):
+            address = (location.get("addresses") or {}).get("state")
+            if address is not None and read_u8(address) != 3:
+                return completed + 1
+            return completed
+    return completed + 1
+
+
+def sync_bonus_state_overlay(
+    ctx: MarbleBalanceContext,
+    current: tuple[str, str | None, str | None, int] | None,
+) -> None:
+    if current is None or current[0] != "stage":
+        restore_bonus_state_overlay(ctx)
+        return
+
+    current_key = (current[1], current[2], current[3])
+    for location in ctx.slot_data.get("locations", {}).values():
+        if location.get("category") != "bonus_goal":
+            continue
+        key = (location.get("difficulty"), location.get("world"), location.get("level"))
+        if key == current_key:
+            continue
+        if (
+            current[1] == key[0]
+            and current[2] == key[1]
+            and current[3] == 5
+            and key[2] >= 6
+            and effective_bonus_opening_completion_count(ctx, key[0], key[1], current) < 3
+        ):
+            continue
+        address = (location.get("addresses") or {}).get("state")
+        if address is None:
+            continue
+        if address not in ctx._bonus_state_overlay_originals:
+            ctx._bonus_state_overlay_originals[address] = read_u8(address)
+        if read_u8(address) != 3:
+            write_u8_if_changed(address, 2)
+    ctx._bonus_state_overlay_active = bool(ctx._bonus_state_overlay_originals)
+
+
 def sync_bonus_vehicle_gates(ctx: MarbleBalanceContext) -> None:
     static = ctx.slot_data.get("static_addresses", {})
     if vehicle_pickup_protection_active(ctx):
@@ -1046,6 +1135,8 @@ def sync_bonus_vehicle_gates(ctx: MarbleBalanceContext) -> None:
 def sync_bonus_level_access(ctx: MarbleBalanceContext) -> None:
     owned = owned_bonus_levels(ctx)
     current = stage_identity(current_stage(ctx.slot_data)) if in_level_active(ctx.slot_data) else None
+    if current is None:
+        restore_bonus_state_overlay(ctx)
     for location in ctx.slot_data.get("locations", {}).values():
         if location.get("category") != "bonus_goal":
             continue
@@ -1060,6 +1151,7 @@ def sync_bonus_level_access(ctx: MarbleBalanceContext) -> None:
                 write_u8(address, 1)
         elif current != ("stage", key[0], key[1], key[2]) and value in {1, 2, 3}:
             write_u8(address, 0)
+    sync_bonus_state_overlay(ctx, current)
 
 
 def sync_mirror_trophies(ctx: MarbleBalanceContext) -> None:
