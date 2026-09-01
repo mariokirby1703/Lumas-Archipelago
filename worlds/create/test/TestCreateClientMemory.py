@@ -95,15 +95,19 @@ def make_context() -> SimpleNamespace:
                 for index, world_key in enumerate(game_data.WORLD_KEYS)
             },
             "starting_world": "W01",
+            "goal_world": "W07",
             "locations": {},
             "required_sparks": 516,
-            "options": {"create_chain_checks": True},
+            "spark_goal_mode": "goal_world_unlock",
+            "options": {"create_chain_checks": True, "spark_goal_mode": "goal_world_unlock"},
         },
         save_slot_armed=True,
         checked_locations=set(),
         locations_checked=set(),
+        items_received=[],
         _object_records={},
         _object_resync_pending=True,
+        _object_resync_blocked_until=0.0,
         _last_received_object_values=frozenset(),
         _last_object_resync_at=0.0,
         _object_resolver_failure_logged=False,
@@ -111,6 +115,15 @@ def make_context() -> SimpleNamespace:
         _challenge_palette_failure_logged=False,
         _contraption_patch_checked=False,
         _contraption_patch_applied=False,
+        _chain_events_seen=set(),
+        _chain_event_armed_contexts=set(),
+        _chain_completion_context=None,
+        _previous_chain_completion=None,
+        _chain_context_ready_at=0.0,
+        _hub_event_ready_at=0.0,
+        _hub_challenge_spark_armed=False,
+        _previous_hub_challenge_sparks=None,
+        _spark_goal_access_logged=False,
     )
 
 
@@ -215,11 +228,22 @@ class TestCreateClientObjectMemory(unittest.TestCase):
         self.assertEqual(0, self.fake.read_u32(entries + 0x04))
         self.assertEqual(0, self.fake.read_u32(entries))
 
-    def test_total_sparks_is_not_written_by_ap_client(self) -> None:
+    def test_total_sparks_displays_ap_spark_count_when_required_sparks_enabled(self) -> None:
         total_sparks_address = int(game_data.RAM_ADDRESSES["total_sparks"]["address"], 0)
         self.fake.write_u32(total_sparks_address, 123)
 
-        client.sync_total_sparks(self.ctx)
+        with patch.object(client, "received_spark_count", return_value=516):
+            client.sync_total_sparks(self.ctx)
+
+        self.assertEqual(516, self.fake.read_u32(total_sparks_address))
+
+    def test_total_sparks_is_not_written_when_required_sparks_disabled(self) -> None:
+        total_sparks_address = int(game_data.RAM_ADDRESSES["total_sparks"]["address"], 0)
+        self.fake.write_u32(total_sparks_address, 123)
+        self.ctx.slot_data["required_sparks"] = 0
+
+        with patch.object(client, "received_spark_count", return_value=516):
+            client.sync_total_sparks(self.ctx)
 
         self.assertEqual(123, self.fake.read_u32(total_sparks_address))
 
@@ -266,11 +290,93 @@ class TestCreateClientObjectMemory(unittest.TestCase):
 
         with patch.object(client.time, "monotonic", return_value=10.0):
             client.check_create_chain(self.ctx, newly_checked)
-        self.fake.write_byte(chain_completion_address, 1)
         with patch.object(client.time, "monotonic", return_value=13.0):
+            client.check_create_chain(self.ctx, newly_checked)
+        self.fake.write_byte(chain_completion_address, 1)
+        with patch.object(client.time, "monotonic", return_value=14.0):
             client.check_create_chain(self.ctx, newly_checked)
 
         self.assertEqual({12345}, newly_checked)
+
+    def test_hub_create_chain_ignores_stale_startup_completion(self) -> None:
+        current_world_address = int(game_data.RAM_ADDRESSES["current_world_id"]["address"], 0)
+        chain_completion_address = int(game_data.RAM_ADDRESSES["create_chain_completion"]["address"], 0)
+        location_name = "Hub World Create Chain"
+        self.ctx.slot_data["locations"][location_name] = {"id": 23456}
+        self.fake.write_byte(current_world_address, 1)
+        newly_checked: set[int] = set()
+
+        self.fake.write_byte(chain_completion_address, 0)
+        with patch.object(client.time, "monotonic", return_value=10.0):
+            client.check_create_chain(self.ctx, newly_checked)
+        self.fake.write_byte(chain_completion_address, 1)
+        self.ctx._hub_event_ready_at = 60.0
+        with patch.object(client.time, "monotonic", return_value=20.0):
+            client.check_create_chain(self.ctx, newly_checked)
+
+        self.assertEqual(set(), newly_checked)
+
+    def test_hub_create_chain_sends_stable_completion_after_grace(self) -> None:
+        current_world_address = int(game_data.RAM_ADDRESSES["current_world_id"]["address"], 0)
+        chain_completion_address = int(game_data.RAM_ADDRESSES["create_chain_completion"]["address"], 0)
+        location_name = "Hub World Create Chain"
+        self.ctx.slot_data["locations"][location_name] = {"id": 23456}
+        self.fake.write_byte(current_world_address, 1)
+        self.fake.write_byte(chain_completion_address, 1)
+        self.ctx._hub_event_ready_at = 20.0
+        newly_checked: set[int] = set()
+
+        with patch.object(client.time, "monotonic", return_value=10.0):
+            client.check_create_chain(self.ctx, newly_checked)
+        with patch.object(client.time, "monotonic", return_value=23.0):
+            client.check_create_chain(self.ctx, newly_checked)
+
+        self.assertEqual({23456}, newly_checked)
+
+    def test_slot_settle_wait_is_silent(self) -> None:
+        self.ctx._slot_ready_at = 10.0
+
+        with patch.object(client.time, "monotonic", return_value=9.0):
+            with patch.object(client.logger, "info") as info:
+                self.assertFalse(client.CreateContext.slot_ram_is_settled(self.ctx))
+
+        info.assert_not_called()
+
+    def test_hub_challenge_reward_requires_zero_baseline(self) -> None:
+        current_world_address = int(game_data.RAM_ADDRESSES["current_world_id"]["address"], 0)
+        current_challenge_address = int(game_data.RAM_ADDRESSES["current_challenge_index"]["address"], 0)
+        current_sparks_address = int(game_data.RAM_ADDRESSES["current_challenge_sparks"]["address"], 0)
+        location_name = "Hub World Challenge 1 - Reward"
+        self.ctx.slot_data["locations"][location_name] = {"id": 34567}
+        self.fake.write_byte(current_world_address, 1)
+        self.fake.write_byte(current_challenge_address, 10)
+        newly_checked: set[int] = set()
+
+        self.fake.write_byte(current_sparks_address, 1)
+        with patch.object(client.time, "monotonic", return_value=100.0):
+            client.check_challenge_sparks(self.ctx, newly_checked)
+        self.fake.write_byte(current_sparks_address, 0)
+        with patch.object(client.time, "monotonic", return_value=101.0):
+            client.check_challenge_sparks(self.ctx, newly_checked)
+        self.fake.write_byte(current_sparks_address, 1)
+        with patch.object(client.time, "monotonic", return_value=102.0):
+            client.check_challenge_sparks(self.ctx, newly_checked)
+
+        self.assertEqual({34567}, newly_checked)
+
+    def test_spark_requirement_can_unlock_goal_world_from_ap_spark_count(self) -> None:
+        current_world_address = int(game_data.RAM_ADDRESSES["current_world_id"]["address"], 0)
+        goal_world_access = int(game_data.CHALLENGE_RECORDS[6]["access"], 16)
+        self.fake.write_byte(current_world_address, 1)
+        self.fake.write_byte(goal_world_access, 0)
+
+        with (
+            patch.object(client, "received_world_keys", return_value=set()),
+            patch.object(client, "received_spark_count", return_value=516),
+        ):
+            client.sync_world_access(self.ctx)
+
+        self.assertEqual(1, self.fake.read_byte(goal_world_access))
 
 
 if __name__ == "__main__":

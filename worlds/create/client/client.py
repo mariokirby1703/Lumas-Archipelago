@@ -42,6 +42,8 @@ DEFAULT_SYNC_SLEEP_SECONDS = 0.1
 OBJECT_RECORD_COUNT = 262
 OBJECT_LOCK_THRESHOLD = 0x7FFFFFFF
 OBJECT_RESYNC_INTERVAL_SECONDS = 2.0
+OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS = 5.0
+HUB_EVENT_GRACE_SECONDS = 30.0
 OBJECT_LIST_OFFSET = 0x04E4
 CHALLENGE_OBJECT_ENTRY_STRIDE = 0x08
 
@@ -58,6 +60,7 @@ class CreateCommandProcessor(ClientCommandProcessor):
         logger.info(
             f"{len(self.ctx.locations_checked)} local checks, "
             f"{len(received_item_names(self.ctx))} received items, "
+            f"{received_spark_count(self.ctx)} AP Sparks, "
             f"Slot 3 armed: {self.ctx.save_slot_armed}."
         )
 
@@ -91,6 +94,7 @@ class CreateContext(CommonContext):
         self._selected_object_freeze_value: int | None = None
         self._object_records: dict[int, int] = {}
         self._object_resync_pending = True
+        self._object_resync_blocked_until = 0.0
         self._last_received_object_values: frozenset[int] = frozenset()
         self._last_object_resync_at = 0.0
         self._object_resolver_failure_logged = False
@@ -99,8 +103,13 @@ class CreateContext(CommonContext):
         self._contraption_patch_checked = False
         self._contraption_patch_applied = False
         self._chain_events_seen: set[tuple[str | None, int]] = set()
+        self._chain_event_armed_contexts: set[tuple[str | None, int | None]] = set()
         self._chain_completion_context: tuple[str | None, int | None] | None = None
         self._previous_chain_completion: int | None = None
+        self._hub_event_ready_at = 0.0
+        self._hub_challenge_spark_armed = False
+        self._previous_hub_challenge_sparks: int | None = None
+        self._spark_goal_access_logged = False
         self._chain_context_ready_at = 0.0
         self._ram_ready_at = 0.0
         self._ram_settle_logged = False
@@ -154,9 +163,6 @@ class CreateContext(CommonContext):
         remaining = self._ram_ready_at - time.monotonic()
         if remaining <= 0:
             return True
-        if not self._ram_settle_logged:
-            logger.info(f"Waiting {RAM_SETTLE_SECONDS:.0f}s for Create RAM to settle before reading or writing slot data.")
-            self._ram_settle_logged = True
         return False
 
     def _reset_ram_baselines(self) -> None:
@@ -179,6 +185,7 @@ class CreateContext(CommonContext):
     def _reset_object_runtime_state(self) -> None:
         self._object_records = {}
         self._object_resync_pending = True
+        self._object_resync_blocked_until = 0.0
         self._last_received_object_values = frozenset()
         self._last_object_resync_at = 0.0
         self._object_resolver_failure_logged = False
@@ -186,6 +193,11 @@ class CreateContext(CommonContext):
         self._challenge_palette_failure_logged = False
         self._contraption_patch_checked = False
         self._contraption_patch_applied = False
+        self._chain_event_armed_contexts = set()
+        self._hub_event_ready_at = 0.0
+        self._hub_challenge_spark_armed = False
+        self._previous_hub_challenge_sparks = None
+        self._spark_goal_access_logged = False
 
     def start_slot_settle(self) -> None:
         self._slot_ready_at = time.monotonic() + RAM_SETTLE_SECONDS
@@ -196,9 +208,6 @@ class CreateContext(CommonContext):
         remaining = self._slot_ready_at - time.monotonic()
         if remaining <= 0:
             return True
-        if not self._slot_settle_logged:
-            logger.info(f"Save Slot 3 observed. Waiting {RAM_SETTLE_SECONDS:.0f}s before AP RAM sync.")
-            self._slot_settle_logged = True
         return False
 
     def make_gui(self):
@@ -340,7 +349,6 @@ def object_records(ctx: CreateContext) -> dict[int, int] | None:
     try:
         ctx._object_records = resolve_object_records(ctx)
         ctx._object_resolver_failure_logged = False
-        logger.info(f"Resolved {len(ctx._object_records)} Create Object availability records.")
     except Exception as error:
         ctx._object_records = {}
         if not ctx._object_resolver_failure_logged:
@@ -365,7 +373,7 @@ def sync_save_slot_guard(ctx: CreateContext) -> None:
         return
     if ctx._save_slot_verified_once:
         if not ctx.save_slot_armed:
-            logger.info("Save Slot 3 was verified earlier. Skipping guard read for this reconnect.")
+            ctx._hub_event_ready_at = time.monotonic() + HUB_EVENT_GRACE_SECONDS
         ctx.save_slot_armed = True
         return
 
@@ -384,7 +392,7 @@ def sync_save_slot_guard(ctx: CreateContext) -> None:
             ctx.save_slot_armed = False
             return
         if not ctx.save_slot_armed:
-            logger.info("Save Slot 3 RAM settled. RAM writes and location sending are now enabled.")
+            ctx._hub_event_ready_at = time.monotonic() + HUB_EVENT_GRACE_SECONDS
         ctx.save_slot_armed = True
         ctx._save_slot_verified_once = True
         return
@@ -393,9 +401,7 @@ def sync_save_slot_guard(ctx: CreateContext) -> None:
         ctx.save_slot_armed = ctx.slot_ram_is_settled()
         return
 
-    if ctx.save_slot_armed:
-        logger.info("Save Slot 3 guard no longer matches. RAM writes and location sending are paused.")
-    elif not ctx._waiting_for_slot_logged:
+    if not ctx.save_slot_armed and not ctx._waiting_for_slot_logged:
         logger.info("Waiting for Save Slot 3 guard before sending checks or writing RAM.")
         ctx._waiting_for_slot_logged = True
     ctx.save_slot_armed = False
@@ -447,9 +453,22 @@ def checked_location(ctx: CreateContext, location_name: str, newly_checked: set[
 def check_challenge_sparks(ctx: CreateContext, newly_checked: set[int]) -> None:
     if current_world_id(ctx) == 1 and current_challenge_raw(ctx) == 10:
         earned = read_u8(_address(ctx.slot_data["ram"]["addresses"]["current_challenge_sparks"]))
-        if earned > 0:
+        previous = ctx._previous_hub_challenge_sparks
+        ctx._previous_hub_challenge_sparks = earned
+        if earned == 0:
+            ctx._hub_challenge_spark_armed = True
+            return
+        if (
+            ctx._hub_challenge_spark_armed
+            and previous == 0
+            and earned > 0
+            and time.monotonic() >= ctx._hub_event_ready_at
+        ):
             checked_location(ctx, "Hub World Challenge 1 - Reward", newly_checked)
+            ctx._hub_challenge_spark_armed = False
         return
+    ctx._hub_challenge_spark_armed = False
+    ctx._previous_hub_challenge_sparks = None
 
     world_key = current_world_key(ctx)
     if not world_key:
@@ -488,17 +507,35 @@ def check_create_chain(ctx: CreateContext, newly_checked: set[int]) -> None:
         ctx._chain_completion_context = context_key
         ctx._previous_chain_completion = completion_flag
         ctx._chain_context_ready_at = time.monotonic() + CHAIN_CONTEXT_SETTLE_SECONDS
+        ctx._chain_event_armed_contexts.discard(context_key)
         return
     if time.monotonic() < ctx._chain_context_ready_at:
         ctx._previous_chain_completion = completion_flag
         return
+    if completion_flag == 0:
+        ctx._chain_event_armed_contexts.add(context_key)
 
     previous_completion = ctx._previous_chain_completion
     ctx._previous_chain_completion = completion_flag
     if (
+        world_id == 1
+        and completion_flag == 1
+        and time.monotonic() >= ctx._hub_event_ready_at
+    ):
+        event_key = (None, 1)
+        if event_key not in ctx._chain_events_seen:
+            checked_location(ctx, "Hub World Create Chain", newly_checked)
+            ctx._chain_events_seen.add(event_key)
+            ctx._chain_event_armed_contexts.discard(context_key)
+            ctx._object_resync_blocked_until = time.monotonic() + OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS
+            ctx._object_resync_pending = True
+        return
+    if (
         previous_completion is None
         or previous_completion == 1
         or completion_flag != 1
+        or context_key not in ctx._chain_event_armed_contexts
+        or (world_id == 1 and time.monotonic() < ctx._hub_event_ready_at)
     ):
         return
 
@@ -507,6 +544,9 @@ def check_create_chain(ctx: CreateContext, newly_checked: set[int]) -> None:
         if event_key not in ctx._chain_events_seen:
             checked_location(ctx, "Hub World Create Chain", newly_checked)
             ctx._chain_events_seen.add(event_key)
+            ctx._chain_event_armed_contexts.discard(context_key)
+            ctx._object_resync_blocked_until = time.monotonic() + OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS
+            ctx._object_resync_pending = True
     elif world_key is not None:
         chain = max(1, min(5, (chain_index or 0) + 1))
         event_key = (world_key, chain)
@@ -514,6 +554,9 @@ def check_create_chain(ctx: CreateContext, newly_checked: set[int]) -> None:
             world_name = ctx.slot_data["worlds"][world_key]["name"]
             checked_location(ctx, f"{world_name} Create Chain {chain}", newly_checked)
             ctx._chain_events_seen.add(event_key)
+            ctx._chain_event_armed_contexts.discard(context_key)
+            ctx._object_resync_blocked_until = time.monotonic() + OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS
+            ctx._object_resync_pending = True
 
 
 def location_context_is_settled(ctx: CreateContext) -> bool:
@@ -531,9 +574,6 @@ def location_context_is_settled(ctx: CreateContext) -> bool:
     remaining = ctx._location_context_ready_at - time.monotonic()
     if remaining <= 0:
         return True
-    if not ctx._location_context_logged:
-        logger.info(f"Waiting {WORLD_CONTEXT_SETTLE_SECONDS:.0f}s after world load before sending Create checks.")
-        ctx._location_context_logged = True
     return False
 
 
@@ -594,6 +634,9 @@ def sync_object_availability(ctx: CreateContext, challenge_active: bool) -> None
         return
 
     now = time.monotonic()
+    if now < ctx._object_resync_blocked_until:
+        ctx._object_resync_pending = True
+        return
     if (
         not ctx._object_resync_pending
         and now - ctx._last_object_resync_at < OBJECT_RESYNC_INTERVAL_SECONDS
@@ -649,8 +692,24 @@ def sync_world_access(ctx: CreateContext) -> None:
 
     owned_worlds = received_world_keys(ctx)
     records = ctx.slot_data["ram"]["challenge_records"]
+    required_sparks = int(ctx.slot_data.get("required_sparks", 0))
+    spark_goal_mode = ctx.slot_data.get("spark_goal_mode") or ctx.slot_data.get("options", {}).get("spark_goal_mode")
+    ap_sparks = received_spark_count(ctx)
     for world_key, world_data in ctx.slot_data.get("worlds", {}).items():
         unlocked = 1 if world_key in owned_worlds else 0
+        if (
+            required_sparks > 0
+            and spark_goal_mode == "goal_world_unlock"
+            and world_key == ctx.slot_data.get("goal_world")
+            and ap_sparks >= required_sparks
+        ):
+            unlocked = 1
+            if not ctx._spark_goal_access_logged:
+                logger.info(
+                    f"Luma found their {world_data['name']} Access "
+                    f"({ap_sparks} Sparks Collected)."
+                )
+                ctx._spark_goal_access_logged = True
         if world_key == ctx.slot_data.get("starting_world") and not hub_create_chain_done(ctx):
             unlocked = 0
         if not world_data.get("included", True):
@@ -665,7 +724,11 @@ def sync_world_access(ctx: CreateContext) -> None:
 
 
 def sync_total_sparks(ctx: CreateContext) -> None:
-    return
+    required_sparks = int(ctx.slot_data.get("required_sparks", 0))
+    if not ctx.save_slot_armed or required_sparks <= 0:
+        return
+    total_sparks_address = _address(ctx.slot_data["ram"]["addresses"]["total_sparks"])
+    write_u32_be_if_changed(total_sparks_address, min(received_spark_count(ctx), 610))
 
 
 def _read_challenge_object_list_candidate(container: int) -> tuple[int, int] | None:
@@ -765,7 +828,6 @@ def ensure_contraption_patch(ctx: CreateContext, challenge_active: bool) -> None
     write_u32_be(address, patched)
     ctx._contraption_patch_checked = True
     ctx._contraption_patch_applied = True
-    logger.info("Applied Create Contraption-o-matic availability patch.")
 
 
 def enforce_selected_object(ctx: CreateContext) -> bool:
@@ -839,7 +901,13 @@ def process_victory(ctx: CreateContext) -> None:
     if ctx.finished_game:
         return
     required_sparks = int(ctx.slot_data.get("required_sparks", 0))
-    if ITEM_VICTORY in received_item_names(ctx) and received_spark_count(ctx) >= required_sparks:
+    spark_goal_mode = ctx.slot_data.get("spark_goal_mode") or ctx.slot_data.get("options", {}).get("spark_goal_mode")
+    spark_count = received_spark_count(ctx)
+    if required_sparks > 0 and spark_goal_mode == "spark_hunt" and spark_count >= required_sparks:
+        Utils.async_start(ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}]))
+        ctx.finished_game = True
+        return
+    if ITEM_VICTORY in received_item_names(ctx) and spark_count >= required_sparks:
         Utils.async_start(ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}]))
         ctx.finished_game = True
 

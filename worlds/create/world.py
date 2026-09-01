@@ -41,6 +41,7 @@ class CreateWorld(World):
     active_world_keys: tuple[str, ...]
     world_unlock_order: tuple[str, ...]
     required_sparks: int
+    spark_goal_mode: str
 
     @staticmethod
     def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:
@@ -48,34 +49,53 @@ class CreateWorld(World):
 
     def generate_early(self) -> None:
         self._apply_ut_slot_data()
-        self.active_world_keys = WORLD_KEYS if self.options.include_ii_worlds else FIRST_TEN_WORLDS
+        self.required_sparks = int(self.options.required_sparks.value)
+        self.spark_goal_mode = "spark_hunt" if self.options.spark_goal_mode.value == 1 else "goal_world_unlock"
+        active_world_keys = list(WORLD_KEYS if self.options.include_ii_worlds else FIRST_TEN_WORLDS)
         if not getattr(self, "starting_world_key", None):
-            option_value = self.options.starting_world.value
-            self.starting_world_key = WORLD_KEYS[option_value - 1]
-        if self.starting_world_key not in self.active_world_keys:
-            self.starting_world_key = self.random.choice(self.active_world_keys)
+            starting_option = self.options.starting_world.value
+            self.starting_world_key = (
+                self.random.choice(active_world_keys)
+                if starting_option == 0
+                else WORLD_KEYS[starting_option - 1]
+            )
+        if not getattr(self, "goal_world_key", None):
+            goal_option = self.options.goal_world.value
+            self.goal_world_key = (
+                self.random.choice(active_world_keys)
+                if goal_option == 0
+                else WORLD_KEYS[goal_option - 1]
+            )
+
+        selected_world_keys = [self.starting_world_key]
+        if not (self.required_sparks > 0 and self.spark_goal_mode == "spark_hunt"):
+            selected_world_keys.append(self.goal_world_key)
+        for selected_world_key in selected_world_keys:
+            if selected_world_key not in active_world_keys:
+                active_world_keys.append(selected_world_key)
+        self.active_world_keys = tuple(active_world_keys)
+
         if not self._can_bootstrap_starting_world(self.starting_world_key):
             bootstrap_worlds = [
                 world_key for world_key in self.active_world_keys
                 if self._can_bootstrap_starting_world(world_key)
             ]
             self.starting_world_key = self.random.choice(bootstrap_worlds)
-        if not getattr(self, "goal_world_key", None):
-            self.goal_world_key = WORLD_KEYS[self.options.goal_world.value - 1]
         if self.goal_world_key not in self.active_world_keys:
             self.goal_world_key = self.random.choice(self.active_world_keys)
+        if (
+            self.required_sparks > 0
+            and self.spark_goal_mode == "goal_world_unlock"
+            and self.goal_world_key == self.starting_world_key
+        ):
+            possible_goal_worlds = [
+                world_key for world_key in self.active_world_keys
+                if world_key != self.starting_world_key
+            ]
+            self.goal_world_key = self.random.choice(possible_goal_worlds)
         remaining_worlds = [world_key for world_key in self.active_world_keys if world_key != self.starting_world_key]
         self.random.shuffle(remaining_worlds)
         self.world_unlock_order = (self.starting_world_key, *remaining_worlds)
-        self.required_sparks = int(self.options.required_sparks.value)
-        self.multiworld.early_items[self.player]["Jumbo Ramp"] = 1
-        self.multiworld.local_early_items[self.player]["Jumbo Ramp"] = 1
-        for challenge_number in range(1, 6):
-            challenge_data = game_data.CHALLENGE_TABLE[(self.starting_world_key, challenge_number)]
-            for requirement in challenge_data.objects:
-                if requirement.global_value in game_data.UNLOCKABLE_OBJECT_VALUES:
-                    item_name = game_data.object_item_name(requirement.name)
-                    self.multiworld.local_early_items[self.player].setdefault(item_name, 1)
 
     def _apply_ut_slot_data(self) -> None:
         re_gen_passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
@@ -186,10 +206,19 @@ class CreateWorld(World):
         return game_data.spark_location_name(self.goal_world_key, 10, 1)
 
     def _place_victory_item(self) -> None:
+        if self.required_sparks > 0 and self.spark_goal_mode == "spark_hunt":
+            return
         self.get_location(self._goal_location_name()).place_locked_item(self.create_item(ITEM_VICTORY))
 
     def _starting_challenge_object_names(self, world_key: str) -> list[str]:
         challenge_data = game_data.CHALLENGE_TABLE[(world_key, 1)]
+        possible_requirements = game_data.possible_challenge_requirements(challenge_data, 1)
+        if possible_requirements:
+            shortest_requirement = min(possible_requirements, key=lambda requirement: len(requirement.objects))
+            return [
+                game_data.object_item_name(object_name)
+                for object_name in shortest_requirement.objects
+            ]
         return [
             game_data.object_item_name(requirement.name)
             for requirement in challenge_data.objects
@@ -201,14 +230,12 @@ class CreateWorld(World):
             item_name for item_name in self._starting_challenge_object_names(world_key)
             if item_name != "Jumbo Ramp"
         ]
-        bootstrap_slots = 1 if not self.options.create_chain_checks else 2
+        bootstrap_slots = 2 if not self.options.create_chain_checks else 3
         return len(non_jumbo_objects) <= bootstrap_slots
 
     def _place_bootstrap_items(self) -> None:
         bootstrap_locations: list[str] = []
-        if not self.options.create_chain_checks:
-            bootstrap_locations.append(game_data.hub_create_chain_location_name())
-        else:
+        if self.options.create_chain_checks:
             bootstrap_locations.append(game_data.create_chain_location_name(self.starting_world_key, 1))
         bootstrap_locations.extend(
             [
@@ -235,6 +262,7 @@ class CreateWorld(World):
             "create_chain_checks",
             "include_ii_worlds",
             "required_sparks",
+            "spark_goal_mode",
         )
         return {
             "game": self.game,
@@ -246,6 +274,7 @@ class CreateWorld(World):
             "world_unlock_order": list(self.world_unlock_order),
             "starting_objects": self._starting_challenge_object_names(self.starting_world_key),
             "required_sparks": self.required_sparks,
+            "spark_goal_mode": self.spark_goal_mode,
             "options": option_data,
             "locations": {
                 name: self._slot_location_data(name)
@@ -301,6 +330,14 @@ class CreateWorld(World):
             "special": challenge.special,
             "spark_reward": challenge.spark_reward,
             "block_value": challenge.block_value,
+            "logic_objects": list(game_data.challenge_logic_object_names(challenge)),
+            "possible_requirements": [
+                {
+                    "objects": list(requirement.objects),
+                    "max_spark": requirement.max_spark,
+                }
+                for requirement in game_data.possible_challenge_requirements(challenge)
+            ],
             "objects": [
                 {
                     "name": requirement.name,

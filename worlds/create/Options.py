@@ -2,11 +2,14 @@ from dataclasses import dataclass
 
 from Options import Choice, DefaultOnToggle, OptionGroup, PerGameCommonOptions, Range, Toggle
 
+from .world_constants import WORLD_NAMES
+
 
 class StartingWorld(Choice):
     """World that starts unlocked. Random chooses one of the 14 campaign worlds during generation."""
 
     display_name = "Starting World"
+    option_random_world = 0
     option_theme_park = 1
     option_transportopia = 2
     option_family_home = 3
@@ -22,12 +25,25 @@ class StartingWorld(Choice):
     option_outer_space_ii = 13
     option_future_world_ii = 14
     default = "random"
+
+    @classmethod
+    def from_text(cls, text: str):
+        if text.lower() == "random":
+            return cls(cls.option_random_world)
+        return super().from_text(text)
+
+    @classmethod
+    def get_option_name(cls, value: int) -> str:
+        if value == cls.option_random_world:
+            return "Random"
+        return WORLD_NAMES[value_to_world_key(value)]
 
 
 class GoalWorld(Choice):
     """Challenge 10 of this world is the victory condition."""
 
     display_name = "Goal World"
+    option_random_world = 0
     option_theme_park = 1
     option_transportopia = 2
     option_family_home = 3
@@ -43,6 +59,22 @@ class GoalWorld(Choice):
     option_outer_space_ii = 13
     option_future_world_ii = 14
     default = "random"
+
+    @classmethod
+    def from_text(cls, text: str):
+        if text.lower() == "random":
+            return cls(cls.option_random_world)
+        return super().from_text(text)
+
+    @classmethod
+    def get_option_name(cls, value: int) -> str:
+        if value == cls.option_random_world:
+            return "Random"
+        return WORLD_NAMES[value_to_world_key(value)]
+
+
+def value_to_world_key(value: int) -> str:
+    return f"W{value:02d}"
 
 
 class CreateChainChecks(DefaultOnToggle):
@@ -58,11 +90,20 @@ class IncludeIIWorlds(Toggle):
 
 
 class RequiredSparks(Range):
-    """Require this many AP Spark items before the client can goal. 0 disables AP Spark goal gating."""
+    """Require this many Sparks before the client can goal. 0 disables Spark goal gating."""
 
-    display_name = "Required AP Sparks"
+    display_name = "Required Sparks"
     range_start = 0
     range_end = 610
+    default = 0
+
+
+class SparkGoalMode(Choice):
+    """How Required Sparks are used when set above 0."""
+
+    display_name = "Spark Goal Mode"
+    option_goal_world_unlock = 0
+    option_spark_hunt = 1
     default = 0
 
 
@@ -73,6 +114,7 @@ class CreateOptions(PerGameCommonOptions):
     create_chain_checks: CreateChainChecks
     include_ii_worlds: IncludeIIWorlds
     required_sparks: RequiredSparks
+    spark_goal_mode: SparkGoalMode
 
 
 option_groups = [
@@ -84,6 +126,7 @@ option_groups = [
             CreateChainChecks,
             IncludeIIWorlds,
             RequiredSparks,
+            SparkGoalMode,
         ],
     ),
 ]
@@ -96,6 +139,7 @@ option_presets = {
         "create_chain_checks": True,
         "include_ii_worlds": False,
         "required_sparks": 0,
+        "spark_goal_mode": "goal_world_unlock",
     },
     "Compact": {
         "starting_world": "random",
@@ -103,5 +147,6 @@ option_presets = {
         "create_chain_checks": True,
         "include_ii_worlds": False,
         "required_sparks": 0,
+        "spark_goal_mode": "goal_world_unlock",
     },
 }

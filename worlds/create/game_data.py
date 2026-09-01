@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections import Counter
 from dataclasses import dataclass
 from importlib.resources import files
 from typing import Any
@@ -35,6 +36,12 @@ class ChallengeData:
     special: str | None
     block_value: int | None
     objects: tuple[ObjectRequirement, ...]
+
+
+@dataclass(frozen=True)
+class PossibleChallengeRequirement:
+    objects: tuple[str, ...]
+    max_spark: int | None = None
 
 
 def _load_json(filename: str) -> Any:
@@ -139,6 +146,206 @@ ALL_CHALLENGES: tuple[ChallengeData, ...] = tuple(
 
 HUB_CHALLENGE_DATA = CHALLENGE_TABLE[(HUB_WORLD_KEY, 1)]
 
+SCORETACULAR_POSSIBLE_REQUIREMENTS = (
+    PossibleChallengeRequirement(("Bouncer",)),
+    PossibleChallengeRequirement(("Teleporter",), 1),
+    PossibleChallengeRequirement(("Perfect Teleporter",), 1),
+)
+
+POSSIBLE_CHALLENGE_REQUIREMENTS: dict[tuple[str, int], tuple[PossibleChallengeRequirement, ...]] = {
+    ("W02", 1): (PossibleChallengeRequirement(("Jumbo Ramp",)),),
+    ("W02", 2): (PossibleChallengeRequirement(("Beach Buggy", "Jumbo Ramp")),),
+    ("W02", 3): (PossibleChallengeRequirement(("Tow Truck",)),),
+    ("W02", 4): (PossibleChallengeRequirement(("Jumbo Ramp",)),),
+    ("W02", 5): (PossibleChallengeRequirement(("Jumbo Ramp",)),),
+    ("W02", 6): (PossibleChallengeRequirement(("Jumbo Ramp",)),),
+    ("W02", 7): (PossibleChallengeRequirement(("Temporary Glue", "Horseshoe Magnet")),),
+    ("W02", 8): (PossibleChallengeRequirement(("Girder",)), PossibleChallengeRequirement(("Drivewheel",))),
+    ("W02", 9): (PossibleChallengeRequirement(("Tow Rocket", "Horseshoe Magnet")),),
+    ("W02", 10): (PossibleChallengeRequirement(("Bouncer",)),),
+    ("W01", 1): (PossibleChallengeRequirement(("Jumbo Ramp",)),),
+    ("W01", 2): (PossibleChallengeRequirement(("Basketball",)),),
+    ("W01", 3): (PossibleChallengeRequirement(("Automatic Rocket",)),),
+    ("W01", 4): (PossibleChallengeRequirement(("Automatic Fan",)),),
+    ("W01", 5): (PossibleChallengeRequirement(("Automatic Fan", "Balloon")),),
+    ("W01", 6): (PossibleChallengeRequirement(("Elephant Balloon", "Jumbo Ramp")),),
+    ("W01", 7): (PossibleChallengeRequirement(("Jumbo Ramp",), 3),),
+    ("W01", 8): (
+        PossibleChallengeRequirement(("Long Block",)),
+        PossibleChallengeRequirement(("Block",)),
+        PossibleChallengeRequirement(("Girder",)),
+    ),
+    ("W01", 9): (PossibleChallengeRequirement(("Drivewheel",)),),
+    ("W01", 10): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W03", 1): (PossibleChallengeRequirement(("Lawn Mower", "Jumbo Ramp")),),
+    ("W03", 2): (PossibleChallengeRequirement(("Automatic Fan",)),),
+    ("W03", 3): (PossibleChallengeRequirement(("Spring Pad Ramp",)),),
+    ("W03", 4): (PossibleChallengeRequirement(("Long Block",)), PossibleChallengeRequirement(("Block",))),
+    ("W03", 5): (PossibleChallengeRequirement(("Spring Pad Ramp",)),),
+    ("W03", 6): (PossibleChallengeRequirement(("Spring Pad Ramp",)),),
+    ("W03", 7): (PossibleChallengeRequirement(("Jumbo Ramp",)),),
+    ("W03", 8): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W03", 9): (PossibleChallengeRequirement(("Blast Bomb", "Spring Pad Ramp"), 1),),
+    ("W03", 10): (PossibleChallengeRequirement(("Spring Pad Ramp",)),),
+    ("W04", 1): (PossibleChallengeRequirement(("Jumbo Ramp",)), PossibleChallengeRequirement(("Automatic Rocket",))),
+    ("W04", 2): (PossibleChallengeRequirement(("Block",)), PossibleChallengeRequirement(("Long Block",))),
+    ("W04", 3): (PossibleChallengeRequirement(("Bouncer", "Teleporter")),),
+    ("W04", 4): (PossibleChallengeRequirement(("Laser Cannon", "Rock no. 42")),),
+    ("W04", 5): (PossibleChallengeRequirement(("Spring Pad Ramp", "Ladder")),),
+    ("W04", 6): (PossibleChallengeRequirement(("Block",)), PossibleChallengeRequirement(("Long Block",))),
+    ("W04", 7): (PossibleChallengeRequirement(("Laser Cannon", "Rock no. 42")),),
+    ("W04", 8): (PossibleChallengeRequirement(("Space Mine",)),),
+    ("W04", 10): (
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Long Block")),
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
+    ),
+    ("W05", 1): (PossibleChallengeRequirement(("Balloon", "Outdoor Trailer", "Tractor")),),
+    ("W05", 2): (PossibleChallengeRequirement(("Automatic Fan",)),),
+    ("W05", 3): (PossibleChallengeRequirement(("Block",)), PossibleChallengeRequirement(("Long Block",))),
+    ("W05", 5): (PossibleChallengeRequirement(("Jumbo Ramp",), 1),),
+    ("W05", 6): (PossibleChallengeRequirement(("Block",)), PossibleChallengeRequirement(("Long Block",))),
+    ("W05", 7): (PossibleChallengeRequirement(("Spring Pad Ramp", "Jumbo Ramp")),),
+    ("W05", 8): (PossibleChallengeRequirement(("Horseshoe Magnet",)),),
+    ("W05", 9): (PossibleChallengeRequirement(("Blast Bomb", "Horseshoe Magnet"), 1),),
+    ("W05", 10): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W08", 1): (
+        PossibleChallengeRequirement(("Automatic Fan", "Marker Cone")),
+        PossibleChallengeRequirement(("Automatic Fan", "Packing Pallet")),
+    ),
+    ("W08", 3): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W08", 5): (PossibleChallengeRequirement(("Spring Pad Ramp", "Tall Steps")),),
+    ("W08", 7): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W08", 8): (PossibleChallengeRequirement(("Teleporter",)),),
+    ("W08", 9): (PossibleChallengeRequirement(("Balloon",)),),
+    ("W06", 1): (PossibleChallengeRequirement(("Egyptian Obelisk", "Canopic Jar")),),
+    ("W06", 2): (PossibleChallengeRequirement(("Blast Bomb", "Spring Pad Ramp")),),
+    ("W06", 3): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W06", 5): (PossibleChallengeRequirement(("Blast Bomb", "Jumbo Ramp"), 3),),
+    ("W06", 6): (PossibleChallengeRequirement(("Block",)), PossibleChallengeRequirement(("Long Block",))),
+    ("W06", 9): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W07", 1): (PossibleChallengeRequirement(("Haz-chem Canister", "Jumbo Ramp", "Temporary Glue")),),
+    ("W07", 2): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W07", 3): (
+        PossibleChallengeRequirement(("Ramp-Bot", "Spring Pad 3000", "Horseshoe Magnet", "Spring Pad Ramp")),
+    ),
+    ("W07", 4): (PossibleChallengeRequirement(("Long Block",)), PossibleChallengeRequirement(("Block",), 3)),
+    ("W07", 7): (PossibleChallengeRequirement(("Jumbo Ramp", "Magnet-Bot")),),
+    ("W07", 9): (PossibleChallengeRequirement(("Haz-chem Canister", "Temporary Glue", "Lazy-Bot")),),
+    ("W07", 10): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W09", 1): (PossibleChallengeRequirement(("Pop-Up Barrel", "Pirate Boot")),),
+    ("W09", 2): (
+        PossibleChallengeRequirement(("Girder", "Long Block", "Hinge")),
+        PossibleChallengeRequirement(("Girder", "Block", "Hinge")),
+    ),
+    ("W09", 5): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W09", 6): (PossibleChallengeRequirement(("Bouncer", "Burster")),),
+    ("W09", 10): (PossibleChallengeRequirement(("Long Block",)), PossibleChallengeRequirement(("Block",))),
+    ("W10", 1): (PossibleChallengeRequirement(("Horseshoe Magnet", "Dart Rocket", "Bouncer")),),
+    ("W10", 2): (PossibleChallengeRequirement(("Blast Bomb",)),),
+    ("W10", 3): (
+        PossibleChallengeRequirement(("Girder",)),
+        PossibleChallengeRequirement(("Long Block",)),
+        PossibleChallengeRequirement(("Block",)),
+    ),
+    ("W10", 4): (PossibleChallengeRequirement(("Blast Bomb", "Battering Ram (Low)", "Dart Rocket")),),
+    ("W10", 8): (
+        PossibleChallengeRequirement(("Balloon", "Small Ramp", "Knight Armour")),
+        PossibleChallengeRequirement(("Balloon", "Small Ramp", "Heaven Armour")),
+    ),
+    ("W10", 9): (
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Long Block")),
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
+    ),
+    ("W11", 1): (PossibleChallengeRequirement(("Girder",)),),
+    ("W11", 2): (PossibleChallengeRequirement(("Teleporter",)),),
+    ("W11", 3): (PossibleChallengeRequirement(("Bouncer", "Teleporter")),),
+    ("W11", 4): (
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Long Block")),
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
+    ),
+    ("W11", 7): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W11", 10): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W12", 2): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W12", 5): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W12", 8): (PossibleChallengeRequirement(("Soccer Ball", "Spring Pad Ramp")),),
+    ("W12", 10): (
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Long Block")),
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
+    ),
+    ("W13", 1): (PossibleChallengeRequirement(("Dark Matter",)),),
+    ("W13", 2): (PossibleChallengeRequirement(("Space Mine", "Spring Pad Ramp")),),
+    ("W13", 3): (
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Long Block")),
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
+    ),
+    ("W13", 5): (PossibleChallengeRequirement(("Horseshoe Magnet", "Zero-Gravity Generator", "Space Mine")),),
+    ("W13", 6): (
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Long Block")),
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
+    ),
+    ("W13", 9): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W13", 10): (PossibleChallengeRequirement(("Automatic Rocket", "Zero-Gravity Generator", "Teleporter")),),
+    ("W14", 1): (PossibleChallengeRequirement(("Ultra Bounce Ball",)),),
+    ("W14", 2): (PossibleChallengeRequirement(("Girder", "Drivewheel")),),
+    ("W14", 5): (PossibleChallengeRequirement(("Spring Pad 3000",)),),
+    ("W14", 6): (
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Long Block")),
+        PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
+    ),
+    ("W14", 7): (PossibleChallengeRequirement(("Defense Laser", "Lazy-Bot")),),
+    ("W14", 9): (
+        PossibleChallengeRequirement(("Girder", "Long Block", "Hinge")),
+        PossibleChallengeRequirement(("Girder", "Block", "Hinge")),
+    ),
+}
+
+POSSIBLE_CHALLENGE_OBJECT_NAMES = frozenset(
+    object_name
+    for requirement_group in POSSIBLE_CHALLENGE_REQUIREMENTS.values()
+    for requirement in requirement_group
+    for object_name in requirement.objects
+) | frozenset(
+    object_name
+    for requirement in SCORETACULAR_POSSIBLE_REQUIREMENTS
+    for object_name in requirement.objects
+)
+
+
+def possible_challenge_requirements(
+    challenge_data: ChallengeData,
+    spark: int | None = None,
+) -> tuple[PossibleChallengeRequirement, ...]:
+    requirements = list(POSSIBLE_CHALLENGE_REQUIREMENTS.get((challenge_data.world_key, challenge_data.challenge), ()))
+    if challenge_data.special == "Scoretacular":
+        requirements.extend(SCORETACULAR_POSSIBLE_REQUIREMENTS)
+    if spark is not None:
+        requirements = [
+            requirement
+            for requirement in requirements
+            if requirement.max_spark is None or spark <= requirement.max_spark
+        ]
+    return tuple(dict.fromkeys(requirements))
+
+
+def challenge_logic_object_names(challenge_data: ChallengeData) -> tuple[str, ...]:
+    if challenge_data.special == "Scoretacular":
+        return ("Bouncer",)
+    return tuple(
+        requirement.name
+        for requirement in challenge_data.objects
+        if requirement.global_value in UNLOCKABLE_OBJECT_VALUES
+    )
+
+
+def challenge_has_out_of_logic_possible(challenge_data: ChallengeData, spark: int | None = None) -> bool:
+    strict_objects = frozenset(challenge_logic_object_names(challenge_data))
+    for possible_requirement in possible_challenge_requirements(challenge_data, spark):
+        if possible_requirement.max_spark is not None:
+            return True
+        if frozenset(possible_requirement.objects) != strict_objects:
+            return True
+    return False
+
 RAM_MAP = _load_json("ram_map.json")
 RAM_ADDRESSES = RAM_MAP["addresses"]
 CHALLENGE_RECORDS = RAM_MAP["challenge_records"]["records"]
@@ -175,26 +382,140 @@ def required_object_values(world_keys: tuple[str, ...] | None = None) -> frozens
     )
 
 
-def spark_item_amounts_for_total(total: int) -> list[int]:
-    if total < 0 or total > 610:
-        raise ValueError(f"Create required spark total must be between 0 and 610, got {total}.")
-    available_amounts = [
+def _vanilla_spark_amounts() -> list[int]:
+    amounts = [
         challenge.spark_reward
         for challenge in (HUB_CHALLENGE_DATA, *ALL_CHALLENGES)
     ]
-    available_amounts.extend([1] * (len(WORLD_KEYS) * CREATE_CHAINS_PER_WORLD + 1))
-    available_amounts.sort(reverse=True)
+    amounts.extend([1] * (len(WORLD_KEYS) * CREATE_CHAINS_PER_WORLD + 1))
+    return amounts
 
+
+def spark_item_amounts_for_total(
+    total: int,
+    random_source: Any | None = None,
+    max_count: int | None = None,
+) -> list[int]:
+    if total < 0 or total > 610:
+        raise ValueError(f"Create required spark total must be between 0 and 610, got {total}.")
+    available_amounts = _vanilla_spark_amounts()
+    if sum(available_amounts) != 610:
+        raise ValueError("Create vanilla AP Spark amount table must sum to 610.")
+    if total == 610:
+        result = list(available_amounts)
+        if max_count is not None and len(result) > max_count:
+            result = _compact_spark_amounts(total, max_count, random_source)
+        if random_source is not None:
+            random_source.shuffle(result)
+        return result
+
+    amount_to_remove = 610 - total
+    removal_candidates = _spark_removal_candidates(available_amounts, total)
+    if random_source is not None:
+        random_source.shuffle(removal_candidates)
+
+    min_remove_count = max(0, len(available_amounts) - max_count) if max_count is not None else 0
     reachable: dict[int, list[int]] = {0: []}
-    for amount in available_amounts:
+    for amount in removal_candidates:
         for subtotal, amounts in tuple(reachable.items()):
             next_total = subtotal + amount
-            if next_total > total or next_total in reachable:
+            if next_total > amount_to_remove:
                 continue
-            reachable[next_total] = [*amounts, amount]
-            if next_total == total:
-                return reachable[next_total]
-    return reachable[total]
+            next_amounts = [*amounts, amount]
+            if len(next_amounts) > len(reachable.get(next_total, [])):
+                reachable[next_total] = next_amounts
+
+    if amount_to_remove in reachable and len(reachable[amount_to_remove]) >= min_remove_count:
+        removed = Counter(reachable[amount_to_remove])
+        result = []
+        for amount in available_amounts:
+            if removed[amount]:
+                removed[amount] -= 1
+            else:
+                result.append(amount)
+    elif max_count is not None:
+        result = _compact_spark_amounts(total, max_count, random_source)
+    else:
+        raise ValueError(f"Could not build Create AP Spark amount list for total {total}.")
+
+    if random_source is not None:
+        random_source.shuffle(result)
+    return result
+
+
+def _spark_removal_candidates(available_amounts: list[int], total: int) -> list[int]:
+    if total < sum(amount for amount in set(available_amounts)):
+        return list(available_amounts)
+
+    counts = Counter(available_amounts)
+    candidates: list[int] = []
+    for amount in sorted(counts):
+        minimum_remaining = min(5, counts[amount])
+        candidates.extend([amount] * max(0, counts[amount] - minimum_remaining))
+    return candidates
+
+
+def _compact_spark_amounts(total: int, max_count: int, random_source: Any | None = None) -> list[int]:
+    if total == 0:
+        return []
+    if max_count <= 0:
+        raise ValueError(f"Create AP Spark total {total} cannot fit into {max_count} items.")
+
+    available_counts = Counter(_vanilla_spark_amounts())
+    reachable: dict[tuple[int, int], Counter[int]] = {(0, 0): Counter()}
+    for amount in (6, 3, 2, 1):
+        for _ in range(available_counts[amount]):
+            for (subtotal, count), amounts in tuple(reachable.items()):
+                next_total = subtotal + amount
+                next_count = count + 1
+                if next_total > total or next_count > max_count or (next_total, next_count) in reachable:
+                    continue
+                next_amounts = amounts.copy()
+                next_amounts[amount] += 1
+                reachable[(next_total, next_count)] = next_amounts
+
+    possible_counts = [
+        count
+        for candidate_total, count in reachable
+        if candidate_total == total
+    ]
+    if not possible_counts:
+        raise ValueError(f"Could not build Create AP Spark amount list for total {total}.")
+
+    minimum_count = min(possible_counts)
+    preferred_counts = [
+        count
+        for count in possible_counts
+        if count <= min(max_count, minimum_count + 20)
+    ]
+    count = max(preferred_counts)
+    amounts = reachable[(total, count)]
+
+    result: list[int] = []
+    for amount in (1, 2, 3, 6):
+        result.extend([amount] * amounts[amount])
+
+    if total >= 12:
+        missing_amounts = [amount for amount in (1, 2, 3, 6) if amounts[amount] == 0]
+        for missing_amount in missing_amounts:
+            for index, amount in enumerate(result):
+                replacement_total = total - amount + missing_amount
+                if replacement_total == total:
+                    continue
+                try:
+                    replacement_tail = _compact_spark_amounts(
+                        total - missing_amount,
+                        max_count - 1,
+                        random_source,
+                    )
+                except ValueError:
+                    continue
+                result = [missing_amount, *replacement_tail]
+                break
+
+    if random_source is not None:
+        random_source.shuffle(result)
+    return result
 
 
 def spark_item_name(amount: int) -> str:
