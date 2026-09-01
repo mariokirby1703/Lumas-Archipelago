@@ -1,0 +1,1993 @@
+{
+    "Hub World": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 0,
+                    "source": "explicit"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": null
+        }
+    },
+    "World 01 (Theme Park)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 0,
+                    "source": "explicit"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": 1
+        },
+        "2": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Basketball",
+                    "value": 0,
+                    "source": "explicit"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": 1
+        },
+        "3": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 0,
+                    "source": "explicit"
+                },
+                {
+                    "name": "Automatic Rocket",
+                    "value": 1,
+                    "source": "explicit"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 1
+        },
+        "4": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Automatic Fan",
+                    "value": 0,
+                    "source": "explicit"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": 1
+        },
+        "5": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Automatic Fan",
+                    "value": 1,
+                    "source": "explicit"
+                },
+                {
+                    "name": "Balloon",
+                    "value": 0,
+                    "source": "explicit"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "6": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Elephant Balloon",
+                    "value": 0,
+                    "source": "explicit"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 1,
+                    "source": "explicit"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "7": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "8": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [
+                "37-41"
+            ],
+            "spark_reward": 6
+        },
+        "9": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [
+                "37-41"
+            ],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [
+                "37-41"
+            ],
+            "spark_reward": 6
+        }
+    },
+    "World 02 (Transportopia)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 0,
+                    "source": "explicit"
+                },
+                {
+                    "name": "Ramp Truck",
+                    "value": 1,
+                    "source": "explicit"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 1
+        },
+        "2": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Beach Buggy",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "3": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Tow Truck",
+                    "value": 0,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": 1
+        },
+        "4": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Anvil",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "5": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Bouncer",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "6": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Automatic Fan",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Crate",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 1
+        },
+        "8": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "9": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Tow Rocket",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Ramp Truck",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 1
+        },
+        "10": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 03 (Family Home)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Lawn Mower",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "2": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Automatic Fan",
+                    "value": 0,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": 1
+        },
+        "3": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "4": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "5": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Space Hopper",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "All-Terrain Vehicle",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 2
+        },
+        "6": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Temporary Glue",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Ladder",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 2
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Temporary Glue",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Space Hopper",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 3
+        },
+        "8": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "9": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        }
+    },
+    "World 04 (Outer Space)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Automatic Rocket",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 1
+        },
+        "2": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "3": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Bouncer",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Teleporter",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "4": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Laser Cannon",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Rock no. 42",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 1
+        },
+        "5": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "6": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Laser Cannon",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Rock no. 42",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "8": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Space Mine",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        },
+        "9": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 05 (The Great Outdoors)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Tractor",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Balloon",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Outdoor Trailer",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 2
+        },
+        "2": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Automatic Fan",
+                    "value": 0,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": 3
+        },
+        "3": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "4": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Dirt Bike",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        },
+        "5": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "6": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Square Hay Bale",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Ladder",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 3
+        },
+        "8": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Temporary Glue",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Small Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Dart Rocket",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 3
+        },
+        "9": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 06 (Ancient History)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Egyptian Obelisk",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Canopic Jar",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 1
+        },
+        "2": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Blast Bomb",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        },
+        "3": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "4": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Mystic Wheel",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "5": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "6": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Automatic Fan",
+                    "value": 0,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": 1
+        },
+        "8": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Automatic Fan",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Icarus Wings",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "9": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 07 (Future World)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Haz-chem Canister",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 3
+        },
+        "2": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "3": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Ramp-Bot",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Spring Pad 3000",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 3
+        },
+        "4": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "5": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Ramp-Bot",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Spiky Advert Blimp",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 1
+        },
+        "6": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Temporary Glue",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Magnet-Bot",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 2
+        },
+        "8": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "9": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Haz-chem Canister",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Lazy-Bot",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 3
+        },
+        "10": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 08 (Urban Sports)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Marker Cone",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Packing Pallet",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Automatic Fan",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 2
+        },
+        "2": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Temporary Glue",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Skateboard",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "3": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "4": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "5": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Tall Steps",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Delay Rocket",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 3
+        },
+        "6": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Temporary Glue",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Delay Rocket",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Small Ramp",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 3
+        },
+        "7": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "8": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Teleporter",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        },
+        "9": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Boombox",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Balloon",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        },
+        "10": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 09 (Pirate)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Pop-Up Barrel",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Powder Keg",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Pirate Boot",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 1
+        },
+        "2": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "3": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Pirate Balloon",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Button-Activated Fan",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Sticky Anchor",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 3
+        },
+        "4": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Sticky Anchor",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Pirate Cannon",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Colonial Globe",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 2
+        },
+        "5": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "6": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Pirate Balloon",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Powder Keg",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Pirate Cannon",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 2
+        },
+        "8": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Burster",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Pirate Cannon",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "9": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 10 (Darkworld)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Balloon",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Dart Rocket",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Bouncer",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 2
+        },
+        "2": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Balloon",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Automatic Fan",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Blast Bomb",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Small Ramp",
+                    "value": 3,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 4,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 6,
+            "spark_reward": 2
+        },
+        "3": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "4": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Dart Rocket",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Blast Bomb",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Seesaw",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Battering Ram (Low)",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 1
+        },
+        "5": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "6": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Bouncer",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Blast Bomb",
+                    "value": 3,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Hearse",
+                    "value": 4,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 6,
+            "spark_reward": 3
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Zero-Gravity Generator",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Automatic Rocket",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        },
+        "8": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Balloon",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Small Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Knight Armour",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Heaven Armour",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 2
+        },
+        "9": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 11 (Theme Park II)": {
+        "1": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "2": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Bouncer",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Teleporter",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 1
+        },
+        "3": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Bouncer",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Small Ramp",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Teleporter",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 3
+        },
+        "4": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "5": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "6": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Teleporter",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Burster",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "7": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "8": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Beach Buggy",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 3,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Hot Air Balloon",
+                    "value": 4,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 6,
+            "spark_reward": 3
+        },
+        "9": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 12 (Family Home II)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 0,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": 1
+        },
+        "2": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "3": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Ladder",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Kennel",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        },
+        "4": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "5": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "6": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Blast Bomb",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Teleporter",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 2
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Hot Air Balloon",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Jumbo Ramp",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Button-Activated Fan",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 3
+        },
+        "8": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Soccer Ball",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Rocking Horse",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 2
+        },
+        "9": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        }
+    },
+    "World 13 (Outer Space II)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Dark Matter",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Space Mine",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Alien Ball",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Vortex",
+                    "value": 3,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Teleporter",
+                    "value": 4,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 6,
+            "spark_reward": 1
+        },
+        "2": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Space Mine",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Small Ramp",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 3
+        },
+        "3": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "4": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "5": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Spring Pad Ramp",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Zero-Gravity Generator",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Space Mine",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 3
+        },
+        "6": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Automatic Fan",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Delay Rocket",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Temporary Glue",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 3
+        },
+        "8": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Laser Cannon",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Teleporter",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        },
+        "9": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Zero-Gravity Generator",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Laser Cannon",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Automatic Rocket",
+                    "value": 2,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Teleporter",
+                    "value": 3,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 5,
+            "spark_reward": 3
+        }
+    },
+    "World 14 (Future World II)": {
+        "1": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Boom Block",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Ultra Bounce Ball",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Fuel Cell",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 1
+        },
+        "2": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "3": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Balloon",
+                    "value": 0,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 2,
+            "spark_reward": 3
+        },
+        "4": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "5": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Teleporter",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Spring Pad 3000",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Magnet-Bot",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 3
+        },
+        "6": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "7": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Defense Laser",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 1,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Lazy-Bot",
+                    "value": 2,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 4,
+            "spark_reward": 2
+        },
+        "8": {
+            "type": "global",
+            "special": "Scoretacular",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "9": {
+            "type": "global",
+            "special": "Contraption-o-matic",
+            "objects": [],
+            "spark_reward": 6
+        },
+        "10": {
+            "type": "local",
+            "objects": [
+                {
+                    "name": "Horseshoe Magnet",
+                    "value": 0,
+                    "source": "ordered_index"
+                },
+                {
+                    "name": "Teleporter",
+                    "value": 1,
+                    "source": "ordered_index"
+                }
+            ],
+            "block_value": 3,
+            "spark_reward": 3
+        }
+    }
+}

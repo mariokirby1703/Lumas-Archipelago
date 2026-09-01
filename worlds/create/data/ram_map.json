@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "snapshot": "2026-09-01",
+  "endianness": "big",
+  "addresses": {
+    "current_world_id": {
+      "address": "0x80675D33",
+      "type": "u8",
+      "status": "confirmed_partial_mapping",
+      "notes": "1=Hub,2=Theme Park,3=Transportopia,4=Family Home,5=Outer Space directly confirmed; later sequential IDs need direct verification."
+    },
+    "current_challenge_index": {
+      "address": "0x8068CFC3",
+      "type": "u8",
+      "status": "confirmed",
+      "notes": "0..9=Challenge 1..10,10=Hub challenge,255=inactive"
+    },
+    "hub_hover_index": {
+      "address": "0x8068CFCB",
+      "type": "u8",
+      "status": "confirmed",
+      "notes": "0..9 worlds 1..10,10 Hub Challenge,11..14 II worlds,15 Free Create"
+    },
+    "total_sparks": {
+      "address": "0x8068CD88",
+      "type": "u32_be",
+      "status": "confirmed_read_only_for_ap",
+      "notes": "Vanilla rebuilds/restores on Hub load; do not use AP writes."
+    },
+    "sparks_this_try": {
+      "address": "0x8067BA03",
+      "type": "u8",
+      "status": "confirmed"
+    },
+    "current_challenge_sparks": {
+      "address": "0x8067BA0F",
+      "type": "u8",
+      "status": "confirmed"
+    },
+    "generic_completion_event": {
+      "address": "0x8068DC94",
+      "type": "u8",
+      "status": "confirmed_generic",
+      "notes": "Changes on normal challenge and Create Chain completion; not Chain-specific."
+    },
+    "create_chain_index": {
+      "address": "0x8069A3BB",
+      "type": "u8",
+      "status": "confirmed",
+      "notes": "0..4 progression/spawn index"
+    },
+    "create_chain_completion": {
+      "address": "0x8068ED48",
+      "type": "u8",
+      "status": "confirmed",
+      "notes": "Chain-specific completion event; not ordinary challenge completion."
+    },
+    "selected_object": {
+      "address": "0x8068E654",
+      "type": "u32_be",
+      "status": "confirmed",
+      "notes": "Canonical field. Writer PC 0x80067C14: stw r4,0x14(r3), r3=0x8068E640. Low-halfword alias 0x8068E656/657."
+    },
+    "selected_scene_prop": {
+      "address": "0x8067DE7A",
+      "type": "u16_be",
+      "status": "confirmed"
+    },
+    "flower_placement_permission": {
+      "address": "0x8069A3E8",
+      "type": "u8",
+      "status": "observed_incidental"
+    },
+    "save_slot_guard_primary": {
+      "address": "0x80B1ABD3",
+      "type": "s8_like",
+      "status": "best_candidate",
+      "notes": "Require positive observation of 2 before arming; later -1 accepted only after same-session 2."
+    },
+    "save_slot_guard_secondary_1": {
+      "address": "0x80B217F9",
+      "type": "u8",
+      "status": "candidate"
+    },
+    "save_slot_guard_secondary_2": {
+      "address": "0x80B22975",
+      "type": "u8",
+      "status": "candidate"
+    },
+    "object_availability_candidate_siege_tower": {
+      "address": "0x807E23AB",
+      "type": "u8_bitfield",
+      "status": "experimental_unvalidated",
+      "notes": "Unlockable-only index 58 -> byte offset 7, bit2/mask0x04. Unique Increased-by-4 result after vanilla unlocking Siege Tower. Derived base 0x807E23A4 if hypothesis holds."
+    }
+  },
+  "challenge_records": {
+    "stride": "0x60",
+    "records": [
+      {
+        "challenge": 1,
+        "max": "0x8068D0EB",
+        "earned": "0x8068D0EF",
+        "access": "0x8068D0F3"
+      },
+      {
+        "challenge": 2,
+        "max": "0x8068D14B",
+        "earned": "0x8068D14F",
+        "access": "0x8068D153"
+      },
+      {
+        "challenge": 3,
+        "max": "0x8068D1AB",
+        "earned": "0x8068D1AF",
+        "access": "0x8068D1B3"
+      },
+      {
+        "challenge": 4,
+        "max": "0x8068D20B",
+        "earned": "0x8068D20F",
+        "access": "0x8068D213"
+      },
+      {
+        "challenge": 5,
+        "max": "0x8068D26B",
+        "earned": "0x8068D26F",
+        "access": "0x8068D273"
+      },
+      {
+        "challenge": 6,
+        "max": "0x8068D2CB",
+        "earned": "0x8068D2CF",
+        "access": "0x8068D2D3"
+      },
+      {
+        "challenge": 7,
+        "max": "0x8068D32B",
+        "earned": "0x8068D32F",
+        "access": "0x8068D333"
+      },
+      {
+        "challenge": 8,
+        "max": "0x8068D38B",
+        "earned": "0x8068D38F",
+        "access": "0x8068D393"
+      },
+      {
+        "challenge": 9,
+        "max": "0x8068D3EB",
+        "earned": "0x8068D3EF",
+        "access": "0x8068D3F3"
+      },
+      {
+        "challenge": 10,
+        "max": "0x8068D44B",
+        "earned": "0x8068D44F",
+        "access": "0x8068D453"
+      }
+    ]
+  },
+  "ii_world_flags": {
+    "Theme Park II": [
+      "0x8068D510",
+      "0x8068D512",
+      "0x8068D513"
+    ],
+    "Family Home II": [
+      "0x8068D570",
+      "0x8068D572",
+      "0x8068D573"
+    ],
+    "Outer Space II": [
+      "0x8068D5D0",
+      "0x8068D5D2",
+      "0x8068D5D3"
+    ],
+    "Future World II": [
+      "0x8068D630",
+      "0x8068D632",
+      "0x8068D633"
+    ]
+  },
+  "object_system": {
+    "registry_root": "0x8066EA00",
+    "registry_key": "0xA7390852",
+    "record_count": 262,
+    "owned_write_offsets": [
+      "0x0C",
+      "0x14",
+      "0x2C"
+    ],
+    "unowned_threshold_offset": "0x2C",
+    "unowned_threshold_value": "0x7FFFFFFF",
+    "challenge_object_root_lead": "0x808D1CD4",
+    "challenge_object_list_offset": "0x04E4",
+    "challenge_object_entry_stride": "0x08",
+    "challenge_object_hide_offset": "0x04",
+    "contraption_patch": {
+      "address": "0x800689A8",
+      "original": "0x40820018",
+      "patched": "0x60000000"
+    }
+  }
+}

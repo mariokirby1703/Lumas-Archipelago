@@ -1,0 +1,107 @@
+from dataclasses import dataclass
+
+from Options import Choice, DefaultOnToggle, OptionGroup, PerGameCommonOptions, Range, Toggle
+
+
+class StartingWorld(Choice):
+    """World that starts unlocked. Random chooses one of the 14 campaign worlds during generation."""
+
+    display_name = "Starting World"
+    option_theme_park = 1
+    option_transportopia = 2
+    option_family_home = 3
+    option_outer_space = 4
+    option_the_great_outdoors = 5
+    option_ancient_history = 6
+    option_future_world = 7
+    option_urban_sports = 8
+    option_pirate = 9
+    option_darkworld = 10
+    option_theme_park_ii = 11
+    option_family_home_ii = 12
+    option_outer_space_ii = 13
+    option_future_world_ii = 14
+    default = "random"
+
+
+class GoalWorld(Choice):
+    """Challenge 10 of this world is the victory condition."""
+
+    display_name = "Goal World"
+    option_theme_park = 1
+    option_transportopia = 2
+    option_family_home = 3
+    option_outer_space = 4
+    option_the_great_outdoors = 5
+    option_ancient_history = 6
+    option_future_world = 7
+    option_urban_sports = 8
+    option_pirate = 9
+    option_darkworld = 10
+    option_theme_park_ii = 11
+    option_family_home_ii = 12
+    option_outer_space_ii = 13
+    option_future_world_ii = 14
+    default = "random"
+
+
+class CreateChainChecks(DefaultOnToggle):
+    """Add 5 Create Chain checks per campaign world."""
+
+    display_name = "Create Chain Checks"
+
+
+class IncludeIIWorlds(Toggle):
+    """Include Theme Park II, Family Home II, Outer Space II, and Future World II."""
+
+    display_name = "Include II Worlds"
+
+
+class RequiredSparks(Range):
+    """Require this many AP Spark items before the client can goal. 0 disables AP Spark goal gating."""
+
+    display_name = "Required AP Sparks"
+    range_start = 0
+    range_end = 610
+    default = 0
+
+
+@dataclass
+class CreateOptions(PerGameCommonOptions):
+    starting_world: StartingWorld
+    goal_world: GoalWorld
+    create_chain_checks: CreateChainChecks
+    include_ii_worlds: IncludeIIWorlds
+    required_sparks: RequiredSparks
+
+
+option_groups = [
+    OptionGroup(
+        "Campaign",
+        [
+            StartingWorld,
+            GoalWorld,
+            CreateChainChecks,
+            IncludeIIWorlds,
+            RequiredSparks,
+        ],
+    ),
+]
+
+
+option_presets = {
+    "Standard": {
+        "starting_world": "random",
+        "goal_world": "random",
+        "create_chain_checks": True,
+        "include_ii_worlds": False,
+        "required_sparks": 0,
+    },
+    "Compact": {
+        "starting_world": "random",
+        "goal_world": "random",
+        "create_chain_checks": True,
+        "include_ii_worlds": False,
+        "required_sparks": 0,
+    },
+}
