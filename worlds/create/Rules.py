@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from BaseClasses import CollectionState, LocationProgressType
+from BaseClasses import CollectionState
 
 from . import Locations, game_data
-from .world_constants import HUB_WORLD_KEY, ITEM_VICTORY, SPARK_ITEM_AMOUNTS
+from .world_constants import HUB_WORLD_KEY, ITEM_UT_GLITCHED, ITEM_VICTORY, SPARK_ITEM_AMOUNTS
 
 if TYPE_CHECKING:
     from .world import CreateWorld
@@ -72,9 +72,9 @@ def _has_create_chain_challenge_progress(state: CollectionState, world: CreateWo
     return _solvable_challenge_count(state, world, world_key) >= chain
 
 
-def _challenge_rule(world: CreateWorld, challenge_data: game_data.ChallengeData):
+def _challenge_rule(world: CreateWorld, challenge_data: game_data.ChallengeData, spark: int | None = None):
     access_rule = _world_access_rule(world, challenge_data.world_key)
-    required_object_groups = _challenge_logic_object_groups(world, challenge_data)
+    required_object_groups = _challenge_logic_object_groups(world, challenge_data, spark)
     required_completion_count = _required_completion_count(challenge_data.challenge)
 
     def rule(state: CollectionState) -> bool:
@@ -99,19 +99,11 @@ def _challenge_rule(world: CreateWorld, challenge_data: game_data.ChallengeData)
 def _challenge_logic_object_groups(
     world: CreateWorld,
     challenge_data: game_data.ChallengeData,
+    spark: int | None = None,
 ) -> tuple[tuple[str, ...], ...]:
-    if challenge_data.world_key == world.starting_world_key and challenge_data.challenge == 1:
-        possible_requirements = game_data.possible_challenge_requirements(challenge_data, 1)
-        if possible_requirements:
-            return tuple(
-                tuple(game_data.object_item_name(object_name) for object_name in requirement.objects)
-                for requirement in possible_requirements
-            )
-    return (
-        tuple(
-            game_data.object_item_name(object_name)
-            for object_name in game_data.challenge_logic_object_names(challenge_data)
-        ),
+    return tuple(
+        tuple(game_data.object_item_name(object_name) for object_name in group)
+        for group in game_data.challenge_logic_object_groups(challenge_data, spark)
     )
 
 
@@ -145,7 +137,7 @@ def _possible_challenge_rule(world: CreateWorld, challenge_data: game_data.Chall
 def _challenge_objects_available(state: CollectionState, world: CreateWorld, challenge_data: game_data.ChallengeData) -> bool:
     return any(
         all(_has(state, world, item_name) for item_name in required_objects)
-        for required_objects in _challenge_logic_object_groups(world, challenge_data)
+        for required_objects in _challenge_logic_object_groups(world, challenge_data, 1)
     )
 
 
@@ -184,7 +176,7 @@ def set_location_rules(world: CreateWorld) -> None:
         data = Locations.LOCATION_TABLE[location.name]
         if data.category in {"challenge", "spark"} and data.world_key and data.challenge:
             challenge_data = game_data.CHALLENGE_TABLE[(data.world_key, data.challenge)]
-            strict_rule = _challenge_rule(world, challenge_data)
+            strict_rule = _challenge_rule(world, challenge_data, data.spark)
             world.set_rule(location, strict_rule)
             possible_rule = _possible_challenge_rule(world, challenge_data, data.spark)
             if possible_rule is not None:
@@ -194,11 +186,11 @@ def set_location_rules(world: CreateWorld) -> None:
                     data.spark,
                 )
                 if getattr(world.multiworld, "generation_is_fake", False) and location.out_of_logic_possible:
-                    location.progress_type = LocationProgressType.PRIORITY
                     world.set_rule(
                         location,
                         lambda state, strict_rule=strict_rule, possible_rule=possible_rule: (
-                            strict_rule(state) or possible_rule(state)
+                            strict_rule(state)
+                            or (state.has(ITEM_UT_GLITCHED, world.player) and possible_rule(state))
                         ),
                     )
         elif data.category == "create_chain" and data.world_key:
@@ -211,12 +203,17 @@ def set_location_rules(world: CreateWorld) -> None:
                     and _has_create_chain_challenge_progress(state, world, world_key, chain)
                 ),
             )
+        elif data.category == "spark_goal_world_unlock":
+            world.set_rule(
+                location,
+                lambda state: _spark_count(state, world) >= world.required_sparks,
+            )
 
 
 def set_completion_condition(world: CreateWorld) -> None:
     def completion_rule(state: CollectionState) -> bool:
         spark_count = _spark_count(state, world)
-        if world.required_sparks > 0 and world.spark_goal_mode == "spark_hunt":
+        if world.spark_goal_mode == "spark_hunt":
             return spark_count >= world.required_sparks
         return state.has(ITEM_VICTORY, world.player) and spark_count >= world.required_sparks
 

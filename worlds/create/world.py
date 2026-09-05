@@ -10,7 +10,10 @@ from worlds.AutoWorld import World
 
 from . import Items, Locations, Regions, Rules, game_data, web_world
 from .Options import CreateOptions
-from .world_constants import FILLER_ITEMS, FIRST_TEN_WORLDS, GAME_NAME, HUB_WORLD_KEY, ITEM_VICTORY, WORLD_KEYS
+from .world_constants import (
+    FILLER_ITEMS, FIRST_TEN_WORLDS, GAME_NAME, HUB_WORLD_KEY, ITEM_UT_GLITCHED, ITEM_VICTORY,
+    SPARK_ITEM_AMOUNTS, WORLD_KEYS,
+)
 
 
 class CreateWorld(World):
@@ -28,6 +31,7 @@ class CreateWorld(World):
     location_name_to_id = Locations.LOCATION_NAME_TO_ID
     item_name_groups = Items.item_groups
     location_name_groups = Locations.location_name_groups
+    glitches_item_name = ITEM_UT_GLITCHED
 
     item_type = Items.CreateItem
     location_type = Locations.CreateLocation
@@ -36,11 +40,12 @@ class CreateWorld(World):
     ut_can_gen_without_yaml = True
 
     starting_world_key: str
-    goal_world_key: str
+    goal_world_key: str | None
     active_location_names: list[str]
     active_world_keys: tuple[str, ...]
     world_unlock_order: tuple[str, ...]
     required_sparks: int
+    extra_sparks: int
     spark_goal_mode: str
 
     @staticmethod
@@ -50,7 +55,12 @@ class CreateWorld(World):
     def generate_early(self) -> None:
         self._apply_ut_slot_data()
         self.required_sparks = int(self.options.required_sparks.value)
-        self.spark_goal_mode = "spark_hunt" if self.options.spark_goal_mode.value == 1 else "goal_world_unlock"
+        self.extra_sparks = 0
+        self.spark_goal_mode = (
+            "spark_hunt"
+            if self.required_sparks > 0 and self.options.spark_goal_mode.value == 1
+            else "goal_world_unlock"
+        )
         active_world_keys = list(WORLD_KEYS if self.options.include_ii_worlds else FIRST_TEN_WORLDS)
         if not getattr(self, "starting_world_key", None):
             starting_option = self.options.starting_world.value
@@ -59,7 +69,12 @@ class CreateWorld(World):
                 if starting_option == 0
                 else WORLD_KEYS[starting_option - 1]
             )
-        if not getattr(self, "goal_world_key", None):
+        if self.spark_goal_mode == "spark_hunt":
+            # Goal World is deliberately ignored in Spark Hunt. Do not even
+            # consume an RNG choice for it, so changing the option cannot alter
+            # the generated seed.
+            self.goal_world_key = None
+        elif not getattr(self, "goal_world_key", None):
             goal_option = self.options.goal_world.value
             self.goal_world_key = (
                 self.random.choice(active_world_keys)
@@ -68,7 +83,7 @@ class CreateWorld(World):
             )
 
         selected_world_keys = [self.starting_world_key]
-        if not (self.required_sparks > 0 and self.spark_goal_mode == "spark_hunt"):
+        if self.goal_world_key is not None:
             selected_world_keys.append(self.goal_world_key)
         for selected_world_key in selected_world_keys:
             if selected_world_key not in active_world_keys:
@@ -81,7 +96,7 @@ class CreateWorld(World):
                 if self._can_bootstrap_starting_world(world_key)
             ]
             self.starting_world_key = self.random.choice(bootstrap_worlds)
-        if self.goal_world_key not in self.active_world_keys:
+        if self.goal_world_key is not None and self.goal_world_key not in self.active_world_keys:
             self.goal_world_key = self.random.choice(self.active_world_keys)
         if (
             self.required_sparks > 0
@@ -124,7 +139,6 @@ class CreateWorld(World):
         self.active_location_names = [location.name for location in self.get_locations()]
 
     def create_items(self) -> None:
-        self.push_precollected(self.create_item(game_data.world_access_item_name(self.starting_world_key)))
         Items.create_all_items(self)
 
     def set_rules(self) -> None:
@@ -137,13 +151,36 @@ class CreateWorld(World):
         filleritempool: list[Item],
         fill_locations: list,
     ) -> None:
+        if self.multiworld.groups:
+            linked_players = set().union(*(group["players"] for group in self.multiworld.groups.values()))
+            if self.player != min(linked_players):
+                return
+            self._sphere_fill_create_progression(
+                progitempool,
+                fill_locations,
+                recipient_ids=linked_players | set(self.multiworld.groups),
+                location_player_ids=linked_players,
+            )
+            return
         self._sphere_fill_create_progression(progitempool, fill_locations)
 
-    def _sphere_fill_create_progression(self, progitempool: list[Item], fill_locations: list) -> None:
+    def _sphere_fill_create_progression(
+        self,
+        progitempool: list[Item],
+        fill_locations: list,
+        recipient_ids: set[int] | None = None,
+        location_player_ids: set[int] | None = None,
+    ) -> None:
         progression_names = Items.item_groups["Objects"] | Items.item_groups["World Access"]
+        recipient_ids = recipient_ids or {self.player}
+        location_player_ids = location_player_ids or {self.player}
         create_progression = [
             item for item in progitempool
-            if item.player == self.player and item.name in progression_names
+            if item.player in recipient_ids and item.name in progression_names
+        ]
+        spark_progression = [
+            item for item in progitempool
+            if item.player in recipient_ids and item.name in SPARK_ITEM_AMOUNTS
         ]
         if not create_progression:
             return
@@ -152,41 +189,82 @@ class CreateWorld(World):
         state.sweep_for_advancements()
 
         while create_progression:
-            best_item: Item | None = None
-            best_location = None
+            best_bundle: list[Item] | None = None
+            best_locations: list | None = None
             best_score = -1
-            for item in create_progression:
+            candidate_bundles: list[list[Item]] = [[item] for item in create_progression]
+            items_by_name = {item.name: item for item in create_progression}
+            seen_bundles = {(item.name,) for item in create_progression}
+            for world_key in self.active_world_keys:
+                for challenge in range(1, 11):
+                    challenge_data = game_data.CHALLENGE_TABLE[(world_key, challenge)]
+                    for required_names in Rules._challenge_logic_object_groups(self, challenge_data):
+                        bundle = [items_by_name[name] for name in required_names if name in items_by_name]
+                        bundle_key = tuple(sorted(item.name for item in bundle))
+                        if len(bundle) > 1 and bundle_key not in seen_bundles:
+                            candidate_bundles.append(bundle)
+                            seen_bundles.add(bundle_key)
+
+            # A spark-gated goal world needs a whole threshold, not one Spark,
+            # before an access-rule score can improve.
+            if spark_progression and self.required_sparks > 0:
+                spark_bundle: list[Item] = []
+                spark_total = Rules._spark_count(state, self)
+                for spark_item in sorted(
+                    spark_progression, key=lambda item: SPARK_ITEM_AMOUNTS[item.name], reverse=True
+                ):
+                    spark_bundle.append(spark_item)
+                    spark_total += SPARK_ITEM_AMOUNTS[spark_item.name]
+                    if spark_total >= self.required_sparks:
+                        candidate_bundles.append(spark_bundle)
+                        break
+
+            reachable_slots = sum(
+                1 for location in fill_locations
+                if location.player in location_player_ids and location.can_reach(state)
+            )
+            for bundle in candidate_bundles:
                 valid_locations = [
                     location for location in fill_locations
-                    if location.player == self.player and location.can_fill(state, item, check_access=True)
+                    if location.player in location_player_ids
+                    and all(location.can_fill(state, item, check_access=True) for item in bundle)
                 ]
-                if not valid_locations:
+                if not valid_locations or len(bundle) > reachable_slots:
                     continue
-                location = self.random.choice(valid_locations)
+                if len(valid_locations) < len(bundle):
+                    continue
+                locations = self.random.sample(valid_locations, len(bundle))
                 simulated_state = state.copy()
-                simulated_state.collect(item, True, location)
+                for bundled_item, location in zip(bundle, locations):
+                    simulated_state.collect(bundled_item, True, location)
                 simulated_state.sweep_for_advancements()
                 score = sum(
                     1 for candidate in fill_locations
-                    if candidate.player == self.player and candidate.can_reach(simulated_state)
-                )
+                    if candidate.player in location_player_ids and candidate.can_reach(simulated_state)
+                ) - len(bundle)
                 if score > best_score:
-                    best_item = item
-                    best_location = location
+                    best_bundle = bundle
+                    best_locations = locations
                     best_score = score
 
-            if best_item is None or best_location is None:
+            if best_bundle is None or best_locations is None:
                 unplaced = ", ".join(item.name for item in create_progression)
                 raise RuntimeError(f"Create sphere fill could not place progression items: {unplaced}")
 
-            self.multiworld.push_item(best_location, best_item, False)
-            fill_locations.remove(best_location)
-            progitempool.remove(best_item)
-            create_progression.remove(best_item)
-            state.collect(best_item, True, best_location)
+            for item, location in zip(best_bundle, best_locations):
+                self.multiworld.push_item(location, item, False)
+                fill_locations.remove(location)
+                progitempool.remove(item)
+                if item in create_progression:
+                    create_progression.remove(item)
+                else:
+                    spark_progression.remove(item)
+                state.collect(item, True, location)
             state.sweep_for_advancements()
 
     def create_item(self, name: str) -> Items.CreateItem:
+        if name == ITEM_UT_GLITCHED:
+            return Items.CreateItem(name, ItemClassification.progression, None, self.player)
         return Items.create_item(self, name)
 
     def collect_item(self, state, item: Item, remove: bool = False) -> str | None:
@@ -203,22 +281,16 @@ class CreateWorld(World):
         return self.get_region(game_data.region_name(data.world_key))
 
     def _goal_location_name(self) -> str:
+        assert self.goal_world_key is not None
         return game_data.spark_location_name(self.goal_world_key, 10, 1)
 
     def _place_victory_item(self) -> None:
-        if self.required_sparks > 0 and self.spark_goal_mode == "spark_hunt":
+        if self.spark_goal_mode == "spark_hunt":
             return
         self.get_location(self._goal_location_name()).place_locked_item(self.create_item(ITEM_VICTORY))
 
     def _starting_challenge_object_names(self, world_key: str) -> list[str]:
         challenge_data = game_data.CHALLENGE_TABLE[(world_key, 1)]
-        possible_requirements = game_data.possible_challenge_requirements(challenge_data, 1)
-        if possible_requirements:
-            shortest_requirement = min(possible_requirements, key=lambda requirement: len(requirement.objects))
-            return [
-                game_data.object_item_name(object_name)
-                for object_name in shortest_requirement.objects
-            ]
         return [
             game_data.object_item_name(requirement.name)
             for requirement in challenge_data.objects
@@ -226,14 +298,17 @@ class CreateWorld(World):
         ]
 
     def _can_bootstrap_starting_world(self, world_key: str) -> bool:
-        non_jumbo_objects = [
-            item_name for item_name in self._starting_challenge_object_names(world_key)
-            if item_name != "Jumbo Ramp"
-        ]
-        bootstrap_slots = 2 if not self.options.create_chain_checks else 3
-        return len(non_jumbo_objects) <= bootstrap_slots
+        return True
 
     def _place_bootstrap_items(self) -> None:
+        self.get_location("Starting World Unlock").place_locked_item(
+            self.create_item(game_data.world_access_item_name(self.starting_world_key))
+        )
+        if self.required_sparks > 0 and self.spark_goal_mode == "goal_world_unlock":
+            assert self.goal_world_key is not None
+            self.get_location("Spark Requirement Met").place_locked_item(
+                self.create_item(game_data.world_access_item_name(self.goal_world_key))
+            )
         bootstrap_locations: list[str] = []
         if self.options.create_chain_checks:
             bootstrap_locations.append(game_data.create_chain_location_name(self.starting_world_key, 1))
@@ -255,6 +330,13 @@ class CreateWorld(World):
             if location.item is None:
                 location.place_locked_item(self.create_item(item_name))
 
+        # Object-heavy selected starts can require more strict objects than the
+        # three visible hub/chain bootstrap checks can hold. Precollect only the
+        # overflow instead of replacing the selected start or treating a
+        # glitched alternative as normal logic.
+        for item_name in bootstrap_items[len(bootstrap_locations):]:
+            self.push_precollected(self.create_item(item_name))
+
     def fill_slot_data(self) -> Mapping[str, Any]:
         option_data = self.options.as_dict(
             "starting_world",
@@ -274,6 +356,7 @@ class CreateWorld(World):
             "world_unlock_order": list(self.world_unlock_order),
             "starting_objects": self._starting_challenge_object_names(self.starting_world_key),
             "required_sparks": self.required_sparks,
+            "extra_sparks": self.extra_sparks,
             "spark_goal_mode": self.spark_goal_mode,
             "options": option_data,
             "locations": {
@@ -352,7 +435,8 @@ class CreateWorld(World):
     def write_spoiler_header(self, spoiler_handle) -> None:
         spoiler_handle.write("\nCreate Settings:\n\n")
         spoiler_handle.write(f"Starting World: {game_data.WORLD_NAMES[self.starting_world_key]}\n")
-        spoiler_handle.write(f"Goal World: {game_data.WORLD_NAMES[self.goal_world_key]}\n")
+        goal = "Spark Hunt (Goal World ignored)" if self.goal_world_key is None else game_data.WORLD_NAMES[self.goal_world_key]
+        spoiler_handle.write(f"Goal: {goal}\n")
 
     def generate_output(self, output_directory: str) -> None:
         output = {

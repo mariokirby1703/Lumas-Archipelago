@@ -6,7 +6,9 @@ from .world_constants import WORLD_NAMES
 
 
 class StartingWorld(Choice):
-    """World that starts unlocked. Random chooses one of the 14 campaign worlds during generation."""
+    """World that starts unlocked. Random chooses from the enabled worlds.
+    Selecting a II world includes it even when Include II Worlds is disabled.
+    """
 
     display_name = "Starting World"
     option_random_world = 0
@@ -40,7 +42,9 @@ class StartingWorld(Choice):
 
 
 class GoalWorld(Choice):
-    """Challenge 10 of this world is the victory condition."""
+    """Earn the first Spark in Challenge 10 of this world to finish Goal World Unlock.
+    Required Sparks gates access to this world. Ignored in Spark Hunt with a positive requirement.
+    """
 
     display_name = "Goal World"
     option_random_world = 0
@@ -78,7 +82,7 @@ def value_to_world_key(value: int) -> str:
 
 
 class CreateChainChecks(DefaultOnToggle):
-    """Add 5 Create Chain checks per campaign world."""
+    """Add 5 Create Chain checks per world."""
 
     display_name = "Create Chain Checks"
 
@@ -90,16 +94,22 @@ class IncludeIIWorlds(Toggle):
 
 
 class RequiredSparks(Range):
-    """Require this many Sparks before the client can goal. 0 disables Spark goal gating."""
+    """Archipelago Sparks needed to unlock the goal world or finish Spark Hunt.
+    With 0, Spark Goal Mode is ignored: goal world access is a normal Archipelago item,
+    and completing the goal world's final challenge finishes the game.
+    """
 
     display_name = "Required Sparks"
     range_start = 0
     range_end = 610
-    default = 0
+    default = 100
 
 
 class SparkGoalMode(Choice):
-    """How Required Sparks are used when set above 0."""
+    """Goal World Unlock requires the goal world's final challenge and the required Sparks.
+    Spark Hunt finishes on collecting the required Sparks, without a final challenge.
+    Ignored when Required Sparks is 0.
+    """
 
     display_name = "Spark Goal Mode"
     option_goal_world_unlock = 0
@@ -119,7 +129,7 @@ class CreateOptions(PerGameCommonOptions):
 
 option_groups = [
     OptionGroup(
-        "Campaign",
+        "Worlds",
         [
             StartingWorld,
             GoalWorld,
@@ -138,7 +148,7 @@ option_presets = {
         "goal_world": "random",
         "create_chain_checks": True,
         "include_ii_worlds": False,
-        "required_sparks": 0,
+        "required_sparks": 100,
         "spark_goal_mode": "goal_world_unlock",
     },
     "Compact": {
@@ -146,7 +156,7 @@ option_presets = {
         "goal_world": "random",
         "create_chain_checks": True,
         "include_ii_worlds": False,
-        "required_sparks": 0,
+        "required_sparks": 100,
         "spark_goal_mode": "goal_world_unlock",
     },
 }

@@ -48,6 +48,7 @@ CHALLENGES_PER_WORLD = 10
 CREATE_CHAINS_PER_WORLD = 5
 
 ITEM_VICTORY = "Victory"
+ITEM_UT_GLITCHED = "Universal Tracker Glitched Logic Item"
 ITEM_SPARK_1 = "1 Spark"
 ITEM_SPARK_2 = "2 Sparks"
 ITEM_SPARK_3 = "3 Sparks"
@@ -60,8 +61,43 @@ SPARK_ITEM_AMOUNTS = {
 }
 SPARK_ITEM_BY_AMOUNT = {amount: item for item, amount in SPARK_ITEM_AMOUNTS.items()}
 FILLER_ITEMS = ("Creativity",)
+LIMITED_FILLER_ITEMS = (
+    "Nothing",
+    "Nothing",
+    "Nothing",
+    "Custom Structure Platform",
+    "Burning Fire Ring",
+    "Colorful Hoop",
+    "Nothing",
+    "Nothing",
+    "Finish Line",
+    "Doorbell",
+    "Big Space Hopper",
+    "Black Telephone",
+    "Toast",
+    "Empty Toaster",
+    "Target",
+    "Rubber Duck",
+    "Pink Rubber Duck",
+    "Car Wash Arch",
+    "Glass Pane",
+    "Levitating Orb",
+    "Nothing",
+    "Parabolic Antenna",
+    "Telescope",
+    "Nothing",
+    "Wooden Fence",
+    "Water Pump",
+    "Clay Disc",
+    "Tentacle",
+    "Battery",
+    "Nothing",
+    "Blue Balloon",
+    "Stone Arch",
+    "Holly Wreath",
+)
+LIMITED_FILLER_ITEM_NAMES = frozenset(LIMITED_FILLER_ITEMS)
 
-# PAL Create. GameTDB lists the PAL Wii disc as SECP69.
 GAME_ID_ADDRESS = 0x80000000
 SUPPORTED_GAME_IDS = (b"SECP69",)
 SUPPORTED_GAME_ID_LABEL = "SECP69"

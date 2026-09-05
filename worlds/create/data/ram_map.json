@@ -49,6 +49,12 @@
       "status": "confirmed",
       "notes": "0..4 progression/spawn index"
     },
+    "create_chains_completed": {
+      "address": "0x8069A3B8",
+      "type": "u32_be",
+      "status": "confirmed_from_symbols_and_code",
+      "notes": "gCreateChains+0x18; persistent number of fully completed chains. Hub becomes 1 only after its complete three-link chain."
+    },
     "create_chain_completion": {
       "address": "0x8068ED48",
       "type": "u8",

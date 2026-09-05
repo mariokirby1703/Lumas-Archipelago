@@ -1,3 +1,6 @@
 /notes
 /test
 __pycache__
+/tools
+*.pyc
+*.pyo

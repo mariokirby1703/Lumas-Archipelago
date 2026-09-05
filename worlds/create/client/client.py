@@ -42,11 +42,12 @@ DEFAULT_SYNC_SLEEP_SECONDS = 0.1
 OBJECT_RECORD_COUNT = 262
 OBJECT_LOCK_THRESHOLD = 0x7FFFFFFF
 OBJECT_RESYNC_INTERVAL_SECONDS = 2.0
+OBJECT_RESOLVER_RETRY_SECONDS = 1.0
+OBJECT_MEM2_REHOOK_LIMIT = 3
 OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS = 5.0
 HUB_EVENT_GRACE_SECONDS = 30.0
 OBJECT_LIST_OFFSET = 0x04E4
 CHALLENGE_OBJECT_ENTRY_STRIDE = 0x08
-
 
 class CreateCommandProcessor(ClientCommandProcessor):
     ctx: "CreateContext"
@@ -85,6 +86,7 @@ class CreateContext(CommonContext):
         self._save_slot_verified_once = False
         self._slot_guard_observed_this_session = False
         self._waiting_for_slot_logged = False
+        self._slot_connected_logged = False
         self._slot_ready_at = 0.0
         self._slot_settle_logged = False
         self._location_context: tuple[int | None, str | None] | None = None
@@ -98,7 +100,12 @@ class CreateContext(CommonContext):
         self._last_received_object_values: frozenset[int] = frozenset()
         self._last_object_resync_at = 0.0
         self._object_resolver_failure_logged = False
+        self._object_resolver_retry_at = 0.0
+        self._object_resolver_trace: dict[str, int] = {}
+        self._object_mem2_rehook_requested = False
+        self._object_mem2_rehook_attempts = 0
         self._challenge_palette_context: tuple[str | None, int | None] | None = None
+        self._challenge_palette_keys: dict[int, int] = {}
         self._challenge_palette_failure_logged = False
         self._contraption_patch_checked = False
         self._contraption_patch_applied = False
@@ -109,7 +116,6 @@ class CreateContext(CommonContext):
         self._hub_event_ready_at = 0.0
         self._hub_challenge_spark_armed = False
         self._previous_hub_challenge_sparks: int | None = None
-        self._spark_goal_access_logged = False
         self._chain_context_ready_at = 0.0
         self._ram_ready_at = 0.0
         self._ram_settle_logged = False
@@ -139,6 +145,7 @@ class CreateContext(CommonContext):
             self.save_slot_armed = False
             self._slot_guard_observed_this_session = False
             self._waiting_for_slot_logged = False
+            self._slot_connected_logged = False
             self._slot_ready_at = 0.0
             self._slot_settle_logged = False
             self._reset_ram_baselines()
@@ -149,6 +156,7 @@ class CreateContext(CommonContext):
         self.save_slot_armed = False
         self._slot_guard_observed_this_session = False
         self._waiting_for_slot_logged = False
+        self._slot_connected_logged = False
         self._slot_ready_at = 0.0
         self._slot_settle_logged = False
         self._reset_ram_baselines()
@@ -189,7 +197,10 @@ class CreateContext(CommonContext):
         self._last_received_object_values = frozenset()
         self._last_object_resync_at = 0.0
         self._object_resolver_failure_logged = False
+        self._object_resolver_retry_at = 0.0
+        self._object_resolver_trace = {}
         self._challenge_palette_context = None
+        self._challenge_palette_keys = {}
         self._challenge_palette_failure_logged = False
         self._contraption_patch_checked = False
         self._contraption_patch_applied = False
@@ -197,7 +208,6 @@ class CreateContext(CommonContext):
         self._hub_event_ready_at = 0.0
         self._hub_challenge_spark_armed = False
         self._previous_hub_challenge_sparks = None
-        self._spark_goal_access_logged = False
 
     def start_slot_settle(self) -> None:
         self._slot_ready_at = time.monotonic() + RAM_SETTLE_SECONDS
@@ -299,6 +309,35 @@ def _plausible_pointer(value: int) -> bool:
     return 0x80000000 <= value <= 0x93FFFFFF and value % 4 == 0
 
 
+def _validated_object_pointer(value: int, label: str, *, allow_null: bool = False) -> int:
+    if not isinstance(value, int) or not 0 <= value <= 0xFFFFFFFF:
+        raise RuntimeError(f"{label} is not an unsigned 32-bit value: {value!r}")
+    if allow_null and value == 0:
+        return value
+    if not _plausible_pointer(value):
+        raise RuntimeError(f"{label} is not a plausible Wii pointer: 0x{value:08X}")
+    return value
+
+
+class ObjectMemoryReadError(RuntimeError):
+    def __init__(self, address: int, label: str, error: Exception) -> None:
+        self.address = address
+        super().__init__(f"Could not read {label} at 0x{address:08X}: {error}")
+
+
+def _read_object_u32(address: int, label: str) -> int:
+    _validated_object_pointer(address, f"Address for {label}")
+    try:
+        return read_u32_be(address)
+    except Exception as error:
+        raise ObjectMemoryReadError(address, label, error) from error
+
+
+def _format_object_resolver_trace(ctx: CreateContext) -> str:
+    trace = getattr(ctx, "_object_resolver_trace", {})
+    return ", ".join(f"{name}=0x{value:08X}" for name, value in trace.items())
+
+
 def object_system_data(ctx: CreateContext) -> dict[str, Any]:
     return ctx.slot_data.get("ram", {}).get("object_system", {})
 
@@ -308,18 +347,25 @@ def find_first_object_node(ctx: CreateContext) -> int:
     registry_root = _int_from_hexish(object_system.get("registry_root"), 0x8066EA00)
     registry_key = _int_from_hexish(object_system.get("registry_key"), 0xA7390852)
 
-    entry = read_u32_be(registry_root)
+    ctx._object_resolver_trace = {"registry_root": registry_root}
+    entry = _read_object_u32(registry_root, "registry first entry")
+    ctx._object_resolver_trace["registry_first_entry"] = entry
     for _ in range(512):
         if not entry:
             break
-        if not _plausible_pointer(entry):
-            raise RuntimeError(f"Object registry entry pointer is not plausible: 0x{entry:08X}")
-        if read_u32_be(entry + 0x0C) == registry_key:
-            node = read_u32_be(entry + 0x2C)
-            if not _plausible_pointer(node):
-                raise RuntimeError(f"Object node pointer is not plausible: 0x{node:08X}")
+        _validated_object_pointer(entry, "Object registry entry pointer")
+        ctx._object_resolver_trace["registry_entry"] = entry
+        entry_key = _read_object_u32(entry + 0x0C, "registry entry key")
+        ctx._object_resolver_trace["registry_entry_key"] = entry_key
+        if entry_key == registry_key:
+            ctx._object_resolver_trace["matching_entry"] = entry
+            node = _read_object_u32(entry + 0x2C, "first Object node pointer")
+            _validated_object_pointer(node, "First Object node pointer")
+            ctx._object_resolver_trace["first_object_node"] = node
             return node
-        entry = read_u32_be(entry + 0x28)
+        entry = _read_object_u32(entry + 0x28, "next registry entry pointer")
+        _validated_object_pointer(entry, "Next Object registry entry pointer", allow_null=True)
+        ctx._object_resolver_trace["registry_next"] = entry
     raise RuntimeError("Object registry key was not found.")
 
 
@@ -332,27 +378,53 @@ def resolve_object_records(ctx: CreateContext) -> dict[int, int]:
             raise RuntimeError(f"Object list ended before object ID {object_id}.")
         if node in seen_nodes:
             raise RuntimeError(f"Object list looped at node 0x{node:08X}.")
-        if not _plausible_pointer(node):
-            raise RuntimeError(f"Object node pointer is not plausible: 0x{node:08X}")
+        _validated_object_pointer(node, f"Object node {object_id} pointer")
         seen_nodes.add(node)
-        record = read_u32_be(node + 0x10)
-        if not _plausible_pointer(record):
-            raise RuntimeError(f"Availability record for object ID {object_id} is not plausible: 0x{record:08X}")
+        record = _read_object_u32(node + 0x10, f"Object {object_id} Availability Record pointer")
+        _validated_object_pointer(record, f"Availability record for Object ID {object_id}")
         records[object_id] = record
-        node = read_u32_be(node + 0x14)
+        next_node = _read_object_u32(node + 0x14, f"Object node {object_id} next pointer")
+        _validated_object_pointer(next_node, f"Object node {object_id} next pointer", allow_null=True)
+        if object_id < 2:
+            ctx._object_resolver_trace[f"node_{object_id}"] = node
+            ctx._object_resolver_trace[f"node_{object_id}_record"] = record
+            ctx._object_resolver_trace[f"node_{object_id}_next"] = next_node
+        if object_id in (13, 126):
+            ctx._object_resolver_trace[f"object_{object_id}_record"] = record
+        node = next_node
+    if len(set(records.values())) != OBJECT_RECORD_COUNT:
+        raise RuntimeError("Object list contains duplicate Availability Record pointers.")
     return records
 
 
 def object_records(ctx: CreateContext) -> dict[int, int] | None:
     if len(ctx._object_records) == OBJECT_RECORD_COUNT:
         return ctx._object_records
+    if time.monotonic() < ctx._object_resolver_retry_at:
+        return None
+    recovering = ctx._object_resolver_failure_logged
     try:
         ctx._object_records = resolve_object_records(ctx)
+        ctx._object_resolver_retry_at = 0.0
         ctx._object_resolver_failure_logged = False
+        ctx._object_mem2_rehook_attempts = 0
+        if recovering:
+            logger.info("Create Object availability records resolved; Object RAM sync resumed.")
     except Exception as error:
         ctx._object_records = {}
+        ctx._object_resolver_retry_at = time.monotonic() + OBJECT_RESOLVER_RETRY_SECONDS
+        if (
+            isinstance(error, ObjectMemoryReadError)
+            and 0x90000000 <= error.address <= 0x93FFFFFF
+            and ctx._object_mem2_rehook_attempts < OBJECT_MEM2_REHOOK_LIMIT
+        ):
+            ctx._object_mem2_rehook_requested = True
         if not ctx._object_resolver_failure_logged:
-            logger.warning(f"Could not resolve Create Object availability records; Object RAM resync is paused: {error}")
+            logger.warning(
+                "Create Object availability records are not ready; "
+                f"Object RAM sync will retry automatically: {error}. "
+                f"Resolver trace: {_format_object_resolver_trace(ctx)}"
+            )
             ctx._object_resolver_failure_logged = True
         return None
     return ctx._object_records
@@ -375,6 +447,9 @@ def sync_save_slot_guard(ctx: CreateContext) -> None:
         if not ctx.save_slot_armed:
             ctx._hub_event_ready_at = time.monotonic() + HUB_EVENT_GRACE_SECONDS
         ctx.save_slot_armed = True
+        if not ctx._slot_connected_logged:
+            logger.info("Save Slot 3 connected.")
+            ctx._slot_connected_logged = True
         return
 
     guard = _address(ctx.slot_data["ram"]["addresses"]["save_slot_guard_primary"])
@@ -395,6 +470,9 @@ def sync_save_slot_guard(ctx: CreateContext) -> None:
             ctx._hub_event_ready_at = time.monotonic() + HUB_EVENT_GRACE_SECONDS
         ctx.save_slot_armed = True
         ctx._save_slot_verified_once = True
+        if not ctx._slot_connected_logged:
+            logger.info("Save Slot 3 connected.")
+            ctx._slot_connected_logged = True
         return
 
     if value == 0xFF and ctx._slot_guard_observed_this_session:
@@ -402,12 +480,13 @@ def sync_save_slot_guard(ctx: CreateContext) -> None:
         return
 
     if not ctx.save_slot_armed and not ctx._waiting_for_slot_logged:
-        logger.info("Waiting for Save Slot 3 guard before sending checks or writing RAM.")
+        logger.info("Waiting for Save Slot 3")
         ctx._waiting_for_slot_logged = True
     ctx.save_slot_armed = False
     ctx._slot_guard_observed_this_session = False
     ctx._slot_ready_at = 0.0
     ctx._slot_settle_logged = False
+    ctx._slot_connected_logged = False
 
 
 def current_world_key(ctx: CreateContext) -> str | None:
@@ -496,13 +575,25 @@ def check_create_chain(ctx: CreateContext, newly_checked: set[int]) -> None:
     world_id = current_world_id(ctx)
     if world_id != 1 and not ctx.slot_data["options"].get("create_chain_checks", True):
         return
+    if world_id == 1:
+        if current_challenge_raw(ctx) != 10:
+            return
+        event_key = (None, 1)
+        if event_key not in ctx._chain_events_seen:
+            checked_location(ctx, "Hub World Create Chain", newly_checked)
+            checked_location(ctx, "Starting World Unlock", newly_checked)
+            ctx._chain_events_seen.add(event_key)
+            ctx._object_resync_blocked_until = time.monotonic() + OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS
+            ctx._object_resync_pending = True
+        return
+
     world_key = current_world_key(ctx)
     chain_index = None
-    if world_id != 1 and world_key is not None:
+    if world_key is not None:
         chain_index = read_u8(_address(ctx.slot_data["ram"]["addresses"]["create_chain_index"]))
 
     completion_flag = read_u8(_address(ctx.slot_data["ram"]["addresses"]["create_chain_completion"]))
-    context_key = (world_key if world_id != 1 else None, chain_index)
+    context_key = (world_key, chain_index)
     if ctx._chain_completion_context != context_key:
         ctx._chain_completion_context = context_key
         ctx._previous_chain_completion = completion_flag
@@ -518,36 +609,14 @@ def check_create_chain(ctx: CreateContext, newly_checked: set[int]) -> None:
     previous_completion = ctx._previous_chain_completion
     ctx._previous_chain_completion = completion_flag
     if (
-        world_id == 1
-        and completion_flag == 1
-        and time.monotonic() >= ctx._hub_event_ready_at
-    ):
-        event_key = (None, 1)
-        if event_key not in ctx._chain_events_seen:
-            checked_location(ctx, "Hub World Create Chain", newly_checked)
-            ctx._chain_events_seen.add(event_key)
-            ctx._chain_event_armed_contexts.discard(context_key)
-            ctx._object_resync_blocked_until = time.monotonic() + OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS
-            ctx._object_resync_pending = True
-        return
-    if (
         previous_completion is None
         or previous_completion == 1
         or completion_flag != 1
         or context_key not in ctx._chain_event_armed_contexts
-        or (world_id == 1 and time.monotonic() < ctx._hub_event_ready_at)
     ):
         return
 
-    if world_id == 1:
-        event_key = (None, 1)
-        if event_key not in ctx._chain_events_seen:
-            checked_location(ctx, "Hub World Create Chain", newly_checked)
-            ctx._chain_events_seen.add(event_key)
-            ctx._chain_event_armed_contexts.discard(context_key)
-            ctx._object_resync_blocked_until = time.monotonic() + OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS
-            ctx._object_resync_pending = True
-    elif world_key is not None:
+    if world_key is not None:
         chain = max(1, min(5, (chain_index or 0) + 1))
         event_key = (world_key, chain)
         if event_key not in ctx._chain_events_seen:
@@ -557,6 +626,17 @@ def check_create_chain(ctx: CreateContext, newly_checked: set[int]) -> None:
             ctx._chain_event_armed_contexts.discard(context_key)
             ctx._object_resync_blocked_until = time.monotonic() + OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS
             ctx._object_resync_pending = True
+
+
+def check_spark_goal_world_unlock(ctx: CreateContext, newly_checked: set[int]) -> None:
+    required_sparks = int(ctx.slot_data.get("required_sparks", 0))
+    spark_goal_mode = ctx.slot_data.get("spark_goal_mode") or ctx.slot_data.get("options", {}).get("spark_goal_mode")
+    if (
+        required_sparks > 0
+        and spark_goal_mode == "goal_world_unlock"
+        and received_spark_count(ctx) >= required_sparks
+    ):
+        checked_location(ctx, "Spark Requirement Met", newly_checked)
 
 
 def location_context_is_settled(ctx: CreateContext) -> bool:
@@ -586,6 +666,7 @@ async def check_locations(ctx: CreateContext) -> None:
             return
         check_challenge_sparks(ctx, newly_checked)
         check_create_chain(ctx, newly_checked)
+        check_spark_goal_world_unlock(ctx, newly_checked)
     except Exception:
         logger.debug("Failed while checking Create locations.", exc_info=True)
     if newly_checked and ctx.slot is not None:
@@ -630,6 +711,8 @@ def sync_object_availability(ctx: CreateContext, challenge_active: bool) -> None
         ctx._last_received_object_values = owned_values
         ctx._object_resync_pending = True
 
+    # The global Object list is not stable/readable while a challenge is active.
+    # Resolve and write its Availability Records only after returning to a world.
     if challenge_active:
         return
 
@@ -647,15 +730,27 @@ def sync_object_availability(ctx: CreateContext, challenge_active: bool) -> None
     if not records:
         return
 
-    for object_data in ctx.slot_data.get("objects", {}).values():
-        object_id = int(object_data["global_value"])
-        record = records.get(object_id)
-        if not record:
-            continue
-        if object_id in owned_values:
-            apply_owned_object_record(record)
-        else:
-            apply_unowned_object_record(record)
+    try:
+        for object_data in ctx.slot_data.get("objects", {}).values():
+            object_id = int(object_data["global_value"])
+            record = records.get(object_id)
+            if not record:
+                continue
+            if object_id in owned_values:
+                apply_owned_object_record(record)
+            else:
+                apply_unowned_object_record(record)
+    except Exception as error:
+        ctx._object_records = {}
+        ctx._object_resync_pending = True
+        ctx._object_resolver_retry_at = now + OBJECT_RESOLVER_RETRY_SECONDS
+        if not ctx._object_resolver_failure_logged:
+            logger.warning(
+                "Create Object availability records changed while syncing; "
+                f"Object RAM sync will retry automatically: {error}"
+            )
+            ctx._object_resolver_failure_logged = True
+        return
 
     ctx._object_resync_pending = False
     ctx._last_object_resync_at = now
@@ -692,24 +787,8 @@ def sync_world_access(ctx: CreateContext) -> None:
 
     owned_worlds = received_world_keys(ctx)
     records = ctx.slot_data["ram"]["challenge_records"]
-    required_sparks = int(ctx.slot_data.get("required_sparks", 0))
-    spark_goal_mode = ctx.slot_data.get("spark_goal_mode") or ctx.slot_data.get("options", {}).get("spark_goal_mode")
-    ap_sparks = received_spark_count(ctx)
     for world_key, world_data in ctx.slot_data.get("worlds", {}).items():
         unlocked = 1 if world_key in owned_worlds else 0
-        if (
-            required_sparks > 0
-            and spark_goal_mode == "goal_world_unlock"
-            and world_key == ctx.slot_data.get("goal_world")
-            and ap_sparks >= required_sparks
-        ):
-            unlocked = 1
-            if not ctx._spark_goal_access_logged:
-                logger.info(
-                    f"Luma found their {world_data['name']} Access "
-                    f"({ap_sparks} Sparks Collected)."
-                )
-                ctx._spark_goal_access_logged = True
         if world_key == ctx.slot_data.get("starting_world") and not hub_create_chain_done(ctx):
             unlocked = 0
         if not world_data.get("included", True):
@@ -790,9 +869,18 @@ def filter_current_challenge_palette(ctx: CreateContext, challenge_active: bool)
     for obj in objects:
         selected_value = int(obj["selected_value"])
         global_value = int(obj["global_value"])
-        if selected_value >= count or global_value in owned_values:
+        if selected_value >= count:
             continue
-        write_u32_be_if_changed(entries + selected_value * CHALLENGE_OBJECT_ENTRY_STRIDE + 0x04, 0)
+        key_address = entries + selected_value * CHALLENGE_OBJECT_ENTRY_STRIDE + 0x04
+        current_key = read_u32_be(key_address)
+        if current_key:
+            ctx._challenge_palette_keys[global_value] = current_key
+        if global_value in owned_values:
+            original_key = ctx._challenge_palette_keys.get(global_value)
+            if original_key:
+                write_u32_be_if_changed(key_address, original_key)
+        else:
+            write_u32_be_if_changed(key_address, 0)
 
     ctx._challenge_palette_context = context
     ctx._challenge_palette_failure_logged = False
@@ -948,7 +1036,19 @@ async def dolphin_sync_task(ctx: CreateContext) -> None:
                     sync_world_access(ctx)
                     sync_total_sparks(ctx)
                     local_challenge_runtime_active = filter_current_challenge_palette(ctx, challenge_active)
-                    sync_object_availability(ctx, local_challenge_runtime_active)
+                    sync_object_availability(ctx, challenge_active)
+                    if ctx._object_mem2_rehook_requested:
+                        ctx._object_mem2_rehook_requested = False
+                        ctx._object_mem2_rehook_attempts += 1
+                        logger.info(
+                            "Create Object MEM2 was unavailable; reconnecting to Dolphin "
+                            f"to rediscover it ({ctx._object_mem2_rehook_attempts}/{OBJECT_MEM2_REHOOK_LIMIT})."
+                        )
+                        dolphin_memory_engine.un_hook()
+                        ctx.dolphin_status = CONNECTION_LOST_STATUS
+                        ctx.start_ram_settle()
+                        sleep_time = 1
+                        continue
                     ensure_contraption_patch(ctx, local_challenge_runtime_active)
                     object_freeze_active = enforce_selected_object(ctx)
                     await check_locations(ctx)

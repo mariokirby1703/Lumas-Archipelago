@@ -1,10 +1,18 @@
+from collections import Counter
+import unittest
+
 from BaseClasses import ItemClassification, LocationProgressType
 
 from . import CreateTestBase
 from .. import Rules, game_data
 from ..Locations import LOCATION_TABLE
-from ..Options import GoalWorld, StartingWorld
-from ..world_constants import II_WORLDS, ITEM_VICTORY, SPARK_ITEM_AMOUNTS
+from ..Options import (
+    CreateChainChecks, GoalWorld, IncludeIIWorlds, RequiredSparks, SparkGoalMode, StartingWorld, option_presets,
+)
+from ..world_constants import (
+    II_WORLDS, ITEM_UT_GLITCHED, ITEM_VICTORY, LIMITED_FILLER_ITEMS, LIMITED_FILLER_ITEM_NAMES,
+    SPARK_ITEM_AMOUNTS,
+)
 
 
 class TestCreateData(CreateTestBase):
@@ -60,6 +68,11 @@ class TestCreateData(CreateTestBase):
     def test_yaml_defaults_are_compact_random(self) -> None:
         self.assertEqual("random", StartingWorld.default)
         self.assertEqual("random", GoalWorld.default)
+        self.assertEqual(100, RequiredSparks.default)
+        self.assertEqual(SparkGoalMode.option_goal_world_unlock, SparkGoalMode.default)
+        self.assertEqual(1, CreateChainChecks.default)
+        self.assertEqual(0, IncludeIIWorlds.default)
+        self.assertEqual(100, option_presets["Standard"]["required_sparks"])
 
     def test_ii_world_options_display_uppercase_ii(self) -> None:
         self.assertEqual("Theme Park II", StartingWorld.get_option_name(11))
@@ -119,6 +132,18 @@ class TestCreateData(CreateTestBase):
         for amount in (1, 2, 3, 6):
             self.assertGreater(amount_counts[amount], 0)
 
+    def test_spark_amounts_are_evenly_distributed(self) -> None:
+        for total in (30, 45, 100, 516, 610):
+            with self.subTest(total=total):
+                amounts = game_data.spark_item_amounts_for_total(total)
+                counts = [amounts.count(amount) for amount in (1, 2, 3, 6)]
+                self.assertEqual(total, sum(amounts))
+                self.assertEqual(4, sum(count > 0 for count in counts))
+                self.assertLessEqual(max(counts) - min(counts), 1)
+
+    def test_perfect_teleporter_is_progression_for_scoretacular(self) -> None:
+        self.assertTrue(self.world.create_item("Perfect Teleporter").advancement)
+
 
 class TestCreateCompactMode(CreateTestBase):
     options = {
@@ -148,7 +173,11 @@ class TestCreateCompactMode(CreateTestBase):
             location.item for location in self.multiworld.get_locations(self.player)
             if location.item and location.item.name in game_data.UNLOCKABLE_OBJECTS_BY_NAME
         ]
-        object_names = {item.name for item in (*object_items, *reserved_object_items)}
+        starting_object_items = [
+            item for item in self.multiworld.precollected_items[self.player]
+            if item.name in game_data.UNLOCKABLE_OBJECTS_BY_NAME
+        ]
+        object_names = {item.name for item in (*object_items, *reserved_object_items, *starting_object_items)}
         self.assertEqual(
             {game_data.object_item_name(obj.name) for obj in game_data.UNLOCKABLE_OBJECTS},
             object_names,
@@ -193,10 +222,13 @@ class TestCreateOuterSpaceIIStartBootstrap(CreateTestBase):
         "include_ii_worlds": False,
     }
 
-    def test_possible_requirement_bootstraps_object_heavy_start(self) -> None:
+    def test_strict_requirements_bootstrap_object_heavy_start(self) -> None:
         self.assertEqual("W13", self.world.starting_world_key)
-        self.assertEqual(["Dark Matter"], self.world._starting_challenge_object_names("W13"))
-        self.multiworld.state.collect(self.world.create_item("Dark Matter"))
+        self.assertEqual(
+            ["Dark Matter", "Space Mine", "Alien Ball", "Vortex", "Teleporter"],
+            self.world._starting_challenge_object_names("W13"),
+        )
+        self.multiworld.state.sweep_for_advancements()
         self.assertTrue(self.can_reach_location("Outer Space II Challenge 01 Spark 1"))
 
 
@@ -258,7 +290,7 @@ class TestCreateChallengeLogic(CreateTestBase):
         self.assertTrue(self.can_reach_location("Theme Park Challenge 03 Spark 1"))
         self.assertTrue(self.can_reach_location("Theme Park Challenge 04 Spark 1"))
 
-    def test_scoretacular_requires_bouncer_for_strict_logic(self) -> None:
+    def test_scoretacular_uses_challenge_specific_early_spark_rule(self) -> None:
         required_items = {
             game_data.object_item_name(requirement.name)
             for challenge in range(1, 5)
@@ -267,11 +299,44 @@ class TestCreateChallengeLogic(CreateTestBase):
         }
         self.collect_by_name(required_items)
 
-        self.assertFalse(self.can_reach_location("Theme Park Challenge 07 Spark 1"))
-        self.collect_by_name({"Bouncer"})
-        self.assertTrue(self.can_reach_location("Theme Park Challenge 07 Spark 1"))
+        self.collect_by_name(required_items | {"Jumbo Ramp"})
+        for spark in range(1, 4):
+            self.assertTrue(self.can_reach_location(f"Theme Park Challenge 07 Spark {spark}"))
 
-    def test_out_of_logic_possible_rule_marks_limited_sparks(self) -> None:
+        challenge = game_data.CHALLENGE_TABLE[("W01", 7)]
+        self.assertEqual((("Jumbo Ramp",),), game_data.challenge_logic_object_groups(challenge, 1))
+
+    def test_scoretacular_sparks_two_and_three_accept_single_unlocks(self) -> None:
+        challenge = game_data.CHALLENGE_TABLE[("W01", 7)]
+        for spark in (2, 3):
+            groups = game_data.challenge_logic_object_groups(challenge, spark)
+            self.assertIn(("Bouncer",), groups)
+            self.assertIn(("Teleporter",), groups)
+            self.assertIn(("Perfect Teleporter",), groups)
+
+    def test_scoretacular_without_specific_first_spark_rule_uses_standard_unlocks(self) -> None:
+        challenge = game_data.CHALLENGE_TABLE[("W02", 10)]
+        self.assertEqual(
+            (("Bouncer",), ("Teleporter",), ("Perfect Teleporter",)),
+            game_data.challenge_logic_object_groups(challenge, 1),
+        )
+
+    def test_scoretacular_six_sparks_requires_bouncer_and_teleporter(self) -> None:
+        required_items = {
+            game_data.object_item_name(requirement.name)
+            for challenge in range(1, 5)
+            for requirement in game_data.CHALLENGE_TABLE[("W01", challenge)].objects
+            if requirement.global_value in game_data.UNLOCKABLE_OBJECT_VALUES
+        }
+        spark_6 = self.multiworld.get_location("Theme Park Challenge 07 Spark 6", self.player)
+        self.collect_by_name(required_items | {"Bouncer"})
+        self.assertFalse(spark_6.access_rule(self.multiworld.state))
+        self.assertTrue(spark_6.out_of_logic_possible)
+        self.assertTrue(spark_6.possible_access_rule(self.multiworld.state))
+        self.collect_by_name({"Perfect Teleporter"})
+        self.assertTrue(spark_6.access_rule(self.multiworld.state))
+
+    def test_scoretacular_challenge_specific_limit_is_normal_logic(self) -> None:
         required_items = {
             game_data.object_item_name(requirement.name)
             for challenge in range(1, 5)
@@ -280,11 +345,8 @@ class TestCreateChallengeLogic(CreateTestBase):
         }
         self.collect_by_name(required_items | {"Jumbo Ramp"})
         spark_3 = self.multiworld.get_location("Theme Park Challenge 07 Spark 3", self.player)
-        spark_4 = self.multiworld.get_location("Theme Park Challenge 07 Spark 4", self.player)
-
-        self.assertTrue(spark_3.out_of_logic_possible)
-        self.assertTrue(spark_3.possible_access_rule(self.multiworld.state))
-        self.assertFalse(hasattr(spark_4, "possible_access_rule") and spark_4.possible_access_rule(self.multiworld.state))
+        self.assertFalse(spark_3.out_of_logic_possible)
+        self.assertTrue(spark_3.access_rule(self.multiworld.state))
 
     def test_out_of_logic_possible_rule_supports_contraption_combos(self) -> None:
         required_items = {
@@ -310,16 +372,24 @@ class TestCreateChallengeLogic(CreateTestBase):
             for requirement in game_data.CHALLENGE_TABLE[("W01", challenge)].objects
             if requirement.global_value in game_data.UNLOCKABLE_OBJECT_VALUES
         }
-        self.collect_by_name(required_items | {"Jumbo Ramp"})
-        location = self.multiworld.get_location("Theme Park Challenge 07 Spark 3", self.player)
+        self.collect_by_name(required_items | {"Bouncer"})
+        location = self.multiworld.get_location("Theme Park Challenge 07 Spark 6", self.player)
 
-        self.assertFalse(self.can_reach_location("Theme Park Challenge 07 Spark 3"))
+        self.assertTrue(location.out_of_logic_possible)
+        self.assertFalse(self.can_reach_location("Theme Park Challenge 07 Spark 6"))
         self.assertTrue(location.possible_access_rule(self.multiworld.state))
 
         self.multiworld.generation_is_fake = True
         Rules.set_location_rules(self.world)
-        self.assertEqual(LocationProgressType.PRIORITY, location.progress_type)
-        self.assertTrue(self.can_reach_location("Theme Park Challenge 07 Spark 3"))
+        self.assertFalse(self.can_reach_location("Theme Park Challenge 07 Spark 6"))
+        self.multiworld.state.collect(self.world.create_item(ITEM_UT_GLITCHED))
+        self.assertTrue(self.can_reach_location("Theme Park Challenge 07 Spark 6"))
+
+    def test_ancient_history_challenge_one_glitched_route_only_needs_obelisk(self) -> None:
+        location = self.multiworld.get_location("Ancient History Challenge 01 Spark 1", self.player)
+        self.collect_by_name({"Ancient History Access", "Egyptian Obelisk"})
+        self.assertFalse(location.access_rule(self.multiworld.state))
+        self.assertTrue(location.possible_access_rule(self.multiworld.state))
 
 
 class TestCreateRequiredSparks(CreateTestBase):
@@ -353,6 +423,61 @@ class TestCreateRequiredSparks(CreateTestBase):
         self.assertTrue(self.multiworld.can_beat_game(state))
 
 
+class TestCreateSmallSparkRequirement(CreateTestBase):
+    options = {
+        "starting_world": "theme_park",
+        "goal_world": "future_world",
+        "create_chain_checks": True,
+        "include_ii_worlds": False,
+        "required_sparks": 10,
+    }
+
+    def test_ten_required_sparks_include_full_extra_margin(self) -> None:
+        spark_total = sum(SPARK_ITEM_AMOUNTS.get(item.name, 0) for item in self.multiworld.itempool)
+        filler_count = sum(
+            1 for item in self.multiworld.itempool
+            if item.name in self.world.item_name_groups["Filler"]
+        )
+        self.assertEqual(10, self.world.required_sparks)
+        self.assertEqual(5, self.world.extra_sparks)
+        self.assertEqual(15, spark_total)
+        self.assertGreater(filler_count, 200)
+        self.assertEqual(5, self.world.fill_slot_data()["extra_sparks"])
+
+    def test_limited_fillers_replace_creativity_once_per_list_entry(self) -> None:
+        item_counts = Counter(item.name for item in self.multiworld.itempool)
+
+        self.assertEqual(Counter(LIMITED_FILLER_ITEMS), item_counts & Counter(LIMITED_FILLER_ITEMS))
+        self.assertEqual(8, item_counts["Nothing"])
+        self.assertTrue(LIMITED_FILLER_ITEM_NAMES.isdisjoint(self.world.item_name_groups["Objects"]))
+        for item_name in LIMITED_FILLER_ITEM_NAMES:
+            self.assertEqual(ItemClassification.filler, self.world.create_item(item_name).classification)
+
+
+class TestCreateThirtySparkRequirement(CreateTestBase):
+    options = {
+        "starting_world": "random",
+        "goal_world": "random",
+        "create_chain_checks": True,
+        "include_ii_worlds": False,
+        "required_sparks": 30,
+        "spark_goal_mode": "goal_world_unlock",
+    }
+
+    def test_thirty_required_sparks_include_fifty_percent_extra(self) -> None:
+        spark_total = sum(SPARK_ITEM_AMOUNTS.get(item.name, 0) for item in self.multiworld.itempool)
+        self.assertEqual(30, self.world.required_sparks)
+        self.assertEqual(15, self.world.extra_sparks)
+        self.assertEqual(45, spark_total)
+
+    def test_regression_fill_seed_39297526737049392155(self) -> None:
+        from Fill import distribute_items_restrictive
+
+        self.world_setup(39297526737049392155)
+        distribute_items_restrictive(self.multiworld)
+        self.assertTrue(self.multiworld.can_beat_game())
+
+
 class TestCreateChainsDisabled(CreateTestBase):
     options = {
         "starting_world": "theme_park",
@@ -376,11 +501,48 @@ class TestCreateChainsDisabled(CreateTestBase):
             for item in self.multiworld.itempool
         )
         extra_spark_total = spark_total - self.world.required_sparks
-        filler_count = sum(1 for item in self.multiworld.itempool if item.name == "Creativity")
         self.assertEqual(516, self.world.required_sparks)
         self.assertGreaterEqual(spark_total, 516)
-        self.assertLessEqual(extra_spark_total, int(516 * 0.3))
-        self.assertGreater(filler_count, 0)
+        self.assertLessEqual(extra_spark_total, min(610 - 516, int(516 * 0.5)))
+        self.assertEqual(self.world.extra_sparks, extra_spark_total)
+        # Objects and required Sparks may occupy every slot when chains are disabled.
+        self.assertEqual(len(self.multiworld.get_unfilled_locations()), len(self.multiworld.itempool))
+
+
+class TestCreateZeroSparks(unittest.TestCase):
+    def test_both_modes_use_normal_goal_world_item_access(self) -> None:
+        from test.general import setup_multiworld
+        from ..world import CreateWorld
+
+        for mode in ("spark_hunt", "goal_world_unlock"):
+            for goal in ("future_world", "random"):
+                with self.subTest(mode=mode, goal=goal):
+                    multiworld = setup_multiworld(CreateWorld, seed=12345, options={
+                        "starting_world": "theme_park",
+                        "goal_world": goal,
+                        "required_sparks": 0,
+                        "spark_goal_mode": mode,
+                    })
+                    world = multiworld.worlds[1]
+                    self.assertEqual("goal_world_unlock", world.spark_goal_mode)
+                    self.assertIsNotNone(world.goal_world_key)
+                    if goal == "future_world":
+                        self.assertEqual("W07", world.goal_world_key)
+                    access_item = game_data.world_access_item_name(world.goal_world_key)
+                    self.assertIn(access_item, [item.name for item in multiworld.itempool])
+                    self.assertNotIn("Spark Requirement Met", world.active_location_names)
+                    self.assertEqual(ITEM_VICTORY, world.get_location(world._goal_location_name()).item.name)
+                    self.assertFalse(multiworld.can_beat_game(multiworld.state))
+                    entrance = world.get_entrance(f"Hub to {game_data.WORLD_NAMES[world.goal_world_key]}")
+                    self.assertFalse(entrance.can_reach(multiworld.state))
+                    multiworld.state.collect(world.create_item(access_item))
+                    self.assertTrue(entrance.can_reach(multiworld.state))
+                    self.assertFalse(multiworld.can_beat_game(multiworld.state))
+                    multiworld.state.collect(world.create_item(ITEM_VICTORY))
+                    self.assertTrue(multiworld.can_beat_game(multiworld.state))
+                    slot_data = world.fill_slot_data()
+                    self.assertEqual("goal_world_unlock", slot_data["spark_goal_mode"])
+                    self.assertEqual(world.goal_world_key, slot_data["goal_world"])
 
 
 class TestCreateSparkHunt(CreateTestBase):
@@ -394,6 +556,8 @@ class TestCreateSparkHunt(CreateTestBase):
     }
 
     def test_spark_hunt_completion_uses_ap_spark_counter_only(self) -> None:
+        self.assertIsNone(self.world.goal_world_key)
+        self.assertIsNone(self.world.fill_slot_data()["goal_world"])
         self.assertFalse(any(location.item and location.item.name == ITEM_VICTORY for location in self.multiworld.get_locations()))
         state = self.multiworld.state
         self.assertFalse(self.multiworld.can_beat_game(state))
@@ -425,3 +589,16 @@ class TestCreateSparkGoalWorldUnlock(CreateTestBase):
                     break
                 state.collect(self.world.create_item(item_name))
         self.assertTrue(entrance.can_reach(state))
+
+    def test_goal_world_access_is_sent_from_spark_requirement_location(self) -> None:
+        location = self.multiworld.get_location("Spark Requirement Met", self.player)
+        self.assertEqual("Future World Access", location.item.name)
+
+        state = self.multiworld.state
+        self.assertFalse(location.can_reach(state))
+        for item_name, amount in SPARK_ITEM_AMOUNTS.items():
+            for _ in range(610 // amount + 1):
+                if sum(state.count(name, self.player) * value for name, value in SPARK_ITEM_AMOUNTS.items()) >= 610:
+                    break
+                state.collect(self.world.create_item(item_name))
+        self.assertTrue(location.can_reach(state))

@@ -58,6 +58,8 @@ def build_location_table() -> dict[str, LocationData]:
             )
 
     add(game_data.hub_create_chain_location_name(), "create_chain", chain=1)
+    add("Starting World Unlock", "starting_world_unlock")
+    add("Spark Requirement Met", "spark_goal_world_unlock")
     for world_key in WORLD_KEYS:
         for chain in range(1, CREATE_CHAINS_PER_WORLD + 1):
             add(game_data.create_chain_location_name(world_key, chain), "create_chain", world_key, chain=chain)
@@ -82,6 +84,14 @@ def enabled_location_names(world: CreateWorld) -> list[str]:
         if data.category == "spark":
             locations.append(name)
         elif data.category == "create_chain" and (data.world_key is None or world.options.create_chain_checks):
+            locations.append(name)
+        elif data.category == "starting_world_unlock":
+            locations.append(name)
+        elif (
+            data.category == "spark_goal_world_unlock"
+            and world.required_sparks > 0
+            and world.spark_goal_mode == "goal_world_unlock"
+        ):
             locations.append(name)
     return locations
 

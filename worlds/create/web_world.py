@@ -18,7 +18,7 @@ class CreateWebWorld(WebWorld):
             "English",
             "setup_en.md",
             "setup/en",
-            ["TomGo", "Codex"],
+            ["Luma"],
         )
     ]
 

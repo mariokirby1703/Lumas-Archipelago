@@ -5,8 +5,7 @@
             "objects": [
                 {
                     "name": "Jumbo Ramp",
-                    "value": 0,
-                    "source": "explicit"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -19,8 +18,7 @@
             "objects": [
                 {
                     "name": "Jumbo Ramp",
-                    "value": 0,
-                    "source": "explicit"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -31,8 +29,7 @@
             "objects": [
                 {
                     "name": "Basketball",
-                    "value": 0,
-                    "source": "explicit"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -43,13 +40,11 @@
             "objects": [
                 {
                     "name": "Jumbo Ramp",
-                    "value": 0,
-                    "source": "explicit"
+                    "value": 0
                 },
                 {
                     "name": "Automatic Rocket",
-                    "value": 1,
-                    "source": "explicit"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -60,8 +55,7 @@
             "objects": [
                 {
                     "name": "Automatic Fan",
-                    "value": 0,
-                    "source": "explicit"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -72,13 +66,11 @@
             "objects": [
                 {
                     "name": "Automatic Fan",
-                    "value": 1,
-                    "source": "explicit"
+                    "value": 1
                 },
                 {
                     "name": "Balloon",
-                    "value": 0,
-                    "source": "explicit"
+                    "value": 0
                 }
             ],
             "block_value": 3,
@@ -89,13 +81,11 @@
             "objects": [
                 {
                     "name": "Elephant Balloon",
-                    "value": 0,
-                    "source": "explicit"
+                    "value": 0
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 1,
-                    "source": "explicit"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -138,13 +128,11 @@
             "objects": [
                 {
                     "name": "Jumbo Ramp",
-                    "value": 0,
-                    "source": "explicit"
+                    "value": 0
                 },
                 {
                     "name": "Ramp Truck",
-                    "value": 1,
-                    "source": "explicit"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -155,13 +143,11 @@
             "objects": [
                 {
                     "name": "Beach Buggy",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -172,8 +158,7 @@
             "objects": [
                 {
                     "name": "Tow Truck",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -184,13 +169,11 @@
             "objects": [
                 {
                     "name": "Anvil",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -201,13 +184,11 @@
             "objects": [
                 {
                     "name": "Jumbo Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Bouncer",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -218,13 +199,11 @@
             "objects": [
                 {
                     "name": "Automatic Fan",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -235,18 +214,15 @@
             "objects": [
                 {
                     "name": "Crate",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -263,18 +239,15 @@
             "objects": [
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Tow Rocket",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Ramp Truck",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -293,13 +266,11 @@
             "objects": [
                 {
                     "name": "Jumbo Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Lawn Mower",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -310,8 +281,7 @@
             "objects": [
                 {
                     "name": "Automatic Fan",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -322,13 +292,11 @@
             "objects": [
                 {
                     "name": "Jumbo Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -345,23 +313,19 @@
             "objects": [
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Space Hopper",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "All-Terrain Vehicle",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -372,18 +336,15 @@
             "objects": [
                 {
                     "name": "Temporary Glue",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Ladder",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -394,18 +355,15 @@
             "objects": [
                 {
                     "name": "Temporary Glue",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Space Hopper",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -428,13 +386,11 @@
             "objects": [
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -447,13 +403,11 @@
             "objects": [
                 {
                     "name": "Jumbo Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Automatic Rocket",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -470,13 +424,11 @@
             "objects": [
                 {
                     "name": "Bouncer",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Teleporter",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -487,13 +439,11 @@
             "objects": [
                 {
                     "name": "Laser Cannon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Rock no. 42",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -516,13 +466,11 @@
             "objects": [
                 {
                     "name": "Laser Cannon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Rock no. 42",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -533,13 +481,11 @@
             "objects": [
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Space Mine",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -564,18 +510,15 @@
             "objects": [
                 {
                     "name": "Tractor",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Balloon",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Outdoor Trailer",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -586,8 +529,7 @@
             "objects": [
                 {
                     "name": "Automatic Fan",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -604,13 +546,11 @@
             "objects": [
                 {
                     "name": "Dirt Bike",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -633,23 +573,19 @@
             "objects": [
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Square Hay Bale",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Ladder",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -660,23 +596,19 @@
             "objects": [
                 {
                     "name": "Temporary Glue",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Small Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Dart Rocket",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -701,13 +633,11 @@
             "objects": [
                 {
                     "name": "Egyptian Obelisk",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Canopic Jar",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -718,13 +648,11 @@
             "objects": [
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Blast Bomb",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -741,13 +669,11 @@
             "objects": [
                 {
                     "name": "Mystic Wheel",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -770,8 +696,7 @@
             "objects": [
                 {
                     "name": "Automatic Fan",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -782,13 +707,11 @@
             "objects": [
                 {
                     "name": "Automatic Fan",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Icarus Wings",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -813,18 +736,15 @@
             "objects": [
                 {
                     "name": "Jumbo Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Haz-chem Canister",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -841,23 +761,19 @@
             "objects": [
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Ramp-Bot",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Spring Pad 3000",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -874,13 +790,11 @@
             "objects": [
                 {
                     "name": "Ramp-Bot",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Spiky Advert Blimp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -897,18 +811,15 @@
             "objects": [
                 {
                     "name": "Temporary Glue",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Magnet-Bot",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -925,23 +836,19 @@
             "objects": [
                 {
                     "name": "Haz-chem Canister",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Lazy-Bot",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -960,18 +867,15 @@
             "objects": [
                 {
                     "name": "Marker Cone",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Packing Pallet",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Automatic Fan",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -982,13 +886,11 @@
             "objects": [
                 {
                     "name": "Temporary Glue",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Skateboard",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -1011,23 +913,19 @@
             "objects": [
                 {
                     "name": "Tall Steps",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Delay Rocket",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -1038,18 +936,15 @@
             "objects": [
                 {
                     "name": "Temporary Glue",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Delay Rocket",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Small Ramp",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1066,13 +961,11 @@
             "objects": [
                 {
                     "name": "Teleporter",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -1083,13 +976,11 @@
             "objects": [
                 {
                     "name": "Boombox",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Balloon",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -1108,18 +999,15 @@
             "objects": [
                 {
                     "name": "Pop-Up Barrel",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Powder Keg",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Pirate Boot",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1136,18 +1024,15 @@
             "objects": [
                 {
                     "name": "Pirate Balloon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Button-Activated Fan",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Sticky Anchor",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1158,18 +1043,15 @@
             "objects": [
                 {
                     "name": "Sticky Anchor",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Pirate Cannon",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Colonial Globe",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1192,18 +1074,15 @@
             "objects": [
                 {
                     "name": "Pirate Balloon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Powder Keg",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Pirate Cannon",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1214,13 +1093,11 @@
             "objects": [
                 {
                     "name": "Burster",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Pirate Cannon",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -1245,23 +1122,19 @@
             "objects": [
                 {
                     "name": "Balloon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Dart Rocket",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Bouncer",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -1272,28 +1145,23 @@
             "objects": [
                 {
                     "name": "Balloon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Automatic Fan",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Blast Bomb",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Small Ramp",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 },
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 4,
-                    "source": "ordered_index"
+                    "value": 4
                 }
             ],
             "block_value": 6,
@@ -1310,23 +1178,19 @@
             "objects": [
                 {
                     "name": "Dart Rocket",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Blast Bomb",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Seesaw",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Battering Ram (Low)",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -1343,28 +1207,23 @@
             "objects": [
                 {
                     "name": "Bouncer",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Blast Bomb",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 },
                 {
                     "name": "Hearse",
-                    "value": 4,
-                    "source": "ordered_index"
+                    "value": 4
                 }
             ],
             "block_value": 6,
@@ -1375,13 +1234,11 @@
             "objects": [
                 {
                     "name": "Zero-Gravity Generator",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Automatic Rocket",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -1392,23 +1249,19 @@
             "objects": [
                 {
                     "name": "Balloon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Small Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Knight Armour",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Heaven Armour",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -1439,18 +1292,15 @@
             "objects": [
                 {
                     "name": "Bouncer",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Teleporter",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1461,23 +1311,19 @@
             "objects": [
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Bouncer",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Small Ramp",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Teleporter",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -1500,13 +1346,11 @@
             "objects": [
                 {
                     "name": "Teleporter",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Burster",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -1523,28 +1367,23 @@
             "objects": [
                 {
                     "name": "Beach Buggy",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 },
                 {
                     "name": "Hot Air Balloon",
-                    "value": 4,
-                    "source": "ordered_index"
+                    "value": 4
                 }
             ],
             "block_value": 6,
@@ -1569,8 +1408,7 @@
             "objects": [
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -1587,13 +1425,11 @@
             "objects": [
                 {
                     "name": "Ladder",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Kennel",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -1616,13 +1452,11 @@
             "objects": [
                 {
                     "name": "Blast Bomb",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Teleporter",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -1633,18 +1467,15 @@
             "objects": [
                 {
                     "name": "Hot Air Balloon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Jumbo Ramp",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Button-Activated Fan",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1655,18 +1486,15 @@
             "objects": [
                 {
                     "name": "Soccer Ball",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Rocking Horse",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1691,28 +1519,23 @@
             "objects": [
                 {
                     "name": "Dark Matter",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Space Mine",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Alien Ball",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Vortex",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 },
                 {
                     "name": "Teleporter",
-                    "value": 4,
-                    "source": "ordered_index"
+                    "value": 4
                 }
             ],
             "block_value": 6,
@@ -1723,23 +1546,19 @@
             "objects": [
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Space Mine",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Small Ramp",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -1762,23 +1581,19 @@
             "objects": [
                 {
                     "name": "Spring Pad Ramp",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Zero-Gravity Generator",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Space Mine",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -1795,18 +1610,15 @@
             "objects": [
                 {
                     "name": "Automatic Fan",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Delay Rocket",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Temporary Glue",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1817,13 +1629,11 @@
             "objects": [
                 {
                     "name": "Laser Cannon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Teleporter",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
@@ -1840,23 +1650,19 @@
             "objects": [
                 {
                     "name": "Zero-Gravity Generator",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Laser Cannon",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Automatic Rocket",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 },
                 {
                     "name": "Teleporter",
-                    "value": 3,
-                    "source": "ordered_index"
+                    "value": 3
                 }
             ],
             "block_value": 5,
@@ -1869,18 +1675,15 @@
             "objects": [
                 {
                     "name": "Boom Block",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Ultra Bounce Ball",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Fuel Cell",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1897,8 +1700,7 @@
             "objects": [
                 {
                     "name": "Balloon",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 }
             ],
             "block_value": 2,
@@ -1915,18 +1717,15 @@
             "objects": [
                 {
                     "name": "Teleporter",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Spring Pad 3000",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Magnet-Bot",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1943,18 +1742,15 @@
             "objects": [
                 {
                     "name": "Defense Laser",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 },
                 {
                     "name": "Lazy-Bot",
-                    "value": 2,
-                    "source": "ordered_index"
+                    "value": 2
                 }
             ],
             "block_value": 4,
@@ -1977,13 +1773,11 @@
             "objects": [
                 {
                     "name": "Horseshoe Magnet",
-                    "value": 0,
-                    "source": "ordered_index"
+                    "value": 0
                 },
                 {
                     "name": "Teleporter",
-                    "value": 1,
-                    "source": "ordered_index"
+                    "value": 1
                 }
             ],
             "block_value": 3,
