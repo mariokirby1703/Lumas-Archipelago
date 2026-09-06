@@ -125,6 +125,7 @@ def make_context() -> SimpleNamespace:
         _chain_completion_context=None,
         _previous_chain_completion=None,
         _hub_chain_reward_pulses=0,
+        _hub_chain_part_sequence=None,
         _chain_context_ready_at=0.0,
         _hub_event_ready_at=0.0,
         _hub_challenge_spark_armed=False,
@@ -159,6 +160,62 @@ class TestCreateClientObjectMemory(unittest.TestCase):
         self.fake = install_fake_dolphin()
         self.ctx = make_context()
         self.records = seed_object_registry(self.fake, self.ctx)
+
+    def test_mem2_read_failure_selects_verified_fallback_and_routes_writes(self) -> None:
+        fallback = Mock()
+        fallback.read.return_value = b"\x91\x15\xb4\x00"
+        engine = sys.modules["dolphin_memory_engine"]
+        client.reset_mem2_fallback()
+        try:
+            with patch.object(engine, "read_bytes", side_effect=RuntimeError("MEM2 missing")):
+                with patch.object(client.sys, "platform", "win32"):
+                    with patch("worlds.create.client.windows_mem2.WindowsMEM2", return_value=fallback):
+                        self.assertEqual(0x9115B400, client.read_u32_be(0x9115B37C))
+            client.write_u32_be(0x9115B37C, 123)
+            fallback.write.assert_called_once_with(0x9115B37C, (123).to_bytes(4, "big"))
+            client.write_u32_be(0x8068CD88, 100)
+            self.assertEqual(100, self.fake.read_u32(0x8068CD88))
+        finally:
+            client.reset_mem2_fallback()
+        fallback.close.assert_called_once()
+
+    def test_mem1_read_failure_does_not_use_mem2_fallback(self) -> None:
+        engine = sys.modules["dolphin_memory_engine"]
+        with patch.object(engine, "read_bytes", side_effect=RuntimeError("MEM1 missing")):
+            with patch("worlds.create.client.windows_mem2.WindowsMEM2") as fallback:
+                with self.assertRaises(RuntimeError):
+                    client.read_u32_be(0x80000000)
+                fallback.assert_not_called()
+
+    def test_mem2_mapping_rejects_private_and_guarded_regions(self) -> None:
+        from ..client.windows_mem2 import MemoryRegion, mapped_ram
+        region = MemoryRegion()
+        region.size, region.state, region.kind, region.protect = 0x4000000, 0x1000, 0x40000, 4
+        self.assertTrue(mapped_ram(region, 0x4000000))
+        region.kind = 0x20000
+        self.assertFalse(mapped_ram(region, 0x4000000))
+        region.kind, region.protect = 0x40000, 0x104
+        self.assertFalse(mapped_ram(region, 0x4000000))
+
+    def test_mem2_mapping_bounds(self) -> None:
+        from ..client.windows_mem2 import WindowsMEM2
+        memory = WindowsMEM2.__new__(WindowsMEM2)
+        memory.handle, memory.base = 1, 0x100000000
+        self.assertEqual(0x10115B37C, memory._address(0x9115B37C, 4))
+        for address, size in ((0x8FFFFFFF, 4), (0x93FFFFFF, 4), (0x94000000, 1)):
+            with self.subTest(address=address), self.assertRaises(ValueError):
+                memory._address(address, size)
+
+    def test_unreadable_palette_candidate_does_not_abort_other_candidates(self) -> None:
+        with patch.object(client, "read_u32_be", side_effect=[0x80640000, 0x912F0000]):
+            with patch.object(client, "_read_challenge_object_list_candidate",
+                              side_effect=[RuntimeError("unreadable candidate"), (0x912F1000, 1)]):
+                self.assertEqual((0x912F1000, 1), client.resolve_current_challenge_object_list(1, self.ctx))
+
+    def test_palette_memory_failure_does_not_escape_into_reconnect_loop(self) -> None:
+        with patch.object(client, "_filter_current_challenge_palette", side_effect=RuntimeError("MEM2 missing")):
+            self.assertFalse(client.filter_current_challenge_palette(self.ctx, True))
+            self.assertTrue(self.ctx._challenge_palette_failure_logged)
 
     def test_object_registry_resolves_all_ids(self) -> None:
         records = client.resolve_object_records(self.ctx)
@@ -370,6 +427,29 @@ class TestCreateClientObjectMemory(unittest.TestCase):
 
         self.assertEqual({12345}, newly_checked)
 
+    def test_hub_parts_require_full_sequence_for_part_three(self) -> None:
+        world_address = int(game_data.RAM_ADDRESSES["current_world_id"]["address"], 0)
+        part_address = int(game_data.RAM_ADDRESSES["hub_create_chain_part"]["address"], 0)
+        self.fake.write_byte(world_address, 1)
+        for part in range(1, 4):
+            self.ctx.slot_data["locations"][f"Hub World Create Chain Part {part}"] = {"id": 9000 + part}
+        for sequence, expected in (
+            ([3], set()),
+            ([1, 2, 3], {9001, 9002}),
+            ([0, 2, 3], {9002}),
+            ([0, 1, 0, 2, 3], {9001, 9002}),
+            ([0, 0, 1, 1, 2, 2, 3, 3], {9001, 9002, 9003}),
+            ([0, 1, 2, 7], {9001, 9002, 9003}),
+        ):
+            with self.subTest(sequence=sequence):
+                self.ctx.locations_checked.clear()
+                self.ctx._hub_chain_part_sequence = None
+                checked = set()
+                for value in sequence:
+                    self.fake.write_byte(part_address, value)
+                    client.check_hub_create_chain_parts(self.ctx, checked)
+                self.assertEqual(expected, checked)
+
     def test_hub_create_chain_triggers_first_time_hub_challenge_is_entered(self) -> None:
         current_world_address = int(game_data.RAM_ADDRESSES["current_world_id"]["address"], 0)
         challenge_address = int(game_data.RAM_ADDRESSES["current_challenge_index"]["address"], 0)
@@ -415,6 +495,16 @@ class TestCreateClientObjectMemory(unittest.TestCase):
         client.check_create_chain(self.ctx, newly_checked)
 
         self.assertEqual({23456}, newly_checked)
+
+    def test_slot_selection_cooldown_is_five_seconds(self) -> None:
+        self.ctx._reset_ram_baselines = Mock()
+        with patch.object(client.time, "monotonic", return_value=100.0):
+            client.CreateContext.start_slot_settle(self.ctx)
+        self.assertEqual(105.0, self.ctx._slot_ready_at)
+        with patch.object(client.time, "monotonic", return_value=104.9):
+            self.assertFalse(client.CreateContext.slot_ram_is_settled(self.ctx))
+        with patch.object(client.time, "monotonic", return_value=105.0):
+            self.assertTrue(client.CreateContext.slot_ram_is_settled(self.ctx))
 
     def test_slot_settle_wait_is_silent(self) -> None:
         self.ctx._slot_ready_at = 10.0

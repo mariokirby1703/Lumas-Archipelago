@@ -63,6 +63,8 @@ def build_location_table() -> dict[str, LocationData]:
     for world_key in WORLD_KEYS:
         for chain in range(1, CREATE_CHAINS_PER_WORLD + 1):
             add(game_data.create_chain_location_name(world_key, chain), "create_chain", world_key, chain=chain)
+    for part in range(1, 4):
+        add(f"Hub World Create Chain Part {part}", "create_chain", chain=part)
     return table
 
 

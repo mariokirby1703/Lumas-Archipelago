@@ -151,6 +151,8 @@ class CreateWorld(World):
         filleritempool: list[Item],
         fill_locations: list,
     ) -> None:
+        if self.multiworld.players > 1:
+            return
         if self.multiworld.groups:
             linked_players = set().union(*(group["players"] for group in self.multiworld.groups.values()))
             if self.player != min(linked_players):
@@ -309,6 +311,8 @@ class CreateWorld(World):
             self.get_location("Spark Requirement Met").place_locked_item(
                 self.create_item(game_data.world_access_item_name(self.goal_world_key))
             )
+        if self.multiworld.players > 1:
+            return
         bootstrap_locations: list[str] = []
         if self.options.create_chain_checks:
             bootstrap_locations.append(game_data.create_chain_location_name(self.starting_world_key, 1))
@@ -319,23 +323,32 @@ class CreateWorld(World):
             ]
         )
 
+        bootstrap_locations.extend(f"Hub World Create Chain Part {part}" for part in range(1, 4))
+
         bootstrap_items = ["Jumbo Ramp"]
         bootstrap_items.extend(
             item_name for item_name in self._starting_challenge_object_names(self.starting_world_key)
             if item_name != "Jumbo Ramp"
         )
 
+        if len(bootstrap_items) > len(bootstrap_locations):
+            candidates = [
+                list(dict.fromkeys(("Jumbo Ramp", *group)))
+                for challenge in range(1, 4)
+                for group in game_data.challenge_logic_object_groups(
+                    game_data.CHALLENGE_TABLE[(self.starting_world_key, challenge)], 1
+                )
+            ]
+            candidates = [items for items in candidates if len(items) <= len(bootstrap_locations)]
+            if not candidates:
+                raise ValueError("Starting world has no opening route that fits the Hub checks.")
+            bootstrap_items = min(candidates, key=len)
+
         for location_name, item_name in zip(bootstrap_locations, bootstrap_items):
             location = self.get_location(location_name)
             if location.item is None:
                 location.place_locked_item(self.create_item(item_name))
 
-        # Object-heavy selected starts can require more strict objects than the
-        # three visible hub/chain bootstrap checks can hold. Precollect only the
-        # overflow instead of replacing the selected start or treating a
-        # glitched alternative as normal logic.
-        for item_name in bootstrap_items[len(bootstrap_locations):]:
-            self.push_precollected(self.create_item(item_name))
 
     def fill_slot_data(self) -> Mapping[str, Any]:
         option_data = self.options.as_dict(

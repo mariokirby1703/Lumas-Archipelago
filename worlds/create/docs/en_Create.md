@@ -8,7 +8,9 @@ worlds contain ten challenges apiece, while Create Chains reward free-form build
 ## What does Archipelago randomize?
 
 World access and usable Create Objects become items. Challenge Spark rewards are checks, as are the Hub World Create
-Chain and, when enabled, five Create Chains in every world. The optional four II worlds can also join the seed.
+Chain, its three tutorial parts, and, when enabled, five Create Chains in every world. The optional four II worlds can also join the seed.
+
+The three Hub tutorial parts are always enabled and provide three additional checks at the start.
 
 Objects are locked in-game until their corresponding Archipelago item is received. The external Create Client
 synchronizes these unlocks through Dolphin's memory; the game disc image itself is never modified.

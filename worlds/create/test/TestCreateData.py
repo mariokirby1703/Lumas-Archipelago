@@ -55,7 +55,7 @@ class TestCreateData(CreateTestBase):
 
         self.assertEqual(539, len(spark_locations))
         self.assertEqual(141, len(challenge_locations))
-        self.assertEqual(71, len(chain_locations))
+        self.assertEqual(74, len(chain_locations))
 
     def test_corrected_requirements(self) -> None:
         future_world_9 = game_data.CHALLENGE_TABLE[("W07", 9)]
@@ -479,6 +479,10 @@ class TestCreateThirtySparkRequirement(CreateTestBase):
 
 
 class TestCreateChainsDisabled(CreateTestBase):
+    def test_hub_tutorial_parts_are_available_at_start(self) -> None:
+        for part in range(1, 4):
+            self.assertTrue(self.can_reach_location(f"Hub World Create Chain Part {part}"))
+
     options = {
         "starting_world": "theme_park",
         "goal_world": "future_world",
@@ -602,3 +606,90 @@ class TestCreateSparkGoalWorldUnlock(CreateTestBase):
                     break
                 state.collect(self.world.create_item(item_name))
         self.assertTrue(location.can_reach(state))
+
+
+class TestCreateNoAutomaticStartingItems(unittest.TestCase):
+    def test_every_start_has_an_opening_without_free_items(self) -> None:
+        from test.general import setup_multiworld
+        from ..world import CreateWorld
+
+        for chains in (False, True):
+            for index, world_key in enumerate(game_data.WORLD_KEYS, 1):
+                with self.subTest(world=world_key, chains=chains):
+                    multiworld = setup_multiworld(CreateWorld, seed=12345, options={
+                        "starting_world": index,
+                        "goal_world": "theme_park",
+                        "create_chain_checks": chains,
+                        "include_ii_worlds": False,
+                    })
+                    world = multiworld.worlds[1]
+                    self.assertEqual(world_key, world.starting_world_key)
+                    self.assertFalse(multiworld.precollected_items[1])
+                    for part in range(1, 4):
+                        self.assertTrue(world.get_location(f"Hub World Create Chain Part {part}").can_reach(multiworld.state))
+                    multiworld.state.sweep_for_advancements()
+                    self.assertTrue(any(
+                        world.get_location(game_data.spark_location_name(world_key, challenge, 1)).can_reach(multiworld.state)
+                        for challenge in range(1, 4)
+                    ))
+                    self.assertEqual(len(multiworld.itempool), len(multiworld.get_unfilled_locations()))
+
+    def test_darkworld_objects_are_hub_part_rewards(self) -> None:
+        from test.general import setup_multiworld
+        from ..world import CreateWorld
+        multiworld = setup_multiworld(CreateWorld, seed=12345, options={
+            "starting_world": "darkworld", "create_chain_checks": False,
+        })
+        world = multiworld.worlds[1]
+        self.assertEqual(
+            ["Horseshoe Magnet", "Dart Rocket", "Bouncer"],
+            [world.get_location(f"Hub World Create Chain Part {part}").item.name for part in range(1, 4)],
+        )
+        self.assertFalse(multiworld.precollected_items[1])
+
+
+class TestCreateMultiworldShuffle(unittest.TestCase):
+    def test_objects_are_in_shared_pool_and_cross_player_fill_is_beatable(self) -> None:
+        from test.general import setup_multiworld
+        from ..world import CreateWorld
+        from Fill import distribute_items_restrictive
+        from BaseClasses import CollectionState
+
+        multiworld = setup_multiworld([CreateWorld, CreateWorld], seed=1703, options={
+            "starting_world": "darkworld", "goal_world": "theme_park",
+            "create_chain_checks": False, "required_sparks": 10,
+        })
+        for player in (1, 2):
+            world = multiworld.worlds[player]
+            self.assertFalse(multiworld.precollected_items[player])
+            for part in range(1, 4):
+                self.assertIsNone(world.get_location(f"Hub World Create Chain Part {part}").item)
+            self.assertIsNone(world.get_location("Hub World Create Chain").item)
+            self.assertIn("Jumbo Ramp", [item.name for item in multiworld.itempool if item.player == player])
+        distribute_items_restrictive(multiworld)
+        remote_objects = [
+            location for location in multiworld.get_filled_locations()
+            if location.item.player != location.player
+            and location.item.name in game_data.UNLOCKABLE_OBJECTS_BY_NAME
+        ]
+        self.assertTrue(remote_objects)
+        self.assertTrue(multiworld.can_beat_game(CollectionState(multiworld)))
+
+    def test_objects_can_land_in_another_game(self) -> None:
+        from test.general import setup_multiworld
+        from ..world import CreateWorld
+        from worlds.checksfinder import ChecksFinderWorld
+        from Fill import distribute_items_restrictive
+        from BaseClasses import CollectionState
+
+        multiworld = setup_multiworld([CreateWorld, ChecksFinderWorld], seed=1703, options=[{
+            "starting_world": "darkworld", "goal_world": "theme_park",
+            "create_chain_checks": False, "required_sparks": 10,
+        }, {}])
+        distribute_items_restrictive(multiworld)
+        self.assertTrue(any(
+            loc.item.player == 1 and loc.item.name in game_data.UNLOCKABLE_OBJECTS_BY_NAME
+            for loc in multiworld.get_filled_locations(2)
+        ))
+        self.assertTrue(any(loc.item.player == 2 for loc in multiworld.get_filled_locations(1)))
+        self.assertTrue(multiworld.can_beat_game(CollectionState(multiworld)))

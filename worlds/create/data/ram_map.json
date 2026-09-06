@@ -55,6 +55,12 @@
       "status": "confirmed_from_symbols_and_code",
       "notes": "gCreateChains+0x18; persistent number of fully completed chains. Hub becomes 1 only after its complete three-link chain."
     },
+    "hub_create_chain_part": {
+      "address": "0x8069A3BF",
+      "type": "u8",
+      "status": "confirmed_by_user",
+      "notes": "Hub tutorial parts: 1=Part 1, 2=Part 2; Part 3 requires observing 0 -> 1 -> 2 -> >=3 in the Hub."
+    },
     "create_chain_completion": {
       "address": "0x8068ED48",
       "type": "u8",

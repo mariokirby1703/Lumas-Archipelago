@@ -35,6 +35,7 @@ CONNECTION_REFUSED_GAME_STATUS = (
     f"Dolphin connected, but Create {SUPPORTED_GAME_ID_LABEL} is not running."
 )
 RAM_SETTLE_SECONDS = 10.0
+SLOT_SETTLE_SECONDS = 5.0
 CHAIN_CONTEXT_SETTLE_SECONDS = 2.0
 WORLD_CONTEXT_SETTLE_SECONDS = 5.0
 OBJECT_FREEZE_SLEEP_SECONDS = 0.02
@@ -116,6 +117,7 @@ class CreateContext(CommonContext):
         self._hub_event_ready_at = 0.0
         self._hub_challenge_spark_armed = False
         self._previous_hub_challenge_sparks: int | None = None
+        self._hub_chain_part_sequence: int | None = None
         self._chain_context_ready_at = 0.0
         self._ram_ready_at = 0.0
         self._ram_settle_logged = False
@@ -163,6 +165,7 @@ class CreateContext(CommonContext):
         await super().disconnect(allow_autoreconnect)
 
     def start_ram_settle(self) -> None:
+        reset_mem2_fallback()
         self._ram_ready_at = time.monotonic() + RAM_SETTLE_SECONDS
         self._ram_settle_logged = False
         self._reset_ram_baselines()
@@ -208,9 +211,10 @@ class CreateContext(CommonContext):
         self._hub_event_ready_at = 0.0
         self._hub_challenge_spark_armed = False
         self._previous_hub_challenge_sparks = None
+        self._hub_chain_part_sequence = None
 
     def start_slot_settle(self) -> None:
-        self._slot_ready_at = time.monotonic() + RAM_SETTLE_SECONDS
+        self._slot_ready_at = time.monotonic() + SLOT_SETTLE_SECONDS
         self._slot_settle_logged = False
         self._reset_ram_baselines()
 
@@ -230,34 +234,71 @@ def _address(address_data: dict[str, Any]) -> int:
     return int(address_data["address"], 16)
 
 
-def read_u8(address: int) -> int:
+_mem2_fallback = None
+_mem2_fallback_retry_at = 0.0
+
+
+def reset_mem2_fallback() -> None:
+    global _mem2_fallback, _mem2_fallback_retry_at
+    if _mem2_fallback is not None:
+        _mem2_fallback.close()
+    _mem2_fallback = None
+    _mem2_fallback_retry_at = 0.0
+
+
+def read_memory(address: int, size: int) -> bytes:
     import dolphin_memory_engine
 
-    return dolphin_memory_engine.read_byte(address)
+    global _mem2_fallback, _mem2_fallback_retry_at
+    mem2 = 0x90000000 <= address < address + size <= 0x94000000
+    if mem2 and _mem2_fallback is not None:
+        return _mem2_fallback.read(address, size)
+    try:
+        return dolphin_memory_engine.read_bytes(address, size)
+    except RuntimeError:
+        if not mem2 or sys.platform != "win32" or time.monotonic() < _mem2_fallback_retry_at:
+            raise
+        _mem2_fallback_retry_at = time.monotonic() + OBJECT_RESOLVER_RETRY_SECONDS
+        from .windows_mem2 import WindowsMEM2
+
+        fallback = WindowsMEM2(dolphin_memory_engine)
+        try:
+            result = fallback.read(address, size)
+        except Exception:
+            fallback.close()
+            raise
+        _mem2_fallback = fallback
+        logger.info("Create MEM2 connected through verified Windows RAM mapping.")
+        return result
+
+
+def write_memory(address: int, data: bytes) -> None:
+    import dolphin_memory_engine
+
+    if _mem2_fallback is not None and 0x90000000 <= address < address + len(data) <= 0x94000000:
+        _mem2_fallback.write(address, data)
+    else:
+        dolphin_memory_engine.write_bytes(address, data)
+
+
+def read_u8(address: int) -> int:
+    return read_memory(address, 1)[0]
 
 
 def read_u16_be(address: int) -> int:
-    import dolphin_memory_engine
-
-    return int.from_bytes(dolphin_memory_engine.read_bytes(address, 2), "big")
+    return int.from_bytes(read_memory(address, 2), "big")
 
 
 def read_u32_be(address: int) -> int:
-    import dolphin_memory_engine
-
-    return int.from_bytes(dolphin_memory_engine.read_bytes(address, 4), "big")
+    return int.from_bytes(read_memory(address, 4), "big")
 
 
 def write_u8(address: int, value: int) -> None:
-    import dolphin_memory_engine
-
-    dolphin_memory_engine.write_byte(address, value & 0xFF)
+    write_memory(address, bytes([value & 0xFF]))
 
 
 def write_u32_be(address: int, value: int) -> None:
-    import dolphin_memory_engine
-
-    dolphin_memory_engine.write_bytes(address, int(value).to_bytes(4, "big"))
+    write_memory(address, int(value).to_bytes(4, "big"))
 
 
 def write_u8_if_changed(address: int, value: int) -> None:
@@ -267,9 +308,7 @@ def write_u8_if_changed(address: int, value: int) -> None:
 
 def write_u16_be_if_changed(address: int, value: int) -> None:
     if read_u16_be(address) != value:
-        import dolphin_memory_engine
-
-        dolphin_memory_engine.write_bytes(address, int(value).to_bytes(2, "big"))
+        write_memory(address, int(value).to_bytes(2, "big"))
 
 
 def write_u32_be_if_changed(address: int, value: int) -> None:
@@ -571,7 +610,32 @@ def check_challenge_sparks(ctx: CreateContext, newly_checked: set[int]) -> None:
             )
 
 
+def check_hub_create_chain_parts(ctx: CreateContext, newly_checked: set[int]) -> None:
+    if current_world_id(ctx) != 1:
+        ctx._hub_chain_part_sequence = None
+        return
+    address = ctx.slot_data["ram"]["addresses"].get("hub_create_chain_part")
+    if address is None:
+        return
+    value = read_u8(_address(address))
+    previous = ctx._hub_chain_part_sequence
+    if value == 0:
+        ctx._hub_chain_part_sequence = 0
+    elif previous is not None and value == previous:
+        pass  # Repeated polls do not interrupt the sequence.
+    elif previous in (0, 1) and value == previous + 1:
+        ctx._hub_chain_part_sequence = value
+    elif previous == 2 and value >= 3:
+        checked_location(ctx, "Hub World Create Chain Part 3", newly_checked)
+        ctx._hub_chain_part_sequence = None
+    else:
+        ctx._hub_chain_part_sequence = None
+    if value in (1, 2):
+        checked_location(ctx, f"Hub World Create Chain Part {value}", newly_checked)
+
+
 def check_create_chain(ctx: CreateContext, newly_checked: set[int]) -> None:
+    check_hub_create_chain_parts(ctx, newly_checked)
     world_id = current_world_id(ctx)
     if world_id != 1 and not ctx.slot_data["options"].get("create_chain_checks", True):
         return
@@ -644,6 +708,7 @@ def location_context_is_settled(ctx: CreateContext) -> bool:
     context = (world_id, current_world_key(ctx))
     if ctx._location_context != context:
         ctx._location_context = context
+        ctx._hub_chain_part_sequence = None
         ctx._location_context_ready_at = time.monotonic() + WORLD_CONTEXT_SETTLE_SECONDS
         ctx._location_context_logged = False
         ctx._chain_completion_context = None
@@ -833,7 +898,10 @@ def resolve_current_challenge_object_list(expected_count: int, ctx: CreateContex
             pass
 
     for candidate in candidates:
-        resolved = _read_challenge_object_list_candidate(candidate)
+        try:
+            resolved = _read_challenge_object_list_candidate(candidate)
+        except (RuntimeError, OSError):
+            continue
         if resolved is None:
             continue
         entries, count = resolved
@@ -843,6 +911,16 @@ def resolve_current_challenge_object_list(expected_count: int, ctx: CreateContex
 
 
 def filter_current_challenge_palette(ctx: CreateContext, challenge_active: bool) -> bool:
+    try:
+        return _filter_current_challenge_palette(ctx, challenge_active)
+    except (RuntimeError, OSError):
+        if not ctx._challenge_palette_failure_logged:
+            logger.debug("Create challenge Object palette is temporarily unreadable; retrying.")
+            ctx._challenge_palette_failure_logged = True
+        return False
+
+
+def _filter_current_challenge_palette(ctx: CreateContext, challenge_active: bool) -> bool:
     if not challenge_active:
         ctx._challenge_palette_context = None
         ctx._challenge_palette_failure_logged = False
@@ -1003,6 +1081,7 @@ def process_victory(ctx: CreateContext) -> None:
 async def dolphin_sync_task(ctx: CreateContext) -> None:
     import dolphin_memory_engine
 
+    reset_mem2_fallback()
     logger.info("Starting Dolphin connector. Use /dolphin for status information.")
     sleep_time = 0.0
     while not ctx.exit_event.is_set():
@@ -1081,6 +1160,8 @@ async def dolphin_sync_task(ctx: CreateContext) -> None:
             ctx.start_ram_settle()
             logger.error(traceback.format_exc())
             sleep_time = 5
+
+    reset_mem2_fallback()
 
 
 async def main(args: Namespace) -> None:
