@@ -693,3 +693,43 @@ class TestCreateMultiworldShuffle(unittest.TestCase):
         ))
         self.assertTrue(any(loc.item.player == 2 for loc in multiworld.get_filled_locations(1)))
         self.assertTrue(multiworld.can_beat_game(CollectionState(multiworld)))
+
+
+class TestCreateItemLinkPlacement(unittest.TestCase):
+    def test_linked_items_can_be_placed_in_another_game(self) -> None:
+        from test.general import setup_multiworld, gen_steps
+        from ..world import CreateWorld
+        from worlds.checksfinder import ChecksFinderWorld
+        from worlds.AutoWorld import call_all
+        from BaseClasses import CollectionState
+        from Fill import distribute_items_restrictive
+
+        for replacement in (False, True):
+            with self.subTest(link_replacement=replacement):
+                options = {
+                    "starting_world": "darkworld", "goal_world": "theme_park",
+                    "create_chain_checks": False, "required_sparks": 10,
+                    "item_links": [{
+                        "name": "SharedCreate", "item_pool": ["Everything"],
+                        "link_replacement": replacement, "replacement_item": None,
+                    }],
+                }
+                multiworld = setup_multiworld(
+                    [CreateWorld, CreateWorld, ChecksFinderWorld], steps=(), seed=1703,
+                    options=[options, options, {}],
+                )
+                multiworld.set_item_links()
+                multiworld.state = CollectionState(multiworld)
+                for step in gen_steps:
+                    if step != "pre_fill":
+                        call_all(multiworld, step)
+                multiworld.link_items()
+                multiworld._all_state = None
+                call_all(multiworld, "pre_fill")
+                distribute_items_restrictive(multiworld)
+                group_id = next(iter(multiworld.groups))
+                self.assertTrue(any(
+                    location.item.player == group_id
+                    for location in multiworld.get_filled_locations(3)
+                ))
+                self.assertTrue(multiworld.can_beat_game(CollectionState(multiworld)))

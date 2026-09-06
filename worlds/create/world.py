@@ -151,18 +151,22 @@ class CreateWorld(World):
         filleritempool: list[Item],
         fill_locations: list,
     ) -> None:
-        if self.multiworld.players > 1:
-            return
-        if self.multiworld.groups:
-            linked_players = set().union(*(group["players"] for group in self.multiworld.groups.values()))
-            if self.player != min(linked_players):
+        create_groups = {
+            group_id: group for group_id, group in self.multiworld.groups.items()
+            if group["game"] == self.game
+        }
+        if create_groups:
+            linked_players = set().union(*(group["players"] for group in create_groups.values()))
+            if self.player not in linked_players or self.player != min(linked_players):
                 return
             self._sphere_fill_create_progression(
                 progitempool,
                 fill_locations,
-                recipient_ids=linked_players | set(self.multiworld.groups),
-                location_player_ids=linked_players,
+                recipient_ids=linked_players | set(create_groups),
+                location_player_ids=set(self.multiworld.player_ids),
             )
+            return
+        if self.multiworld.players > 1:
             return
         self._sphere_fill_create_progression(progitempool, fill_locations)
 
