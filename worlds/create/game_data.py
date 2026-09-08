@@ -273,12 +273,18 @@ POSSIBLE_CHALLENGE_REQUIREMENTS: dict[tuple[str, int], tuple[PossibleChallengeRe
         PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
     ),
     ("W13", 1): (PossibleChallengeRequirement(("Dark Matter",)),),
-    ("W13", 2): (PossibleChallengeRequirement(("Space Mine", "Spring Pad Ramp")),),
+    ("W13", 2): (
+        PossibleChallengeRequirement(("Space Mine",), 1),
+        PossibleChallengeRequirement(("Space Mine", "Spring Pad Ramp")),
+    ),
     ("W13", 3): (
         PossibleChallengeRequirement(("Girder", "Drivewheel", "Long Block")),
         PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
     ),
-    ("W13", 5): (PossibleChallengeRequirement(("Horseshoe Magnet", "Zero-Gravity Generator", "Space Mine")),),
+    ("W13", 5): (
+        PossibleChallengeRequirement(("Space Mine",), 1),
+        PossibleChallengeRequirement(("Horseshoe Magnet", "Zero-Gravity Generator", "Space Mine")),
+    ),
     ("W13", 6): (
         PossibleChallengeRequirement(("Girder", "Drivewheel", "Long Block")),
         PossibleChallengeRequirement(("Girder", "Drivewheel", "Block")),
@@ -344,6 +350,10 @@ def challenge_logic_object_groups(
     if challenge_data.special == "Scoretacular":
         if spark is not None and spark >= 4:
             return (("Bouncer", "Teleporter"), ("Bouncer", "Perfect Teleporter"))
+        if challenge_data.world_key == "W13" and challenge_data.challenge == 4:
+            if spark == 1:
+                return (("Bouncer",), ("Teleporter",))
+            return (("Bouncer",),)
         groups = [
             requirement.objects
             for requirement in POSSIBLE_CHALLENGE_REQUIREMENTS.get(

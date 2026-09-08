@@ -343,6 +343,37 @@ class TestCreateChallengeLogic(CreateTestBase):
         self.collect_by_name({"Perfect Teleporter"})
         self.assertTrue(spark_6.access_rule(self.multiworld.state))
 
+    def test_outer_space_ii_challenge_four_allows_only_first_spark_with_teleporter_alone(self) -> None:
+        challenge = game_data.CHALLENGE_TABLE[("W13", 4)]
+        self.assertEqual(
+            (("Bouncer",), ("Teleporter",)),
+            game_data.challenge_logic_object_groups(challenge, 1),
+        )
+        self.assertEqual(
+            (("Bouncer",),),
+            game_data.challenge_logic_object_groups(challenge, 2),
+        )
+        self.assertEqual(
+            (("Bouncer", "Teleporter"), ("Bouncer", "Perfect Teleporter")),
+            game_data.challenge_logic_object_groups(challenge, 4),
+        )
+
+    def test_outer_space_ii_challenges_two_and_five_allow_one_glitched_spark_with_space_mine(self) -> None:
+        for challenge_number in (2, 5):
+            challenge = game_data.CHALLENGE_TABLE[("W13", challenge_number)]
+            first_spark_requirements = game_data.possible_challenge_requirements(challenge, 1)
+            second_spark_requirements = game_data.possible_challenge_requirements(challenge, 2)
+
+            self.assertIn(
+                game_data.PossibleChallengeRequirement(("Space Mine",), 1),
+                first_spark_requirements,
+            )
+            self.assertNotIn(
+                game_data.PossibleChallengeRequirement(("Space Mine",), 1),
+                second_spark_requirements,
+            )
+            self.assertTrue(game_data.challenge_has_out_of_logic_possible(challenge, 1))
+
     def test_scoretacular_challenge_specific_limit_is_normal_logic(self) -> None:
         required_items = {
             game_data.object_item_name(requirement.name)
