@@ -1,7 +1,8 @@
 from collections import Counter
 import unittest
+from unittest.mock import patch
 
-from BaseClasses import ItemClassification, LocationProgressType
+from BaseClasses import ItemClassification
 
 from . import CreateTestBase
 from .. import Rules, game_data
@@ -239,24 +240,30 @@ class TestCreateProgressiveLogic(CreateTestBase):
         "create_chain_checks": True,
     }
 
-    def test_create_chains_remain_normal_reachable_checks(self) -> None:
+    def test_create_chain_logic_uses_zero_two_four_six_eight_solvable_challenges(self) -> None:
         self.assertTrue(self.can_reach_location("Hub World Create Chain"))
         self.assertIsNone(self.multiworld.get_location("Hub World Create Chain", self.player).item)
-        self.assertTrue(self.can_reach_location("Theme Park Create Chain 1"))
-        self.assertFalse(self.can_reach_location("Theme Park Create Chain 2"))
-        required_items = {
-            game_data.object_item_name(requirement.name)
-            for challenge in range(1, 3)
-            for requirement in game_data.CHALLENGE_TABLE[("W01", challenge)].objects
-            if requirement.global_value in game_data.UNLOCKABLE_OBJECT_VALUES
-        }
-        self.collect_by_name(required_items)
-        self.assertTrue(self.can_reach_location("Theme Park Create Chain 2"))
-        self.assertFalse(self.can_reach_location("Theme Park Create Chain 3"))
-        self.assertEqual(
-            LocationProgressType.DEFAULT,
-            self.multiworld.get_location("Theme Park Create Chain 5", self.player).progress_type,
-        )
+        for chain, required_count in enumerate((0, 2, 4, 6, 8), 1):
+            location = self.multiworld.get_location(f"Theme Park Create Chain {chain}", self.player)
+            with patch.object(Rules, "_solvable_challenge_count", return_value=max(0, required_count - 1)):
+                self.assertEqual(chain == 1, location.access_rule(self.multiworld.state))
+            with patch.object(Rules, "_solvable_challenge_count", return_value=required_count):
+                self.assertTrue(location.access_rule(self.multiworld.state))
+
+    def test_create_chains_are_universal_tracker_out_of_logic_possibilities(self) -> None:
+        for chain in range(1, 6):
+            location = self.multiworld.get_location(f"Theme Park Create Chain {chain}", self.player)
+            self.assertTrue(location.out_of_logic_possible)
+            self.assertTrue(location.possible_access_rule(self.multiworld.state))
+
+        chain_five = self.multiworld.get_location("Theme Park Create Chain 5", self.player)
+        with patch.object(Rules, "_solvable_challenge_count", return_value=7):
+            self.assertFalse(chain_five.access_rule(self.multiworld.state))
+            self.multiworld.generation_is_fake = True
+            Rules.set_location_rules(self.world)
+            self.assertFalse(chain_five.access_rule(self.multiworld.state))
+            self.multiworld.state.collect(self.world.create_item(ITEM_UT_GLITCHED))
+            self.assertTrue(chain_five.access_rule(self.multiworld.state))
 
     def test_starting_world_is_ap_logic_accessible_without_chain_item(self) -> None:
         required_items = {

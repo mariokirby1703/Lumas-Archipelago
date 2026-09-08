@@ -67,9 +67,8 @@ def _has_world_completions(
 
 
 def _has_create_chain_challenge_progress(state: CollectionState, world: CreateWorld, world_key: str, chain: int) -> bool:
-    if chain <= 1:
-        return True
-    return _solvable_challenge_count(state, world, world_key) >= chain
+    required_solvable_challenges = max(0, (chain - 1) * 2)
+    return _solvable_challenge_count(state, world, world_key) >= required_solvable_challenges
 
 
 def _challenge_rule(world: CreateWorld, challenge_data: game_data.ChallengeData, spark: int | None = None):
@@ -196,13 +195,24 @@ def set_location_rules(world: CreateWorld) -> None:
         elif data.category == "create_chain" and data.world_key:
             access_rule = _world_access_rule(world, data.world_key)
             chain = data.chain or 1
-            world.set_rule(
-                location,
+            strict_rule = (
                 lambda state, access_rule=access_rule, world_key=data.world_key, chain=chain: (
                     access_rule(state)
                     and _has_create_chain_challenge_progress(state, world, world_key, chain)
-                ),
+                )
             )
+            possible_rule = access_rule
+            world.set_rule(location, strict_rule)
+            location.possible_access_rule = possible_rule
+            location.out_of_logic_possible = True
+            if getattr(world.multiworld, "generation_is_fake", False):
+                world.set_rule(
+                    location,
+                    lambda state, strict_rule=strict_rule, possible_rule=possible_rule: (
+                        strict_rule(state)
+                        or (state.has(ITEM_UT_GLITCHED, world.player) and possible_rule(state))
+                    ),
+                )
         elif data.category == "spark_goal_world_unlock":
             world.set_rule(
                 location,
