@@ -9,9 +9,14 @@ from flask.testing import FlaskClient
 class TestBase(unittest.TestCase):
     app: typing.ClassVar[Flask]
     client: FlaskClient
+    _shared_app: typing.ClassVar[Flask | None] = None
 
     @classmethod
     def setUpClass(cls) -> None:
+        if TestBase._shared_app is not None:
+            cls.app = TestBase._shared_app
+            return
+
         from WebHostLib import app as raw_app
         from WebHost import get_app
 
@@ -24,13 +29,8 @@ class TestBase(unittest.TestCase):
             "TESTING": True,
             "DEBUG": True,
         })
-        try:
-            cls.app = get_app()
-        except AssertionError as e:
-            # since we only have 1 global app object, this might fail, but luckily all tests use the same config
-            if "register_blueprint" not in e.args[0]:
-                raise
-            cls.app = raw_app
+        TestBase._shared_app = get_app()
+        cls.app = TestBase._shared_app
 
     def setUp(self) -> None:
         from WebHostLib.models import db
