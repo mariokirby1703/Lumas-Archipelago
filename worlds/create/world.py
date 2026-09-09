@@ -151,12 +151,25 @@ class CreateWorld(World):
         filleritempool: list[Item],
         fill_locations: list,
     ) -> None:
-        if self.multiworld.players > 1 or self.multiworld.groups:
+        if self.multiworld.groups:
+            create_players = [
+                player for player in self.multiworld.player_ids
+                if self.multiworld.game[player] == self.game
+            ]
+            if self.player != min(create_players):
+                return
+        elif self.multiworld.players > 1:
             return
+        else:
+            create_players = [self.player]
 
         world_access_names = Items.item_groups["World Access"]
         object_names = Items.item_groups["Objects"]
-        create_items = [item for item in progitempool if item.player == self.player]
+        create_recipients = set(create_players) | {
+            group_id for group_id, group in self.multiworld.groups.items()
+            if group["game"] == self.game
+        }
+        create_items = [item for item in progitempool if item.player in create_recipients]
         def placement_priority(item: Item) -> int:
             if item.name in world_access_names:
                 return 0
@@ -205,6 +218,7 @@ class CreateWorld(World):
                 if location.can_fill(state, item, check_access=False)
                 and not (
                     item.name in SPARK_ITEM_AMOUNTS
+                    and self.multiworld.players == 1
                     and self.spark_goal_mode == "goal_world_unlock"
                     and Locations.LOCATION_TABLE[location.name].world_key == self.goal_world_key
                 )
