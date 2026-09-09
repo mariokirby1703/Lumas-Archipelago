@@ -734,6 +734,39 @@ class TestCreateMultiworldShuffle(unittest.TestCase):
 
 
 class TestCreateItemLinkPlacement(unittest.TestCase):
+    def test_linked_sparks_do_not_lock_the_goal_world(self) -> None:
+        from argparse import Namespace
+        from BaseClasses import CollectionState, MultiWorld
+        from Fill import distribute_items_restrictive
+        from Options import ItemLinks
+        from worlds.AutoWorld import call_all
+        from ..world import CreateWorld
+
+        multiworld = MultiWorld(2)
+        multiworld.game = {1: CreateWorld.game, 2: CreateWorld.game}
+        multiworld.player_name = {1: "Linker 1", 2: "Linker 2"}
+        multiworld.set_seed(79661108309851432069)
+        item_links = [{
+            "name": "ItemLinkTest", "item_pool": ["Everything"],
+            "link_replacement": True, "replacement_item": None,
+        }]
+        args = Namespace()
+        for name, option in CreateWorld.options_dataclass.type_hints.items():
+            setattr(args, name, {1: option.from_any(option.default), 2: option.from_any(option.default)})
+        args.item_links = {1: ItemLinks.from_any(item_links), 2: ItemLinks.from_any(item_links)}
+        multiworld.set_options(args)
+        multiworld.set_item_links()
+        multiworld.state = CollectionState(multiworld)
+        for step in ("generate_early", "create_regions", "create_items", "set_rules", "connect_entrances",
+                     "generate_basic"):
+            call_all(multiworld, step)
+        multiworld.link_items()
+        multiworld._all_state = None
+        call_all(multiworld, "pre_fill")
+        distribute_items_restrictive(multiworld)
+
+        self.assertTrue(multiworld.can_beat_game(CollectionState(multiworld)))
+
     def test_linked_items_can_be_placed_in_another_game(self) -> None:
         from test.general import setup_multiworld, gen_steps
         from ..world import CreateWorld

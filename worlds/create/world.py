@@ -183,6 +183,20 @@ class CreateWorld(World):
 
         create_items.sort(key=placement_priority)
 
+        def spark_is_behind_goal_unlock(item: Item, location) -> bool:
+            if item.name not in SPARK_ITEM_AMOUNTS:
+                return False
+            location_data = Locations.LOCATION_TABLE.get(location.name)
+            if location_data is None or location_data.world_key is None:
+                return False
+            if self.multiworld.game.get(location.player) != self.game:
+                return False
+            location_world = self.multiworld.worlds[location.player]
+            return (
+                location_world.spark_goal_mode == "goal_world_unlock"
+                and location_data.world_key == location_world.goal_world_key
+            )
+
         state = self.multiworld.state.copy()
         state.sweep_for_advancements()
         while create_items:
@@ -216,12 +230,7 @@ class CreateWorld(World):
             valid_locations = [
                 location for location in reachable_locations
                 if location.can_fill(state, item, check_access=False)
-                and not (
-                    item.name in SPARK_ITEM_AMOUNTS
-                    and self.multiworld.players == 1
-                    and self.spark_goal_mode == "goal_world_unlock"
-                    and Locations.LOCATION_TABLE[location.name].world_key == self.goal_world_key
-                )
+                and not spark_is_behind_goal_unlock(item, location)
             ]
             if not valid_locations:
                 names = ", ".join(item.name for item in create_items)
