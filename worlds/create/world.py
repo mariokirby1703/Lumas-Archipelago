@@ -12,7 +12,7 @@ from . import Items, Locations, Regions, Rules, game_data, web_world
 from .Options import CreateOptions
 from .world_constants import (
     FILLER_ITEMS, FIRST_TEN_WORLDS, GAME_NAME, HUB_WORLD_KEY, ITEM_UT_GLITCHED, ITEM_VICTORY,
-    WORLD_KEYS,
+    SPARK_ITEM_AMOUNTS, WORLD_KEYS,
 )
 
 
@@ -151,7 +151,76 @@ class CreateWorld(World):
         filleritempool: list[Item],
         fill_locations: list,
     ) -> None:
-        return
+        if self.multiworld.players > 1 or self.multiworld.groups:
+            return
+
+        world_access_names = Items.item_groups["World Access"]
+        object_names = Items.item_groups["Objects"]
+        create_items = [item for item in progitempool if item.player == self.player]
+        def placement_priority(item: Item) -> int:
+            if item.name in world_access_names:
+                return 0
+            if item.name in object_names and item.advancement:
+                return 1
+            if item.name in SPARK_ITEM_AMOUNTS and item.advancement:
+                return 2
+            if item.name in object_names:
+                return 3
+            return 4
+
+        create_items.sort(key=placement_priority)
+
+        state = self.multiworld.state.copy()
+        state.sweep_for_advancements()
+        while create_items:
+            reachable_locations = [
+                location for location in fill_locations
+                if location.can_reach(state)
+            ]
+            if not reachable_locations:
+                names = ", ".join(item.name for item in create_items)
+                raise RuntimeError(f"Create could not place items: {names}")
+
+            item = create_items[0]
+            if len(reachable_locations) <= 3:
+                best_score = -1
+                seen_names: set[str] = set()
+                for candidate in create_items:
+                    if candidate.name in seen_names:
+                        continue
+                    seen_names.add(candidate.name)
+                    simulated_state = state.copy()
+                    simulated_state.collect(candidate, True)
+                    simulated_state.sweep_for_advancements()
+                    score = sum(
+                        location.can_reach(simulated_state)
+                        for location in fill_locations
+                    )
+                    if score > best_score:
+                        item = candidate
+                        best_score = score
+
+            valid_locations = [
+                location for location in reachable_locations
+                if location.can_fill(state, item, check_access=False)
+                and not (
+                    item.name in SPARK_ITEM_AMOUNTS
+                    and self.spark_goal_mode == "goal_world_unlock"
+                    and Locations.LOCATION_TABLE[location.name].world_key == self.goal_world_key
+                )
+            ]
+            if not valid_locations:
+                names = ", ".join(item.name for item in create_items)
+                raise RuntimeError(f"Create could not place items: {names}")
+
+            location = self.random.choice(valid_locations)
+            self.multiworld.push_item(location, item, False)
+            fill_locations.remove(location)
+            progitempool.remove(item)
+            create_items.remove(item)
+            state.locations_checked.add(location)
+            state.collect(item, True, location)
+            state.sweep_for_advancements()
 
     def create_item(self, name: str) -> Items.CreateItem:
         if name == ITEM_UT_GLITCHED:
