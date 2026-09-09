@@ -399,6 +399,22 @@ class TestCreateClientObjectMemory(unittest.TestCase):
         for raw_address in game_data.II_WORLD_FLAGS_BY_NAME["Theme Park II"]:
             self.assertEqual(0, self.fake.read_byte(int(raw_address, 16)))
 
+    def test_owned_world_access_waits_for_hub_chain_completion(self) -> None:
+        current_world_address = int(game_data.RAM_ADDRESSES["current_world_id"]["address"], 0)
+        access_address = int(game_data.CHALLENGE_RECORDS[1]["access"], 16)
+        hub_chain_location_id = 23456
+        self.ctx.slot_data["locations"]["Hub World Create Chain"] = {"id": hub_chain_location_id}
+        self.fake.write_byte(current_world_address, 1)
+
+        with patch.object(client, "received_world_keys", return_value={"W02"}):
+            client.sync_world_access(self.ctx)
+            self.assertEqual(0, self.fake.read_byte(access_address))
+
+            self.ctx.locations_checked.add(hub_chain_location_id)
+            client.sync_world_access(self.ctx)
+
+        self.assertEqual(1, self.fake.read_byte(access_address))
+
     def test_create_chain_check_uses_chain_specific_completion(self) -> None:
         current_world_address = int(game_data.RAM_ADDRESSES["current_world_id"]["address"], 0)
         chain_index_address = int(game_data.RAM_ADDRESSES["create_chain_index"]["address"], 0)

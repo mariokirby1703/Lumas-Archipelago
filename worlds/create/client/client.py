@@ -851,11 +851,10 @@ def sync_world_access(ctx: CreateContext) -> None:
         return
 
     owned_worlds = received_world_keys(ctx)
+    hub_chain_complete = hub_create_chain_done(ctx)
     records = ctx.slot_data["ram"]["challenge_records"]
     for world_key, world_data in ctx.slot_data.get("worlds", {}).items():
-        unlocked = 1 if world_key in owned_worlds else 0
-        if world_key == ctx.slot_data.get("starting_world") and not hub_create_chain_done(ctx):
-            unlocked = 0
+        unlocked = 1 if hub_chain_complete and world_key in owned_worlds else 0
         if not world_data.get("included", True):
             continue
         hub_index = int(ctx.slot_data["worlds"][world_key]["hub_index"])
