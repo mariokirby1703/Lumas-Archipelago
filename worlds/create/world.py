@@ -12,7 +12,7 @@ from . import Items, Locations, Regions, Rules, game_data, web_world
 from .Options import CreateOptions
 from .world_constants import (
     FILLER_ITEMS, FIRST_TEN_WORLDS, GAME_NAME, HUB_WORLD_KEY, ITEM_UT_GLITCHED, ITEM_VICTORY,
-    SPARK_ITEM_AMOUNTS, WORLD_KEYS,
+    WORLD_KEYS,
 )
 
 
@@ -151,122 +151,7 @@ class CreateWorld(World):
         filleritempool: list[Item],
         fill_locations: list,
     ) -> None:
-        create_groups = {
-            group_id: group for group_id, group in self.multiworld.groups.items()
-            if group["game"] == self.game
-        }
-        if create_groups:
-            linked_players = set().union(*(group["players"] for group in create_groups.values()))
-            if self.player not in linked_players or self.player != min(linked_players):
-                return
-            self._sphere_fill_create_progression(
-                progitempool,
-                fill_locations,
-                recipient_ids=linked_players | set(create_groups),
-                location_player_ids=set(self.multiworld.player_ids),
-            )
-            return
-        if self.multiworld.players > 1:
-            return
-        self._sphere_fill_create_progression(progitempool, fill_locations)
-
-    def _sphere_fill_create_progression(
-        self,
-        progitempool: list[Item],
-        fill_locations: list,
-        recipient_ids: set[int] | None = None,
-        location_player_ids: set[int] | None = None,
-    ) -> None:
-        progression_names = Items.item_groups["Objects"] | Items.item_groups["World Access"]
-        recipient_ids = recipient_ids or {self.player}
-        location_player_ids = location_player_ids or {self.player}
-        create_progression = [
-            item for item in progitempool
-            if item.player in recipient_ids and item.name in progression_names
-        ]
-        spark_progression = [
-            item for item in progitempool
-            if item.player in recipient_ids and item.name in SPARK_ITEM_AMOUNTS
-        ]
-        if not create_progression:
-            return
-
-        state = self.multiworld.state.copy()
-        state.sweep_for_advancements()
-
-        while create_progression:
-            best_bundle: list[Item] | None = None
-            best_locations: list | None = None
-            best_score = -1
-            candidate_bundles: list[list[Item]] = [[item] for item in create_progression]
-            items_by_name = {item.name: item for item in create_progression}
-            seen_bundles = {(item.name,) for item in create_progression}
-            for world_key in self.active_world_keys:
-                for challenge in range(1, 11):
-                    challenge_data = game_data.CHALLENGE_TABLE[(world_key, challenge)]
-                    for required_names in Rules._challenge_logic_object_groups(self, challenge_data):
-                        bundle = [items_by_name[name] for name in required_names if name in items_by_name]
-                        bundle_key = tuple(sorted(item.name for item in bundle))
-                        if len(bundle) > 1 and bundle_key not in seen_bundles:
-                            candidate_bundles.append(bundle)
-                            seen_bundles.add(bundle_key)
-
-            # A spark-gated goal world needs a whole threshold, not one Spark,
-            # before an access-rule score can improve.
-            if spark_progression and self.required_sparks > 0:
-                spark_bundle: list[Item] = []
-                spark_total = Rules._spark_count(state, self)
-                for spark_item in sorted(
-                    spark_progression, key=lambda item: SPARK_ITEM_AMOUNTS[item.name], reverse=True
-                ):
-                    spark_bundle.append(spark_item)
-                    spark_total += SPARK_ITEM_AMOUNTS[spark_item.name]
-                    if spark_total >= self.required_sparks:
-                        candidate_bundles.append(spark_bundle)
-                        break
-
-            reachable_slots = sum(
-                1 for location in fill_locations
-                if location.player in location_player_ids and location.can_reach(state)
-            )
-            for bundle in candidate_bundles:
-                valid_locations = [
-                    location for location in fill_locations
-                    if location.player in location_player_ids
-                    and all(location.can_fill(state, item, check_access=True) for item in bundle)
-                ]
-                if not valid_locations or len(bundle) > reachable_slots:
-                    continue
-                if len(valid_locations) < len(bundle):
-                    continue
-                locations = self.random.sample(valid_locations, len(bundle))
-                simulated_state = state.copy()
-                for bundled_item, location in zip(bundle, locations):
-                    simulated_state.collect(bundled_item, True, location)
-                simulated_state.sweep_for_advancements()
-                score = sum(
-                    1 for candidate in fill_locations
-                    if candidate.player in location_player_ids and candidate.can_reach(simulated_state)
-                ) - len(bundle)
-                if score > best_score:
-                    best_bundle = bundle
-                    best_locations = locations
-                    best_score = score
-
-            if best_bundle is None or best_locations is None:
-                unplaced = ", ".join(item.name for item in create_progression)
-                raise RuntimeError(f"Create sphere fill could not place progression items: {unplaced}")
-
-            for item, location in zip(best_bundle, best_locations):
-                self.multiworld.push_item(location, item, False)
-                fill_locations.remove(location)
-                progitempool.remove(item)
-                if item in create_progression:
-                    create_progression.remove(item)
-                else:
-                    spark_progression.remove(item)
-                state.collect(item, True, location)
-            state.sweep_for_advancements()
+        return
 
     def create_item(self, name: str) -> Items.CreateItem:
         if name == ITEM_UT_GLITCHED:

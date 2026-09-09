@@ -165,13 +165,6 @@ def create_all_items(world: CreateWorld) -> None:
         items.append(item)
     world.extra_sparks = sum(extra_spark_amounts)
 
-    minimum_extra_slots = ceil(desired_extra_sparks / max(SPARK_ITEM_AMOUNTS.values()))
-    if extra_spark_capacity >= minimum_extra_slots and world.extra_sparks != desired_extra_sparks:
-        raise RuntimeError(
-            f"Create could fit the requested {desired_extra_sparks} extra Sparks, "
-            f"but generated only {world.extra_sparks}."
-        )
-
     if len(items) > unfilled_locations:
         raise ValueError(
             f"Create item pool has {len(items)} progression items but only {unfilled_locations} open locations."
