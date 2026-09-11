@@ -6,6 +6,7 @@ import sys
 import time
 import traceback
 from argparse import Namespace
+from collections import deque
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +26,7 @@ from NetUtils import ClientStatus
 from ..world_constants import GAME_ID_ADDRESS, GAME_NAME, ITEM_VICTORY, SPARK_ITEM_AMOUNTS
 from ..world_constants import SUPPORTED_GAME_ID_LABEL, SUPPORTED_GAME_IDS
 from ..world_constants import HUB_WORLD_KEY
+from .popup_runtime import PopupRuntime, IDLE, ACTIVE, ERROR, MODAL_LAYER
 
 ModuleUpdate.update()
 
@@ -52,6 +54,32 @@ CHALLENGE_OBJECT_ENTRY_STRIDE = 0x08
 
 class CreateCommandProcessor(ClientCommandProcessor):
     ctx: "CreateContext"
+
+    def _cmd_createpopup(self, object_id: str = "") -> None:
+        """Queue a vanilla Object Unlocked popup: /createpopup <0..261>."""
+        try:
+            value = int(object_id)
+        except ValueError:
+            logger.warning("Usage: /createpopup <object_id>, integer 0..261.")
+            return
+        if not 0 <= value < OBJECT_RECORD_COUNT or not any(
+            int(data["global_value"]) == value for data in self.ctx.slot_data.get("objects", {}).values()
+        ):
+            logger.warning("Object ID must be an unlockable Object in this slot (0..261).")
+            return
+        self.ctx._object_popup_queue.append(value)
+        logger.info("Queued Object popup: %s (ID %d).", popup_object_name(self.ctx, value), value)
+
+    def _cmd_createpopupstatus(self) -> None:
+        """Display popup patch, mailbox, modal layer and queue diagnostics."""
+        runtime = self.ctx._popup_runtime
+        logger.info("Popup installed=%s ready=%s failure=%s queue=%d", runtime.installed,
+                    runtime.ready, runtime.failure, len(self.ctx._object_popup_queue))
+        if self.ctx.dolphin_status == CONNECTION_CONNECTED_STATUS:
+            try:
+                logger.info("Popup mailbox=%s modal=%d", runtime.snapshot(read_memory), read_u32_be(MODAL_LAYER))
+            except Exception as error:
+                logger.warning("Popup status unavailable: %s", error)
 
     def _cmd_dolphin(self) -> None:
         """Display the current Dolphin connection status."""
@@ -84,7 +112,14 @@ class CreateContext(CommonContext):
         self.patch_data: dict[str, Any] = {}
         self.slot_data: dict[str, Any] = {}
         self.save_slot_armed = False
-        self._save_slot_verified_once = False
+        self._popup_runtime = PopupRuntime()
+        self._popup_runtime_ready = False
+        self._popup_item_cursor = 0
+        self._popup_accept_new_items = False
+        self._object_popup_queue: deque[int] = deque()
+        self._popup_inflight: tuple[int, int] | None = None
+        self._popup_last_status: int | None = None
+        self._popup_delay_logged = False
         self._slot_guard_observed_this_session = False
         self._waiting_for_slot_logged = False
         self._slot_connected_logged = False
@@ -165,6 +200,11 @@ class CreateContext(CommonContext):
         await super().disconnect(allow_autoreconnect)
 
     def start_ram_settle(self) -> None:
+        self.save_slot_armed = False
+        self._slot_guard_observed_this_session = False
+        self._slot_ready_at = 0.0
+        self._slot_settle_logged = False
+        self._slot_connected_logged = False
         reset_mem2_fallback()
         self._ram_ready_at = time.monotonic() + RAM_SETTLE_SECONDS
         self._ram_settle_logged = False
@@ -177,12 +217,25 @@ class CreateContext(CommonContext):
         return False
 
     def _reset_ram_baselines(self) -> None:
+        self._reset_popup_state()
         self._reset_location_context()
         self._reset_selected_object_freeze()
         self._reset_object_runtime_state()
         self._chain_completion_context = None
         self._previous_chain_completion = None
         self._chain_context_ready_at = 0.0
+
+    def _reset_popup_state(self) -> None:
+        if self.dolphin_status == CONNECTION_CONNECTED_STATUS:
+            self._popup_runtime.uninstall(read_memory, write_memory)
+        self._popup_runtime = PopupRuntime()
+        self._popup_runtime_ready = False
+        self._popup_item_cursor = 0
+        self._popup_accept_new_items = False
+        self._object_popup_queue.clear()
+        self._popup_inflight = None
+        self._popup_last_status = None
+        self._popup_delay_logged = False
 
     def _reset_location_context(self) -> None:
         self._location_context = None
@@ -482,21 +535,12 @@ def in_challenge(raw_challenge: int | None = None) -> bool:
 def sync_save_slot_guard(ctx: CreateContext) -> None:
     if not ctx.slot_data:
         return
-    if ctx._save_slot_verified_once:
-        if not ctx.save_slot_armed:
-            ctx._hub_event_ready_at = time.monotonic() + HUB_EVENT_GRACE_SECONDS
-        ctx.save_slot_armed = True
-        if not ctx._slot_connected_logged:
-            logger.info("Save Slot 3 connected.")
-            ctx._slot_connected_logged = True
-        return
 
     guard = _address(ctx.slot_data["ram"]["addresses"]["save_slot_guard_primary"])
     try:
         value = read_u8(guard)
     except Exception:
-        ctx.save_slot_armed = False
-        return
+        value = None  # A failed read also invalidates the current observation.
 
     if value == 2:
         if not ctx._slot_guard_observed_this_session:
@@ -508,13 +552,17 @@ def sync_save_slot_guard(ctx: CreateContext) -> None:
         if not ctx.save_slot_armed:
             ctx._hub_event_ready_at = time.monotonic() + HUB_EVENT_GRACE_SECONDS
         ctx.save_slot_armed = True
-        ctx._save_slot_verified_once = True
         if not ctx._slot_connected_logged:
             logger.info("Save Slot 3 connected.")
             ctx._slot_connected_logged = True
         return
 
     if value == 0xFF and ctx._slot_guard_observed_this_session:
+        if not ctx.save_slot_armed and ctx.slot_ram_is_settled():
+            ctx._hub_event_ready_at = time.monotonic() + HUB_EVENT_GRACE_SECONDS
+            if not ctx._slot_connected_logged:
+                logger.info("Save Slot 3 connected.")
+                ctx._slot_connected_logged = True
         ctx.save_slot_armed = ctx.slot_ram_is_settled()
         return
 
@@ -526,6 +574,9 @@ def sync_save_slot_guard(ctx: CreateContext) -> None:
     ctx._slot_ready_at = 0.0
     ctx._slot_settle_logged = False
     ctx._slot_connected_logged = False
+    if getattr(ctx, "_popup_runtime", None):
+        ctx._popup_runtime.uninstall(read_memory, write_memory)
+        ctx._popup_runtime_ready = False
 
 
 def current_world_key(ctx: CreateContext) -> str | None:
@@ -819,6 +870,102 @@ def sync_object_availability(ctx: CreateContext, challenge_active: bool) -> None
 
     ctx._object_resync_pending = False
     ctx._last_object_resync_at = now
+
+
+def popup_object_name(ctx: CreateContext, object_id: int) -> str:
+    return next((data.get("name", name) for name, data in ctx.slot_data.get("objects", {}).items()
+                 if int(data["global_value"]) == object_id), str(object_id))
+
+
+def collect_new_object_popup_items(ctx: CreateContext) -> None:
+    if not ctx._popup_accept_new_items:
+        return
+    if ctx._popup_item_cursor > len(ctx.items_received):
+        # An AP resync replaced the receipt list. Establish a fresh baseline.
+        ctx._popup_item_cursor = len(ctx.items_received)
+        return
+    while ctx._popup_item_cursor < len(ctx.items_received):
+        item = ctx.items_received[ctx._popup_item_cursor]
+        ctx._popup_item_cursor += 1
+        name = item_name_from_network(ctx, item.item)
+        data = ctx.slot_data.get("objects", {}).get(name)
+        if not data:
+            continue
+        try:
+            value = int(data["global_value"])
+        except (KeyError, TypeError, ValueError):
+            logger.warning("Ignoring invalid popup Object data for %s.", name)
+            continue
+        if 0 <= value < OBJECT_RECORD_COUNT:
+            ctx._object_popup_queue.append(value)
+            logger.info("Queued Object popup: %s (ID %d).", name, value)
+
+
+def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> None:
+    if not ctx._popup_runtime_ready or not ctx.save_slot_armed or challenge_active:
+        return
+    runtime = ctx._popup_runtime
+    state = runtime.snapshot(read_memory)
+    status = state["status"]
+    if status != ctx._popup_last_status:
+        if status == ACTIVE:
+            logger.info("Showing AP Object popup: %s (ID %d).",
+                        popup_object_name(ctx, state["object_id"]), state["object_id"])
+        elif status == ERROR:
+            logger.warning("AP Object popup runtime error %d, request %d, Object %d; popup dispatch stopped.",
+                           state["error"], state["request_seq"], state["object_id"])
+        ctx._popup_last_status = status
+    if ctx._popup_inflight:
+        value, sequence = ctx._popup_inflight
+        if state["ack_seq"] == sequence and status == IDLE:
+            logger.info("AP Object popup closed.")
+            ctx._popup_inflight = None
+        elif status == IDLE:
+            # A pending request was cancelled during a transition.
+            ctx._object_popup_queue.appendleft(value)
+            ctx._popup_inflight = None
+        else:
+            return
+    if status != IDLE or not ctx._object_popup_queue or ctx._object_resync_pending:
+        return
+    if time.monotonic() < ctx._object_resync_blocked_until:
+        return
+    if read_u32_be(MODAL_LAYER):
+        if not ctx._popup_delay_logged:
+            logger.info("Create AP Object popup delayed: another modal UI is active.")
+            ctx._popup_delay_logged = True
+        return
+    ctx._popup_delay_logged = False
+    records = object_records(ctx)
+    value = ctx._object_popup_queue[0]
+    if not records or value not in records:
+        return
+    apply_owned_object_record(records[value])
+    if runtime.request_object(value, read_memory, write_memory):
+        ctx._object_popup_queue.popleft()
+        ctx._popup_inflight = (value, runtime.snapshot(read_memory)["request_seq"])
+
+
+def sync_object_popups(ctx: CreateContext, challenge_active: bool) -> None:
+    if not ctx.save_slot_armed or not ctx.ram_is_settled() or not ctx.slot_ram_is_settled():
+        return
+    # Capture the receipt baseline after the first successful availability sync,
+    # independently of heartbeat readiness so items arriving during that probe
+    # are still retained in receipt order.
+    if not ctx._popup_accept_new_items and not ctx._object_resync_pending and ctx._object_records:
+        ctx._popup_item_cursor = len(ctx.items_received)
+        ctx._popup_accept_new_items = True
+    collect_new_object_popup_items(ctx)
+    if challenge_active:
+        # Do not let an already-published request survive into an unsafe Object
+        # registry. Active UI owners are always left to vanilla cleanup.
+        if ctx._popup_runtime.installed:
+            ctx._popup_runtime.reset_request(read_memory, write_memory)
+        return
+    if ctx._object_resync_pending or not ctx._object_records:
+        return
+    ctx._popup_runtime_ready = ctx._popup_runtime.ensure_installed(read_memory, write_memory)
+    service_object_popup_queue(ctx, challenge_active)
 
 
 def current_challenge_context(ctx: CreateContext) -> tuple[str | None, int | None, int]:
@@ -1115,6 +1262,7 @@ async def dolphin_sync_task(ctx: CreateContext) -> None:
                     sync_total_sparks(ctx)
                     local_challenge_runtime_active = filter_current_challenge_palette(ctx, challenge_active)
                     sync_object_availability(ctx, challenge_active)
+                    sync_object_popups(ctx, challenge_active)
                     if ctx._object_mem2_rehook_requested:
                         ctx._object_mem2_rehook_requested = False
                         ctx._object_mem2_rehook_attempts += 1
@@ -1122,6 +1270,7 @@ async def dolphin_sync_task(ctx: CreateContext) -> None:
                             "Create Object MEM2 was unavailable; reconnecting to Dolphin "
                             f"to rediscover it ({ctx._object_mem2_rehook_attempts}/{OBJECT_MEM2_REHOOK_LIMIT})."
                         )
+                        ctx._popup_runtime.uninstall(read_memory, write_memory)
                         dolphin_memory_engine.un_hook()
                         ctx.dolphin_status = CONNECTION_LOST_STATUS
                         ctx.start_ram_settle()
@@ -1154,12 +1303,20 @@ async def dolphin_sync_task(ctx: CreateContext) -> None:
             logger.info(CONNECTION_CONNECTED_STATUS)
             ctx.start_ram_settle()
         except Exception:
+            try:
+                if (dolphin_memory_engine.is_hooked()
+                        and dolphin_memory_engine.read_bytes(GAME_ID_ADDRESS, 6) in SUPPORTED_GAME_IDS):
+                    ctx._popup_runtime.uninstall(read_memory, write_memory)
+            except Exception:
+                logger.debug("Popup cleanup unavailable after Dolphin error.", exc_info=True)
             dolphin_memory_engine.un_hook()
             ctx.dolphin_status = CONNECTION_LOST_STATUS
             ctx.start_ram_settle()
             logger.error(traceback.format_exc())
             sleep_time = 5
 
+    if dolphin_memory_engine.is_hooked() and ctx.dolphin_status == CONNECTION_CONNECTED_STATUS:
+        ctx._popup_runtime.uninstall(read_memory, write_memory)
     reset_mem2_fallback()
 
 

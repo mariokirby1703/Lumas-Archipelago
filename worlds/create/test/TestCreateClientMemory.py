@@ -3,11 +3,13 @@ from __future__ import annotations
 import sys
 import types
 import unittest
+from collections import deque
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from .. import game_data
 from ..client import client
+from ..client import popup_runtime as popup
 
 
 class FakeDolphinMemoryEngine:
@@ -602,6 +604,372 @@ class TestCreateVictory(unittest.TestCase):
                     ])
                 else:
                     ctx.send_msgs.assert_not_called()
+
+
+class TestCreateSaveSlotGuard(unittest.TestCase):
+    def setUp(self):
+        self.fake = install_fake_dolphin()
+        self.ctx = make_context()
+        self.ctx.save_slot_armed = False
+        self.ctx._slot_guard_observed_this_session = False
+        self.ctx._slot_ready_at = 0.0
+        self.ctx._slot_settle_logged = False
+        self.ctx._slot_connected_logged = False
+        self.ctx._waiting_for_slot_logged = False
+        self.ctx._reset_ram_baselines = Mock()
+        self.ctx.start_slot_settle = types.MethodType(client.CreateContext.start_slot_settle, self.ctx)
+        self.ctx.slot_ram_is_settled = types.MethodType(client.CreateContext.slot_ram_is_settled, self.ctx)
+        self.guard = client._address(self.ctx.slot_data["ram"]["addresses"]["save_slot_guard_primary"])
+
+    def sync(self, value, now):
+        self.fake.write_byte(self.guard, value)
+        with patch.object(client.time, "monotonic", return_value=now):
+            client.sync_save_slot_guard(self.ctx)
+
+    def test_ff_requires_positive_observation(self):
+        self.sync(255, 100)
+        self.assertFalse(self.ctx.save_slot_armed)
+        self.assertFalse(self.ctx._slot_guard_observed_this_session)
+
+    def test_two_starts_settle_and_ff_only_arms_after_deadline(self):
+        self.sync(2, 100)
+        self.assertTrue(self.ctx._slot_guard_observed_this_session)
+        self.assertEqual(105, self.ctx._slot_ready_at)
+        self.assertFalse(self.ctx.save_slot_armed)
+        self.ctx._reset_ram_baselines.assert_called_once()
+        self.sync(255, 104)
+        self.assertFalse(self.ctx.save_slot_armed)
+        self.sync(255, 105)
+        self.assertTrue(self.ctx.save_slot_armed)
+        self.assertEqual(135, self.ctx._hub_event_ready_at)
+
+    def test_invalid_guard_revokes_success_and_requires_new_settle(self):
+        self.sync(2, 100)
+        self.sync(2, 105)
+        self.assertTrue(self.ctx.save_slot_armed)
+        self.sync(0, 106)
+        self.assertFalse(self.ctx.save_slot_armed)
+        self.assertFalse(self.ctx._slot_guard_observed_this_session)
+        self.assertEqual(0, self.ctx._slot_ready_at)
+        self.assertFalse(self.ctx._slot_connected_logged)
+        self.sync(255, 107)
+        self.assertFalse(self.ctx.save_slot_armed)
+        self.sync(2, 108)
+        self.assertEqual(113, self.ctx._slot_ready_at)
+        self.assertFalse(self.ctx.save_slot_armed)
+
+    def test_reconnect_cannot_arm_from_previous_success(self):
+        self.sync(2, 100)
+        self.sync(2, 105)
+        client.CreateContext.on_package(self.ctx, "Connected", {"slot_data": self.ctx.slot_data})
+        self.sync(255, 110)
+        self.assertFalse(self.ctx.save_slot_armed)
+        self.sync(0, 111)
+        self.assertFalse(self.ctx.save_slot_armed)
+
+    def test_dolphin_rehook_revokes_guard_observation(self):
+        self.sync(2, 100)
+        self.sync(2, 105)
+        client.CreateContext.start_ram_settle(self.ctx)
+        self.sync(255, 110)
+        self.assertFalse(self.ctx.save_slot_armed)
+
+    def test_failed_read_revokes_guard_observation(self):
+        self.sync(2, 100)
+        self.sync(2, 105)
+        with patch.object(client, "read_u8", side_effect=RuntimeError("unhooked")):
+            client.sync_save_slot_guard(self.ctx)
+        self.sync(255, 110)
+        self.assertFalse(self.ctx.save_slot_armed)
+
+
+class TestCreatePopupRuntime(unittest.TestCase):
+    def setUp(self):
+        self.fake = FakeDolphinMemoryEngine()
+        self.runtime = popup.PopupRuntime()
+        self.read = self.fake.read_bytes
+        self.writes = []
+        self.base = self.runtime.layout.mailbox
+        for address, value in popup.ORIGINALS.items():
+            self.fake.write_u32(address, value)
+
+    def write(self, address, data):
+        self.writes.append((address, data))
+        self.fake.write_bytes(address, data)
+
+    def install(self):
+        self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
+        self.assertTrue(self.runtime.installed)
+        self.fake.write_u32(self.base + 0x1C, 1)
+        self.assertTrue(self.runtime.ensure_installed(self.read, self.write))
+
+    def test_branch_encoder(self):
+        self.assertEqual(0x4808A365, popup.ppc_branch(0x8000DB5C, 0x80097EC0, link=True))
+        self.assertEqual(0x4BFFFFFC, popup.ppc_branch(0x1004, 0x1000))
+        self.assertEqual(0x49FFFFFC, popup.ppc_branch(0, 0x1FFFFFC))
+        self.assertEqual(0x4A000000, popup.ppc_branch(0x2000000, 0))
+        for source, target in ((0, 1), (1, 5), (0, 0x2000000), (0x2000004, 0)):
+            with self.subTest(source=source, target=target), self.assertRaises(ValueError):
+                popup.ppc_branch(source, target)
+
+    def test_installs_code_before_scan_hooks_and_dispatcher_last(self):
+        self.install()
+        self.assertEqual(self.runtime.layout.code_base, self.writes[0][0])
+        self.assertEqual([0x80092184, 0x8009240C, 0x8000DB5C], [a for a, _ in self.writes[1:]])
+        self.assertEqual(0x4BFF84ED, self.fake.read_u32(0x8000DB5C))
+        self.assertEqual(0x4BF740BC, self.fake.read_u32(0x80092184))
+        self.assertEqual(0x4BF73E74, self.fake.read_u32(0x8009240C))
+        self.assertEqual(b" \0", self.read(self.base + 0x44, 2))
+        self.assertEqual(self.runtime.layout.closed_callback, self.fake.read_u32(self.base + 0x38))
+        self.assertEqual(self.base, self.fake.read_u32(self.base + 0x3C))
+
+    def test_refuses_unexpected_instruction_without_writing(self):
+        self.fake.write_u32(0x80092184, 0x12345678)
+        self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
+        self.assertEqual([], self.writes)
+        self.assertIn("unexpected instruction", self.runtime.failure)
+
+    def test_refuses_unknown_cave_even_with_valid_signature(self):
+        for signature in (False, True):
+            with self.subTest(signature=signature):
+                self.setUp()
+                if signature:
+                    self.fake.write_bytes(self.runtime.layout.code_base, self.runtime.image)
+                self.fake.write_u32(self.runtime.layout.code_base, 0x12345678)
+                self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
+                self.assertEqual([], self.writes)
+
+    def test_adopts_exact_patch_without_overwriting_live_owner(self):
+        self.install()
+        self.fake.write_u32(self.base + 8, popup.ACTIVE)
+        self.fake.write_u32(self.base + 0x20, 0x81234560)
+        before = self.read(self.base, 0x48)
+        replacement = popup.PopupRuntime()
+        replacement.ensure_installed(self.read, self.write)
+        self.assertTrue(replacement.installed)
+        self.assertEqual(before, self.read(self.base, 0x48))
+
+    def test_uninstall_restores_main_first_cancels_pending_retains_callback(self):
+        self.install()
+        self.assertTrue(self.runtime.request_object(13, self.read, self.write))
+        self.writes.clear()
+        self.runtime.uninstall(self.read, self.write)
+        self.assertEqual(popup.IDLE, self.fake.read_u32(self.base + 8))
+        self.assertEqual([self.base + 8, *popup.ORIGINALS], [a for a, _ in self.writes])
+        for address, value in popup.ORIGINALS.items():
+            self.assertEqual(value, self.fake.read_u32(address))
+        self.assertNotEqual(bytes(20), self.read(self.runtime.layout.closed_callback, 20))
+
+    def test_requests_validate_range_busy_state_and_publish_last(self):
+        self.assertFalse(self.runtime.request_object(13, self.read, self.write))
+        self.install()
+        for value in (-1, 262, "13"):
+            self.assertFalse(self.runtime.request_object(value, self.read, self.write))
+        self.writes.clear()
+        self.assertTrue(self.runtime.request_object(13, self.read, self.write))
+        self.assertEqual((self.base + 8, b"\0\0\0\1"), self.writes[-1])
+        state = self.runtime.snapshot(self.read)
+        self.assertEqual((13, 1, popup.PENDING), (state["object_id"], state["request_seq"], state["status"]))
+        for status in (popup.PENDING, popup.ACTIVE, popup.ERROR):
+            self.fake.write_u32(self.base + 8, status)
+            self.assertFalse(self.runtime.request_object(6, self.read, self.write))
+
+    def test_uninstall_leaves_active_owner_for_vanilla_close_callback(self):
+        self.install()
+        self.fake.write_u32(self.base + 8, popup.ACTIVE)
+        self.fake.write_u32(self.base + 0x20, 0x81234560)
+        self.fake.write_byte(self.base + 0x34, 1)
+        owner = self.read(self.base, 0x48)
+        self.runtime.uninstall(self.read, self.write)
+        self.assertEqual(owner, self.read(self.base, 0x48))
+
+    def test_reinstall_cancels_abandoned_pending_request(self):
+        self.install()
+        self.runtime.request_object(13, self.read, self.write)
+        replacement = popup.PopupRuntime()
+        replacement.ensure_installed(self.read, self.write)
+        self.assertEqual(popup.IDLE, replacement.status(self.read))
+
+    def test_big_endian_status_heartbeat_and_sequence_wrap(self):
+        self.install()
+        self.fake.write_u32(self.base + 0x1C, 0x12345678)
+        self.fake.write_u32(self.base + 0x10, 0xFFFFFFFF)
+        self.assertEqual(0x12345678, self.runtime.heartbeat(self.read))
+        self.assertTrue(self.runtime.request_object(13, self.read, self.write))
+        self.assertEqual(0, self.runtime.snapshot(self.read)["request_seq"])
+        self.assertEqual(popup.PENDING, self.runtime.status(self.read))
+
+    def test_heartbeat_timeout_restores_originals_and_stops_retrying(self):
+        self.runtime.ensure_installed(self.read, self.write)
+        for _ in range(50):
+            self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
+        self.assertIn("heartbeat missing", self.runtime.failure)
+        for address, value in popup.ORIGINALS.items():
+            self.assertEqual(value, self.fake.read_u32(address))
+        count = len(self.writes)
+        self.runtime.ensure_installed(self.read, self.write)
+        self.assertEqual(count, len(self.writes))
+
+    def test_hook_readback_failure_rolls_back_partial_installation(self):
+        def broken_write(address, data):
+            if address != 0x8009240C:
+                self.write(address, data)
+        self.assertFalse(self.runtime.ensure_installed(self.read, broken_write))
+        for address, value in popup.ORIGINALS.items():
+            self.assertEqual(value, self.fake.read_u32(address))
+
+    def test_code_readback_failure_never_installs_hooks(self):
+        def broken_write(address, data):
+            self.write(address, data)
+            if address == self.runtime.layout.code_base:
+                self.fake.write_byte(address, 0)
+        self.assertFalse(self.runtime.ensure_installed(self.read, broken_write))
+        self.assertEqual([self.runtime.layout.code_base], [a for a, _ in self.writes])
+
+    def test_dispatcher_and_scan_machine_code_contract(self):
+        # Validate generated words/call destinations, not simulated PPC execution.
+        image = self.runtime.image
+        layout = self.runtime.layout
+        self.assertLessEqual(layout.end, 0x80006514)
+        original_call = layout.dispatcher + 12
+        self.assertEqual(popup.word(popup.ppc_branch(original_call, 0x80097EC0, link=True)), image[12:16])
+        self.assertIn(bytes.fromhex("816c001c396b0001916c001c"), image)  # heartbeat++ through r11
+        self.assertIn(bytes.fromhex("38e0000439000140392000b4"), image)  # type 4,320,180
+        for base, vanilla, ap_word, destination in (
+            (layout.object_scan_start_hook, 0x3A600000, 0x826C000C, 0x80092188),
+            (layout.object_scan_step_hook, 0x3A730001, 0x3A607FFF, 0x80092410),
+        ):
+            offset = base - layout.code_base
+            code = image[offset:offset + 36]
+            self.assertEqual(popup.word(ap_word), code[20:24])
+            self.assertEqual(popup.word(vanilla), code[28:32])
+            self.assertEqual(popup.word(popup.ppc_branch(base + 24, destination)), code[24:28])
+            self.assertEqual(popup.word(popup.ppc_branch(base + 32, destination)), code[32:36])
+
+
+class TestCreatePopupQueue(unittest.TestCase):
+    def setUp(self):
+        self.fake = install_fake_dolphin()
+        self.ctx = make_context()
+        self.ctx._popup_runtime = popup.PopupRuntime()
+        self.ctx._popup_runtime_ready = False
+        self.ctx._popup_accept_new_items = False
+        self.ctx._popup_item_cursor = 0
+        self.ctx._object_popup_queue = deque()
+        self.ctx._popup_inflight = None
+        self.ctx._popup_last_status = None
+        self.ctx._popup_delay_logged = False
+        self.ctx.ram_is_settled = lambda: True
+        self.ctx.slot_ram_is_settled = lambda: True
+        self.names = {value: name for name, data in self.ctx.slot_data["objects"].items()
+                      for value in (int(data["global_value"]),)}
+        self.lookup = patch.object(client, "item_name_from_network", side_effect=lambda ctx, item: self.names.get(item))
+        self.lookup.start()
+        self.addCleanup(self.lookup.stop)
+        for address, value in popup.ORIGINALS.items():
+            self.fake.write_u32(address, value)
+        self.ctx._object_records = seed_object_registry(self.fake, self.ctx)
+        self.ctx._object_resync_pending = False
+
+    def receipt(self, value):
+        self.ctx.items_received.append(SimpleNamespace(item=value))
+
+    def ready(self):
+        client.sync_object_popups(self.ctx, False)
+        self.fake.write_u32(self.ctx._popup_runtime.layout.mailbox + 0x1C, 1)
+        client.sync_object_popups(self.ctx, False)
+
+    def test_baseline_suppresses_history_and_keeps_receipt_order_duplicates(self):
+        self.receipt(13)
+        self.ready()
+        self.assertEqual([], list(self.ctx._object_popup_queue))
+        for value in (6, 99999, 13, 6):
+            self.receipt(value)
+        client.collect_new_object_popup_items(self.ctx)
+        self.assertEqual([6, 13, 6], list(self.ctx._object_popup_queue))
+        client.collect_new_object_popup_items(self.ctx)
+        self.assertEqual([6, 13, 6], list(self.ctx._object_popup_queue))
+
+    def test_challenge_defers_and_record_unlock_precedes_request(self):
+        self.ready()
+        self.receipt(13)
+        client.sync_object_popups(self.ctx, True)
+        self.assertEqual([13], list(self.ctx._object_popup_queue))
+        self.assertEqual(popup.IDLE, self.ctx._popup_runtime.status(client.read_memory))
+        record = self.ctx._object_records[13]
+        client.apply_unowned_object_record(record)
+        original = self.ctx._popup_runtime.request_object
+        def checked_request(*args):
+            for offset in (0x0C, 0x14, 0x2C):
+                self.assertEqual(0, self.fake.read_u32(record + offset))
+            return original(*args)
+        with patch.object(self.ctx._popup_runtime, "request_object", side_effect=checked_request):
+            client.sync_object_popups(self.ctx, False)
+        self.assertEqual((13, 1), self.ctx._popup_inflight)
+
+    def test_queue_waits_for_close_and_modal_ui(self):
+        self.ready()
+        self.ctx._object_popup_queue.extend((13, 6))
+        self.fake.write_u32(popup.MODAL_LAYER, 1)
+        client.service_object_popup_queue(self.ctx, False)
+        self.assertEqual([13, 6], list(self.ctx._object_popup_queue))
+        self.fake.write_u32(popup.MODAL_LAYER, 0)
+        client.service_object_popup_queue(self.ctx, False)
+        client.service_object_popup_queue(self.ctx, False)
+        self.assertEqual([6], list(self.ctx._object_popup_queue))
+        base = self.ctx._popup_runtime.layout.mailbox
+        self.fake.write_u32(base + 8, popup.IDLE)
+        self.fake.write_u32(base + 0x14, 1)  # simulate mailbox written by close callback
+        client.service_object_popup_queue(self.ctx, False)
+        self.assertEqual((6, 2), self.ctx._popup_inflight)
+
+    def test_challenge_cancels_pending_and_requeues_same_object(self):
+        self.ready()
+        self.ctx._object_popup_queue.append(13)
+        client.sync_object_popups(self.ctx, False)
+        client.sync_object_popups(self.ctx, True)
+        self.assertEqual(popup.IDLE, self.ctx._popup_runtime.status(client.read_memory))
+        client.sync_object_popups(self.ctx, False)
+        self.assertEqual((13, 2), self.ctx._popup_inflight)
+
+    def test_no_dispatch_until_settled_or_records_synced(self):
+        self.ctx._object_popup_queue.append(13)
+        self.ctx.ram_is_settled = lambda: False
+        client.sync_object_popups(self.ctx, False)
+        self.assertFalse(self.ctx._popup_runtime.installed)
+        self.ctx.ram_is_settled = lambda: True
+        self.ctx._object_resync_pending = True
+        client.sync_object_popups(self.ctx, False)
+        self.assertFalse(self.ctx._popup_runtime.installed)
+        self.assertFalse(self.ctx._popup_accept_new_items)
+
+    def test_manual_command_validates_slot_object_and_uses_shared_queue(self):
+        processor = SimpleNamespace(ctx=self.ctx)
+        for value in ("", "x", "-1", "262", "13 6"):
+            client.CreateCommandProcessor._cmd_createpopup(processor, value)
+        self.assertEqual([], list(self.ctx._object_popup_queue))
+        client.CreateCommandProcessor._cmd_createpopup(processor, "13")
+        self.assertEqual([13], list(self.ctx._object_popup_queue))
+        self.ready()
+        self.assertEqual((13, 1), self.ctx._popup_inflight)
+
+    def test_popup_session_reset_clears_receipts_queue_and_cancels_pending(self):
+        self.ready()
+        self.ctx._object_popup_queue.extend((13, 6))
+        client.service_object_popup_queue(self.ctx, False)
+        self.ctx.dolphin_status = client.CONNECTION_CONNECTED_STATUS
+        client.CreateContext._reset_popup_state(self.ctx)
+        self.assertFalse(self.ctx._popup_accept_new_items)
+        self.assertIsNone(self.ctx._popup_inflight)
+        self.assertEqual([], list(self.ctx._object_popup_queue))
+        self.assertEqual(popup.IDLE, self.ctx._popup_runtime.status(client.read_memory))
+
+    def test_receipt_during_heartbeat_probe_is_not_lost(self):
+        client.sync_object_popups(self.ctx, False)
+        self.receipt(13)
+        self.fake.write_u32(self.ctx._popup_runtime.layout.mailbox + 0x1C, 1)
+        client.sync_object_popups(self.ctx, False)
+        self.assertEqual((13, 1), self.ctx._popup_inflight)
 
 
 if __name__ == "__main__":
