@@ -718,8 +718,10 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(len(lines) - 1, int(lines[0].split()[1], 16))
         words = [int(word, 16) for line in lines[1:] for word in line.split()]
         self.assertEqual([0x9421FFF0, 0x91810008, 0x7C0004AC], words[:3])
+        tail = words[-7:] if words[-3] == 0x60000000 else words[-6:]
         self.assertEqual([0x7C0004AC, 0x4C00012C, 0x81810008, 0x38210010,
-                          0x60000000, 0x4E800020, 0], words[-7:])
+                          *([0x60000000] if words[-3] == 0x60000000 else []),
+                          0x4E800020, 0], tail)
         # r12 is the only scratch register; no branches/calls/CR/CTR/LR writes.
         # The only stores in the generated helper allocate/save its own frame.
         stores = [value for value in words if value >> 26 in (36, 37, 38, 39, 44, 45, 47)]
@@ -729,11 +731,12 @@ class TestCreatePopupRuntime(unittest.TestCase):
         words = [int(word, 16) for line in popup.cache_flush_gecko_code().splitlines()[1:]
                  for word in line.split()]
         expected_flushes = (self.runtime.layout.mailbox - (self.runtime.layout.code_base & ~31)) // 32
-        self.assertEqual(expected_flushes + 3, words.count(0x7C0067AC))
+        self.assertEqual(expected_flushes + len(popup.ORIGINALS), words.count(0x7C0067AC))
         self.assertEqual(expected_flushes - 1, words.count(0x398C0020))
         self.assertEqual([0x3D808000, 0x618C6040], words[3:5])
         raw = b"".join(map(popup.word, words))
-        for high, low in ((0x8000, 0xDB40), (0x8009, 0x2180), (0x8009, 0x2400)):
+        for address in popup.ORIGINALS:
+            high, low = address >> 16, address & 0xFFE0
             self.assertIn(popup.word(0x3D800000 | high) + popup.word(0x618C0000 | low)
                           + popup.word(0x7C0067AC), raw)
         self.assertNotIn(popup.word(popup.MAGIC), raw)  # no mailbox initialization
@@ -741,7 +744,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
     def test_installs_code_before_scan_hooks_and_dispatcher_last(self):
         self.install()
         self.assertEqual(self.runtime.layout.code_base, self.writes[0][0])
-        self.assertEqual([0x80092184, 0x8009240C, 0x8000DB5C], [a for a, _ in self.writes[1:]])
+        self.assertEqual([*list(popup.ORIGINALS)[1:], 0x8000DB5C], [a for a, _ in self.writes[1:]])
         self.assertEqual(0x4BFF84ED, self.fake.read_u32(0x8000DB5C))
         self.assertEqual(0x4BF740BC, self.fake.read_u32(0x80092184))
         self.assertEqual(0x4BF73E74, self.fake.read_u32(0x8009240C))
@@ -899,11 +902,122 @@ class TestCreatePopupRuntime(unittest.TestCase):
             (layout.object_scan_step_hook, 0x3A730001, 0x3A607FFF, 0x80092410),
         ):
             offset = base - layout.code_base
-            code = image[offset:offset + 36]
-            self.assertEqual(popup.word(ap_word), code[20:24])
-            self.assertEqual(popup.word(vanilla), code[28:32])
-            self.assertEqual(popup.word(popup.ppc_branch(base + 24, destination)), code[24:28])
-            self.assertEqual(popup.word(popup.ppc_branch(base + 32, destination)), code[32:36])
+            code = image[offset:offset + 52]
+            self.assertEqual(popup.word(ap_word), code[36:40])
+            self.assertEqual(popup.word(vanilla), code[44:48])
+            self.assertEqual(popup.word(popup.ppc_branch(base + 40, destination)), code[40:44])
+            self.assertEqual(popup.word(popup.ppc_branch(base + 48, destination)), code[48:52])
+
+    def run_leaf_hook(self, entry, registers, *, lr=0x81230000):
+        """Execute the small leaf hooks' integer subset, stopping at native code.
+
+        This checks decoded instructions and branch outcomes, including the
+        native fallback ABI. Native UI execution is still a Dolphin test.
+        """
+        regs = list(registers)
+        pc, equal = entry, False
+        def signed(value, bits):
+            return value - (1 << bits) if value & (1 << (bits - 1)) else value
+        for _ in range(64):
+            if not self.runtime.layout.code_base <= pc < self.runtime.layout.mailbox:
+                return pc, regs, equal
+            offset = pc - self.runtime.layout.code_base
+            ins = int.from_bytes(self.runtime.image[offset:offset + 4], "big")
+            pc += 4
+            op, rt, ra, rb = ins >> 26, (ins >> 21) & 31, (ins >> 16) & 31, (ins >> 11) & 31
+            imm = signed(ins & 0xFFFF, 16)
+            if op in (14, 15):
+                regs[rt] = ((regs[ra] if ra else 0) + (imm << (16 if op == 15 else 0))) & 0xFFFFFFFF
+            elif op == 24:
+                regs[ra] = regs[rt] | (ins & 0xFFFF)
+            elif op == 32:
+                regs[rt] = self.fake.read_u32(((regs[ra] if ra else 0) + imm) & 0xFFFFFFFF)
+            elif op in (10, 11):
+                equal = regs[ra] == (imm & 0xFFFFFFFF if op == 11 else ins & 0xFFFF)
+            elif op == 31 and (ins >> 1) & 1023 in (0, 32):
+                equal = regs[ra] == regs[rb]
+            elif op == 31 and (ins >> 1) & 1023 == 444:
+                regs[ra] = regs[rt] | regs[rb]
+            elif op == 18:
+                self.assertFalse(ins & 3)  # these stubs tail-call native functions
+                pc = pc - 4 + signed(ins & 0x03FFFFFC, 26)
+            elif op == 16:
+                self.assertEqual(2, ra)  # CR0 EQ; other CR fields stay untouched
+                self.assertIn(rt, (4, 12))
+                if equal == (rt == 12):
+                    pc = pc - 4 + signed(ins & 0xFFFC, 16)
+            elif ins == 0x4E800020:
+                pc = lr
+            else:
+                self.fail(f"Unsupported hook instruction {ins:08X}")
+        self.fail("Hook did not return to native code")
+
+    def hook_registers(self, *, status=popup.ACTIVE, ap_owner=True):
+        regs = [0x10000000 + i * 0x100 for i in range(32)]
+        regs[28], regs[25] = 0x81200000, 0x81200100
+        owner = self.base + 0x20 if ap_owner else 0x81200200
+        self.fake.write_u32(regs[28] + 0x20, owner)
+        self.fake.write_u32(regs[25] + 4, owner)
+        self.fake.write_u32(self.base + 8, status)
+        self.fake.write_u32(self.base + 0x0C, 13)
+        return regs
+
+    def test_ap_availability_uses_owned_record_without_spark_delta(self):
+        for target, threshold, expected in ((13, 0, 0x80025420), (6, 0, 0x81230000),
+                                             (13, 0x7FFFFFFF, 0x81230000)):
+            with self.subTest(target=target, threshold=threshold):
+                regs = self.hook_registers()
+                regs[19], regs[7] = target, threshold
+                destination, result, _ = self.run_leaf_hook(self.runtime.layout.object_available_hook, regs)
+                self.assertEqual(expected, destination)
+                if expected == 0x80025420:
+                    self.assertEqual(regs[3:9], result[3:9])
+                else:
+                    self.assertEqual(0, result[3])
+
+    def test_ap_scan_selects_one_object_and_never_other_unlock_categories(self):
+        regs = self.hook_registers()
+        layout = self.runtime.layout
+        dest, result, _ = self.run_leaf_hook(layout.object_scan_start_hook, regs)
+        self.assertEqual((0x80092188, 13), (dest, result[19]))
+        dest, result, _ = self.run_leaf_hook(layout.object_scan_step_hook, result)
+        self.assertEqual((0x80092410, 0x7FFF), (dest, result[19]))
+        for count in (0, 1):
+            regs[30] = count
+            dest, result, _ = self.run_leaf_hook(layout.object_scan_finish_hook, regs)
+            self.assertEqual((0x800930E8, count), (dest, result[29]))
+
+    def test_ap_display_calls_object_panel_directly_with_original_view(self):
+        regs = self.hook_registers()
+        dest, result, _ = self.run_leaf_hook(self.runtime.layout.object_display_hook, regs)
+        self.assertEqual(0x8028DF30, dest)
+        self.assertEqual(regs[3], result[3])
+        self.assertEqual(self.runtime.layout.show_unlock_string, result[4])
+        self.assertEqual((regs[13] - 0x7518) & 0xFFFFFFFF, result[5])
+        self.assertEqual(0, result[6])
+        offset = result[4] - self.runtime.layout.code_base
+        self.assertEqual(b"_root.ShowUnlock\0", self.runtime.image[offset:offset + 17])
+
+    def test_vanilla_hooks_preserve_behavior_even_while_ap_popup_is_active(self):
+        layout = self.runtime.layout
+        for status, owner in ((popup.IDLE, True), (popup.PENDING, True), (popup.ACTIVE, False)):
+            with self.subTest(status=status, owner=owner):
+                regs = self.hook_registers(status=status, ap_owner=owner)
+                for entry, expected in ((layout.object_available_hook, 0x80025560),
+                                        (layout.object_display_hook, 0x8028DF30)):
+                    dest, result, _ = self.run_leaf_hook(entry, regs)
+                    self.assertEqual(expected, dest)
+                    self.assertEqual(regs[3:10], result[3:10])
+                dest, result, _ = self.run_leaf_hook(layout.object_scan_start_hook, regs)
+                self.assertEqual((0x80092188, 0), (dest, result[19]))
+                dest, result, _ = self.run_leaf_hook(layout.object_scan_step_hook, regs)
+                self.assertEqual((0x80092410, regs[19] + 1), (dest, result[19]))
+                for count in (0, 1):
+                    regs[30], regs[29] = count, 1
+                    dest, result, equal = self.run_leaf_hook(layout.object_scan_finish_hook, regs)
+                    self.assertEqual(0x80092428, dest)
+                    self.assertEqual(regs[29:31], result[29:31])
+                    self.assertEqual(count == 1, equal)
 
 
 class TestCreatePopupQueue(unittest.TestCase):

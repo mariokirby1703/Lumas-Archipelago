@@ -1,6 +1,6 @@
 """Experimental, executable-specific CREATE Wii Object popup patch.
 
-All addresses and the wrapper ABI come from the runtime implementation briefing.
+Addresses/ABI are verified against the supported executable and its UI scripts.
 Memory access is injected by the client; this module never owns a Dolphin hook.
 The cave is retained on uninstall because a live vanilla UI may still call back.
 """
@@ -13,11 +13,18 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 1
+VERSION = 2
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 HEARTBEAT_TIMEOUT_SECONDS = 5.0
-ORIGINALS = {0x8000DB5C: 0x4808A365, 0x80092184: 0x3A600000, 0x8009240C: 0x3A730001}
+ORIGINALS = {
+    0x8000DB5C: 0x4808A365,
+    0x80092184: 0x3A600000,
+    0x8009240C: 0x3A730001,
+    0x800921E0: 0x4BF93381,
+    0x80092424: 0x7C1EE800,
+    0x80091DBC: 0x481FC175,
+}
 CACHE_HELPER_NAME = "CREATE AP Popup Instruction Cache"
 
 
@@ -41,8 +48,12 @@ class PopupPatchLayout:
     closed_callback: int = 0x80006200
     object_scan_start_hook: int = 0x80006240
     object_scan_step_hook: int = 0x80006280
+    object_available_hook: int = 0x800062C0
+    object_scan_finish_hook: int = 0x80006330
+    object_display_hook: int = 0x80006370
     mailbox: int = 0x80006400
-    end: int = 0x80006448
+    show_unlock_string: int = 0x80006448
+    end: int = 0x8000645C
 
 
 def cache_flush_gecko_code() -> str:
@@ -119,7 +130,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.emit(0x9061003C, *load_mailbox, 0x816C001C, 0x396B0001, 0x916C001C)
     d.emit(0x800C0000, 0x3D604150, 0x616B4F50, 0x7C005800)  # magic vs r11
     d.branch("return", 0x40820000)  # bne
-    d.emit(0x800C0004, 0x28000001)
+    d.emit(0x800C0004, 0x28000000 | VERSION)
     d.branch("return", 0x40820000)
     d.emit(0x800C0008, 0x28000001)
     d.branch("return", 0x40820000)
@@ -158,20 +169,65 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     c = _Routine(layout.closed_callback)
     c.emit(0x80030010, 0x90030014, 0x38000000, 0x90030008, 0x4E800020)
     routines = [(d, layout.closed_callback), (c, layout.object_scan_start_hook)]
+
+    def ap_owner_guard(r, owner_load):
+        # ACTIVE alone lasts until dismissal and must not affect vanilla popups.
+        # UpdateUnlocks has the popup in r28; its callback context (+0x20) is
+        # our FeMessageFlow owner. The factory keeps the callback pair in r25.
+        r.emit(*load_mailbox, 0x800C0008, 0x28000002)
+        r.branch("vanilla", 0x40820000)
+        r.emit(0x396C0020, owner_load, 0x7C005800)  # expected owner; cmpw r0,r11
+        r.branch("vanilla", 0x40820000)
+
     for base, original, ap_instruction, back, limit in (
         (layout.object_scan_start_hook, 0x3A600000, 0x826C000C, 0x80092188,
          layout.object_scan_step_hook),
-        (layout.object_scan_step_hook, 0x3A730001, 0x3A607FFF, 0x80092410, layout.mailbox),
+        (layout.object_scan_step_hook, 0x3A730001, 0x3A607FFF, 0x80092410,
+         layout.object_available_hook),
     ):
         r = _Routine(base)
-        r.emit(*load_mailbox, 0x800C0008, 0x28000002)
-        r.branch("vanilla", 0x40820000)
+        ap_owner_guard(r, 0x801C0020)  # lwz r0,0x20(r28)
         r.emit(ap_instruction)
         r.branch(back)
         r.label("vanilla")
         r.emit(original)
         r.branch(back)
         routines.append((r, limit))
+
+    a = _Routine(layout.object_available_hook)
+    ap_owner_guard(a, 0x801C0020)
+    a.emit(0x800C000C, 0x7C009800)  # requested ID must equal scanned r19
+    a.branch("unavailable", 0x40820000)
+    a.emit(0x2C070000)  # AP-owned record has threshold r7 == 0
+    a.branch("unavailable", 0x40820000)
+    # Same r3..r7 ABI, but no newly-awarded-Spark or current-world restriction.
+    # Tail calls preserve the original availability call's return address.
+    a.branch(0x80025420)  # cUnlockManager::IsThingUnlocked
+    a.label("unavailable")
+    a.emit(0x38600000, 0x4E800020)
+    a.label("vanilla")
+    a.branch(0x80025560)  # IsThingUnlockedForThisAwardOfSparks
+    routines.append((a, layout.object_scan_finish_hook))
+
+    f = _Routine(layout.object_scan_finish_hook)
+    ap_owner_guard(f, 0x801C0020)
+    f.emit(0x7FDDF378)  # mr r29,r30: actual count (0 or 1), never invented
+    f.branch(0x800930E8)  # submit array; skip every non-object category
+    f.label("vanilla")
+    f.emit(ORIGINALS[0x80092424])  # restore original comparison's CR0
+    f.branch(0x80092428)
+    routines.append((f, layout.object_display_hook))
+
+    s = _Routine(layout.object_display_hook)
+    ap_owner_guard(s, 0x80190004)  # lwz r0,4(r25): factory callback context
+    # CreativeChainMsg.gfx::AddUnlockImages initializes the vanilla image/name
+    # array. Display would show the award banner first. ShowUnlock(false) opens
+    # only the object panel; its Event_UnlockFinished -> PlayOutro ->
+    # Event_OnOutroEnd path still invokes normal native owner/modal cleanup.
+    s.emit(0x388C0048, 0x38AD8AE8, 0x38C00000)  # ShowUnlock; "%d"; false
+    s.label("vanilla")
+    s.branch(0x8028DF30)  # GFxMovieView::Invoke, preserve incoming LR/CR1
+    routines.append((s, layout.mailbox))
     image = bytearray(layout.end - layout.code_base)
     for routine, limit in routines:
         code = routine.build()
@@ -184,6 +240,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     image[offset + 0x38:offset + 0x44] = (
         word(layout.closed_callback) + word(layout.mailbox) + word(layout.mailbox + 0x44))
     image[offset + 0x44:offset + 0x48] = b" \0\0\0"
+    image[offset + 0x48:offset + 0x5C] = b"_root.ShowUnlock\0\0\0\0"
     return bytes(image)
 
 
@@ -195,6 +252,9 @@ class PopupRuntime:
             0x8000DB5C: ppc_branch(0x8000DB5C, self.layout.dispatcher, link=True),
             0x80092184: ppc_branch(0x80092184, self.layout.object_scan_start_hook),
             0x8009240C: ppc_branch(0x8009240C, self.layout.object_scan_step_hook),
+            0x800921E0: ppc_branch(0x800921E0, self.layout.object_available_hook, link=True),
+            0x80092424: ppc_branch(0x80092424, self.layout.object_scan_finish_hook),
+            0x80091DBC: ppc_branch(0x80091DBC, self.layout.object_display_hook, link=True),
         }
         self.installed = False
         self.ready = False
@@ -258,7 +318,7 @@ class PopupRuntime:
                 raise RuntimeError("unknown nonzero code-cave contents")
             if not self.installed:
                 self.reset_request(read_memory, write_memory)
-                for address in (0x80092184, 0x8009240C, 0x8000DB5C):
+                for address in (*list(self.hooks)[1:], 0x8000DB5C):
                     write_memory(address, word(self.hooks[address]))
                     if read_memory(address, 4) != word(self.hooks[address]):
                         raise RuntimeError(f"hook readback failed at 0x{address:08X}")

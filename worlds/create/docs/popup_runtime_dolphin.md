@@ -1,5 +1,27 @@
 # Experimental Object popup: Dolphin instruction-cache helper
 
+## Object-panel correction (runtime protocol 2)
+
+Install the new `create.apworld` and **replace the existing Gecko helper's
+code** with the accompanying `CREATE-AP-Popup-Cache.txt`. The helper now covers
+six hook sites. Close the client, stop the game completely, then start CREATE
+fresh (do not load an emulator save state) and launch the updated client from
+the AP Launcher. The previous code cave is deliberately not overwritten by a
+different runtime revision. Your existing AP seed and in-game Slot 3 save can
+be reused; the APWorld release version remains unchanged.
+
+The old build successfully created a popup, but selected the Chain award view
+and rejected the object because its AP-owned Spark threshold is zero. This
+build calls the asset's object panel directly and uses ordinary ownership
+instead of the newly-awarded-Spark predicate for the requested object only.
+
+Live checks: `/createpopup 13` should show Automatic Rocket's vanilla image/name
+without a Chain/Spark award banner; confirmation should close the panel and
+restore input. Then test `/createpopup 6`, newly received Objects, and an ordinary
+vanilla Chain completion. `/createpopupstatus` should report `version=2` in the
+mailbox. Automated checks verify the patch and fallbacks; the visual result and
+controller cleanup still need confirmation in Dolphin.
+
 The external client can write and verify PPC instructions in RAM, but
 `dolphin_memory_engine` cannot invalidate Dolphin's emulated instruction cache.
 This also affects the ordinary Interpreter: it fetches instructions through
@@ -31,8 +53,9 @@ client build, not a published release.
 
 Dolphin's own Gecko handler executes a small, normally returning C0 function
 each frame. It issues `icbi` for the code-cave instruction lines
-`0x80006040..0x800063E0` and the three hook lines `0x8000DB40`, `0x80092180`,
-`0x80092400`, followed by instruction synchronization. This refreshes both
+`0x80006040..0x800063E0` and the six hook lines `0x8000DB40`, `0x80092180`,
+`0x80092400`, `0x800921E0`, `0x80092420`, `0x80091DA0`, followed by instruction
+synchronization. This refreshes both
 instruction-cache and JIT visibility of the client's changes, including
 restored original instructions after uninstall. The handler lives in Dolphin's
 Gecko allocation, outside the popup cave.
@@ -58,3 +81,39 @@ an unexecuted call site remains another possible cause.
 
 These explain why a successful RAM readback and `modal=0` do not prove that the
 dispatcher has executed. The client must still observe a changing heartbeat.
+
+## Verified native/UI path and AP-only interception
+
+The supported executable's symbols identify `0x80074930` as
+`FeMessageFlow::BeginChainMsg`, `0x80091C40` as `MakeCreativeChainMessage`, and
+`0x800920F0` as `FeSimpleMessage::UpdateUnlocks`. Contrary to the original
+briefing's generic-popup assumption, type 4 selects the award view of
+`CreativeChainMsg.gfx`. `MakeFePuzzleMessage` at `0x80091620` loads the separate
+puzzle/challenge-unlock UI; it is not the Object Unlocked panel.
+
+Inspection of `CreativeChainMsg.gfx` establishes that `AddUnlockImages` stores
+the vanilla image/name array and calls `Unlock`. `Display` opens the award
+banner. `ShowUnlock(false)` instead loads the object's thumbnail and localized
+label into the unlock panel and starts its slide-on animation. The normal
+`Event_UnlockFinished -> PlayOutro -> Event_OnOutroEnd` callback path remains.
+The award box starts hidden and this patch never calls its `Display` for AP.
+
+The AP-specific interceptions are:
+
+- `0x80091DBC`: replace the factory's final GFx `Display` invocation with
+  `_root.ShowUnlock`, using the same movie view and native lifecycle.
+- `0x800921E0`: call `IsThingUnlocked` (`0x80025420`) for the exact requested
+  zero-threshold AP record. The original `IsThingUnlockedForThisAwardOfSparks`
+  (`0x80025560`) rejects zero thresholds and requires a new Spark crossing in
+  the current world, which explains the missing object image in the old build.
+- `0x80092424`: submit the actual object count (zero or one) and bypass all
+  other unlock categories, even when the requested object cannot be displayed.
+
+Both original scan hooks and the new interceptions require ACTIVE status **and
+the AP owner's callback context**. A vanilla popup keeps its original scan,
+Spark predicate and Display arguments even while an AP popup exists. No global
+availability function, UI asset, Spark count, or reward state machine is changed.
+
+The extra routines remain below the mailbox at `0x80006400`; the immutable
+`_root.ShowUnlock` string ends within the reserved cave at `0x8000645C`.
+No extracted game executable, asset, or third-party RE dependency is packaged.
