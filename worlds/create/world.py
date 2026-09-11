@@ -170,16 +170,16 @@ class CreateWorld(World):
             if group["game"] == self.game
         }
         create_items = [item for item in progitempool if item.player in create_recipients]
-        def placement_priority(item: Item) -> int:
-            if item.name in world_access_names:
-                return 0
+        def placement_priority(item: Item) -> tuple[int, int]:
             if item.name in object_names and item.advancement:
-                return 1
+                return 0, 0
+            if item.name in world_access_names:
+                return 1, 0
             if item.name in SPARK_ITEM_AMOUNTS and item.advancement:
-                return 2
+                return 2, -SPARK_ITEM_AMOUNTS[item.name]
             if item.name in object_names:
-                return 3
-            return 4
+                return 3, 0
+            return 4, 0
 
         create_items.sort(key=placement_priority)
 
@@ -199,33 +199,91 @@ class CreateWorld(World):
 
         state = self.multiworld.state.copy()
         state.sweep_for_advancements()
+        reachable_locations: list = []
+        placements: list[tuple[Any, Item]] = []
+
+        def rollback_placements() -> None:
+            for placed_location, placed_item in reversed(placements):
+                placed_location.item = None
+                placed_item.location = None
+                fill_locations.append(placed_location)
+                progitempool.append(placed_item)
+
         while create_items:
-            reachable_locations = [
-                location for location in fill_locations
-                if location.can_reach(state)
-            ]
             if not reachable_locations:
-                names = ", ".join(item.name for item in create_items)
-                raise RuntimeError(f"Create could not place items: {names}")
+                state.sweep_for_advancements()
+                reachable_locations = [
+                    location for location in fill_locations
+                    if location.can_reach(state)
+                ]
+            if not reachable_locations:
+                rollback_placements()
+                return
 
             item = create_items[0]
-            if len(reachable_locations) <= 3:
-                best_score = -1
-                seen_names: set[str] = set()
-                for candidate in create_items:
-                    if candidate.name in seen_names:
+            if len(reachable_locations) <= 8:
+                reachable_set = set(reachable_locations)
+                found_unlock = False
+                world_rank = {world_key: rank for rank, world_key in enumerate(self.world_unlock_order)}
+                locked_locations = sorted(
+                    (location for location in fill_locations if location not in reachable_set),
+                    key=lambda location: (
+                        world_rank.get(
+                            getattr(Locations.LOCATION_TABLE.get(location.name), "world_key", None),
+                            len(world_rank),
+                        ),
+                        getattr(Locations.LOCATION_TABLE.get(location.name), "challenge", None) or 99,
+                        getattr(Locations.LOCATION_TABLE.get(location.name), "spark", None) or 99,
+                    ),
+                )
+                items_by_name = {candidate.name: candidate for candidate in reversed(create_items)}
+                for locked_location in locked_locations:
+                    location_data = Locations.LOCATION_TABLE.get(locked_location.name)
+                    if (
+                        location_data is None
+                        or location_data.world_key is None
+                        or location_data.challenge is None
+                        or location_data.category not in {"challenge", "spark"}
+                    ):
                         continue
-                    seen_names.add(candidate.name)
-                    simulated_state = state.copy()
-                    simulated_state.collect(candidate, True)
-                    simulated_state.sweep_for_advancements()
-                    score = sum(
-                        location.can_reach(simulated_state)
-                        for location in fill_locations
-                    )
-                    if score > best_score:
-                        item = candidate
-                        best_score = score
+                    challenge = game_data.CHALLENGE_TABLE[(location_data.world_key, location_data.challenge)]
+                    groups = game_data.challenge_logic_object_groups(challenge, location_data.spark)
+                    preferred_names = list(dict.fromkeys(
+                        (game_data.world_access_item_name(location_data.world_key),)
+                        + tuple(name for group in groups for name in group)
+                    ))
+                    for name in preferred_names:
+                        candidate = items_by_name.get(name)
+                        if candidate is None:
+                            continue
+                        simulated_state = state.copy()
+                        simulated_state.collect(candidate, True)
+                        simulated_state.sweep_for_advancements()
+                        if locked_location.can_reach(simulated_state):
+                            item = candidate
+                            found_unlock = True
+                            break
+                    if found_unlock:
+                        break
+                    if len(reachable_locations) > 1:
+                        for group in groups:
+                            missing = [
+                                items_by_name[name]
+                                for name in group
+                                if not state.has(name, locked_location.player) and name in items_by_name
+                            ]
+                            if not missing or len(missing) > len(reachable_locations):
+                                continue
+                            simulated_state = state.copy()
+                            for candidate in missing:
+                                simulated_state.collect(candidate, True)
+                            simulated_state.sweep_for_advancements()
+                            if locked_location.can_reach(simulated_state):
+                                item = missing[0]
+                                found_unlock = True
+                                break
+                    if found_unlock:
+                        break
 
             valid_locations = [
                 location for location in reachable_locations
@@ -233,17 +291,18 @@ class CreateWorld(World):
                 and not spark_is_behind_goal_unlock(item, location)
             ]
             if not valid_locations:
-                names = ", ".join(item.name for item in create_items)
-                raise RuntimeError(f"Create could not place items: {names}")
+                rollback_placements()
+                return
 
             location = self.random.choice(valid_locations)
             self.multiworld.push_item(location, item, False)
+            placements.append((location, item))
             fill_locations.remove(location)
+            reachable_locations.remove(location)
             progitempool.remove(item)
             create_items.remove(item)
             state.locations_checked.add(location)
             state.collect(item, True, location)
-            state.sweep_for_advancements()
 
     def create_item(self, name: str) -> Items.CreateItem:
         if name == ITEM_UT_GLITCHED:

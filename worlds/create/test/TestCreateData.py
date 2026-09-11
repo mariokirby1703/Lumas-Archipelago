@@ -515,6 +515,24 @@ class TestCreateThirtySparkRequirement(CreateTestBase):
         distribute_items_restrictive(self.multiworld)
         self.assertTrue(self.multiworld.can_beat_game())
 
+    def test_high_spark_fill_fallback_regressions(self) -> None:
+        from BaseClasses import CollectionState
+        from Fill import distribute_items_restrictive
+        from test.general import setup_multiworld
+        from ..world import CreateWorld
+
+        cases = (
+            (7, {"starting_world": 14, "goal_world": 1, "create_chain_checks": 1,
+                 "include_ii_worlds": 0, "required_sparks": 554, "spark_goal_mode": 0}),
+            (122, {"starting_world": 10, "goal_world": 0, "create_chain_checks": 0,
+                   "include_ii_worlds": 0, "required_sparks": 369, "spark_goal_mode": 0}),
+        )
+        for seed, options in cases:
+            with self.subTest(seed=seed):
+                multiworld = setup_multiworld(CreateWorld, seed=seed, options=options)
+                distribute_items_restrictive(multiworld)
+                self.assertTrue(multiworld.can_beat_game(CollectionState(multiworld)))
+
 
 class TestCreateChainsDisabled(CreateTestBase):
     def test_hub_tutorial_parts_are_available_at_start(self) -> None:
