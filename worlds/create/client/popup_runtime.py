@@ -13,19 +13,21 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 2
+VERSION = 3
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
+OBJECT_REGISTRY_COUNT = 0x80904C84
+VTABLE_SLOT = 0x805E2C70
+ORIGINAL_UPDATE = 0x8000D880
+GAME_SINGLETON = 0x806798C0
+GAME_VTABLE = 0x805E2C4C
 HEARTBEAT_TIMEOUT_SECONDS = 5.0
-ORIGINALS = {
-    0x8000DB5C: 0x4808A365,
-    0x80092184: 0x3A600000,
-    0x8009240C: 0x3A730001,
-    0x800921E0: 0x4BF93381,
-    0x80092424: 0x7C1EE800,
-    0x80091DBC: 0x481FC175,
-}
-CACHE_HELPER_NAME = "CREATE AP Popup Instruction Cache"
+CODE_ORIGINALS = {0x80091D0C: 0x3BAD8AD0, 0x800921E0: 0x4BF93381}
+ORIGINALS = {VTABLE_SLOT: ORIGINAL_UPDATE, **CODE_ORIGINALS}
+# Refuse old runtime revisions rather than mixing instruction-cache state.
+LEGACY_ORIGINALS = {0x8000DB5C: 0x4808A365, 0x80092184: 0x3A600000,
+                    0x8009240C: 0x3A730001, 0x80092424: 0x7C1EE800,
+                    0x80091DBC: 0x481FC175}
 
 
 def ppc_branch(source: int, target: int, *, link: bool = False) -> int:
@@ -45,48 +47,18 @@ def word(value: int) -> bytes:
 class PopupPatchLayout:
     code_base: int = 0x80006048
     dispatcher: int = 0x80006048
-    closed_callback: int = 0x80006200
-    object_scan_start_hook: int = 0x80006240
-    object_scan_step_hook: int = 0x80006280
-    object_available_hook: int = 0x800062C0
-    object_scan_finish_hook: int = 0x80006330
-    object_display_hook: int = 0x80006370
+    maintain_hooks: int = 0x80006220
+    object_available_hook: int = 0x80006360
+    object_display_hook: int = 0x800063B0
+    closed_callback: int = 0x800063E4
     mailbox: int = 0x80006400
-    show_unlock_string: int = 0x80006448
-    end: int = 0x8000645C
+    end: int = 0x80006470
 
 
-def cache_flush_gecko_code() -> str:
-    """C0 helper executed by Dolphin's own Gecko handler once per frame.
-
-    External DolphinMemoryEngine writes do not invalidate the emulated icache,
-    even in Interpreter mode (MMU::TryReadInstruction). Guest icbi does, and
-    also invalidates the corresponding JIT blocks. No game RAM is written here
-    except our temporary stack frame. Invalidate on every frame so installs,
-    retries and restores are all observed without a second mailbox protocol.
-
-    Gecko's C0 dispatch uses r4/r15 for its continuation, so preserve all caller
-    state: only r12 is used and saved; LR, CTR, CR and other GPRs are untouched.
-    Source/ABI: dolphin-emu/dolphin docs/codehandler.s, _execute.
-    """
-    layout = PopupPatchLayout()
-    code = [0x9421FFF0, 0x91810008, 0x7C0004AC]  # stwu sp,-16; stw r12,8(sp); sync
-    first = layout.code_base & ~31
-    code.extend((0x3D800000 | (first >> 16), 0x618C0000 | (first & 0xFFFF)))
-    for address in range(first, layout.mailbox, 32):
-        code.append(0x7C0067AC)  # icbi 0,r12
-        if address + 32 < layout.mailbox:
-            code.append(0x398C0020)  # addi r12,r12,32
-    for hook in ORIGINALS:
-        address = hook & ~31
-        code.extend((0x3D800000 | (address >> 16), 0x618C0000 | (address & 0xFFFF), 0x7C0067AC))
-    code.extend((0x7C0004AC, 0x4C00012C, 0x81810008, 0x38210010))  # sync; isync; restore
-    if len(code) % 2:
-        code.append(0x60000000)  # align final blr/padding pair
-    code.extend((0x4E800020, 0))
-    lines = [f"C0000000 {len(code) // 2:08X}"]
-    lines.extend(f"{code[i]:08X} {code[i + 1]:08X}" for i in range(0, len(code), 2))
-    return "\n".join(lines) + "\n"
+def hook_words(layout):
+    return {VTABLE_SLOT: layout.dispatcher,
+            0x80091D0C: ppc_branch(0x80091D0C, layout.object_display_hook),
+            0x800921E0: ppc_branch(0x800921E0, layout.object_available_hook, link=True)}
 
 
 class _Routine:
@@ -119,37 +91,60 @@ class _Routine:
 
 
 def build_image(layout: PopupPatchLayout) -> bytes:
-    # r12 is a volatile mailbox pointer, reloaded after calls. 64-byte EABI
-    # frame with linkage area; preserve LR and original update's return in r3.
-    load_mailbox = (0x3D808000, 0x618C6400)  # lis r12,0x8000; ori r12,r12,0x6400
     if layout != PopupPatchLayout():
         raise ValueError("Only the verified CREATE executable layout is supported")
+    load_mailbox = (0x3D808000, 0x618C6400)
+    hooks = hook_words(layout)
+
+    def load(r, register, value):
+        r.emit(0x3C000000 | register << 21 | value >> 16,
+               0x60000000 | register << 21 | register << 16 | value & 0xFFFF)
+
     d = _Routine(layout.dispatcher)
-    d.emit(0x9421FFC0, 0x7C0802A6, 0x90010044)  # stwu; mflr; stw LR
-    d.branch(0x80097EC0, link=True)  # unconditionally preserve original update
-    d.emit(0x9061003C, *load_mailbox, 0x816C001C, 0x396B0001, 0x916C001C)
-    d.emit(0x800C0000, 0x3D604150, 0x616B4F50, 0x7C005800)  # magic vs r11
-    d.branch("return", 0x40820000)  # bne
+    d.emit(0x9421FFC0, 0x7C0802A6, 0x90010044)
+    # SimUpdate(this, const cTime&) receives the untouched incoming r3/r4.
+    d.branch(ORIGINAL_UPDATE, link=True)
+    d.emit(0x9061003C)
+    d.branch(layout.maintain_hooks, link=True)
+    d.emit(*load_mailbox, 0x816C001C, 0x396B0001, 0x916C001C)
+    d.emit(0x800C0000, 0x3D604150, 0x616B4F50, 0x7C005800)
+    d.branch("return", 0x40820000)
     d.emit(0x800C0004, 0x28000000 | VERSION)
+    d.branch("return", 0x40820000)
+    d.emit(0x800C0048, 0x28000001)  # guest hooks installed/cache synchronized
+    d.branch("return", 0x40820000)
+    d.emit(0x800C0044, 0x28000001)  # Python still enables dispatch
     d.branch("return", 0x40820000)
     d.emit(0x800C0008, 0x28000001)
     d.branch("return", 0x40820000)
-    d.emit(0x800C000C, 0x28000106)  # cmplwi r0,262 (also rejects negative IDs)
-    d.branch("invalid", 0x40800000)  # bge
-    # Recheck transition-sensitive RAM on the game thread, including requests
-    # that waited behind a modal UI. Python supplies the positive Slot 3 session.
-    d.emit(0x3D608069, 0x880BCFC3, 0x2800000A)  # challenge byte
-    d.branch("return", 0x40810000)  # ble: challenge 0..10
-    d.emit(0x3D6080B2, 0x880BABD3, 0x28000002)  # save guard byte
+    d.emit(0x800C000C, 0x28000106)
+    d.branch("invalid", 0x40800000)
+    d.emit(0x3D6080B2, 0x880BABD3, 0x28000002)
     d.branch("guard_ok", 0x41820000)
     d.emit(0x280000FF)
     d.branch("return", 0x40820000)
     d.label("guard_ok")
-    d.emit(0x3D608095, 0x800B8040, 0x28000000)  # modal layer (signed displacement)
+    d.emit(0x3D608095, 0x800B8040, 0x28000000)
     d.branch("return", 0x40820000)
-    d.emit(0x880C0034, 0x28000000)  # lbz handle.active
+    d.emit(0x880C0034, 0x28000000)
     d.branch("return", 0x40820000)
-    d.emit(0x800C0020, 0x28000000)  # also require no existing popup pointer
+    d.emit(0x800C0020, 0x28000000)
+    d.branch("return", 0x40820000)
+    # Native registry/preflight works independently of Python MEM2 traversal.
+    load(d, 11, OBJECT_REGISTRY_COUNT)
+    d.emit(0x800B0000, 0x808C000C, 0x7C040040)  # cmplw target,count
+    d.branch("return", 0x40800000)
+    load(d, 3, 0x808D3440)
+    d.branch(0x80490BF0, link=True)
+    d.emit(0x28030000)
+    d.branch("return", 0x41820000)
+    d.emit(0x80030000, 0x28000000)  # descriptor must exist
+    d.branch("return", 0x41820000)
+    d.emit(0x7C0B0378, 0x800B0340, 0x28000000)  # descriptor unlockable flag
+    d.branch("return", 0x41820000)
+    d.emit(*load_mailbox, 0x800C0008, 0x28000001)  # cancellation during preflight
+    d.branch("return", 0x40820000)
+    d.emit(0x800C0044, 0x28000001)
     d.branch("return", 0x40820000)
     d.emit(0x38000000, 0x900C0018, 0x38000002, 0x900C0008)
     d.emit(0x386C0020, 0x388C0040, 0x38A00000, 0x38CC0038,
@@ -157,7 +152,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.branch(0x80074930, link=True)
     d.emit(*load_mailbox, 0x800C0020, 0x28000000)
     d.branch("return", 0x40820000)
-    d.emit(0x38000003)  # popup creation returned NULL
+    d.emit(0x38000003)
     d.branch("error")
     d.label("invalid")
     d.emit(0x38000001)
@@ -166,81 +161,86 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.label("return")
     d.emit(0x8061003C, 0x80010044, 0x7C0803A6, 0x38210040, 0x4E800020)
 
-    c = _Routine(layout.closed_callback)
-    c.emit(0x80030010, 0x90030014, 0x38000000, 0x90030008, 0x4E800020)
-    routines = [(d, layout.closed_callback), (c, layout.object_scan_start_hook)]
+    # Only guest PPC writes executable hooks. Python publishes code once and
+    # redirects the data pointer. Guest removal flushes before detaching itself;
+    # a paused game completes removal on its next SimUpdate, without Gecko.
+    m = _Routine(layout.maintain_hooks)
+    m.emit(*load_mailbox, 0x814C0044)  # enabled
+    for index, (address, original) in enumerate(CODE_ORIGINALS.items()):
+        load(m, 11, address)
+        load(m, 5, original)
+        load(m, 6, hooks[address])
+        m.emit(0x800B0000, 0x7C002800)
+        m.branch(f"known{index}", 0x41820000)
+        m.emit(0x7C003000)
+        m.branch(f"known{index}", 0x41820000)
+        # Never overwrite somebody else's hook. Disable, then restore any
+        # other known hook on the following frame before removing the vtable.
+        m.emit(0x280A0000)
+        m.branch(f"next{index}", 0x41820000)
+        m.emit(0x38000005, 0x900C0018, 0x38000003, 0x900C0008,
+               0x38000000, 0x900C0044, 0x900C0048, 0x4E800020)
+        m.label(f"known{index}")
+        m.emit(0x280A0001)
+        m.branch(f"write{index}", 0x40820000)
+        m.emit(0x7CC53378)  # mr r5,r6 (patched instruction)
+        m.label(f"write{index}")
+        m.emit(0x90AB0000, 0x7C00586C, 0x7C0004AC, 0x7C005FAC)
+        # stw; dcbst 0,r11; sync; icbi 0,r11
+        m.label(f"next{index}")
+    m.emit(0x7C0004AC, 0x4C00012C, 0x914C0048, 0x280A0000)
+    m.branch("return", 0x40820000)
+    load(m, 11, VTABLE_SLOT)
+    load(m, 5, layout.dispatcher)
+    m.emit(0x800B0000, 0x7C002800)
+    m.branch("return", 0x40820000)
+    load(m, 5, ORIGINAL_UPDATE)
+    m.emit(0x90AB0000, 0x7C0004AC)
+    m.label("return")
+    m.emit(0x4E800020)
 
     def ap_owner_guard(r, owner_load):
-        # ACTIVE alone lasts until dismissal and must not affect vanilla popups.
-        # UpdateUnlocks has the popup in r28; its callback context (+0x20) is
-        # our FeMessageFlow owner. The factory keeps the callback pair in r25.
         r.emit(*load_mailbox, 0x800C0008, 0x28000002)
         r.branch("vanilla", 0x40820000)
-        r.emit(0x396C0020, owner_load, 0x7C005800)  # expected owner; cmpw r0,r11
+        r.emit(0x396C0020, owner_load, 0x7C005800)
         r.branch("vanilla", 0x40820000)
-
-    for base, original, ap_instruction, back, limit in (
-        (layout.object_scan_start_hook, 0x3A600000, 0x826C000C, 0x80092188,
-         layout.object_scan_step_hook),
-        (layout.object_scan_step_hook, 0x3A730001, 0x3A607FFF, 0x80092410,
-         layout.object_available_hook),
-    ):
-        r = _Routine(base)
-        ap_owner_guard(r, 0x801C0020)  # lwz r0,0x20(r28)
-        r.emit(ap_instruction)
-        r.branch(back)
-        r.label("vanilla")
-        r.emit(original)
-        r.branch(back)
-        routines.append((r, limit))
 
     a = _Routine(layout.object_available_hook)
     ap_owner_guard(a, 0x801C0020)
-    a.emit(0x800C000C, 0x7C009800)  # requested ID must equal scanned r19
-    a.branch("unavailable", 0x40820000)
-    a.emit(0x2C070000)  # AP-owned record has threshold r7 == 0
-    a.branch("unavailable", 0x40820000)
-    # Same r3..r7 ABI, but no newly-awarded-Spark or current-world restriction.
-    # Tail calls preserve the original availability call's return address.
-    a.branch(0x80025420)  # cUnlockManager::IsThingUnlocked
-    a.label("unavailable")
-    a.emit(0x38600000, 0x4E800020)
+    a.emit(0x800C000C, 0x7C009800, 0x38600000)
+    a.branch("return", 0x40820000)
+    a.emit(0x38600001)  # exact target, no threshold write needed
+    a.label("return")
+    a.emit(0x4E800020)
     a.label("vanilla")
-    a.branch(0x80025560)  # IsThingUnlockedForThisAwardOfSparks
-    routines.append((a, layout.object_scan_finish_hook))
-
-    f = _Routine(layout.object_scan_finish_hook)
-    ap_owner_guard(f, 0x801C0020)
-    f.emit(0x7FDDF378)  # mr r29,r30: actual count (0 or 1), never invented
-    f.branch(0x800930E8)  # submit array; skip every non-object category
-    f.label("vanilla")
-    f.emit(ORIGINALS[0x80092424])  # restore original comparison's CR0
-    f.branch(0x80092428)
-    routines.append((f, layout.object_display_hook))
+    a.branch(0x80025560)
 
     s = _Routine(layout.object_display_hook)
-    ap_owner_guard(s, 0x80190004)  # lwz r0,4(r25): factory callback context
-    # CreativeChainMsg.gfx::AddUnlockImages initializes the vanilla image/name
-    # array. Display would show the award banner first. ShowUnlock(false) opens
-    # only the object panel; its Event_UnlockFinished -> PlayOutro ->
-    # Event_OnOutroEnd path still invokes normal native owner/modal cleanup.
-    s.emit(0x388C0048, 0x38AD8AE8, 0x38C00000)  # ShowUnlock; "%d"; false
+    ap_owner_guard(s, 0x80190004)
+    s.emit(0x3BAD8AD8)  # r29 = "unlock"; type 4 still builds the object array
+    s.branch(0x80091D10)
     s.label("vanilla")
-    s.branch(0x8028DF30)  # GFxMovieView::Invoke, preserve incoming LR/CR1
-    routines.append((s, layout.mailbox))
+    s.emit(CODE_ORIGINALS[0x80091D0C])  # r29 = "award"
+    s.branch(0x80091D10)
+
+    c = _Routine(layout.closed_callback)
+    c.emit(0x80030010, 0x90030014, 0x38000000, 0x90030008, 0x4E800020)
     image = bytearray(layout.end - layout.code_base)
-    for routine, limit in routines:
+    for routine, limit in ((d, layout.maintain_hooks), (m, layout.object_available_hook),
+                           (a, layout.object_display_hook), (s, layout.closed_callback),
+                           (c, layout.mailbox)):
         code = routine.build()
         if routine.base + len(code) > limit:
-            raise ValueError("Popup routine exceeds reserved cave space")
+            raise ValueError(f"Popup routine {routine.base:08X} exceeds cave space ({len(code)} bytes)")
         start = routine.base - layout.code_base
         image[start:start + len(code)] = code
     offset = layout.mailbox - layout.code_base
     image[offset:offset + 8] = word(MAGIC) + word(VERSION)
     image[offset + 0x38:offset + 0x44] = (
-        word(layout.closed_callback) + word(layout.mailbox) + word(layout.mailbox + 0x44))
-    image[offset + 0x44:offset + 0x48] = b" \0\0\0"
-    image[offset + 0x48:offset + 0x5C] = b"_root.ShowUnlock\0\0\0\0"
+        word(layout.closed_callback) + word(layout.mailbox) + word(layout.mailbox + 0x4C))
+    image[offset + 0x44:offset + 0x48] = word(1)
+    message = b"$GUI_PR_UNLOCK_GAME_OBJECT\0"
+    image[offset + 0x4C:offset + 0x4C + len(message)] = message
     return bytes(image)
 
 
@@ -248,14 +248,7 @@ class PopupRuntime:
     def __init__(self, *, probe_timeout: float = HEARTBEAT_TIMEOUT_SECONDS):
         self.layout = PopupPatchLayout()
         self.image = build_image(self.layout)
-        self.hooks = {
-            0x8000DB5C: ppc_branch(0x8000DB5C, self.layout.dispatcher, link=True),
-            0x80092184: ppc_branch(0x80092184, self.layout.object_scan_start_hook),
-            0x8009240C: ppc_branch(0x8009240C, self.layout.object_scan_step_hook),
-            0x800921E0: ppc_branch(0x800921E0, self.layout.object_available_hook, link=True),
-            0x80092424: ppc_branch(0x80092424, self.layout.object_scan_finish_hook),
-            0x80091DBC: ppc_branch(0x80091DBC, self.layout.object_display_hook, link=True),
-        }
+        self.hooks = hook_words(self.layout)
         self.installed = False
         self.ready = False
         self.failure = None
@@ -278,12 +271,13 @@ class PopupRuntime:
         }
 
     def snapshot(self, read_memory):
-        raw = read_memory(self.layout.mailbox, 0x38)
+        raw = read_memory(self.layout.mailbox, 0x4C)
         fields = struct.unpack(">8I", raw[:0x20])
         result = dict(zip(("magic", "version", "status", "object_id", "request_seq",
                            "ack_seq", "error", "heartbeat"), fields))
         result.update(popup_pointer=int.from_bytes(raw[0x20:0x24], "big"),
-                      active=raw[0x34])
+                      active=raw[0x34], enabled=int.from_bytes(raw[0x44:0x48], "big"),
+                      hooks_applied=int.from_bytes(raw[0x48:0x4C], "big"))
         return result
 
     def status(self, read_memory):
@@ -297,12 +291,18 @@ class PopupRuntime:
         # insufficient to accept somebody else's code or a partial installation.
         offset = self.layout.mailbox - self.layout.code_base
         return (len(data) == len(self.image) and data[:offset + 8] == self.image[:offset + 8]
-                and data[offset + 0x38:] == self.image[offset + 0x38:])
+                and data[offset + 0x38:offset + 0x44] == self.image[offset + 0x38:offset + 0x44]
+                and data[offset + 0x4C:] == self.image[offset + 0x4C:])
 
     def ensure_installed(self, read_memory, write_memory):
         if self.failure:
             return False
         try:
+            if read_memory(GAME_SINGLETON, 4) != word(GAME_VTABLE):
+                raise RuntimeError("CREATE singleton/vtable is not ready or has changed")
+            for address, original in LEGACY_ORIGINALS.items():
+                if read_memory(address, 4) != word(original):
+                    raise RuntimeError("old/conflicting popup patch detected; stop and freshly boot CREATE")
             for address, original in ORIGINALS.items():
                 actual = int.from_bytes(read_memory(address, 4), "big")
                 if actual not in (original, self.hooks[address]):
@@ -318,20 +318,26 @@ class PopupRuntime:
                 raise RuntimeError("unknown nonzero code-cave contents")
             if not self.installed:
                 self.reset_request(read_memory, write_memory)
-                for address in (*list(self.hooks)[1:], 0x8000DB5C):
-                    write_memory(address, word(self.hooks[address]))
-                    if read_memory(address, 4) != word(self.hooks[address]):
-                        raise RuntimeError(f"hook readback failed at 0x{address:08X}")
+                write_memory(self.layout.mailbox + 0x44, word(1))
+                write_memory(VTABLE_SLOT, word(self.layout.dispatcher))
+                if read_memory(VTABLE_SLOT, 4) != word(self.layout.dispatcher):
+                    raise RuntimeError("vtable data-pointer readback failed")
                 self.installed = True
                 self._heartbeat = self.heartbeat(read_memory)
                 self._last_heartbeat_at = time.monotonic()
-                logger.info("Create AP Object popup runtime patch installed; waiting up to %.0fs for heartbeat.",
+                logger.info("Create AP popup vtable bootstrap installed (no Gecko); waiting up to %.0fs for heartbeat.",
                             self.probe_timeout)
                 return False
-            if any(read_memory(a, 4) != word(h) for a, h in self.hooks.items()):
-                raise RuntimeError("runtime hooks changed after installation")
+            state = self.snapshot(read_memory)
+            if not state["enabled"] or state["error"] == 5:
+                raise RuntimeError("guest popup hooks disabled or conflicting instruction detected")
+            if read_memory(VTABLE_SLOT, 4) != word(self.layout.dispatcher):
+                raise RuntimeError("runtime vtable pointer changed after installation")
             beat = self.heartbeat(read_memory)
-            if beat != self._heartbeat:
+            applied = state["hooks_applied"] == 1
+            if applied and any(read_memory(a, 4) != word(self.hooks[a]) for a in CODE_ORIGINALS):
+                raise RuntimeError("runtime hooks changed after guest installation")
+            if beat != self._heartbeat and applied:
                 if not self.ready:
                     logger.info("Create AP Object popup runtime hook heartbeat confirmed.")
                 self.ready = True
@@ -343,9 +349,9 @@ class PopupRuntime:
                                    self.diagnostics(read_memory), self.snapshot(read_memory))
                     raise RuntimeError(
                         "runtime hook heartbeat missing (error 4); RAM readback alone does not prove "
-                        "instruction execution. Resume Dolphin if paused. Enable the CREATE AP "
-                        "Popup Instruction Cache Gecko helper in Dolphin (code: /createpopupcache), "
-                        "then use /createpopupretry. Interpreter mode also uses an instruction cache.")
+                        "instruction execution. Resume Dolphin if paused. This build uses the vtable "
+                        "bootstrap without Gecko; freshly boot CREATE without a save state, then use "
+                        "/createpopupretry and /createpopupstatus to diagnose the virtual call.")
             self._heartbeat = beat
             return self.ready
         except Exception as error:
@@ -361,19 +367,16 @@ class PopupRuntime:
                 write_memory(self.layout.mailbox + 8, word(IDLE))
 
     def uninstall(self, read_memory, write_memory):
-        # Do not destroy a live owner or callback. Vanilla cleanup retains control.
+        # Guest restores and invalidates its instructions before detaching the
+        # vtable. Keep the entry installed until that cleanup can actually run.
+        # In particular, a paused Dolphin must flush on resume, not be detached
+        # by Python while stale JIT code still points into the cave.
         try:
             self.reset_request(read_memory, write_memory)
+            if self._known_image(read_memory(self.layout.code_base, len(self.image))):
+                write_memory(self.layout.mailbox + 0x44, word(0))
         except Exception:
-            pass
-        for address, original in ORIGINALS.items():  # main call first
-            try:
-                if read_memory(address, 4) == word(self.hooks[address]):
-                    write_memory(address, word(original))
-                    if read_memory(address, 4) != word(original):
-                        logger.warning("Popup hook restoration readback failed at 0x%08X", address)
-            except Exception:
-                logger.debug("Could not restore popup hook at 0x%08X", address, exc_info=True)
+            logger.debug("Could not request guest popup hook removal", exc_info=True)
         self.installed = self.ready = False
 
     def request_object(self, object_id, read_memory, write_memory):

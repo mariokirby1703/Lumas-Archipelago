@@ -27,7 +27,6 @@ from ..world_constants import GAME_ID_ADDRESS, GAME_NAME, ITEM_VICTORY, SPARK_IT
 from ..world_constants import SUPPORTED_GAME_ID_LABEL, SUPPORTED_GAME_IDS
 from ..world_constants import HUB_WORLD_KEY
 from .popup_runtime import PopupRuntime, IDLE, ACTIVE, ERROR, MODAL_LAYER
-from .popup_runtime import CACHE_HELPER_NAME, cache_flush_gecko_code
 
 ModuleUpdate.update()
 
@@ -81,9 +80,6 @@ class CreateCommandProcessor(ClientCommandProcessor):
                 or not ctx.ram_is_settled() or not ctx.slot_ram_is_settled()):
             logger.warning("Popup retry requires Dolphin and settled Save Slot 3 RAM.")
             return
-        if in_challenge(current_challenge_raw(ctx)):
-            logger.warning("Leave the challenge before retrying the popup hook.")
-            return
         state = ctx._popup_runtime.snapshot(read_memory)
         if state["status"] == ACTIVE or state["active"] or state["popup_pointer"]:
             logger.warning("Close the active popup normally before retrying.")
@@ -93,14 +89,14 @@ class CreateCommandProcessor(ClientCommandProcessor):
         ctx._popup_runtime_ready = False
         ctx._popup_last_status = None
         logger.info("Popup diagnostic retry requested (120 seconds). Queue retained. "
-                    "Keep Dolphin running in the Hub/world; use /createpopupstatus for diagnostics. "
-                    "This command does not clear Dolphin's instruction cache.")
+                    "Keep Dolphin running; use /createpopupstatus for diagnostics. "
+                    "The guest runtime manages its own instruction-cache invalidation.")
 
     def _cmd_createpopupcache(self) -> None:
-        """Print the Dolphin Gecko helper needed to invalidate popup instruction caches."""
-        logger.info("In Dolphin, enable cheats and add/enable this code under CREATE > Properties > "
-                    "Gecko Codes. Restart the game after enabling it. Name: %s\n%s",
-                    CACHE_HELPER_NAME, cache_flush_gecko_code())
+        """Explain migration from the old Gecko-based popup build."""
+        logger.info("This popup build uses a vtable bootstrap and needs no Gecko helper. "
+                    "Disable the old CREATE AP Popup Instruction Cache code and freshly boot CREATE "
+                    "without an emulator save state. Use /createpopupstatus to check the heartbeat.")
 
     def _cmd_createpopupstatus(self) -> None:
         """Display popup patch, mailbox, modal layer and queue diagnostics."""
@@ -935,7 +931,7 @@ def collect_new_object_popup_items(ctx: CreateContext) -> None:
 
 
 def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> None:
-    if not ctx._popup_runtime_ready or not ctx.save_slot_armed or challenge_active:
+    if not ctx._popup_runtime_ready or not ctx.save_slot_armed:
         return
     runtime = ctx._popup_runtime
     state = runtime.snapshot(read_memory)
@@ -959,9 +955,7 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
             ctx._popup_inflight = None
         else:
             return
-    if status != IDLE or not ctx._object_popup_queue or ctx._object_resync_pending:
-        return
-    if time.monotonic() < ctx._object_resync_blocked_until:
+    if status != IDLE or not ctx._object_popup_queue:
         return
     if read_u32_be(MODAL_LAYER):
         if not ctx._popup_delay_logged:
@@ -969,11 +963,10 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
             ctx._popup_delay_logged = True
         return
     ctx._popup_delay_logged = False
-    records = object_records(ctx)
     value = ctx._object_popup_queue[0]
-    if not records or value not in records:
-        return
-    apply_owned_object_record(records[value])
+    # Display is independent of availability synchronization. In challenges
+    # only the game-thread lookup touches the native object registry; Python
+    # never traverses MEM2 or changes thresholds just to show a notification.
     if runtime.request_object(value, read_memory, write_memory):
         ctx._object_popup_queue.popleft()
         ctx._popup_inflight = (value, runtime.snapshot(read_memory)["request_seq"])
@@ -982,21 +975,12 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
 def sync_object_popups(ctx: CreateContext, challenge_active: bool) -> None:
     if not ctx.save_slot_armed or not ctx.ram_is_settled() or not ctx.slot_ram_is_settled():
         return
-    # Capture the receipt baseline after the first successful availability sync,
-    # independently of heartbeat readiness so items arriving during that probe
-    # are still retained in receipt order.
-    if not ctx._popup_accept_new_items and not ctx._object_resync_pending and ctx._object_records:
+    # Establish history once settled, independently of the MEM2 resolver and
+    # heartbeat; new receipts during a challenge/probe must still be retained.
+    if not ctx._popup_accept_new_items:
         ctx._popup_item_cursor = len(ctx.items_received)
         ctx._popup_accept_new_items = True
     collect_new_object_popup_items(ctx)
-    if challenge_active:
-        # Do not let an already-published request survive into an unsafe Object
-        # registry. Active UI owners are always left to vanilla cleanup.
-        if ctx._popup_runtime.installed:
-            ctx._popup_runtime.reset_request(read_memory, write_memory)
-        return
-    if ctx._object_resync_pending or not ctx._object_records:
-        return
     ctx._popup_runtime_ready = ctx._popup_runtime.ensure_installed(read_memory, write_memory)
     service_object_popup_queue(ctx, challenge_active)
 
