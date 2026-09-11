@@ -69,6 +69,31 @@ class CreateCommandProcessor(ClientCommandProcessor):
             return
         self.ctx._object_popup_queue.append(value)
         logger.info("Queued Object popup: %s (ID %d).", popup_object_name(self.ctx, value), value)
+        if self.ctx._popup_runtime.failure:
+            logger.warning("Popup display is blocked: %s. The Object remains queued.",
+                           self.ctx._popup_runtime.failure)
+
+    def _cmd_createpopupretry(self) -> None:
+        """Retry the popup hook for 120 seconds without clearing the receipt queue."""
+        ctx = self.ctx
+        if (ctx.dolphin_status != CONNECTION_CONNECTED_STATUS or not ctx.save_slot_armed
+                or not ctx.ram_is_settled() or not ctx.slot_ram_is_settled()):
+            logger.warning("Popup retry requires Dolphin and settled Save Slot 3 RAM.")
+            return
+        if in_challenge(current_challenge_raw(ctx)):
+            logger.warning("Leave the challenge before retrying the popup hook.")
+            return
+        state = ctx._popup_runtime.snapshot(read_memory)
+        if state["status"] == ACTIVE or state["active"] or state["popup_pointer"]:
+            logger.warning("Close the active popup normally before retrying.")
+            return
+        ctx._popup_runtime.uninstall(read_memory, write_memory)
+        ctx._popup_runtime = PopupRuntime(probe_timeout=120.0)
+        ctx._popup_runtime_ready = False
+        ctx._popup_last_status = None
+        logger.info("Popup diagnostic retry requested (120 seconds). Queue retained. "
+                    "Keep Dolphin running in the Hub/world; use /createpopupstatus for diagnostics. "
+                    "This command does not clear Dolphin's instruction cache.")
 
     def _cmd_createpopupstatus(self) -> None:
         """Display popup patch, mailbox, modal layer and queue diagnostics."""
@@ -77,6 +102,7 @@ class CreateCommandProcessor(ClientCommandProcessor):
                     runtime.ready, runtime.failure, len(self.ctx._object_popup_queue))
         if self.ctx.dolphin_status == CONNECTION_CONNECTED_STATUS:
             try:
+                logger.info("Popup hook diagnostics: %s", runtime.diagnostics(read_memory))
                 logger.info("Popup mailbox=%s modal=%d", runtime.snapshot(read_memory), read_u32_be(MODAL_LAYER))
             except Exception as error:
                 logger.warning("Popup status unavailable: %s", error)

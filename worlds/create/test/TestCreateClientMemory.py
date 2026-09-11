@@ -800,8 +800,9 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(popup.PENDING, self.runtime.status(self.read))
 
     def test_heartbeat_timeout_restores_originals_and_stops_retrying(self):
-        self.runtime.ensure_installed(self.read, self.write)
-        for _ in range(50):
+        with patch.object(popup.time, "monotonic", return_value=100):
+            self.runtime.ensure_installed(self.read, self.write)
+        with patch.object(popup.time, "monotonic", return_value=105):
             self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
         self.assertIn("heartbeat missing", self.runtime.failure)
         for address, value in popup.ORIGINALS.items():
@@ -809,6 +810,38 @@ class TestCreatePopupRuntime(unittest.TestCase):
         count = len(self.writes)
         self.runtime.ensure_installed(self.read, self.write)
         self.assertEqual(count, len(self.writes))
+
+    def test_fast_syncs_do_not_shorten_heartbeat_probe(self):
+        with patch.object(popup.time, "monotonic", return_value=100):
+            self.runtime.ensure_installed(self.read, self.write)
+        with patch.object(popup.time, "monotonic", return_value=101):
+            for _ in range(100):
+                self.runtime.ensure_installed(self.read, self.write)
+        self.assertTrue(self.runtime.installed)
+        self.assertIsNone(self.runtime.failure)
+
+    def test_manual_probe_can_confirm_late_heartbeat(self):
+        self.runtime = popup.PopupRuntime(probe_timeout=120)
+        with patch.object(popup.time, "monotonic", return_value=100):
+            self.runtime.ensure_installed(self.read, self.write)
+        with patch.object(popup.time, "monotonic", return_value=200):
+            self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
+            self.assertIsNone(self.runtime.failure)
+            self.fake.write_u32(self.base + 0x1C, 1)
+            self.assertTrue(self.runtime.ensure_installed(self.read, self.write))
+        # After confirmation the ordinary liveness timeout applies again.
+        with patch.object(popup.time, "monotonic", return_value=205):
+            self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
+        self.assertIn("heartbeat missing", self.runtime.failure)
+
+    def test_diagnostics_distinguish_ram_patch_from_execution(self):
+        self.runtime.ensure_installed(self.read, self.write)
+        report = self.runtime.diagnostics(self.read)
+        self.assertTrue(report["installed"])
+        self.assertTrue(report["cave_matches"])
+        self.assertFalse(report["ready"])
+        for hook in report["hooks"].values():
+            self.assertEqual(hook["ram"], hook["expected"])
 
     def test_hook_readback_failure_rolls_back_partial_installation(self):
         def broken_write(address, data):
@@ -970,6 +1003,33 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.fake.write_u32(self.ctx._popup_runtime.layout.mailbox + 0x1C, 1)
         client.sync_object_popups(self.ctx, False)
         self.assertEqual((13, 1), self.ctx._popup_inflight)
+
+    def test_manual_retry_preserves_queue_receipt_cursor_and_cancelled_request(self):
+        self.ready()
+        self.ctx._object_popup_queue.extend((13, 6))
+        client.service_object_popup_queue(self.ctx, False)
+        self.ctx._popup_item_cursor = 10
+        self.ctx.dolphin_status = client.CONNECTION_CONNECTED_STATUS
+        self.fake.write_byte(client._address(
+            self.ctx.slot_data["ram"]["addresses"]["current_challenge_index"]), 255)
+        client.CreateCommandProcessor._cmd_createpopupretry(SimpleNamespace(ctx=self.ctx))
+        self.assertEqual([6], list(self.ctx._object_popup_queue))
+        self.assertEqual((13, 1), self.ctx._popup_inflight)
+        self.assertEqual(10, self.ctx._popup_item_cursor)
+        self.assertEqual(120, self.ctx._popup_runtime.probe_timeout)
+        self.assertFalse(self.ctx._popup_runtime_ready)
+        self.assertEqual(popup.IDLE, self.ctx._popup_runtime.status(client.read_memory))
+
+    def test_manual_retry_refuses_active_popup(self):
+        self.ready()
+        runtime = self.ctx._popup_runtime
+        self.ctx.dolphin_status = client.CONNECTION_CONNECTED_STATUS
+        self.fake.write_byte(client._address(
+            self.ctx.slot_data["ram"]["addresses"]["current_challenge_index"]), 255)
+        self.fake.write_u32(runtime.layout.mailbox + 8, popup.ACTIVE)
+        client.CreateCommandProcessor._cmd_createpopupretry(SimpleNamespace(ctx=self.ctx))
+        self.assertIs(runtime, self.ctx._popup_runtime)
+        self.assertEqual(popup.ACTIVE, runtime.status(client.read_memory))
 
 
 if __name__ == "__main__":

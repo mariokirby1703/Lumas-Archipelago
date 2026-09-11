@@ -9,12 +9,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 import logging
 import struct
+import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
 VERSION = 1
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
+HEARTBEAT_TIMEOUT_SECONDS = 5.0
 ORIGINALS = {0x8000DB5C: 0x4808A365, 0x80092184: 0x3A600000, 0x8009240C: 0x3A730001}
 
 
@@ -152,7 +154,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
 
 
 class PopupRuntime:
-    def __init__(self):
+    def __init__(self, *, probe_timeout: float = HEARTBEAT_TIMEOUT_SECONDS):
         self.layout = PopupPatchLayout()
         self.image = build_image(self.layout)
         self.hooks = {
@@ -164,7 +166,22 @@ class PopupRuntime:
         self.ready = False
         self.failure = None
         self._heartbeat = None
-        self._heartbeat_polls = 0
+        self.probe_timeout = probe_timeout
+        self._last_heartbeat_at = 0.0
+
+    def diagnostics(self, read_memory):
+        return {
+            "installed": self.installed,
+            "ready": self.ready,
+            "failure": self.failure,
+            "heartbeat_unchanged_seconds": round(time.monotonic() - self._last_heartbeat_at, 1)
+            if self.installed else None,
+            "cave_matches": self._known_image(read_memory(self.layout.code_base, len(self.image))),
+            "hooks": {f"0x{address:08X}": {
+                "ram": read_memory(address, 4).hex().upper(),
+                "expected": f"{value:08X}",
+            } for address, value in self.hooks.items()},
+        }
 
     def snapshot(self, read_memory):
         raw = read_memory(self.layout.mailbox, 0x38)
@@ -213,7 +230,9 @@ class PopupRuntime:
                         raise RuntimeError(f"hook readback failed at 0x{address:08X}")
                 self.installed = True
                 self._heartbeat = self.heartbeat(read_memory)
-                logger.info("Create AP Object popup runtime patch installed.")
+                self._last_heartbeat_at = time.monotonic()
+                logger.info("Create AP Object popup runtime patch installed; waiting up to %.0fs for heartbeat.",
+                            self.probe_timeout)
                 return False
             if any(read_memory(a, 4) != word(h) for a, h in self.hooks.items()):
                 raise RuntimeError("runtime hooks changed after installation")
@@ -222,11 +241,16 @@ class PopupRuntime:
                 if not self.ready:
                     logger.info("Create AP Object popup runtime hook heartbeat confirmed.")
                 self.ready = True
-                self._heartbeat_polls = 0
+                self._last_heartbeat_at = time.monotonic()
             else:
-                self._heartbeat_polls += 1
-                if self._heartbeat_polls >= 50:
-                    raise RuntimeError("runtime hook heartbeat missing (error 4); check Dolphin JIT")
+                timeout = HEARTBEAT_TIMEOUT_SECONDS if self.ready else self.probe_timeout
+                if time.monotonic() - self._last_heartbeat_at >= timeout:
+                    logger.warning("Popup hook diagnostics before rollback: %s; mailbox=%s",
+                                   self.diagnostics(read_memory), self.snapshot(read_memory))
+                    raise RuntimeError(
+                        "runtime hook heartbeat missing (error 4); RAM readback alone does not prove "
+                        "instruction execution. Resume Dolphin if paused. Use /createpopupretry for "
+                        "a 120-second diagnostic probe; check the CPU engine/instruction cache.")
             self._heartbeat = beat
             return self.ready
         except Exception as error:
