@@ -72,7 +72,11 @@ def create_item(world: CreateWorld, name: str) -> CreateItem:
 def _classification_for_world(world: CreateWorld, name: str) -> ItemClassification:
     if name in FILLER_ITEMS or name in LIMITED_FILLER_ITEM_NAMES:
         return ItemClassification.filler
-    if name == ITEM_VICTORY or name in SPARK_ITEM_AMOUNTS:
+    if name == ITEM_VICTORY:
+        return ItemClassification.progression_skip_balancing
+    if name in SPARK_ITEM_AMOUNTS:
+        if getattr(world.multiworld, "generation_is_fake", False):
+            return ItemClassification.useful
         return ItemClassification.progression_skip_balancing
     if name in item_groups["World Access"]:
         return ItemClassification.progression
@@ -137,7 +141,9 @@ def create_all_items(world: CreateWorld) -> None:
         spark_amounts = []
     world.required_sparks = capped_required_sparks
     for amount in spark_amounts:
-        items.append(world.create_item(game_data.spark_item_name(amount)))
+        item = world.create_item(game_data.spark_item_name(amount))
+        item.classification = ItemClassification.progression_skip_balancing
+        items.append(item)
 
     # Always aim for a full 50% safety margin. Round upward so even a small
     # non-zero requirement receives at least one extra Spark when a slot exists.

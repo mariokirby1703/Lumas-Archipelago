@@ -423,6 +423,16 @@ class TestCreateChallengeLogic(CreateTestBase):
         self.multiworld.state.collect(self.world.create_item(ITEM_UT_GLITCHED))
         self.assertTrue(self.can_reach_location("Theme Park Challenge 07 Spark 6"))
 
+    def test_universal_tracker_uses_network_flags_for_spark_classification(self) -> None:
+        self.multiworld.generation_is_fake = True
+        useful_spark = self.world.create_item("6 Sparks")
+        self.assertEqual(ItemClassification.useful, useful_spark.classification)
+        self.assertFalse(useful_spark.advancement)
+
+        progression_spark = self.world.create_item("6 Sparks")
+        progression_spark.classification |= ItemClassification.progression_skip_balancing
+        self.assertTrue(progression_spark.advancement)
+
     def test_ancient_history_challenge_one_glitched_route_only_needs_obelisk(self) -> None:
         location = self.multiworld.get_location("Ancient History Challenge 01 Spark 1", self.player)
         self.collect_by_name({"Ancient History Access", "Egyptian Obelisk"})
