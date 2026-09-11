@@ -248,8 +248,13 @@ class CreateWorld(World):
                         continue
                     challenge = game_data.CHALLENGE_TABLE[(location_data.world_key, location_data.challenge)]
                     groups = game_data.challenge_logic_object_groups(challenge, location_data.spark)
-                    preferred_names = list(dict.fromkeys(
+                    access_items = (
                         (game_data.world_access_item_name(location_data.world_key),)
+                        if location_data.world_key != HUB_WORLD_KEY
+                        else ()
+                    )
+                    preferred_names = list(dict.fromkeys(
+                        access_items
                         + tuple(name for group in groups for name in group)
                     ))
                     for name in preferred_names:
