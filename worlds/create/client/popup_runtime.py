@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 3
+VERSION = 4
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -22,12 +22,13 @@ ORIGINAL_UPDATE = 0x8000D880
 GAME_SINGLETON = 0x806798C0
 GAME_VTABLE = 0x805E2C4C
 HEARTBEAT_TIMEOUT_SECONDS = 5.0
-CODE_ORIGINALS = {0x80091D0C: 0x3BAD8AD0, 0x800921E0: 0x4BF93381}
+CODE_ORIGINALS = {0x800325E4: 0x4BFF2F7D}
 ORIGINALS = {VTABLE_SLOT: ORIGINAL_UPDATE, **CODE_ORIGINALS}
 # Refuse old runtime revisions rather than mixing instruction-cache state.
 LEGACY_ORIGINALS = {0x8000DB5C: 0x4808A365, 0x80092184: 0x3A600000,
                     0x8009240C: 0x3A730001, 0x80092424: 0x7C1EE800,
-                    0x80091DBC: 0x481FC175}
+                    0x80091DBC: 0x481FC175, 0x80091D0C: 0x3BAD8AD0,
+                    0x800921E0: 0x4BF93381}
 
 
 def ppc_branch(source: int, target: int, *, link: bool = False) -> int:
@@ -47,18 +48,18 @@ def word(value: int) -> bytes:
 class PopupPatchLayout:
     code_base: int = 0x80006048
     dispatcher: int = 0x80006048
-    maintain_hooks: int = 0x80006220
-    object_available_hook: int = 0x80006360
-    object_display_hook: int = 0x800063B0
-    closed_callback: int = 0x800063E4
+    construct_results: int = 0x80006220
+    maintain_hooks: int = 0x80006300
+    object_available_hook: int = 0x800063C0
+    closed_callback: int = 0x800061E0
     mailbox: int = 0x80006400
-    end: int = 0x80006470
+    result_context: int = 0x80006450
+    end: int = 0x80006490
 
 
 def hook_words(layout):
     return {VTABLE_SLOT: layout.dispatcher,
-            0x80091D0C: ppc_branch(0x80091D0C, layout.object_display_hook),
-            0x800921E0: ppc_branch(0x800921E0, layout.object_available_hook, link=True)}
+            0x800325E4: ppc_branch(0x800325E4, layout.object_available_hook, link=True)}
 
 
 class _Routine:
@@ -147,9 +148,8 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.emit(0x800C0044, 0x28000001)
     d.branch("return", 0x40820000)
     d.emit(0x38000000, 0x900C0018, 0x38000002, 0x900C0008)
-    d.emit(0x386C0020, 0x388C0040, 0x38A00000, 0x38CC0038,
-           0x38E00004, 0x39000140, 0x392000B4)
-    d.branch(0x80074930, link=True)
+    d.emit(0x38000001, 0x980C0034)  # owner active until native End completes
+    d.branch(layout.construct_results, link=True)
     d.emit(*load_mailbox, 0x800C0020, 0x28000000)
     d.branch("return", 0x40820000)
     d.emit(0x38000003)
@@ -206,29 +206,40 @@ def build_image(layout: PopupPatchLayout) -> bytes:
         r.branch("vanilla", 0x40820000)
 
     a = _Routine(layout.object_available_hook)
-    ap_owner_guard(a, 0x801C0020)
-    a.emit(0x800C000C, 0x7C009800, 0x38600000)
+    ap_owner_guard(a, 0x801D0020)  # FePuzzleResults this = r29, callback owner +0x20
+    a.emit(0x800C000C, 0x7C008800, 0x38600000)  # current Object ID = r17
     a.branch("return", 0x40820000)
-    a.emit(0x38600001)  # exact target, no threshold write needed
+    a.emit(0x38600001)
     a.label("return")
     a.emit(0x4E800020)
     a.label("vanilla")
     a.branch(0x80025560)
 
-    s = _Routine(layout.object_display_hook)
-    ap_owner_guard(s, 0x80190004)
-    s.emit(0x3BAD8AD8)  # r29 = "unlock"; type 4 still builds the object array
-    s.branch(0x80091D10)
-    s.label("vanilla")
-    s.emit(CODE_ORIGINALS[0x80091D0C])  # r29 = "award"
-    s.branch(0x80091D10)
+    f = _Routine(layout.construct_results)
+    f.emit(0x9421FFE0, 0x7C0802A6, 0x90010024, *load_mailbox)
+    f.emit(0x386C0038, 0x388C0050)
+    f.branch(0x80031DB0, link=True)  # builds the one-object array in the same frame
+    f.emit(*load_mailbox, 0x906C0020, 0x28030000)
+    f.branch("return", 0x41820000)
+    f.emit(0x80830014, 0x28040000)
+    f.branch("return", 0x41820000)
+    f.emit(0x80040000, 0x28000000)
+    f.branch("return", 0x41820000)
+    # Native UI registration: index = (movie_slot - manager.slots) / 24.
+    load(f, 11, 0x80947F50)
+    f.emit(0x7C8B2050, 0x38000018, 0x7C840396)  # subf r4,r11,r4; divwu r4,r4,r0
+    load(f, 3, 0x80947A30)
+    f.emit(0x38A00000, 0x38C00001)
+    f.branch(0x804EA4D0, link=True)
+    f.label("return")
+    f.emit(0x80010024, 0x7C0803A6, 0x38210020, 0x4E800020)
 
     c = _Routine(layout.closed_callback)
     c.emit(0x80030010, 0x90030014, 0x38000000, 0x90030008, 0x4E800020)
     image = bytearray(layout.end - layout.code_base)
-    for routine, limit in ((d, layout.maintain_hooks), (m, layout.object_available_hook),
-                           (a, layout.object_display_hook), (s, layout.closed_callback),
-                           (c, layout.mailbox)):
+    for routine, limit in ((d, layout.closed_callback), (c, layout.construct_results),
+                           (f, layout.maintain_hooks), (m, layout.object_available_hook),
+                           (a, layout.mailbox)):
         code = routine.build()
         if routine.base + len(code) > limit:
             raise ValueError(f"Popup routine {routine.base:08X} exceeds cave space ({len(code)} bytes)")
@@ -236,11 +247,13 @@ def build_image(layout: PopupPatchLayout) -> bytes:
         image[start:start + len(code)] = code
     offset = layout.mailbox - layout.code_base
     image[offset:offset + 8] = word(MAGIC) + word(VERSION)
-    image[offset + 0x38:offset + 0x44] = (
-        word(layout.closed_callback) + word(layout.mailbox) + word(layout.mailbox + 0x4C))
+    # Native FeMessageFlow::End releases the result object and UI slot, clears
+    # owner.pointer, invokes our acknowledgement, then clears owner.active.
+    image[offset + 0x2C:offset + 0x34] = word(layout.closed_callback) + word(layout.mailbox)
+    image[offset + 0x38:offset + 0x40] = word(0x80074D90) + word(layout.mailbox + 0x20)
     image[offset + 0x44:offset + 0x48] = word(1)
-    message = b"$GUI_PR_UNLOCK_GAME_OBJECT\0"
-    image[offset + 0x4C:offset + 0x4C + len(message)] = message
+    # Synthetic sPuzzleResults: no Puzzle pointer, one Object reward, no Sparks.
+    image[offset + 0x60:offset + 0x64] = word(1)
     return bytes(image)
 
 

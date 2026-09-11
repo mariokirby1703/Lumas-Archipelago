@@ -713,9 +713,12 @@ def execute_popup_ppc(runtime, memory, entry, registers, *, lr=0x81230000, nativ
         elif op in (32, 34):
             address = ((regs[ra] if ra else 0) + imm) & 0xFFFFFFFF
             regs[rt] = int.from_bytes(memory.read_bytes(address, 4 if op == 32 else 1), "big")
-        elif op in (36, 37):
+        elif op in (36, 37, 38):
             address = ((regs[ra] if ra else 0) + imm) & 0xFFFFFFFF
-            memory.write_u32(address, regs[rt])
+            if op == 38:
+                memory.write_byte(address, regs[rt] & 255)
+            else:
+                memory.write_u32(address, regs[rt])
             events.append(("store", address, regs[rt]))
             if op == 37:
                 regs[ra] = address
@@ -725,6 +728,10 @@ def execute_popup_ppc(runtime, memory, entry, registers, *, lr=0x81230000, nativ
             if op == 11 or op == 31 and xo == 0:
                 left, right = signed(left, 32), signed(right, 32)
             cr = (left < right, left > right, left == right)
+        elif op == 31 and xo == 40:
+            regs[rt] = (regs[rb] - regs[ra]) & 0xFFFFFFFF
+        elif op == 31 and xo == 459:
+            regs[rt] = regs[ra] // regs[rb]
         elif op == 31 and xo == 444:
             regs[ra] = regs[rt] | regs[rb]
         elif ins == 0x7C0802A6:
@@ -800,7 +807,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(self.runtime.layout.dispatcher, self.fake.read_u32(popup.VTABLE_SLOT))
         self.assertFalse(self.runtime.ready)
 
-    def test_guest_installs_and_flushes_exactly_the_two_code_hooks(self):
+    def test_guest_installs_and_flushes_only_results_availability_hook(self):
         self.runtime.ensure_installed(self.read, self.write)
         _, _, _, events = execute_popup_ppc(self.runtime, self.fake,
                                             self.runtime.layout.maintain_hooks, [0] * 32)
@@ -808,19 +815,20 @@ class TestCreatePopupRuntime(unittest.TestCase):
             self.assertEqual(self.runtime.hooks[address], self.fake.read_u32(address))
             self.assertIn(("dcbst", address & ~31), events)
             self.assertIn(("icbi", address & ~31), events)
-        self.assertEqual(2, sum(e[0] == "icbi" for e in events))
+        self.assertEqual(1, sum(e[0] == "icbi" for e in events))
         self.assertLess(events.index(("isync",)), events.index(("store", self.base + 0x48, 1)))
 
-    def test_installs_original_update_and_localized_primary_message(self):
+    def test_installs_results_context_and_native_owner_cleanup(self):
         self.install()
         self.assertEqual(self.runtime.layout.code_base, self.writes[0][0])
-        pointer = self.fake.read_u32(self.base + 0x40)
-        self.assertEqual(b"$GUI_PR_UNLOCK_GAME_OBJECT\0", self.read(pointer, 27))
-        self.assertEqual(self.runtime.layout.closed_callback, self.fake.read_u32(self.base + 0x38))
-        self.assertEqual(self.base, self.fake.read_u32(self.base + 0x3C))
+        self.assertEqual(0x80074D90, self.fake.read_u32(self.base + 0x38))
+        self.assertEqual(self.base + 0x20, self.fake.read_u32(self.base + 0x3C))
+        self.assertEqual(self.runtime.layout.closed_callback, self.fake.read_u32(self.base + 0x2C))
+        context = self.runtime.layout.result_context
+        self.assertEqual(bytes(16) + popup.word(1) + bytes(44), self.read(context, 64))
 
     def test_refuses_unexpected_instruction_without_writing(self):
-        self.fake.write_u32(0x800921E0, 0x12345678)
+        self.fake.write_u32(0x800325E4, 0x12345678)
         self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
         self.assertEqual([], self.writes)
         self.assertIn("unexpected instruction", self.runtime.failure)
@@ -955,13 +963,12 @@ class TestCreatePopupRuntime(unittest.TestCase):
     def test_guest_conflict_preserves_foreign_hook_and_removes_own_hooks(self):
         self.install()
         foreign = 0x12345678
-        self.fake.write_u32(0x800921E0, foreign)
+        self.fake.write_u32(0x800325E4, foreign)
         apply_guest_popup_hooks(self.runtime, self.fake)
         self.assertEqual(5, self.runtime.snapshot(self.read)["error"])
         self.assertEqual(0, self.runtime.snapshot(self.read)["enabled"])
         apply_guest_popup_hooks(self.runtime, self.fake)
-        self.assertEqual(foreign, self.fake.read_u32(0x800921E0))
-        self.assertEqual(popup.CODE_ORIGINALS[0x80091D0C], self.fake.read_u32(0x80091D0C))
+        self.assertEqual(foreign, self.fake.read_u32(0x800325E4))
         self.assertEqual(popup.ORIGINAL_UPDATE, self.fake.read_u32(popup.VTABLE_SLOT))
 
     def test_code_readback_failure_never_installs_hooks(self):
@@ -978,7 +985,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(layout.end - layout.code_base, len(self.runtime.image))
         self.assertEqual(popup.word(popup.ppc_branch(layout.dispatcher + 12, popup.ORIGINAL_UPDATE, link=True)),
                          self.runtime.image[12:16])
-        self.assertEqual({popup.VTABLE_SLOT, 0x80091D0C, 0x800921E0}, set(self.runtime.hooks))
+        self.assertEqual({popup.VTABLE_SLOT, 0x800325E4}, set(self.runtime.hooks))
 
     def dispatcher_frame(self, *, lookup_result=0x81204000):
         regs = [0x10000000 + i * 0x100 for i in range(32)]
@@ -991,13 +998,20 @@ class TestCreatePopupRuntime(unittest.TestCase):
             self.assertEqual((0x808D3440, 13), tuple(r[3:5]))
             r[3] = lookup_result
         def construct(r):
-            self.assertEqual((self.base + 0x20, self.base + 0x40, 0,
-                              self.base + 0x38, 4, 320, 180), tuple(r[3:10]))
+            self.assertEqual((self.base + 0x38, self.runtime.layout.result_context), tuple(r[3:5]))
             self.assertEqual(popup.ACTIVE, self.fake.read_u32(self.base + 8))
-            self.fake.write_u32(self.base + 0x20, 0x81206000)
+            self.assertEqual(0, self.fake.read_u32(r[4]))
+            self.assertEqual(1, self.fake.read_u32(r[4] + 0x10))
+            self.fake.write_u32(0x81206000 + 0x14, 0x80947F98)
+            self.fake.write_u32(0x80947F98, 0x81208000)
+            r[3] = 0x81206000
+        def register(r):
+            self.assertEqual((0x80947A30, 3, 0, 1), tuple(r[3:7]))
+            self.assertEqual(0x81206000, self.fake.read_u32(self.base + 0x20))
         pc, result, _, events = execute_popup_ppc(
             self.runtime, self.fake, self.runtime.layout.dispatcher, regs,
-            native={popup.ORIGINAL_UPDATE: original_update, 0x80490BF0: lookup, 0x80074930: construct})
+            native={popup.ORIGINAL_UPDATE: original_update, 0x80490BF0: lookup,
+                    0x80031DB0: construct, 0x804EA4D0: register})
         self.assertEqual(0x81230000, pc)
         self.assertEqual(0x12345678, result[3])
         self.assertEqual(before[1], result[1])
@@ -1017,9 +1031,9 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.prepare_dispatch()
         self.fake.write_byte(0x8068CFC3, 0)  # running challenge
         events = self.dispatcher_frame()
-        self.assertEqual([popup.ORIGINAL_UPDATE, 0x80490BF0, 0x80074930],
+        self.assertEqual([popup.ORIGINAL_UPDATE, 0x80490BF0, 0x80031DB0, 0x804EA4D0],
                          [e[1] for e in events if e[0] == "call"])
-        self.assertLess(events.index(("isync",)), events.index(("call", 0x80074930)))
+        self.assertLess(events.index(("isync",)), events.index(("call", 0x80031DB0)))
         self.assertEqual(1, self.runtime.heartbeat(self.read))
         self.assertTrue(self.runtime.ensure_installed(self.read, self.write))
 
@@ -1036,7 +1050,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
                 self.fake.write_u32(0x81204000, descriptor)
                 self.fake.write_u32(0x81205000 + 0x340, unlockable)
                 events = self.dispatcher_frame(lookup_result=record)
-                self.assertNotIn(("call", 0x80074930), events)
+                self.assertNotIn(("call", 0x80031DB0), events)
                 self.assertEqual(popup.PENDING, self.runtime.status(self.read))
                 self.assertEqual(0, self.runtime.snapshot(self.read)["error"])
 
@@ -1078,9 +1092,9 @@ class TestCreatePopupRuntime(unittest.TestCase):
 
     def hook_registers(self, *, status=popup.ACTIVE, ap_owner=True):
         regs = [0x10000000 + i * 0x100 for i in range(32)]
-        regs[28], regs[25] = 0x81200000, 0x81200100
+        regs[29], regs[25] = 0x81200000, 0x81200100
         owner = self.base + 0x20 if ap_owner else 0x81200200
-        self.fake.write_u32(regs[28] + 0x20, owner)
+        self.fake.write_u32(regs[29] + 0x20, owner)
         self.fake.write_u32(regs[25] + 4, owner)
         self.fake.write_u32(self.base + 8, status)
         self.fake.write_u32(self.base + 0x0C, 13)
@@ -1090,7 +1104,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         for target, threshold in ((13, 0), (13, 0x7FFFFFFF), (6, 0), (6, 99)):
             with self.subTest(target=target, threshold=threshold):
                 regs = self.hook_registers()
-                regs[19], regs[7] = target, threshold
+                regs[17], regs[7] = target, threshold
                 destination, result, _ = self.run_leaf_hook(self.runtime.layout.object_available_hook, regs)
                 self.assertEqual(0x81230000, destination)
                 self.assertEqual(int(target == 13), result[3])
@@ -1100,34 +1114,20 @@ class TestCreatePopupRuntime(unittest.TestCase):
         regs = self.hook_registers()
         accepted = []
         for object_id in range(262):
-            regs[19] = object_id
+            regs[17] = object_id
             _, result, _ = self.run_leaf_hook(self.runtime.layout.object_available_hook, regs)
             if result[3]:
                 accepted.append(object_id)
         self.assertEqual([13], accepted)
 
-    def test_ap_display_preserves_type4_builder_and_selects_unlock_mode(self):
-        regs = self.hook_registers()
-        regs[13] = 0x80670C20
-        dest, result, _ = self.run_leaf_hook(self.runtime.layout.object_display_hook, regs)
-        self.assertEqual(0x80091D10, dest)
-        self.assertEqual(0x806696F8, result[29])
-        self.assertEqual(regs[3:10], result[3:10])
-        self.assertEqual(regs[26], result[26])
-
-    def test_vanilla_hooks_preserve_behavior_even_while_ap_popup_is_active(self):
-        layout = self.runtime.layout
+    def test_vanilla_availability_preserved_during_other_popup(self):
         for status, owner in ((popup.IDLE, True), (popup.PENDING, True), (popup.ACTIVE, False)):
             with self.subTest(status=status, owner=owner):
                 regs = self.hook_registers(status=status, ap_owner=owner)
-                regs[13] = 0x80670C20
-                dest, result, _ = self.run_leaf_hook(layout.object_available_hook, regs)
+                dest, result, _ = self.run_leaf_hook(self.runtime.layout.object_available_hook, regs)
                 self.assertEqual(0x80025560, dest)
                 self.assertEqual(regs[3:10], result[3:10])
-                dest, result, _ = self.run_leaf_hook(layout.object_display_hook, regs)
-                self.assertEqual(0x80091D10, dest)
-                self.assertEqual(0x806696F0, result[29])
-                self.assertEqual(regs[3:10], result[3:10])
+
 
 class TestCreatePopupQueue(unittest.TestCase):
     def setUp(self):
@@ -1169,8 +1169,22 @@ class TestCreatePopupQueue(unittest.TestCase):
             self.receipt(value)
         client.collect_new_object_popup_items(self.ctx)
         self.assertEqual([6, 13, 6], list(self.ctx._object_popup_queue))
+
+    def test_real_receiveditems_queues_objects_once_and_preserves_history_baseline(self):
+        self.receipt(13)
+        client.CreateContext.on_package(self.ctx, "ReceivedItems", {"index": 0})
+        self.assertEqual([], list(self.ctx._object_popup_queue))
+        for value in (6, 99999, 13):
+            self.receipt(value)
+        client.CreateContext.on_package(self.ctx, "ReceivedItems", {"index": 1})
+        self.assertEqual([6, 13], list(self.ctx._object_popup_queue))
+        client.CreateContext.on_package(self.ctx, "ReceivedItems", {"index": 1})
+        self.assertEqual([6, 13], list(self.ctx._object_popup_queue))
+        self.ready()
+        self.assertEqual((6, 1), self.ctx._popup_inflight)
+        self.assertEqual([13], list(self.ctx._object_popup_queue))
         client.collect_new_object_popup_items(self.ctx)
-        self.assertEqual([6, 13, 6], list(self.ctx._object_popup_queue))
+        self.assertEqual([13], list(self.ctx._object_popup_queue))
 
     def test_challenge_dispatch_does_not_resolve_or_write_object_records(self):
         self.ready()

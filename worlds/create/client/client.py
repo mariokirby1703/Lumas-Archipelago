@@ -205,6 +205,15 @@ class CreateContext(CommonContext):
         await self.send_connect(game=self.game)
 
     def on_package(self, cmd: str, args: dict[str, Any]) -> None:
+        if cmd == "ReceivedItems":
+            # CommonClient has already updated items_received. Keep its normal
+            # AP logging and enqueue newly received Objects on the same path as
+            # /createpopup, including receipts arriving while the UI is busy.
+            if not self._popup_accept_new_items and args.get("index") == 0:
+                self._popup_item_cursor = len(self.items_received)
+                self._popup_accept_new_items = True
+            else:
+                collect_new_object_popup_items(self)
         if cmd == "Connected":
             self.slot_data = args["slot_data"]
             self.locations_checked = set()

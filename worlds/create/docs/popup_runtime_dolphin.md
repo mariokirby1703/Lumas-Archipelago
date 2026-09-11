@@ -1,96 +1,84 @@
-# Experimental Object popup: vtable bootstrap (runtime protocol 3)
+# Object popup test: FePuzzleResultsPO (runtime protocol 4)
 
-## Install and test
+## Install
 
-1. Close the Create Client and stop CREATE completely in Dolphin.
-2. Disable the old **CREATE AP Popup Instruction Cache** Gecko code. This build
-   does not require a Gecko helper or an Interpreter CPU setting.
-3. Install the accompanying `create.apworld`, then restart the AP Launcher so
-   the Create Client loads the new implementation.
-4. Boot CREATE fresh, without loading an emulator save state. Load the existing
-   in-game Save Slot 3 and connect the Create Client from the AP Launcher.
-5. Look for **vtable bootstrap installed (no Gecko)**, then **runtime hook
-   heartbeat confirmed**. `/createpopupstatus` should report mailbox version 3,
-   `enabled=1`, and `hooks_applied=1`.
-6. Test `/createpopup 13` and `/createpopup 6` in the Hub. Confirm that only the
-   Object Unlocked view appears, with the matching vanilla image/name, and that
-   dismissal restores input.
-7. Repeat inside a challenge, including a newly received AP Object. Check that
-   gameplay resumes normally and that queued notifications remain in order.
-8. Check an ordinary vanilla Create Chain completion as well.
+1. Close the Create Client and stop CREATE completely.
+2. Keep the old CREATE AP Popup Instruction Cache Gecko helper disabled.
+3. Install this build's create.apworld and restart the AP Launcher.
+4. Boot CREATE fresh without a Dolphin save state, load in-game Save Slot 3,
+   and connect the Create Client through the AP Launcher.
+5. Check /createpopupstatus: version=4, enabled=1, hooks_applied=1 and a changing
+   heartbeat. No new AP seed or APWorld release version is required.
 
-No new seed or APWorld release-version bump is needed. Old code-cave revisions
-are rejected; a fresh game boot is required for migration. A client reconnect
-can reuse the exact same runtime image without overwriting an active UI owner.
-`/createpopupcache` now explains removal of the obsolete helper instead of
-printing code. `/createpopupretry` retains the queue and probes for 120 seconds;
-it is also available inside challenges when the save-slot state is settled.
+## Test both manual and real AP receipts
 
-## Runtime architecture
+- /createpopup 13 should display Automatic Rocket; /createpopup 6 Jumbo Ramp.
+- Receive an actual AP Object item: the normal AP receive log remains enabled
+  and the Object is automatically queued for this same popup implementation.
+- Receive several items while a popup or another modal is open. Dismiss each;
+  check receipt order, matching images/names, and normal controller input.
+- Repeat within a challenge. Python must not resolve/write Object records just
+  to show the notification. Native registry readiness and modal checks defer it.
+- Initial receipt history is not replayed. New ReceivedItems packets are handled
+  directly and the polling cursor prevents duplicate enqueueing.
+- Verify an ordinary vanilla challenge completion and Create Chain as well.
 
-Python validates the singleton at `0x806798C0` against the game's vtable
-`0x805E2C4C`, the original instructions, the old hook sites, and the reserved
-code cave. It writes the immutable runtime image, then redirects only the
-**data pointer** at `0x805E2C70` from `0x8000D880` to `0x80006048`.
+The intended result is only the Object Unlocked view. Its visual startup,
+dismissal/input restoration and real Dolphin vtable bootstrap still require
+live confirmation; the tests do not render the UI. If an empty results/Spark
+state appears first, capture that behavior and /createpopupstatus. This build
+uses the confirmed Results movie rather than the Chain or PuzzleUnlock movie.
 
-The wrapper receives the original `SimUpdate(this, const cTime&)` arguments and
-calls `0x8000D880` once, before servicing the popup. Guest PPC installs these two
-instruction hooks and executes `dcbst`, `sync`, `icbi`, and `isync` itself:
+## Verified construction and ownership
 
-- `0x80091D0C`: type 4 keeps its native object-array builder but uses the existing
-  `"unlock"` string at `0x806696F8` for an AP owner. Vanilla uses `"award"` at
-  `0x806696F0`. The normal factory Display and destructor paths remain intact.
-- `0x800921E0`: the exact AP target ID in r19 returns true without writing an
-  unlock threshold. Other IDs return false **within that AP-owned popup**,
-  preventing an earlier vanilla candidate from consuming the one-object quota.
-  Outside that owner, the original `0x80025560` predicate is called unchanged.
+The vtable bootstrap at 0x805E2C70 still enters the code cave at 0x80006048,
+calls the original SimUpdate at 0x8000D880, and lets guest PPC manage its own
+instruction writes and cache invalidation. The previous award-mode hook and
+FeSimpleMessage availability hook are removed; old revisions require a fresh
+boot instead of being overwritten in place.
 
-The owner context is checked as well as ACTIVE status. The old heartbeat-call,
-scan-start, scan-stop, scan-finish, and direct ShowUnlock hooks are gone. The
-primary message is the localized `$GUI_PR_UNLOCK_GAME_OBJECT`, not a blank.
-No global unlock function, UI asset, Spark counter, or reward state machine is
-modified. Type 4 still builds the image/name array using native game code.
+MakeFePuzzleResults at 0x80031DB0 receives a callback pair and a persistent,
+zero-initialized result context at 0x80006450. Only context+0x10 is 1. A null
+context+0 selects FePuzzleResultsPO.gfx and skips the challenge-specific result
+setup at 0x80031F28. Its factory calls FePuzzleResults::UpdateUnlocks with the
+sum of context+0x10/+0x14, giving exactly one unlock slot before returning.
+The factory also performs native UI/VFX setup; no claim is made that skipping
+the challenge-specific block alone proves a particular rendered first frame.
 
-A pending request waits while another modal UI or owner exists, the save guard
-is invalid, the native object count at `0x80904C84` does not cover the target, or
-`0x80490BF0` returns no record/descriptor. The descriptor must also be eligible
-for the native object builder. These checks run on the game thread. Waiting
-leaves the mailbox request intact for a later frame.
+Only the code hook at 0x800325E4 remains. In this builder the result object is
+r29 and the scanned global Object ID is r17. ACTIVE status and the AP owner
+callback context must match. The exact target returns true; other Objects in
+that AP scan return false. A vanilla result object calls the original Spark
+threshold predicate at 0x80025560 unchanged. Native preflight first requires
+an available registry, target record, descriptor and unlockable descriptor flag.
+No temporary threshold writes or Spark awards are used for AP display.
 
-Popup dispatch no longer depends on Python's MEM2 object-record traversal and
-never writes a threshold to display an item. Ordinary Object availability
-synchronization retains its existing challenge restrictions. New receipts are
-queued independently of that synchronization; existing receipt history is
-suppressed when the settled popup session establishes its baseline.
+After the factory returns, the AP owner stores the result pointer. The movie
+slot at result+0x14 must exist and be loaded before UI registration with
+0x804EA4D0(manager=0x80947A30, index=(slot-0x80947F50)/24, 0, 1), matching the
+normal caller at 0x800456F4..0x80045758.
 
-## Removal and diagnostics
+The result callback invokes native FeMessageFlow::End through 0x80074D90 with
+our separate owner. This releases the object/UI slot, clears the pointer,
+invokes the mailbox acknowledgement, then clears owner.active. The result
+class restores modal state through its own OnOutroEnd at 0x800336E0; AP does
+not write the modal layer. Callback data and owner memory survive uninstall.
 
-Python requests removal through the mailbox and cancels pending dispatch. The
-next guest update restores the known original instructions, invalidates their
-cache lines, and **only then** restores the vtable pointer. A paused game
-completes this sequence on resume. The code cave and active owner are retained
-for normal UI dismissal. Unknown third-party instructions are never overwritten;
-a guest conflict disables dispatch and is reported as error 5.
+Python requests removal via enabled=0. Guest code restores the original
+instruction, invalidates its cache line, then restores the vtable pointer.
+A paused game completes removal on resume. Foreign instructions are preserved
+and disable dispatch with error 5. Readback alone is insufficient for readiness:
+heartbeat, guest acknowledgement and hook words must agree.
 
-A RAM readback alone does not mark the runtime ready. The client requires a
-changing heartbeat, the guest's `hooks_applied` acknowledgement, and matching
-hook words. If the heartbeat stays zero, provide `/createpopupstatus` after a
-fresh boot with the old Gecko helper disabled. Do not enable the old helper to
-mask a failed vtable-bootstrap test.
+## Scope and evidence
 
-## Verification limits
+The supported local DOL/symbols and extracted UI actions confirm the factory,
+null-context branch, builder, hook ABI, registration and close paths. The new
+external dump interpretation is consistent with those local files; the remote
+/mnt/data RAW dumps themselves are not present in this workspace.
 
-The local supported DOL and its symbol table confirm the vtable entry,
-`cCreateGame::SimUpdate`, both hook instructions, the mode strings, and native
-lookup ABI. Inspection of `CreativeChainMsg.gfx` confirms its distinct award
-and unlock Display modes and object-array builder. Automated tests execute the
-generated patch's integer/control/cache instructions with explicit native-call
-test doubles, covering preflight, owner isolation, guest installation/removal,
-register/return preservation, and challenge queue behavior.
-
-Two aspects still require a live Dolphin test: whether the virtual call observes
-the changed data pointer without cache assistance, and whether type 4's unlock
-Display produces the desired visual sequence and restores input in each game
-context. These are not claimed as already proven by the automated tests.
-No game executable, extracted UI asset, or reverse-engineering dependency is
-included in the APWorld package.
+Tests decode the emitted PPC integer/control/cache instructions with native
+call doubles, covering factory arguments, UI-slot registration, register/return
+preservation, owner isolation, target selection, preflight, guest removal,
+request ordering and real ReceivedItems event integration. No game binaries,
+extracted UI assets, or reverse-engineering dependencies are packaged.
