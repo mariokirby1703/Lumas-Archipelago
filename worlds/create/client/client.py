@@ -27,6 +27,7 @@ from ..world_constants import GAME_ID_ADDRESS, GAME_NAME, ITEM_VICTORY, SPARK_IT
 from ..world_constants import SUPPORTED_GAME_ID_LABEL, SUPPORTED_GAME_IDS
 from ..world_constants import HUB_WORLD_KEY
 from .popup_runtime import PopupRuntime, IDLE, ACTIVE, ERROR, MODAL_LAYER
+from .popup_runtime import CACHE_HELPER_NAME, cache_flush_gecko_code
 
 ModuleUpdate.update()
 
@@ -94,6 +95,12 @@ class CreateCommandProcessor(ClientCommandProcessor):
         logger.info("Popup diagnostic retry requested (120 seconds). Queue retained. "
                     "Keep Dolphin running in the Hub/world; use /createpopupstatus for diagnostics. "
                     "This command does not clear Dolphin's instruction cache.")
+
+    def _cmd_createpopupcache(self) -> None:
+        """Print the Dolphin Gecko helper needed to invalidate popup instruction caches."""
+        logger.info("In Dolphin, enable cheats and add/enable this code under CREATE > Properties > "
+                    "Gecko Codes. Restart the game after enabling it. Name: %s\n%s",
+                    CACHE_HELPER_NAME, cache_flush_gecko_code())
 
     def _cmd_createpopupstatus(self) -> None:
         """Display popup patch, mailbox, modal layer and queue diagnostics."""

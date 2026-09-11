@@ -18,6 +18,7 @@ IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 HEARTBEAT_TIMEOUT_SECONDS = 5.0
 ORIGINALS = {0x8000DB5C: 0x4808A365, 0x80092184: 0x3A600000, 0x8009240C: 0x3A730001}
+CACHE_HELPER_NAME = "CREATE AP Popup Instruction Cache"
 
 
 def ppc_branch(source: int, target: int, *, link: bool = False) -> int:
@@ -42,6 +43,39 @@ class PopupPatchLayout:
     object_scan_step_hook: int = 0x80006280
     mailbox: int = 0x80006400
     end: int = 0x80006448
+
+
+def cache_flush_gecko_code() -> str:
+    """C0 helper executed by Dolphin's own Gecko handler once per frame.
+
+    External DolphinMemoryEngine writes do not invalidate the emulated icache,
+    even in Interpreter mode (MMU::TryReadInstruction). Guest icbi does, and
+    also invalidates the corresponding JIT blocks. No game RAM is written here
+    except our temporary stack frame. Invalidate on every frame so installs,
+    retries and restores are all observed without a second mailbox protocol.
+
+    Gecko's C0 dispatch uses r4/r15 for its continuation, so preserve all caller
+    state: only r12 is used and saved; LR, CTR, CR and other GPRs are untouched.
+    Source/ABI: dolphin-emu/dolphin docs/codehandler.s, _execute.
+    """
+    layout = PopupPatchLayout()
+    code = [0x9421FFF0, 0x91810008, 0x7C0004AC]  # stwu sp,-16; stw r12,8(sp); sync
+    first = layout.code_base & ~31
+    code.extend((0x3D800000 | (first >> 16), 0x618C0000 | (first & 0xFFFF)))
+    for address in range(first, layout.mailbox, 32):
+        code.append(0x7C0067AC)  # icbi 0,r12
+        if address + 32 < layout.mailbox:
+            code.append(0x398C0020)  # addi r12,r12,32
+    for hook in ORIGINALS:
+        address = hook & ~31
+        code.extend((0x3D800000 | (address >> 16), 0x618C0000 | (address & 0xFFFF), 0x7C0067AC))
+    code.extend((0x7C0004AC, 0x4C00012C, 0x81810008, 0x38210010))  # sync; isync; restore
+    if len(code) % 2:
+        code.append(0x60000000)  # align final blr/padding pair
+    code.extend((0x4E800020, 0))
+    lines = [f"C0000000 {len(code) // 2:08X}"]
+    lines.extend(f"{code[i]:08X} {code[i + 1]:08X}" for i in range(0, len(code), 2))
+    return "\n".join(lines) + "\n"
 
 
 class _Routine:
@@ -249,8 +283,9 @@ class PopupRuntime:
                                    self.diagnostics(read_memory), self.snapshot(read_memory))
                     raise RuntimeError(
                         "runtime hook heartbeat missing (error 4); RAM readback alone does not prove "
-                        "instruction execution. Resume Dolphin if paused. Use /createpopupretry for "
-                        "a 120-second diagnostic probe; check the CPU engine/instruction cache.")
+                        "instruction execution. Resume Dolphin if paused. Enable the CREATE AP "
+                        "Popup Instruction Cache Gecko helper in Dolphin (code: /createpopupcache), "
+                        "then use /createpopupretry. Interpreter mode also uses an instruction cache.")
             self._heartbeat = beat
             return self.ready
         except Exception as error:

@@ -712,6 +712,32 @@ class TestCreatePopupRuntime(unittest.TestCase):
             with self.subTest(source=source, target=target), self.assertRaises(ValueError):
                 popup.ppc_branch(source, target)
 
+    def test_cache_helper_gecko_framing_and_preserved_caller_state(self):
+        lines = popup.cache_flush_gecko_code().splitlines()
+        self.assertEqual("C0000000", lines[0].split()[0])
+        self.assertEqual(len(lines) - 1, int(lines[0].split()[1], 16))
+        words = [int(word, 16) for line in lines[1:] for word in line.split()]
+        self.assertEqual([0x9421FFF0, 0x91810008, 0x7C0004AC], words[:3])
+        self.assertEqual([0x7C0004AC, 0x4C00012C, 0x81810008, 0x38210010,
+                          0x60000000, 0x4E800020, 0], words[-7:])
+        # r12 is the only scratch register; no branches/calls/CR/CTR/LR writes.
+        # The only stores in the generated helper allocate/save its own frame.
+        stores = [value for value in words if value >> 26 in (36, 37, 38, 39, 44, 45, 47)]
+        self.assertEqual([0x9421FFF0, 0x91810008], stores)
+
+    def test_cache_helper_covers_cave_and_all_hook_cache_lines(self):
+        words = [int(word, 16) for line in popup.cache_flush_gecko_code().splitlines()[1:]
+                 for word in line.split()]
+        expected_flushes = (self.runtime.layout.mailbox - (self.runtime.layout.code_base & ~31)) // 32
+        self.assertEqual(expected_flushes + 3, words.count(0x7C0067AC))
+        self.assertEqual(expected_flushes - 1, words.count(0x398C0020))
+        self.assertEqual([0x3D808000, 0x618C6040], words[3:5])
+        raw = b"".join(map(popup.word, words))
+        for high, low in ((0x8000, 0xDB40), (0x8009, 0x2180), (0x8009, 0x2400)):
+            self.assertIn(popup.word(0x3D800000 | high) + popup.word(0x618C0000 | low)
+                          + popup.word(0x7C0067AC), raw)
+        self.assertNotIn(popup.word(popup.MAGIC), raw)  # no mailbox initialization
+
     def test_installs_code_before_scan_hooks_and_dispatcher_last(self):
         self.install()
         self.assertEqual(self.runtime.layout.code_base, self.writes[0][0])
@@ -985,6 +1011,13 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.assertEqual([13], list(self.ctx._object_popup_queue))
         self.ready()
         self.assertEqual((13, 1), self.ctx._popup_inflight)
+
+    def test_cache_command_prints_helper_without_touching_runtime(self):
+        with patch.object(client.logger, "info") as log:
+            client.CreateCommandProcessor._cmd_createpopupcache(SimpleNamespace(ctx=self.ctx))
+        self.assertEqual(popup.CACHE_HELPER_NAME, log.call_args.args[1])
+        self.assertEqual(popup.cache_flush_gecko_code(), log.call_args.args[2])
+        self.assertFalse(self.ctx._popup_runtime.installed)
 
     def test_popup_session_reset_clears_receipts_queue_and_cancels_pending(self):
         self.ready()
