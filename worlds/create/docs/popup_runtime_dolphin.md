@@ -23,6 +23,17 @@
   directly and the polling cursor prevents duplicate enqueueing.
 - Verify an ordinary vanilla challenge completion and Create Chain as well.
 
+Automatic NetworkItem popups use a separate queue from manual `/createpopup`
+requests. A network popup waits while a challenge is active, for at least two
+seconds after a newly detected location check, while another modal is active,
+and until the current world context has settled. The item remains queued.
+Manual test requests remain immediate so they can still probe the runtime.
+
+The client logs the world/challenge context, modal value, selected Create Chain
+state bytes and elapsed time since the last location check and Object receipt
+when an automatic popup is delayed and when it starts. These values are
+diagnostic; no gameplay or input flag is written by the popup gate.
+
 The intended result is only the Object Unlocked view. Its visual startup,
 dismissal/input restoration and real Dolphin vtable bootstrap still require
 live confirmation; the tests do not render the UI. If an empty results/Spark

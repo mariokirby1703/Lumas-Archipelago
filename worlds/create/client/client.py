@@ -49,6 +49,7 @@ OBJECT_RESOLVER_RETRY_SECONDS = 1.0
 OBJECT_MEM2_REHOOK_LIMIT = 3
 OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS = 5.0
 HUB_EVENT_GRACE_SECONDS = 30.0
+AUTO_POPUP_EVENT_GRACE_SECONDS = 2.0
 OBJECT_LIST_OFFSET = 0x04E4
 CHALLENGE_OBJECT_ENTRY_STRIDE = 0x08
 
@@ -102,7 +103,8 @@ class CreateCommandProcessor(ClientCommandProcessor):
         """Display popup patch, mailbox, modal layer and queue diagnostics."""
         runtime = self.ctx._popup_runtime
         logger.info("Popup installed=%s ready=%s failure=%s queue=%d", runtime.installed,
-                    runtime.ready, runtime.failure, len(self.ctx._object_popup_queue))
+                    runtime.ready, runtime.failure,
+                    len(self.ctx._object_popup_queue) + len(self.ctx._automatic_object_popup_queue))
         if self.ctx.dolphin_status == CONNECTION_CONNECTED_STATUS:
             try:
                 logger.info("Popup hook diagnostics: %s", runtime.diagnostics(read_memory))
@@ -146,9 +148,14 @@ class CreateContext(CommonContext):
         self._popup_item_cursor = 0
         self._popup_accept_new_items = False
         self._object_popup_queue: deque[int] = deque()
+        self._automatic_object_popup_queue: deque[tuple[int, float]] = deque()
         self._popup_inflight: tuple[int, int] | None = None
+        self._popup_inflight_automatic: tuple[int, float] | None = None
         self._popup_last_status: int | None = None
         self._popup_delay_logged = False
+        self._auto_popup_blocked_until = 0.0
+        self._last_location_check_at = 0.0
+        self._last_object_received_at = 0.0
         self._slot_guard_observed_this_session = False
         self._waiting_for_slot_logged = False
         self._slot_connected_logged = False
@@ -271,9 +278,14 @@ class CreateContext(CommonContext):
         self._popup_item_cursor = 0
         self._popup_accept_new_items = False
         self._object_popup_queue.clear()
+        self._automatic_object_popup_queue.clear()
         self._popup_inflight = None
+        self._popup_inflight_automatic = None
         self._popup_last_status = None
         self._popup_delay_logged = False
+        self._auto_popup_blocked_until = 0.0
+        self._last_location_check_at = 0.0
+        self._last_object_received_at = 0.0
 
     def _reset_location_context(self) -> None:
         self._location_context = None
@@ -824,6 +836,11 @@ async def check_locations(ctx: CreateContext) -> None:
     except Exception:
         logger.debug("Failed while checking Create locations.", exc_info=True)
     if newly_checked and ctx.slot is not None:
+        ctx._last_location_check_at = time.monotonic()
+        ctx._auto_popup_blocked_until = max(
+            ctx._auto_popup_blocked_until,
+            ctx._last_location_check_at + AUTO_POPUP_EVENT_GRACE_SECONDS,
+        )
         await ctx.send_msgs([{"cmd": "LocationChecks", "locations": list(newly_checked)}])
 
 
@@ -935,8 +952,34 @@ def collect_new_object_popup_items(ctx: CreateContext) -> None:
             logger.warning("Ignoring invalid popup Object data for %s.", name)
             continue
         if 0 <= value < OBJECT_RECORD_COUNT:
-            ctx._object_popup_queue.append(value)
-            logger.info("Queued Object popup: %s (ID %d).", name, value)
+            received_at = time.monotonic()
+            ctx._last_object_received_at = received_at
+            ctx._automatic_object_popup_queue.append((value, received_at))
+            # ReceivedItems runs on the server loop; do not read Dolphin memory
+            # concurrently here. The Dolphin sync loop samples RAM when this
+            # entry is delayed or started and includes elapsed receipt time.
+            logger.info("Queued NetworkItem Object popup: %s (ID %d).", name, value)
+
+
+def popup_event_diagnostics(ctx: CreateContext, now: float) -> dict[str, Any]:
+    try:
+        return {
+            "world_id": current_world_id(ctx),
+            "challenge_raw": current_challenge_raw(ctx),
+            "chain_8069A3B8_u32": read_u32_be(0x8069A3B8),
+            "chain_8069A3BC_u32": read_u32_be(0x8069A3BC),
+            "chain_8069A3BE_u8": read_u8(0x8069A3BE),
+            "chain_8069A3BF_u8": read_u8(0x8069A3BF),
+            "chain_completion_8068ED48_u8": read_u8(0x8068ED48),
+            "generic_completion_8068DC94_u8": read_u8(0x8068DC94),
+            "modal_80948040_u32": read_u32_be(MODAL_LAYER),
+            "ms_since_last_location_check": round((now - ctx._last_location_check_at) * 1000)
+            if ctx._last_location_check_at else None,
+            "ms_since_object_received": round((now - ctx._last_object_received_at) * 1000)
+            if ctx._last_object_received_at else None,
+        }
+    except Exception as error:
+        return {"unavailable": str(error)}
 
 
 def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> None:
@@ -958,26 +1001,46 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
         if state["ack_seq"] == sequence and status == IDLE:
             logger.info("AP Object popup closed; lifecycle=%s", runtime.lifecycle(read_memory))
             ctx._popup_inflight = None
+            ctx._popup_inflight_automatic = None
         elif status == IDLE:
             # A pending request was cancelled during a transition.
-            ctx._object_popup_queue.appendleft(value)
+            if ctx._popup_inflight_automatic:
+                ctx._automatic_object_popup_queue.appendleft(ctx._popup_inflight_automatic)
+            else:
+                ctx._object_popup_queue.appendleft(value)
             ctx._popup_inflight = None
+            ctx._popup_inflight_automatic = None
         else:
             return
-    if status != IDLE or not ctx._object_popup_queue:
+    if status != IDLE or (not ctx._object_popup_queue and not ctx._automatic_object_popup_queue):
         return
     if read_u32_be(MODAL_LAYER):
         if not ctx._popup_delay_logged:
             logger.info("Create AP Object popup delayed: another modal UI is active.")
             ctx._popup_delay_logged = True
         return
+    automatic = not ctx._object_popup_queue
+    now = time.monotonic()
+    if automatic and (challenge_active or now < ctx._auto_popup_blocked_until
+                      or now < ctx._location_context_ready_at):
+        if not ctx._popup_delay_logged:
+            logger.info("Create AP Object popup delayed until the current game event is settled; diagnostics=%s",
+                        popup_event_diagnostics(ctx, now))
+            ctx._popup_delay_logged = True
+        return
     ctx._popup_delay_logged = False
-    value = ctx._object_popup_queue[0]
+    value = (ctx._automatic_object_popup_queue[0][0] if automatic
+             else ctx._object_popup_queue[0])
     # Display is independent of availability synchronization. In challenges
     # only the game-thread lookup touches the native object registry; Python
     # never traverses MEM2 or changes thresholds just to show a notification.
     if runtime.request_object(value, read_memory, write_memory):
-        ctx._object_popup_queue.popleft()
+        if automatic:
+            ctx._popup_inflight_automatic = ctx._automatic_object_popup_queue.popleft()
+            logger.info("Starting queued NetworkItem Object popup; diagnostics=%s",
+                        popup_event_diagnostics(ctx, now))
+        else:
+            ctx._object_popup_queue.popleft()
         ctx._popup_inflight = (value, runtime.snapshot(read_memory)["request_seq"])
 
 
@@ -1288,6 +1351,7 @@ async def dolphin_sync_task(ctx: CreateContext) -> None:
                     sync_total_sparks(ctx)
                     local_challenge_runtime_active = filter_current_challenge_palette(ctx, challenge_active)
                     sync_object_availability(ctx, challenge_active)
+                    await check_locations(ctx)
                     sync_object_popups(ctx, challenge_active)
                     if ctx._object_mem2_rehook_requested:
                         ctx._object_mem2_rehook_requested = False
@@ -1304,7 +1368,6 @@ async def dolphin_sync_task(ctx: CreateContext) -> None:
                         continue
                     ensure_contraption_patch(ctx, local_challenge_runtime_active)
                     object_freeze_active = enforce_selected_object(ctx)
-                    await check_locations(ctx)
                     process_victory(ctx)
                 sleep_time = OBJECT_FREEZE_SLEEP_SECONDS if object_freeze_active else DEFAULT_SYNC_SLEEP_SECONDS
                 continue

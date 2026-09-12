@@ -1331,9 +1331,15 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.ctx._popup_accept_new_items = False
         self.ctx._popup_item_cursor = 0
         self.ctx._object_popup_queue = deque()
+        self.ctx._automatic_object_popup_queue = deque()
         self.ctx._popup_inflight = None
+        self.ctx._popup_inflight_automatic = None
         self.ctx._popup_last_status = None
         self.ctx._popup_delay_logged = False
+        self.ctx._auto_popup_blocked_until = 0.0
+        self.ctx._last_location_check_at = 0.0
+        self.ctx._last_object_received_at = 0.0
+        self.ctx._location_context_ready_at = 0.0
         self.ctx.ram_is_settled = lambda: True
         self.ctx.slot_ram_is_settled = lambda: True
         self.names = {value: name for name, data in self.ctx.slot_data["objects"].items()
@@ -1361,7 +1367,7 @@ class TestCreatePopupQueue(unittest.TestCase):
         for value in (6, 99999, 13, 6):
             self.receipt(value)
         client.collect_new_object_popup_items(self.ctx)
-        self.assertEqual([6, 13, 6], list(self.ctx._object_popup_queue))
+        self.assertEqual([6, 13, 6], [value for value, _ in self.ctx._automatic_object_popup_queue])
 
     def test_real_receiveditems_queues_objects_once_and_preserves_history_baseline(self):
         self.receipt(13)
@@ -1370,14 +1376,14 @@ class TestCreatePopupQueue(unittest.TestCase):
         for value in (6, 99999, 13):
             self.receipt(value)
         client.CreateContext.on_package(self.ctx, "ReceivedItems", {"index": 1})
-        self.assertEqual([6, 13], list(self.ctx._object_popup_queue))
+        self.assertEqual([6, 13], [value for value, _ in self.ctx._automatic_object_popup_queue])
         client.CreateContext.on_package(self.ctx, "ReceivedItems", {"index": 1})
-        self.assertEqual([6, 13], list(self.ctx._object_popup_queue))
+        self.assertEqual([6, 13], [value for value, _ in self.ctx._automatic_object_popup_queue])
         self.ready()
         self.assertEqual((6, 1), self.ctx._popup_inflight)
-        self.assertEqual([13], list(self.ctx._object_popup_queue))
+        self.assertEqual([13], [value for value, _ in self.ctx._automatic_object_popup_queue])
         client.collect_new_object_popup_items(self.ctx)
-        self.assertEqual([13], list(self.ctx._object_popup_queue))
+        self.assertEqual([13], [value for value, _ in self.ctx._automatic_object_popup_queue])
 
     def test_challenge_dispatch_does_not_resolve_or_write_object_records(self):
         self.ready()
@@ -1390,8 +1396,25 @@ class TestCreatePopupQueue(unittest.TestCase):
         with patch.object(client, "object_records", side_effect=AssertionError("MEM2 traversal")), \
              patch.object(client, "apply_owned_object_record", side_effect=AssertionError("threshold write")):
             client.sync_object_popups(self.ctx, True)
-        self.assertEqual((13, 1), self.ctx._popup_inflight)
+        self.assertIsNone(self.ctx._popup_inflight)
+        self.assertEqual([13], [value for value, _ in self.ctx._automatic_object_popup_queue])
         self.assertEqual(before, self.fake.read_bytes(record, 0x34))
+
+    def test_automatic_receipt_waits_for_event_grace_and_context_settle(self):
+        self.ready()
+        self.receipt(13)
+        with patch.object(client.time, "monotonic", return_value=100.0):
+            client.collect_new_object_popup_items(self.ctx)
+        self.ctx._auto_popup_blocked_until = 102.0
+        self.ctx._location_context_ready_at = 103.0
+        with patch.object(client.time, "monotonic", return_value=102.5):
+            client.service_object_popup_queue(self.ctx, False)
+        self.assertIsNone(self.ctx._popup_inflight)
+        with patch.object(client.time, "monotonic", return_value=103.0), \
+             patch.object(client.logger, "info"):
+            client.service_object_popup_queue(self.ctx, False)
+        self.assertEqual((13, 1), self.ctx._popup_inflight)
+        self.assertEqual((13, 100.0), self.ctx._popup_inflight_automatic)
 
     def test_queue_waits_for_close_and_modal_ui(self):
         self.ready()
@@ -1439,6 +1462,7 @@ class TestCreatePopupQueue(unittest.TestCase):
         for value in ("", "x", "-1", "262", "13 6"):
             client.CreateCommandProcessor._cmd_createpopup(processor, value)
         self.assertEqual([], list(self.ctx._object_popup_queue))
+        self.assertEqual([], list(self.ctx._automatic_object_popup_queue))
         client.CreateCommandProcessor._cmd_createpopup(processor, "13")
         self.assertEqual([13], list(self.ctx._object_popup_queue))
         self.ready()
