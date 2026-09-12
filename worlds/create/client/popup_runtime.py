@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 13
+VERSION = 6
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -25,7 +25,7 @@ HEARTBEAT_TIMEOUT_SECONDS = 5.0
 CODE_ORIGINALS = {0x800325E4: 0x4BFF2F7D}
 ORIGINALS = {VTABLE_SLOT: ORIGINAL_UPDATE, **CODE_ORIGINALS}
 # Refuse old runtime revisions rather than mixing instruction-cache state.
-LEGACY_ORIGINALS = {0x80092184: 0x3A600000, 0x8009240C: 0x3A730001,
+LEGACY_ORIGINALS = {0x8000DB5C: 0x4808A365, 0x80092184: 0x3A600000, 0x8009240C: 0x3A730001,
                     0x80092424: 0x7C1EE800,
                     0x80091DBC: 0x481FC175, 0x80091D0C: 0x3BAD8AD0,
                     0x800921E0: 0x4BF93381}
@@ -48,20 +48,13 @@ def word(value: int) -> bytes:
 class PopupPatchLayout:
     code_base: int = 0x80006048
     dispatcher: int = 0x80006048
-    construct_results: int = 0x80006200
-    show_unlock: int = 0x80006354
-    maintain_hooks: int = 0x80006384
+    construct_results: int = 0x80006210
+    maintain_hooks: int = 0x80006380
     object_available_hook: int = 0x80006440
     closed_callback: int = 0x800061D0
     mailbox: int = 0x80006480
     result_context: int = 0x800064D0
     end: int = 0x80006514
-    aux_base: int = 0x8062C100
-    aux_setup: int = 0x8062C100
-    aux_update: int = 0x8062C1A0
-    aux_data: int = 0x8062C300
-    aux_diagnostics: int = 0x8062C410
-    aux_end: int = 0x8062C450
 
 
 def hook_words(layout):
@@ -121,11 +114,9 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.branch("return", 0x40820000)
     d.emit(0x800C0048, 0x28000001)  # guest hooks installed/cache synchronized
     d.branch("return", 0x40820000)
-    d.emit(0x800C0008, 0x28000002)
-    d.branch("pending_check", 0x40820000)
-    d.branch(layout.show_unlock, link=True)
-    d.label("pending_check")
-    d.emit(0x28000001)
+    d.emit(0x800C0044, 0x28000001)  # Python still enables dispatch
+    d.branch("return", 0x40820000)
+    d.emit(0x800C0008, 0x28000001)
     d.branch("return", 0x40820000)
     d.emit(0x800C000C, 0x28000106)
     d.branch("invalid", 0x40800000)
@@ -153,6 +144,8 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.emit(0x7C0B0378, 0x800B0340, 0x28000000)  # descriptor unlockable flag
     d.branch("return", 0x41820000)
     d.emit(*load_mailbox, 0x800C0008, 0x28000001)  # cancellation during preflight
+    d.branch("return", 0x40820000)
+    d.emit(0x800C0044, 0x28000001)
     d.branch("return", 0x40820000)
     d.emit(0x906C0054)  # diagnostic: registry record used by preflight
     d.emit(0x38000000, 0x900C0018, 0x38000002, 0x900C0008)
@@ -204,7 +197,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     m.emit(0x800B0000, 0x7C002800)
     m.branch("return", 0x40820000)
     load(m, 5, ORIGINAL_UPDATE)
-    m.emit(0x90AB0000)
+    m.emit(0x90AB0000, 0x7C0004AC)
     m.label("return")
     m.emit(0x4E800020)
 
@@ -232,30 +225,31 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     f.branch("return", 0x41820000)
     f.emit(0x80830014, 0x28040000)
     f.branch("return", 0x41820000)
+    f.emit(0x80040000, 0x28000000)
+    f.branch("return", 0x41820000)
     # Native UI registration: index = (movie_slot - manager.slots) / 24.
     load(f, 11, 0x80947F50)
     f.emit(0x7C8B2050, 0x38000018, 0x7C840396)  # subf r4,r11,r4; divwu r4,r4,r0
     load(f, 3, 0x80947A30)
     f.emit(0x38A00000, 0x38C00001)
     f.branch(0x804EA4D0, link=True)
-    # Unlock has already initialized mItemData/m_numUnlocks inside the native
-    # factory. Keep the movie alive while AP installs its completion handler.
-    f.emit(*load_mailbox, 0x806C0020, 0x80630014, 0x80630004, 0x28030000)
-    f.branch("return", 0x41820000)
-    f.emit(
-           0x906C0040, 0x90610008)
+    # Stop the PO root timeline at its initial frame before Congratulations
+    # animates in, then run the actual PO object-only method. Unlock has already
+    # initialized mItemData/m_numUnlocks inside the native factory.
+    f.emit(*load_mailbox, 0x808C0020, 0x80840014, 0x38610008)
+    f.branch(0x8000ED20, link=True)  # acquire movie ref into stack +8
+    f.emit(0x80010008, *load_mailbox, 0x900C0040)
     # PO lacks Event_UnlockFinished, which the shared UnlockContainer calls.
     # Copy the existing PlayOutro function onto this movie only. The native
     # Event_OnOutroEnd callback then owns all modal/owner cleanup.
     f.emit(0x38000000, 0x90010014,  # GFxValue type = Undefined; payload is inactive
-           0x38810010)
-    f.emit(0x80610008)
+           0x80610008, 0x38810010)
     load(f, 5, 0x805E29DC)  # _level0.PlayOutro
     f.branch(0x8027E73C, link=True)  # GetVariable
     f.emit(0x28030000)
     f.branch("binding_done", 0x41820000)
     f.emit(0x80610008)
-    f.emit(*load_mailbox, 0x388C0068)  # Event_UnlockFinished, relative to root
+    load(f, 4, 0x800061F0)  # _root.Event_UnlockFinished
     f.emit(0x38A10010, 0x38C00000)
     f.branch(0x8027E864, link=True)  # SetVariable, normal (not sticky)
     f.label("binding_done")
@@ -266,35 +260,30 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     f.label("released_value")
     f.emit(*load_mailbox, 0x800C004C, 0x28000001)
     f.branch("release_movie", 0x40820000)  # keep vanilla timeline on failure
-    # Hide only the Results background. The auxiliary state machine controls
-    # the separately-rooted UnlockContainer and its visible image load.
-    f.emit(0x38000002, 0x90010014, 0x38000000, 0x90010018,
-           0x80610008, *load_mailbox, 0x388C007D, 0x38A10010, 0x38C00000)
-    f.branch(0x8027E864, link=True)  # Set mScreen._visible = false
-    f.emit(0x28030000)
-    f.branch("return", 0x41820000)
-    f.branch(layout.aux_setup, link=True)
+    for string_offset in (0x68, 0x73):
+        f.emit(0x80610008, *load_mailbox, 0x388C0000 | string_offset,
+               0x38AC008F, 0x4CC63182)  # empty Invoke format, no args
+        f.branch(0x8028DF30, link=True)
+    f.emit(*load_mailbox, 0x906C005C)  # DeterminePlaySequence Invoke return value
     f.label("release_movie")
+    f.emit(0x80610008)
+    f.branch(0x8035A96C, link=True)  # release movie ref
     f.label("return")
     f.emit(0x80010034, 0x7C0803A6, 0x38210030, 0x4E800020)
 
-    # ACTIVE needs no per-frame movie manipulation; the native timeline runs.
-    s = _Routine(layout.show_unlock)
-    s.branch(layout.aux_update)
-
     c = _Routine(layout.closed_callback)
+    c.emit(0x81630090, 0x396B0001, 0x91630090)  # callback observed for this request
     c.emit(0x80030010, 0x90030014, 0x38000000, 0x90030008, 0x4E800020)
     image = bytearray(layout.end - layout.code_base)
-    for routine, limit in ((d, layout.closed_callback), (c, 0x800061E4),
-                           (f, layout.show_unlock), (s, layout.maintain_hooks),
-                           (m, layout.object_available_hook),
+    for routine, limit in ((d, layout.closed_callback), (c, 0x800061F0),
+                           (f, layout.maintain_hooks), (m, layout.object_available_hook),
                            (a, layout.mailbox)):
         code = routine.build()
         if routine.base + len(code) > limit:
             raise ValueError(f"Popup routine {routine.base:08X} exceeds cave space ({len(code)} bytes)")
         start = routine.base - layout.code_base
         image[start:start + len(code)] = code
-    image[0x800061E4 - layout.code_base:0x80006200 - layout.code_base] = b"_root.DeterminePlaySequence\0"
+    image[0x800061F0 - layout.code_base:0x8000620B - layout.code_base] = b"_root.Event_UnlockFinished\0"
     offset = layout.mailbox - layout.code_base
     image[offset:offset + 8] = word(MAGIC) + word(VERSION)
     # Native FeMessageFlow::End releases the result object and UI slot, clears
@@ -304,74 +293,8 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     image[offset + 0x44:offset + 0x48] = word(1)
     # Synthetic sPuzzleResults: no Puzzle pointer, one Object reward, no Sparks.
     image[offset + 0x60:offset + 0x64] = word(1)
-    image[offset + 0x68:offset + 0x7D] = b"Event_UnlockFinished\0"
-    image[offset + 0x7D:offset + 0x8E] = b"mScreen._visible\0"
-    return bytes(image)
-
-
-def build_aux_image(layout: PopupPatchLayout) -> bytes:
-    """Direct unlock state machine in verified zero DOL padding."""
-    if layout != PopupPatchLayout():
-        raise ValueError("Only the verified CREATE executable layout is supported")
-    load_mailbox = (0x3D808000, 0x618C6480)
-
-    def load(r, register, value):
-        r.emit(0x3C000000 | register << 21 | value >> 16,
-               0x60000000 | register << 21 | register << 16 | value & 0xFFFF)
-
-    strings = {}
-    data = bytearray()
-    for name, value in (
-            ("root_stop", b"_root.stop\0"),
-            ("determine", b"_root.DeterminePlaySequence\0"),
-            ("unlock_stop", b"_root.mUnlockContainer.mUnlockFrame.stop\0"),
-            ("unlock_play", b"_root.mUnlockContainer.mUnlockFrame.play\0"),
-            ("width", b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._width\0")):
-        strings[name] = layout.aux_data + len(data)
-        data.extend(value)
-
-    def invoke(r, path):
-        r.emit(*load_mailbox, 0x806C0040)
-        load(r, 4, path)
-        r.emit(0x38AC008F, 0x4CC63182)
-        r.branch(0x8028DF30, link=True)
-
-    setup = _Routine(layout.aux_setup)
-    setup.emit(0x9421FFE0, 0x7C0802A6, 0x90010024)
-    invoke(setup, strings["root_stop"])
-    invoke(setup, strings["determine"])
-    invoke(setup, strings["unlock_stop"])
-    setup.emit(*load_mailbox, 0x38000001, 0x900C0024)
-    setup.emit(0x80010024, 0x7C0803A6, 0x38210020, 0x4E800020)
-
-    update = _Routine(layout.aux_update)
-    update.emit(0x9421FFD0, 0x7C0802A6, 0x90010034, *load_mailbox,
-                0x800C0024, 0x28000001)
-    update.branch("return", 0x40820000)
-    update.emit(0x38000000, 0x90010014, 0x806C0040, 0x38810010)
-    load(update, 5, strings["width"])
-    update.branch(0x8027E73C, link=True)
-    update.emit(0x28030000)
-    update.branch("return", 0x41820000)
-    update.emit(0x80010014, 0x7000008F, 0x28000005)
-    update.branch("return", 0x40820000)
-    update.emit(0x81610018, 0x2C0B0000)
-    update.branch("return", 0x40810000)  # signed high word <= 0
-    invoke(update, strings["unlock_play"])
-    update.emit(*load_mailbox, 0x38000002, 0x900C0024)
-    update.label("return")
-    update.emit(0x80010034, 0x7C0803A6, 0x38210030, 0x4E800020)
-
-    image = bytearray(layout.aux_end - layout.aux_base)
-    for routine, limit in ((setup, layout.aux_update), (update, layout.aux_data)):
-        code = routine.build()
-        if routine.base + len(code) > limit:
-            raise ValueError(f"Popup auxiliary routine {routine.base:08X} exceeds cave space ({len(code)} bytes)")
-        start = routine.base - layout.aux_base
-        image[start:start + len(code)] = code
-    if len(data) > layout.aux_diagnostics - layout.aux_data:
-        raise ValueError("Popup auxiliary strings exceed cave space")
-    image[layout.aux_data - layout.aux_base:layout.aux_data - layout.aux_base + len(data)] = data
+    image[offset + 0x68:offset + 0x73] = b"_root.stop\0"
+    image[offset + 0x73:offset + 0x8F] = b"_root.DeterminePlaySequence\0"
     return bytes(image)
 
 
@@ -379,7 +302,6 @@ class PopupRuntime:
     def __init__(self, *, probe_timeout: float = HEARTBEAT_TIMEOUT_SECONDS):
         self.layout = PopupPatchLayout()
         self.image = build_image(self.layout)
-        self.aux_image = build_aux_image(self.layout)
         self.hooks = hook_words(self.layout)
         self.installed = False
         self.ready = False
@@ -397,8 +319,6 @@ class PopupRuntime:
             "heartbeat_unchanged_seconds": round(time.monotonic() - self._last_heartbeat_at, 1)
             if self.installed else None,
             "cave_matches": self._known_image(read_memory(self.layout.code_base, len(self.image))),
-            "aux_cave_matches": self._known_aux_image(
-                read_memory(self.layout.aux_base, len(self.aux_image))),
             "hooks": {f"0x{address:08X}": {
                 "ram": read_memory(address, 4).hex().upper(),
                 "expected": f"{value:08X}",
@@ -416,8 +336,8 @@ class PopupRuntime:
             "ack_seq": state["ack_seq"], "modal": u32(MODAL_LAYER),
             "owner_active": bool(state["active"]),
             "unlock_finished_handler_bound": bool(u32(self.layout.mailbox + 0x4C)),
-            "popup_phase": u32(self.layout.mailbox + 0x24),
-            "show_unlock_called": u32(self.layout.mailbox + 0x24) >= 1,
+            "ap_callback_calls": u32(self.layout.mailbox + 0x90),
+            "direct_sequence_succeeded": bool(u32(self.layout.mailbox + 0x5C)),
             "movie_slot": None, "movie_slot_active": False, "root_frame_zero_based": None,
         }
         record = u32(self.layout.mailbox + 0x54)
@@ -438,7 +358,6 @@ class PopupRuntime:
                         raise ValueError("Incomplete thumbnail name read")
                     name.extend(byte)
             result["thumbnail_identifier_from_metadata"] = "Thumb:" + name.decode("utf-8", errors="replace") if name else None
-            result["metadata_name"] = name.decode("utf-8", errors="replace") if name else None
         except Exception as error:
             result["metadata_read_error"] = str(error)
         if state["popup_pointer"]:
@@ -484,11 +403,8 @@ class PopupRuntime:
         return (len(data) == len(self.image) and data[:offset + 8] == self.image[:offset + 8]
                 and data[offset + 0x38:offset + 0x40] == self.image[offset + 0x38:offset + 0x40]
                 and data[offset + 0x50:offset + 0x54] == self.image[offset + 0x50:offset + 0x54]
+                and data[offset + 0x58:offset + 0x5C] == self.image[offset + 0x58:offset + 0x5C]
                 and data[offset + 0x60:offset + 0x90] == self.image[offset + 0x60:offset + 0x90])
-
-    def _known_aux_image(self, data):
-        mutable = self.layout.aux_diagnostics - self.layout.aux_base
-        return len(data) == len(self.aux_image) and data[:mutable] == self.aux_image[:mutable]
 
     def ensure_installed(self, read_memory, write_memory):
         if self.failure:
@@ -504,21 +420,14 @@ class PopupRuntime:
                 if actual not in (original, self.hooks[address]):
                     raise RuntimeError(f"unexpected instruction at 0x{address:08X}: 0x{actual:08X}")
             cave = read_memory(self.layout.code_base, len(self.image))
-            aux_cave = read_memory(self.layout.aux_base, len(self.aux_image))
-            if cave != bytes(len(self.image)) and not self._known_image(cave):
-                raise RuntimeError("unknown nonzero code-cave contents")
-            if aux_cave != bytes(len(self.aux_image)) and not self._known_aux_image(aux_cave):
-                raise RuntimeError("unknown nonzero auxiliary code-cave contents")
-            if aux_cave == bytes(len(self.aux_image)):
-                write_memory(self.layout.aux_base, self.aux_image)
-                if read_memory(self.layout.aux_base, len(self.aux_image)) != self.aux_image:
-                    raise RuntimeError("auxiliary code/data readback failed")
             if cave == bytes(len(self.image)):
                 if any(read_memory(a, 4) != word(o) for a, o in ORIGINALS.items()):
                     raise RuntimeError("hook points into an empty code cave")
                 write_memory(self.layout.code_base, self.image)
                 if read_memory(self.layout.code_base, len(self.image)) != self.image:
                     raise RuntimeError("code/data readback failed")
+            elif not self._known_image(cave):
+                raise RuntimeError("unknown nonzero code-cave contents")
             if not self.installed:
                 self.reset_request(read_memory, write_memory)
                 write_memory(self.layout.mailbox + 0x44, word(1))
@@ -592,8 +501,7 @@ class PopupRuntime:
         write_memory(self.layout.mailbox + 0x0C, word(object_id))
         write_memory(self.layout.mailbox + 0x10, word((state["request_seq"] + 1) & 0xFFFFFFFF))
         write_memory(self.layout.mailbox + 0x18, word(0))
-        for offset in (0x24, 0x28, 0x4C, 0x54, 0x5C, 0x90):
+        for offset in (0x4C, 0x54, 0x5C, 0x90):
             write_memory(self.layout.mailbox + offset, word(0))
-        write_memory(self.layout.aux_diagnostics, bytes(self.layout.aux_end - self.layout.aux_diagnostics))
         write_memory(self.layout.mailbox + 0x08, word(PENDING))  # publish last
         return True
