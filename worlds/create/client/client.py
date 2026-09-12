@@ -1099,12 +1099,6 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
             ctx._popup_delay_logged = True
         return
     automatic = not ctx._object_popup_queue
-    if automatic and ctx._popup_chain_gate_armed:
-        if not ctx._popup_delay_logged:
-            logger.info("Create AP Object popup delayed until the current game event is settled; diagnostics=%s",
-                        popup_event_diagnostics(ctx, now))
-            ctx._popup_delay_logged = True
-        return
     ctx._popup_delay_logged = False
     value = (ctx._automatic_object_popup_queue[0][0] if automatic
              else ctx._object_popup_queue[0])
