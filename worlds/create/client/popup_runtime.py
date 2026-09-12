@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 7
+VERSION = 8
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -56,6 +56,11 @@ class PopupPatchLayout:
     mailbox: int = 0x80006480
     result_context: int = 0x800064D0
     end: int = 0x80006514
+    aux_base: int = 0x8062C100
+    aux_setup: int = 0x8062C100
+    aux_update: int = 0x8062C1A0
+    aux_data: int = 0x8062C300
+    aux_end: int = 0x8062C400
 
 
 def hook_words(layout):
@@ -260,26 +265,21 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     f.label("released_value")
     f.emit(*load_mailbox, 0x800C004C, 0x28000001)
     f.branch("release_movie", 0x40820000)  # keep vanilla timeline on failure
-    # Hide only the Results background. The separately-rooted UnlockContainer
-    # stays visible while its thumbnail preloader gets three game updates.
+    # Hide only the Results background. The auxiliary state machine controls
+    # the separately-rooted UnlockContainer and its visible image load.
     f.emit(0x38000002, 0x90010014, 0x38000000, 0x90010018,
            0x80610008, *load_mailbox, 0x388C007D, 0x38A10010, 0x38C00000)
     f.branch(0x8027E864, link=True)  # Set mScreen._visible = false
-    f.emit(0x1C63FFFD, *load_mailbox, 0x906C0028)  # success=-3, failure=0
+    f.emit(0x28030000)
+    f.branch("return", 0x41820000)
+    f.branch(layout.aux_setup, link=True)
     f.label("release_movie")
     f.label("return")
     f.emit(0x80010034, 0x7C0803A6, 0x38210030, 0x4E800020)
 
-    # ACTIVE popups wait for three real SimUpdate calls. This gives Unlock()'s
-    # loadMovie thumbnail preload time before the visible sequence starts.
+    # The larger verified auxiliary cave owns the thumbnail-ready state machine.
     s = _Routine(layout.show_unlock)
-    # r12 is the mailbox pointer established by the dispatcher immediately
-    # before this helper call. A successful hide starts at -3; addic. reaches
-    # zero on the third update. Failure stays zero and returns before counting.
-    s.emit(0x800C0028, 0x28000000, 0x4D820020,
-           0x34000001, 0x900C0028, 0x4C820020,
-           0x806C0040, 0x388CFD64, 0x38AC008F, 0x4CC63182)
-    s.branch(0x8028DF30)  # tail call preserves the dispatcher's return address
+    s.branch(layout.aux_update)
 
     c = _Routine(layout.closed_callback)
     c.emit(0x80030010, 0x90030014, 0x38000000, 0x90030008, 0x4E800020)
@@ -308,10 +308,98 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     return bytes(image)
 
 
+def build_aux_image(layout: PopupPatchLayout) -> bytes:
+    """State machine in a second verified all-zero DOL padding region."""
+    if layout != PopupPatchLayout():
+        raise ValueError("Only the verified CREATE executable layout is supported")
+    load_mailbox = (0x3D808000, 0x618C6480)
+
+    def load(r, register, value):
+        r.emit(0x3C000000 | register << 21 | value >> 16,
+               0x60000000 | register << 21 | register << 16 | value & 0xFFFF)
+
+    strings = {}
+    data = bytearray()
+    for name, value in (
+            ("frames", b"_root.mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._framesloaded\0"),
+            ("stop", b"_root.mUnlockContainer.mUnlockFrame.stop\0"),
+            ("root_stop", b"_root.stop\0"),
+            ("goto_stop", b"_root.mUnlockContainer.mUnlockFrame.gotoAndStop\0"),
+            ("play", b"_root.mUnlockContainer.mUnlockFrame.play\0"),
+            ("wait", b"Wait\0"), ("string_format", b"s\0")):
+        strings[name] = layout.aux_data + len(data)
+        data.extend(value)
+
+    def invoke(r, path, *, argument=None):
+        r.emit(*load_mailbox, 0x806C0040)
+        load(r, 4, path)
+        if argument is None:
+            r.emit(0x38AC008F)
+        else:
+            load(r, 5, strings["string_format"])
+            load(r, 6, argument)
+        r.emit(0x4CC63182)
+        r.branch(0x8028DF30, link=True)
+
+    setup = _Routine(layout.aux_setup)
+    setup.emit(0x9421FFE0, 0x7C0802A6, 0x90010024)
+    invoke(setup, strings["root_stop"])  # suppress the native Results sequence
+    invoke(setup, 0x800061E4)  # load visible image and begin SlideOn
+    invoke(setup, strings["stop"])  # stop on its still-invisible first frame
+    setup.emit(*load_mailbox, 0x38000001, 0x900C0024,
+               0x38000000, 0x900C0028, 0x900C005C, 0x900C0058, 0x900C0090)
+    setup.emit(0x80010024, 0x7C0803A6, 0x38210020, 0x4E800020)
+
+    update = _Routine(layout.aux_update)
+    update.emit(0x9421FFD0, 0x7C0802A6, 0x90010034, *load_mailbox,
+                0x800C0024, 0x28000001)
+    update.branch("wait_for_image", 0x41820000)
+    update.emit(0x28000002)
+    update.branch("visible_hold", 0x41820000)
+    update.branch("return")
+    update.label("wait_for_image")
+    update.emit(0x816C0028, 0x396B0001, 0x916C0028, 0x280B012C)
+    update.branch("show_image", 0x41820000)  # fail-safe after 300 updates
+    update.emit(0x38000000, 0x90010014, 0x806C0040, 0x38810010)
+    load(update, 5, strings["frames"])
+    update.branch(0x8027E73C, link=True)
+    update.emit(0x28030000)
+    update.branch("return", 0x41820000)
+    update.emit(*load_mailbox, 0x80010014, 0x900C005C,
+                0x80010018, 0x900C0058, 0x8161001C, 0x916C0090,
+                0x7C005B78, 0x28000000)
+    update.branch("return", 0x41820000)
+    update.label("show_image")
+    invoke(update, strings["goto_stop"], argument=strings["wait"])
+    update.emit(*load_mailbox, 0x38000002, 0x900C0024,
+                0x3800003C, 0x900C0028)
+    update.branch("return")
+    update.label("visible_hold")
+    update.emit(0x800C0028, 0x3400FFFF, 0x900C0028)
+    update.branch("return", 0x40820000)
+    invoke(update, strings["play"])
+    update.emit(*load_mailbox, 0x38000003, 0x900C0024)
+    update.label("return")
+    update.emit(0x80010034, 0x7C0803A6, 0x38210030, 0x4E800020)
+
+    image = bytearray(layout.aux_end - layout.aux_base)
+    for routine, limit in ((setup, layout.aux_update), (update, layout.aux_data)):
+        code = routine.build()
+        if routine.base + len(code) > limit:
+            raise ValueError(f"Popup auxiliary routine {routine.base:08X} exceeds cave space ({len(code)} bytes)")
+        start = routine.base - layout.aux_base
+        image[start:start + len(code)] = code
+    if len(data) > layout.aux_end - layout.aux_data:
+        raise ValueError("Popup auxiliary strings exceed cave space")
+    image[layout.aux_data - layout.aux_base:layout.aux_data - layout.aux_base + len(data)] = data
+    return bytes(image)
+
+
 class PopupRuntime:
     def __init__(self, *, probe_timeout: float = HEARTBEAT_TIMEOUT_SECONDS):
         self.layout = PopupPatchLayout()
         self.image = build_image(self.layout)
+        self.aux_image = build_aux_image(self.layout)
         self.hooks = hook_words(self.layout)
         self.installed = False
         self.ready = False
@@ -329,6 +417,7 @@ class PopupRuntime:
             "heartbeat_unchanged_seconds": round(time.monotonic() - self._last_heartbeat_at, 1)
             if self.installed else None,
             "cave_matches": self._known_image(read_memory(self.layout.code_base, len(self.image))),
+            "aux_cave_matches": read_memory(self.layout.aux_base, len(self.aux_image)) == self.aux_image,
             "hooks": {f"0x{address:08X}": {
                 "ram": read_memory(address, 4).hex().upper(),
                 "expected": f"{value:08X}",
@@ -339,6 +428,7 @@ class PopupRuntime:
         state = self.snapshot(read_memory)
         def u32(address):
             return int.from_bytes(read_memory(address, 4), "big")
+        frames_payload = (u32(self.layout.mailbox + 0x58) << 32) | u32(self.layout.mailbox + 0x90)
         result = {
             "popup_pointer": f"0x{state['popup_pointer']:08X}",
             "callback_invoked": bool(state["request_seq"] and state["ack_seq"] == state["request_seq"]),
@@ -346,8 +436,13 @@ class PopupRuntime:
             "ack_seq": state["ack_seq"], "modal": u32(MODAL_LAYER),
             "owner_active": bool(state["active"]),
             "unlock_finished_handler_bound": bool(u32(self.layout.mailbox + 0x4C)),
-            "preload_frames_remaining": max(0, -struct.unpack(">i", word(u32(self.layout.mailbox + 0x28)))[0]),
-            "direct_sequence_called": u32(self.layout.mailbox + 0x28) == 0,
+            "popup_phase": u32(self.layout.mailbox + 0x24),
+            "visible_hold_frames_remaining": u32(self.layout.mailbox + 0x28),
+            "show_unlock_called": u32(self.layout.mailbox + 0x24) >= 1,
+            "thumbnail_ready": u32(self.layout.mailbox + 0x24) >= 2 and bool(frames_payload),
+            "thumbnail_framesloaded_value_type": u32(self.layout.mailbox + 0x5C),
+            "thumbnail_framesloaded_payload":
+                f"0x{frames_payload:016X}",
             "movie_slot": None, "movie_slot_active": False, "root_frame_zero_based": None,
         }
         record = u32(self.layout.mailbox + 0x54)
@@ -414,7 +509,6 @@ class PopupRuntime:
         return (len(data) == len(self.image) and data[:offset + 8] == self.image[:offset + 8]
                 and data[offset + 0x38:offset + 0x40] == self.image[offset + 0x38:offset + 0x40]
                 and data[offset + 0x50:offset + 0x54] == self.image[offset + 0x50:offset + 0x54]
-                and data[offset + 0x58:offset + 0x5C] == self.image[offset + 0x58:offset + 0x5C]
                 and data[offset + 0x60:offset + 0x90] == self.image[offset + 0x60:offset + 0x90])
 
     def ensure_installed(self, read_memory, write_memory):
@@ -431,14 +525,21 @@ class PopupRuntime:
                 if actual not in (original, self.hooks[address]):
                     raise RuntimeError(f"unexpected instruction at 0x{address:08X}: 0x{actual:08X}")
             cave = read_memory(self.layout.code_base, len(self.image))
+            aux_cave = read_memory(self.layout.aux_base, len(self.aux_image))
+            if cave != bytes(len(self.image)) and not self._known_image(cave):
+                raise RuntimeError("unknown nonzero code-cave contents")
+            if aux_cave != bytes(len(self.aux_image)) and aux_cave != self.aux_image:
+                raise RuntimeError("unknown nonzero auxiliary code-cave contents")
+            if aux_cave == bytes(len(self.aux_image)):
+                write_memory(self.layout.aux_base, self.aux_image)
+                if read_memory(self.layout.aux_base, len(self.aux_image)) != self.aux_image:
+                    raise RuntimeError("auxiliary code/data readback failed")
             if cave == bytes(len(self.image)):
                 if any(read_memory(a, 4) != word(o) for a, o in ORIGINALS.items()):
                     raise RuntimeError("hook points into an empty code cave")
                 write_memory(self.layout.code_base, self.image)
                 if read_memory(self.layout.code_base, len(self.image)) != self.image:
                     raise RuntimeError("code/data readback failed")
-            elif not self._known_image(cave):
-                raise RuntimeError("unknown nonzero code-cave contents")
             if not self.installed:
                 self.reset_request(read_memory, write_memory)
                 write_memory(self.layout.mailbox + 0x44, word(1))

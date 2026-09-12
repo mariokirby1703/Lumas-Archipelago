@@ -1,4 +1,4 @@
-# Object popup test: FePuzzleResultsPO (runtime protocol 7)
+# Object popup test: FePuzzleResultsPO (runtime protocol 8)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's create.apworld and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load in-game Save Slot 3,
    and connect the Create Client through the AP Launcher.
-5. Check /createpopupstatus: version=7, enabled=1, hooks_applied=1 and a changing
+5. Check /createpopupstatus: version=8, enabled=1, hooks_applied=1 and a changing
    heartbeat. No new AP seed or APWorld release version is required.
 
 ## Test both manual and real AP receipts
@@ -32,12 +32,23 @@ uses the confirmed Results movie rather than the Chain or PuzzleUnlock movie.
 ## Direct object view and close diagnostics
 
 After the native factory has built AddUnlockImages/Unlock and registered the UI
-slot, AP sets `mScreen._visible=false`. The separately-rooted UnlockContainer is
-unchanged. A successful hide initializes a three-SimUpdate countdown; only its
-third real game update invokes `_root.DeterminePlaySequence`. This gives Unlock's
-`loadMovie("Thumb:...")` preload a short head start before the object view becomes
-visible. This deliberately tests the observed load race; three frames are not
-yet treated as a final readiness check.
+slot, AP sets `mScreen._visible=false`. It then invokes DeterminePlaySequence so
+the visible image container starts its own `loadMovie("Thumb:...")`, and stops the
+UnlockFrame before its first visible frame. The earlier three-frame experiment
+only waited for the separate cache container and did not fix the white image.
+The PO root itself is stopped first so its normal Results stages cannot race this
+AP-only state machine; PlayOutro later resumes it at the native End label.
+
+Each SimUpdate now reads `_framesloaded` from the actual visible path
+`mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer`. A zero value keeps
+the unlock hidden. A nonzero value jumps the UnlockFrame to its visible `Wait`
+label. It stays there for 60 real game updates, adding about one second at 60 Hz,
+then `play()` resumes the original SlideOff and completion event. The thumbnail
+URI and native loader are unchanged.
+
+If `_framesloaded` never becomes nonzero, a 300-update fail-safe resumes the
+visible/close path so a missing resource cannot leave CREATE permanently modal.
+In that case thumbnail_ready remains false in `/createpopupstatus`.
 
 The shared FePuzzleThumbnail UnlockContainer ends by calling
 `_root.Event_UnlockFinished`. FePuzzleResultsPO does not define that handler.
@@ -53,8 +64,7 @@ function objects via GASValue::SetAsObject (0x801D40B0), which recognizes them
 and restores the function value. No vanilla movie is modified.
 
 If handler binding or hiding mScreen fails, AP does not invoke the direct unlock
-sequence. The ordinary native Results timeline remains available. Check
-unlock_finished_handler_bound and the signed preload counter.
+sequence. The ordinary native Results timeline remains available.
 
 The child completion event should now start PlayOutro, whose final root frame
 calls Event_OnOutroEnd. Native OnOutroEnd (0x800336E0) restores modal state and
@@ -63,19 +73,20 @@ There is no second polling close path or elapsed-time close trigger.
 
 `/createpopupstatus` includes:
 
-- unlock_finished_handler_bound, preload_frames_remaining and
-  direct_sequence_called. The latter means the countdown reached zero; a zero
-  counter after a failed screen hide is intentionally ambiguous.
+- unlock_finished_handler_bound, popup_phase and show_unlock_called.
+- thumbnail_ready, thumbnail_framesloaded_value_type and the exact raw
+  thumbnail_framesloaded_payload returned by GFx.
+- visible_hold_frames_remaining while the object is held at the Wait label.
 - unlock_count read from the live result object +0x24 (unavailable after deletion).
 - object_record_preflight, metadata_ptr, metadata_resolved, and
   thumbnail_identifier_from_metadata, derived from record+0x18 and metadata+0.
 - The existing owner, callback, request/ack, modal, movie slot and root frame fields.
 
-The thumbnail diagnostic reports the metadata-derived identifier, not proof
-that AddUnlockImages ran or that the resource loaded. There are no independent
+The metadata-derived identifier does not itself prove a successful load;
+thumbnail_ready now records the visible container's `_framesloaded` result.
+There are no independent
 native-close, outer-close, availability, AddUnlockImages or Unlock call counters
-in this build; the fixed verified cave is fully occupied. These are not inferred
-or reported as measured calls. The thumbnail URI and loader remain unchanged.
+in this build. These are not inferred or reported as measured calls.
 
 After dismissal expect callback_invoked=true, ack_seq=request_seq, status=0,
 owner_active=false, popup_pointer=0 and modal=0.
@@ -89,6 +100,11 @@ calls the original SimUpdate at 0x8000D880, and lets guest PPC manage its own
 instruction writes and cache invalidation. The previous award-mode hook and
 FeSimpleMessage availability hook are removed; old revisions require a fresh
 boot instead of being overwritten in place.
+
+Protocol 8 also uses the executable's verified zero padding at
+0x8062C100..0x8062C400 for the ready/hold state machine and its GFx paths. Both
+caves must be entirely zero or match this exact runtime image before installation.
+No extracted game asset is packaged.
 
 MakeFePuzzleResults at 0x80031DB0 receives a callback pair and a persistent,
 result context at 0x800064D0. Context+0x10 is 1. The null-Puzzle path does
