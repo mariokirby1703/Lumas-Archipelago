@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 10
+VERSION = 11
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -323,7 +323,6 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
     data = bytearray()
     image_path = b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer."
     for name, value in (
-            ("root_stop", b"_root.stop\0"),
             ("item_count", b"mItemData.length\0"),
             ("visible_width", image_path + b"_width\0"),
             ("preload_width", b"mThumbnailContainer0._width\0"),
@@ -331,16 +330,10 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
         strings[name] = layout.aux_data + len(data)
         data.extend(value)
 
-    def invoke(r, path):
-        r.emit(*load_mailbox, 0x806C0040)
-        load(r, 4, path)
-        r.emit(0x38AC008F, 0x4CC63182)
-        r.branch(0x8028DF30, link=True)
-
     setup = _Routine(layout.aux_setup)
     setup.emit(0x9421FFE0, 0x7C0802A6, 0x90010024)
-    invoke(setup, strings["root_stop"])  # suppress the native Results sequence
-    invoke(setup, 0x800061E4)  # unchanged visible object sequence
+    # Leave the PO root running. Its native timeline invokes
+    # DeterminePlaySequence after UI registration and owns unlock timing.
     setup.emit(*load_mailbox, 0x38000001, 0x900C0024)
     setup.emit(0x80010024, 0x7C0803A6, 0x38210020, 0x4E800020)
 

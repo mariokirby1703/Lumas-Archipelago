@@ -1,4 +1,4 @@
-# Object popup test: FePuzzleResultsPO (runtime protocol 10)
+# Object popup test: FePuzzleResultsPO (runtime protocol 11)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's create.apworld and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load in-game Save Slot 3,
    and connect the Create Client through the AP Launcher.
-5. Check /createpopupstatus: version=10, enabled=1, hooks_applied=1 and a changing
+5. Check /createpopupstatus: version=11, enabled=1, hooks_applied=1 and a changing
    heartbeat. No new AP seed or APWorld release version is required.
 
 ## Test both manual and real AP receipts
@@ -32,11 +32,12 @@ uses the confirmed Results movie rather than the Chain or PuzzleUnlock movie.
 ## Direct object view and close diagnostics
 
 After the native factory has built AddUnlockImages/Unlock and registered the UI
-slot, AP sets `mScreen._visible=false`. It stops the PO root and invokes
-DeterminePlaySequence once, which starts the native visible Object sequence and
-its `loadMovie("Thumb:...")` call. Protocol 9 does not stop, seek or resume the
-UnlockFrame and does not add a fixed display delay. This isolates the remaining
-white-image and input problems from the child-timeline changes in protocol 8.
+slot, AP sets `mScreen._visible=false`. Protocol 11 then leaves the PO root and
+UnlockFrame timelines entirely under ActionScript control. The PO root reaches
+its own native DeterminePlaySequence frames after registration; that function
+loads the visible `Thumb:` movie and starts `SlideOn`. AP does not invoke
+DeterminePlaySequence itself and does not stop, seek or resume either timeline.
+There is no fixed display delay.
 
 Each active SimUpdate reads four properties without changing the movie:
 `mItemData.length`, the visible image container's `_width`, the native preload
@@ -101,7 +102,7 @@ instruction writes and cache invalidation. The previous award-mode hook and
 FeSimpleMessage availability hook are removed; old revisions require a fresh
 boot instead of being overwritten in place.
 
-Protocol 10 also uses the executable's verified zero padding at
+Protocol 11 also uses the executable's verified zero padding at
 0x8062C100..0x8062C450 for the loader diagnostics and their GFx paths. Both
 caves must be entirely zero or match this exact runtime image before installation.
 No extracted game asset is packaged.

@@ -1123,7 +1123,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         creation_events = events
         self.assertEqual([popup.ORIGINAL_UPDATE, 0x80490BF0, 0x80031DB0, 0x804EA4D0,
                           0x8027E73C, 0x8027E864, 0x802E6EFC, 0x8027E864,
-                          0x8028DF30, 0x8028DF30],
+                          ],
                          [e[1] for e in events if e[0] == "call"])
         self.assertEqual(1, self.fake.read_u32(self.base + 0x24))
         events = self.dispatcher_frame(visible_width=128.0, preload_width=64.0)
