@@ -25,10 +25,13 @@
 
 Automatic NetworkItem popups use a separate queue from manual `/createpopup`
 requests. At every Dolphin sync the client samples CreateChainsCamera state at
-`0x8069A3BC` and the global modal at `0x80948040`. A network popup starts only
-after both are zero for three consecutive samples. The item remains queued.
-There is no fixed event timer and a normal active challenge does not itself
-block the queue. Manual test requests remain immediate.
+`0x8069A3BC` and the global modal at `0x80948040`. A detected Hub event arms the
+gate with the controller's current busy value. Its network popup starts after
+the controller has left that captured value and modal is zero for three
+consecutive samples. Receipts outside an armed Hub event are not subjected to a
+global `chain_state == 0` requirement. The item remains queued; there is no
+fixed event timer, and a normal active challenge does not itself block the
+queue. Manual test requests remain immediate.
 
 The client logs the world/challenge context, modal value, selected Create Chain
 state bytes and elapsed time since the last location check and Object receipt

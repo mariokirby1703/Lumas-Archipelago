@@ -168,6 +168,8 @@ class CreateContext(CommonContext):
         self._popup_gate_modal_transition: tuple[int, int] | None = None
         self._popup_gate_modal_changed_at = 0.0
         self._popup_gate_idle_samples = 0
+        self._popup_chain_gate_armed = False
+        self._popup_chain_busy_state: int | None = None
         self._popup_post_close_observe_until = 0.0
         self._slot_guard_observed_this_session = False
         self._waiting_for_slot_logged = False
@@ -304,6 +306,8 @@ class CreateContext(CommonContext):
         self._popup_gate_modal_transition = None
         self._popup_gate_modal_changed_at = 0.0
         self._popup_gate_idle_samples = 0
+        self._popup_chain_gate_armed = False
+        self._popup_chain_busy_state = None
         self._popup_post_close_observe_until = 0.0
 
     def _reset_location_context(self) -> None:
@@ -856,6 +860,12 @@ async def check_locations(ctx: CreateContext) -> None:
         logger.debug("Failed while checking Create locations.", exc_info=True)
     if newly_checked and ctx.slot is not None:
         ctx._last_location_check_at = time.monotonic()
+        chain_state = read_u32_be(0x8069A3BC)
+        if current_world_id(ctx) == 1 and chain_state != 0:
+            ctx._popup_chain_gate_armed = True
+            ctx._popup_chain_busy_state = chain_state
+            ctx._popup_gate_idle_samples = 0
+            logger.info("Armed Hub event popup gate at CreateChainsCamera state %d.", chain_state)
         await ctx.send_msgs([{"cmd": "LocationChecks", "locations": list(newly_checked)}])
 
 
@@ -992,10 +1002,17 @@ def observe_popup_gate(ctx: CreateContext, now: float) -> tuple[int, int]:
             if now <= ctx._popup_post_close_observe_until:
                 logger.info("Post-close vanilla modal transition %d -> %d; diagnostics=%s",
                             previous, modal, popup_event_diagnostics(ctx, now))
-    if chain_state == 0 and modal == 0:
+    chain_event_finished = (not ctx._popup_chain_gate_armed
+                            or chain_state != ctx._popup_chain_busy_state)
+    if chain_event_finished and modal == 0:
         ctx._popup_gate_idle_samples += 1
     else:
         ctx._popup_gate_idle_samples = 0
+    if ctx._popup_chain_gate_armed and ctx._popup_gate_idle_samples >= AUTO_POPUP_IDLE_SAMPLES:
+        logger.info("Hub event popup gate released: CreateChainsCamera state %s -> %d.",
+                    ctx._popup_chain_busy_state, chain_state)
+        ctx._popup_chain_gate_armed = False
+        ctx._popup_chain_busy_state = None
     return chain_state, modal
 
 
@@ -1012,6 +1029,8 @@ def popup_event_diagnostics(ctx: CreateContext, now: float) -> dict[str, Any]:
             "generic_completion_8068DC94_u8": read_u8(0x8068DC94),
             "modal_80948040_u32": read_u32_be(MODAL_LAYER),
             "chain_state_idle_samples": ctx._popup_gate_idle_samples,
+            "chain_gate_armed": ctx._popup_chain_gate_armed,
+            "chain_gate_busy_state": ctx._popup_chain_busy_state,
             "chain_state_stable_ms": round((now - ctx._popup_gate_chain_changed_at) * 1000)
             if ctx._popup_gate_chain_changed_at else None,
             "last_modal_transition": ctx._popup_gate_modal_transition,
@@ -1080,7 +1099,7 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
             ctx._popup_delay_logged = True
         return
     automatic = not ctx._object_popup_queue
-    if automatic and (chain_state != 0 or ctx._popup_gate_idle_samples < AUTO_POPUP_IDLE_SAMPLES):
+    if automatic and ctx._popup_chain_gate_armed:
         if not ctx._popup_delay_logged:
             logger.info("Create AP Object popup delayed until the current game event is settled; diagnostics=%s",
                         popup_event_diagnostics(ctx, now))

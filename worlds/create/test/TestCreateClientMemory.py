@@ -1344,6 +1344,8 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.ctx._popup_gate_modal_transition = None
         self.ctx._popup_gate_modal_changed_at = 0.0
         self.ctx._popup_gate_idle_samples = 0
+        self.ctx._popup_chain_gate_armed = False
+        self.ctx._popup_chain_busy_state = None
         self.ctx._popup_post_close_observe_until = 0.0
         self.ctx.ram_is_settled = lambda: True
         self.ctx.slot_ram_is_settled = lambda: True
@@ -1411,11 +1413,13 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.receipt(13)
         with patch.object(client.time, "monotonic", return_value=100.0):
             client.collect_new_object_popup_items(self.ctx)
+        self.ctx._popup_chain_gate_armed = True
+        self.ctx._popup_chain_busy_state = 1
         self.fake.write_u32(0x8069A3BC, 1)
         with patch.object(client.time, "monotonic", return_value=101.0):
             client.service_object_popup_queue(self.ctx, False)
         self.assertIsNone(self.ctx._popup_inflight)
-        self.fake.write_u32(0x8069A3BC, 0)
+        self.fake.write_u32(0x8069A3BC, 999)
         with patch.object(client.logger, "info"):
             for sample in range(client.AUTO_POPUP_IDLE_SAMPLES):
                 with patch.object(client.time, "monotonic", return_value=102.0 + sample / 10):
