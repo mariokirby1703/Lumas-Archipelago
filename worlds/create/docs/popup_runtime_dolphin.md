@@ -1,4 +1,4 @@
-# Object popup test: FePuzzleResultsPO (runtime protocol 6)
+# Object popup test: FePuzzleResultsPO (runtime protocol 7)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's create.apworld and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load in-game Save Slot 3,
    and connect the Create Client through the AP Launcher.
-5. Check /createpopupstatus: version=6, enabled=1, hooks_applied=1 and a changing
+5. Check /createpopupstatus: version=7, enabled=1, hooks_applied=1 and a changing
    heartbeat. No new AP seed or APWorld release version is required.
 
 ## Test both manual and real AP receipts
@@ -31,36 +31,30 @@ uses the confirmed Results movie rather than the Chain or PuzzleUnlock movie.
 
 ## Direct object view and close diagnostics
 
-After the native factory has built AddUnlockImages/Unlock and the UI slot is
-registered, AP invokes `_root.stop`, then `_root.DeterminePlaySequence`, on the
-same movie reference before returning to the game loop. FePuzzleResultsPO does
-not define ShowUnlock; that method belongs to the other Results variant.
-DeterminePlaySequence is the PO method that loads the object image/label,
-starts the unlock container and increments its stage. The original Unlock
-initialization remains intact.
-
-Stopping the PO root at its initial frame prevents the Congratulations timeline
-from starting. Its initial mScreen color transform has RGB multipliers 256 and
-alpha multiplier 0, while the unlock container is a separate child. The native
-PlayOutro still resumes the root at its End label for normal closing.
+After the native factory has built AddUnlockImages/Unlock and registered the UI
+slot, AP sets `mScreen._visible=false`. The separately-rooted UnlockContainer is
+unchanged. A successful hide initializes a three-SimUpdate countdown; only its
+third real game update invokes `_root.DeterminePlaySequence`. This gives Unlock's
+`loadMovie("Thumb:...")` preload a short head start before the object view becomes
+visible. This deliberately tests the observed load race; three frames are not
+yet treated as a final readiness check.
 
 The shared FePuzzleThumbnail UnlockContainer ends by calling
 `_root.Event_UnlockFinished`. FePuzzleResultsPO does not define that handler.
-Stopping its root therefore leaves it at frame 0 after the child animation,
+Without a handler, a manually-started unlock leaves the root behind after the child animation,
 with no PlayOutro and no native cleanup. The previous final-root-frame fallback
 cannot resolve this missing event connection and has been removed.
 
-Before stopping the root, this build copies `_level0.PlayOutro` with native
+Before scheduling the unlock, this build copies `_level0.PlayOutro` with native
 GFx GetVariable (0x8027E73C) / SetVariable (0x8027E864) to
 `_root.Event_UnlockFinished` on the AP movie only. The temporary managed value
 is released through 0x802E6EFC. The local GFxValue conversion path preserves
 function objects via GASValue::SetAsObject (0x801D40B0), which recognizes them
 and restores the function value. No vanilla movie is modified.
 
-If GetVariable or SetVariable fails, the root is neither stopped nor advanced
-manually: its ordinary native results timeline remains running. This fallback
-may display Congratulations, but avoids knowingly stopping a movie whose
-completion event could not be connected. Check unlock_finished_handler_bound.
+If handler binding or hiding mScreen fails, AP does not invoke the direct unlock
+sequence. The ordinary native Results timeline remains available. Check
+unlock_finished_handler_bound and the signed preload counter.
 
 The child completion event should now start PlayOutro, whose final root frame
 calls Event_OnOutroEnd. Native OnOutroEnd (0x800336E0) restores modal state and
@@ -69,8 +63,9 @@ There is no second polling close path or elapsed-time close trigger.
 
 `/createpopupstatus` includes:
 
-- unlock_finished_handler_bound and direct_sequence_succeeded (native API results).
-- ap_callback_calls, reset for each request and incremented at the AP callback.
+- unlock_finished_handler_bound, preload_frames_remaining and
+  direct_sequence_called. The latter means the countdown reached zero; a zero
+  counter after a failed screen hide is intentionally ambiguous.
 - unlock_count read from the live result object +0x24 (unavailable after deletion).
 - object_record_preflight, metadata_ptr, metadata_resolved, and
   thumbnail_identifier_from_metadata, derived from record+0x18 and metadata+0.
@@ -80,10 +75,10 @@ The thumbnail diagnostic reports the metadata-derived identifier, not proof
 that AddUnlockImages ran or that the resource loaded. There are no independent
 native-close, outer-close, availability, AddUnlockImages or Unlock call counters
 in this build; the fixed verified cave is fully occupied. These are not inferred
-or reported as measured calls. Image timing/loading behavior is unchanged.
+or reported as measured calls. The thumbnail URI and loader remain unchanged.
 
-After dismissal expect ap_callback_calls=1, callback_invoked=true,
-ack_seq=request_seq, status=0, owner_active=false, popup_pointer=0 and modal=0.
+After dismissal expect callback_invoked=true, ack_seq=request_seq, status=0,
+owner_active=false, popup_pointer=0 and modal=0.
 Test menu, Play, placement and Paint immediately afterwards. Live verification
 of the ActionScript event connection and controller input is still required.
 
@@ -97,8 +92,8 @@ boot instead of being overwritten in place.
 
 MakeFePuzzleResults at 0x80031DB0 receives a callback pair and a persistent,
 result context at 0x800064D0. Context+0x10 is 1. The null-Puzzle path does
-not read context+4/+0x0C, which hold the preflight record and direct Invoke
-result for diagnostics; the fields it does consume remain zero otherwise. A null
+not read context+4/+0x0C, which are reused for read-only diagnostics; the
+fields it consumes remain zero otherwise. A null
 context+0 selects FePuzzleResultsPO.gfx and skips the challenge-specific result
 setup at 0x80031F28. Its factory calls FePuzzleResults::UpdateUnlocks with the
 sum of context+0x10/+0x14, giving exactly one unlock slot before returning.

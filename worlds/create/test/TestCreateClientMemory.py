@@ -706,8 +706,13 @@ def execute_popup_ppc(runtime, memory, entry, registers, *, lr=0x81230000, nativ
         pc += 4
         op, rt, ra, rb = ins >> 26, (ins >> 21) & 31, (ins >> 16) & 31, (ins >> 11) & 31
         imm, xo = signed(ins & 0xFFFF, 16), (ins >> 1) & 1023
-        if op in (14, 15):
-            regs[rt] = ((regs[ra] if ra else 0) + (imm << (16 if op == 15 else 0))) & 0xFFFFFFFF
+        if op == 7:
+            regs[rt] = (regs[ra] * imm) & 0xFFFFFFFF
+        elif op in (13, 14, 15):
+            left = regs[ra] if op == 13 or ra else 0
+            regs[rt] = (left + (imm << (16 if op == 15 else 0))) & 0xFFFFFFFF
+            if op == 13:
+                cr = (bool(regs[rt] & 0x80000000), regs[rt] != 0 and not bool(regs[rt] & 0x80000000), regs[rt] == 0)
         elif op == 28:
             regs[ra] = regs[rt] & (ins & 0xFFFF)
             cr = (bool(regs[ra] & 0x80000000), regs[ra] != 0 and not bool(regs[ra] & 0x80000000), regs[ra] == 0)
@@ -756,6 +761,9 @@ def execute_popup_ppc(runtime, memory, entry, registers, *, lr=0x81230000, nativ
             assert ra in (0, 1, 2) and rt in (4, 12)
             if cr[ra] == (rt == 12):
                 pc = source + signed(ins & 0xFFFC, 16)
+        elif ins in (0x4D820020, 0x4C820020):
+            if cr[2] == (ins == 0x4D820020):
+                pc = lr
         elif ins == 0x4E800020:
             pc = lr
         else:
@@ -992,7 +1000,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
                          self.runtime.image[12:16])
         self.assertEqual({popup.VTABLE_SLOT, 0x800325E4}, set(self.runtime.hooks))
 
-    def dispatcher_frame(self, *, lookup_result=0x81204000, get_ok=True, set_ok=True):
+    def dispatcher_frame(self, *, lookup_result=0x81204000, get_ok=True, set_ok=True,
+                         hide_ok=True):
         regs = [0x10000000 + i * 0x100 for i in range(32)]
         regs[1], regs[3], regs[4] = 0x81700000, popup.GAME_SINGLETON, 0x81203000
         before = list(regs)
@@ -1009,14 +1018,12 @@ class TestCreatePopupRuntime(unittest.TestCase):
             self.assertEqual(1, self.fake.read_u32(r[4] + 0x10))
             self.fake.write_u32(0x81206000 + 0x14, 0x80947F98)
             self.fake.write_u32(0x80947F98, 0x81208000)
+            self.fake.write_u32(0x80947F98 + 4, 0x81209000)
             r[3] = 0x81206000
         def register(r):
             self.assertEqual((0x80947A30, 3, 0, 1), tuple(r[3:7]))
             self.assertEqual(0x81206000, self.fake.read_u32(self.base + 0x20))
         invokes = []
-        def acquire(r):
-            self.assertEqual(0x80947F98, r[4])
-            self.fake.write_u32(r[3], 0x81209000)
         def get_variable(r):
             self.assertEqual(0x81209000, r[3])
             self.assertEqual(0x805E29DC, r[5])
@@ -1026,10 +1033,16 @@ class TestCreatePopupRuntime(unittest.TestCase):
             self.fake.write_u32(r[4] + 8, 0x8120D000)
             r[3] = int(get_ok)
         def set_variable(r):
-            self.assertEqual(b"_root.Event_UnlockFinished", self.read(r[4], 32).split(b"\0")[0])
-            self.assertEqual(0x46, self.fake.read_u32(r[5] + 4))
             self.assertEqual(0, r[6])
-            r[3] = int(set_ok)
+            name = self.read(r[4], 32).split(b"\0")[0]
+            if name == b"Event_UnlockFinished":
+                self.assertEqual(0x46, self.fake.read_u32(r[5] + 4))
+                r[3] = int(set_ok)
+            else:
+                self.assertEqual(b"mScreen._visible", name)
+                self.assertEqual(2, self.fake.read_u32(r[5] + 4))
+                self.assertEqual(0, self.fake.read_u32(r[5] + 8))
+                r[3] = int(hide_ok)
         def release_value(r):
             self.assertEqual(0x8120C000, r[3])
             self.assertEqual(0x8120D000, r[5])
@@ -1040,15 +1053,12 @@ class TestCreatePopupRuntime(unittest.TestCase):
             invokes.append(name)
             self.assertIn(name, (b"_root.stop", b"_root.DeterminePlaySequence"))
             r[3] = 1
-        def release(r):
-            self.assertEqual([b"_root.stop", b"_root.DeterminePlaySequence"] if get_ok and set_ok else [], invokes)
-            self.assertEqual(0x81209000, r[3])
         pc, result, _, events = execute_popup_ppc(
             self.runtime, self.fake, self.runtime.layout.dispatcher, regs,
             native={popup.ORIGINAL_UPDATE: original_update, 0x80490BF0: lookup,
                     0x80031DB0: construct, 0x804EA4D0: register,
-                    0x8000ED20: acquire, 0x8027E73C: get_variable, 0x8027E864: set_variable,
-                    0x802E6EFC: release_value, 0x8028DF30: invoke, 0x8035A96C: release})
+                    0x8027E73C: get_variable, 0x8027E864: set_variable,
+                    0x802E6EFC: release_value, 0x8028DF30: invoke})
         self.assertEqual(0x81230000, pc)
         self.assertEqual(0x12345678, result[3])
         self.assertEqual(before[1], result[1])
@@ -1068,12 +1078,21 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.prepare_dispatch()
         self.fake.write_byte(0x8068CFC3, 0)  # running challenge
         events = self.dispatcher_frame()
+        creation_events = events
         self.assertEqual([popup.ORIGINAL_UPDATE, 0x80490BF0, 0x80031DB0, 0x804EA4D0,
-                          0x8000ED20, 0x8027E73C, 0x8027E864, 0x802E6EFC,
-                          0x8028DF30, 0x8028DF30, 0x8035A96C],
+                          0x8027E73C, 0x8027E864, 0x802E6EFC, 0x8027E864],
                          [e[1] for e in events if e[0] == "call"])
-        self.assertLess(events.index(("isync",)), events.index(("call", 0x80031DB0)))
-        self.assertEqual(1, self.runtime.heartbeat(self.read))
+        self.assertEqual(0xFFFFFFFD, self.fake.read_u32(self.base + 0x28))
+        for expected in (0xFFFFFFFE, 0xFFFFFFFF):
+            events = self.dispatcher_frame()
+            self.assertNotIn(("call", 0x8028DF30), events)
+            self.assertEqual(expected, self.fake.read_u32(self.base + 0x28))
+        events = self.dispatcher_frame()
+        self.assertIn(("call", 0x8028DF30), events)
+        self.assertEqual(0, self.fake.read_u32(self.base + 0x28))
+        self.assertLess(creation_events.index(("isync",)),
+                        creation_events.index(("call", 0x80031DB0)))
+        self.assertEqual(4, self.runtime.heartbeat(self.read))
         self.assertTrue(self.runtime.ensure_installed(self.read, self.write))
 
     def test_failed_event_binding_keeps_native_timeline_running(self):
@@ -1085,8 +1104,17 @@ class TestCreatePopupRuntime(unittest.TestCase):
                 self.assertNotIn(("call", 0x8028DF30), events)
                 self.assertIn(("call", 0x802E6EFC), events)
                 self.assertEqual(0, self.fake.read_u32(self.base + 0x4C))
-                self.assertEqual(0, self.fake.read_u32(self.base + 0x5C))
+                self.assertEqual(0, self.fake.read_u32(self.base + 0x28))
                 self.assertTrue(self.runtime._known_image(self.read(self.runtime.layout.code_base, len(self.runtime.image))))
+
+    def test_failed_screen_hide_does_not_start_direct_sequence(self):
+        self.prepare_dispatch()
+        events = self.dispatcher_frame(hide_ok=False)
+        self.assertNotIn(("call", 0x8028DF30), events)
+        self.assertEqual(0, self.fake.read_u32(self.base + 0x28))
+        for _ in range(4):
+            events = self.dispatcher_frame()
+            self.assertNotIn(("call", 0x8028DF30), events)
 
     def test_thumbnail_diagnostic_reads_metadata_without_mutation(self):
         self.prepare_dispatch()
@@ -1097,9 +1125,10 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.fake.write_u32(0x81206024, 1)
         report = self.runtime.lifecycle(self.read)
         self.assertEqual("Thumb:AutomaticRocket", report["thumbnail_identifier_from_metadata"])
+        self.assertEqual("AutomaticRocket", report["metadata_name"])
         self.assertEqual(1, report["unlock_count"])
         self.assertTrue(report["unlock_finished_handler_bound"])
-        self.assertTrue(report["direct_sequence_succeeded"])
+        self.assertEqual(3, report["preload_frames_remaining"])
         self.assertTrue(self.runtime._known_image(self.read(self.runtime.layout.code_base, len(self.runtime.image))))
 
     def test_native_preflight_defers_until_registry_and_descriptor_are_ready(self):
