@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 8
+VERSION = 9
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -58,9 +58,10 @@ class PopupPatchLayout:
     end: int = 0x80006514
     aux_base: int = 0x8062C100
     aux_setup: int = 0x8062C100
-    aux_update: int = 0x8062C1A0
+    aux_update: int = 0x8062C180
     aux_data: int = 0x8062C300
-    aux_end: int = 0x8062C400
+    aux_diagnostics: int = 0x8062C410
+    aux_end: int = 0x8062C450
 
 
 def hook_words(layout):
@@ -309,7 +310,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
 
 
 def build_aux_image(layout: PopupPatchLayout) -> bytes:
-    """State machine in a second verified all-zero DOL padding region."""
+    """GFx loader diagnostics in a second verified all-zero DOL padding region."""
     if layout != PopupPatchLayout():
         raise ValueError("Only the verified CREATE executable layout is supported")
     load_mailbox = (0x3D808000, 0x618C6480)
@@ -320,66 +321,39 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
 
     strings = {}
     data = bytearray()
+    image_path = b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer."
     for name, value in (
-            ("frames", b"_root.mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._framesloaded\0"),
-            ("stop", b"_root.mUnlockContainer.mUnlockFrame.stop\0"),
             ("root_stop", b"_root.stop\0"),
-            ("goto_stop", b"_root.mUnlockContainer.mUnlockFrame.gotoAndStop\0"),
-            ("play", b"_root.mUnlockContainer.mUnlockFrame.play\0"),
-            ("wait", b"Wait\0"), ("string_format", b"s\0")):
+            ("loading", image_path + b"mLoading\0"),
+            ("failed", image_path + b"mLoadFailed\0"),
+            ("width", image_path + b"_width\0"),
+            ("height", image_path + b"_height\0")):
         strings[name] = layout.aux_data + len(data)
         data.extend(value)
 
-    def invoke(r, path, *, argument=None):
+    def invoke(r, path):
         r.emit(*load_mailbox, 0x806C0040)
         load(r, 4, path)
-        if argument is None:
-            r.emit(0x38AC008F)
-        else:
-            load(r, 5, strings["string_format"])
-            load(r, 6, argument)
-        r.emit(0x4CC63182)
+        r.emit(0x38AC008F, 0x4CC63182)
         r.branch(0x8028DF30, link=True)
 
     setup = _Routine(layout.aux_setup)
     setup.emit(0x9421FFE0, 0x7C0802A6, 0x90010024)
     invoke(setup, strings["root_stop"])  # suppress the native Results sequence
-    invoke(setup, 0x800061E4)  # load visible image and begin SlideOn
-    invoke(setup, strings["stop"])  # stop on its still-invisible first frame
-    setup.emit(*load_mailbox, 0x38000001, 0x900C0024,
-               0x38000000, 0x900C0028, 0x900C005C, 0x900C0058, 0x900C0090)
+    invoke(setup, 0x800061E4)  # unchanged visible object sequence
+    setup.emit(*load_mailbox, 0x38000001, 0x900C0024)
     setup.emit(0x80010024, 0x7C0803A6, 0x38210020, 0x4E800020)
 
     update = _Routine(layout.aux_update)
-    update.emit(0x9421FFD0, 0x7C0802A6, 0x90010034, *load_mailbox,
-                0x800C0024, 0x28000001)
-    update.branch("wait_for_image", 0x41820000)
-    update.emit(0x28000002)
-    update.branch("visible_hold", 0x41820000)
-    update.branch("return")
-    update.label("wait_for_image")
-    update.emit(0x816C0028, 0x396B0001, 0x916C0028, 0x280B012C)
-    update.branch("show_image", 0x41820000)  # fail-safe after 300 updates
-    update.emit(0x38000000, 0x90010014, 0x806C0040, 0x38810010)
-    load(update, 5, strings["frames"])
-    update.branch(0x8027E73C, link=True)
-    update.emit(0x28030000)
-    update.branch("return", 0x41820000)
-    update.emit(*load_mailbox, 0x80010014, 0x900C005C,
-                0x80010018, 0x900C0058, 0x8161001C, 0x916C0090,
-                0x7C005B78, 0x28000000)
-    update.branch("return", 0x41820000)
-    update.label("show_image")
-    invoke(update, strings["goto_stop"], argument=strings["wait"])
-    update.emit(*load_mailbox, 0x38000002, 0x900C0024,
-                0x3800003C, 0x900C0028)
-    update.branch("return")
-    update.label("visible_hold")
-    update.emit(0x800C0028, 0x3400FFFF, 0x900C0028)
-    update.branch("return", 0x40820000)
-    invoke(update, strings["play"])
-    update.emit(*load_mailbox, 0x38000003, 0x900C0024)
-    update.label("return")
+    update.emit(0x9421FFD0, 0x7C0802A6, 0x90010034)
+    for index, name in enumerate(("loading", "failed", "width", "height")):
+        update.emit(0x38000000, 0x90010014, *load_mailbox,
+                    0x806C0040, 0x38810010)
+        load(update, 5, strings[name])
+        update.branch(0x8027E73C, link=True)
+        load(update, 11, layout.aux_diagnostics + index * 16)
+        update.emit(0x80010010, 0x900B0000, 0x80010014, 0x900B0004,
+                    0x80010018, 0x900B0008, 0x8001001C, 0x900B000C)
     update.emit(0x80010034, 0x7C0803A6, 0x38210030, 0x4E800020)
 
     image = bytearray(layout.aux_end - layout.aux_base)
@@ -389,7 +363,7 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
             raise ValueError(f"Popup auxiliary routine {routine.base:08X} exceeds cave space ({len(code)} bytes)")
         start = routine.base - layout.aux_base
         image[start:start + len(code)] = code
-    if len(data) > layout.aux_end - layout.aux_data:
+    if len(data) > layout.aux_diagnostics - layout.aux_data:
         raise ValueError("Popup auxiliary strings exceed cave space")
     image[layout.aux_data - layout.aux_base:layout.aux_data - layout.aux_base + len(data)] = data
     return bytes(image)
@@ -417,7 +391,8 @@ class PopupRuntime:
             "heartbeat_unchanged_seconds": round(time.monotonic() - self._last_heartbeat_at, 1)
             if self.installed else None,
             "cave_matches": self._known_image(read_memory(self.layout.code_base, len(self.image))),
-            "aux_cave_matches": read_memory(self.layout.aux_base, len(self.aux_image)) == self.aux_image,
+            "aux_cave_matches": self._known_aux_image(
+                read_memory(self.layout.aux_base, len(self.aux_image))),
             "hooks": {f"0x{address:08X}": {
                 "ram": read_memory(address, 4).hex().upper(),
                 "expected": f"{value:08X}",
@@ -428,7 +403,19 @@ class PopupRuntime:
         state = self.snapshot(read_memory)
         def u32(address):
             return int.from_bytes(read_memory(address, 4), "big")
-        frames_payload = (u32(self.layout.mailbox + 0x58) << 32) | u32(self.layout.mailbox + 0x90)
+        def gfx_value(index):
+            raw = read_memory(self.layout.aux_diagnostics + index * 16, 16)
+            value_type = int.from_bytes(raw[4:8], "big") & 0x8F
+            payload = raw[8:16]
+            value = None
+            if value_type == 2:
+                value = bool(payload[0])
+            elif value_type in (3, 4):
+                value = int.from_bytes(payload[:4], "big", signed=value_type == 3)
+            elif value_type == 5:
+                value = struct.unpack(">d", payload)[0]
+            return {"type": value_type, "value": value, "payload": "0x" + payload.hex().upper()}
+        loading, failed, width, height = (gfx_value(index) for index in range(4))
         result = {
             "popup_pointer": f"0x{state['popup_pointer']:08X}",
             "callback_invoked": bool(state["request_seq"] and state["ack_seq"] == state["request_seq"]),
@@ -437,12 +424,15 @@ class PopupRuntime:
             "owner_active": bool(state["active"]),
             "unlock_finished_handler_bound": bool(u32(self.layout.mailbox + 0x4C)),
             "popup_phase": u32(self.layout.mailbox + 0x24),
-            "visible_hold_frames_remaining": u32(self.layout.mailbox + 0x28),
             "show_unlock_called": u32(self.layout.mailbox + 0x24) >= 1,
-            "thumbnail_ready": u32(self.layout.mailbox + 0x24) >= 2 and bool(frames_payload),
-            "thumbnail_framesloaded_value_type": u32(self.layout.mailbox + 0x5C),
-            "thumbnail_framesloaded_payload":
-                f"0x{frames_payload:016X}",
+            "thumbnail_loading": loading,
+            "thumbnail_load_failed": failed,
+            "thumbnail_width": width,
+            "thumbnail_height": height,
+            "thumbnail_loader_complete_observed": (
+                loading["value"] is False and failed["value"] is False
+                and isinstance(width["value"], (int, float)) and width["value"] > 0
+                and isinstance(height["value"], (int, float)) and height["value"] > 0),
             "movie_slot": None, "movie_slot_active": False, "root_frame_zero_based": None,
         }
         record = u32(self.layout.mailbox + 0x54)
@@ -511,6 +501,10 @@ class PopupRuntime:
                 and data[offset + 0x50:offset + 0x54] == self.image[offset + 0x50:offset + 0x54]
                 and data[offset + 0x60:offset + 0x90] == self.image[offset + 0x60:offset + 0x90])
 
+    def _known_aux_image(self, data):
+        mutable = self.layout.aux_diagnostics - self.layout.aux_base
+        return len(data) == len(self.aux_image) and data[:mutable] == self.aux_image[:mutable]
+
     def ensure_installed(self, read_memory, write_memory):
         if self.failure:
             return False
@@ -528,7 +522,7 @@ class PopupRuntime:
             aux_cave = read_memory(self.layout.aux_base, len(self.aux_image))
             if cave != bytes(len(self.image)) and not self._known_image(cave):
                 raise RuntimeError("unknown nonzero code-cave contents")
-            if aux_cave != bytes(len(self.aux_image)) and aux_cave != self.aux_image:
+            if aux_cave != bytes(len(self.aux_image)) and not self._known_aux_image(aux_cave):
                 raise RuntimeError("unknown nonzero auxiliary code-cave contents")
             if aux_cave == bytes(len(self.aux_image)):
                 write_memory(self.layout.aux_base, self.aux_image)
@@ -615,5 +609,6 @@ class PopupRuntime:
         write_memory(self.layout.mailbox + 0x18, word(0))
         for offset in (0x24, 0x28, 0x4C, 0x54, 0x5C, 0x90):
             write_memory(self.layout.mailbox + offset, word(0))
+        write_memory(self.layout.aux_diagnostics, bytes(self.layout.aux_end - self.layout.aux_diagnostics))
         write_memory(self.layout.mailbox + 0x08, word(PENDING))  # publish last
         return True

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import struct
 import types
 import unittest
 from collections import deque
@@ -1016,7 +1017,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual({popup.VTABLE_SLOT, 0x800325E4}, set(self.runtime.hooks))
 
     def dispatcher_frame(self, *, lookup_result=0x81204000, get_ok=True, set_ok=True,
-                         hide_ok=True, frames_loaded=True):
+                         hide_ok=True, loading=False, load_failed=False,
+                         thumbnail_width=0.0, thumbnail_height=0.0):
         regs = [0x10000000 + i * 0x100 for i in range(32)]
         regs[1], regs[3], regs[4] = 0x81700000, popup.GAME_SINGLETON, 0x81203000
         before = list(regs)
@@ -1041,18 +1043,26 @@ class TestCreatePopupRuntime(unittest.TestCase):
         invokes = []
         def get_variable(r):
             self.assertEqual(0x81209000, r[3])
-            self.assertEqual(bytes(12), self.read(r[4] + 4, 12))
+            self.assertEqual(bytes(4), self.read(r[4] + 4, 4))
             if r[5] == 0x805E29DC:
                 self.fake.write_u32(r[4], 0x8120C000)
                 self.fake.write_u32(r[4] + 4, 0x46)
                 self.fake.write_u32(r[4] + 8, 0x8120D000)
                 r[3] = int(get_ok)
             else:
-                self.assertEqual(
-                    b"_root.mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._framesloaded",
-                    self.read(r[5], 100).split(b"\0")[0])
-                self.fake.write_u32(r[4] + 4, 3)
-                self.fake.write_u32(r[4] + 8, int(frames_loaded))
+                name = self.read(r[5], 100).split(b"\0")[0]
+                prefix = b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer."
+                self.assertTrue(name.startswith(prefix))
+                prop = name[len(prefix):]
+                if prop in (b"mLoading", b"mLoadFailed"):
+                    self.fake.write_u32(r[4] + 4, 2)
+                    self.fake.write_byte(r[4] + 8,
+                                         int(loading if prop == b"mLoading" else load_failed))
+                else:
+                    self.assertIn(prop, (b"_width", b"_height"))
+                    self.fake.write_u32(r[4] + 4, 5)
+                    value = thumbnail_width if prop == b"_width" else thumbnail_height
+                    self.write(r[4] + 8, struct.pack(">d", value))
                 r[3] = 1
         def set_variable(r):
             self.assertEqual(0, r[6])
@@ -1112,27 +1122,19 @@ class TestCreatePopupRuntime(unittest.TestCase):
         creation_events = events
         self.assertEqual([popup.ORIGINAL_UPDATE, 0x80490BF0, 0x80031DB0, 0x804EA4D0,
                           0x8027E73C, 0x8027E864, 0x802E6EFC, 0x8027E864,
-                          0x8028DF30, 0x8028DF30, 0x8028DF30],
+                          0x8028DF30, 0x8028DF30],
                          [e[1] for e in events if e[0] == "call"])
         self.assertEqual(1, self.fake.read_u32(self.base + 0x24))
-        for _ in range(2):
-            events = self.dispatcher_frame(frames_loaded=False)
-            self.assertNotIn(("call", 0x8028DF30), events)
-            self.assertEqual(1, self.fake.read_u32(self.base + 0x24))
-        events = self.dispatcher_frame(frames_loaded=True)
-        self.assertIn(("call", 0x8028DF30), events)
-        self.assertEqual(2, self.fake.read_u32(self.base + 0x24))
-        self.assertEqual(60, self.fake.read_u32(self.base + 0x28))
-        for remaining in range(59, 0, -1):
-            events = self.dispatcher_frame()
-            self.assertNotIn(("call", 0x8028DF30), events)
-            self.assertEqual(remaining, self.fake.read_u32(self.base + 0x28))
-        events = self.dispatcher_frame()
-        self.assertIn(("call", 0x8028DF30), events)
-        self.assertEqual(3, self.fake.read_u32(self.base + 0x24))
+        events = self.dispatcher_frame(loading=False, load_failed=False,
+                                       thumbnail_width=128.0, thumbnail_height=64.0)
+        self.assertNotIn(("call", 0x8028DF30), events)
+        report = self.runtime.lifecycle(self.read)
+        self.assertTrue(report["thumbnail_loader_complete_observed"])
+        self.assertEqual(128.0, report["thumbnail_width"]["value"])
+        self.assertEqual(64.0, report["thumbnail_height"]["value"])
         self.assertLess(creation_events.index(("isync",)),
                         creation_events.index(("call", 0x80031DB0)))
-        self.assertEqual(64, self.runtime.heartbeat(self.read))
+        self.assertEqual(2, self.runtime.heartbeat(self.read))
         self.assertTrue(self.runtime.ensure_installed(self.read, self.write))
 
     def test_failed_event_binding_keeps_native_timeline_running(self):
@@ -1156,18 +1158,6 @@ class TestCreatePopupRuntime(unittest.TestCase):
             events = self.dispatcher_frame()
             self.assertNotIn(("call", 0x8028DF30), events)
 
-    def test_thumbnail_wait_has_cleanup_preserving_fail_safe(self):
-        self.prepare_dispatch()
-        self.dispatcher_frame()
-        for _ in range(299):
-            events = self.dispatcher_frame(frames_loaded=False)
-            self.assertNotIn(("call", 0x8028DF30), events)
-        events = self.dispatcher_frame(frames_loaded=False)
-        self.assertIn(("call", 0x8028DF30), events)
-        report = self.runtime.lifecycle(self.read)
-        self.assertEqual(2, report["popup_phase"])
-        self.assertFalse(report["thumbnail_ready"])
-
     def test_thumbnail_diagnostic_reads_metadata_without_mutation(self):
         self.prepare_dispatch()
         self.dispatcher_frame()
@@ -1182,7 +1172,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertTrue(report["unlock_finished_handler_bound"])
         self.assertEqual(1, report["popup_phase"])
         self.assertTrue(report["show_unlock_called"])
-        self.assertFalse(report["thumbnail_ready"])
+        self.assertFalse(report["thumbnail_loader_complete_observed"])
         self.assertTrue(self.runtime._known_image(self.read(self.runtime.layout.code_base, len(self.runtime.image))))
 
     def test_native_preflight_defers_until_registry_and_descriptor_are_ready(self):

@@ -1,4 +1,4 @@
-# Object popup test: FePuzzleResultsPO (runtime protocol 8)
+# Object popup test: FePuzzleResultsPO (runtime protocol 9)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's create.apworld and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load in-game Save Slot 3,
    and connect the Create Client through the AP Launcher.
-5. Check /createpopupstatus: version=8, enabled=1, hooks_applied=1 and a changing
+5. Check /createpopupstatus: version=9, enabled=1, hooks_applied=1 and a changing
    heartbeat. No new AP seed or APWorld release version is required.
 
 ## Test both manual and real AP receipts
@@ -32,23 +32,17 @@ uses the confirmed Results movie rather than the Chain or PuzzleUnlock movie.
 ## Direct object view and close diagnostics
 
 After the native factory has built AddUnlockImages/Unlock and registered the UI
-slot, AP sets `mScreen._visible=false`. It then invokes DeterminePlaySequence so
-the visible image container starts its own `loadMovie("Thumb:...")`, and stops the
-UnlockFrame before its first visible frame. The earlier three-frame experiment
-only waited for the separate cache container and did not fix the white image.
-The PO root itself is stopped first so its normal Results stages cannot race this
-AP-only state machine; PlayOutro later resumes it at the native End label.
+slot, AP sets `mScreen._visible=false`. It stops the PO root and invokes
+DeterminePlaySequence once, which starts the native visible Object sequence and
+its `loadMovie("Thumb:...")` call. Protocol 9 does not stop, seek or resume the
+UnlockFrame and does not add a fixed display delay. This isolates the remaining
+white-image and input problems from the child-timeline changes in protocol 8.
 
-Each SimUpdate now reads `_framesloaded` from the actual visible path
-`mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer`. A zero value keeps
-the unlock hidden. A nonzero value jumps the UnlockFrame to its visible `Wait`
-label. It stays there for 60 real game updates, adding about one second at 60 Hz,
-then `play()` resumes the original SlideOff and completion event. The thumbnail
-URI and native loader are unchanged.
-
-If `_framesloaded` never becomes nonzero, a 300-update fail-safe resumes the
-visible/close path so a missing resource cannot leave CREATE permanently modal.
-In that case thumbnail_ready remains false in `/createpopupstatus`.
+Each active SimUpdate reads four properties from the actual visible path
+`mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer`: `mLoading`,
+`mLoadFailed`, `_width` and `_height`. These reads are diagnostic only and do not
+change the movie. `_framesloaded` is no longer used because its observed payload
+decoded to 1.0 even while the rendered thumbnail remained white.
 
 The shared FePuzzleThumbnail UnlockContainer ends by calling
 `_root.Event_UnlockFinished`. FePuzzleResultsPO does not define that handler.
@@ -74,16 +68,19 @@ There is no second polling close path or elapsed-time close trigger.
 `/createpopupstatus` includes:
 
 - unlock_finished_handler_bound, popup_phase and show_unlock_called.
-- thumbnail_ready, thumbnail_framesloaded_value_type and the exact raw
-  thumbnail_framesloaded_payload returned by GFx.
-- visible_hold_frames_remaining while the object is held at the Wait label.
+- thumbnail_loading, thumbnail_load_failed, thumbnail_width and thumbnail_height.
+  Each field reports the GFx type, decoded value and exact raw payload.
+- thumbnail_loader_complete_observed, which becomes true only when loading and
+  failure are both false and both dimensions are positive.
 - unlock_count read from the live result object +0x24 (unavailable after deletion).
 - object_record_preflight, metadata_ptr, metadata_resolved, and
   thumbnail_identifier_from_metadata, derived from record+0x18 and metadata+0.
 - The existing owner, callback, request/ack, modal, movie slot and root frame fields.
 
-The metadata-derived identifier does not itself prove a successful load;
-thumbnail_ready now records the visible container's `_framesloaded` result.
+The metadata-derived identifier does not itself prove a successful load. The
+loader-complete field is also only an inference from the four visible-container
+properties. A GFx type of 0 means that the queried property was undefined; this
+would show that the ActionScript loader state is not exposed on this container.
 There are no independent
 native-close, outer-close, availability, AddUnlockImages or Unlock call counters
 in this build. These are not inferred or reported as measured calls.
@@ -101,8 +98,8 @@ instruction writes and cache invalidation. The previous award-mode hook and
 FeSimpleMessage availability hook are removed; old revisions require a fresh
 boot instead of being overwritten in place.
 
-Protocol 8 also uses the executable's verified zero padding at
-0x8062C100..0x8062C400 for the ready/hold state machine and its GFx paths. Both
+Protocol 9 also uses the executable's verified zero padding at
+0x8062C100..0x8062C450 for the loader diagnostics and their GFx paths. Both
 caves must be entirely zero or match this exact runtime image before installation.
 No extracted game asset is packaged.
 
