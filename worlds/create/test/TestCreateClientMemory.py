@@ -786,7 +786,6 @@ def seed_popup_memory(memory):
 
 def apply_guest_popup_hooks(runtime, memory):
     execute_popup_ppc(runtime, memory, runtime.layout.maintain_hooks, [0] * 32)
-    execute_popup_ppc(runtime, memory, runtime.layout.aux_maintain_chain, [0] * 32)
 
 
 class TestCreatePopupRuntime(unittest.TestCase):
@@ -818,26 +817,6 @@ class TestCreatePopupRuntime(unittest.TestCase):
             with self.subTest(source=source, target=target), self.assertRaises(ValueError):
                 popup.ppc_branch(source, target)
 
-    def test_chain_update_is_suspended_only_for_active_busy_ap_popup(self):
-        controller = 0x8069A3A0
-        regs = [0] * 32
-        regs[3] = controller
-        self.fake.write_u32(controller + 0x1C, 1)
-        for status, expected_pc in (
-                (popup.IDLE, 0x80097EC0),
-                (popup.PENDING, 0x80097EC0),
-                (popup.ACTIVE, 0x81230000)):
-            with self.subTest(status=status):
-                self.fake.write_u32(self.base + 8, status)
-                pc, _, _, _ = execute_popup_ppc(
-                    self.runtime, self.fake, self.runtime.layout.aux_chain_update, regs)
-                self.assertEqual(expected_pc, pc)
-        self.fake.write_u32(controller + 0x1C, 0)
-        self.fake.write_u32(self.base + 8, popup.ACTIVE)
-        pc, _, _, _ = execute_popup_ppc(
-            self.runtime, self.fake, self.runtime.layout.aux_chain_update, regs)
-        self.assertEqual(0x80097EC0, pc)
-
     def test_python_installs_only_cave_and_vtable_data_pointer(self):
         self.runtime.ensure_installed(self.read, self.write)
         self.assertTrue(self.runtime.installed)
@@ -849,18 +828,15 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(self.runtime.layout.dispatcher, self.fake.read_u32(popup.VTABLE_SLOT))
         self.assertFalse(self.runtime.ready)
 
-    def test_guest_installs_and_flushes_both_runtime_hooks(self):
+    def test_guest_installs_and_flushes_results_availability_hook(self):
         self.runtime.ensure_installed(self.read, self.write)
-        _, _, _, chain_events = execute_popup_ppc(
-            self.runtime, self.fake, self.runtime.layout.aux_maintain_chain, [0] * 32)
         _, _, _, events = execute_popup_ppc(
             self.runtime, self.fake, self.runtime.layout.maintain_hooks, [0] * 32)
-        events = chain_events + events
         for address in popup.CODE_ORIGINALS:
             self.assertEqual(self.runtime.hooks[address], self.fake.read_u32(address))
             self.assertIn(("dcbst", address & ~31), events)
             self.assertIn(("icbi", address & ~31), events)
-        self.assertEqual(2, sum(e[0] == "icbi" for e in events))
+        self.assertEqual(1, sum(e[0] == "icbi" for e in events))
         self.assertLess(events.index(("isync",)), events.index(("store", self.base + 0x48, 1)))
 
     def test_installs_results_context_and_native_owner_cleanup(self):
@@ -912,11 +888,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.runtime.uninstall(self.read, self.write)
         self.assertEqual([self.base + 8, self.base + 0x44], [a for a, _ in self.writes])
         self.assertEqual(self.runtime.layout.dispatcher, self.fake.read_u32(popup.VTABLE_SLOT))
-        _, _, _, chain_events = execute_popup_ppc(
-            self.runtime, self.fake, self.runtime.layout.aux_maintain_chain, [0] * 32)
         _, _, _, events = execute_popup_ppc(
             self.runtime, self.fake, self.runtime.layout.maintain_hooks, [0] * 32)
-        events = chain_events + events
         for address, value in popup.ORIGINALS.items():
             self.assertEqual(value, self.fake.read_u32(address))
         self.assertLess(events.index(("isync",)),
@@ -1041,8 +1014,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(layout.end - layout.code_base, len(self.runtime.image))
         self.assertEqual(popup.word(popup.ppc_branch(layout.dispatcher + 12, popup.ORIGINAL_UPDATE, link=True)),
                          self.runtime.image[12:16])
-        self.assertEqual({popup.VTABLE_SLOT, 0x800325E4, popup.CHAIN_UPDATE_SITE},
-                         set(self.runtime.hooks))
+        self.assertEqual({popup.VTABLE_SLOT, 0x800325E4}, set(self.runtime.hooks))
 
     def dispatcher_frame(self, *, lookup_result=0x81204000, get_ok=True, set_ok=True,
                          hide_ok=True, item_count=1.0, visible_width=0.0,
@@ -1151,11 +1123,13 @@ class TestCreatePopupRuntime(unittest.TestCase):
         creation_events = events
         self.assertEqual([popup.ORIGINAL_UPDATE, 0x80490BF0, 0x80031DB0, 0x804EA4D0,
                           0x8027E73C, 0x8027E864, 0x802E6EFC, 0x8027E864,
+                          0x8028DF30, 0x8028DF30, 0x8028DF30,
                           ],
                          [e[1] for e in events if e[0] == "call"])
         self.assertEqual(1, self.fake.read_u32(self.base + 0x24))
         events = self.dispatcher_frame(visible_width=128.0, preload_width=64.0)
-        self.assertNotIn(("call", 0x8028DF30), events)
+        self.assertIn(("call", 0x8028DF30), events)
+        self.assertEqual(2, self.fake.read_u32(self.base + 0x24))
         report = self.runtime.lifecycle(self.read)
         self.assertTrue(report["show_unlock_called"])
         self.assertLess(creation_events.index(("isync",)),
@@ -1295,13 +1269,10 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertTrue(report["callback_invoked"])
         self.assertEqual(0, report["modal"])
 
-    def test_refuses_previous_revision_and_wrong_singleton(self):
-        for address in (0x8000DB5C, popup.GAME_SINGLETON):
-            with self.subTest(address=address):
-                self.setUp()
-                self.fake.write_u32(address, 0x12345678)
-                self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
-                self.assertEqual([], self.writes)
+    def test_refuses_wrong_singleton(self):
+        self.fake.write_u32(popup.GAME_SINGLETON, 0x12345678)
+        self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
+        self.assertEqual([], self.writes)
 
     def run_leaf_hook(self, entry, registers, *, lr=0x81230000):
         pc, regs, equal, _ = execute_popup_ppc(self.runtime, self.fake, entry, registers, lr=lr)
@@ -1362,15 +1333,6 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.ctx._popup_delay_logged = False
         self.ctx._last_location_check_at = 0.0
         self.ctx._last_object_received_at = 0.0
-        self.ctx._popup_gate_chain_state = None
-        self.ctx._popup_gate_chain_changed_at = 0.0
-        self.ctx._popup_gate_modal = None
-        self.ctx._popup_gate_modal_transition = None
-        self.ctx._popup_gate_modal_changed_at = 0.0
-        self.ctx._popup_gate_idle_samples = 0
-        self.ctx._popup_chain_gate_armed = False
-        self.ctx._popup_chain_busy_state = None
-        self.ctx._popup_post_close_observe_until = 0.0
         self.ctx.ram_is_settled = lambda: True
         self.ctx.slot_ram_is_settled = lambda: True
         self.names = {value: name for name, data in self.ctx.slot_data["objects"].items()
@@ -1389,8 +1351,7 @@ class TestCreatePopupQueue(unittest.TestCase):
         client.sync_object_popups(self.ctx, False)
         apply_guest_popup_hooks(self.ctx._popup_runtime, self.fake)
         self.fake.write_u32(self.ctx._popup_runtime.layout.mailbox + 0x1C, 1)
-        for _ in range(client.AUTO_POPUP_IDLE_SAMPLES):
-            client.sync_object_popups(self.ctx, False)
+        client.sync_object_popups(self.ctx, False)
 
     def test_baseline_suppresses_history_and_keeps_receipt_order_duplicates(self):
         self.receipt(13)
@@ -1437,8 +1398,6 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.receipt(13)
         with patch.object(client.time, "monotonic", return_value=100.0):
             client.collect_new_object_popup_items(self.ctx)
-        self.ctx._popup_chain_gate_armed = True
-        self.ctx._popup_chain_busy_state = 1
         self.fake.write_u32(0x8069A3BC, 1)
         with patch.object(client.time, "monotonic", return_value=101.0):
             client.service_object_popup_queue(self.ctx, False)
@@ -1519,8 +1478,7 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.receipt(13)
         apply_guest_popup_hooks(self.ctx._popup_runtime, self.fake)
         self.fake.write_u32(self.ctx._popup_runtime.layout.mailbox + 0x1C, 1)
-        for _ in range(client.AUTO_POPUP_IDLE_SAMPLES):
-            client.sync_object_popups(self.ctx, False)
+        client.sync_object_popups(self.ctx, False)
         self.assertEqual((13, 1), self.ctx._popup_inflight)
 
     def test_manual_retry_preserves_queue_receipt_cursor_and_cancelled_request(self):

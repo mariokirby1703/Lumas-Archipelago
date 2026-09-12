@@ -1,4 +1,4 @@
-# Object popup test: FePuzzleResultsPO (runtime protocol 12)
+# Object popup test: FePuzzleResultsPO (runtime protocol 13)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's create.apworld and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load in-game Save Slot 3,
    and connect the Create Client through the AP Launcher.
-5. Check /createpopupstatus: version=12, enabled=1, hooks_applied=1 and a changing
+5. Check /createpopupstatus: version=13, enabled=1, hooks_applied=1 and a changing
    heartbeat. No new AP seed or APWorld release version is required.
 
 ## Test both manual and real AP receipts
@@ -28,34 +28,21 @@ requests. Both start at the earliest sync where the popup runtime is idle and
 the global modal at `0x80948040` is zero. There is no Chain-state, challenge or
 timer gate. A busy modal leaves the item queued for the next sync.
 
-While an AP popup is ACTIVE and CreateChainsCamera state `r3+0x1C` is nonzero,
-the hook at `0x8000DB5C` temporarily skips its call to `0x80097EC0`. PENDING and
-state zero always run the original update. The hook never writes the controller
-state; the original update resumes on the first frame after the AP callback
-returns the mailbox to IDLE.
-
-The client logs the world/challenge context, modal value, selected Create Chain
-state bytes and elapsed time since the last location check and Object receipt
-when an automatic popup is delayed by a modal and when it starts. These values
-are diagnostic; no gameplay or input flag is written by the client.
-For two seconds after an automatic popup closes, modal transitions are also
-logged. `/createpopupstatus` reports state stability and the last modal
-transition. If the AP popup is inactive while modal is nonzero, it includes the
-raw nonzero entries among the first 16 UI-manager slots for diagnosis only.
-
 The intended and live-confirmed result is only the Object Unlocked view with its
-native thumbnail. Manual dismissal restores input. The temporary Chain-update
-suspension still requires live confirmation; the tests do not render the UI.
+native thumbnail. Protocol 13 does not hook, pause or inspect CreateChainsCamera
+or challenge execution. The direct width-gated presentation still requires live
+confirmation; the tests do not render the UI.
 
 ## Direct object view and close diagnostics
 
 After the native factory has built AddUnlockImages/Unlock and registered the UI
-slot, AP sets `mScreen._visible=false`. Protocol 12 then leaves the PO root and
-UnlockFrame timelines entirely under ActionScript control. The PO root reaches
-its own native DeterminePlaySequence frames after registration; that function
-loads the visible `Thumb:` movie and starts `SlideOn`. AP does not invoke
-DeterminePlaySequence itself and does not stop, seek or resume either timeline.
-There is no fixed display delay.
+slot, AP sets `mScreen._visible=false`, stops the PO root, invokes
+DeterminePlaySequence exactly once to issue the visible `Thumb:` load, and stops
+the UnlockFrame before it becomes visible. Each active SimUpdate reads
+`mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._width`. Only a GFx
+Number with a positive double high word resumes the UnlockFrame with `play()`.
+The live Protocol 11 result measured about 102.4 for a rendered Automatic Rocket
+thumbnail. Protocol 13 uses no `_framesloaded` check, fixed delay or timeout.
 
 The shared FePuzzleThumbnail UnlockContainer ends by calling
 `_root.Event_UnlockFinished`. FePuzzleResultsPO does not define that handler.
@@ -86,8 +73,8 @@ There is no second polling close path or elapsed-time close trigger.
   thumbnail_identifier_from_metadata, derived from record+0x18 and metadata+0.
 - The existing owner, callback, request/ack, modal, movie slot and root frame fields.
 
-The metadata-derived identifier and the live-confirmed rendered thumbnail
-together establish the working Protocol 12 image path.
+The metadata-derived identifier and the positive visible width together identify
+the intended rendered thumbnail.
 There are no independent
 native-close, outer-close, availability, AddUnlockImages or Unlock call counters
 in this build. These are not inferred or reported as measured calls.
@@ -105,9 +92,8 @@ instruction writes and cache invalidation. The previous award-mode hook and
 FeSimpleMessage availability hook are removed; old revisions require a fresh
 boot instead of being overwritten in place.
 
-Protocol 12 also uses the executable's verified zero padding at
-0x8062C100..0x8062C450 for the Chain update hook and its guest-side maintenance.
-Both
+Protocol 13 also uses the executable's verified zero padding at
+0x8062C100..0x8062C450 for the direct unlock setup, width poll and GFx paths. Both
 caves must be entirely zero or match this exact runtime image before installation.
 No extracted game asset is packaged.
 
@@ -121,9 +107,8 @@ sum of context+0x10/+0x14, giving exactly one unlock slot before returning.
 The factory also performs native UI/VFX setup; no claim is made that skipping
 the challenge-specific block alone proves a particular rendered first frame.
 
-The Object availability hook is at 0x800325E4. The Chain update call hook is at
-0x8000DB5C and preserves its original call except during an ACTIVE AP popup with
-a nonzero controller state. In the availability builder the result object is
+The only code hook is the Object availability hook at 0x800325E4. The call at
+0x8000DB5C remains its original `bl 0x80097EC0`. In the availability builder the result object is
 r29 and the scanned global Object ID is r17. ACTIVE status and the AP owner
 callback context must match. The exact target returns true; other Objects in
 that AP scan return false. A vanilla result object calls the original Spark

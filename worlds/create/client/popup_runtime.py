@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 12
+VERSION = 13
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -22,11 +22,8 @@ ORIGINAL_UPDATE = 0x8000D880
 GAME_SINGLETON = 0x806798C0
 GAME_VTABLE = 0x805E2C4C
 HEARTBEAT_TIMEOUT_SECONDS = 5.0
-CHAIN_UPDATE_SITE = 0x8000DB5C
-CHAIN_UPDATE_ORIGINAL = 0x4808A365
 CODE_ORIGINALS = {0x800325E4: 0x4BFF2F7D}
-ORIGINALS = {VTABLE_SLOT: ORIGINAL_UPDATE, **CODE_ORIGINALS,
-             CHAIN_UPDATE_SITE: CHAIN_UPDATE_ORIGINAL}
+ORIGINALS = {VTABLE_SLOT: ORIGINAL_UPDATE, **CODE_ORIGINALS}
 # Refuse old runtime revisions rather than mixing instruction-cache state.
 LEGACY_ORIGINALS = {0x80092184: 0x3A600000, 0x8009240C: 0x3A730001,
                     0x80092424: 0x7C1EE800,
@@ -61,8 +58,7 @@ class PopupPatchLayout:
     end: int = 0x80006514
     aux_base: int = 0x8062C100
     aux_setup: int = 0x8062C100
-    aux_chain_update: int = 0x8062C140
-    aux_maintain_chain: int = 0x8062C180
+    aux_update: int = 0x8062C1A0
     aux_data: int = 0x8062C300
     aux_diagnostics: int = 0x8062C410
     aux_end: int = 0x8062C450
@@ -70,8 +66,7 @@ class PopupPatchLayout:
 
 def hook_words(layout):
     return {VTABLE_SLOT: layout.dispatcher,
-            0x800325E4: ppc_branch(0x800325E4, layout.object_available_hook, link=True),
-            CHAIN_UPDATE_SITE: ppc_branch(CHAIN_UPDATE_SITE, layout.aux_chain_update, link=True)}
+            0x800325E4: ppc_branch(0x800325E4, layout.object_available_hook, link=True)}
 
 
 class _Routine:
@@ -118,7 +113,6 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     # SimUpdate(this, const cTime&) receives the untouched incoming r3/r4.
     d.branch(ORIGINAL_UPDATE, link=True)
     d.emit(0x9061003C)
-    d.branch(layout.aux_maintain_chain, link=True)
     d.branch(layout.maintain_hooks, link=True)
     d.emit(*load_mailbox, 0x816C001C, 0x396B0001, 0x916C001C)
     d.emit(0x800C0000, 0x3D604150, 0x616B4F50, 0x7C005800)
@@ -286,7 +280,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
 
     # ACTIVE needs no per-frame movie manipulation; the native timeline runs.
     s = _Routine(layout.show_unlock)
-    s.emit(0x4E800020)
+    s.branch(layout.aux_update)
 
     c = _Routine(layout.closed_callback)
     c.emit(0x80030010, 0x90030014, 0x38000000, 0x90030008, 0x4E800020)
@@ -316,7 +310,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
 
 
 def build_aux_image(layout: PopupPatchLayout) -> bytes:
-    """Chain suspension and hook maintenance in verified zero DOL padding."""
+    """Direct unlock state machine in verified zero DOL padding."""
     if layout != PopupPatchLayout():
         raise ValueError("Only the verified CREATE executable layout is supported")
     load_mailbox = (0x3D808000, 0x618C6480)
@@ -325,52 +319,51 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
         r.emit(0x3C000000 | register << 21 | value >> 16,
                0x60000000 | register << 21 | register << 16 | value & 0xFFFF)
 
+    strings = {}
     data = bytearray()
+    for name, value in (
+            ("root_stop", b"_root.stop\0"),
+            ("determine", b"_root.DeterminePlaySequence\0"),
+            ("unlock_stop", b"_root.mUnlockContainer.mUnlockFrame.stop\0"),
+            ("unlock_play", b"_root.mUnlockContainer.mUnlockFrame.play\0"),
+            ("width", b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._width\0")):
+        strings[name] = layout.aux_data + len(data)
+        data.extend(value)
+
+    def invoke(r, path):
+        r.emit(*load_mailbox, 0x806C0040)
+        load(r, 4, path)
+        r.emit(0x38AC008F, 0x4CC63182)
+        r.branch(0x8028DF30, link=True)
 
     setup = _Routine(layout.aux_setup)
     setup.emit(0x9421FFE0, 0x7C0802A6, 0x90010024)
-    # Leave the PO root running. Its native timeline invokes
-    # DeterminePlaySequence after UI registration and owns unlock timing.
+    invoke(setup, strings["root_stop"])
+    invoke(setup, strings["determine"])
+    invoke(setup, strings["unlock_stop"])
     setup.emit(*load_mailbox, 0x38000001, 0x900C0024)
     setup.emit(0x80010024, 0x7C0803A6, 0x38210020, 0x4E800020)
 
-    chain_update = _Routine(layout.aux_chain_update)
-    chain_update.emit(*load_mailbox, 0x800C0008, 0x28000002)
-    chain_update.branch("original", 0x40820000)
-    chain_update.emit(0x8003001C, 0x28000000)
-    chain_update.branch("original", 0x41820000)
-    chain_update.emit(0x4E800020)
-    chain_update.label("original")
-    chain_update.branch(0x80097EC0)
-
-    maintain_chain = _Routine(layout.aux_maintain_chain)
-    maintain_chain.emit(*load_mailbox, 0x814C0044)
-    load(maintain_chain, 11, CHAIN_UPDATE_SITE)
-    load(maintain_chain, 5, CHAIN_UPDATE_ORIGINAL)
-    load(maintain_chain, 6, hook_words(layout)[CHAIN_UPDATE_SITE])
-    maintain_chain.emit(0x800B0000, 0x7C002800)
-    maintain_chain.branch("known", 0x41820000)
-    maintain_chain.emit(0x7C003000)
-    maintain_chain.branch("known", 0x41820000)
-    maintain_chain.emit(0x280A0000)
-    maintain_chain.branch("return", 0x41820000)
-    maintain_chain.emit(0x38000005, 0x900C0018, 0x38000003, 0x900C0008,
-                        0x38000000, 0x900C0044, 0x900C0048)
-    maintain_chain.branch("return")
-    maintain_chain.label("known")
-    maintain_chain.emit(0x280A0001)
-    maintain_chain.branch("write", 0x40820000)
-    maintain_chain.emit(0x7CC53378)
-    maintain_chain.label("write")
-    maintain_chain.emit(0x90AB0000, 0x7C00586C, 0x7C0004AC, 0x7C005FAC,
-                        0x7C0004AC, 0x4C00012C)
-    maintain_chain.label("return")
-    maintain_chain.emit(0x4E800020)
+    update = _Routine(layout.aux_update)
+    update.emit(0x9421FFD0, 0x7C0802A6, 0x90010034, *load_mailbox,
+                0x800C0024, 0x28000001)
+    update.branch("return", 0x40820000)
+    update.emit(0x38000000, 0x90010014, 0x806C0040, 0x38810010)
+    load(update, 5, strings["width"])
+    update.branch(0x8027E73C, link=True)
+    update.emit(0x28030000)
+    update.branch("return", 0x41820000)
+    update.emit(0x80010014, 0x7000008F, 0x28000005)
+    update.branch("return", 0x40820000)
+    update.emit(0x81610018, 0x2C0B0000)
+    update.branch("return", 0x40810000)  # signed high word <= 0
+    invoke(update, strings["unlock_play"])
+    update.emit(*load_mailbox, 0x38000002, 0x900C0024)
+    update.label("return")
+    update.emit(0x80010034, 0x7C0803A6, 0x38210030, 0x4E800020)
 
     image = bytearray(layout.aux_end - layout.aux_base)
-    for routine, limit in ((setup, layout.aux_chain_update),
-                           (chain_update, layout.aux_maintain_chain),
-                           (maintain_chain, layout.aux_data)):
+    for routine, limit in ((setup, layout.aux_update), (update, layout.aux_data)):
         code = routine.build()
         if routine.base + len(code) > limit:
             raise ValueError(f"Popup auxiliary routine {routine.base:08X} exceeds cave space ({len(code)} bytes)")
