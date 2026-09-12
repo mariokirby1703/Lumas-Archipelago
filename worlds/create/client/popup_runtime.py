@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 9
+VERSION = 10
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -324,10 +324,10 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
     image_path = b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer."
     for name, value in (
             ("root_stop", b"_root.stop\0"),
-            ("loading", image_path + b"mLoading\0"),
-            ("failed", image_path + b"mLoadFailed\0"),
-            ("width", image_path + b"_width\0"),
-            ("height", image_path + b"_height\0")):
+            ("item_count", b"mItemData.length\0"),
+            ("visible_width", image_path + b"_width\0"),
+            ("preload_width", b"mThumbnailContainer0._width\0"),
+            ("visible", image_path + b"_visible\0")):
         strings[name] = layout.aux_data + len(data)
         data.extend(value)
 
@@ -346,7 +346,7 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
 
     update = _Routine(layout.aux_update)
     update.emit(0x9421FFD0, 0x7C0802A6, 0x90010034)
-    for index, name in enumerate(("loading", "failed", "width", "height")):
+    for index, name in enumerate(("item_count", "visible_width", "preload_width", "visible")):
         update.emit(0x38000000, 0x90010014, *load_mailbox,
                     0x806C0040, 0x38810010)
         load(update, 5, strings[name])
@@ -415,7 +415,8 @@ class PopupRuntime:
             elif value_type == 5:
                 value = struct.unpack(">d", payload)[0]
             return {"type": value_type, "value": value, "payload": "0x" + payload.hex().upper()}
-        loading, failed, width, height = (gfx_value(index) for index in range(4))
+        item_count, visible_width, preload_width, visible = (
+            gfx_value(index) for index in range(4))
         result = {
             "popup_pointer": f"0x{state['popup_pointer']:08X}",
             "callback_invoked": bool(state["request_seq"] and state["ack_seq"] == state["request_seq"]),
@@ -425,14 +426,10 @@ class PopupRuntime:
             "unlock_finished_handler_bound": bool(u32(self.layout.mailbox + 0x4C)),
             "popup_phase": u32(self.layout.mailbox + 0x24),
             "show_unlock_called": u32(self.layout.mailbox + 0x24) >= 1,
-            "thumbnail_loading": loading,
-            "thumbnail_load_failed": failed,
-            "thumbnail_width": width,
-            "thumbnail_height": height,
-            "thumbnail_loader_complete_observed": (
-                loading["value"] is False and failed["value"] is False
-                and isinstance(width["value"], (int, float)) and width["value"] > 0
-                and isinstance(height["value"], (int, float)) and height["value"] > 0),
+            "movie_item_data_length": item_count,
+            "visible_thumbnail_width": visible_width,
+            "preloaded_thumbnail_width": preload_width,
+            "visible_thumbnail_container_visible": visible,
             "movie_slot": None, "movie_slot_active": False, "root_frame_zero_based": None,
         }
         record = u32(self.layout.mailbox + 0x54)

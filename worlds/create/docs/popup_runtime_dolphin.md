@@ -1,4 +1,4 @@
-# Object popup test: FePuzzleResultsPO (runtime protocol 9)
+# Object popup test: FePuzzleResultsPO (runtime protocol 10)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's create.apworld and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load in-game Save Slot 3,
    and connect the Create Client through the AP Launcher.
-5. Check /createpopupstatus: version=9, enabled=1, hooks_applied=1 and a changing
+5. Check /createpopupstatus: version=10, enabled=1, hooks_applied=1 and a changing
    heartbeat. No new AP seed or APWorld release version is required.
 
 ## Test both manual and real AP receipts
@@ -38,11 +38,14 @@ its `loadMovie("Thumb:...")` call. Protocol 9 does not stop, seek or resume the
 UnlockFrame and does not add a fixed display delay. This isolates the remaining
 white-image and input problems from the child-timeline changes in protocol 8.
 
-Each active SimUpdate reads four properties from the actual visible path
-`mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer`: `mLoading`,
-`mLoadFailed`, `_width` and `_height`. These reads are diagnostic only and do not
-change the movie. `_framesloaded` is no longer used because its observed payload
-decoded to 1.0 even while the rendered thumbnail remained white.
+Each active SimUpdate reads four properties without changing the movie:
+`mItemData.length`, the visible image container's `_width`, the native preload
+container `mThumbnailContainer0._width`, and the visible image container's
+`_visible`. `_framesloaded` is no longer used because its observed payload
+decoded to 1.0 even while the rendered thumbnail remained white. `mLoading` and
+`mLoadFailed` were removed because the movie only assigns them through its
+separate MovieClipLoader listener, while DeterminePlaySequence uses the clip's
+direct `loadMovie` method.
 
 The shared FePuzzleThumbnail UnlockContainer ends by calling
 `_root.Event_UnlockFinished`. FePuzzleResultsPO does not define that handler.
@@ -68,19 +71,19 @@ There is no second polling close path or elapsed-time close trigger.
 `/createpopupstatus` includes:
 
 - unlock_finished_handler_bound, popup_phase and show_unlock_called.
-- thumbnail_loading, thumbnail_load_failed, thumbnail_width and thumbnail_height.
-  Each field reports the GFx type, decoded value and exact raw payload.
-- thumbnail_loader_complete_observed, which becomes true only when loading and
-  failure are both false and both dimensions are positive.
+- movie_item_data_length, visible_thumbnail_width, preloaded_thumbnail_width,
+  and visible_thumbnail_container_visible. Each field reports the GFx type,
+  decoded value and exact raw payload.
 - unlock_count read from the live result object +0x24 (unavailable after deletion).
 - object_record_preflight, metadata_ptr, metadata_resolved, and
   thumbnail_identifier_from_metadata, derived from record+0x18 and metadata+0.
 - The existing owner, callback, request/ack, modal, movie slot and root frame fields.
 
 The metadata-derived identifier does not itself prove a successful load. The
-loader-complete field is also only an inference from the four visible-container
-properties. A GFx type of 0 means that the queried property was undefined; this
-would show that the ActionScript loader state is not exposed on this container.
+preload width distinguishes the factory's earlier cache load from the later
+visible load. A positive preload width with a zero visible width isolates the
+failure to that second load. A GFx type of 0 means that the queried property was
+undefined.
 There are no independent
 native-close, outer-close, availability, AddUnlockImages or Unlock call counters
 in this build. These are not inferred or reported as measured calls.
@@ -98,7 +101,7 @@ instruction writes and cache invalidation. The previous award-mode hook and
 FeSimpleMessage availability hook are removed; old revisions require a fresh
 boot instead of being overwritten in place.
 
-Protocol 9 also uses the executable's verified zero padding at
+Protocol 10 also uses the executable's verified zero padding at
 0x8062C100..0x8062C450 for the loader diagnostics and their GFx paths. Both
 caves must be entirely zero or match this exact runtime image before installation.
 No extracted game asset is packaged.

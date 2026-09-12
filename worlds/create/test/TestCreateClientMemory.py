@@ -1017,8 +1017,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual({popup.VTABLE_SLOT, 0x800325E4}, set(self.runtime.hooks))
 
     def dispatcher_frame(self, *, lookup_result=0x81204000, get_ok=True, set_ok=True,
-                         hide_ok=True, loading=False, load_failed=False,
-                         thumbnail_width=0.0, thumbnail_height=0.0):
+                         hide_ok=True, item_count=1.0, visible_width=0.0,
+                         preload_width=0.0, thumbnail_visible=True):
         regs = [0x10000000 + i * 0x100 for i in range(32)]
         regs[1], regs[3], regs[4] = 0x81700000, popup.GAME_SINGLETON, 0x81203000
         before = list(regs)
@@ -1051,17 +1051,18 @@ class TestCreatePopupRuntime(unittest.TestCase):
                 r[3] = int(get_ok)
             else:
                 name = self.read(r[5], 100).split(b"\0")[0]
-                prefix = b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer."
-                self.assertTrue(name.startswith(prefix))
-                prop = name[len(prefix):]
-                if prop in (b"mLoading", b"mLoadFailed"):
+                if name.endswith(b"._visible"):
                     self.fake.write_u32(r[4] + 4, 2)
-                    self.fake.write_byte(r[4] + 8,
-                                         int(loading if prop == b"mLoading" else load_failed))
+                    self.fake.write_byte(r[4] + 8, int(thumbnail_visible))
                 else:
-                    self.assertIn(prop, (b"_width", b"_height"))
+                    self.assertIn(name, (
+                        b"mItemData.length",
+                        b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._width",
+                        b"mThumbnailContainer0._width"))
                     self.fake.write_u32(r[4] + 4, 5)
-                    value = thumbnail_width if prop == b"_width" else thumbnail_height
+                    value = {b"mItemData.length": item_count,
+                             b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._width": visible_width,
+                             b"mThumbnailContainer0._width": preload_width}[name]
                     self.write(r[4] + 8, struct.pack(">d", value))
                 r[3] = 1
         def set_variable(r):
@@ -1125,13 +1126,13 @@ class TestCreatePopupRuntime(unittest.TestCase):
                           0x8028DF30, 0x8028DF30],
                          [e[1] for e in events if e[0] == "call"])
         self.assertEqual(1, self.fake.read_u32(self.base + 0x24))
-        events = self.dispatcher_frame(loading=False, load_failed=False,
-                                       thumbnail_width=128.0, thumbnail_height=64.0)
+        events = self.dispatcher_frame(visible_width=128.0, preload_width=64.0)
         self.assertNotIn(("call", 0x8028DF30), events)
         report = self.runtime.lifecycle(self.read)
-        self.assertTrue(report["thumbnail_loader_complete_observed"])
-        self.assertEqual(128.0, report["thumbnail_width"]["value"])
-        self.assertEqual(64.0, report["thumbnail_height"]["value"])
+        self.assertEqual(1.0, report["movie_item_data_length"]["value"])
+        self.assertEqual(128.0, report["visible_thumbnail_width"]["value"])
+        self.assertEqual(64.0, report["preloaded_thumbnail_width"]["value"])
+        self.assertTrue(report["visible_thumbnail_container_visible"]["value"])
         self.assertLess(creation_events.index(("isync",)),
                         creation_events.index(("call", 0x80031DB0)))
         self.assertEqual(2, self.runtime.heartbeat(self.read))
@@ -1165,6 +1166,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.fake.write_u32(0x8120E000, 0x8120F000)
         self.write(0x8120F000, b"AutomaticRocket\0")
         self.fake.write_u32(0x81206024, 1)
+        self.dispatcher_frame()
         report = self.runtime.lifecycle(self.read)
         self.assertEqual("Thumb:AutomaticRocket", report["thumbnail_identifier_from_metadata"])
         self.assertEqual("AutomaticRocket", report["metadata_name"])
@@ -1172,7 +1174,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertTrue(report["unlock_finished_handler_bound"])
         self.assertEqual(1, report["popup_phase"])
         self.assertTrue(report["show_unlock_called"])
-        self.assertFalse(report["thumbnail_loader_complete_observed"])
+        self.assertEqual(0.0, report["visible_thumbnail_width"]["value"])
         self.assertTrue(self.runtime._known_image(self.read(self.runtime.layout.code_base, len(self.runtime.image))))
 
     def test_native_preflight_defers_until_registry_and_descriptor_are_ready(self):
