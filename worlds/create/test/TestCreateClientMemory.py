@@ -785,6 +785,7 @@ def seed_popup_memory(memory):
 
 
 def apply_guest_popup_hooks(runtime, memory):
+    execute_popup_ppc(runtime, memory, runtime.layout.aux_maintain_source_hook, [0] * 32)
     execute_popup_ppc(runtime, memory, runtime.layout.maintain_hooks, [0] * 32)
 
 
@@ -830,6 +831,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
 
     def test_guest_installs_and_flushes_only_results_availability_hook(self):
         self.runtime.ensure_installed(self.read, self.write)
+        execute_popup_ppc(self.runtime, self.fake,
+                          self.runtime.layout.aux_maintain_source_hook, [0] * 32)
         _, _, _, events = execute_popup_ppc(self.runtime, self.fake,
                                             self.runtime.layout.maintain_hooks, [0] * 32)
         for address in popup.CODE_ORIGINALS:
@@ -888,6 +891,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.runtime.uninstall(self.read, self.write)
         self.assertEqual([self.base + 8, self.base + 0x44], [a for a, _ in self.writes])
         self.assertEqual(self.runtime.layout.dispatcher, self.fake.read_u32(popup.VTABLE_SLOT))
+        execute_popup_ppc(self.runtime, self.fake,
+                          self.runtime.layout.aux_maintain_source_hook, [0] * 32)
         _, _, _, events = execute_popup_ppc(self.runtime, self.fake,
                                             self.runtime.layout.maintain_hooks, [0] * 32)
         for address, value in popup.ORIGINALS.items():
@@ -1014,7 +1019,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(layout.end - layout.code_base, len(self.runtime.image))
         self.assertEqual(popup.word(popup.ppc_branch(layout.dispatcher + 12, popup.ORIGINAL_UPDATE, link=True)),
                          self.runtime.image[12:16])
-        self.assertEqual({popup.VTABLE_SLOT, 0x800325E4}, set(self.runtime.hooks))
+        self.assertEqual({popup.VTABLE_SLOT, 0x800325E4, popup.HUB_CHAIN_CALLBACK},
+                         set(self.runtime.hooks))
 
     def dispatcher_frame(self, *, lookup_result=0x81204000, get_ok=True, set_ok=True,
                          hide_ok=True, item_count=1.0, visible_width=0.0,
@@ -1273,8 +1279,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
 
     def test_suppresses_only_matching_chain_wrapper_through_native_end(self):
         for callback, context, diagnostic in (
-                (popup.HUB_CHAIN_CALLBACK, popup.HUB_CHAIN_CONTEXT, "hub_chain_part"),
-                (popup.CHAIN_CALLBACK, popup.CHAIN_CONTEXT, "create_chains_completion")):
+                (popup.CHAIN_CALLBACK, popup.CHAIN_CONTEXT, "create_chains_completion"),):
             with self.subTest(callback=f"0x{callback:08X}"):
                 self.setUp()
                 self.install()
@@ -1301,6 +1306,48 @@ class TestCreatePopupRuntime(unittest.TestCase):
                     self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
                 self.assertEqual(1, self.fake.read_u32(
                     self.base + popup.SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET))
+
+    def test_hub_queue_source_hook_consumes_entries_before_popup_creation(self):
+        self.install()
+        self.fake.write_u32(self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 1)
+        entries = (0x81201000, 0x81202000, 0x81203000)
+        for offset, value in zip((4, 8, 12), entries):
+            self.fake.write_u32(popup.HUB_CHAIN_CONTEXT + offset, value)
+        self.fake.write_byte(popup.HUB_CHAIN_CONTEXT, 0)
+        self.fake.write_byte(popup.HUB_CHAIN_CONTEXT + 1, 1)
+        regs = [0] * 32
+        regs[3] = popup.HUB_CHAIN_CONTEXT
+        destination, _, _, events = execute_popup_ppc(
+            self.runtime, self.fake, self.runtime.layout.aux_hub_queue_hook, regs)
+        self.assertEqual(0x81230000, destination)
+        self.assertEqual([], [event for event in events if event[0] == "call"])
+        self.assertEqual((0, 0, 0), tuple(
+            self.fake.read_u32(popup.HUB_CHAIN_CONTEXT + offset) for offset in (4, 8, 12)))
+        self.assertEqual((1, 0), (
+            self.fake.read_byte(popup.HUB_CHAIN_CONTEXT),
+            self.fake.read_byte(popup.HUB_CHAIN_CONTEXT + 1)))
+        self.assertEqual(0, self.fake.read_u32(
+            self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
+        report = self.runtime.lifecycle(self.read)
+        self.assertEqual(entries, tuple(report[f"hub_queue_entry_{index}_before"]
+                                        for index in range(3)))
+        self.assertEqual((0, 0, 0), tuple(report[f"hub_queue_entry_{index}_after"]
+                                         for index in range(3)))
+        self.assertEqual((0, 1), (report["hub_queue_flag0_before"],
+                                  report["hub_queue_flag1_before"]))
+        self.assertEqual((1, 0), (report["hub_queue_flag0_after"],
+                                  report["hub_queue_flag1_after"]))
+        self.assertEqual(1, report["hub_queue_source_suppressed_count"])
+
+    def test_hub_queue_source_hook_replays_displaced_instruction_when_unarmed(self):
+        self.install()
+        regs = [0] * 32
+        regs[1] = 0x81700000
+        regs[3] = popup.HUB_CHAIN_CONTEXT
+        destination, result, _, _ = execute_popup_ppc(
+            self.runtime, self.fake, self.runtime.layout.aux_hub_queue_hook, regs)
+        self.assertEqual(popup.HUB_CHAIN_CALLBACK + 4, destination)
+        self.assertEqual(0x816FFFD0, result[1])
 
     def test_chain_suppression_rejects_nonmatching_wrapper(self):
         for address, value, byte in (

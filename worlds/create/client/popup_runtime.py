@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 15
+VERSION = 16
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -30,8 +30,11 @@ HUB_CHAIN_CONTEXT = 0x8068DD50
 CHAIN_WRAPPER_END = 0x80074DA0
 SUPPRESS_NEXT_CHAIN_POPUP_OFFSET = 0x28
 SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET = 0x90
+HUB_QUEUE_SOURCE_COUNT_DIAGNOSTIC = 0x28
 CODE_ORIGINALS = {0x800325E4: 0x4BFF2F7D}
+SOURCE_CODE_ORIGINALS = {HUB_CHAIN_CALLBACK: 0x9421FFD0}
 ORIGINALS = {VTABLE_SLOT: ORIGINAL_UPDATE, **CODE_ORIGINALS}
+ORIGINALS.update(SOURCE_CODE_ORIGINALS)
 # Refuse old runtime revisions rather than mixing instruction-cache state.
 LEGACY_ORIGINALS = {0x8000DB5C: 0x4808A365, 0x80092184: 0x3A600000,
                     0x8009240C: 0x3A730001, 0x80092424: 0x7C1EE800,
@@ -67,15 +70,17 @@ class PopupPatchLayout:
     aux_base: int = 0x8062C100
     aux_setup: int = 0x8062C100
     aux_update: int = 0x8062C180
-    aux_suppress_chain: int = 0x8062C190
-    aux_data: int = 0x8062C300
-    aux_diagnostics: int = 0x8062C410
+    aux_hub_queue_hook: int = 0x8062C190
+    aux_suppress_chain: int = 0x8062C290
+    aux_maintain_source_hook: int = 0x8062C340
+    aux_diagnostics: int = 0x8062C3D0
     aux_end: int = 0x8062C450
 
 
 def hook_words(layout):
     return {VTABLE_SLOT: layout.dispatcher,
-            0x800325E4: ppc_branch(0x800325E4, layout.object_available_hook, link=True)}
+            0x800325E4: ppc_branch(0x800325E4, layout.object_available_hook, link=True),
+            HUB_CHAIN_CALLBACK: ppc_branch(HUB_CHAIN_CALLBACK, layout.aux_hub_queue_hook)}
 
 
 class _Routine:
@@ -122,6 +127,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     # SimUpdate(this, const cTime&) receives the untouched incoming r3/r4.
     d.branch(ORIGINAL_UPDATE, link=True)
     d.emit(0x9061003C)
+    d.branch(layout.aux_maintain_source_hook, link=True)
     d.branch(layout.maintain_hooks, link=True)
     d.branch(layout.aux_suppress_chain, link=True)
     d.emit(*load_mailbox, 0x816C001C, 0x396B0001, 0x916C001C)
@@ -329,17 +335,6 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
         r.emit(0x3C000000 | register << 21 | value >> 16,
                0x60000000 | register << 21 | register << 16 | value & 0xFFFF)
 
-    strings = {}
-    data = bytearray()
-    image_path = b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer."
-    for name, value in (
-            ("item_count", b"mItemData.length\0"),
-            ("visible_width", image_path + b"_width\0"),
-            ("preload_width", b"mThumbnailContainer0._width\0"),
-            ("visible", image_path + b"_visible\0")):
-        strings[name] = layout.aux_data + len(data)
-        data.extend(value)
-
     setup = _Routine(layout.aux_setup)
     setup.emit(0x9421FFE0, 0x7C0802A6, 0x90010024)
     # Leave the PO root running. Its native timeline invokes
@@ -367,9 +362,6 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
     suppress.emit(0x880B0014, 0x28000000)
     suppress.branch("return", 0x41820000)
     suppress.emit(0x800B000C)
-    load(suppress, 10, HUB_CHAIN_CALLBACK)
-    suppress.emit(0x7C005000)
-    suppress.branch("hub_context", 0x41820000)
     load(suppress, 10, CHAIN_CALLBACK)
     suppress.emit(0x7C005000)
     suppress.branch("return", 0x40820000)
@@ -377,13 +369,6 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
     load(suppress, 10, CHAIN_CONTEXT)
     suppress.emit(0x7C005000)
     suppress.branch("return", 0x40820000)
-    suppress.branch("matched")
-    suppress.label("hub_context")
-    suppress.emit(0x800B0010)
-    load(suppress, 10, HUB_CHAIN_CONTEXT)
-    suppress.emit(0x7C005000)
-    suppress.branch("return", 0x40820000)
-    suppress.label("matched")
     suppress.emit(0x7D635B78)
     suppress.branch(CHAIN_WRAPPER_END, link=True)
     suppress.emit(*load_mailbox, 0x38000000,
@@ -394,18 +379,86 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
     suppress.label("return")
     suppress.emit(0x80010014, 0x7C0803A6, 0x38210010, 0x4E800020)
 
+    # Intercept TutorialMessages' three-entry queue before 0x80074B20 can
+    # create a modal popup. The vanilla entry instruction is replayed on the
+    # ordinary path; the suppression path uses only volatile registers.
+    source = _Routine(layout.aux_hub_queue_hook)
+    source.emit(*load_mailbox,
+                0x800C0000 | SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 0x28000001)
+    source.branch("vanilla", 0x40820000)
+    load(source, 11, HUB_CHAIN_CONTEXT)
+    source.emit(0x7C035800)
+    source.branch("vanilla", 0x40820000)
+    source.emit(0x80830004, 0x80A30008, 0x80C3000C, 0x88E30000, 0x89030001)
+    load(source, 11, layout.aux_diagnostics)
+    source.emit(0x908B0000, 0x90AB0004, 0x90CB0008, 0x90EB000C, 0x910B0010)
+    source.emit(0x39200000, 0x28040000)
+    source.branch("had_any", 0x40820000)
+    source.emit(0x28050000)
+    source.branch("had_any", 0x40820000)
+    source.emit(0x28060000)
+    source.branch("empty", 0x41820000)
+    source.label("had_any")
+    source.emit(0x38000000, 0x90030004, 0x90030008, 0x9003000C,
+                0x39200001, 0x38000001, 0x98030000)
+    source.label("empty")
+    source.emit(0x38000000, 0x98030001,
+                0x80030004, 0x900B0014, 0x80030008, 0x900B0018,
+                0x8003000C, 0x900B001C, 0x88030000, 0x900B0020,
+                0x88030001, 0x900B0024)
+    # An empty callback is faithfully consumed but leaves suppression armed for
+    # the later invocation that actually carries queued messages.
+    source.emit(0x2C090001)
+    source.branch("return", 0x40820000)
+    source.emit(*load_mailbox, 0x38000000,
+                0x900C0000 | SUPPRESS_NEXT_CHAIN_POPUP_OFFSET)
+    load(source, 11, layout.aux_diagnostics)
+    source.emit(0x814B0000 | HUB_QUEUE_SOURCE_COUNT_DIAGNOSTIC,
+                0x394A0001,
+                0x914B0000 | HUB_QUEUE_SOURCE_COUNT_DIAGNOSTIC)
+    source.label("return")
+    source.emit(0x4E800020)
+    source.label("vanilla")
+    source.emit(0x9421FFD0)
+    source.branch(HUB_CHAIN_CALLBACK + 4)
+
+    # The compact second hook maintainer mirrors the primary hook lifecycle but
+    # lives in the auxiliary cave so Protocol 11's primary routines do not move.
+    maintain = _Routine(layout.aux_maintain_source_hook)
+    maintain.emit(*load_mailbox, 0x814C0044)
+    load(maintain, 11, HUB_CHAIN_CALLBACK)
+    load(maintain, 5, SOURCE_CODE_ORIGINALS[HUB_CHAIN_CALLBACK])
+    load(maintain, 6, hook_words(layout)[HUB_CHAIN_CALLBACK])
+    maintain.emit(0x800B0000, 0x7C002800)
+    maintain.branch("known", 0x41820000)
+    maintain.emit(0x7C003000)
+    maintain.branch("known", 0x41820000)
+    maintain.emit(0x280A0000)
+    maintain.branch("return", 0x41820000)
+    maintain.emit(0x38000005, 0x900C0018, 0x38000003, 0x900C0008,
+                  0x38000000, 0x900C0044, 0x900C0048)
+    maintain.branch("return")
+    maintain.label("known")
+    maintain.emit(0x280A0001)
+    maintain.branch("write", 0x40820000)
+    maintain.emit(0x7CC53378)
+    maintain.label("write")
+    maintain.emit(0x90AB0000, 0x7C00586C, 0x7C0004AC, 0x7C005FAC,
+                  0x7C0004AC, 0x4C00012C)
+    maintain.label("return")
+    maintain.emit(0x4E800020)
+
     image = bytearray(layout.aux_end - layout.aux_base)
     for routine, limit in ((setup, layout.aux_update),
-                           (update, layout.aux_suppress_chain),
-                           (suppress, layout.aux_data)):
+                           (update, layout.aux_hub_queue_hook),
+                           (source, layout.aux_suppress_chain),
+                           (suppress, layout.aux_maintain_source_hook),
+                           (maintain, layout.aux_diagnostics)):
         code = routine.build()
         if routine.base + len(code) > limit:
             raise ValueError(f"Popup auxiliary routine {routine.base:08X} exceeds cave space ({len(code)} bytes)")
         start = routine.base - layout.aux_base
         image[start:start + len(code)] = code
-    if len(data) > layout.aux_diagnostics - layout.aux_data:
-        raise ValueError("Popup auxiliary strings exceed cave space")
-    image[layout.aux_data - layout.aux_base:layout.aux_data - layout.aux_base + len(data)] = data
     return bytes(image)
 
 
@@ -467,6 +520,8 @@ class PopupRuntime:
             self.layout.mailbox + SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
         chain_popup_present = bool(u32(CHAIN_WRAPPER)) and bool(
             read_memory(CHAIN_WRAPPER + 0x14, 1)[0])
+        hub_queue_diagnostics = [u32(self.layout.aux_diagnostics + offset)
+                                 for offset in range(0, 0x2C, 4)]
         result = {
             "popup_pointer": f"0x{state['popup_pointer']:08X}",
             "callback_invoked": bool(state["request_seq"] and state["ack_seq"] == state["request_seq"]),
@@ -495,6 +550,17 @@ class PopupRuntime:
             "chain_wrapper_active": bool(read_memory(CHAIN_WRAPPER + 0x14, 1)[0]),
             "suppressed_chain_popup_count": u32(
                 self.layout.mailbox + SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET),
+            "hub_queue_entry_0_before": hub_queue_diagnostics[0],
+            "hub_queue_entry_1_before": hub_queue_diagnostics[1],
+            "hub_queue_entry_2_before": hub_queue_diagnostics[2],
+            "hub_queue_flag0_before": hub_queue_diagnostics[3],
+            "hub_queue_flag1_before": hub_queue_diagnostics[4],
+            "hub_queue_entry_0_after": hub_queue_diagnostics[5],
+            "hub_queue_entry_1_after": hub_queue_diagnostics[6],
+            "hub_queue_entry_2_after": hub_queue_diagnostics[7],
+            "hub_queue_flag0_after": hub_queue_diagnostics[8],
+            "hub_queue_flag1_after": hub_queue_diagnostics[9],
+            "hub_queue_source_suppressed_count": hub_queue_diagnostics[10],
             "movie_slot": None, "movie_slot_active": False, "root_frame_zero_based": None,
         }
         record = u32(self.layout.mailbox + 0x54)
@@ -615,7 +681,8 @@ class PopupRuntime:
                 raise RuntimeError("runtime vtable pointer changed after installation")
             beat = self.heartbeat(read_memory)
             applied = state["hooks_applied"] == 1
-            if applied and any(read_memory(a, 4) != word(self.hooks[a]) for a in CODE_ORIGINALS):
+            executable_hooks = CODE_ORIGINALS.keys() | SOURCE_CODE_ORIGINALS.keys()
+            if applied and any(read_memory(a, 4) != word(self.hooks[a]) for a in executable_hooks):
                 raise RuntimeError("runtime hooks changed after guest installation")
             if beat != self._heartbeat and applied:
                 if not self.ready:
