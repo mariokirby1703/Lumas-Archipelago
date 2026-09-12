@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import struct
 import types
 import unittest
 from collections import deque
@@ -693,21 +694,32 @@ def execute_popup_ppc(runtime, memory, entry, registers, *, lr=0x81230000, nativ
     def signed(value, bits):
         return value - (1 << bits) if value & (1 << (bits - 1)) else value
     for _ in range(1024):
-        if not runtime.layout.code_base <= pc < runtime.layout.mailbox:
+        in_primary = runtime.layout.code_base <= pc < runtime.layout.mailbox
+        in_auxiliary = runtime.layout.aux_base <= pc < runtime.layout.aux_end
+        if not (in_primary or in_auxiliary):
             if native and pc in native:
                 events.append(("call", pc))
                 native[pc](regs)
                 pc = lr
                 continue
             return pc, regs, cr[2], events
-        offset = pc - runtime.layout.code_base
-        ins = int.from_bytes(runtime.image[offset:offset + 4], "big")
+        if in_primary:
+            offset = pc - runtime.layout.code_base
+            ins = int.from_bytes(runtime.image[offset:offset + 4], "big")
+        else:
+            offset = pc - runtime.layout.aux_base
+            ins = int.from_bytes(runtime.aux_image[offset:offset + 4], "big")
         source = pc
         pc += 4
         op, rt, ra, rb = ins >> 26, (ins >> 21) & 31, (ins >> 16) & 31, (ins >> 11) & 31
         imm, xo = signed(ins & 0xFFFF, 16), (ins >> 1) & 1023
-        if op in (14, 15):
-            regs[rt] = ((regs[ra] if ra else 0) + (imm << (16 if op == 15 else 0))) & 0xFFFFFFFF
+        if op == 7:
+            regs[rt] = (regs[ra] * imm) & 0xFFFFFFFF
+        elif op in (13, 14, 15):
+            left = regs[ra] if op == 13 or ra else 0
+            regs[rt] = (left + (imm << (16 if op == 15 else 0))) & 0xFFFFFFFF
+            if op == 13:
+                cr = (bool(regs[rt] & 0x80000000), regs[rt] != 0 and not bool(regs[rt] & 0x80000000), regs[rt] == 0)
         elif op == 28:
             regs[ra] = regs[rt] & (ins & 0xFFFF)
             cr = (bool(regs[ra] & 0x80000000), regs[ra] != 0 and not bool(regs[ra] & 0x80000000), regs[ra] == 0)
@@ -756,6 +768,9 @@ def execute_popup_ppc(runtime, memory, entry, registers, *, lr=0x81230000, nativ
             assert ra in (0, 1, 2) and rt in (4, 12)
             if cr[ra] == (rt == 12):
                 pc = source + signed(ins & 0xFFFC, 16)
+        elif ins in (0x4D820020, 0x4C820020):
+            if cr[2] == (ins == 0x4D820020):
+                pc = lr
         elif ins == 0x4E800020:
             pc = lr
         else:
@@ -805,7 +820,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
     def test_python_installs_only_cave_and_vtable_data_pointer(self):
         self.runtime.ensure_installed(self.read, self.write)
         self.assertTrue(self.runtime.installed)
-        self.assertEqual([self.runtime.layout.code_base, self.base + 0x44, popup.VTABLE_SLOT],
+        self.assertEqual([self.runtime.layout.aux_base, self.runtime.layout.code_base,
+                          self.base + 0x44, popup.VTABLE_SLOT],
                          [a for a, _ in self.writes])
         for address, original in popup.CODE_ORIGINALS.items():
             self.assertEqual(original, self.fake.read_u32(address))
@@ -825,7 +841,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
 
     def test_installs_results_context_and_native_owner_cleanup(self):
         self.install()
-        self.assertEqual(self.runtime.layout.code_base, self.writes[0][0])
+        self.assertEqual(self.runtime.layout.aux_base, self.writes[0][0])
+        self.assertEqual(self.runtime.layout.code_base, self.writes[1][0])
         self.assertEqual(0x80074D90, self.fake.read_u32(self.base + 0x38))
         self.assertEqual(self.base + 0x20, self.fake.read_u32(self.base + 0x3C))
         self.assertEqual(self.runtime.layout.closed_callback, self.fake.read_u32(self.base + 0x2C))
@@ -847,6 +864,12 @@ class TestCreatePopupRuntime(unittest.TestCase):
                 self.fake.write_u32(self.runtime.layout.code_base, 0x12345678)
                 self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
                 self.assertEqual([], self.writes)
+
+    def test_refuses_unknown_auxiliary_cave_without_writing(self):
+        self.fake.write_u32(self.runtime.layout.aux_base, 0x12345678)
+        self.assertFalse(self.runtime.ensure_installed(self.read, self.write))
+        self.assertEqual([], self.writes)
+        self.assertIn("auxiliary", self.runtime.failure)
 
     def test_adopts_exact_patch_without_overwriting_live_owner(self):
         self.install()
@@ -982,7 +1005,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
             if address == self.runtime.layout.code_base:
                 self.fake.write_byte(address, 0)
         self.assertFalse(self.runtime.ensure_installed(self.read, broken_write))
-        self.assertEqual([self.runtime.layout.code_base], [a for a, _ in self.writes])
+        self.assertEqual([self.runtime.layout.aux_base, self.runtime.layout.code_base],
+                         [a for a, _ in self.writes])
 
     def test_dispatcher_calls_original_simupdate_and_has_no_legacy_hooks(self):
         layout = self.runtime.layout
@@ -992,7 +1016,9 @@ class TestCreatePopupRuntime(unittest.TestCase):
                          self.runtime.image[12:16])
         self.assertEqual({popup.VTABLE_SLOT, 0x800325E4}, set(self.runtime.hooks))
 
-    def dispatcher_frame(self, *, lookup_result=0x81204000, get_ok=True, set_ok=True):
+    def dispatcher_frame(self, *, lookup_result=0x81204000, get_ok=True, set_ok=True,
+                         hide_ok=True, item_count=1.0, visible_width=0.0,
+                         preload_width=0.0, thumbnail_visible=True):
         regs = [0x10000000 + i * 0x100 for i in range(32)]
         regs[1], regs[3], regs[4] = 0x81700000, popup.GAME_SINGLETON, 0x81203000
         before = list(regs)
@@ -1009,46 +1035,72 @@ class TestCreatePopupRuntime(unittest.TestCase):
             self.assertEqual(1, self.fake.read_u32(r[4] + 0x10))
             self.fake.write_u32(0x81206000 + 0x14, 0x80947F98)
             self.fake.write_u32(0x80947F98, 0x81208000)
+            self.fake.write_u32(0x80947F98 + 4, 0x81209000)
             r[3] = 0x81206000
         def register(r):
             self.assertEqual((0x80947A30, 3, 0, 1), tuple(r[3:7]))
             self.assertEqual(0x81206000, self.fake.read_u32(self.base + 0x20))
         invokes = []
-        def acquire(r):
-            self.assertEqual(0x80947F98, r[4])
-            self.fake.write_u32(r[3], 0x81209000)
         def get_variable(r):
             self.assertEqual(0x81209000, r[3])
-            self.assertEqual(0x805E29DC, r[5])
-            self.assertEqual(bytes(16), self.read(r[4], 16))
-            self.fake.write_u32(r[4], 0x8120C000)
-            self.fake.write_u32(r[4] + 4, 0x46)
-            self.fake.write_u32(r[4] + 8, 0x8120D000)
-            r[3] = int(get_ok)
+            self.assertEqual(bytes(4), self.read(r[4] + 4, 4))
+            if r[5] == 0x805E29DC:
+                self.fake.write_u32(r[4], 0x8120C000)
+                self.fake.write_u32(r[4] + 4, 0x46)
+                self.fake.write_u32(r[4] + 8, 0x8120D000)
+                r[3] = int(get_ok)
+            else:
+                name = self.read(r[5], 100).split(b"\0")[0]
+                if name.endswith(b"._visible"):
+                    self.fake.write_u32(r[4] + 4, 2)
+                    self.fake.write_byte(r[4] + 8, int(thumbnail_visible))
+                else:
+                    self.assertIn(name, (
+                        b"mItemData.length",
+                        b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._width",
+                        b"mThumbnailContainer0._width"))
+                    self.fake.write_u32(r[4] + 4, 5)
+                    value = {b"mItemData.length": item_count,
+                             b"mUnlockContainer.mUnlockFrame.mDropdown.mImageContainer._width": visible_width,
+                             b"mThumbnailContainer0._width": preload_width}[name]
+                    self.write(r[4] + 8, struct.pack(">d", value))
+                r[3] = 1
         def set_variable(r):
-            self.assertEqual(b"_root.Event_UnlockFinished", self.read(r[4], 32).split(b"\0")[0])
-            self.assertEqual(0x46, self.fake.read_u32(r[5] + 4))
             self.assertEqual(0, r[6])
-            r[3] = int(set_ok)
+            name = self.read(r[4], 100).split(b"\0")[0]
+            if name == b"Event_UnlockFinished":
+                self.assertEqual(0x46, self.fake.read_u32(r[5] + 4))
+                r[3] = int(set_ok)
+            else:
+                self.assertEqual(b"mScreen._visible", name)
+                self.assertEqual(2, self.fake.read_u32(r[5] + 4))
+                self.assertEqual(0, self.fake.read_u32(r[5] + 8))
+                r[3] = int(hide_ok)
         def release_value(r):
             self.assertEqual(0x8120C000, r[3])
             self.assertEqual(0x8120D000, r[5])
         def invoke(r):
             self.assertEqual(0x81209000, r[3])
-            self.assertEqual(b"\0", self.read(r[5], 1))
-            name = self.read(r[4], 32).split(b"\0")[0]
+            name = self.read(r[4], 100).split(b"\0")[0]
             invokes.append(name)
-            self.assertIn(name, (b"_root.stop", b"_root.DeterminePlaySequence"))
+            self.assertIn(name, (
+                b"_root.stop",
+                b"_root.DeterminePlaySequence",
+                b"_root.mUnlockContainer.mUnlockFrame.stop",
+                b"_root.mUnlockContainer.mUnlockFrame.gotoAndStop",
+                b"_root.mUnlockContainer.mUnlockFrame.play"))
+            if name.endswith(b"gotoAndStop"):
+                self.assertEqual(b"s\0", self.read(r[5], 2))
+                self.assertEqual(b"Wait\0", self.read(r[6], 5))
+            else:
+                self.assertEqual(b"\0", self.read(r[5], 1))
             r[3] = 1
-        def release(r):
-            self.assertEqual([b"_root.stop", b"_root.DeterminePlaySequence"] if get_ok and set_ok else [], invokes)
-            self.assertEqual(0x81209000, r[3])
         pc, result, _, events = execute_popup_ppc(
             self.runtime, self.fake, self.runtime.layout.dispatcher, regs,
             native={popup.ORIGINAL_UPDATE: original_update, 0x80490BF0: lookup,
                     0x80031DB0: construct, 0x804EA4D0: register,
-                    0x8000ED20: acquire, 0x8027E73C: get_variable, 0x8027E864: set_variable,
-                    0x802E6EFC: release_value, 0x8028DF30: invoke, 0x8035A96C: release})
+                    0x8027E73C: get_variable, 0x8027E864: set_variable,
+                    0x802E6EFC: release_value, 0x8028DF30: invoke})
         self.assertEqual(0x81230000, pc)
         self.assertEqual(0x12345678, result[3])
         self.assertEqual(before[1], result[1])
@@ -1068,12 +1120,22 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.prepare_dispatch()
         self.fake.write_byte(0x8068CFC3, 0)  # running challenge
         events = self.dispatcher_frame()
+        creation_events = events
         self.assertEqual([popup.ORIGINAL_UPDATE, 0x80490BF0, 0x80031DB0, 0x804EA4D0,
-                          0x8000ED20, 0x8027E73C, 0x8027E864, 0x802E6EFC,
-                          0x8028DF30, 0x8028DF30, 0x8035A96C],
+                          0x8027E73C, 0x8027E864, 0x802E6EFC, 0x8027E864,
+                          ],
                          [e[1] for e in events if e[0] == "call"])
-        self.assertLess(events.index(("isync",)), events.index(("call", 0x80031DB0)))
-        self.assertEqual(1, self.runtime.heartbeat(self.read))
+        self.assertEqual(1, self.fake.read_u32(self.base + 0x24))
+        events = self.dispatcher_frame(visible_width=128.0, preload_width=64.0)
+        self.assertNotIn(("call", 0x8028DF30), events)
+        report = self.runtime.lifecycle(self.read)
+        self.assertIsNone(report["movie_item_data_length"]["value"])
+        self.assertIsNone(report["visible_thumbnail_width"]["value"])
+        self.assertIsNone(report["preloaded_thumbnail_width"]["value"])
+        self.assertIsNone(report["visible_thumbnail_container_visible"]["value"])
+        self.assertLess(creation_events.index(("isync",)),
+                        creation_events.index(("call", 0x80031DB0)))
+        self.assertEqual(2, self.runtime.heartbeat(self.read))
         self.assertTrue(self.runtime.ensure_installed(self.read, self.write))
 
     def test_failed_event_binding_keeps_native_timeline_running(self):
@@ -1085,8 +1147,17 @@ class TestCreatePopupRuntime(unittest.TestCase):
                 self.assertNotIn(("call", 0x8028DF30), events)
                 self.assertIn(("call", 0x802E6EFC), events)
                 self.assertEqual(0, self.fake.read_u32(self.base + 0x4C))
-                self.assertEqual(0, self.fake.read_u32(self.base + 0x5C))
+                self.assertEqual(0, self.fake.read_u32(self.base + 0x28))
                 self.assertTrue(self.runtime._known_image(self.read(self.runtime.layout.code_base, len(self.runtime.image))))
+
+    def test_failed_screen_hide_does_not_start_direct_sequence(self):
+        self.prepare_dispatch()
+        events = self.dispatcher_frame(hide_ok=False)
+        self.assertNotIn(("call", 0x8028DF30), events)
+        self.assertEqual(0, self.fake.read_u32(self.base + 0x28))
+        for _ in range(4):
+            events = self.dispatcher_frame()
+            self.assertNotIn(("call", 0x8028DF30), events)
 
     def test_thumbnail_diagnostic_reads_metadata_without_mutation(self):
         self.prepare_dispatch()
@@ -1095,11 +1166,15 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.fake.write_u32(0x8120E000, 0x8120F000)
         self.write(0x8120F000, b"AutomaticRocket\0")
         self.fake.write_u32(0x81206024, 1)
+        self.dispatcher_frame()
         report = self.runtime.lifecycle(self.read)
         self.assertEqual("Thumb:AutomaticRocket", report["thumbnail_identifier_from_metadata"])
+        self.assertEqual("AutomaticRocket", report["metadata_name"])
         self.assertEqual(1, report["unlock_count"])
         self.assertTrue(report["unlock_finished_handler_bound"])
-        self.assertTrue(report["direct_sequence_succeeded"])
+        self.assertEqual(1, report["popup_phase"])
+        self.assertTrue(report["show_unlock_called"])
+        self.assertIsNone(report["visible_thumbnail_width"]["value"])
         self.assertTrue(self.runtime._known_image(self.read(self.runtime.layout.code_base, len(self.runtime.image))))
 
     def test_native_preflight_defers_until_registry_and_descriptor_are_ready(self):
@@ -1196,6 +1271,55 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertTrue(report["callback_invoked"])
         self.assertEqual(0, report["modal"])
 
+    def test_suppresses_only_matching_chain_wrapper_through_native_end(self):
+        self.install()
+        self.fake.write_u32(self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 1)
+        self.fake.write_u32(popup.CHAIN_WRAPPER, 0x81206000)
+        self.fake.write_u32(popup.CHAIN_WRAPPER + 0x0C, popup.CHAIN_CALLBACK)
+        self.fake.write_u32(popup.CHAIN_WRAPPER + 0x10, popup.CHAIN_CONTEXT)
+        self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 1)
+        calls = []
+        def native_end(regs):
+            self.assertEqual(popup.CHAIN_WRAPPER, regs[3])
+            calls.append(regs[3])
+            self.fake.write_u32(popup.CHAIN_WRAPPER, 0)
+            self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 0)
+        execute_popup_ppc(
+            self.runtime, self.fake, self.runtime.layout.aux_suppress_chain,
+            [0] * 32, native={popup.CHAIN_WRAPPER_END: native_end})
+        self.assertEqual([popup.CHAIN_WRAPPER], calls)
+        self.assertEqual(0, self.fake.read_u32(
+            self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
+        self.assertEqual(1, self.fake.read_u32(
+            self.base + popup.SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET))
+
+    def test_chain_suppression_rejects_nonmatching_wrapper(self):
+        for address, value, byte in (
+                (self.base + 8, popup.ACTIVE, False),
+                (popup.CHAIN_WRAPPER, 0, False),
+                (popup.CHAIN_WRAPPER + 0x0C, 0x12345678, False),
+                (popup.CHAIN_WRAPPER + 0x10, 0x12345678, False),
+                (popup.CHAIN_WRAPPER + 0x14, 0, True)):
+            with self.subTest(address=address):
+                self.setUp()
+                self.install()
+                self.fake.write_u32(self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 1)
+                self.fake.write_u32(popup.CHAIN_WRAPPER, 0x81206000)
+                self.fake.write_u32(popup.CHAIN_WRAPPER + 0x0C, popup.CHAIN_CALLBACK)
+                self.fake.write_u32(popup.CHAIN_WRAPPER + 0x10, popup.CHAIN_CONTEXT)
+                self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 1)
+                if byte:
+                    self.fake.write_byte(address, value)
+                else:
+                    self.fake.write_u32(address, value)
+                calls = []
+                execute_popup_ppc(
+                    self.runtime, self.fake, self.runtime.layout.aux_suppress_chain,
+                    [0] * 32, native={popup.CHAIN_WRAPPER_END: lambda regs: calls.append(regs[3])})
+                self.assertEqual([], calls)
+                self.assertEqual(1, self.fake.read_u32(
+                    self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
+
     def test_refuses_previous_revision_and_wrong_singleton(self):
         for address in (0x8000DB5C, popup.GAME_SINGLETON):
             with self.subTest(address=address):
@@ -1259,6 +1383,7 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.ctx._automatic_object_popup_queue = deque()
         self.ctx._popup_inflight = None
         self.ctx._popup_inflight_automatic = None
+        self.ctx._popup_inflight_chain_suppression_armed = False
         self.ctx._popup_last_status = None
         self.ctx._popup_delay_logged = False
         self.ctx.ram_is_settled = lambda: True
@@ -1272,8 +1397,8 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.ctx._object_records = seed_object_registry(self.fake, self.ctx)
         self.ctx._object_resync_pending = False
 
-    def receipt(self, value):
-        self.ctx.items_received.append(SimpleNamespace(item=value))
+    def receipt(self, value, location=0):
+        self.ctx.items_received.append(SimpleNamespace(item=value, location=location))
 
     def ready(self):
         client.sync_object_popups(self.ctx, False)
@@ -1288,7 +1413,7 @@ class TestCreatePopupQueue(unittest.TestCase):
         for value in (6, 99999, 13, 6):
             self.receipt(value)
         client.collect_new_object_popup_items(self.ctx)
-        self.assertEqual([6, 13, 6], [value for value, _ in self.ctx._automatic_object_popup_queue])
+        self.assertEqual([6, 13, 6], [value for value, _, _ in self.ctx._automatic_object_popup_queue])
 
     def test_real_receiveditems_queues_objects_once_and_preserves_history_baseline(self):
         self.receipt(13)
@@ -1297,14 +1422,42 @@ class TestCreatePopupQueue(unittest.TestCase):
         for value in (6, 99999, 13):
             self.receipt(value)
         client.CreateContext.on_package(self.ctx, "ReceivedItems", {"index": 1})
-        self.assertEqual([6, 13], [value for value, _ in self.ctx._automatic_object_popup_queue])
+        self.assertEqual([6, 13], [value for value, _, _ in self.ctx._automatic_object_popup_queue])
         client.CreateContext.on_package(self.ctx, "ReceivedItems", {"index": 1})
-        self.assertEqual([6, 13], [value for value, _ in self.ctx._automatic_object_popup_queue])
+        self.assertEqual([6, 13], [value for value, _, _ in self.ctx._automatic_object_popup_queue])
         self.ready()
         self.assertEqual((6, 1), self.ctx._popup_inflight)
-        self.assertEqual([13], [value for value, _ in self.ctx._automatic_object_popup_queue])
+        self.assertEqual([13], [value for value, _, _ in self.ctx._automatic_object_popup_queue])
         client.collect_new_object_popup_items(self.ctx)
-        self.assertEqual([13], [value for value, _ in self.ctx._automatic_object_popup_queue])
+        self.assertEqual([13], [value for value, _, _ in self.ctx._automatic_object_popup_queue])
+
+    def test_only_hub_chain_location_marks_automatic_receipt_for_suppression(self):
+        chain_location = 333001
+        self.ctx.slot_data.setdefault("locations", {})["Hub World Create Chain Part 1"] = {
+            "id": chain_location}
+        self.receipt(13, chain_location)
+        self.receipt(6, chain_location + 100000)
+        self.ctx._popup_accept_new_items = True
+        client.collect_new_object_popup_items(self.ctx)
+        self.assertEqual([(13, True), (6, False)], [
+            (value, suppress) for value, _, suppress in self.ctx._automatic_object_popup_queue])
+
+    def test_chain_receipt_arms_guest_flag_only_after_popup_becomes_active(self):
+        chain_location = 333001
+        self.ctx.slot_data.setdefault("locations", {})["Hub World Create Chain Part 1"] = {
+            "id": chain_location}
+        self.ready()
+        self.receipt(13, chain_location)
+        client.collect_new_object_popup_items(self.ctx)
+        client.service_object_popup_queue(self.ctx, False)
+        base = self.ctx._popup_runtime.layout.mailbox
+        self.assertEqual(0, self.fake.read_u32(
+            base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
+        self.fake.write_u32(base + 8, popup.ACTIVE)
+        self.fake.write_u32(base + 0x20, 0x81206000)
+        client.service_object_popup_queue(self.ctx, False)
+        self.assertEqual(1, self.fake.read_u32(
+            base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
 
     def test_challenge_dispatch_does_not_resolve_or_write_object_records(self):
         self.ready()

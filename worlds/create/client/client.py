@@ -48,6 +48,12 @@ OBJECT_RESYNC_INTERVAL_SECONDS = 2.0
 OBJECT_RESOLVER_RETRY_SECONDS = 1.0
 OBJECT_MEM2_REHOOK_LIMIT = 3
 OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS = 5.0
+HUB_CREATE_CHAIN_POPUP_LOCATIONS = frozenset({
+    "Hub World Create Chain Part 1",
+    "Hub World Create Chain Part 2",
+    "Hub World Create Chain Part 3",
+    "Hub World Create Chain",
+})
 HUB_EVENT_GRACE_SECONDS = 30.0
 OBJECT_LIST_OFFSET = 0x04E4
 CHALLENGE_OBJECT_ENTRY_STRIDE = 0x08
@@ -148,9 +154,10 @@ class CreateContext(CommonContext):
         self._popup_item_cursor = 0
         self._popup_accept_new_items = False
         self._object_popup_queue: deque[int] = deque()
-        self._automatic_object_popup_queue: deque[tuple[int, float]] = deque()
+        self._automatic_object_popup_queue: deque[tuple[int, float, bool]] = deque()
         self._popup_inflight: tuple[int, int] | None = None
-        self._popup_inflight_automatic: tuple[int, float] | None = None
+        self._popup_inflight_automatic: tuple[int, float, bool] | None = None
+        self._popup_inflight_chain_suppression_armed = False
         self._popup_last_status: int | None = None
         self._popup_delay_logged = False
         self._slot_guard_observed_this_session = False
@@ -278,6 +285,7 @@ class CreateContext(CommonContext):
         self._automatic_object_popup_queue.clear()
         self._popup_inflight = None
         self._popup_inflight_automatic = None
+        self._popup_inflight_chain_suppression_armed = False
         self._popup_last_status = None
         self._popup_delay_logged = False
 
@@ -921,6 +929,16 @@ def popup_object_name(ctx: CreateContext, object_id: int) -> str:
                  if int(data["global_value"]) == object_id), str(object_id))
 
 
+def is_hub_create_chain_receipt(ctx: CreateContext, item) -> bool:
+    location_id = getattr(item, "location", None)
+    if not location_id:
+        return False
+    return any(
+        ctx.slot_data.get("locations", {}).get(name, {}).get("id") == location_id
+        for name in HUB_CREATE_CHAIN_POPUP_LOCATIONS
+    )
+
+
 def collect_new_object_popup_items(ctx: CreateContext) -> None:
     if not ctx._popup_accept_new_items:
         return
@@ -942,7 +960,8 @@ def collect_new_object_popup_items(ctx: CreateContext) -> None:
             continue
         if 0 <= value < OBJECT_RECORD_COUNT:
             received_at = time.monotonic()
-            ctx._automatic_object_popup_queue.append((value, received_at))
+            suppress_chain_popup = is_hub_create_chain_receipt(ctx, item)
+            ctx._automatic_object_popup_queue.append((value, received_at, suppress_chain_popup))
             # ReceivedItems runs on the server loop; do not read Dolphin memory
             # concurrently here. The Dolphin sync loop samples RAM when this
             # entry is delayed or started and includes elapsed receipt time.
@@ -960,6 +979,13 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
         if status == ACTIVE:
             logger.info("Showing AP Object popup: %s (ID %d).",
                         popup_object_name(ctx, state["object_id"]), state["object_id"])
+            if (ctx._popup_inflight_automatic
+                    and ctx._popup_inflight_automatic[2]
+                    and not ctx._popup_inflight_chain_suppression_armed):
+                ctx._popup_inflight_chain_suppression_armed = runtime.arm_chain_popup_suppression(
+                    read_memory, write_memory)
+                if ctx._popup_inflight_chain_suppression_armed:
+                    logger.info("Armed suppression for the next native Hub Create Chain popup.")
         elif status == ERROR:
             logger.warning("AP Object popup runtime error %d, request %d, Object %d; popup dispatch stopped.",
                            state["error"], state["request_seq"], state["object_id"])
@@ -970,6 +996,7 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
             logger.info("AP Object popup closed; lifecycle=%s", runtime.lifecycle(read_memory))
             ctx._popup_inflight = None
             ctx._popup_inflight_automatic = None
+            ctx._popup_inflight_chain_suppression_armed = False
         elif status == IDLE:
             # A pending request was cancelled during a transition.
             if ctx._popup_inflight_automatic:
@@ -978,6 +1005,7 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
                 ctx._object_popup_queue.appendleft(value)
             ctx._popup_inflight = None
             ctx._popup_inflight_automatic = None
+            ctx._popup_inflight_chain_suppression_armed = False
         else:
             return
     if status != IDLE or (not ctx._object_popup_queue and not ctx._automatic_object_popup_queue):

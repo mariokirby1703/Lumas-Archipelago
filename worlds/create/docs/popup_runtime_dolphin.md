@@ -1,62 +1,61 @@
-# Object popup isolation test: Protocol 6 baseline
-
-This build restores the popup guest runtime from commit `02833474` unchanged.
-It intentionally excludes the later thumbnail, Create Chain freeze, Hub gate,
-busy/idle sampling, timer, challenge-wait, and child-preload experiments. The
-current client-side NetworkItem receive queue remains enabled.
+# Object popup test: Protocol 14 (Protocol 11 timeline + Chain suppression)
 
 ## Install
 
 1. Close the Create Client and stop CREATE completely.
 2. Keep the old CREATE AP Popup Instruction Cache Gecko helper disabled.
 3. Install this build's `create.apworld` and restart the AP Launcher.
-4. Boot CREATE fresh without a Dolphin save state, load the configured in-game
-   save slot, and connect the Create Client through the AP Launcher.
-5. Run `/createpopupstatus`. Expect `version=6`, `enabled=1`,
+4. Boot CREATE fresh without a Dolphin save state, load the configured save
+   slot, and connect through the Create Client in the AP Launcher.
+5. `/createpopupstatus` should report `version=14`, `enabled=1`,
    `hooks_applied=1`, and a changing heartbeat.
 
-A fresh CREATE boot is required because a newer popup protocol may still be in
-Dolphin's RAM and instruction cache. No new AP seed is required.
+A fresh game boot is required because older runtime code may remain in Dolphin's
+RAM or instruction cache. No new AP seed is required.
 
-## Required baseline tests
+## What this build changes
 
-First run `/createpopup 13` in the Hub/world:
+The Object presentation is the proven Protocol-11 implementation from commit
+`ea220093`: CREATE's native `FePuzzleResultsPO` timeline loads the Object image,
+shows only the unlock view, calls `PlayOutro`, and performs native cleanup.
+Manual `/createpopup` behavior and this timeline are unchanged.
 
-- An Object popup should appear. A white/missing thumbnail is expected in this
-  baseline and is outside this test.
-- Close the popup normally.
-- Immediately test movement, menus, Play, placement, and Paint.
+Automatic Object receipts use the same request path. They start when the AP
+runtime and global modal layer are idle and the normal RAM/save/native Object
+guards pass. There is no Create Chain freeze, event gate, busy/idle sampling,
+timer, challenge wait, state-999 wait, or direct thumbnail preload state machine.
 
-Then receive a real AP Object from Hub Create Chain Part 1:
+The only new guest action targets the later vanilla Chain/Spark notification.
+An automatic Object receipt arms suppression only when its
+`NetworkItem.location` is one of:
 
-- The ordinary AP receive message should appear in the client.
-- The Object should be queued automatically and its popup should start as soon
-  as the global modal layer is free.
-- The running Create Chain must not be paused or modified.
-- Close the popup and test input again.
+- Hub World Create Chain Part 1
+- Hub World Create Chain Part 2
+- Hub World Create Chain Part 3
+- Hub World Create Chain
 
-Automatic NetworkItem popups and manual commands use separate FIFO queues.
-Initial receipt history is not replayed. New Object receipts are collected once,
-including duplicates, and remain queued while another modal or AP popup is open.
-There is no Chain-state, challenge-state, elapsed-time, or post-location gate.
+The flag is armed only after the AP Object popup becomes active. Once that AP
+popup has closed, the post-update dispatcher checks wrapper `0x8068ED34`. It
+calls native `FeMessageFlow::End` at `0x80074DA0` exactly once only if the
+wrapper has a popup, is active, and contains callback `0x80099490` with context
+`0x8069A3A0`. Native End destroys the visual popup and invokes its stored Chain
+callback, allowing CreateChainsCamera to continue normally.
 
-If either test produces no popup or leaves input locked, run
-`/createpopupstatus` immediately and capture the full client output. Useful
-fields include `status`, `popup_pointer`, `modal`, `owner_active`,
-`request_seq`, `ack_seq`, `callback_invoked`, and `heartbeat`.
+The implementation never writes the modal layer or Create Chain state and does
+not hook or pause `0x80097EC0`.
 
-## Restored runtime behavior
+## Test
 
-Protocol 6 constructs `FePuzzleResultsPO` with one synthetic Object reward,
-registers its native UI slot, binds `_root.Event_UnlockFinished` to
-`PlayOutro`, and calls `_root.stop` followed by
-`_root.DeterminePlaySequence`. Native `Event_OnOutroEnd` owns modal teardown,
-result destruction, and the acknowledgement callback.
+1. Run `/createpopup 13`. Confirm the correct image/name, normal close, and
+   working movement, menus, Play, placement, and Paint afterward.
+2. Trigger Hub Create Chain Part 1 and receive its real AP Object. Confirm the
+   Object popup appears immediately with its image and closes normally.
+3. Confirm `Chain complete / Spark awarded` is not visibly shown, the Chain
+   continues, and input works.
+4. Receive an Object from an unrelated AP location. Its popup should work, but
+   it must not arm Chain suppression.
 
-The runtime hooks only the simulation vtable bootstrap and the scoped Object
-availability predicate at `0x800325E4`. The original Create Chain call at
-`0x8000DB5C` is required and is never replaced. No popup code is installed in
-the later auxiliary cave at `0x8062C100`.
-
-The next thumbnail experiment waits until both manual and real NetworkItem
-baseline paths are confirmed in Dolphin.
+`/createpopupstatus` reports `suppress_next_chain_popup`, the Chain wrapper's
+popup pointer/active/callback/context fields, and
+`suppressed_chain_popup_count`. After a successful Hub test the flag should be
+zero and the count should have increased by one.
