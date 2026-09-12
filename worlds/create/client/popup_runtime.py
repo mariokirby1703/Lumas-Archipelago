@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 14
+VERSION = 15
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -25,6 +25,8 @@ HEARTBEAT_TIMEOUT_SECONDS = 5.0
 CHAIN_WRAPPER = 0x8068ED34
 CHAIN_CALLBACK = 0x80099490
 CHAIN_CONTEXT = 0x8069A3A0
+HUB_CHAIN_CALLBACK = 0x8005C5B0
+HUB_CHAIN_CONTEXT = 0x8068DD50
 CHAIN_WRAPPER_END = 0x80074DA0
 SUPPRESS_NEXT_CHAIN_POPUP_OFFSET = 0x28
 SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET = 0x90
@@ -365,6 +367,9 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
     suppress.emit(0x880B0014, 0x28000000)
     suppress.branch("return", 0x41820000)
     suppress.emit(0x800B000C)
+    load(suppress, 10, HUB_CHAIN_CALLBACK)
+    suppress.emit(0x7C005000)
+    suppress.branch("hub_context", 0x41820000)
     load(suppress, 10, CHAIN_CALLBACK)
     suppress.emit(0x7C005000)
     suppress.branch("return", 0x40820000)
@@ -372,6 +377,13 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
     load(suppress, 10, CHAIN_CONTEXT)
     suppress.emit(0x7C005000)
     suppress.branch("return", 0x40820000)
+    suppress.branch("matched")
+    suppress.label("hub_context")
+    suppress.emit(0x800B0010)
+    load(suppress, 10, HUB_CHAIN_CONTEXT)
+    suppress.emit(0x7C005000)
+    suppress.branch("return", 0x40820000)
+    suppress.label("matched")
     suppress.emit(0x7D635B78)
     suppress.branch(CHAIN_WRAPPER_END, link=True)
     suppress.emit(*load_mailbox, 0x38000000,
@@ -445,6 +457,16 @@ class PopupRuntime:
             return {"type": value_type, "value": value, "payload": "0x" + payload.hex().upper()}
         item_count, visible_width, preload_width, visible = (
             gfx_value(index) for index in range(4))
+        chain_callback = u32(CHAIN_WRAPPER + 0x0C)
+        chain_context = u32(CHAIN_WRAPPER + 0x10)
+        chain_signature = {
+            (HUB_CHAIN_CALLBACK, HUB_CHAIN_CONTEXT): "hub_chain_part",
+            (CHAIN_CALLBACK, CHAIN_CONTEXT): "create_chains_completion",
+        }.get((chain_callback, chain_context))
+        suppression_armed = bool(u32(
+            self.layout.mailbox + SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
+        chain_popup_present = bool(u32(CHAIN_WRAPPER)) and bool(
+            read_memory(CHAIN_WRAPPER + 0x14, 1)[0])
         result = {
             "popup_pointer": f"0x{state['popup_pointer']:08X}",
             "callback_invoked": bool(state["request_seq"] and state["ack_seq"] == state["request_seq"]),
@@ -458,11 +480,18 @@ class PopupRuntime:
             "visible_thumbnail_width": visible_width,
             "preloaded_thumbnail_width": preload_width,
             "visible_thumbnail_container_visible": visible,
-            "suppress_next_chain_popup": bool(u32(
-                self.layout.mailbox + SUPPRESS_NEXT_CHAIN_POPUP_OFFSET)),
+            "suppress_next_chain_popup": suppression_armed,
+            "suppression_match_signature": chain_signature,
+            "suppression_miss_callback": bool(
+                suppression_armed and chain_popup_present
+                and chain_callback not in (HUB_CHAIN_CALLBACK, CHAIN_CALLBACK)),
+            "suppression_miss_context": bool(
+                suppression_armed and chain_popup_present
+                and chain_callback in (HUB_CHAIN_CALLBACK, CHAIN_CALLBACK)
+                and chain_signature is None),
             "chain_wrapper_popup_ptr": f"0x{u32(CHAIN_WRAPPER):08X}",
-            "chain_wrapper_callback": f"0x{u32(CHAIN_WRAPPER + 0x0C):08X}",
-            "chain_wrapper_context": f"0x{u32(CHAIN_WRAPPER + 0x10):08X}",
+            "chain_wrapper_callback": f"0x{chain_callback:08X}",
+            "chain_wrapper_context": f"0x{chain_context:08X}",
             "chain_wrapper_active": bool(read_memory(CHAIN_WRAPPER + 0x14, 1)[0]),
             "suppressed_chain_popup_count": u32(
                 self.layout.mailbox + SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET),

@@ -1,4 +1,4 @@
-# Object popup test: Protocol 14 (Protocol 11 timeline + Chain suppression)
+# Object popup test: Protocol 15 (Protocol 11 timeline + Chain suppression)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's `create.apworld` and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load the configured save
    slot, and connect through the Create Client in the AP Launcher.
-5. `/createpopupstatus` should report `version=14`, `enabled=1`,
+5. `/createpopupstatus` should report `version=15`, `enabled=1`,
    `hooks_applied=1`, and a changing heartbeat.
 
 A fresh game boot is required because older runtime code may remain in Dolphin's
@@ -37,9 +37,14 @@ An automatic Object receipt arms suppression only when its
 The flag is armed only after the AP Object popup becomes active. Once that AP
 popup has closed, the post-update dispatcher checks wrapper `0x8068ED34`. It
 calls native `FeMessageFlow::End` at `0x80074DA0` exactly once only if the
-wrapper has a popup, is active, and contains callback `0x80099490` with context
-`0x8069A3A0`. Native End destroys the visual popup and invokes its stored Chain
-callback, allowing CreateChainsCamera to continue normally.
+wrapper has a popup, is active, and matches one of the two observed signatures:
+
+- Hub Chain Part notification: callback `0x8005C5B0`, context `0x8068DD50`
+- CreateChains completion: callback `0x80099490`, context `0x8069A3A0`
+
+Native End destroys the visual popup and invokes its stored callback, allowing
+the vanilla state machine to continue normally. A missing or mismatching wrapper
+leaves the suppression flag armed for a later frame.
 
 The implementation never writes the modal layer or Create Chain state and does
 not hook or pause `0x80097EC0`.
@@ -55,7 +60,7 @@ not hook or pause `0x80097EC0`.
 4. Receive an Object from an unrelated AP location. Its popup should work, but
    it must not arm Chain suppression.
 
-`/createpopupstatus` reports `suppress_next_chain_popup`, the Chain wrapper's
-popup pointer/active/callback/context fields, and
+`/createpopupstatus` reports `suppress_next_chain_popup`, the matched signature,
+callback/context mismatch indicators, the Chain wrapper's pointer fields, and
 `suppressed_chain_popup_count`. After a successful Hub test the flag should be
 zero and the count should have increased by one.

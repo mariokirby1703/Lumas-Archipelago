@@ -1272,26 +1272,35 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(0, report["modal"])
 
     def test_suppresses_only_matching_chain_wrapper_through_native_end(self):
-        self.install()
-        self.fake.write_u32(self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 1)
-        self.fake.write_u32(popup.CHAIN_WRAPPER, 0x81206000)
-        self.fake.write_u32(popup.CHAIN_WRAPPER + 0x0C, popup.CHAIN_CALLBACK)
-        self.fake.write_u32(popup.CHAIN_WRAPPER + 0x10, popup.CHAIN_CONTEXT)
-        self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 1)
-        calls = []
-        def native_end(regs):
-            self.assertEqual(popup.CHAIN_WRAPPER, regs[3])
-            calls.append(regs[3])
-            self.fake.write_u32(popup.CHAIN_WRAPPER, 0)
-            self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 0)
-        execute_popup_ppc(
-            self.runtime, self.fake, self.runtime.layout.aux_suppress_chain,
-            [0] * 32, native={popup.CHAIN_WRAPPER_END: native_end})
-        self.assertEqual([popup.CHAIN_WRAPPER], calls)
-        self.assertEqual(0, self.fake.read_u32(
-            self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
-        self.assertEqual(1, self.fake.read_u32(
-            self.base + popup.SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET))
+        for callback, context, diagnostic in (
+                (popup.HUB_CHAIN_CALLBACK, popup.HUB_CHAIN_CONTEXT, "hub_chain_part"),
+                (popup.CHAIN_CALLBACK, popup.CHAIN_CONTEXT, "create_chains_completion")):
+            with self.subTest(callback=f"0x{callback:08X}"):
+                self.setUp()
+                self.install()
+                self.fake.write_u32(self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 1)
+                self.fake.write_u32(popup.CHAIN_WRAPPER, 0x81206000)
+                self.fake.write_u32(popup.CHAIN_WRAPPER + 0x0C, callback)
+                self.fake.write_u32(popup.CHAIN_WRAPPER + 0x10, context)
+                self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 1)
+                report = self.runtime.lifecycle(self.read)
+                self.assertEqual(diagnostic, report["suppression_match_signature"])
+                self.assertFalse(report["suppression_miss_callback"])
+                self.assertFalse(report["suppression_miss_context"])
+                calls = []
+                def native_end(regs):
+                    self.assertEqual(popup.CHAIN_WRAPPER, regs[3])
+                    calls.append(regs[3])
+                    self.fake.write_u32(popup.CHAIN_WRAPPER, 0)
+                    self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 0)
+                execute_popup_ppc(
+                    self.runtime, self.fake, self.runtime.layout.aux_suppress_chain,
+                    [0] * 32, native={popup.CHAIN_WRAPPER_END: native_end})
+                self.assertEqual([popup.CHAIN_WRAPPER], calls)
+                self.assertEqual(0, self.fake.read_u32(
+                    self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
+                self.assertEqual(1, self.fake.read_u32(
+                    self.base + popup.SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET))
 
     def test_chain_suppression_rejects_nonmatching_wrapper(self):
         for address, value, byte in (
