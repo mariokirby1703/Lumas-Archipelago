@@ -24,21 +24,25 @@
 - Verify an ordinary vanilla challenge completion and Create Chain as well.
 
 Automatic NetworkItem popups use a separate queue from manual `/createpopup`
-requests. A network popup waits while a challenge is active, for at least two
-seconds after a newly detected location check, while another modal is active,
-and until the current world context has settled. The item remains queued.
-Manual test requests remain immediate so they can still probe the runtime.
+requests. At every Dolphin sync the client samples CreateChainsCamera state at
+`0x8069A3BC` and the global modal at `0x80948040`. A network popup starts only
+after both are zero for three consecutive samples. The item remains queued.
+There is no fixed event timer and a normal active challenge does not itself
+block the queue. Manual test requests remain immediate.
 
 The client logs the world/challenge context, modal value, selected Create Chain
 state bytes and elapsed time since the last location check and Object receipt
 when an automatic popup is delayed and when it starts. These values are
 diagnostic; no gameplay or input flag is written by the popup gate.
+For two seconds after an automatic popup closes, modal transitions are also
+logged. `/createpopupstatus` reports state stability and the last modal
+transition. If the AP popup is inactive while modal is nonzero, it includes the
+raw nonzero entries among the first 16 UI-manager slots for diagnosis only.
 
-The intended result is only the Object Unlocked view. Its visual startup,
-dismissal/input restoration and real Dolphin vtable bootstrap still require
-live confirmation; the tests do not render the UI. If an empty results/Spark
-state appears first, capture that behavior and /createpopupstatus. This build
-uses the confirmed Results movie rather than the Chain or PuzzleUnlock movie.
+The intended and live-confirmed result is only the Object Unlocked view with its
+native thumbnail. Manual dismissal restores input. Automatic receipt gating
+still requires live confirmation around Create Chain and challenge completion
+events; the tests do not render the UI.
 
 ## Direct object view and close diagnostics
 

@@ -1336,10 +1336,15 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.ctx._popup_inflight_automatic = None
         self.ctx._popup_last_status = None
         self.ctx._popup_delay_logged = False
-        self.ctx._auto_popup_blocked_until = 0.0
         self.ctx._last_location_check_at = 0.0
         self.ctx._last_object_received_at = 0.0
-        self.ctx._location_context_ready_at = 0.0
+        self.ctx._popup_gate_chain_state = None
+        self.ctx._popup_gate_chain_changed_at = 0.0
+        self.ctx._popup_gate_modal = None
+        self.ctx._popup_gate_modal_transition = None
+        self.ctx._popup_gate_modal_changed_at = 0.0
+        self.ctx._popup_gate_idle_samples = 0
+        self.ctx._popup_post_close_observe_until = 0.0
         self.ctx.ram_is_settled = lambda: True
         self.ctx.slot_ram_is_settled = lambda: True
         self.names = {value: name for name, data in self.ctx.slot_data["objects"].items()
@@ -1358,7 +1363,8 @@ class TestCreatePopupQueue(unittest.TestCase):
         client.sync_object_popups(self.ctx, False)
         apply_guest_popup_hooks(self.ctx._popup_runtime, self.fake)
         self.fake.write_u32(self.ctx._popup_runtime.layout.mailbox + 0x1C, 1)
-        client.sync_object_popups(self.ctx, False)
+        for _ in range(client.AUTO_POPUP_IDLE_SAMPLES):
+            client.sync_object_popups(self.ctx, False)
 
     def test_baseline_suppresses_history_and_keeps_receipt_order_duplicates(self):
         self.receipt(13)
@@ -1385,7 +1391,7 @@ class TestCreatePopupQueue(unittest.TestCase):
         client.collect_new_object_popup_items(self.ctx)
         self.assertEqual([13], [value for value, _ in self.ctx._automatic_object_popup_queue])
 
-    def test_challenge_dispatch_does_not_resolve_or_write_object_records(self):
+    def test_idle_challenge_dispatch_does_not_resolve_or_write_object_records(self):
         self.ready()
         self.receipt(13)
         record = self.ctx._object_records[13]
@@ -1396,23 +1402,24 @@ class TestCreatePopupQueue(unittest.TestCase):
         with patch.object(client, "object_records", side_effect=AssertionError("MEM2 traversal")), \
              patch.object(client, "apply_owned_object_record", side_effect=AssertionError("threshold write")):
             client.sync_object_popups(self.ctx, True)
-        self.assertIsNone(self.ctx._popup_inflight)
-        self.assertEqual([13], [value for value, _ in self.ctx._automatic_object_popup_queue])
+        self.assertEqual((13, 1), self.ctx._popup_inflight)
+        self.assertEqual([], list(self.ctx._automatic_object_popup_queue))
         self.assertEqual(before, self.fake.read_bytes(record, 0x34))
 
-    def test_automatic_receipt_waits_for_event_grace_and_context_settle(self):
+    def test_automatic_receipt_waits_for_three_idle_chain_samples(self):
         self.ready()
         self.receipt(13)
         with patch.object(client.time, "monotonic", return_value=100.0):
             client.collect_new_object_popup_items(self.ctx)
-        self.ctx._auto_popup_blocked_until = 102.0
-        self.ctx._location_context_ready_at = 103.0
-        with patch.object(client.time, "monotonic", return_value=102.5):
+        self.fake.write_u32(0x8069A3BC, 1)
+        with patch.object(client.time, "monotonic", return_value=101.0):
             client.service_object_popup_queue(self.ctx, False)
         self.assertIsNone(self.ctx._popup_inflight)
-        with patch.object(client.time, "monotonic", return_value=103.0), \
-             patch.object(client.logger, "info"):
-            client.service_object_popup_queue(self.ctx, False)
+        self.fake.write_u32(0x8069A3BC, 0)
+        with patch.object(client.logger, "info"):
+            for sample in range(client.AUTO_POPUP_IDLE_SAMPLES):
+                with patch.object(client.time, "monotonic", return_value=102.0 + sample / 10):
+                    client.service_object_popup_queue(self.ctx, False)
         self.assertEqual((13, 1), self.ctx._popup_inflight)
         self.assertEqual((13, 100.0), self.ctx._popup_inflight_automatic)
 
@@ -1490,7 +1497,8 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.receipt(13)
         apply_guest_popup_hooks(self.ctx._popup_runtime, self.fake)
         self.fake.write_u32(self.ctx._popup_runtime.layout.mailbox + 0x1C, 1)
-        client.sync_object_popups(self.ctx, False)
+        for _ in range(client.AUTO_POPUP_IDLE_SAMPLES):
+            client.sync_object_popups(self.ctx, False)
         self.assertEqual((13, 1), self.ctx._popup_inflight)
 
     def test_manual_retry_preserves_queue_receipt_cursor_and_cancelled_request(self):

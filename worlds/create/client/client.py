@@ -49,7 +49,8 @@ OBJECT_RESOLVER_RETRY_SECONDS = 1.0
 OBJECT_MEM2_REHOOK_LIMIT = 3
 OBJECT_RESYNC_AFTER_CHAIN_DELAY_SECONDS = 5.0
 HUB_EVENT_GRACE_SECONDS = 30.0
-AUTO_POPUP_EVENT_GRACE_SECONDS = 2.0
+AUTO_POPUP_IDLE_SAMPLES = 3
+POPUP_POST_CLOSE_OBSERVE_SECONDS = 2.0
 OBJECT_LIST_OFFSET = 0x04E4
 CHALLENGE_OBJECT_ENTRY_STRIDE = 0x08
 
@@ -108,7 +109,13 @@ class CreateCommandProcessor(ClientCommandProcessor):
         if self.ctx.dolphin_status == CONNECTION_CONNECTED_STATUS:
             try:
                 logger.info("Popup hook diagnostics: %s", runtime.diagnostics(read_memory))
-                logger.info("Popup mailbox=%s modal=%d", runtime.snapshot(read_memory), read_u32_be(MODAL_LAYER))
+                snapshot = runtime.snapshot(read_memory)
+                modal = read_u32_be(MODAL_LAYER)
+                logger.info("Popup mailbox=%s modal=%d gate=%s", snapshot, modal,
+                            popup_event_diagnostics(self.ctx, time.monotonic()))
+                if not snapshot["popup_pointer"] and modal:
+                    logger.info("Nonzero raw UI-manager slots while AP popup is inactive: %s",
+                                ui_slot_diagnostics())
             except Exception as error:
                 logger.warning("Popup status unavailable: %s", error)
 
@@ -153,9 +160,15 @@ class CreateContext(CommonContext):
         self._popup_inflight_automatic: tuple[int, float] | None = None
         self._popup_last_status: int | None = None
         self._popup_delay_logged = False
-        self._auto_popup_blocked_until = 0.0
         self._last_location_check_at = 0.0
         self._last_object_received_at = 0.0
+        self._popup_gate_chain_state: int | None = None
+        self._popup_gate_chain_changed_at = 0.0
+        self._popup_gate_modal: int | None = None
+        self._popup_gate_modal_transition: tuple[int, int] | None = None
+        self._popup_gate_modal_changed_at = 0.0
+        self._popup_gate_idle_samples = 0
+        self._popup_post_close_observe_until = 0.0
         self._slot_guard_observed_this_session = False
         self._waiting_for_slot_logged = False
         self._slot_connected_logged = False
@@ -283,9 +296,15 @@ class CreateContext(CommonContext):
         self._popup_inflight_automatic = None
         self._popup_last_status = None
         self._popup_delay_logged = False
-        self._auto_popup_blocked_until = 0.0
         self._last_location_check_at = 0.0
         self._last_object_received_at = 0.0
+        self._popup_gate_chain_state = None
+        self._popup_gate_chain_changed_at = 0.0
+        self._popup_gate_modal = None
+        self._popup_gate_modal_transition = None
+        self._popup_gate_modal_changed_at = 0.0
+        self._popup_gate_idle_samples = 0
+        self._popup_post_close_observe_until = 0.0
 
     def _reset_location_context(self) -> None:
         self._location_context = None
@@ -837,10 +856,6 @@ async def check_locations(ctx: CreateContext) -> None:
         logger.debug("Failed while checking Create locations.", exc_info=True)
     if newly_checked and ctx.slot is not None:
         ctx._last_location_check_at = time.monotonic()
-        ctx._auto_popup_blocked_until = max(
-            ctx._auto_popup_blocked_until,
-            ctx._last_location_check_at + AUTO_POPUP_EVENT_GRACE_SECONDS,
-        )
         await ctx.send_msgs([{"cmd": "LocationChecks", "locations": list(newly_checked)}])
 
 
@@ -961,6 +976,29 @@ def collect_new_object_popup_items(ctx: CreateContext) -> None:
             logger.info("Queued NetworkItem Object popup: %s (ID %d).", name, value)
 
 
+def observe_popup_gate(ctx: CreateContext, now: float) -> tuple[int, int]:
+    chain_state = read_u32_be(0x8069A3BC)
+    modal = read_u32_be(MODAL_LAYER)
+    if chain_state != ctx._popup_gate_chain_state:
+        ctx._popup_gate_chain_state = chain_state
+        ctx._popup_gate_chain_changed_at = now
+        ctx._popup_gate_idle_samples = 0
+    if modal != ctx._popup_gate_modal:
+        previous = ctx._popup_gate_modal
+        ctx._popup_gate_modal = modal
+        ctx._popup_gate_modal_changed_at = now
+        if previous is not None:
+            ctx._popup_gate_modal_transition = (previous, modal)
+            if now <= ctx._popup_post_close_observe_until:
+                logger.info("Post-close vanilla modal transition %d -> %d; diagnostics=%s",
+                            previous, modal, popup_event_diagnostics(ctx, now))
+    if chain_state == 0 and modal == 0:
+        ctx._popup_gate_idle_samples += 1
+    else:
+        ctx._popup_gate_idle_samples = 0
+    return chain_state, modal
+
+
 def popup_event_diagnostics(ctx: CreateContext, now: float) -> dict[str, Any]:
     try:
         return {
@@ -973,6 +1011,12 @@ def popup_event_diagnostics(ctx: CreateContext, now: float) -> dict[str, Any]:
             "chain_completion_8068ED48_u8": read_u8(0x8068ED48),
             "generic_completion_8068DC94_u8": read_u8(0x8068DC94),
             "modal_80948040_u32": read_u32_be(MODAL_LAYER),
+            "chain_state_idle_samples": ctx._popup_gate_idle_samples,
+            "chain_state_stable_ms": round((now - ctx._popup_gate_chain_changed_at) * 1000)
+            if ctx._popup_gate_chain_changed_at else None,
+            "last_modal_transition": ctx._popup_gate_modal_transition,
+            "modal_transition_ms_ago": round((now - ctx._popup_gate_modal_changed_at) * 1000)
+            if ctx._popup_gate_modal_changed_at else None,
             "ms_since_last_location_check": round((now - ctx._last_location_check_at) * 1000)
             if ctx._last_location_check_at else None,
             "ms_since_object_received": round((now - ctx._last_object_received_at) * 1000)
@@ -982,11 +1026,26 @@ def popup_event_diagnostics(ctx: CreateContext, now: float) -> dict[str, Any]:
         return {"unavailable": str(error)}
 
 
+def ui_slot_diagnostics() -> list[dict[str, Any]]:
+    base, stride, count = 0x80947F50, 0x18, 16
+    raw = read_memory(base, stride * count)
+    return [
+        {"slot": index, "address": f"0x{base + index * stride:08X}",
+         "words": [f"0x{int.from_bytes(entry[offset:offset + 4], 'big'):08X}"
+                   for offset in range(0, stride, 4)]}
+        for index in range(count)
+        for entry in (raw[index * stride:(index + 1) * stride],)
+        if any(entry)
+    ]
+
+
 def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> None:
     if not ctx._popup_runtime_ready or not ctx.save_slot_armed:
         return
     runtime = ctx._popup_runtime
     state = runtime.snapshot(read_memory)
+    now = time.monotonic()
+    chain_state, modal = observe_popup_gate(ctx, now)
     status = state["status"]
     if status != ctx._popup_last_status:
         if status == ACTIVE:
@@ -1002,6 +1061,7 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
             logger.info("AP Object popup closed; lifecycle=%s", runtime.lifecycle(read_memory))
             ctx._popup_inflight = None
             ctx._popup_inflight_automatic = None
+            ctx._popup_post_close_observe_until = now + POPUP_POST_CLOSE_OBSERVE_SECONDS
         elif status == IDLE:
             # A pending request was cancelled during a transition.
             if ctx._popup_inflight_automatic:
@@ -1014,15 +1074,13 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
             return
     if status != IDLE or (not ctx._object_popup_queue and not ctx._automatic_object_popup_queue):
         return
-    if read_u32_be(MODAL_LAYER):
+    if modal:
         if not ctx._popup_delay_logged:
             logger.info("Create AP Object popup delayed: another modal UI is active.")
             ctx._popup_delay_logged = True
         return
     automatic = not ctx._object_popup_queue
-    now = time.monotonic()
-    if automatic and (challenge_active or now < ctx._auto_popup_blocked_until
-                      or now < ctx._location_context_ready_at):
+    if automatic and (chain_state != 0 or ctx._popup_gate_idle_samples < AUTO_POPUP_IDLE_SAMPLES):
         if not ctx._popup_delay_logged:
             logger.info("Create AP Object popup delayed until the current game event is settled; diagnostics=%s",
                         popup_event_diagnostics(ctx, now))
