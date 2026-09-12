@@ -738,6 +738,8 @@ def execute_popup_ppc(runtime, memory, entry, registers, *, lr=0x81230000, nativ
             regs[0] = lr
         elif ins == 0x7C0803A6:
             lr = regs[0]
+        elif ins == 0x4CC63182:
+            pass  # variadic call CR1 flag
         elif ins in (0x7C0004AC, 0x4C00012C):
             events.append(("sync" if ins == 0x7C0004AC else "isync",))
         elif op == 31 and xo in (54, 982):
@@ -825,7 +827,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(self.base + 0x20, self.fake.read_u32(self.base + 0x3C))
         self.assertEqual(self.runtime.layout.closed_callback, self.fake.read_u32(self.base + 0x2C))
         context = self.runtime.layout.result_context
-        self.assertEqual(bytes(16) + popup.word(1) + bytes(44), self.read(context, 64))
+        self.assertEqual(bytes(16) + popup.word(1) + bytes(4), self.read(context, 24))
 
     def test_refuses_unexpected_instruction_without_writing(self):
         self.fake.write_u32(0x800325E4, 0x12345678)
@@ -1008,10 +1010,24 @@ class TestCreatePopupRuntime(unittest.TestCase):
         def register(r):
             self.assertEqual((0x80947A30, 3, 0, 1), tuple(r[3:7]))
             self.assertEqual(0x81206000, self.fake.read_u32(self.base + 0x20))
+        invokes = []
+        def acquire(r):
+            self.assertEqual(0x80947F98, r[4])
+            self.fake.write_u32(r[3], 0x81209000)
+        def invoke(r):
+            self.assertEqual(0x81209000, r[3])
+            self.assertEqual(b"\0", self.read(r[5], 1))
+            name = self.read(r[4], 32).split(b"\0")[0]
+            invokes.append(name)
+            self.assertIn(name, (b"_root.stop", b"_root.DeterminePlaySequence"))
+        def release(r):
+            self.assertEqual([b"_root.stop", b"_root.DeterminePlaySequence"], invokes)
+            self.assertEqual(0x81209000, r[3])
         pc, result, _, events = execute_popup_ppc(
             self.runtime, self.fake, self.runtime.layout.dispatcher, regs,
             native={popup.ORIGINAL_UPDATE: original_update, 0x80490BF0: lookup,
-                    0x80031DB0: construct, 0x804EA4D0: register})
+                    0x80031DB0: construct, 0x804EA4D0: register,
+                    0x8000ED20: acquire, 0x8028DF30: invoke, 0x8035A96C: release})
         self.assertEqual(0x81230000, pc)
         self.assertEqual(0x12345678, result[3])
         self.assertEqual(before[1], result[1])
@@ -1031,7 +1047,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.prepare_dispatch()
         self.fake.write_byte(0x8068CFC3, 0)  # running challenge
         events = self.dispatcher_frame()
-        self.assertEqual([popup.ORIGINAL_UPDATE, 0x80490BF0, 0x80031DB0, 0x804EA4D0],
+        self.assertEqual([popup.ORIGINAL_UPDATE, 0x80490BF0, 0x80031DB0, 0x804EA4D0,
+                          0x8000ED20, 0x8028DF30, 0x8028DF30, 0x8035A96C],
                          [e[1] for e in events if e[0] == "call"])
         self.assertLess(events.index(("isync",)), events.index(("call", 0x80031DB0)))
         self.assertEqual(1, self.runtime.heartbeat(self.read))
@@ -1077,6 +1094,59 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertNotIn(("call", 0x80490BF0), events)
         self.assertEqual(popup.ORIGINAL_UPDATE, self.fake.read_u32(popup.VTABLE_SLOT))
         self.assertEqual(popup.IDLE, self.runtime.status(self.read))
+
+    def test_outro_fallback_requires_final_frame_and_same_movie_and_runs_once(self):
+        for frame, same_movie, expected in ((0, True, False), (365, True, False),
+                                             (373, True, False), (374, False, False),
+                                             (374, True, True)):
+            with self.subTest(frame=frame, same_movie=same_movie):
+                self.setUp()
+                self.prepare_dispatch()
+                self.fake.write_u32(self.base + 8, popup.ACTIVE)
+                self.fake.write_u32(self.base + 0x10, 1)
+                self.fake.write_u32(self.base + 0x20, 0x81206000)
+                self.fake.write_u32(self.base + 0x40, 0x81209000 if same_movie else 0x8120A000)
+                self.fake.write_u32(0x81206014, 0x80947F98)
+                self.fake.write_u32(0x80947F9C, 0x81209000)
+                self.fake.write_u32(0x81209064, 0x8120B000)
+                self.fake.write_u32(0x8120B0BC, frame)
+                regs = [0] * 32
+                regs[1] = 0x81700000
+                calls = []
+                def close(r):
+                    self.assertEqual(0x81206000, r[3])
+                    self.assertEqual(1, self.fake.read_u32(self.base + 0x90))
+                    calls.append(r[3])
+                native = {popup.ORIGINAL_UPDATE: lambda r: None, 0x800336E0: close}
+                for _ in range(2):
+                    execute_popup_ppc(self.runtime, self.fake, self.runtime.layout.dispatcher, regs, native=native)
+                self.assertEqual(int(expected), len(calls))
+                self.assertEqual(0x81206000, self.fake.read_u32(self.base + 0x20))
+
+    def test_lifecycle_reports_acknowledgement_and_native_movie_frame(self):
+        self.install()
+        self.fake.write_u32(self.base + 0x10, 7)
+        self.fake.write_u32(self.base + 0x20, 0x81206000)
+        self.fake.write_u32(0x81206014, 0x80947F98)
+        self.fake.write_u32(0x80947F98, 1)
+        self.fake.write_u32(0x80947F9C, 0x81209000)
+        self.fake.write_u32(0x81209064, 0x8120B000)
+        self.fake.write_u32(0x8120B0BC, 374)
+        self.fake.write_u32(popup.MODAL_LAYER, 1)
+        report = self.runtime.lifecycle(self.read)
+        self.assertFalse(report["callback_invoked"])
+        self.assertTrue(report["movie_slot_active"])
+        self.assertEqual(374, report["root_frame_zero_based"])
+        self.assertEqual(1, report["modal"])
+        # Native End owns pointer/modal cleanup; the final AP callback only acks.
+        self.fake.write_u32(self.base + 0x20, 0)
+        self.fake.write_u32(popup.MODAL_LAYER, 0)
+        regs = [0] * 32
+        regs[3] = self.base
+        execute_popup_ppc(self.runtime, self.fake, self.runtime.layout.closed_callback, regs)
+        report = self.runtime.lifecycle(self.read)
+        self.assertTrue(report["callback_invoked"])
+        self.assertEqual(0, report["modal"])
 
     def test_refuses_previous_revision_and_wrong_singleton(self):
         for address in (0x8000DB5C, popup.GAME_SINGLETON):

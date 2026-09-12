@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 4
+VERSION = 5
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -48,13 +48,13 @@ def word(value: int) -> bytes:
 class PopupPatchLayout:
     code_base: int = 0x80006048
     dispatcher: int = 0x80006048
-    construct_results: int = 0x80006220
-    maintain_hooks: int = 0x80006300
-    object_available_hook: int = 0x800063C0
-    closed_callback: int = 0x800061E0
-    mailbox: int = 0x80006400
-    result_context: int = 0x80006450
-    end: int = 0x80006490
+    construct_results: int = 0x80006270
+    maintain_hooks: int = 0x80006380
+    object_available_hook: int = 0x80006440
+    closed_callback: int = 0x80006240
+    mailbox: int = 0x80006480
+    result_context: int = 0x800064D0
+    end: int = 0x80006514
 
 
 def hook_words(layout):
@@ -94,7 +94,7 @@ class _Routine:
 def build_image(layout: PopupPatchLayout) -> bytes:
     if layout != PopupPatchLayout():
         raise ValueError("Only the verified CREATE executable layout is supported")
-    load_mailbox = (0x3D808000, 0x618C6400)
+    load_mailbox = (0x3D808000, 0x618C6480)
     hooks = hook_words(layout)
 
     def load(r, register, value):
@@ -116,7 +116,9 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.branch("return", 0x40820000)
     d.emit(0x800C0044, 0x28000001)  # Python still enables dispatch
     d.branch("return", 0x40820000)
-    d.emit(0x800C0008, 0x28000001)
+    d.emit(0x800C0008, 0x28000002)
+    d.branch("outro_fallback", 0x41820000)
+    d.emit(0x28000001)
     d.branch("return", 0x40820000)
     d.emit(0x800C000C, 0x28000106)
     d.branch("invalid", 0x40800000)
@@ -158,6 +160,26 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.emit(0x38000001)
     d.label("error")
     d.emit(0x900C0018, 0x38000003, 0x900C0008)
+    d.branch("return")
+    d.label("outro_fallback")
+    # PO's final root frame is 375 (zero-based 374), with Event_OnOutroEnd
+    # followed by Stop. Never use elapsed time or mere invisibility as proof.
+    d.emit(0x800C0090, 0x816C0010, 0x7C005800)
+    d.branch("return", 0x41820000)
+    d.emit(0x806C0020, 0x28030000)
+    d.branch("return", 0x41820000)
+    d.emit(0x80830014, 0x28040000)
+    d.branch("return", 0x41820000)
+    d.emit(0x80840004, 0x28040000)  # movie reference, not slot asset pointer
+    d.branch("return", 0x41820000)
+    d.emit(0x800C0040, 0x7C002000)  # still the movie created for this request
+    d.branch("return", 0x40820000)
+    d.emit(0x80840064, 0x28040000)  # GFxMovieRoot root sprite
+    d.branch("return", 0x41820000)
+    d.emit(0x800400BC, 0x28000176)  # final frame 374 only
+    d.branch("return", 0x40820000)
+    d.emit(0x916C0090)  # mark before native cleanup, once per request
+    d.branch(0x800336E0, link=True)
     d.label("return")
     d.emit(0x8061003C, 0x80010044, 0x7C0803A6, 0x38210040, 0x4E800020)
 
@@ -231,6 +253,18 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     load(f, 3, 0x80947A30)
     f.emit(0x38A00000, 0x38C00001)
     f.branch(0x804EA4D0, link=True)
+    # Stop the PO root timeline at its initial frame before Congratulations
+    # animates in, then run the actual PO object-only method. Unlock has already
+    # initialized mItemData/m_numUnlocks inside the native factory.
+    f.emit(*load_mailbox, 0x808C0020, 0x80840014, 0x38610008)
+    f.branch(0x8000ED20, link=True)  # acquire movie ref into stack +8
+    f.emit(0x80010008, *load_mailbox, 0x900C0040)
+    for string_offset in (0x68, 0x73):
+        f.emit(0x80610008, *load_mailbox, 0x388C0000 | string_offset,
+               0x38AC008F, 0x4CC63182)  # empty Invoke format, no args
+        f.branch(0x8028DF30, link=True)
+    f.emit(0x80610008)
+    f.branch(0x8035A96C, link=True)  # release movie ref
     f.label("return")
     f.emit(0x80010024, 0x7C0803A6, 0x38210020, 0x4E800020)
 
@@ -254,6 +288,8 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     image[offset + 0x44:offset + 0x48] = word(1)
     # Synthetic sPuzzleResults: no Puzzle pointer, one Object reward, no Sparks.
     image[offset + 0x60:offset + 0x64] = word(1)
+    image[offset + 0x68:offset + 0x73] = b"_root.stop\0"
+    image[offset + 0x73:offset + 0x8F] = b"_root.DeterminePlaySequence\0"
     return bytes(image)
 
 
@@ -271,6 +307,7 @@ class PopupRuntime:
 
     def diagnostics(self, read_memory):
         return {
+            "lifecycle": self.lifecycle(read_memory),
             "installed": self.installed,
             "ready": self.ready,
             "failure": self.failure,
@@ -282,6 +319,38 @@ class PopupRuntime:
                 "expected": f"{value:08X}",
             } for address, value in self.hooks.items()},
         }
+
+    def lifecycle(self, read_memory):
+        state = self.snapshot(read_memory)
+        def u32(address):
+            return int.from_bytes(read_memory(address, 4), "big")
+        result = {
+            "popup_pointer": f"0x{state['popup_pointer']:08X}",
+            "callback_invoked": bool(state["request_seq"] and state["ack_seq"] == state["request_seq"]),
+            "status": state["status"], "request_seq": state["request_seq"],
+            "ack_seq": state["ack_seq"], "modal": u32(MODAL_LAYER),
+            "owner_active": bool(state["active"]),
+            "fallback_seq": u32(self.layout.mailbox + 0x90),
+            "movie_slot": None, "movie_slot_active": False, "root_frame_zero_based": None,
+        }
+        if state["popup_pointer"]:
+            try:
+                pointer = state["popup_pointer"]
+                result["popup_vtable"] = f"0x{u32(pointer + 0x10):08X}"
+                result["close_callback"] = f"0x{u32(pointer + 0x1C):08X}"
+                result["callback_context"] = f"0x{u32(pointer + 0x20):08X}"
+                slot = u32(pointer + 0x14)
+                result["movie_slot"] = f"0x{slot:08X}"
+                if slot:
+                    movie = u32(slot + 4)
+                    result["movie_slot_active"] = bool(u32(slot) and movie)
+                    result["movie_slot_flags"] = f"0x{u32(slot + 0x0C):08X}"
+                    sprite = u32(movie + 0x64) if movie else 0
+                    if sprite:
+                        result["root_frame_zero_based"] = u32(sprite + 0xBC)
+            except Exception as error:
+                result["read_error"] = str(error)
+        return result
 
     def snapshot(self, read_memory):
         raw = read_memory(self.layout.mailbox, 0x4C)
@@ -304,8 +373,8 @@ class PopupRuntime:
         # insufficient to accept somebody else's code or a partial installation.
         offset = self.layout.mailbox - self.layout.code_base
         return (len(data) == len(self.image) and data[:offset + 8] == self.image[:offset + 8]
-                and data[offset + 0x38:offset + 0x44] == self.image[offset + 0x38:offset + 0x44]
-                and data[offset + 0x4C:] == self.image[offset + 0x4C:])
+                and data[offset + 0x38:offset + 0x40] == self.image[offset + 0x38:offset + 0x40]
+                and data[offset + 0x4C:offset + 0x90] == self.image[offset + 0x4C:offset + 0x90])
 
     def ensure_installed(self, read_memory, write_memory):
         if self.failure:

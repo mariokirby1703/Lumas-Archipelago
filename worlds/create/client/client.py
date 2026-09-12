@@ -956,7 +956,7 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
     if ctx._popup_inflight:
         value, sequence = ctx._popup_inflight
         if state["ack_seq"] == sequence and status == IDLE:
-            logger.info("AP Object popup closed.")
+            logger.info("AP Object popup closed; lifecycle=%s", runtime.lifecycle(read_memory))
             ctx._popup_inflight = None
         elif status == IDLE:
             # A pending request was cancelled during a transition.

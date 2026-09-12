@@ -1,4 +1,4 @@
-# Object popup test: FePuzzleResultsPO (runtime protocol 4)
+# Object popup test: FePuzzleResultsPO (runtime protocol 5)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's create.apworld and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load in-game Save Slot 3,
    and connect the Create Client through the AP Launcher.
-5. Check /createpopupstatus: version=4, enabled=1, hooks_applied=1 and a changing
+5. Check /createpopupstatus: version=5, enabled=1, hooks_applied=1 and a changing
    heartbeat. No new AP seed or APWorld release version is required.
 
 ## Test both manual and real AP receipts
@@ -29,6 +29,43 @@ live confirmation; the tests do not render the UI. If an empty results/Spark
 state appears first, capture that behavior and /createpopupstatus. This build
 uses the confirmed Results movie rather than the Chain or PuzzleUnlock movie.
 
+## Direct object view and close diagnostics
+
+After the native factory has built AddUnlockImages/Unlock and the UI slot is
+registered, AP invokes `_root.stop`, then `_root.DeterminePlaySequence`, on the
+same movie reference before returning to the game loop. FePuzzleResultsPO does
+not define ShowUnlock; that method belongs to the other Results variant.
+DeterminePlaySequence is the PO method that loads the object image/label,
+starts the unlock container and increments its stage. The original Unlock
+initialization remains intact.
+
+Stopping the PO root at its initial frame prevents the Congratulations timeline
+from starting. Its initial mScreen color transform has RGB multipliers 256 and
+alpha multiplier 0, while the unlock container is a separate child. The native
+PlayOutro still resumes the root at its End label for normal closing.
+
+The normal native close callback remains preferred. After the original game
+update, a still-ACTIVE AP popup may invoke OnOutroEnd (0x800336E0) once if its
+movie is the same one retained at creation and its root sprite is at frame 374
+(zero-based), the PO movie's final frame containing Event_OnOutroEnd and Stop.
+Earlier frames, invisible UI alone, a replaced movie or elapsed time never
+trigger this fallback. The fallback is marked before calling native cleanup.
+It never directly clears a popup pointer or writes the modal layer.
+
+`/createpopupstatus` includes a lifecycle section: popup pointer, native vtable,
+callback/context, whether the request was acknowledged, owner active flag,
+movie slot/flags, whether that slot has a movie, root frame, modal layer, and
+fallback sequence. A closed notification also logs this section. `movie_slot_active`
+means the slot contains an asset and movie reference, not proof of visual
+visibility or completed animation.
+
+After normal dismissal expect callback_invoked=true, ack_seq=request_seq,
+status=0, owner_active=false, popup_pointer=0 and modal=0. If these hold but
+input remains unavailable, provide dumps of the broken and playable states;
+this build does not guess at other gameplay flags. If callback_invoked=false,
+the frame and fallback sequence distinguish an unfinished animation from an
+attempted native-close fallback. Live visual/input verification remains required.
+
 ## Verified construction and ownership
 
 The vtable bootstrap at 0x805E2C70 still enters the code cave at 0x80006048,
@@ -38,7 +75,7 @@ FeSimpleMessage availability hook are removed; old revisions require a fresh
 boot instead of being overwritten in place.
 
 MakeFePuzzleResults at 0x80031DB0 receives a callback pair and a persistent,
-zero-initialized result context at 0x80006450. Only context+0x10 is 1. A null
+zero-initialized result context at 0x800064D0. Only context+0x10 is 1. A null
 context+0 selects FePuzzleResultsPO.gfx and skips the challenge-specific result
 setup at 0x80031F28. Its factory calls FePuzzleResults::UpdateUnlocks with the
 sum of context+0x10/+0x14, giving exactly one unlock slot before returning.
