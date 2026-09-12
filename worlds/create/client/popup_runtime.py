@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 5
+VERSION = 6
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -48,10 +48,10 @@ def word(value: int) -> bytes:
 class PopupPatchLayout:
     code_base: int = 0x80006048
     dispatcher: int = 0x80006048
-    construct_results: int = 0x80006270
+    construct_results: int = 0x80006210
     maintain_hooks: int = 0x80006380
     object_available_hook: int = 0x80006440
-    closed_callback: int = 0x80006240
+    closed_callback: int = 0x800061D0
     mailbox: int = 0x80006480
     result_context: int = 0x800064D0
     end: int = 0x80006514
@@ -116,9 +116,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.branch("return", 0x40820000)
     d.emit(0x800C0044, 0x28000001)  # Python still enables dispatch
     d.branch("return", 0x40820000)
-    d.emit(0x800C0008, 0x28000002)
-    d.branch("outro_fallback", 0x41820000)
-    d.emit(0x28000001)
+    d.emit(0x800C0008, 0x28000001)
     d.branch("return", 0x40820000)
     d.emit(0x800C000C, 0x28000106)
     d.branch("invalid", 0x40800000)
@@ -149,6 +147,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.branch("return", 0x40820000)
     d.emit(0x800C0044, 0x28000001)
     d.branch("return", 0x40820000)
+    d.emit(0x906C0054)  # diagnostic: registry record used by preflight
     d.emit(0x38000000, 0x900C0018, 0x38000002, 0x900C0008)
     d.emit(0x38000001, 0x980C0034)  # owner active until native End completes
     d.branch(layout.construct_results, link=True)
@@ -161,25 +160,6 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     d.label("error")
     d.emit(0x900C0018, 0x38000003, 0x900C0008)
     d.branch("return")
-    d.label("outro_fallback")
-    # PO's final root frame is 375 (zero-based 374), with Event_OnOutroEnd
-    # followed by Stop. Never use elapsed time or mere invisibility as proof.
-    d.emit(0x800C0090, 0x816C0010, 0x7C005800)
-    d.branch("return", 0x41820000)
-    d.emit(0x806C0020, 0x28030000)
-    d.branch("return", 0x41820000)
-    d.emit(0x80830014, 0x28040000)
-    d.branch("return", 0x41820000)
-    d.emit(0x80840004, 0x28040000)  # movie reference, not slot asset pointer
-    d.branch("return", 0x41820000)
-    d.emit(0x800C0040, 0x7C002000)  # still the movie created for this request
-    d.branch("return", 0x40820000)
-    d.emit(0x80840064, 0x28040000)  # GFxMovieRoot root sprite
-    d.branch("return", 0x41820000)
-    d.emit(0x800400BC, 0x28000176)  # final frame 374 only
-    d.branch("return", 0x40820000)
-    d.emit(0x916C0090)  # mark before native cleanup, once per request
-    d.branch(0x800336E0, link=True)
     d.label("return")
     d.emit(0x8061003C, 0x80010044, 0x7C0803A6, 0x38210040, 0x4E800020)
 
@@ -238,7 +218,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     a.branch(0x80025560)
 
     f = _Routine(layout.construct_results)
-    f.emit(0x9421FFE0, 0x7C0802A6, 0x90010024, *load_mailbox)
+    f.emit(0x9421FFD0, 0x7C0802A6, 0x90010034, *load_mailbox)
     f.emit(0x386C0038, 0x388C0050)
     f.branch(0x80031DB0, link=True)  # builds the one-object array in the same frame
     f.emit(*load_mailbox, 0x906C0020, 0x28030000)
@@ -259,19 +239,43 @@ def build_image(layout: PopupPatchLayout) -> bytes:
     f.emit(*load_mailbox, 0x808C0020, 0x80840014, 0x38610008)
     f.branch(0x8000ED20, link=True)  # acquire movie ref into stack +8
     f.emit(0x80010008, *load_mailbox, 0x900C0040)
+    # PO lacks Event_UnlockFinished, which the shared UnlockContainer calls.
+    # Copy the existing PlayOutro function onto this movie only. The native
+    # Event_OnOutroEnd callback then owns all modal/owner cleanup.
+    f.emit(0x38000000, 0x90010014,  # GFxValue type = Undefined; payload is inactive
+           0x80610008, 0x38810010)
+    load(f, 5, 0x805E29DC)  # _level0.PlayOutro
+    f.branch(0x8027E73C, link=True)  # GetVariable
+    f.emit(0x28030000)
+    f.branch("binding_done", 0x41820000)
+    f.emit(0x80610008)
+    load(f, 4, 0x800061F0)  # _root.Event_UnlockFinished
+    f.emit(0x38A10010, 0x38C00000)
+    f.branch(0x8027E864, link=True)  # SetVariable, normal (not sticky)
+    f.label("binding_done")
+    f.emit(*load_mailbox, 0x906C004C, 0x80010014, 0x70000040)
+    f.branch("released_value", 0x41820000)
+    f.emit(0x80610010, 0x38810010, 0x80A10018)
+    f.branch(0x802E6EFC, link=True)  # release managed GFxValue
+    f.label("released_value")
+    f.emit(*load_mailbox, 0x800C004C, 0x28000001)
+    f.branch("release_movie", 0x40820000)  # keep vanilla timeline on failure
     for string_offset in (0x68, 0x73):
         f.emit(0x80610008, *load_mailbox, 0x388C0000 | string_offset,
                0x38AC008F, 0x4CC63182)  # empty Invoke format, no args
         f.branch(0x8028DF30, link=True)
+    f.emit(*load_mailbox, 0x906C005C)  # DeterminePlaySequence Invoke return value
+    f.label("release_movie")
     f.emit(0x80610008)
     f.branch(0x8035A96C, link=True)  # release movie ref
     f.label("return")
-    f.emit(0x80010024, 0x7C0803A6, 0x38210020, 0x4E800020)
+    f.emit(0x80010034, 0x7C0803A6, 0x38210030, 0x4E800020)
 
     c = _Routine(layout.closed_callback)
+    c.emit(0x81630090, 0x396B0001, 0x91630090)  # callback observed for this request
     c.emit(0x80030010, 0x90030014, 0x38000000, 0x90030008, 0x4E800020)
     image = bytearray(layout.end - layout.code_base)
-    for routine, limit in ((d, layout.closed_callback), (c, layout.construct_results),
+    for routine, limit in ((d, layout.closed_callback), (c, 0x800061F0),
                            (f, layout.maintain_hooks), (m, layout.object_available_hook),
                            (a, layout.mailbox)):
         code = routine.build()
@@ -279,6 +283,7 @@ def build_image(layout: PopupPatchLayout) -> bytes:
             raise ValueError(f"Popup routine {routine.base:08X} exceeds cave space ({len(code)} bytes)")
         start = routine.base - layout.code_base
         image[start:start + len(code)] = code
+    image[0x800061F0 - layout.code_base:0x8000620B - layout.code_base] = b"_root.Event_UnlockFinished\0"
     offset = layout.mailbox - layout.code_base
     image[offset:offset + 8] = word(MAGIC) + word(VERSION)
     # Native FeMessageFlow::End releases the result object and UI slot, clears
@@ -330,12 +335,35 @@ class PopupRuntime:
             "status": state["status"], "request_seq": state["request_seq"],
             "ack_seq": state["ack_seq"], "modal": u32(MODAL_LAYER),
             "owner_active": bool(state["active"]),
-            "fallback_seq": u32(self.layout.mailbox + 0x90),
+            "ap_callback_calls": u32(self.layout.mailbox + 0x90),
+            "unlock_finished_handler_bound": bool(u32(self.layout.mailbox + 0x4C)),
+            "direct_sequence_succeeded": bool(u32(self.layout.mailbox + 0x5C)),
             "movie_slot": None, "movie_slot_active": False, "root_frame_zero_based": None,
         }
+        record = u32(self.layout.mailbox + 0x54)
+        result["object_record_preflight"] = f"0x{record:08X}"
+        result["unlock_count"] = None
+        try:
+            metadata = u32(record + 0x18) if record else 0
+            result["metadata_ptr"] = f"0x{metadata:08X}"
+            result["metadata_resolved"] = bool(metadata)
+            name_ptr = u32(metadata) if metadata else 0
+            name = bytearray()
+            if name_ptr:
+                for index in range(256):
+                    byte = read_memory(name_ptr + index, 1)
+                    if byte == b"\0":
+                        break
+                    if len(byte) != 1:
+                        raise ValueError("Incomplete thumbnail name read")
+                    name.extend(byte)
+            result["thumbnail_identifier_from_metadata"] = "Thumb:" + name.decode("utf-8", errors="replace") if name else None
+        except Exception as error:
+            result["metadata_read_error"] = str(error)
         if state["popup_pointer"]:
             try:
                 pointer = state["popup_pointer"]
+                result["unlock_count"] = u32(pointer + 0x24)
                 result["popup_vtable"] = f"0x{u32(pointer + 0x10):08X}"
                 result["close_callback"] = f"0x{u32(pointer + 0x1C):08X}"
                 result["callback_context"] = f"0x{u32(pointer + 0x20):08X}"
@@ -374,7 +402,9 @@ class PopupRuntime:
         offset = self.layout.mailbox - self.layout.code_base
         return (len(data) == len(self.image) and data[:offset + 8] == self.image[:offset + 8]
                 and data[offset + 0x38:offset + 0x40] == self.image[offset + 0x38:offset + 0x40]
-                and data[offset + 0x4C:offset + 0x90] == self.image[offset + 0x4C:offset + 0x90])
+                and data[offset + 0x50:offset + 0x54] == self.image[offset + 0x50:offset + 0x54]
+                and data[offset + 0x58:offset + 0x5C] == self.image[offset + 0x58:offset + 0x5C]
+                and data[offset + 0x60:offset + 0x90] == self.image[offset + 0x60:offset + 0x90])
 
     def ensure_installed(self, read_memory, write_memory):
         if self.failure:
@@ -471,5 +501,7 @@ class PopupRuntime:
         write_memory(self.layout.mailbox + 0x0C, word(object_id))
         write_memory(self.layout.mailbox + 0x10, word((state["request_seq"] + 1) & 0xFFFFFFFF))
         write_memory(self.layout.mailbox + 0x18, word(0))
+        for offset in (0x4C, 0x54, 0x5C, 0x90):
+            write_memory(self.layout.mailbox + offset, word(0))
         write_memory(self.layout.mailbox + 0x08, word(PENDING))  # publish last
         return True
