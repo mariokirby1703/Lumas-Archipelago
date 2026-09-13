@@ -1023,7 +1023,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
         self.assertEqual(layout.end - layout.code_base, len(self.runtime.image))
         self.assertEqual(popup.word(popup.ppc_branch(layout.dispatcher + 12, popup.ORIGINAL_UPDATE, link=True)),
                          self.runtime.image[12:16])
-        self.assertEqual({popup.VTABLE_SLOT, 0x800325E4, popup.HUB_CHAIN_CALLBACK},
+        self.assertEqual({popup.VTABLE_SLOT, 0x800325E4},
                          set(self.runtime.hooks))
 
     def dispatcher_frame(self, *, lookup_result=0x81204000, get_ok=True, set_ok=True,
@@ -1283,7 +1283,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
 
     def test_suppresses_only_matching_chain_wrapper_through_native_end(self):
         for callback, context, diagnostic in (
-                (popup.CHAIN_CALLBACK, popup.CHAIN_CONTEXT, "create_chains_completion"),):
+                (popup.CHAIN_CALLBACK, popup.CHAIN_CONTEXT, "create_chains_completion"),
+                (popup.HUB_CHAIN_CALLBACK, popup.HUB_CHAIN_CONTEXT, "hub_chain_part")):
             with self.subTest(callback=f"0x{callback:08X}"):
                 self.setUp()
                 self.install()
@@ -1292,6 +1293,10 @@ class TestCreatePopupRuntime(unittest.TestCase):
                 self.fake.write_u32(popup.CHAIN_WRAPPER + 0x0C, callback)
                 self.fake.write_u32(popup.CHAIN_WRAPPER + 0x10, context)
                 self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 1)
+                if callback == popup.HUB_CHAIN_CALLBACK:
+                    self.fake.write_u32(0x81206034, 1)
+                    self.fake.write_u32(0x81206038, 1)
+                    self.fake.write_u32(popup.MODAL_LAYER, 1)
                 report = self.runtime.lifecycle(self.read)
                 self.assertEqual(diagnostic, report["suppression_match_signature"])
                 self.assertFalse(report["suppression_miss_callback"])
@@ -1300,6 +1305,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
                 def native_end(regs):
                     self.assertEqual(popup.CHAIN_WRAPPER, regs[3])
                     calls.append(regs[3])
+                    self.fake.write_u32(
+                        popup.MODAL_LAYER, self.fake.read_u32(0x81206034))
                     self.fake.write_u32(popup.CHAIN_WRAPPER, 0)
                     self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 0)
                 execute_popup_ppc(
@@ -1310,65 +1317,30 @@ class TestCreatePopupRuntime(unittest.TestCase):
                     self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
                 self.assertEqual(1, self.fake.read_u32(
                     self.base + popup.SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET))
+                if callback == popup.HUB_CHAIN_CALLBACK:
+                    report = self.runtime.lifecycle(self.read)
+                    self.assertEqual(1, report["chain_popup_previous_modal_before"])
+                    self.assertEqual(1, report["chain_popup_current_modal_before"])
+                    self.assertEqual(0, report["global_modal_after_chain_cleanup"])
+                    self.assertEqual(0, self.fake.read_u32(popup.MODAL_LAYER))
 
-    def test_hub_queue_source_hook_consumes_entries_before_popup_creation(self):
-        self.install()
-        self.fake.write_u32(self.base + 8, popup.ACTIVE)
-        self.fake.write_u32(self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 1)
-        entries = (0x81201000, 0x81202000, 0x81203000)
-        for offset, value in zip((4, 8, 12), entries):
-            self.fake.write_u32(popup.HUB_CHAIN_CONTEXT + offset, value)
-        self.fake.write_byte(popup.HUB_CHAIN_CONTEXT, 0)
-        self.fake.write_byte(popup.HUB_CHAIN_CONTEXT + 1, 1)
-        regs = [0] * 32
-        regs[3] = popup.HUB_CHAIN_CONTEXT
-        destination, _, _, events = execute_popup_ppc(
-            self.runtime, self.fake, self.runtime.layout.aux_hub_queue_hook, regs)
-        self.assertEqual(0x81230000, destination)
-        self.assertEqual([], [event for event in events if event[0] == "call"])
-        self.assertEqual((0, 0, 0), tuple(
-            self.fake.read_u32(popup.HUB_CHAIN_CONTEXT + offset) for offset in (4, 8, 12)))
-        self.assertEqual((1, 0), (
-            self.fake.read_byte(popup.HUB_CHAIN_CONTEXT),
-            self.fake.read_byte(popup.HUB_CHAIN_CONTEXT + 1)))
-        self.assertEqual(0, self.fake.read_u32(
-            self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
-        report = self.runtime.lifecycle(self.read)
-        self.assertEqual(entries, tuple(report[f"hub_queue_entry_{index}_before"]
-                                        for index in range(3)))
-        self.assertEqual((0, 0, 0), tuple(report[f"hub_queue_entry_{index}_after"]
-                                         for index in range(3)))
-        self.assertEqual((0, 0), (report["hub_queue_flag0_before"],
-                                  report["hub_queue_flag1_before"]))
-        self.assertEqual((1, 0), (report["hub_queue_flag0_after"],
-                                  report["hub_queue_flag1_after"]))
-        self.assertEqual(3, report["hub_queue_source_suppressed_count"])
-
-    def test_hub_queue_source_hook_requires_active_request(self):
+    def test_hub_chain_cleanup_requires_current_modal_one(self):
         self.install()
         self.fake.write_u32(self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 1)
-        self.fake.write_u32(self.base + 8, popup.PENDING)
-        self.fake.write_u32(popup.HUB_CHAIN_CONTEXT + 4, 0x81201000)
-        regs = [0] * 32
-        regs[1] = 0x81700000
-        regs[3] = popup.HUB_CHAIN_CONTEXT
-        destination, result, _, _ = execute_popup_ppc(
-            self.runtime, self.fake, self.runtime.layout.aux_hub_queue_hook, regs)
-        self.assertEqual(popup.HUB_CHAIN_CALLBACK + 4, destination)
-        self.assertEqual(0x816FFFD0, result[1])
-        self.assertEqual(0x81201000, self.fake.read_u32(popup.HUB_CHAIN_CONTEXT + 4))
+        self.fake.write_u32(popup.CHAIN_WRAPPER, 0x81206000)
+        self.fake.write_u32(popup.CHAIN_WRAPPER + 0x0C, popup.HUB_CHAIN_CALLBACK)
+        self.fake.write_u32(popup.CHAIN_WRAPPER + 0x10, popup.HUB_CHAIN_CONTEXT)
+        self.fake.write_byte(popup.CHAIN_WRAPPER + 0x14, 1)
+        self.fake.write_u32(0x81206034, 1)
+        self.fake.write_u32(0x81206038, 0)
+        calls = []
+        execute_popup_ppc(
+            self.runtime, self.fake, self.runtime.layout.aux_suppress_chain,
+            [0] * 32, native={popup.CHAIN_WRAPPER_END: lambda regs: calls.append(regs[3])})
+        self.assertEqual([], calls)
+        self.assertEqual(1, self.fake.read_u32(0x81206034))
         self.assertEqual(1, self.fake.read_u32(
             self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
-
-    def test_hub_queue_source_hook_replays_displaced_instruction_when_unarmed(self):
-        self.install()
-        regs = [0] * 32
-        regs[1] = 0x81700000
-        regs[3] = popup.HUB_CHAIN_CONTEXT
-        destination, result, _, _ = execute_popup_ppc(
-            self.runtime, self.fake, self.runtime.layout.aux_hub_queue_hook, regs)
-        self.assertEqual(popup.HUB_CHAIN_CALLBACK + 4, destination)
-        self.assertEqual(0x816FFFD0, result[1])
 
     def test_chain_suppression_rejects_nonmatching_wrapper(self):
         for address, value, byte in (
