@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 16
+VERSION = 17
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -386,21 +386,30 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
     source.emit(*load_mailbox,
                 0x800C0000 | SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 0x28000001)
     source.branch("vanilla", 0x40820000)
+    source.emit(0x800C0008, 0x28000002)
+    source.branch("vanilla", 0x40820000)
     load(source, 11, HUB_CHAIN_CONTEXT)
     source.emit(0x7C035800)
     source.branch("vanilla", 0x40820000)
-    source.emit(0x80830004, 0x80A30008, 0x80C3000C, 0x88E30000, 0x89030001)
+    source.emit(0x80830004, 0x80A30008, 0x80C3000C)
     load(source, 11, layout.aux_diagnostics)
-    source.emit(0x908B0000, 0x90AB0004, 0x90CB0008, 0x90EB000C, 0x910B0010)
+    source.emit(0x908B0000, 0x90AB0004, 0x90CB0008)
     source.emit(0x39200000, 0x28040000)
-    source.branch("had_any", 0x40820000)
+    source.branch("count_q1", 0x41820000)
+    source.emit(0x39290001)
+    source.label("count_q1")
     source.emit(0x28050000)
-    source.branch("had_any", 0x40820000)
+    source.branch("count_q2", 0x41820000)
+    source.emit(0x39290001)
+    source.label("count_q2")
     source.emit(0x28060000)
+    source.branch("counted", 0x41820000)
+    source.emit(0x39290001)
+    source.label("counted")
+    source.emit(0x2C090000)
     source.branch("empty", 0x41820000)
-    source.label("had_any")
     source.emit(0x38000000, 0x90030004, 0x90030008, 0x9003000C,
-                0x39200001, 0x38000001, 0x98030000)
+                0x38000001, 0x98030000)
     source.label("empty")
     source.emit(0x38000000, 0x98030001,
                 0x80030004, 0x900B0014, 0x80030008, 0x900B0018,
@@ -408,13 +417,13 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
                 0x88030001, 0x900B0024)
     # An empty callback is faithfully consumed but leaves suppression armed for
     # the later invocation that actually carries queued messages.
-    source.emit(0x2C090001)
-    source.branch("return", 0x40820000)
+    source.emit(0x2C090000)
+    source.branch("return", 0x41820000)
     source.emit(*load_mailbox, 0x38000000,
                 0x900C0000 | SUPPRESS_NEXT_CHAIN_POPUP_OFFSET)
     load(source, 11, layout.aux_diagnostics)
     source.emit(0x814B0000 | HUB_QUEUE_SOURCE_COUNT_DIAGNOSTIC,
-                0x394A0001,
+                0x7D4A4A14,
                 0x914B0000 | HUB_QUEUE_SOURCE_COUNT_DIAGNOSTIC)
     source.label("return")
     source.emit(0x4E800020)
@@ -726,13 +735,16 @@ class PopupRuntime:
             logger.debug("Could not request guest popup hook removal", exc_info=True)
         self.installed = self.ready = False
 
-    def request_object(self, object_id, read_memory, write_memory):
+    def request_object(self, object_id, read_memory, write_memory, *, suppress_hub_chain=False):
         if not isinstance(object_id, int) or not 0 <= object_id < 262 or not self.ready:
             return False
         state = self.snapshot(read_memory)
         if (state["magic"] != MAGIC or state["version"] != VERSION
                 or state["status"] != IDLE or state["active"] or state["popup_pointer"]):
             return False
+        # Set request-scoped suppression before publishing any request metadata.
+        write_memory(self.layout.mailbox + SUPPRESS_NEXT_CHAIN_POPUP_OFFSET,
+                     word(bool(suppress_hub_chain)))
         write_memory(self.layout.mailbox + 0x0C, word(object_id))
         write_memory(self.layout.mailbox + 0x10, word((state["request_seq"] + 1) & 0xFFFFFFFF))
         write_memory(self.layout.mailbox + 0x18, word(0))
@@ -740,12 +752,4 @@ class PopupRuntime:
             write_memory(self.layout.mailbox + offset, word(0))
         write_memory(self.layout.aux_diagnostics, bytes(self.layout.aux_end - self.layout.aux_diagnostics))
         write_memory(self.layout.mailbox + 0x08, word(PENDING))  # publish last
-        return True
-
-    def arm_chain_popup_suppression(self, read_memory, write_memory):
-        state = self.snapshot(read_memory)
-        if (not self.ready or state["magic"] != MAGIC or state["version"] != VERSION
-                or state["status"] != ACTIVE or not state["popup_pointer"]):
-            return False
-        write_memory(self.layout.mailbox + SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, word(1))
         return True

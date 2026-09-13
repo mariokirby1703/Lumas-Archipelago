@@ -745,6 +745,8 @@ def execute_popup_ppc(runtime, memory, entry, registers, *, lr=0x81230000, nativ
             cr = (left < right, left > right, left == right)
         elif op == 31 and xo == 40:
             regs[rt] = (regs[rb] - regs[ra]) & 0xFFFFFFFF
+        elif op == 31 and xo == 266:
+            regs[rt] = (regs[ra] + regs[rb]) & 0xFFFFFFFF
         elif op == 31 and xo == 459:
             regs[rt] = regs[ra] // regs[rb]
         elif op == 31 and xo == 444:
@@ -908,6 +910,8 @@ class TestCreatePopupRuntime(unittest.TestCase):
             self.assertFalse(self.runtime.request_object(value, self.read, self.write))
         self.writes.clear()
         self.assertTrue(self.runtime.request_object(13, self.read, self.write))
+        self.assertEqual((self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET,
+                          b"\0\0\0\0"), self.writes[0])
         self.assertEqual((self.base + 8, b"\0\0\0\1"), self.writes[-1])
         state = self.runtime.snapshot(self.read)
         self.assertEqual((13, 1, popup.PENDING), (state["object_id"], state["request_seq"], state["status"]))
@@ -1309,6 +1313,7 @@ class TestCreatePopupRuntime(unittest.TestCase):
 
     def test_hub_queue_source_hook_consumes_entries_before_popup_creation(self):
         self.install()
+        self.fake.write_u32(self.base + 8, popup.ACTIVE)
         self.fake.write_u32(self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 1)
         entries = (0x81201000, 0x81202000, 0x81203000)
         for offset, value in zip((4, 8, 12), entries):
@@ -1333,11 +1338,27 @@ class TestCreatePopupRuntime(unittest.TestCase):
                                         for index in range(3)))
         self.assertEqual((0, 0, 0), tuple(report[f"hub_queue_entry_{index}_after"]
                                          for index in range(3)))
-        self.assertEqual((0, 1), (report["hub_queue_flag0_before"],
+        self.assertEqual((0, 0), (report["hub_queue_flag0_before"],
                                   report["hub_queue_flag1_before"]))
         self.assertEqual((1, 0), (report["hub_queue_flag0_after"],
                                   report["hub_queue_flag1_after"]))
-        self.assertEqual(1, report["hub_queue_source_suppressed_count"])
+        self.assertEqual(3, report["hub_queue_source_suppressed_count"])
+
+    def test_hub_queue_source_hook_requires_active_request(self):
+        self.install()
+        self.fake.write_u32(self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 1)
+        self.fake.write_u32(self.base + 8, popup.PENDING)
+        self.fake.write_u32(popup.HUB_CHAIN_CONTEXT + 4, 0x81201000)
+        regs = [0] * 32
+        regs[1] = 0x81700000
+        regs[3] = popup.HUB_CHAIN_CONTEXT
+        destination, result, _, _ = execute_popup_ppc(
+            self.runtime, self.fake, self.runtime.layout.aux_hub_queue_hook, regs)
+        self.assertEqual(popup.HUB_CHAIN_CALLBACK + 4, destination)
+        self.assertEqual(0x816FFFD0, result[1])
+        self.assertEqual(0x81201000, self.fake.read_u32(popup.HUB_CHAIN_CONTEXT + 4))
+        self.assertEqual(1, self.fake.read_u32(
+            self.base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
 
     def test_hub_queue_source_hook_replays_displaced_instruction_when_unarmed(self):
         self.install()
@@ -1439,7 +1460,6 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.ctx._automatic_object_popup_queue = deque()
         self.ctx._popup_inflight = None
         self.ctx._popup_inflight_automatic = None
-        self.ctx._popup_inflight_chain_suppression_armed = False
         self.ctx._popup_last_status = None
         self.ctx._popup_delay_logged = False
         self.ctx.ram_is_settled = lambda: True
@@ -1498,22 +1518,25 @@ class TestCreatePopupQueue(unittest.TestCase):
         self.assertEqual([(13, True), (6, False)], [
             (value, suppress) for value, _, suppress in self.ctx._automatic_object_popup_queue])
 
-    def test_chain_receipt_arms_guest_flag_only_after_popup_becomes_active(self):
+    def test_chain_receipt_publishes_guest_flag_before_pending_request(self):
         chain_location = 333001
         self.ctx.slot_data.setdefault("locations", {})["Hub World Create Chain Part 1"] = {
             "id": chain_location}
         self.ready()
         self.receipt(13, chain_location)
         client.collect_new_object_popup_items(self.ctx)
-        client.service_object_popup_queue(self.ctx, False)
+        writes = []
+        original_write = client.write_memory
+        def recording_write(address, data):
+            writes.append((address, data))
+            original_write(address, data)
+        with patch.object(client, "write_memory", side_effect=recording_write):
+            client.service_object_popup_queue(self.ctx, False)
         base = self.ctx._popup_runtime.layout.mailbox
-        self.assertEqual(0, self.fake.read_u32(
-            base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
-        self.fake.write_u32(base + 8, popup.ACTIVE)
-        self.fake.write_u32(base + 0x20, 0x81206000)
-        client.service_object_popup_queue(self.ctx, False)
         self.assertEqual(1, self.fake.read_u32(
             base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET))
+        self.assertEqual(base + popup.SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, writes[0][0])
+        self.assertEqual((base + 8, b"\0\0\0\1"), writes[-1])
 
     def test_challenge_dispatch_does_not_resolve_or_write_object_records(self):
         self.ready()

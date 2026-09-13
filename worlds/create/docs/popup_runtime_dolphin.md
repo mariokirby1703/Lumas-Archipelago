@@ -1,4 +1,4 @@
-# Object popup test: Protocol 16 (Protocol 11 timeline + source suppression)
+# Object popup test: Protocol 17 (atomic source suppression)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's `create.apworld` and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load the configured save
    slot, and connect through the Create Client in the AP Launcher.
-5. `/createpopupstatus` should report `version=16`, `enabled=1`,
+5. `/createpopupstatus` should report `version=17`, `enabled=1`,
    `hooks_applied=1`, and a changing heartbeat.
 
 A fresh game boot is required because older runtime code may remain in Dolphin's
@@ -34,13 +34,15 @@ An automatic Object receipt arms suppression only when its
 - Hub World Create Chain Part 3
 - Hub World Create Chain
 
-The flag is armed only after the AP Object popup becomes active. The hook at
-`0x8005C5B0` then intercepts the matching `0x8068DD50` three-entry TutorialMessages
-queue before its call to `0x80074B20`. It records the queue, clears entries
+The client writes the request's suppression flag before its Object metadata and
+publishes `status=PENDING` last. The hook at `0x8005C5B0` intercepts the matching
+`0x8068DD50` three-entry TutorialMessages queue only while that same AP request
+is `ACTIVE`, before its call to `0x80074B20`. It records the queue, clears entries
 `+0x04/+0x08/+0x0C`, leaves state bytes `+0x00/+0x01` as `1/0`, clears the AP
-flag, and returns without creating a popup or entering modal flow.
+flag, adds the number of nonzero entries to the suppression counter, and returns
+without creating a popup or entering modal flow.
 
-When the flag or context does not match, the hook executes the displaced
+When the flag, ACTIVE status, or context does not match, the hook executes the displaced
 `stwu r1,-0x30(r1)` and resumes vanilla at `0x8005C5B4`. An invocation with an
 empty queue leaves suppression armed for a later call carrying entries.
 
@@ -70,4 +72,5 @@ not hook or pause `0x80097EC0`.
 `hub_queue_source_suppressed_count`, the fallback wrapper fields, and its
 `suppressed_chain_popup_count`. After a successful Hub test the AP flag should
 be zero, all three after-entries should be zero, after-flags should be `1/0`,
-and the source-suppressed count should be one.
+and the source-suppressed count should increase by the number of consumed
+nonzero entries.

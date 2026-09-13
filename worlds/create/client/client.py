@@ -157,7 +157,6 @@ class CreateContext(CommonContext):
         self._automatic_object_popup_queue: deque[tuple[int, float, bool]] = deque()
         self._popup_inflight: tuple[int, int] | None = None
         self._popup_inflight_automatic: tuple[int, float, bool] | None = None
-        self._popup_inflight_chain_suppression_armed = False
         self._popup_last_status: int | None = None
         self._popup_delay_logged = False
         self._slot_guard_observed_this_session = False
@@ -285,7 +284,6 @@ class CreateContext(CommonContext):
         self._automatic_object_popup_queue.clear()
         self._popup_inflight = None
         self._popup_inflight_automatic = None
-        self._popup_inflight_chain_suppression_armed = False
         self._popup_last_status = None
         self._popup_delay_logged = False
 
@@ -979,13 +977,6 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
         if status == ACTIVE:
             logger.info("Showing AP Object popup: %s (ID %d).",
                         popup_object_name(ctx, state["object_id"]), state["object_id"])
-            if (ctx._popup_inflight_automatic
-                    and ctx._popup_inflight_automatic[2]
-                    and not ctx._popup_inflight_chain_suppression_armed):
-                ctx._popup_inflight_chain_suppression_armed = runtime.arm_chain_popup_suppression(
-                    read_memory, write_memory)
-                if ctx._popup_inflight_chain_suppression_armed:
-                    logger.info("Armed suppression for the next native Hub Create Chain popup.")
         elif status == ERROR:
             logger.warning("AP Object popup runtime error %d, request %d, Object %d; popup dispatch stopped.",
                            state["error"], state["request_seq"], state["object_id"])
@@ -996,7 +987,6 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
             logger.info("AP Object popup closed; lifecycle=%s", runtime.lifecycle(read_memory))
             ctx._popup_inflight = None
             ctx._popup_inflight_automatic = None
-            ctx._popup_inflight_chain_suppression_armed = False
         elif status == IDLE:
             # A pending request was cancelled during a transition.
             if ctx._popup_inflight_automatic:
@@ -1005,7 +995,6 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
                 ctx._object_popup_queue.appendleft(value)
             ctx._popup_inflight = None
             ctx._popup_inflight_automatic = None
-            ctx._popup_inflight_chain_suppression_armed = False
         else:
             return
     if status != IDLE or (not ctx._object_popup_queue and not ctx._automatic_object_popup_queue):
@@ -1022,7 +1011,9 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
     # Display is independent of availability synchronization. In challenges
     # only the game-thread lookup touches the native object registry; Python
     # never traverses MEM2 or changes thresholds just to show a notification.
-    if runtime.request_object(value, read_memory, write_memory):
+    suppress_hub_chain = automatic and ctx._automatic_object_popup_queue[0][2]
+    if runtime.request_object(value, read_memory, write_memory,
+                              suppress_hub_chain=suppress_hub_chain):
         if automatic:
             ctx._popup_inflight_automatic = ctx._automatic_object_popup_queue.popleft()
             logger.info("Starting queued NetworkItem Object popup: %s (ID %d).",
