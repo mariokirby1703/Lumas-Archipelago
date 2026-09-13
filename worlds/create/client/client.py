@@ -74,7 +74,7 @@ class CreateCommandProcessor(ClientCommandProcessor):
             logger.warning("Object ID must be an unlockable Object in this slot (0..261).")
             return
         self.ctx._object_popup_queue.append(value)
-        logger.info("Queued Object popup: %s (ID %d).", popup_object_name(self.ctx, value), value)
+        logger.debug("Queued Object popup: %s (ID %d).", popup_object_name(self.ctx, value), value)
         if self.ctx._popup_runtime.failure:
             logger.warning("Popup display is blocked: %s. The Object remains queued.",
                            self.ctx._popup_runtime.failure)
@@ -963,7 +963,7 @@ def collect_new_object_popup_items(ctx: CreateContext) -> None:
             # ReceivedItems runs on the server loop; do not read Dolphin memory
             # concurrently here. The Dolphin sync loop samples RAM when this
             # entry is delayed or started and includes elapsed receipt time.
-            logger.info("Queued NetworkItem Object popup: %s (ID %d).", name, value)
+            logger.debug("Queued NetworkItem Object popup: %s (ID %d).", name, value)
 
 
 def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> None:
@@ -975,8 +975,8 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
     status = state["status"]
     if status != ctx._popup_last_status:
         if status == ACTIVE:
-            logger.info("Showing AP Object popup: %s (ID %d).",
-                        popup_object_name(ctx, state["object_id"]), state["object_id"])
+            logger.debug("Showing AP Object popup: %s (ID %d).",
+                         popup_object_name(ctx, state["object_id"]), state["object_id"])
         elif status == ERROR:
             logger.warning("AP Object popup runtime error %d, request %d, Object %d; popup dispatch stopped.",
                            state["error"], state["request_seq"], state["object_id"])
@@ -984,7 +984,7 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
     if ctx._popup_inflight:
         value, sequence = ctx._popup_inflight
         if state["ack_seq"] == sequence and status == IDLE:
-            logger.info("AP Object popup closed; lifecycle=%s", runtime.lifecycle(read_memory))
+            logger.debug("AP Object popup closed; lifecycle=%s", runtime.lifecycle(read_memory))
             ctx._popup_inflight = None
             ctx._popup_inflight_automatic = None
         elif status == IDLE:
@@ -1001,7 +1001,7 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
         return
     if modal:
         if not ctx._popup_delay_logged:
-            logger.info("Create AP Object popup delayed: another modal UI is active.")
+            logger.debug("Create AP Object popup delayed: another modal UI is active.")
             ctx._popup_delay_logged = True
         return
     automatic = not ctx._object_popup_queue
@@ -1016,8 +1016,8 @@ def service_object_popup_queue(ctx: CreateContext, challenge_active: bool) -> No
                               suppress_hub_chain=suppress_hub_chain):
         if automatic:
             ctx._popup_inflight_automatic = ctx._automatic_object_popup_queue.popleft()
-            logger.info("Starting queued NetworkItem Object popup: %s (ID %d).",
-                        popup_object_name(ctx, value), value)
+            logger.debug("Starting queued NetworkItem Object popup: %s (ID %d).",
+                         popup_object_name(ctx, value), value)
         else:
             ctx._object_popup_queue.popleft()
         ctx._popup_inflight = (value, runtime.snapshot(read_memory)["request_seq"])

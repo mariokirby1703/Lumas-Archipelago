@@ -677,8 +677,8 @@ class PopupRuntime:
                 self.installed = True
                 self._heartbeat = self.heartbeat(read_memory)
                 self._last_heartbeat_at = time.monotonic()
-                logger.info("Create AP popup vtable bootstrap installed (no Gecko); waiting up to %.0fs for heartbeat.",
-                            self.probe_timeout)
+                logger.debug("Create AP popup vtable bootstrap installed (no Gecko); waiting up to %.0fs for heartbeat.",
+                             self.probe_timeout)
                 return False
             state = self.snapshot(read_memory)
             if not state["enabled"] or state["error"] == 5:
@@ -692,14 +692,14 @@ class PopupRuntime:
                 raise RuntimeError("runtime hooks changed after guest installation")
             if beat != self._heartbeat and applied:
                 if not self.ready:
-                    logger.info("Create AP Object popup runtime hook heartbeat confirmed.")
+                    logger.debug("Create AP Object popup runtime hook heartbeat confirmed.")
                 self.ready = True
                 self._last_heartbeat_at = time.monotonic()
             else:
                 timeout = HEARTBEAT_TIMEOUT_SECONDS if self.ready else self.probe_timeout
                 if time.monotonic() - self._last_heartbeat_at >= timeout:
-                    logger.warning("Popup hook diagnostics before rollback: %s; mailbox=%s",
-                                   self.diagnostics(read_memory), self.snapshot(read_memory))
+                    logger.debug("Popup hook diagnostics before rollback: %s; mailbox=%s",
+                                 self.diagnostics(read_memory), self.snapshot(read_memory))
                     raise RuntimeError(
                         "runtime hook heartbeat missing (error 4); RAM readback alone does not prove "
                         "instruction execution. Resume Dolphin if paused. This build uses the vtable "
