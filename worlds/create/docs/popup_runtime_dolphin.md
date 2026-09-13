@@ -1,4 +1,4 @@
-# Object popup test: Protocol 18 (nested-modal restore repair)
+# Object popup test: Protocol 19 (complete native Hub close)
 
 ## Install
 
@@ -7,7 +7,7 @@
 3. Install this build's `create.apworld` and restart the AP Launcher.
 4. Boot CREATE fresh without a Dolphin save state, load the configured save
    slot, and connect through the Create Client in the AP Launcher.
-5. `/createpopupstatus` should report `version=18`, `enabled=1`,
+5. `/createpopupstatus` should report `version=19`, `enabled=1`,
    `hooks_applied=1`, and a changing heartbeat.
 
 A fresh game boot is required because older runtime code may remain in Dolphin's
@@ -35,7 +35,7 @@ An automatic Object receipt arms suppression only when its
 - Hub World Create Chain
 
 The client writes the request's suppression flag before its Object metadata and
-publishes `status=PENDING` last. Protocol 18 no longer hooks the TutorialMessages
+publishes `status=PENDING` last. Protocol 19 does not hook the TutorialMessages
 queue source at `0x8005C5B0`; the live Protocol-17 log proved that hook lost the
 creation race.
 
@@ -45,11 +45,13 @@ signatures:
 - CreateChains completion: callback `0x80099490`, context `0x8069A3A0`
 - Hub chain part: callback `0x8005C5B0`, context `0x8068DD50`
 
-For the Hub signature it also validates `popup+0x38 == 1`, records the popup's
-saved/current modal values, and changes only `popup+0x34` from the nested saved
-value to zero. Native `FeMessageFlow::End` at `0x80074DA0` then destroys the
-popup, restores modal zero, and invokes its stored callback normally. The code
-does not modify `popup+0x38` or write the global modal itself.
+For the Hub signature it records the proven saved-modal field at
+`wrapper+0x18` and calls the complete native close entry `0x80074D40`. That
+entry restores the saved modal through the normal game API before continuing
+through `0x80074DA0`, destroying the wrapper and invoking its callback. Because
+the callback can immediately create another queued Hub popup, the exact match
+and native close repeat up to three times in the same dispatcher frame. No
+popup fields or global modal values are modified directly.
 
 The implementation never writes the modal layer or Create Chain state and does
 not hook or pause `0x80097EC0`.
@@ -65,8 +67,9 @@ not hook or pause `0x80097EC0`.
 4. Receive an Object from an unrelated AP location. Its popup should work, but
    it must not arm Chain suppression.
 
-`/createpopupstatus` reports `chain_popup_previous_modal_before`,
-`chain_popup_current_modal_before`, `global_modal_after_chain_cleanup`, the
-wrapper fields, and `suppressed_chain_popup_count`. For the reproduced race the
-three modal diagnostics should be `1`, `1`, and `0`; the wrapper must be inactive
-after cleanup and the global modal must remain zero.
+`/createpopupstatus` reports `hub_wrapper_saved_modal`,
+`hub_close_entry_used`, `hub_close_count_this_frame`,
+`global_modal_before_hub_close`, `global_modal_after_hub_close`, and
+`global_modal_after_ap_close`. For the reproduced race the saved modal and both
+Hub-close modal readings should remain `1`, the close entry should be
+`0x80074D40`, and the modal after the later natural AP close should be `0`.

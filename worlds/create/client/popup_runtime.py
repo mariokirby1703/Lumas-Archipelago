@@ -13,7 +13,7 @@ import time
 
 logger = logging.getLogger("Client")
 MAGIC = 0x41504F50
-VERSION = 18
+VERSION = 19
 IDLE, PENDING, ACTIVE, ERROR = range(4)
 MODAL_LAYER = 0x80948040
 OBJECT_REGISTRY_COUNT = 0x80904C84
@@ -28,12 +28,15 @@ CHAIN_CONTEXT = 0x8069A3A0
 HUB_CHAIN_CALLBACK = 0x8005C5B0
 HUB_CHAIN_CONTEXT = 0x8068DD50
 CHAIN_WRAPPER_END = 0x80074DA0
+CHAIN_WRAPPER_CLOSE = 0x80074D40
 SUPPRESS_NEXT_CHAIN_POPUP_OFFSET = 0x28
 SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET = 0x90
 HUB_QUEUE_SOURCE_COUNT_DIAGNOSTIC = 0x28
-CHAIN_PREVIOUS_MODAL_DIAGNOSTIC = 0x2C
-CHAIN_CURRENT_MODAL_DIAGNOSTIC = 0x30
-CHAIN_GLOBAL_MODAL_AFTER_DIAGNOSTIC = 0x34
+HUB_WRAPPER_SAVED_MODAL_DIAGNOSTIC = 0x2C
+HUB_CLOSE_ENTRY_DIAGNOSTIC = 0x30
+HUB_CLOSE_COUNT_FRAME_DIAGNOSTIC = 0x34
+HUB_GLOBAL_MODAL_BEFORE_DIAGNOSTIC = 0x38
+HUB_GLOBAL_MODAL_AFTER_DIAGNOSTIC = 0x3C
 CODE_ORIGINALS = {0x800325E4: 0x4BFF2F7D}
 SOURCE_CODE_ORIGINALS = {HUB_CHAIN_CALLBACK: 0x9421FFD0}
 ORIGINALS = {VTABLE_SLOT: ORIGINAL_UPDATE, **CODE_ORIGINALS}
@@ -75,9 +78,9 @@ class PopupPatchLayout:
     aux_update: int = 0x8062C180
     aux_hub_queue_hook: int = 0x8062C190
     aux_suppress_chain: int = 0x8062C190
-    aux_maintain_source_hook: int = 0x8062C2B0
-    aux_diagnostics: int = 0x8062C340
-    aux_end: int = 0x8062C3D0
+    aux_maintain_source_hook: int = 0x8062C300
+    aux_diagnostics: int = 0x8062C390
+    aux_end: int = 0x8062C420
 
 
 def hook_words(layout):
@@ -349,61 +352,79 @@ def build_aux_image(layout: PopupPatchLayout) -> bytes:
     update = _Routine(layout.aux_update)
     update.emit(0x4E800020)
 
-    # Close only an exactly identified Chain notification. A Hub notification
-    # nested over the AP popup saved modal=1; correct that single saved value
-    # before native End restores it and invokes the stored callback.
+    # Close exact nested Hub notifications through their complete native modal
+    # lifecycle. A callback can create the next queue entry immediately, so a
+    # bounded loop drains at most the queue's three slots in one frame.
     suppress = _Routine(layout.aux_suppress_chain)
-    suppress.emit(0x9421FFF0, 0x7C0802A6, 0x90010014, *load_mailbox,
+    suppress.emit(0x9421FFE0, 0x7C0802A6, 0x90010024, 0x93C10018,
+                  0x3BC00000)
+    load(suppress, 10, layout.aux_diagnostics)
+    suppress.emit(0x38000000, 0x900A0000 | HUB_CLOSE_COUNT_FRAME_DIAGNOSTIC,
+                  *load_mailbox,
                   0x800C0000 | SUPPRESS_NEXT_CHAIN_POPUP_OFFSET, 0x28000001)
     suppress.branch("return", 0x40820000)
-    suppress.emit(0x800C0008, 0x28000000)
+    suppress.emit(0x800C0008, 0x28000002)
     suppress.branch("return", 0x40820000)
+    suppress.label("check_wrapper")
     load(suppress, 11, CHAIN_WRAPPER)
-    suppress.emit(0x812B0000, 0x28090000)
-    suppress.branch("return", 0x41820000)
+    suppress.emit(0x800B0000, 0x28000000)
+    suppress.branch("no_match", 0x41820000)
     suppress.emit(0x880B0014, 0x28000000)
-    suppress.branch("return", 0x41820000)
+    suppress.branch("no_match", 0x41820000)
     suppress.emit(0x80EB000C)
     load(suppress, 10, HUB_CHAIN_CALLBACK)
     suppress.emit(0x7C075000)
     suppress.branch("hub_signature", 0x41820000)
     load(suppress, 10, CHAIN_CALLBACK)
     suppress.emit(0x7C075000)
-    suppress.branch("return", 0x40820000)
+    suppress.branch("no_match", 0x40820000)
     suppress.emit(0x80EB0010)
     load(suppress, 10, CHAIN_CONTEXT)
     suppress.emit(0x7C075000)
-    suppress.branch("return", 0x40820000)
-    suppress.branch("cleanup")
+    suppress.branch("no_match", 0x40820000)
+    suppress.emit(0x7D635B78)
+    suppress.branch(CHAIN_WRAPPER_END, link=True)
+    suppress.emit(0x3BC00003)
+    suppress.branch("count_and_complete")
     suppress.label("hub_signature")
     suppress.emit(0x80EB0010)
     load(suppress, 10, HUB_CHAIN_CONTEXT)
     suppress.emit(0x7C075000)
-    suppress.branch("return", 0x40820000)
-    suppress.emit(0x80E90034, 0x81090038)
+    suppress.branch("no_match", 0x40820000)
+    suppress.emit(0x80EB0018)
     load(suppress, 10, layout.aux_diagnostics)
-    suppress.emit(0x90EA0000 | CHAIN_PREVIOUS_MODAL_DIAGNOSTIC,
-                  0x910A0000 | CHAIN_CURRENT_MODAL_DIAGNOSTIC,
-                  0x28080001)
-    suppress.branch("return", 0x40820000)
-    suppress.emit(0x38000000, 0x90090034)
-    suppress.label("cleanup")
-    suppress.emit(0x7D635B78)
-    suppress.branch(CHAIN_WRAPPER_END, link=True)
-    load(suppress, 10, MODAL_LAYER)
-    suppress.emit(0x800A0000)
+    suppress.emit(0x90EA0000 | HUB_WRAPPER_SAVED_MODAL_DIAGNOSTIC)
+    load(suppress, 9, CHAIN_WRAPPER_CLOSE)
+    suppress.emit(0x912A0000 | HUB_CLOSE_ENTRY_DIAGNOSTIC)
+    load(suppress, 9, MODAL_LAYER)
+    suppress.emit(0x80090000, 0x900A0000 | HUB_GLOBAL_MODAL_BEFORE_DIAGNOSTIC,
+                  0x7D635B78)
+    suppress.branch(CHAIN_WRAPPER_CLOSE, link=True)
+    load(suppress, 9, MODAL_LAYER)
+    suppress.emit(0x80090000)
     load(suppress, 10, layout.aux_diagnostics)
-    suppress.emit(0x900A0000 | CHAIN_GLOBAL_MODAL_AFTER_DIAGNOSTIC)
-    suppress.emit(*load_mailbox, 0x38000000,
-                  0x900C0000 | SUPPRESS_NEXT_CHAIN_POPUP_OFFSET,
+    suppress.emit(0x900A0000 | HUB_GLOBAL_MODAL_AFTER_DIAGNOSTIC,
+                  0x3BDE0001,
+                  0x93CA0000 | HUB_CLOSE_COUNT_FRAME_DIAGNOSTIC)
+    suppress.label("count_and_complete")
+    suppress.emit(*load_mailbox,
                   0x816C0000 | SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET,
                   0x396B0001,
-                  0x916C0000 | SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET)
+                  0x916C0000 | SUPPRESSED_CHAIN_POPUP_COUNT_OFFSET,
+                  0x2C1E0003)
+    suppress.branch("complete", 0x40800000)
+    suppress.branch("check_wrapper")
+    suppress.label("no_match")
+    suppress.emit(0x2C1E0000)
+    suppress.branch("return", 0x41820000)
+    suppress.label("complete")
+    suppress.emit(*load_mailbox, 0x38000000,
+                  0x900C0000 | SUPPRESS_NEXT_CHAIN_POPUP_OFFSET)
     suppress.label("return")
-    suppress.emit(0x80010014, 0x7C0803A6, 0x38210010, 0x4E800020)
+    suppress.emit(0x83C10018, 0x80010024, 0x7C0803A6, 0x38210020, 0x4E800020)
 
     # Remove a Protocol-17 source hook if this runtime follows it in the same
-    # Dolphin session. Protocol 18 never installs that experimental hook.
+    # Dolphin session. Protocol 19 never installs that experimental hook.
     maintain = _Routine(layout.aux_maintain_source_hook)
     maintain.emit(*load_mailbox)
     load(maintain, 11, HUB_CHAIN_CALLBACK)
@@ -534,12 +555,18 @@ class PopupRuntime:
             "hub_queue_flag0_after": hub_queue_diagnostics[8],
             "hub_queue_flag1_after": hub_queue_diagnostics[9],
             "hub_queue_source_suppressed_count": hub_queue_diagnostics[10],
-            "chain_popup_previous_modal_before": u32(
-                self.layout.aux_diagnostics + CHAIN_PREVIOUS_MODAL_DIAGNOSTIC),
-            "chain_popup_current_modal_before": u32(
-                self.layout.aux_diagnostics + CHAIN_CURRENT_MODAL_DIAGNOSTIC),
-            "global_modal_after_chain_cleanup": u32(
-                self.layout.aux_diagnostics + CHAIN_GLOBAL_MODAL_AFTER_DIAGNOSTIC),
+            "hub_wrapper_saved_modal": u32(
+                self.layout.aux_diagnostics + HUB_WRAPPER_SAVED_MODAL_DIAGNOSTIC),
+            "hub_close_entry_used": f"0x{u32(self.layout.aux_diagnostics + HUB_CLOSE_ENTRY_DIAGNOSTIC):08X}",
+            "hub_close_count_this_frame": u32(
+                self.layout.aux_diagnostics + HUB_CLOSE_COUNT_FRAME_DIAGNOSTIC),
+            "global_modal_before_hub_close": u32(
+                self.layout.aux_diagnostics + HUB_GLOBAL_MODAL_BEFORE_DIAGNOSTIC),
+            "global_modal_after_hub_close": u32(
+                self.layout.aux_diagnostics + HUB_GLOBAL_MODAL_AFTER_DIAGNOSTIC),
+            "global_modal_after_ap_close": (
+                u32(MODAL_LAYER) if state["status"] == IDLE
+                and state["request_seq"] == state["ack_seq"] else None),
             "movie_slot": None, "movie_slot_active": False, "root_frame_zero_based": None,
         }
         record = u32(self.layout.mailbox + 0x54)
