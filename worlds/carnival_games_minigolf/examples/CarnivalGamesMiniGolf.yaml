@@ -1,0 +1,17 @@
+name: Golfer
+game: Carnival Games MiniGolf
+description: Carnival Games MiniGolf example player
+Carnival Games MiniGolf:
+  progression_balancing: 50
+  accessibility: full
+  starting_world: random_world
+  goal: all_27_holes_on_par
+  goal_world: random_world
+  barker_goal_world_requirement: false
+  barker_coins_required: 27
+  minigame_checks: win
+  hole_in_one_checks: false
+  barker_coin_checks: true
+  world_secrets: true
+  shop_checks: true
+  barker_shop_checks: true
