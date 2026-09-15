@@ -53,7 +53,7 @@ async def main():
                     fixture.memory.put(fixture.manager+0x104, 0, 4)
                     fixture.memory.put(fixture.root+0x2DC, 2, 4)
                     for hole in range(27):
-                        fixture.memory.put(fixture.session+0x2F0, hole, 4)
+                        fixture.set_hole(hole)
                         fixture.memory.put(fixture.hole_state+0x127, 0)
                         ctx.runtime.poll(fixture.memory, [i.item for i in ctx.items_received])
                         fixture.memory.put(fixture.hole_state+0x127, 1)

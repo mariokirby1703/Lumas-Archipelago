@@ -42,6 +42,8 @@ class TestRuntime(unittest.TestCase):
                                (self.root+0x19C, self.hole_state), (self.hole_def+0x0C, 3),
                                (self.controller+0x1C, 0x80400000)):
             self.memory.put(address, value, 4)
+        for offset, value in ((0, self.controller), (4, self.hole_state), (8, self.root)):
+            self.memory.put(self.hole_def+offset, value, 4)
         self.backend.writes.clear()
         self.slot = generate(dict(starting_world=0, hole_in_one_checks=1, minigame_checks=3)).worlds[1].fill_slot_data()
         self.runtime = Runtime(self.slot, Journal(self.path))
@@ -51,6 +53,17 @@ class TestRuntime(unittest.TestCase):
 
     def poll(self, items=()):
         return self.runtime.poll(self.memory, items)
+
+    def set_hole(self, index, par=3):
+        base = self.hole_def
+        for record in range(27):
+            address = base + record * 0x10
+            valid = record <= index
+            for offset, value in ((0, self.controller), (4, self.hole_state), (8, self.root)):
+                self.memory.put(address+offset, value if valid else 0, 4)
+            self.memory.put(address+0x0C, par if valid else 0, 4)
+        self.memory.put(self.manager+0x10C, base + index * 0x10, 4)
+        self.memory.put(self.session+0x2F0, index, 4)
 
     def test_invalid_game_and_pointers_never_write(self):
         with patch.object(self.memory, 'verify_game', return_value=False):
@@ -229,14 +242,15 @@ class TestRuntime(unittest.TestCase):
         self.poll([ITEM_TABLE[UNLOCKS[4]]])
         self.assertEqual(self.memory.read(second+0x2CC, 9), expected)
 
-    def test_persistent_prizes_reconcile_but_par_does_not(self):
+    def test_persistent_prizes_and_outside_shop_par_reconcile(self):
         self.memory.put(self.sub+80, 2)
         self.memory.put(self.sub+0x86, 1)
         self.memory.put(self.sub+0x6A, 1)
         checks = self.poll()
         self.assertNotIn(self.runtime.lookup['secret', 80], checks)
-        self.assertNotIn(self.runtime.lookup['par', 0], checks)
+        self.assertIn(self.runtime.lookup['par', 0], checks)
         self.assertIn(self.runtime.lookup['barker', 0], checks)
+        self.assertEqual(self.memory.read(self.sub+0x86, 27), bytes(27))
         self.memory.put(self.sub+80, 1)
         self.assertIn(self.runtime.lookup['secret', 80], self.poll())
         self.runtime = Runtime(self.slot, Journal(self.path))
@@ -280,7 +294,7 @@ class TestRuntime(unittest.TestCase):
         self.assertIn(self.runtime.lookup['complete', 0], checks)
 
     def test_hole_check_is_sent_even_when_ap_world_is_locked(self):
-        self.memory.put(self.session+0x2F0, 8, 4)
+        self.set_hole(8)
         self.memory.put(self.hole_state+0x127, 0)
         self.poll()
         self.memory.put(self.root+0x2DC, 3, 4)
@@ -288,6 +302,16 @@ class TestRuntime(unittest.TestCase):
         checks = self.poll()
         self.assertIn(self.runtime.lookup['complete', 8], checks)
         self.assertIn(self.runtime.lookup['par', 8], checks)
+
+    def test_manager_state_transition_completes_derived_mem1_hole(self):
+        self.set_hole(12)
+        self.memory.put(self.manager+0xBC, 5, 4)
+        self.poll()
+        self.memory.put(self.root+0x2DC, 3, 4)
+        self.memory.put(self.manager+0xBC, 6, 4)
+        checks = self.poll()
+        self.assertIn(self.runtime.lookup['complete', 12], checks)
+        self.assertIn(self.runtime.lookup['par', 12], checks)
 
     def test_minigame_results_and_disabled_checks(self):
         self.memory.put(self.controller+0x1C, MINIGAMES[0][1], 4)
@@ -305,7 +329,7 @@ class TestRuntime(unittest.TestCase):
         other = generate(dict(starting_world=0, minigame_checks=2)).worlds[1].fill_slot_data()
         runtime = Runtime(other, Journal(Path(self.tmp.name)/'perfect.json'))
         self.assertNotIn(('win', 0), runtime.lookup)
-        self.assertFalse(runtime.poll(self.memory, []))  # stale popup on attach
+        self.assertIn(runtime.lookup['perfect', 0], runtime.poll(self.memory, []))
 
     def test_latched_minigame_survives_controller_change_for_result(self):
         self.memory.put(self.controller+0x1C, MINIGAMES[5][1], 4)
@@ -321,8 +345,29 @@ class TestRuntime(unittest.TestCase):
         self.assertIn(self.runtime.lookup['win', 5], checks)
         self.assertIn(self.runtime.lookup['perfect', 5], checks)
 
+    def test_minigame_processing_never_reads_course_field(self):
+        self.memory.put(self.controller+0x1C, MINIGAMES[0][1], 4)
+        array, popup = 0x80960000, 0x80970000
+        self.memory.put(self.manager+0x100, array, 4)
+        self.poll()
+        original_read = self.backend.read_bytes
+
+        def reject_course(address, size):
+            if address == self.session + 0x2F0:
+                raise RuntimeError("course must not be read for minigames")
+            return original_read(address, size)
+
+        self.backend.read_bytes = reject_course
+        self.memory.put(self.manager+0x104, 1, 4)
+        self.memory.put(array, popup, 4)
+        self.memory.put(popup+0x1C, RESULT_VTABLE, 4)
+        self.memory.write(popup+0xC0, bytes([1, 1]))
+        checks = self.poll()
+        self.assertIn(self.runtime.lookup['win', 0], checks)
+        self.assertIn(self.runtime.lookup['perfect', 0], checks)
+
     def test_debug_state_reports_live_hole_and_minigame_context(self):
-        self.memory.put(self.session+0x2F0, 8, 4)
+        self.set_hole(8)
         self.memory.put(self.root+0x2DC, 3, 4)
         self.memory.put(self.hole_def+0x0C, 3, 4)
         self.memory.put(self.controller+0x1C, MINIGAMES[5][1], 4)
@@ -331,10 +376,26 @@ class TestRuntime(unittest.TestCase):
         self.assertEqual(state['manager_state'], 0)
         self.assertEqual(state['session'], self.session)
         self.assertEqual(state['root'], self.root)
-        self.assertEqual((state['hole'], state['strokes'], state['par']), (8, 3, 3))
+        self.assertEqual((state['course'], state['derived_hole'], state['strokes'], state['par']), (8, 8, 3, 3))
         self.assertEqual(state['hole_state'], self.hole_state)
         self.assertEqual(state['vtable'], MINIGAMES[5][1])
         self.assertEqual(state['minigame'], 5)
+
+    def test_debug_state_reports_independent_error_fields(self):
+        self.set_hole(8)
+        original_read = self.backend.read_bytes
+
+        def fail_course(address, size):
+            if address == self.session + 0x2F0:
+                raise RuntimeError("failed course read")
+            return original_read(address, size)
+
+        self.backend.read_bytes = fail_course
+        state = self.runtime.debug_state(self.memory)
+        self.assertEqual(state['course'], 'ERR')
+        self.assertEqual(state['derived_hole'], 8)
+        self.assertEqual(state['par'], 3)
+        self.assertEqual(state['controller'], self.controller)
 
     def test_counter_final_world_and_victory(self):
         slot = generate(dict(starting_world=0, goal=1, goal_world=1, goal_world_access=1,

@@ -48,17 +48,20 @@ class MiniGolfCommands(ClientCommandProcessor):
                 return
             state = self.ctx.runtime.debug_state(Memory(dolphin), self.ctx.local_player)
             def address(value):
-                return f"{value:08X}" if isinstance(value, int) else "none"
-            hole = state['hole']
+                return f"{value:08X}" if isinstance(value, int) else str(value)
+            hole = state['derived_hole']
             hole_name = f" ({HOLES[hole]})" if isinstance(hole, int) and 0 <= hole < 27 else ""
             minigame = state['minigame']
             minigame_name = MINIGAMES[minigame][0] if isinstance(minigame, int) else "none"
-            logger.info("Manager: %s | Manager state: %s | Session: %s | Root: %s | Hole: %s%s | Hole state: %s | "
-                        "In goal: %s | Strokes: %s | Par: %s | Controller: %s | VTable: %s | Minigame: %s",
+            logger.info("Manager: %s | State: %s | Session: %s | Session player: %s | Root: %s | "
+                        "Course: %s | Hole def: %s | Derived hole: %s%s | Strokes: %s | Par: %s | "
+                        "Hole state: %s | In goal: %s | Controller: %s | VTable: %s | Minigame: %s | "
+                        "Object array: %s | Result popup: %s | Win: %s | Perfect: %s",
                         address(state['manager']), state['manager_state'], address(state['session']),
-                        address(state['root']), hole,
-                        hole_name, address(state['hole_state']), state['in_goal'], state['strokes'], state['par'],
-                        address(state['controller']), address(state['vtable']), minigame_name)
+                        state['session_player'], address(state['root']), state['course'], address(state['hole_def']),
+                        hole, hole_name, state['strokes'], state['par'], address(state['hole_state']),
+                        state['in_goal'], address(state['controller']), address(state['vtable']), minigame_name,
+                        address(state['object_array']), address(state['result_popup']), state['win'], state['perfect'])
         except (ImportError, RuntimeError, OSError, MemoryUnavailable) as error:
             logger.info("Live MiniGolf debug state unavailable: %s", error)
 

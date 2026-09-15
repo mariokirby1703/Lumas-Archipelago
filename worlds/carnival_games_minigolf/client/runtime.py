@@ -62,6 +62,8 @@ class Runtime:
         self.result_context = None
         self.previous_results = set()
         self.active_minigame = None
+        self.previous_manager_state = None
+        self.latched_hole = None
         self.pieces_projected = False
 
     def reset_transient(self):
@@ -70,6 +72,8 @@ class Runtime:
         self.result_context = None
         self.previous_results.clear()
         self.active_minigame = None
+        self.previous_manager_state = None
+        self.latched_hole = None
 
     def unlocked(self, items):
         names = [ID_TO_NAME.get(item) for item in items]
@@ -94,14 +98,28 @@ class Runtime:
         # Only the configured AP profile may contribute locations. Other valid
         # local roots can contain stale or unrelated save progress.
         persistent = memory.read(sub, 0xA2)
+        manager_state = memory.integer(snapshot.manager + 0xBC)
         unlocked, coins = self.unlocked(items)
         checks = set()
         for data in self.locations.values():
             offset = {'barker': 0x6A, 'shop': 0, 'club': 0, 'secret': 0, 'barker_shop': 0}.get(data.kind)
             if offset is not None and persistent[offset + data.index] == 1:
                 checks.add(data.code)
+        if manager_state != SHOP_MANAGER_STATE and not self.pieces_projected:
+            for hole, value in enumerate(persistent[0x86:0xA1]):
+                if value == 1:
+                    checks.add(self.lookup['par', hole])
+        hole_def = memory.integer(snapshot.manager + 0x10C)
+        derived_hole = self.derive_hole_id(memory, hole_def)
+        if manager_state == 5 and derived_hole is not None:
+            self.latched_hole = (snapshot.root, derived_hole, hole_def)
+        if self.previous_manager_state == 5 and manager_state == 6 and self.latched_hole is not None:
+            latched_root, hole, latched_def = self.latched_hole
+            if latched_root == snapshot.root:
+                self.add_hole_completion(memory, snapshot.root, latched_def, hole, checks)
+        self.previous_manager_state = manager_state
         try:
-            active_gameplay = self.read_transient(memory, snapshot, unlocked, checks)
+            active_gameplay = self.read_transient(memory, snapshot, checks, derived_hole, hole_def, manager_state)
         except MemoryUnavailable:
             # A single failed MEM2 live-object read must not block persistent
             # roots, locations, locks, or receive-once item processing.
@@ -139,7 +157,7 @@ class Runtime:
             memory.put(sub + 0x85, min(coins, 255))
             memory.put(sub + 0xA1, 1)
         received_names = [ID_TO_NAME[item] for item in items]
-        shop_context = history_ready and self.is_shop_context(memory, snapshot, active_gameplay)
+        shop_context = history_ready and manager_state == SHOP_MANAGER_STATE
         pieces = bytes(int(shop_context and piece < min(3, received_names.count(name)))
                        for name in PAR_CLUB_PIECES for piece in range(3))
         if memory.read(sub + 0x86, 27) != pieces:
@@ -162,13 +180,41 @@ class Runtime:
         memory.put(snapshot.root + ROOT_SUB + 0xA1, 1)
         self.pieces_projected = False
 
-    def read_transient(self, memory, snapshot, unlocked, checks):
+    @staticmethod
+    def valid_hole_definition(memory, address):
+        if not valid_pointer(address, 0x10):
+            return False
+        return (all(valid_pointer(memory.integer(address + offset), 4) for offset in (0, 4, 8))
+                and 1 <= memory.integer(address + 0x0C) <= 20)
+
+    @classmethod
+    def derive_hole_id(cls, memory, current):
+        try:
+            if not cls.valid_hole_definition(memory, current):
+                return None
+            index = 0
+            while index < 26 and cls.valid_hole_definition(memory, current - 0x10):
+                current -= 0x10
+                index += 1
+            return index
+        except MemoryUnavailable:
+            return None
+
+    def add_hole_completion(self, memory, root, hole_def, hole, checks):
+        strokes = memory.integer(root + 0x2DC)
+        par = memory.integer(hole_def + 0x0C)
+        checks.add(self.lookup['complete', hole])
+        if 1 <= strokes <= par <= 20:
+            checks.add(self.lookup['par', hole])
+        if strokes == 1 and ('hio', hole) in self.lookup:
+            checks.add(self.lookup['hio', hole])
+
+    def read_transient(self, memory, snapshot, checks, derived_hole, hole_def, manager_state):
         session = snapshot.session
         if session is None:
             self.reset_transient()
             return False
         controller = memory.integer(session + 0xFC)
-        course = memory.integer(session + 0x2F0)
         vtable = memory.integer(controller + 0x1C) if valid_pointer(controller, 0x134) else None
         minigame = VTABLE_TO_WORLD.get(vtable)
         if minigame is not None:
@@ -190,33 +236,26 @@ class Runtime:
                 obj = memory.integer(array + index*4)
                 if valid_pointer(obj, 0xC2) and memory.integer(obj + 0x1C) == RESULT_VTABLE:
                     results[obj] = memory.read(obj + 0xC0, 2)
-            # A popup already present when attaching/changing minigames is not a new result.
-            if context == self.result_context:
-                for obj, flags in results.items():
-                    if obj not in self.previous_results and flags[1] == 1:
-                        if ('win', self.active_minigame) in self.lookup:
-                            checks.add(self.lookup['win', self.active_minigame])
-                        if flags[0] == 1 and ('perfect', self.active_minigame) in self.lookup:
-                            checks.add(self.lookup['perfect', self.active_minigame])
-            # Allow a newly allocated popup to finish populating its flags on a later poll.
+            for flags in results.values():
+                if flags[1] == 1 and ('win', self.active_minigame) in self.lookup:
+                    checks.add(self.lookup['win', self.active_minigame])
+                if flags[0] == 1 and ('perfect', self.active_minigame) in self.lookup:
+                    checks.add(self.lookup['perfect', self.active_minigame])
             self.previous_results = {obj for obj, flags in results.items() if flags[1] == 1}
-            if context != self.result_context:
-                self.previous_results = set(results)
             self.result_context = context
-            if minigame is not None or results or not 0 <= course < 27:
+            if minigame is not None or results or manager_state not in (5, 6):
                 return True
             self.active_minigame = None
             self.result_context = None
             self.previous_results.clear()
         self.result_context = None
         self.previous_results.clear()
-        hole = course
         hole_state = memory.integer(snapshot.root + 0x19C)
-        hole_def = memory.integer(snapshot.manager + 0x10C)
         pointers_valid = (valid_pointer(hole_state, 0x128) and valid_pointer(hole_def, 0x10)
                           and valid_pointer(controller, 0x20))
         goal = memory.integer(hole_state + 0x127, 1) if pointers_valid else None
-        current_valid = pointers_valid and 0 <= hole < 27
+        hole = derived_hole
+        current_valid = pointers_valid and hole is not None
         context = (snapshot.root, hole_state, hole, controller) if current_valid else None
         completed_hole = hole if (current_valid and self.previous_hole == context) else None
         if completed_hole is None and pointers_valid and self.previous_hole is not None:
@@ -225,13 +264,7 @@ class Runtime:
                     and 0 <= old_hole < 27):
                 completed_hole = old_hole
         if completed_hole is not None and self.previous_goal == 0 and goal == 1:
-            strokes = memory.integer(snapshot.root + 0x2DC)
-            par = memory.integer(hole_def + 0x0C)
-            if 1 <= strokes <= par <= 20:
-                checks.add(self.lookup['par', completed_hole])
-            checks.add(self.lookup['complete', completed_hole])
-            if strokes == 1 and ('hio', completed_hole) in self.lookup:
-                checks.add(self.lookup['hio', completed_hole])
+            self.add_hole_completion(memory, snapshot.root, hole_def, completed_hole, checks)
         if not current_valid:
             self.previous_hole = self.previous_goal = None
             return False
@@ -240,24 +273,47 @@ class Runtime:
 
     def debug_state(self, memory, local_player=0):
         snapshot = memory.resolve(local_player)
-        result = {"manager": snapshot.manager, "manager_state": memory.integer(snapshot.manager + 0xBC),
-                  "session": snapshot.session, "root": snapshot.root,
-                  "hole": None, "hole_state": None, "in_goal": None, "strokes": None, "par": None,
-                  "controller": None, "vtable": None, "minigame": self.active_minigame}
-        if snapshot.session is None:
-            return result
-        result["hole"] = memory.integer(snapshot.session + 0x2F0)
-        result["controller"] = memory.integer(snapshot.session + 0xFC)
-        result["hole_state"] = memory.integer(snapshot.root + 0x19C)
-        hole_def = memory.integer(snapshot.manager + 0x10C)
-        if valid_pointer(result["controller"], 0x20):
-            result["vtable"] = memory.integer(result["controller"] + 0x1C)
-            result["minigame"] = VTABLE_TO_WORLD.get(result["vtable"], self.active_minigame)
-        if valid_pointer(result["hole_state"], 0x128):
-            result["in_goal"] = memory.integer(result["hole_state"] + 0x127, 1)
-        if valid_pointer(hole_def, 0x10):
-            result["strokes"] = memory.integer(snapshot.root + 0x2DC)
-            result["par"] = memory.integer(hole_def + 0x0C)
+        def safe(read):
+            try:
+                return read()
+            except (MemoryUnavailable, RuntimeError, OSError):
+                return "ERR"
+
+        result = {"manager": snapshot.manager, "root": snapshot.root, "session": snapshot.session,
+                  "manager_state": safe(lambda: memory.integer(snapshot.manager + 0xBC)),
+                  "session_player": "none", "course": "none", "controller": "none", "vtable": "none",
+                  "hole_def": safe(lambda: memory.integer(snapshot.manager + 0x10C)),
+                  "derived_hole": None, "strokes": safe(lambda: memory.integer(snapshot.root + 0x2DC)),
+                  "par": "ERR", "hole_state": safe(lambda: memory.integer(snapshot.root + 0x19C)),
+                  "in_goal": "ERR", "object_array": safe(lambda: memory.integer(snapshot.manager + 0x100)),
+                  "result_popup": None, "win": None, "perfect": None,
+                  "minigame": self.active_minigame}
+        if snapshot.session is not None:
+            result["session_player"] = safe(lambda: memory.integer(snapshot.session + 0x2EC))
+            result["course"] = safe(lambda: memory.integer(snapshot.session + 0x2F0))
+            result["controller"] = safe(lambda: memory.integer(snapshot.session + 0xFC))
+        if isinstance(result["controller"], int) and valid_pointer(result["controller"], 0x20):
+            result["vtable"] = safe(lambda: memory.integer(result["controller"] + 0x1C))
+            if isinstance(result["vtable"], int):
+                result["minigame"] = VTABLE_TO_WORLD.get(result["vtable"], self.active_minigame)
+        if isinstance(result["hole_def"], int):
+            result["derived_hole"] = self.derive_hole_id(memory, result["hole_def"])
+            result["par"] = safe(lambda: memory.integer(result["hole_def"] + 0x0C))
+        if isinstance(result["hole_state"], int) and valid_pointer(result["hole_state"], 0x128):
+            result["in_goal"] = safe(lambda: memory.integer(result["hole_state"] + 0x127, 1))
+        count = safe(lambda: memory.integer(snapshot.manager + 0x104))
+        if (isinstance(result["object_array"], int) and isinstance(count, int) and 0 <= count <= 4096
+                and valid_pointer(result["object_array"], max(4, count * 4))):
+            for index in range(count):
+                obj = safe(lambda i=index: memory.integer(result["object_array"] + i * 4))
+                if isinstance(obj, int) and valid_pointer(obj, 0xC2):
+                    obj_vtable = safe(lambda o=obj: memory.integer(o + 0x1C))
+                    if obj_vtable == RESULT_VTABLE:
+                        flags = safe(lambda o=obj: memory.read(o + 0xC0, 2))
+                        result["result_popup"] = obj
+                        if isinstance(flags, bytes):
+                            result["perfect"], result["win"] = flags
+                        break
         return result
 
     def victory(self, items, checks):
