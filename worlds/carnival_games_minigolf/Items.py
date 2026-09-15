@@ -3,6 +3,8 @@ from BaseClasses import Item
 from .data import BASE_ID, GAME, WORLDS
 
 BARKER_COIN = "Barker Coin"
+GOAL_WORLD_ACCESS = "Goal World Access"
+PAR_CLUB_PIECES = tuple(f"{world} Par Club Piece" for world in WORLDS)
 UNLOCKS = tuple(f"Unlock {world}" for world in WORLDS)
 # Relative frequencies within the bundle pool, as agreed with the user.
 COIN_BUNDLE_WEIGHTS = {5: 1, 10: 2, 20: 8, 50: 16, 100: 16, 200: 6, 500: 4}
@@ -27,6 +29,8 @@ COIN_TRAP_DATA = {coin_trap_name(world, amount): (world, amount)
 COIN_TRAPS = tuple(COIN_TRAP_DATA)
 ITEM_TABLE = {name: BASE_ID + i for i, name in enumerate(UNLOCKS)}
 ITEM_TABLE[BARKER_COIN] = BASE_ID + 20
+ITEM_TABLE[GOAL_WORLD_ACCESS] = BASE_ID + 21
+ITEM_TABLE.update({name: BASE_ID + 300 + i for i, name in enumerate(PAR_CLUB_PIECES)})
 # Reserve the provisional 30..38 IDs; never reinterpret an old bundle as a different amount.
 ITEM_TABLE.update({name: BASE_ID + 100 + i for i, name in enumerate(COIN_BUNDLES)})
 ITEM_TABLE.update({name: BASE_ID + 200 + i for i, name in enumerate(COIN_TRAPS)})

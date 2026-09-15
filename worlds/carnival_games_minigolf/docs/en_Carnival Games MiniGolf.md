@@ -7,11 +7,12 @@ from your multiworld.
 One random or chosen world starts open. Find the remaining World Unlock items to explore the rest.
 Receive world-specific Coin Bundles and Barker Coins alongside items for other players.
 
-The default goal is all 27 holes on par or better. Barker Coin Hunt and an optional Barker-gated final
-world provide alternative goals. Starting and final worlds can be selected or randomized.
+The default goal is simply finishing all 27 holes. Barker Coin Hunt and a Goal World whose three holes
+must be completed on Par provide alternative goals. Starting and final worlds can be selected or randomized.
 
 | Check family | Maximum | Default |
 | --- | ---: | --- |
+| Hole completions | 27 | On |
 | Par Club Pieces | 27 | On |
 | Barker Coin collectibles | 27 | On |
 | Hole-in-One | 27 | Off |
@@ -21,8 +22,10 @@ world provide alternative goals. Starting and final worlds can be selected or ra
 | Par Club rewards | 9 | With normal shops |
 | Barker Shop purchases | 7 | On; disabled for counter goals |
 
-The default configuration has 151 locations. All compatible options enable 187 locations.
-Par Club Pieces are accomplishments, not inventory items: earning one performs that location's check.
+The default configuration has 178 locations. All compatible regular options enable 214 locations.
+Par Club Pieces have both a Par-or-better location and a distinct AP progression item. The received items
+control each world's Pro Shop tiers. Goal World access uses one generic AP item, optionally granted by a
+server-visible Barker threshold location.
 Cosmetic prizes remain in the game; purchasing or finding them checks their locations.
 
 See the setup guide for the supported game revision, client connection and save handling.

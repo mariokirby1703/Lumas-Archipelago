@@ -30,11 +30,12 @@ After generating the example, run the real-server protocol smoke test (with simu
 .venv/Scripts/python.exe -m worlds.carnival_games_minigolf.test.protocol_smoke build/carnival-games-minigolf/generation/AP_87394597476875360744.zip
 ```
 
-The smoke test starts an isolated loopback server, completes the default 151 checks, verifies all 151
-receipts and goal status, and checks that recreating the client connection does not duplicate currency.
+The smoke test starts an isolated loopback server, completes every default check, verifies all receipts
+and goal status, and checks that recreating the client connection does not duplicate currency.
 
 Runtime addresses live in `client/constants.py` and `client/runtime.py`; generation never reads game RAM.
 Item and location IDs are stable across options. Coin Bundles contain 5, 10, 20, 50, 100, 200 or 500 coins;
 50 and 100 are most common. The relative weights are isolated in `Items.py`.
-Ten percent of filler rolls are world-specific -5/-10/-20/-50 Coin Traps; larger losses are rarer.
+`Trap Weight` controls what percentage of filler rolls become world-specific -5/-10/-20/-50 Coin Traps;
+larger losses are rarer.
 Unsupported revisions fail verification before any memory write.

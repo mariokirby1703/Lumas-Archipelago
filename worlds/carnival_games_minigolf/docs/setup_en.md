@@ -42,7 +42,8 @@ golfer's turn, and minigame results require the controller's player-root pointer
 ## Saving and reconnecting
 
 Keep the same dedicated game profile for the seed. Save normally in-game before closing Dolphin.
-Persistent flags are read again on reconnect. HIO and minigame checks are recorded locally as soon as
+Persistent shop, secret and Barker flags are reconciled on every poll, so a purchase missed at the instant
+it happens is still sent later or after reconnect. Hole Complete, Par, HIO and minigame checks are recorded locally as soon as
 observed and retried until the AP server acknowledges them. These transient checks must be played while
 the client is connected; a result already open when attaching is deliberately not attributed to a new run.
 
@@ -59,24 +60,58 @@ and marks that receipt delivered; `/currency_recover apply` retries that receipt
 These commands affect only the pending grant. World unlocks and goal-counter Barker totals are reconstructed
 from AP's complete received-item history and periodically reasserted.
 
-## Goals and economy
+## Goals, Goal World access, and Par Club Pieces
 
-- **All 27 Holes on Par:** earn every Par Club Piece. There is no duplicate generic Par check.
+- **All Holes:** finish all 27 normal holes. Score and Par do not matter.
+- **Goal World:** receive Goal World Access, then finish all three holes in the selected Goal World on Par or better.
 - **Barker Coin Hunt:** receive the configured number of AP Barker Coin items.
-- **Barker Goal World Requirement:** receive the configured Barker Coins, unlock the selected/random final
-  world, then complete its three holes on par. This final-world finish takes precedence over `goal`.
+
+`goal_world_access` controls the Goal World item. `world_unlock_item` puts the generic progression item
+**Goal World Access** in the normal pool. `barker_coins` locks that same item on the internal
+**Barker Coin Goal Requirement** location. Once the configured number of Barker Coin items has arrived,
+the client checks that location; the AP server sends Goal World Access; only receipt of that item physically
+opens the Goal World. Reaching the Barker threshold itself is not victory.
+
+Starting World and Goal World list only the nine worlds and default to Archipelago's standard `random`
+value. Goal World must differ from Starting World; if both resolve to the same world,
+the generator rerolls Goal World from the other eight.
 
 Barker counter modes automatically remove Barker Shop checks. Local collectible Barker Coins do not
 advance the AP counter. In normal mode they remain spendable, as do received Barker Coin filler items.
+Counter modes place 150% of the configured requirement in the pool, rounded up, while the access or
+victory threshold stays at the configured value. Barker Coins Required accepts values from 1 through 50.
 
-Normal purchases use the agreed ascending-price tiers: 2/4/6/7 available in logic after 0/1/2/3 obtainable
-Par pieces; the Club reward requires all three. The actual purchase/earned-prize flag is still required
-to send a shop check. Logic assumes normal coins can be earned through repeated play in an open world;
+Every Par-or-better location can award one of three same-named Par Club Piece items for its world through AP. With Shop Checks
+enabled, all 27 pieces are progression items. Shop tiers count only the three received AP pieces of that world:
+0/1/2/3 pieces make the cheapest 2/4/6/7 purchases reachable; the Club reward requires all three.
+The client clears all 27 Vanilla piece flags during normal holes, minigames, and the level-completion screen,
+including a piece Vanilla just awarded. It projects received AP pieces only while the gameplay session pointer
+is null, which the live dump identifies as the Pro Shop context.
+The completion-screen guard prevents a newly earned Vanilla piece from combining with two received AP pieces
+and immediately granting the Club reward. The AP inventory remains authoritative; the Wii save never owns
+progression pieces permanently.
+
+The actual purchase/earned-prize byte must be exactly 1 to send its shop check. The client tests this persistent
+state in every valid local-player root every poll, without requiring a gameplay session or a 0-to-1 transition.
+During gameplay the configured local profile selects the player root; `session + 0x2EC` is not treated as an AP
+profile selector. In the Pro Shop, where the session pointer is null, the client scans the two persistent root
+slots directly and skips empty slots. Loading transitions with no
+valid root pause RAM synchronization until the next poll without resetting the AP connection or receipt journal.
+MEM1 (`0x80000000`–`0x817fffff`) and MEM2 (`0x90000000`–`0x93ffffff`) are both valid. If an individual MEM2
+live-object read fails temporarily, the client skips live hole/minigame tracking for that poll while continuing
+persistent root, location, lock, and item synchronization through a valid fallback root.
+Game-to-AP checks and Starting World lock enforcement continue while the received-item history is loading.
+Only inventory-derived writes such as currency replay, Barker counter reconstruction, threshold evaluation, and
+Par Club Piece projection wait for the complete ordered history.
+The client also requires Dolphin Memory Engine to report active emulation. A process hook without a running game
+can expose stale Wii RAM; that state is never read for locations or written to and reports that it is waiting for
+the game to start.
+Logic assumes normal coins can be earned through repeated play in an open world;
 Coin Bundles are assistance, not required progression. Each world has separate bundles for 5, 10, 20,
 50, 100, 200 and 500 coins. Their relative weights are **1 / 2 / 8 / 16 / 16 / 6 / 4**: approximately
 1.9% / 3.8% / 15.1% / 30.2% / 30.2% / 11.3% / 7.5% of generated bundles. Worlds are chosen uniformly.
 In normal mode, 10% of filler rolls produce a spendable Barker Coin instead; counter modes use only
-normal Coin Bundles and traps for filler. Ten percent of filler rolls produce a world-specific Coin Trap.
+normal Coin Bundles and traps for filler. Trap Weight controls the percentage of filler rolls that produce a world-specific Coin Trap.
 Traps remove 5, 10, 20 or 50 coins and never reduce a balance below zero. Their relative weights are
 **4 / 3 / 2 / 1**, making the largest loss rarest. Receipt journaling prevents a reconnect from applying
 the same trap twice. Barker Shop logic budgets the 27 natural collectibles cumulatively
@@ -87,6 +122,9 @@ before a gated final world. Generation rejects such a configuration with the max
 enable more checks or reduce `barker_coins_required`.
 
 ## Validation status
+
+Win + Perfect Checks creates two separate locations for every minigame: `- Win` and `- Perfect`.
+A Perfect result sends both; Perfect-only mode generates no Win locations.
 
 World generation, item fill, goal logic and mocked RAM behavior have automated coverage. The supplied
 executable was hash-verified and runtime signatures were derived from it. A complete live Dolphin

@@ -4,12 +4,13 @@ description: Carnival Games MiniGolf example player
 Carnival Games MiniGolf:
   progression_balancing: 50
   accessibility: full
-  starting_world: random_world
-  goal: all_27_holes_on_par
-  goal_world: random_world
-  barker_goal_world_requirement: false
+  starting_world: random
+  goal: all_holes
+  goal_world: random
+  goal_world_access: world_unlock_item
   barker_coins_required: 27
-  minigame_checks: win
+  trap_weight: 10
+  minigame_checks: win_checks
   hole_in_one_checks: false
   barker_coin_checks: true
   world_secrets: true

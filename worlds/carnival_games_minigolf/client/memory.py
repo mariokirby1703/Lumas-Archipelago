@@ -23,7 +23,10 @@ class Memory:
         if not (0x80000000 <= address <= 0x81800000 - size or
                 0x90000000 <= address <= 0x94000000 - size):
             raise MemoryUnavailable(f"Address outside Wii RAM: {address:#x}")
-        data = bytes(self.backend.read_bytes(address, size))
+        try:
+            data = bytes(self.backend.read_bytes(address, size))
+        except (RuntimeError, OSError) as error:
+            raise MemoryUnavailable(f"Temporary Dolphin memory read failure at {address:#x}") from error
         if len(data) != size:
             raise MemoryUnavailable("Short Dolphin read")
         return data
@@ -53,19 +56,23 @@ class Memory:
 
     def resolve(self, local_player=0):
         manager = self.pointer(MANAGER_PTR, 0x1A0)
-        count = self.integer(manager + 0x12C)
-        if not 1 <= count <= 4 or not 0 <= local_player < count:
-            raise MemoryUnavailable("Waiting for selected local player")
-        roots = tuple(self.pointer(manager + 0x190 + i*4, 0x2E0) for i in range(count))
-        if len(set(roots)) != count:
-            raise MemoryUnavailable("Player roots are not initialized")
         session = self.integer(manager + 0x114)
         if not valid_pointer(session, 0x2F4):
             session = None
-        return Snapshot(manager, roots, roots[local_player], session, local_player)
+        # manager+0x12C is not a reliable player count in every game state.
+        root_values = tuple(self.integer(manager + 0x190 + i*4) for i in range(2))
+        valid_roots = tuple((i, root) for i, root in enumerate(root_values) if valid_pointer(root, 0x2E0))
+        if not valid_roots:
+            raise MemoryUnavailable("Waiting for game player state.")
+        selected = next(((i, root) for i, root in valid_roots if i == local_player), None)
+        if selected is None:
+            raise MemoryUnavailable("Waiting for configured game player state.")
+        selected_player, selected_root = selected
+        roots = tuple(dict.fromkeys(root for _, root in valid_roots))
+        return Snapshot(manager, roots, selected_root, session, selected_player, local_player)
 
     def confirm(self, snapshot):
-        if self.resolve(snapshot.local_player) != snapshot:
+        if self.resolve(snapshot.requested_player) != snapshot:
             raise MemoryUnavailable("Player context changed during poll")
 
 
@@ -76,3 +83,4 @@ class Snapshot:
     root: int
     session: int | None
     local_player: int
+    requested_player: int

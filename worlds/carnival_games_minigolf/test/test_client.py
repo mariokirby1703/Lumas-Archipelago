@@ -6,11 +6,22 @@ from unittest.mock import AsyncMock, patch
 
 import Utils
 
-from ..client.client import MiniGolfContext
+from ..client.client import MiniGolfContext, emulation_active
 from .test_world import generate
 
 
 class TestClient(unittest.IsolatedAsyncioTestCase):
+    def test_process_hook_without_active_emulation_is_rejected(self):
+        class Status:
+            def __init__(self, name):
+                self.name = name
+
+        dolphin = type('Dolphin', (), {'is_hooked': staticmethod(lambda: True),
+                                       'get_status': staticmethod(lambda: Status('noEmu'))})
+        self.assertFalse(emulation_active(dolphin))
+        dolphin.get_status = staticmethod(lambda: Status('hooked'))
+        self.assertTrue(emulation_active(dolphin))
+
     async def test_empty_history_barrier_and_disconnect(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(Utils, 'user_path',
                 side_effect=lambda *p: str(Path(directory).joinpath(*p))):

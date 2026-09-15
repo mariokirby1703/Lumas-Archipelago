@@ -9,10 +9,15 @@ from websockets.exceptions import ConnectionClosed
 from CommonClient import ClientCommandProcessor, CommonContext, gui_enabled, logger, server_loop
 from NetUtils import ClientStatus
 
-from ..data import GAME, WORLDS
+from ..data import GAME, HOLES, MINIGAMES, WORLDS
 from .journal import Journal
 from .memory import Memory, MemoryUnavailable
 from .runtime import Runtime, validate_slot
+
+
+def emulation_active(dolphin):
+    """A process hook can outlive emulation and still expose stale Wii RAM."""
+    return dolphin.is_hooked() and getattr(dolphin.get_status(), 'name', None) == 'hooked'
 
 
 class MiniGolfCommands(ClientCommandProcessor):
@@ -30,6 +35,31 @@ class MiniGolfCommands(ClientCommandProcessor):
                         len(self.ctx.locations_checked), len(runtime.locations), self.ctx.local_player + 1)
         else:
             logger.info("Connect to a Carnival Games MiniGolf AP slot first.")
+
+    def _cmd_minigolfdebug(self):
+        """Show the resolved live game context for troubleshooting."""
+        if not self.ctx.runtime:
+            logger.info("Connect to a Carnival Games MiniGolf AP slot first.")
+            return
+        try:
+            import dolphin_memory_engine as dolphin
+            if not emulation_active(dolphin):
+                logger.info("Dolphin is not actively emulating the game.")
+                return
+            state = self.ctx.runtime.debug_state(Memory(dolphin), self.ctx.local_player)
+            def address(value):
+                return f"{value:08X}" if isinstance(value, int) else "none"
+            hole = state['hole']
+            hole_name = f" ({HOLES[hole]})" if isinstance(hole, int) and 0 <= hole < 27 else ""
+            minigame = state['minigame']
+            minigame_name = MINIGAMES[minigame][0] if isinstance(minigame, int) else "none"
+            logger.info("Manager: %s | Session: %s | Root: %s | Hole: %s%s | Hole state: %s | "
+                        "In goal: %s | Strokes: %s | Par: %s | Controller: %s | VTable: %s | Minigame: %s",
+                        address(state['manager']), address(state['session']), address(state['root']), hole,
+                        hole_name, address(state['hole_state']), state['in_goal'], state['strokes'], state['par'],
+                        address(state['controller']), address(state['vtable']), minigame_name)
+        except (ImportError, RuntimeError, OSError, MemoryUnavailable) as error:
+            logger.info("Live MiniGolf debug state unavailable: %s", error)
 
     def _cmd_currency_recover(self, action=""):
         """Resolve an interrupted, ambiguous coin grant: skip keeps RAM balance; apply retries the grant."""
@@ -123,7 +153,8 @@ class MiniGolfContext(CommonContext):
                 validate_slot(data)
                 if self.expected_seed and self.expected_seed != data['seed_name']:
                     raise ValueError("Server seed differs from the loaded .apcgm file")
-                identity = json.dumps([data['seed_name'], self.team, self.slot, self.local_player])
+                identity = json.dumps([data['schema_version'], data['seed_name'], self.team, self.slot,
+                                       self.local_player])
                 key = hashlib.sha256(identity.encode()).hexdigest()
                 path = Path(Utils.user_path('carnival_games_minigolf', key + '.json'))
                 self.acquire_journal(path)
@@ -148,10 +179,22 @@ class MiniGolfContext(CommonContext):
             self.history_ready = True
 
     def reset_server_state(self):
+        self.clear_piece_projection()
         super().reset_server_state()
         self.history_ready = False
         self.runtime = None
         self.release_journal()
+
+    def clear_piece_projection(self):
+        if not self.runtime or not self.runtime.pieces_projected:
+            return
+        try:
+            import dolphin_memory_engine as dolphin
+            if emulation_active(dolphin):
+                self.runtime.clear_piece_projection(Memory(dolphin), self.local_player)
+        except (ImportError, RuntimeError, OSError, MemoryUnavailable):
+            logger.warning("Could not clear projected Par Club Pieces while disconnecting; "
+                           "reconnect before saving or entering gameplay.")
 
     def make_gui(self):
         from kvui import GameManager
@@ -182,8 +225,11 @@ async def dolphin_loop(ctx):
                     dolphin.hook()
                 if not dolphin.is_hooked():
                     raise MemoryUnavailable("Waiting for Dolphin.")
-                if not ctx.runtime or not ctx.history_ready or ctx.slot is None or not ctx.server:
-                    raise MemoryUnavailable("Dolphin attached. Waiting for AP slot and complete item history.")
+                if not emulation_active(dolphin):
+                    settled_context = None
+                    raise MemoryUnavailable("Dolphin connected; waiting for the game to start.")
+                if not ctx.runtime or ctx.slot is None or not ctx.server:
+                    raise MemoryUnavailable("Dolphin attached. Waiting for AP slot.")
                 if ctx.runtime_error:
                     raise MemoryUnavailable(ctx.runtime_error)
                 if not memory.verify_game():
@@ -198,7 +244,7 @@ async def dolphin_loop(ctx):
                 if time.monotonic() < settle_at:
                     raise MemoryUnavailable("Game profile found; waiting for RAM to settle.")
                 items = [item.item for item in ctx.items_received]
-                checks = ctx.runtime.poll(memory, items, ctx.local_player)
+                checks = ctx.runtime.poll(memory, items, ctx.local_player, ctx.history_ready)
                 ctx.locations_checked |= checks
                 pending = ctx.locations_checked - ctx.checked_locations
                 if pending and (pending != ctx.last_sent or time.monotonic() - ctx.last_send >= 5):
@@ -209,9 +255,14 @@ async def dolphin_loop(ctx):
                     await ctx.send_msgs([{'cmd': 'StatusUpdate', 'status': ClientStatus.CLIENT_GOAL}])
                     ctx.finished_game = True
                     logger.info("Carnival Games MiniGolf goal complete!")
-                ctx.dolphin_status = "Dolphin connected; supported game verified; synchronization active."
+                if ctx.history_ready:
+                    ctx.dolphin_status = "Dolphin connected; supported game verified; synchronization active."
+                else:
+                    ctx.dolphin_status = "Dolphin connected; game checks active; received item history loading."
             except MemoryUnavailable as error:
                 ctx.dolphin_status = str(error)
+                if ctx.dolphin_status == "Waiting for game player state.":
+                    settled_context = None
             except ValueError as error:
                 ctx.runtime_error = str(error)
                 ctx.dolphin_status = f"Synchronization paused: {error}"
@@ -230,6 +281,8 @@ async def dolphin_loop(ctx):
                 previous_status = ctx.dolphin_status
             await asyncio.sleep(0.1 if ctx.dolphin_status.endswith('active.') else 1)
     finally:
+        if emulation_active(dolphin):
+            ctx.clear_piece_projection()
         if dolphin.is_hooked():
             dolphin.un_hook()
 
@@ -247,5 +300,6 @@ async def main(args):
     finally:
         ctx.exit_event.set()
         await watcher
+        ctx.clear_piece_projection()
         ctx.release_journal()
         await ctx.shutdown()

@@ -1,0 +1,16 @@
+name: BarkerGoalTest
+game: Carnival Games MiniGolf
+Carnival Games MiniGolf:
+  progression_balancing: 50
+  accessibility: full
+  starting_world: wild_west
+  goal: goal_world
+  goal_world: barn_yard
+  goal_world_access: barker_coins
+  barker_coins_required: 5
+  minigame_checks: win_and_perfect_checks
+  hole_in_one_checks: false
+  barker_coin_checks: true
+  world_secrets: true
+  shop_checks: true
+  barker_shop_checks: true
