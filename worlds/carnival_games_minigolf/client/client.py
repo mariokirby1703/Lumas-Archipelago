@@ -52,7 +52,7 @@ class MiniGolfCommands(ClientCommandProcessor):
             hole = state['derived_hole']
             hole_name = f" ({HOLES[hole]})" if isinstance(hole, int) and 0 <= hole < 27 else ""
             minigame = state['minigame']
-            minigame_name = MINIGAMES[minigame][0] if isinstance(minigame, int) else "none"
+            minigame_name = MINIGAMES[minigame]['name'] if isinstance(minigame, int) else "none"
             logger.info("Manager: %s | State: %s | Session: %s | Session player: %s | Root: %s | "
                         "Course: %s | Hole def: %s | Derived hole: %s%s | Strokes: %s | Par: %s | "
                         "Hole state: %s | In goal: %s | Controller: %s | VTable: %s | Minigame: %s | "
@@ -248,7 +248,8 @@ async def dolphin_loop(ctx):
                 if time.monotonic() < settle_at:
                     raise MemoryUnavailable("Game profile found; waiting for RAM to settle.")
                 items = [item.item for item in ctx.items_received]
-                checks = ctx.runtime.poll(memory, items, ctx.local_player, ctx.history_ready)
+                checks = ctx.runtime.poll(memory, items, ctx.local_player, ctx.history_ready,
+                                          ctx.locations_checked | ctx.checked_locations)
                 ctx.locations_checked |= checks
                 pending = ctx.locations_checked - ctx.checked_locations
                 if pending and (pending != ctx.last_sent or time.monotonic() - ctx.last_send >= 5):

@@ -103,7 +103,7 @@ class CarnivalGamesMiniGolfWorld(World):
         return Items.coin_bundle_name(self.random.randrange(9), amount)
 
     def fill_slot_data(self):
-        return {"schema_version": 5, "game": GAME, "seed_name": self.multiworld.seed_name,
+        return {"schema_version": 7, "game": GAME, "seed_name": self.multiworld.seed_name,
                 "starting_world": self.starting_world, "goal_world": self.goal_world,
                 "goal": self.goal_mode, "goal_world_access": self.options.goal_world_access.value,
                 "counter_mode": self.counter_mode, "required_coins": self.required_coins,

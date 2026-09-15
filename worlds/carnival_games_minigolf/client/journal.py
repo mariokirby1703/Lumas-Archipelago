@@ -54,4 +54,6 @@ class Journal:
                              "to retain the current balance, or /currency_recover apply to grant the item again.")
         memory.put(sub + offset, pending['after'], size)
         memory.put(sub + 0xA1, 1)
+        result = pending['before'], pending['after']
         self.advance(index)
+        return result

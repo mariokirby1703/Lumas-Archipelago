@@ -12,7 +12,7 @@ COIN_TRAP_WEIGHTS = {5: 4, 10: 3, 20: 2, 50: 1}
 
 
 def coin_bundle_name(world, amount):
-    return f"{WORLDS[world]} - Coin Bundle ({amount} Coins)"
+    return f"{amount} {WORLDS[world]} Coins"
 
 
 COIN_BUNDLE_DATA = {coin_bundle_name(world, amount): (world, amount)
@@ -21,7 +21,7 @@ COIN_BUNDLES = tuple(COIN_BUNDLE_DATA)
 
 
 def coin_trap_name(world, amount):
-    return f"{WORLDS[world]} - Coin Trap (-{amount} Coins)"
+    return f"-{amount} {WORLDS[world]} Coins"
 
 
 COIN_TRAP_DATA = {coin_trap_name(world, amount): (world, amount)

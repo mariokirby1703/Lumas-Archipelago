@@ -101,8 +101,8 @@ valid root pause RAM synchronization until the next poll without resetting the A
 MEM1 (`0x80000000`–`0x817fffff`) and MEM2 (`0x90000000`–`0x93ffffff`) are both valid. If an individual MEM2
 live-object read fails temporarily, the client skips live hole/minigame tracking for that poll while continuing
 persistent root, location, lock, and item synchronization through a valid fallback root.
-Normal-hole identity is derived from the MEM1 hole-definition table. Completion uses both the manager-state
-transition from 5 to 6 and the live `in_goal` edge, so `session + 0x2F0` is no longer mandatory. Minigame identity
+Normal-hole identity is derived from the MEM1 hole-definition table. Completion is reconciled only while the live
+`in_goal` field equals 1, so `session + 0x2F0` is no longer mandatory. Minigame identity
 comes from the controller VTable before any optional course read, and active result flags are reconciled every poll.
 Outside manager shop state 3, Vanilla Par Club Piece flags are checked before the client clears them.
 Game-to-AP checks and Starting World lock enforcement continue while the received-item history is loading.

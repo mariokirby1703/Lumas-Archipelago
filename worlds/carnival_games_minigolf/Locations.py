@@ -19,12 +19,15 @@ class MiniGolfLocation(Location):
 
 
 LOCATION_TABLE = {}
+HIO_IMPOSSIBLE = frozenset({0, 1, 4, 7, 10, 15, 22, 25})
+HIO_POSSIBLE = tuple(i for i in range(len(HOLES)) if i not in HIO_IMPOSSIBLE)
 for i, hole in enumerate(HOLES):
     LOCATION_TABLE[f"{hole} - Complete"] = LocationData(BASE_ID + 300 + i, "complete", i, i // 3)
-for kind, label, offset in (("par", "Par Club Piece", 0), ("barker", "Barker Coin", 30),
-                             ("hio", "Hole-in-One", 60)):
+for kind, label, offset in (("par", "Par Club Piece", 0), ("barker", "Barker Coin", 30)):
     for i, hole in enumerate(HOLES):
         LOCATION_TABLE[f"{hole} - {label}"] = LocationData(BASE_ID + offset + i, kind, i, i // 3)
+for i in HIO_POSSIBLE:
+    LOCATION_TABLE[f"{HOLES[i]} - Hole-in-One"] = LocationData(BASE_ID + 60 + i, "hio", i, i // 3)
 for prize in PRIZES:
     region = WORLDS[prize['world']] if prize['world'] is not None else "Barker Shop"
     if prize['kind'] in ("shop", "barker_shop"):
@@ -34,9 +37,11 @@ for prize in PRIZES:
         location_name = f"{region} - {label}: {prize['name']}"
     LOCATION_TABLE[location_name] = LocationData(
         BASE_ID + 100 + prize['id'], prize['kind'], prize['id'], prize['world'], prize['pieces'])
-for i, (name, _) in enumerate(MINIGAMES):
+for i, minigame in enumerate(MINIGAMES):
     for j, kind in enumerate(("win", "perfect")):
-        LOCATION_TABLE[f"{name} - {kind.title()}"] = LocationData(BASE_ID + 200 + 2*i + j, kind, i, i)
+        if minigame[f"has_{kind}"]:
+            LOCATION_TABLE[f"{minigame['name']} - {kind.title()}"] = LocationData(
+                BASE_ID + 200 + 2*i + j, kind, i, minigame['world'])
 
 BARKER_REQUIREMENT_LOCATION = "Barker Coin Goal Requirement"
 LOCATION_TABLE[BARKER_REQUIREMENT_LOCATION] = LocationData(BASE_ID + 400, "barker_requirement", 0, None)

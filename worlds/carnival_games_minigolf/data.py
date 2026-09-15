@@ -42,15 +42,19 @@ HOLES = ('Sky City',
  'Troll Bridge',
  'Flower Power')
 
-MINIGAMES = (('Maze-O-Rama', 2152673920),
- ('Ghoul Hunter', 2152708200),
- ('Jungle Bogey', 2152639232),
- ('Juggles', 2152671712),
- ('Mine Shaft Madness', 2152680872),
- ("Pterodactyl's Run", 2152695976),
- ('The Scrambler', 2152648968),
- ('Cannon Fodder', 2152642344),
- ('G-Nome Project', 2152707388))
+MINIGAMES = (
+ {'name': 'Maze-O-Rama', 'vtable': 0x804F3280, 'world': 0, 'has_win': True, 'has_perfect': True},
+ {'name': 'Ghoul Hunter', 'vtable': 0x804FBE00, 'world': 1, 'has_win': True, 'has_perfect': True},
+ {'name': 'Jungle Bogey', 'vtable': 0x804EAB00, 'world': 2, 'has_win': True, 'has_perfect': True},
+ {'name': 'Juggles', 'vtable': 0x804F29E0, 'world': 3, 'has_win': True, 'has_perfect': True},
+ {'name': 'Mine Shaft Madness', 'vtable': 0x804F4DA8, 'world': 4, 'has_win': True, 'has_perfect': True},
+ {'name': "Pterodactyl's Run", 'vtable': 0x804F88A8, 'world': 5, 'has_win': True, 'has_perfect': True},
+ {'name': 'The Scrambler', 'vtable': 0x804ED108, 'world': 6, 'has_win': True, 'has_perfect': True},
+ {'name': 'Cannon Fodder', 'vtable': 0x804EB728, 'world': 7, 'has_win': True, 'has_perfect': True},
+ {'name': 'G-Nome Project', 'vtable': 0x804FB53C, 'world': 8, 'has_win': True, 'has_perfect': True},
+ {'name': "Devil's Brew - Spiders", 'vtable': 0x804FB868, 'world': 1,
+  'has_win': True, 'has_perfect': False},
+)
 
 PRIZES = ({'id': 0, 'name': 'G-Nome Outfit', 'world': 8, 'kind': 'shop', 'price': 300, 'pieces': 3},
  {'id': 1, 'name': 'Candy Striped Ball', 'world': 8, 'kind': 'shop', 'price': 50, 'pieces': 0},

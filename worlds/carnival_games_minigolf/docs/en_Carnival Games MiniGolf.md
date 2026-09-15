@@ -15,14 +15,15 @@ must be completed on Par provide alternative goals. Starting and final worlds ca
 | Hole completions | 27 | On |
 | Par Club Pieces | 27 | On |
 | Barker Coin collectibles | 27 | On |
-| Hole-in-One | 27 | Off |
+| Hole-in-One | 19 | Off |
 | World secrets | 9 | On |
-| Minigame Win / Perfect | 18 | Win only |
+| Minigame Win / Perfect | 19 | Win only |
 | Normal Pro Shop purchases | 63 | On |
 | Par Club rewards | 9 | With normal shops |
 | Barker Shop purchases | 7 | On; disabled for counter goals |
 
-The default configuration has 178 locations. All compatible regular options enable 214 locations.
+The default configuration has 179 locations. The Devil's Brew spider subgame contributes a Win check but has no
+Perfect check.
 Par Club Pieces have both a Par-or-better location and a distinct AP progression item. The received items
 control each world's Pro Shop tiers. Goal World access uses one generic AP item, optionally granted by a
 server-visible Barker threshold location.

@@ -8,7 +8,7 @@
   without a second deduction. Deterministic samples verify the configurable trap rate and 4/3/2/1 weighting.
 - Every starting world tested with All Holes, Barker Hunt, and both Goal World access modes.
 - 30 additional randomized option configurations, including six two-slot multiworlds, filled and beatable.
-- Default YAML generated successfully through the normal `Generate.py` path: 178 locations/items,
+- Default YAML generated successfully through the normal `Generate.py` path: 179 locations/items,
   multidata, spoiler and `.apcgm` in the resulting ZIP.
 - Real local AP server/client handshake tested, including an empty initial inventory. Simulated game RAM
   supplies all default checks; every received item arrives and the server accepts goal completion.

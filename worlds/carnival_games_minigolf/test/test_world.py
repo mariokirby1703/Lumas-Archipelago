@@ -14,7 +14,7 @@ from worlds.AutoWorld import call_all
 from ..data import HOLES, PRIZES, WORLDS
 from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, GOAL_WORLD_ACCESS,
                      PAR_CLUB_PIECES, UNLOCKS)
-from ..Locations import BARKER_REQUIREMENT_LOCATION, LOCATION_TABLE
+from ..Locations import BARKER_REQUIREMENT_LOCATION, HIO_IMPOSSIBLE, HIO_POSSIBLE, LOCATION_TABLE
 from ..world import CarnivalGamesMiniGolfWorld
 from . import MiniGolfTestBase
 
@@ -78,14 +78,19 @@ class TestWorldData(unittest.TestCase):
         self.assertTrue(all(enabled.get_filler_item_name() in COIN_TRAP_DATA for _ in range(1000)))
 
     def test_data_and_shop_tiers(self):
-        self.assertEqual(len(LOCATION_TABLE), 215)
-        self.assertEqual(len({d.code for d in LOCATION_TABLE.values()}), 215)
+        self.assertEqual(len(LOCATION_TABLE), 208)
+        self.assertEqual(len({d.code for d in LOCATION_TABLE.values()}), 208)
         self.assertEqual(len(PRIZES), 88)
         self.assertEqual(len(HOLES), 27)
         for world in range(9):
             purchases = sorted((p for p in PRIZES if p['kind'] == 'shop' and p['world'] == world),
                                key=lambda p: (p['price'], p['id']))
             self.assertEqual([p['pieces'] for p in purchases], [0, 0, 1, 1, 2, 2, 3])
+
+    def test_hio_feasibility_allowlist(self):
+        self.assertEqual(HIO_IMPOSSIBLE, {0, 1, 4, 7, 10, 15, 22, 25})
+        self.assertEqual(len(HIO_POSSIBLE), 19)
+        self.assertEqual({d.index for d in LOCATION_TABLE.values() if d.kind == 'hio'}, set(HIO_POSSIBLE))
 
     def test_each_start_and_goals(self):
         for start in range(9):
@@ -116,11 +121,20 @@ class TestWorldData(unittest.TestCase):
         mw = generate(minimal, fill=True)
         self.assertEqual(len(mw.get_locations()), 54)
         self.assertTrue(mw.can_beat_game())
-        for mode, count in ((0, 0), (1, 9), (2, 9), (3, 18)):
+        for mode, count in ((0, 0), (1, 10), (2, 9), (3, 19)):
             world = generate({**minimal, 'minigame_checks': mode}).worlds[1]
             self.assertEqual(len(world.active_locations), 54+count)
             if mode == 2:
                 self.assertFalse(any(LOCATION_TABLE[n].kind == 'win' for n in world.active_locations))
+
+    def test_spider_subgame_has_only_supported_option_locations(self):
+        name = "Devil's Brew - Spiders - Win"
+        self.assertIn(name, LOCATION_TABLE)
+        self.assertNotIn("Devil's Brew - Spiders - Perfect", LOCATION_TABLE)
+        self.assertNotIn(name, generate({'minigame_checks': 0}).worlds[1].active_locations)
+        self.assertIn(name, generate({'minigame_checks': 1}).worlds[1].active_locations)
+        self.assertNotIn(name, generate({'minigame_checks': 2}).worlds[1].active_locations)
+        self.assertIn(name, generate({'minigame_checks': 3}).worlds[1].active_locations)
 
     def test_invalid_options(self):
         corrected = generate(dict(starting_world=1, goal=1, goal_world=1)).worlds[1]
@@ -157,6 +171,8 @@ class TestWorldData(unittest.TestCase):
         self.assertEqual(PAR_CLUB_PIECES[2], "Amazeon Par Club Piece")
         self.assertIn("Amazeon Shop: Jub Jub Ball", LOCATION_TABLE)
         self.assertFalse(any("Purchase" in name for name in LOCATION_TABLE))
+        self.assertIn("50 Amazeon Coins", COIN_BUNDLE_DATA)
+        self.assertIn("-10 Fairytella Coins", COIN_TRAP_DATA)
         for required, expected in ((1, 2), (5, 8), (27, 41), (50, 75)):
             with self.subTest(required=required):
                 world = generate({'goal': 2, 'barker_coins_required': required}).worlds[1]

@@ -59,8 +59,8 @@ async def main():
                         fixture.memory.put(fixture.hole_state+0x127, 1)
                         checks = ctx.runtime.poll(fixture.memory, [i.item for i in ctx.items_received])
                         ctx.locations_checked |= checks
-                    for w, (_, vtable) in enumerate(MINIGAMES):
-                        fixture.memory.put(fixture.controller+0x1C, vtable, 4)
+                    for w, minigame in enumerate(MINIGAMES):
+                        fixture.memory.put(fixture.controller+0x1C, minigame['vtable'], 4)
                         fixture.memory.put(fixture.manager+0x104, 0, 4)
                         ctx.runtime.poll(fixture.memory, [i.item for i in ctx.items_received])
                         fixture.memory.put(fixture.manager+0x104, 1, 4)
