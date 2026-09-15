@@ -85,14 +85,15 @@ Every Par-or-better location can award one of three same-named Par Club Piece it
 enabled, all 27 pieces are progression items. Shop tiers count only the three received AP pieces of that world:
 0/1/2/3 pieces make the cheapest 2/4/6/7 purchases reachable; the Club reward requires all three.
 The client clears all 27 Vanilla piece flags during normal holes, minigames, and the level-completion screen,
-including a piece Vanilla just awarded. It projects received AP pieces only while the gameplay session pointer
-is null, which the live dump identifies as the Pro Shop context.
+including a piece Vanilla just awarded. It projects received AP pieces only while `manager + 0xBC` is `3`,
+which independent live dumps identify as the Pro Shop context.
 The completion-screen guard prevents a newly earned Vanilla piece from combining with two received AP pieces
 and immediately granting the Club reward. The AP inventory remains authoritative; the Wii save never owns
 progression pieces permanently.
 
 The actual purchase/earned-prize byte must be exactly 1 to send its shop check. The client tests this persistent
-state in every valid local-player root every poll, without requiring a gameplay session or a 0-to-1 transition.
+state in the configured AP profile root every poll, without requiring a gameplay session, a 0-to-1 transition,
+or AP access to that world. Other local roots cannot inject checks into the AP slot.
 During gameplay the configured local profile selects the player root; `session + 0x2EC` is not treated as an AP
 profile selector. In the Pro Shop, where the session pointer is null, the client scans the two persistent root
 slots directly and skips empty slots. Loading transitions with no

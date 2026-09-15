@@ -3,7 +3,7 @@ from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, GOAL_WORLD_A
                      ITEM_TABLE, PAR_CLUB_PIECES, UNLOCKS)
 from ..Locations import LOCATION_TABLE
 from ..data import MINIGAMES
-from .constants import RESULT_VTABLE, ROOT_LOCKS, ROOT_SUB
+from .constants import RESULT_VTABLE, ROOT_LOCKS, ROOT_SUB, SHOP_MANAGER_STATE
 from .memory import MemoryUnavailable, valid_pointer
 
 ID_TO_NAME = {code: name for name, code in ITEM_TABLE.items()}
@@ -91,16 +91,14 @@ class Runtime:
             raise ValueError("Unknown received MiniGolf item ID; update the client")
         snapshot = memory.resolve(local_player)
         root, sub = snapshot.root, snapshot.root + ROOT_SUB
-        # Capture every local profile's persistent state before any AP writes.
-        # The Pro Shop has no gameplay session, but the manager's root array remains valid.
-        persistent_states = [memory.read(root + ROOT_SUB, 0xA2) for root in snapshot.roots]
+        # Only the configured AP profile may contribute locations. Other valid
+        # local roots can contain stale or unrelated save progress.
+        persistent = memory.read(sub, 0xA2)
         unlocked, coins = self.unlocked(items)
         checks = set()
         for data in self.locations.values():
-            if data.world is not None and data.world not in unlocked:
-                continue
             offset = {'barker': 0x6A, 'shop': 0, 'club': 0, 'secret': 0, 'barker_shop': 0}.get(data.kind)
-            if offset is not None and any(state[offset + data.index] == 1 for state in persistent_states):
+            if offset is not None and persistent[offset + data.index] == 1:
                 checks.add(data.code)
         try:
             active_gameplay = self.read_transient(memory, snapshot, unlocked, checks)
@@ -153,8 +151,8 @@ class Runtime:
 
     @staticmethod
     def is_shop_context(memory, snapshot, active_gameplay):
-        """The live dump identifies the Pro Shop by its null gameplay-session pointer."""
-        return snapshot.session is None and not active_gameplay
+        """Independent Pro Shop dumps identify manager state 3 as the shop."""
+        return memory.integer(snapshot.manager + 0xBC) == SHOP_MANAGER_STATE
 
     def clear_piece_projection(self, memory, local_player=0):
         if not self.pieces_projected or not memory.verify_game():
@@ -193,7 +191,7 @@ class Runtime:
                 if valid_pointer(obj, 0xC2) and memory.integer(obj + 0x1C) == RESULT_VTABLE:
                     results[obj] = memory.read(obj + 0xC0, 2)
             # A popup already present when attaching/changing minigames is not a new result.
-            if context == self.result_context and self.active_minigame in unlocked:
+            if context == self.result_context:
                 for obj, flags in results.items():
                     if obj not in self.previous_results and flags[1] == 1:
                         if ('win', self.active_minigame) in self.lookup:
@@ -218,13 +216,13 @@ class Runtime:
         pointers_valid = (valid_pointer(hole_state, 0x128) and valid_pointer(hole_def, 0x10)
                           and valid_pointer(controller, 0x20))
         goal = memory.integer(hole_state + 0x127, 1) if pointers_valid else None
-        current_valid = pointers_valid and 0 <= hole < 27 and hole // 3 in unlocked
+        current_valid = pointers_valid and 0 <= hole < 27
         context = (snapshot.root, hole_state, hole, controller) if current_valid else None
         completed_hole = hole if (current_valid and self.previous_hole == context) else None
         if completed_hole is None and pointers_valid and self.previous_hole is not None:
             old_root, old_state, old_hole, old_controller = self.previous_hole
             if ((old_root, old_state, old_controller) == (snapshot.root, hole_state, controller)
-                    and 0 <= old_hole < 27 and old_hole // 3 in unlocked):
+                    and 0 <= old_hole < 27):
                 completed_hole = old_hole
         if completed_hole is not None and self.previous_goal == 0 and goal == 1:
             strokes = memory.integer(snapshot.root + 0x2DC)
@@ -242,7 +240,8 @@ class Runtime:
 
     def debug_state(self, memory, local_player=0):
         snapshot = memory.resolve(local_player)
-        result = {"manager": snapshot.manager, "session": snapshot.session, "root": snapshot.root,
+        result = {"manager": snapshot.manager, "manager_state": memory.integer(snapshot.manager + 0xBC),
+                  "session": snapshot.session, "root": snapshot.root,
                   "hole": None, "hole_state": None, "in_goal": None, "strokes": None, "par": None,
                   "controller": None, "vtable": None, "minigame": self.active_minigame}
         if snapshot.session is None:

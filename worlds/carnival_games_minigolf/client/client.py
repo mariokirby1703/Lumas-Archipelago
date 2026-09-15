@@ -53,9 +53,10 @@ class MiniGolfCommands(ClientCommandProcessor):
             hole_name = f" ({HOLES[hole]})" if isinstance(hole, int) and 0 <= hole < 27 else ""
             minigame = state['minigame']
             minigame_name = MINIGAMES[minigame][0] if isinstance(minigame, int) else "none"
-            logger.info("Manager: %s | Session: %s | Root: %s | Hole: %s%s | Hole state: %s | "
+            logger.info("Manager: %s | Manager state: %s | Session: %s | Root: %s | Hole: %s%s | Hole state: %s | "
                         "In goal: %s | Strokes: %s | Par: %s | Controller: %s | VTable: %s | Minigame: %s",
-                        address(state['manager']), address(state['session']), address(state['root']), hole,
+                        address(state['manager']), state['manager_state'], address(state['session']),
+                        address(state['root']), hole,
                         hole_name, address(state['hole_state']), state['in_goal'], state['strokes'], state['par'],
                         address(state['controller']), address(state['vtable']), minigame_name)
         except (ImportError, RuntimeError, OSError, MemoryUnavailable) as error:

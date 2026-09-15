@@ -251,14 +251,21 @@ class TestRuntime(unittest.TestCase):
         self.runtime = Runtime(self.slot, Journal(self.path))
         self.assertIn(check, self.poll())
 
-    def test_shop_checks_scan_all_roots_without_session(self):
+    def test_shop_checks_only_scan_configured_root_without_session(self):
         second = 0x80950000
         self.memory.put(self.manager+0x12C, 2, 4)
         self.memory.put(self.manager+0x194, second, 4)
         self.memory.put(self.manager+0x114, 0, 4)
         self.memory.put(second+ROOT_SUB+48, 1)
         self.backend.writes.clear()
+        self.assertNotIn(self.runtime.lookup['shop', 48], self.poll())
+        self.memory.put(self.sub+48, 1)
         self.assertIn(self.runtime.lookup['shop', 48], self.poll())
+
+    def test_persistent_check_is_sent_even_when_its_world_is_locked(self):
+        # Prize 65 belongs to Amazeon, which is locked in this starting-world fixture.
+        self.memory.put(self.sub+65, 1)
+        self.assertIn(self.runtime.lookup['shop', 65], self.poll())
 
     def test_hio_edge_and_stale_attach(self):
         self.memory.put(self.hole_state+0x127, 1)
@@ -271,6 +278,16 @@ class TestRuntime(unittest.TestCase):
         self.assertIn(self.runtime.lookup['hio', 0], checks)
         self.assertIn(self.runtime.lookup['par', 0], checks)
         self.assertIn(self.runtime.lookup['complete', 0], checks)
+
+    def test_hole_check_is_sent_even_when_ap_world_is_locked(self):
+        self.memory.put(self.session+0x2F0, 8, 4)
+        self.memory.put(self.hole_state+0x127, 0)
+        self.poll()
+        self.memory.put(self.root+0x2DC, 3, 4)
+        self.memory.put(self.hole_state+0x127, 1)
+        checks = self.poll()
+        self.assertIn(self.runtime.lookup['complete', 8], checks)
+        self.assertIn(self.runtime.lookup['par', 8], checks)
 
     def test_minigame_results_and_disabled_checks(self):
         self.memory.put(self.controller+0x1C, MINIGAMES[0][1], 4)
@@ -294,14 +311,13 @@ class TestRuntime(unittest.TestCase):
         self.memory.put(self.controller+0x1C, MINIGAMES[5][1], 4)
         array, popup = 0x80960000, 0x80970000
         self.memory.put(self.manager+0x100, array, 4)
-        items = [ITEM_TABLE[UNLOCKS[5]]]
-        self.poll(items)
+        self.poll()
         self.memory.put(self.controller+0x1C, 0x80400000, 4)
         self.memory.put(self.manager+0x104, 1, 4)
         self.memory.put(array, popup, 4)
         self.memory.put(popup+0x1C, RESULT_VTABLE, 4)
         self.memory.write(popup+0xC0, bytes([1, 1]))
-        checks = self.poll(items)
+        checks = self.poll()
         self.assertIn(self.runtime.lookup['win', 5], checks)
         self.assertIn(self.runtime.lookup['perfect', 5], checks)
 
@@ -312,6 +328,7 @@ class TestRuntime(unittest.TestCase):
         self.memory.put(self.controller+0x1C, MINIGAMES[5][1], 4)
         state = self.runtime.debug_state(self.memory)
         self.assertEqual(state['manager'], self.manager)
+        self.assertEqual(state['manager_state'], 0)
         self.assertEqual(state['session'], self.session)
         self.assertEqual(state['root'], self.root)
         self.assertEqual((state['hole'], state['strokes'], state['par']), (8, 3, 3))
@@ -356,7 +373,8 @@ class TestRuntime(unittest.TestCase):
     def test_piece_projection_frontend_and_clear_during_play(self):
         items = [ITEM_TABLE[PAR_CLUB_PIECES[0]], ITEM_TABLE[PAR_CLUB_PIECES[0]],
                  ITEM_TABLE[PAR_CLUB_PIECES[2]]]
-        # The Pro Shop has no gameplay session pointer.
+        # Independent dumps identify manager state 3 as the Pro Shop.
+        self.memory.put(self.manager+0xBC, 3, 4)
         self.memory.put(self.manager+0x114, 0, 4)
         self.poll(items)
         expected = bytes([1, 1, 0, 0, 0, 0, 1, 0, 0] + [0] * 18)
@@ -365,6 +383,7 @@ class TestRuntime(unittest.TestCase):
         self.assertEqual(self.memory.read(self.sub+0x86, 27), bytes(27))
         self.poll(items)
         # Entering normal gameplay clears every projected and vanilla piece.
+        self.memory.put(self.manager+0xBC, 5, 4)
         self.memory.put(self.manager+0x114, self.session, 4)
         self.memory.put(self.session+0x2F0, 0, 4)
         self.memory.write(self.sub+0x86, bytes([1])*27)
@@ -373,11 +392,13 @@ class TestRuntime(unittest.TestCase):
 
     def test_piece_projection_is_cleared_on_level_completion_screen(self):
         items = [ITEM_TABLE[PAR_CLUB_PIECES[6]]] * 2
+        self.memory.put(self.manager+0xBC, 3, 4)
         self.memory.put(self.manager+0x114, 0, 4)
         self.poll(items)
         self.assertEqual(self.memory.read(self.sub+0x86+18, 3), bytes([1, 1, 0]))
         # The course ID can already be invalid while the result screen still owns
         # the live hole state. Never combine its Vanilla piece with AP pieces.
+        self.memory.put(self.manager+0xBC, 6, 4)
         self.memory.put(self.manager+0x114, self.session, 4)
         self.memory.put(self.session+0x2F0, 99, 4)
         self.memory.put(self.hole_state+0x127, 1)
