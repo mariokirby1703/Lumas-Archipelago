@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from Options import Choice, DefaultOnToggle, PerGameCommonOptions, Range, Toggle
+from Options import OptionGroup, Choice, DefaultOnToggle, PerGameCommonOptions, Range, Toggle
 
 
 class StartingWorld(Choice):
@@ -19,7 +19,7 @@ class StartingWorld(Choice):
 
 
 class GoalWorld(StartingWorld):
-    """Final world for Barker Goal World Requirement. Must differ from the starting world."""
+    """Final world for the Goal World goal. Must differ from the starting world."""
     display_name = "Goal World"
     default = "random"
 
@@ -38,7 +38,8 @@ class Goal(Choice):
 
 class MinigameChecks(Choice):
     """Win Checks creates one Win location per minigame. Perfect Checks creates one Perfect location.
-    Win + Perfect Checks creates TWO separate locations per minigame; a Perfect run completes both.
+    The nine main minigames support Win and Perfect; a Perfect run completes both.
+    Devil's Brew - Spiders is experimental and supports Win only.
     """
     display_name = "Minigame Checks"
     option_off = 0
@@ -49,7 +50,7 @@ class MinigameChecks(Choice):
 
 
 class HoleInOneChecks(Toggle):
-    """Add one Hole-in-One check for each normal hole."""
+    """Add Hole-in-One checks for the 19 holes where a Hole-in-One is possible."""
     display_name = "Hole-in-One Checks"
 
 
@@ -97,7 +98,7 @@ class TrapWeight(Range):
     display_name = "Trap Weight"
     range_start = 0
     range_end = 100
-    default = 10
+    default = 0
 
 
 @dataclass
@@ -114,3 +115,12 @@ class MiniGolfOptions(PerGameCommonOptions):
     goal_world_access: GoalWorldAccess
     barker_coins_required: BarkerCoinsRequired
     trap_weight: TrapWeight
+
+
+OPTION_GROUPS = [
+    OptionGroup("Progression", [StartingWorld]),
+    OptionGroup("Goal", [Goal, GoalWorld, GoalWorldAccess, BarkerCoinsRequired]),
+    OptionGroup("Checks", [MinigameChecks, HoleInOneChecks, BarkerCoinChecks,
+                           WorldSecrets, ShopChecks, BarkerShopChecks]),
+    OptionGroup("Filler", [TrapWeight]),
+]

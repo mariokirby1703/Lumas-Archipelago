@@ -33,27 +33,34 @@ The client defaults to local golfer 1. From source, use:
 .venv/Scripts/python.exe -m worlds.carnival_games_minigolf.client.launch --name Golfer --connect localhost:38281 --local-player 1
 ```
 
-`--local-player 1..4` chooses whose persistent checks and currency are tracked. World locks are enforced
-for every local golfer because the game's multiplayer menu can allow a world if any golfer has it.
-Use **one AP client per Dolphin instance**. Local golfers share that AP world's access; this is not
-independent AP slots for four golfers in a single emulator. HIO results are attributed only on the selected
-golfer's turn, and minigame results require the controller's player-root pointer to match that golfer.
+Only **single-player / local golfer 1** is supported (`--local-player 1`). Local multiplayer
+result ownership is not verified. Checks, currency, pieces and world locks use only the selected root;
+a secondary pointer does not establish an active multiplayer profile. Use one AP client per Dolphin instance.
 
 ## Saving and reconnecting
 
 Keep the same dedicated game profile for the seed. Save normally in-game before closing Dolphin.
 Persistent shop, secret and Barker flags are reconciled on every poll, so a purchase missed at the instant
 it happens is still sent later or after reconnect. Hole Complete, Par, HIO and minigame checks are recorded locally as soon as
-observed and retried until the AP server acknowledges them. These transient checks must be played while
-the client is connected; a result already open when attaching is deliberately not attributed to a new run.
+observed and retried until the AP server acknowledges them. These transient checks must be observed while the client is connected. A visible result is reconciled
+when its hole or minigame context can be identified; a popup alone cannot identify a minigame.
 
 Currency receipts and observed checks are stored under Archipelago's user-data directory in
-`carnival_games_minigolf/<seed-team-slot-player-hash>.json`. Keep this directory with your game saves.
+`carnival_games_minigolf/<slot-data-team-slot-player-hash>.json`. Keep this directory with your game saves.
 Reconnecting or restarting the client does not grant processed coins again. Another client cannot open
 the same journal concurrently. Do not switch game profiles mid-session or load old emulator save states:
 the game does not expose a verified save-profile identifier in the supplied RAM map, and an old save can
 discard already delivered currency. The client cannot make game saving and a disk journal atomic.
 
+The journal key hashes canonical slot data plus team, slot and local golfer. Version 0.3.14 refuses to
+silently replace a matching legacy journal: finish an existing seed with the previous client, or use a newly
+generated seed and dedicated game profile. This prevents accidental receipt replay during the key migration.
+
+Currency waits for a null session and unchanged menu state 2/root for at least 300 ms. The client persists
+intent, writes the balance, then waits at least another 300 ms before committing the receipt on a later poll.
+If the game restores the old balance, the write is retried and confirmation restarts. Loading, gameplay,
+shop and root changes do not count as stable menu confirmation. This improves writeback handling but
+is not proof of durable Wii-save storage; real save/reload timing still needs live validation.
 An interrupted grant is recovered automatically when the current balance equals its before/after value.
 If the balance is ambiguous, synchronization pauses. `/currency_recover skip` keeps the current balance
 and marks that receipt delivered; `/currency_recover apply` retries that receipt against the current balance.
@@ -78,18 +85,22 @@ the generator rerolls Goal World from the other eight.
 
 Barker counter modes automatically remove Barker Shop checks. Local collectible Barker Coins do not
 advance the AP counter. In normal mode they remain spendable, as do received Barker Coin filler items.
-Counter modes place 150% of the configured requirement in the pool, rounded up, while the access or
-victory threshold stays at the configured value. Barker Coins Required accepts values from 1 through 50.
+Counter modes aim for 150% of the configured requirement, rounded up, capped by available item slots.
+Only the required number are progression; surplus coins are useful. Feasibility before Goal World uses
+the required number, not the surplus. Barker Coins Required accepts values from 1 through 50.
 
 Every Par-or-better location can award one of three same-named Par Club Piece items for its world through AP. With Shop Checks
 enabled, all 27 pieces are progression items. Shop tiers count only the three received AP pieces of that world:
 0/1/2/3 pieces make the cheapest 2/4/6/7 purchases reachable; the Club reward requires all three.
 The client clears all 27 Vanilla piece flags during normal holes, minigames, and the level-completion screen,
-including a piece Vanilla just awarded. It projects received AP pieces only while `manager + 0xBC` is `3`,
-which independent live dumps identify as the Pro Shop context.
-The completion-screen guard prevents a newly earned Vanilla piece from combining with two received AP pieces
-and immediately granting the Club reward. The AP inventory remains authoritative; the Wii save never owns
-progression pieces permanently.
+including a piece Vanilla just awarded. Menu state 2 displays checked Par locations; shop candidate state 3
+projects received AP pieces once per visit. Temporary display writes and their removal do not set the dirty
+flag. Clearing unprojected Vanilla pieces during gameplay remains a persistent change.
+
+**Pro Shop detection remains experimental.** State 3 is a candidate, not a verified unique shop screen.
+World Select, Level Select and actual Pro Shop dumps are still needed to identify a reliable screen object.
+Avoiding dirty writes does not prevent the game itself from saving a displayed projection during another
+save operation. Permanent save isolation needs live verification before a public release.
 
 The actual purchase/earned-prize byte must be exactly 1 to send its shop check. The client tests this persistent
 state in the configured AP profile root every poll, without requiring a gameplay session, a 0-to-1 transition,
@@ -99,11 +110,14 @@ profile selector. In the Pro Shop, where the session pointer is null, the client
 slots directly and skips empty slots. Loading transitions with no
 valid root pause RAM synchronization until the next poll without resetting the AP connection or receipt journal.
 MEM1 (`0x80000000`–`0x817fffff`) and MEM2 (`0x90000000`–`0x93ffffff`) are both valid. If an individual MEM2
-live-object read fails temporarily, the client skips live hole/minigame tracking for that poll while continuing
-persistent root, location, lock, and item synchronization through a valid fallback root.
+live-object read fails temporarily, the client skips the failed read while continuing
+persistent root, location, lock, and item synchronization through the selected root.
 Normal-hole identity is derived from the MEM1 hole-definition table. Completion is reconciled only while the live
 `in_goal` field equals 1, so `session + 0x2F0` is no longer mandatory. Minigame identity
-comes from the controller VTable before any optional course read, and active result flags are reconciled every poll.
+comes from the controller VTable, with manager-state-7 fallback only for Hole A. The latch survives
+controller/session loss and result transitions, retiring after five consecutive menu polls or a new normal
+hole in gameplay state 5. Result pointers and hole-definition records are read in blocks; unreadable objects
+are skipped individually. Normal Complete/Par/HIO detection does not require a controller read.
 Outside manager shop state 3, Vanilla Par Club Piece flags are checked before the client clears them.
 Game-to-AP checks and Starting World lock enforcement continue while the received-item history is loading.
 Only inventory-derived writes such as currency replay, Barker counter reconstruction, threshold evaluation, and
@@ -117,7 +131,7 @@ Coin Bundles are assistance, not required progression. Each world has separate b
 1.9% / 3.8% / 15.1% / 30.2% / 30.2% / 11.3% / 7.5% of generated bundles. Worlds are chosen uniformly.
 In normal mode, 10% of filler rolls produce a spendable Barker Coin instead; counter modes use only
 normal Coin Bundles and traps for filler. Trap Weight controls the percentage of filler rolls that produce a world-specific Coin Trap.
-Traps remove 5, 10, 20 or 50 coins and never reduce a balance below zero. Their relative weights are
+Trap Weight defaults to 0 (opt-in). Traps remove 5, 10, 20 or 50 coins and never reduce a balance below zero. Their relative weights are
 **4 / 3 / 2 / 1**, making the largest loss rarest. Receipt journaling prevents a reconnect from applying
 the same trap twice. Barker Shop logic budgets the 27 natural collectibles cumulatively
 across purchases, so optional filler is never required to buy its full inventory.
@@ -128,11 +142,13 @@ enable more checks or reduce `barker_coins_required`.
 
 ## Validation status
 
-Win + Perfect Checks creates two separate locations for every minigame: `- Win` and `- Perfect`.
-A Perfect result sends both; Perfect-only mode generates no Win locations.
+The nine main minigames support Win and Perfect locations; a Perfect result sends both when enabled.
+Devil's Brew - Spiders supports **Win only** and is experimental. Its CSpidersSubLogic VTable is distinct
+from Ghoul Hunter, but use of the standard results popup for Spider completion is still an assumption.
+The synthetic test validates that assumption's implementation, not the live game behavior.
 
-World generation, item fill, goal logic and mocked RAM behavior have automated coverage. The supplied
-executable was hash-verified and runtime signatures were derived from it. A complete live Dolphin
-playthrough, all minigame mappings, multiplayer menu behavior and real save/reload currency timing still
-need in-game QA. The master notes identify eight minigame VTables as static mappings and Mine Shaft
-Madness as previously live-confirmed. This package does not claim a completed live playthrough.
+Earlier live reports include Mine Shaft Madness, Ghoul Hunter, G-Nome Project and Pterodactyl's Run.
+Their source dumps are not available in this checkout. The other five main minigames, Spider completion,
+unique shop identity and 500-coin save/reload behavior still need live testing. No complete live playthrough
+or multiplayer support is claimed. See [validation.md](validation.md) for current automated results and
+[release_checklist.md](release_checklist.md) for the remaining evidence required before release.

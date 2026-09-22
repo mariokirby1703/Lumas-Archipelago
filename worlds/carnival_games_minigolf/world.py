@@ -1,5 +1,4 @@
 import json
-from dataclasses import asdict
 from pathlib import Path
 
 from BaseClasses import ItemClassification, Tutorial
@@ -7,11 +6,12 @@ from worlds.AutoWorld import WebWorld, World
 
 from . import Items, Locations, Regions, Rules
 from .data import GAME, WORLDS
-from .Options import MiniGolfOptions
+from .Options import MiniGolfOptions, OPTION_GROUPS
 
 
 class MiniGolfWeb(WebWorld):
     theme = "partyTime"
+    option_groups = OPTION_GROUPS
     tutorials = [Tutorial("Multiworld Setup", "Connect Carnival Games MiniGolf to Archipelago using Dolphin.",
                           "English", "setup_en.md", "setup/en", ["Luma"])]
 
@@ -31,6 +31,14 @@ class CarnivalGamesMiniGolfWorld(World):
                         "Coin Traps": set(Items.COIN_TRAPS), "Traps": set(Items.COIN_TRAPS)}
     location_name_groups = {name: {n for n, d in Locations.LOCATION_TABLE.items() if d.world == i}
                             for i, name in enumerate(WORLDS)}
+
+    item_name_groups['Currency'] = set(Items.COIN_BUNDLES) | {Items.BARKER_COIN}
+    location_name_groups.update({label: {n for n, d in Locations.LOCATION_TABLE.items() if d.kind in kinds}
+                                for label, kinds in {
+                                    'Hole Completions': {'complete'}, 'Par Club Pieces': {'par'},
+                                    'Hole-in-Ones': {'hio'}, 'Minigames': {'win', 'perfect'},
+                                    'World Secrets': {'secret'}, 'Pro Shop': {'shop', 'club'},
+                                    'Barker Shop': {'barker_shop'}}.items()})
 
     def generate_early(self):
         self.starting_world = self.options.starting_world.value
@@ -54,10 +62,14 @@ class CarnivalGamesMiniGolfWorld(World):
         unlock_count = 7 if self.goal_world is not None else 8
         available = sum(Locations.LOCATION_TABLE[n].world != self.goal_world
                         for n in self.active_locations if n != Locations.BARKER_REQUIREMENT_LOCATION)
-        if self.total_barker_coins + unlock_count > available:
+        capacity = (len(self.active_locations) - unlock_count
+                    - (27 if self.options.shop_checks else 0)
+                    - (1 if self.goal_world is not None else 0))
+        self.total_barker_coins = min(self.total_barker_coins, capacity)
+        if self.required_coins + unlock_count > available or self.required_coins > capacity:
             raise ValueError("Carnival Games MiniGolf: Too few enabled checks before the goal for the required "
                              "Barker Coins and world unlocks. Enable Barker Coin Checks, Secrets, Shops or "
-                             f"Minigames, or reduce Barker Coins Required to {available - unlock_count}.")
+                             f"Minigames, or reduce Barker Coins Required to {min(available - unlock_count, capacity)}.")
 
     def create_regions(self):
         Regions.create_regions(self)
@@ -81,7 +93,14 @@ class CarnivalGamesMiniGolfWorld(World):
                 names.append(Items.GOAL_WORLD_ACCESS)
         while len(names) < len(self.active_locations) - locked_locations:
             names.append(self.get_filler_item_name())
-        self.multiworld.itempool.extend(self.create_item(name) for name in names)
+        barker_count = 0
+        for name in names:
+            item = self.create_item(name)
+            if name == Items.BARKER_COIN and self.counter_mode:
+                barker_count += 1
+                if barker_count > self.required_coins:
+                    item.classification = ItemClassification.useful
+            self.multiworld.itempool.append(item)
 
     def create_item(self, name):
         classification = ItemClassification.trap if name in Items.COIN_TRAPS else ItemClassification.filler
@@ -108,7 +127,7 @@ class CarnivalGamesMiniGolfWorld(World):
                 "goal": self.goal_mode, "goal_world_access": self.options.goal_world_access.value,
                 "counter_mode": self.counter_mode, "required_coins": self.required_coins,
                 "total_barker_coins": self.total_barker_coins,
-                "locations": {name: asdict(Locations.LOCATION_TABLE[name]) for name in self.active_locations},
+                "locations": {name: {'code': Locations.LOCATION_TABLE[name].code} for name in self.active_locations},
                 "options": self.options.as_dict("goal", "minigame_checks", "hole_in_one_checks", "barker_coin_checks",
                                                 "world_secrets", "shop_checks", "barker_shop_checks",
                                                 "goal_world_access", "trap_weight")}

@@ -1,24 +1,30 @@
 """Polling and item effects, testable with an in-memory Dolphin substitute."""
 import logging
+import struct
+from time import monotonic
 from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, GOAL_WORLD_ACCESS,
                      ITEM_TABLE, PAR_CLUB_PIECES, UNLOCKS)
 from ..Locations import LOCATION_TABLE
-from ..data import MINIGAMES
-from .constants import RESULT_VTABLE, ROOT_LOCKS, ROOT_SUB, SHOP_MANAGER_STATE
+from ..data import HOLES, MINIGAMES, WORLDS
+from .constants import (RESULT_VTABLE, ROOT_LOCKS, ROOT_SUB, SHOP_MANAGER_STATE,
+                        MANAGER_STATE_MENU, MANAGER_STATE_GAMEPLAY, MANAGER_STATE_MINIGAME,
+                        MINIGAME_MENU_POLLS, CURRENCY_SETTLE_SECONDS)
 from .memory import MemoryUnavailable, valid_pointer
 
 ID_TO_NAME = {code: name for name, code in ITEM_TABLE.items()}
 VTABLE_TO_MINIGAME = {data['vtable']: i for i, data in enumerate(MINIGAMES)}
 logger = logging.getLogger("Client")
+WORLD_COUNT = len(WORLDS)
+HOLE_COUNT = len(HOLES)
 
 
 def validate_slot(data):
     if data.get('schema_version') != 7:
         raise ValueError("Unsupported Carnival Games MiniGolf slot-data version")
     start, final = data.get('starting_world'), data.get('goal_world')
-    if type(start) is not int or not 0 <= start < 9:
+    if type(start) is not int or not 0 <= start < WORLD_COUNT:
         raise ValueError("Invalid starting world")
-    if final is not None and (type(final) is not int or not 0 <= final < 9 or final == start):
+    if final is not None and (type(final) is not int or not 0 <= final < WORLD_COUNT or final == start):
         raise ValueError("Invalid goal world")
     goal = data.get('goal')
     if type(goal) is not int or not 0 <= goal <= 2:
@@ -37,7 +43,7 @@ def validate_slot(data):
     if type(required) is not int or not (1 <= required <= 50 if data['counter_mode'] else required == 0):
         raise ValueError("Invalid Barker requirement")
     total = data.get('total_barker_coins')
-    if type(total) is not int or total != (required * 3 + 1) // 2:
+    if type(total) is not int or not required <= total <= (required * 3 + 1) // 2:
         raise ValueError("Invalid Barker Coin pool size")
     if not isinstance(data.get('locations'), dict):
         raise ValueError("Missing MiniGolf location data")
@@ -59,25 +65,21 @@ class Runtime:
         self.journal = journal
         self.locations = {name: LOCATION_TABLE[name] for name in slot_data['locations']}
         self.lookup = {(d.kind, d.index): d.code for d in self.locations.values()}
-        self.previous_hole = None
-        self.previous_goal = None
-        self.result_context = None
-        self.previous_results = set()
         self.active_minigame = None
-        self.previous_manager_state = None
-        self.latched_hole = None
         self.pieces_projected = False
         self.shop_pieces_injected = False
         self.stable_non_minigame_polls = 0
+        self.menu_context = None
+        self.menu_since = None
+
+    def reset_currency_context(self):
+        self.menu_context = None
+        self.menu_since = None
+        self.journal.reset_confirmation()
 
     def reset_transient(self):
-        self.previous_hole = None
-        self.previous_goal = None
-        self.result_context = None
-        self.previous_results.clear()
+        self.reset_currency_context()
         self.active_minigame = None
-        self.previous_manager_state = None
-        self.latched_hole = None
         self.stable_non_minigame_polls = 0
 
     def unlocked(self, items):
@@ -117,13 +119,12 @@ class Runtime:
                     checks.add(self.lookup['par', hole])
         hole_def = memory.integer(snapshot.manager + 0x10C)
         derived_hole = self.derive_hole_id(memory, hole_def)
-        self.previous_manager_state = manager_state
         try:
-            active_gameplay = self.read_transient(memory, snapshot, checks, derived_hole, hole_def, manager_state)
+            self.read_transient(memory, snapshot, checks, derived_hole, hole_def, manager_state)
         except MemoryUnavailable:
             # A single failed MEM2 live-object read must not block persistent
             # roots, locations, locks, or receive-once item processing.
-            active_gameplay = True
+            pass
         if (history_ready and self.slot['goal_world_access'] == 1
                 and coins >= self.slot['required_coins']):
             requirement = next((d.code for d in self.locations.values() if d.kind == 'barker_requirement'), None)
@@ -131,11 +132,18 @@ class Runtime:
                 checks.add(requirement)
         self.journal.add_checks(checks)
         memory.confirm(snapshot)
-        locks = bytes(0 if i in unlocked else 1 for i in range(9))
-        for player_root in snapshot.roots:
+        locks = bytes(0 if i in unlocked else 1 for i in range(WORLD_COUNT))
+        for player_root in (snapshot.root,):
             if memory.read(player_root + ROOT_LOCKS, 9) != locks:
                 memory.write(player_root + ROOT_LOCKS, locks)
                 memory.put(player_root + ROOT_SUB + 0xA1, 1)
+        menu_context = ((snapshot.manager, root, manager_state)
+                        if snapshot.session is None and manager_state == MANAGER_STATE_MENU else None)
+        if menu_context != self.menu_context or menu_context is None:
+            self.menu_context = menu_context
+            self.menu_since = monotonic() if menu_context else None
+            self.journal.reset_confirmation()
+        stable_menu = self.menu_since is not None and monotonic() - self.menu_since >= CURRENCY_SETTLE_SECONDS
         if history_ready:
             for index in range(cursor, len(items)):
                 memory.confirm(snapshot)
@@ -143,23 +151,25 @@ class Runtime:
                 if name is None:
                     raise ValueError(f"Unknown received MiniGolf item ID: {items[index]}")
                 if name in COIN_BUNDLE_DATA:
-                    if snapshot.session is not None:
+                    if not stable_menu:
                         break
                     world, amount = COIN_BUNDLE_DATA[name]
                     self.apply_currency(memory, sub, index, name, 0x58 + 2*world, amount, 2)
                 elif name in COIN_TRAP_DATA:
-                    if snapshot.session is not None:
+                    if not stable_menu:
                         break
                     world, amount = COIN_TRAP_DATA[name]
                     self.apply_currency(memory, sub, index, name, 0x58 + 2*world, -amount, 2)
                 elif name == BARKER_COIN and not self.slot['counter_mode']:
-                    if snapshot.session is not None:
+                    if not stable_menu:
                         break
                     self.apply_currency(memory, sub, index, name, 0x85, 1, 1)
                 else:
                     self.journal.advance(index)
+                if self.journal.data["pending"] is not None:
+                    break
         if (history_ready and self.slot['counter_mode']
-                and snapshot.session is None
+                and stable_menu
                 and memory.integer(sub + 0x85, 1) != min(coins, 255)):
             memory.put(sub + 0x85, min(coins, 255))
             memory.put(sub + 0xA1, 1)
@@ -170,17 +180,17 @@ class Runtime:
             known_checks = set(checked_locations) | set(self.journal.data['checks']) | checks
             # Menu/select screens display actual Par accomplishments. Gameplay
             # gets no AP inventory projection at all.
-            pieces = (bytes(int(self.lookup['par', hole] in known_checks) for hole in range(27))
-                      if manager_state == 2 else bytes(27))
+            pieces = (bytes(int(self.lookup['par', hole] in known_checks) for hole in range(HOLE_COUNT))
+                      if manager_state == MANAGER_STATE_MENU else bytes(HOLE_COUNT))
             if memory.read(sub + 0x86, 27) != pieces:
                 memory.write(sub + 0x86, pieces)
-                memory.put(sub + 0xA1, 1)
-            self.pieces_projected = False
+                if manager_state != MANAGER_STATE_MENU and not projected_on_previous_poll and any(persistent[0x86:0xA1]):
+                    memory.put(sub + 0xA1, 1)
+            self.pieces_projected = any(pieces)
         elif history_ready and not self.shop_pieces_injected:
             pieces = bytes(int(piece < min(3, received_names.count(name)))
                            for name in PAR_CLUB_PIECES for piece in range(3))
             memory.write(sub + 0x86, pieces)
-            memory.put(sub + 0xA1, 1)
             self.shop_pieces_injected = True
             self.pieces_projected = any(pieces)
         return set(self.journal.data['checks']) & {d.code for d in self.locations.values()}
@@ -194,39 +204,31 @@ class Runtime:
         if not verified:
             raise MemoryUnavailable(f"Currency verification failed at 0x{address:08X}")
 
-    @staticmethod
-    def is_shop_context(memory, snapshot, active_gameplay):
-        """Independent Pro Shop dumps identify manager state 3 as the shop."""
-        return memory.integer(snapshot.manager + 0xBC) == SHOP_MANAGER_STATE
-
     def clear_piece_projection(self, memory, local_player=0):
         if not self.pieces_projected or not memory.verify_game():
             return
         snapshot = memory.resolve(local_player)
-        memory.write(snapshot.root + ROOT_SUB + 0x86, bytes(27))
-        memory.put(snapshot.root + ROOT_SUB + 0xA1, 1)
+        memory.write(snapshot.root + ROOT_SUB + 0x86, bytes(HOLE_COUNT))
         self.pieces_projected = False
         self.shop_pieces_injected = False
 
-    @staticmethod
-    def valid_hole_definition(memory, address):
-        if not valid_pointer(address, 0x10):
-            return False
-        return (all(valid_pointer(memory.integer(address + offset), 4) for offset in (0, 4, 8))
-                and 1 <= memory.integer(address + 0x0C) <= 20)
-
     @classmethod
     def derive_hole_id(cls, memory, current):
+        # One bounded MEM1 read replaces up to 108 cross-process reads. The
+        # course field is deliberately not trusted without a verified table base.
+        if not valid_pointer(current, 16) or current >= 0x81800000:
+            return None
+        start = current - min(HOLE_COUNT - 1, (current - 0x80004000) // 16) * 16
         try:
-            if not cls.valid_hole_definition(memory, current):
-                return None
-            index = 0
-            while index < 26 and cls.valid_hole_definition(memory, current - 0x10):
-                current -= 0x10
-                index += 1
-            return index
+            records = list(struct.iter_unpack('>IIII', memory.read(start, current - start + 16)))
         except MemoryUnavailable:
             return None
+        index = -1
+        for record in reversed(records):
+            if not all(valid_pointer(value) for value in record[:3]) or not 1 <= record[3] <= 20:
+                break
+            index += 1
+        return index if index >= 0 else None
 
     def add_hole_completion(self, memory, root, hole_def, hole, checks):
         strokes = memory.integer(root + 0x2DC)
@@ -238,79 +240,57 @@ class Runtime:
             checks.add(self.lookup['hio', hole])
 
     def read_transient(self, memory, snapshot, checks, derived_hole, hole_def, manager_state):
-        session = snapshot.session
-        if manager_state == 7 and derived_hole is not None:
-            fallback = derived_hole // 3
-            if self.active_minigame != fallback:
-                self.active_minigame = fallback
-                self.result_context = None
-                self.previous_results.clear()
-            self.stable_non_minigame_polls = 0
-        if session is None:
-            # Loading and temporary live-object loss are normal. Only a stable
-            # menu context retires a minigame latch.
-            if manager_state in (2, 3):
-                self.stable_non_minigame_polls += 1
-                if self.stable_non_minigame_polls >= 3:
-                    self.active_minigame = None
-                    self.result_context = None
-                    self.previous_results.clear()
-            return False
-        controller = memory.integer(session + 0xFC)
-        vtable = memory.integer(controller + 0x1C) if valid_pointer(controller, 0x134) else None
-        minigame = VTABLE_TO_MINIGAME.get(vtable)
+        minigame = None
+        if snapshot.session is not None:
+            try:
+                controller = memory.integer(snapshot.session + 0xFC)
+                if valid_pointer(controller, 0x20):
+                    minigame = VTABLE_TO_MINIGAME.get(memory.integer(controller + 0x1C))
+            except MemoryUnavailable:
+                pass  # Normal hole detection is independent of controller reads.
+        if minigame is None and manager_state == MANAGER_STATE_MINIGAME and derived_hole is not None and derived_hole % 3 == 0:
+            minigame = derived_hole // 3
         if minigame is not None:
+            self.active_minigame = minigame
             self.stable_non_minigame_polls = 0
-            self.previous_hole = self.previous_goal = None
-            if self.active_minigame != minigame:
-                self.active_minigame = minigame
-                self.result_context = None
-                self.previous_results.clear()
         if self.active_minigame is not None:
-            context = (snapshot.root, self.active_minigame)
-            array = memory.integer(snapshot.manager + 0x100)
-            count = memory.integer(snapshot.manager + 0x104)
-            if count > 4096 or not valid_pointer(array, max(4, count * 4)):
-                self.result_context = None
-                self.previous_results.clear()
-                return True
-            results = {}
-            for index in range(count):
-                obj = memory.integer(array + index*4)
-                if valid_pointer(obj, 0xC2) and memory.integer(obj + 0x1C) == RESULT_VTABLE:
-                    results[obj] = memory.read(obj + 0xC0, 2)
-            for flags in results.values():
-                if flags[1] == 1 and ('win', self.active_minigame) in self.lookup:
-                    checks.add(self.lookup['win', self.active_minigame])
-                if flags[0] == 1 and ('perfect', self.active_minigame) in self.lookup:
-                    checks.add(self.lookup['perfect', self.active_minigame])
-            self.previous_results = {obj for obj, flags in results.items() if flags[1] == 1}
-            self.result_context = context
-            if minigame is not None or results or manager_state == 7:
-                return True
-            if manager_state in (2, 3):
-                self.stable_non_minigame_polls += 1
-                if self.stable_non_minigame_polls < 3:
-                    return True
-            self.active_minigame = None
-            self.result_context = None
-            self.previous_results.clear()
-        self.result_context = None
-        self.previous_results.clear()
+            # Normal gameplay state 5 is a new context; state 6 can be the gap
+            # between controller destruction and the late result popup.
+            if minigame is None and manager_state == MANAGER_STATE_GAMEPLAY and derived_hole is not None:
+                self.active_minigame = None
+            else:
+                results = []
+                try:
+                    array = memory.integer(snapshot.manager + 0x100)
+                    count = memory.integer(snapshot.manager + 0x104)
+                    if 0 < count <= 4096 and valid_pointer(array, count * 4):
+                        pointers = struct.iter_unpack('>I', memory.read(array, count * 4))
+                        for (obj,) in pointers:
+                            try:
+                                if valid_pointer(obj, 0xC2) and memory.integer(obj + 0x1C) == RESULT_VTABLE:
+                                    results.append(memory.read(obj + 0xC0, 2))
+                            except MemoryUnavailable:
+                                continue
+                except MemoryUnavailable:
+                    pass
+                for perfect, win in results:
+                    if win == 1 and ('win', self.active_minigame) in self.lookup:
+                        checks.add(self.lookup['win', self.active_minigame])
+                    if perfect == 1 and ('perfect', self.active_minigame) in self.lookup:
+                        checks.add(self.lookup['perfect', self.active_minigame])
+                if minigame is None and manager_state in (MANAGER_STATE_MENU, SHOP_MANAGER_STATE):
+                    self.stable_non_minigame_polls += 1
+                    if self.stable_non_minigame_polls >= MINIGAME_MENU_POLLS:
+                        self.active_minigame = None
+                else:
+                    self.stable_non_minigame_polls = 0
+                return
+        if snapshot.session is None or manager_state == MANAGER_STATE_MINIGAME:
+            return
         hole_state = memory.integer(snapshot.root + 0x19C)
-        pointers_valid = (valid_pointer(hole_state, 0x128) and valid_pointer(hole_def, 0x10)
-                          and valid_pointer(controller, 0x20))
-        goal = memory.integer(hole_state + 0x127, 1) if pointers_valid else None
-        hole = derived_hole
-        current_valid = pointers_valid and hole is not None
-        context = (snapshot.root, hole_state, hole, controller) if current_valid else None
-        if current_valid and goal == 1:
-            self.add_hole_completion(memory, snapshot.root, hole_def, hole, checks)
-        if not current_valid:
-            self.previous_hole = self.previous_goal = None
-            return False
-        self.previous_hole, self.previous_goal = context, goal
-        return True
+        if (derived_hole is not None and valid_pointer(hole_state, 0x128)
+                and valid_pointer(hole_def, 0x10) and memory.integer(hole_state + 0x127, 1) == 1):
+            self.add_hole_completion(memory, snapshot.root, hole_def, derived_hole, checks)
 
     def debug_state(self, memory, local_player=0):
         snapshot = memory.resolve(local_player)
@@ -368,5 +348,5 @@ class Runtime:
                 return False
             holes = range(final*3, final*3+3)
         else:
-            return all(self.lookup['complete', i] in checks for i in range(27))
+            return all(self.lookup['complete', i] in checks for i in range(HOLE_COUNT))
         return all(self.lookup['par', i] in checks for i in holes)

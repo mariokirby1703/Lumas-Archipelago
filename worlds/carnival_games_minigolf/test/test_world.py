@@ -59,7 +59,7 @@ class TestWorldData(unittest.TestCase):
         self.assertGreater(samples[50] + samples[100], 4500)
 
     def test_traps_are_classified_and_weighted(self):
-        world = generate({'goal': 1}, seed=20260915).worlds[1]
+        world = generate({'goal': 1, 'trap_weight': 10}, seed=20260915).worlds[1]
         samples = Counter()
         traps = 0
         for _ in range(20000):
@@ -198,3 +198,18 @@ class TestWorldData(unittest.TestCase):
             mw.worlds[1].generate_output(tmp)
             data = json.loads(next(Path(tmp).glob('*.apcgm')).read_text())
             self.assertEqual(data['slot_data'], mw.worlds[1].fill_slot_data())
+
+    def test_surplus_barker_coins_are_useful_and_fit_small_pool(self):
+        from BaseClasses import ItemClassification
+        from ..client.runtime import validate_slot
+        options = dict(goal=2, barker_coins_required=40, minigame_checks=0,
+                       barker_coin_checks=0, world_secrets=0, shop_checks=0,
+                       barker_shop_checks=0, hole_in_one_checks=0)
+        mw = generate(options, fill=True)
+        world = mw.worlds[1]
+        coins = [location.item for location in mw.get_filled_locations() if location.item.name == BARKER_COIN]
+        self.assertEqual(sum(item.classification == ItemClassification.progression for item in coins), 40)
+        self.assertEqual(sum(item.classification == ItemClassification.useful for item in coins), 6)
+        self.assertEqual(len(mw.get_filled_locations()), 54)
+        self.assertTrue(mw.can_beat_game())
+        validate_slot(world.fill_slot_data())

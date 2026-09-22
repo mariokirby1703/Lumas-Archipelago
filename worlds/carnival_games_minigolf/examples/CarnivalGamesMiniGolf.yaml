@@ -9,7 +9,7 @@ Carnival Games MiniGolf:
   goal_world: random
   goal_world_access: world_unlock_item
   barker_coins_required: 27
-  trap_weight: 10
+  trap_weight: 0
   minigame_checks: win_checks
   hole_in_one_checks: false
   barker_coin_checks: true

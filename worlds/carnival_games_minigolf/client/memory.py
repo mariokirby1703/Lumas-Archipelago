@@ -72,7 +72,8 @@ class Memory:
         return Snapshot(manager, roots, selected_root, session, selected_player, local_player)
 
     def confirm(self, snapshot):
-        if self.resolve(snapshot.requested_player) != snapshot:
+        current = self.resolve(snapshot.requested_player)
+        if (current.manager, current.root, current.session) != (snapshot.manager, snapshot.root, snapshot.session):
             raise MemoryUnavailable("Player context changed during poll")
 
 

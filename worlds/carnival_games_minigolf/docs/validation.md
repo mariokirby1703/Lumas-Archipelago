@@ -1,29 +1,59 @@
-# Validation record — 2026-09-14
+# Validation record ? 2026-09-20
 
-- 76 tests and 1093 subtests passed across the world/client tests and relevant AP general tests before
-  the final packaged integration test.
-- All 63 world/denomination combinations deliver the correct currency amount. A deterministic 10,000-roll
-  sample verifies the requested frequency ordering, with 50/100-coin bundles making up the majority.
-- All 36 world/trap combinations deduct the correct 5/10/20/50 coins, clamp at zero, and survive reconnects
-  without a second deduction. Deterministic samples verify the configurable trap rate and 4/3/2/1 weighting.
-- Every starting world tested with All Holes, Barker Hunt, and both Goal World access modes.
-- 30 additional randomized option configurations, including six two-slot multiworlds, filled and beatable.
-- Default YAML generated successfully through the normal `Generate.py` path: 179 locations/items,
-  multidata, spoiler and `.apcgm` in the resulting ZIP.
-- Real local AP server/client handshake tested, including an empty initial inventory. Simulated game RAM
-  supplies all default checks; every received item arrives and the server accepts goal completion.
-- Receipt journal reopened after full item delivery; coin balances did not change on replay.
-- APWorld manifest accepted by `APWorldContainer`; client and launcher registration imported directly
-  from the archive with the source world excluded.
-- User-provided European DOL matched the master-notes SHA-256; four code-region hashes guard runtime writes.
-- Installed `ArchipelagoGenerate.exe` 0.6.7 (frozen Python 3.13.11) successfully generated the default
-  seed using the installed APWorld. Its output also passed the real-server protocol smoke test.
-- Installed launcher dispatched both client help and a headless startup; the client initialized and
-  reached `Waiting for Dolphin`, then exited through the standard `/exit` command.
-- A separate five-Barker Goal World seed completed a real server/client protocol run. The threshold
-  location was checked, Goal World Access was received from the server, Barker Shop locations were absent,
-  and victory occurred only after the three Goal World Par checks.
+Version 0.3.14, local working-tree validation. This record does not claim a GitHub Actions run or live playthrough.
 
-The RAM tests use a memory substitute, not a live Dolphin playthrough. Outstanding live QA includes
-all minigames, multiplayer selection, real save/load timing, and normal-coin replay economy. Setup
-documentation distinguishes these outstanding checks from the automated results above.
+## Automated results
+
+- **110 tests and 846 subtests passed**, with the two existing environment warnings (optional `_speedups`
+  extension unavailable; source Python 3.11.9 version warning).
+- Test selection: `worlds/carnival_games_minigolf/test` and AP general `test_groups`, `test_options`,
+  `test_ids`, `test_items`, `test_locations`, `test_names`, `test_world_manifest`.
+- Covers all bundle/trap denominations and worlds, all starting worlds/goals, 30 randomized option
+  configurations including six two-player AP multiworlds, fills and beatability. AP multiworld testing does
+  not mean local Dolphin multiplayer is supported.
+- Added regressions for a late popup after controller/session loss, unreadable objects before a valid popup,
+  consecutive menu latch retirement, Hole-A-only fallback, controller-independent Complete/Par/HIO,
+  delayed receipt commit, game writeback retry, loading with a null session, interrupted confirmation,
+  non-dirty UI projections, secondary roots, strict uninitialized-memory failures, small Barker pools,
+  canonical slot-data journal identity and safe rejection of legacy receipt journals.
+- Barker surplus is useful, and small pools cap surplus while retaining the required progression count.
+- Source `Generate.py` completed the default example (179 checks/items) and Barker Goal World fixture
+  (182 total checks/items, including the locked threshold check). Both archives passed real loopback
+  AP server/client handshake, all checks/items, accepted goal, fully drained receipt journal and reconnect.
+- Deterministic APWorld build completed; manifest, archive imports, bundled client initialization and
+  launcher registration passed the package smoke script with the source world excluded.
+- Installed to `C:/ProgramData/Archipelago/custom_worlds` with an automatic backup of the previous archive.
+  Installed `ArchipelagoGenerate.exe` 0.6.7 successfully generated the default example; that archive also
+  passed the real-server protocol smoke test (179 checks/items).
+- `git diff --check` passed.
+
+Commands (PowerShell, repository root):
+
+```powershell
+$env:AP_TEST_WORLDS='carnival_games_minigolf'
+$env:SKIP_REQUIREMENTS_UPDATE='1'
+.venv/Scripts/python.exe -m pytest worlds/carnival_games_minigolf/test test/general/test_groups.py test/general/test_options.py test/general/test_ids.py test/general/test_items.py test/general/test_locations.py test/general/test_names.py test/general/test_world_manifest.py -q
+.venv/Scripts/python.exe Generate.py --player_files_path worlds/carnival_games_minigolf/examples --outputpath build/carnival-games-minigolf/v0314-generation --seed 20260920 --spoiler 1
+.venv/Scripts/python.exe Generate.py --player_files_path worlds/carnival_games_minigolf/test/fixtures --outputpath build/carnival-games-minigolf/v0314-barker-generation --seed 20260920 --spoiler 1
+.venv/Scripts/python.exe -m worlds.carnival_games_minigolf.test.protocol_smoke build/carnival-games-minigolf/v0314-generation/AP_57696350233222392309.zip
+.venv/Scripts/python.exe -m worlds.carnival_games_minigolf.test.protocol_smoke build/carnival-games-minigolf/v0314-barker-generation/AP_57696350233222392309.zip
+.venv/Scripts/python.exe worlds/carnival_games_minigolf/build_apworld.py
+```
+
+Local logs are under `build/minigolf-*.log`. Packaged output is
+`build/apworlds/carnival_games_minigolf.apworld`; generated seed archives are in the directories above.
+
+## Limits and outstanding evidence
+
+All RAM tests use synthetic memory. No Dolphin process was running, and the previous live dumps exist
+only in a separate ChatGPT conversation, not in this workspace. No capture-derived fixture or new live
+confirmation is claimed. The optional strict fake rejects missing initialized bytes; it does not make
+synthetic fixtures evidence of actual game layout.
+
+State 3 remains a provisional Pro Shop detector. Spider completion via the standard results popup is
+unconfirmed. Five main minigames still lack the earlier reported live confirmation. The 500-coin grant,
+real save/reload persistence and possible game-initiated saving of temporary piece projections require
+live testing. Avoiding the dirty flag is not a guarantee against those saves.
+
+Only single-player/local golfer 1 is supported. A public release is pending the evidence listed in
+[release_checklist.md](release_checklist.md). Historical master notes are explicitly non-authoritative.

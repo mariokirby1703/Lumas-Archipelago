@@ -37,5 +37,9 @@ Runtime addresses live in `client/constants.py` and `client/runtime.py`; generat
 Item and location IDs are stable across options. Coin Bundles contain 5, 10, 20, 50, 100, 200 or 500 coins;
 50 and 100 are most common. The relative weights are isolated in `Items.py`.
 `Trap Weight` controls what percentage of filler rolls become world-specific -5/-10/-20/-50 Coin Traps;
-larger losses are rarer.
+larger losses are rarer. Traps default to off (weight 0).
 Unsupported revisions fail verification before any memory write.
+
+Single-player / golfer 1 only. Shop identity and Spider completion remain experimental; see
+[release checklist](docs/release_checklist.md). Version 0.3.14 changes journal identity and will not silently
+replay an existing legacy seed journal.

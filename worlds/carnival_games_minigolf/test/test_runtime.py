@@ -14,11 +14,14 @@ from .test_world import generate
 
 
 class FakeDolphin:
-    def __init__(self):
+    def __init__(self, strict=False):
+        self.strict = strict
         self.ram = {}
         self.writes = []
 
     def read_bytes(self, address, size):
+        if self.strict and any(address+i not in self.ram for i in range(size)):
+            raise MemoryUnavailable(f"Uninitialized fixture memory at {address:#x}")
         return bytes(self.ram.get(address+i, 0) for i in range(size))
 
     def write_bytes(self, address, data):
@@ -31,6 +34,11 @@ class TestRuntime(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.path = Path(self.tmp.name) / 'journal.json'
+        self.now = 0.0
+        for module in ('runtime', 'journal'):
+            clock = patch(f'worlds.carnival_games_minigolf.client.{module}.monotonic', side_effect=lambda: self.now)
+            clock.start()
+            self.addCleanup(clock.stop)
         self.backend = FakeDolphin()
         self.memory = Memory(self.backend)
         self.manager, self.root, self.session = 0x805F5400, 0x8094E72C, 0x80900000
@@ -52,7 +60,12 @@ class TestRuntime(unittest.TestCase):
         self.addCleanup(verify.stop)
 
     def poll(self, items=()):
-        return self.runtime.poll(self.memory, items)
+        checks = set()
+        # Convenience for receipt tests: simulate multiple distinct menu polls.
+        for _ in range(2 * len(items) + 3):
+            checks |= self.runtime.poll(self.memory, items)
+            self.now += 0.4
+        return checks
 
     def enter_menu(self, state=2):
         self.memory.put(self.manager+0x114, 0, 4)
@@ -135,12 +148,10 @@ class TestRuntime(unittest.TestCase):
         self.assertIn(self.runtime.lookup['shop', 48], checks)
         expected_locks = bytes(0 if i == self.slot['starting_world'] else 1 for i in range(9))
         self.assertEqual(self.memory.read(self.root+0x2CC, 9), expected_locks)
-        self.assertIsNone(self.runtime.previous_hole)
 
-    def test_failed_live_read_preserves_existing_hole_edge_state(self):
+    def test_failed_live_read_does_not_lose_later_completion(self):
         self.memory.put(self.hole_state+0x127, 0)
         self.poll()
-        previous = self.runtime.previous_hole
         original_read = self.backend.read_bytes
 
         def fail_once(address, size):
@@ -151,7 +162,6 @@ class TestRuntime(unittest.TestCase):
 
         self.backend.read_bytes = fail_once
         self.poll()
-        self.assertEqual(self.runtime.previous_hole, previous)
         self.memory.put(self.hole_state+0x127, 1)
         self.assertIn(self.runtime.lookup['complete', 0], self.poll())
 
@@ -251,7 +261,7 @@ class TestRuntime(unittest.TestCase):
         self.poll(items)
         self.assertEqual(self.memory.integer(self.sub+0x58, 2), 50)
 
-    def test_locks_all_local_players_and_vanilla_reassertion(self):
+    def test_locks_selected_player_only_and_vanilla_reassertion(self):
         second = 0x80950000
         self.memory.put(self.manager+0x12C, 2, 4)
         self.memory.put(self.manager+0x194, second, 4)
@@ -259,11 +269,12 @@ class TestRuntime(unittest.TestCase):
             self.memory.write(root+0x2CC, bytes(9))
         self.poll([ITEM_TABLE[UNLOCKS[4]]])
         expected = bytes([0, 1, 1, 1, 0, 1, 1, 1, 1])
-        for root in (self.root, second):
-            self.assertEqual(self.memory.read(root+0x2CC, 9), expected)
-        self.memory.put(second+0x2CD, 0)
+        self.assertEqual(self.memory.read(self.root+0x2CC, 9), expected)
+        self.assertEqual(self.memory.read(second+0x2CC, 9), bytes(9))
+        self.memory.put(self.root+0x2CD, 0)
         self.poll([ITEM_TABLE[UNLOCKS[4]]])
-        self.assertEqual(self.memory.read(second+0x2CC, 9), expected)
+        self.assertEqual(self.memory.read(self.root+0x2CC, 9), expected)
+        self.assertEqual(self.memory.read(second+0x2CC, 9), bytes(9))
 
     def test_persistent_prizes_and_outside_shop_par_reconcile(self):
         self.memory.put(self.sub+80, 2)
@@ -427,7 +438,7 @@ class TestRuntime(unittest.TestCase):
         self.assertIn(self.runtime.lookup['perfect', 0], checks)
 
     def test_manager_state_seven_latches_minigame_without_controller(self):
-        self.set_hole(17)
+        self.set_hole(15)
         self.memory.put(self.manager+0xBC, 7, 4)
         self.memory.put(self.controller+0x1C, 0x80400000, 4)
         self.poll()
@@ -574,3 +585,134 @@ class TestRuntime(unittest.TestCase):
         self.assertIn(self.runtime.lookup['complete', 0], checks)
         self.assertEqual(self.memory.read(self.sub+0x86, 27), bytes(27))
 
+
+    def test_late_popup_after_controller_and_session_loss(self):
+        self.memory.put(self.controller+0x1C, MINIGAMES[1]['vtable'], 4)
+        self.runtime.poll(self.memory, [])
+        self.memory.put(self.manager+0xBC, 6, 4)
+        self.memory.put(self.manager+0x114, 0, 4)
+        for _ in range(4):
+            self.runtime.poll(self.memory, [])
+            self.assertEqual(self.runtime.active_minigame, 1)
+        array, broken, popup = 0x80960000, 0x80961000, 0x80970000
+        self.memory.put(self.manager+0x100, array, 4)
+        self.memory.put(self.manager+0x104, 2, 4)
+        self.memory.write(array, broken.to_bytes(4, 'big') + popup.to_bytes(4, 'big'))
+        self.memory.put(popup+0x1C, RESULT_VTABLE, 4)
+        self.memory.write(popup+0xC0, bytes([1, 1]))
+        read = self.backend.read_bytes
+        def transient_failure(address, size):
+            if address == broken+0x1C:
+                raise MemoryUnavailable('stale object')
+            return read(address, size)
+        self.backend.read_bytes = transient_failure
+        checks = self.runtime.poll(self.memory, [])
+        self.assertIn(self.runtime.lookup['win', 1], checks)
+        self.assertIn(self.runtime.lookup['perfect', 1], checks)
+
+    def test_menu_latch_requires_consecutive_polls(self):
+        self.runtime.active_minigame = 1
+        self.enter_menu()
+        for _ in range(4):
+            self.runtime.poll(self.memory, [])
+        self.assertEqual(self.runtime.active_minigame, 1)
+        self.memory.put(self.manager+0xBC, 6, 4)
+        self.runtime.poll(self.memory, [])
+        self.enter_menu()
+        for _ in range(4):
+            self.runtime.poll(self.memory, [])
+        self.assertEqual(self.runtime.active_minigame, 1)
+        self.runtime.poll(self.memory, [])
+        self.assertIsNone(self.runtime.active_minigame)
+
+    def test_state_seven_does_not_infer_main_minigame_from_b_or_c(self):
+        for hole in (4, 5, 16, 17):
+            self.set_hole(hole)
+            self.memory.put(self.manager+0xBC, 7, 4)
+            self.runtime.poll(self.memory, [])
+            self.assertIsNone(self.runtime.active_minigame)
+
+    def test_controller_failure_does_not_block_hole_checks(self):
+        self.memory.put(self.root+0x2DC, 1, 4)
+        self.set_hole(2)
+        self.memory.put(self.hole_state+0x127, 1)
+        read = self.backend.read_bytes
+        def failed_controller(address, size):
+            if address == self.session+0xFC:
+                raise MemoryUnavailable('controller missing')
+            return read(address, size)
+        self.backend.read_bytes = failed_controller
+        checks = self.runtime.poll(self.memory, [])
+        for kind in ('complete', 'par', 'hio'):
+            self.assertIn(self.runtime.lookup[kind, 2], checks)
+
+    def test_currency_delayed_confirmation_retries_game_writeback(self):
+        items = [ITEM_TABLE[coin_bundle_name(0, 500)]]
+        self.enter_menu()
+        self.runtime.poll(self.memory, items)
+        self.assertIsNone(self.runtime.journal.data['pending'])
+        self.now += 0.4
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.memory.integer(self.sub+0x58, 2), 500)
+        self.assertEqual(self.runtime.journal.data['cursor'], 0)
+        self.memory.put(self.sub+0x58, 0, 2)  # game overwrites the initial grant
+        self.now += 0.4
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.memory.integer(self.sub+0x58, 2), 500)
+        self.assertEqual(self.runtime.journal.data['cursor'], 0)
+        self.now += 0.1
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.runtime.journal.data['cursor'], 0)
+        self.now += 0.3
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.runtime.journal.data['cursor'], 1)
+
+    def test_null_session_loading_does_not_grant_currency(self):
+        self.enter_menu(6)
+        self.poll([ITEM_TABLE[coin_bundle_name(0, 500)]])
+        self.assertEqual(self.memory.integer(self.sub+0x58, 2), 0)
+        self.assertEqual(self.runtime.journal.data['cursor'], 0)
+
+    def test_projection_writes_do_not_mark_save_dirty(self):
+        self.enter_menu()
+        self.runtime.poll(self.memory, [])  # synchronize locks first
+        self.memory.put(self.sub+0xA1, 0)
+        self.runtime.poll(self.memory, [], checked_locations={self.runtime.lookup['par', 1]})
+        self.assertEqual(self.memory.integer(self.sub+0xA1, 1), 0)
+        self.enter_menu(3)
+        self.runtime.poll(self.memory, [ITEM_TABLE[PAR_CLUB_PIECES[0]]])
+        self.assertEqual(self.memory.integer(self.sub+0xA1, 1), 0)
+        self.runtime.clear_piece_projection(self.memory)
+        self.assertEqual(self.memory.integer(self.sub+0xA1, 1), 0)
+
+    def test_secondary_root_change_does_not_invalidate_snapshot(self):
+        snapshot = self.memory.resolve()
+        self.memory.put(self.manager+0x194, 0x80950000, 4)
+        self.memory.confirm(snapshot)
+
+    def test_strict_fake_rejects_uninitialized_memory(self):
+        backend = FakeDolphin(strict=True)
+        memory = Memory(backend)
+        with self.assertRaises(MemoryUnavailable):
+            memory.read(0x80900000, 4)
+        backend.write_bytes(0x80900000, bytes([0, 0, 0, 7]))
+        self.assertEqual(memory.integer(0x80900000), 7)
+        with self.assertRaises(MemoryUnavailable):
+            memory.read(0x80900000, 5)
+
+    def test_currency_context_interruption_restarts_confirmation(self):
+        items = [ITEM_TABLE[coin_bundle_name(0, 500)]]
+        self.enter_menu()
+        self.runtime.poll(self.memory, items)
+        self.now += 0.4
+        self.runtime.poll(self.memory, items)
+        self.runtime.reset_currency_context()
+        self.now += 10
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.runtime.journal.data['cursor'], 0)
+        self.now += 0.4
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.runtime.journal.data['cursor'], 0)
+        self.now += 0.4
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.runtime.journal.data['cursor'], 1)

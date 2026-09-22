@@ -90,6 +90,8 @@ class MiniGolfContext(CommonContext):
     command_processor = MiniGolfCommands
 
     def __init__(self, address=None, password=None, patch_file=None, local_player=0):
+        if local_player != 0:
+            raise ValueError("Only single-player / local golfer 1 is supported")
         super().__init__(address, password)
         self.local_player = local_player
         self.runtime = None
@@ -157,10 +159,18 @@ class MiniGolfContext(CommonContext):
                 validate_slot(data)
                 if self.expected_seed and self.expected_seed != data['seed_name']:
                     raise ValueError("Server seed differs from the loaded .apcgm file")
-                identity = json.dumps([data['schema_version'], data['seed_name'], self.team, self.slot,
-                                       self.local_player])
+                identity = json.dumps([data, self.team, self.slot, self.local_player],
+                                      sort_keys=True, separators=(',', ':'))
                 key = hashlib.sha256(identity.encode()).hexdigest()
                 path = Path(Utils.user_path('carnival_games_minigolf', key + '.json'))
+                legacy_identity = json.dumps([data['schema_version'], data['seed_name'], self.team,
+                                              self.slot, self.local_player])
+                legacy_key = hashlib.sha256(legacy_identity.encode()).hexdigest()
+                legacy_path = Path(Utils.user_path('carnival_games_minigolf', legacy_key + '.json'))
+                if not path.exists() and legacy_path.exists():
+                    raise ValueError("A legacy receipt journal exists for this seed. Finish it with the previous "
+                                     "client, or generate a new seed with a dedicated game profile; automatic "
+                                     "migration cannot verify the old slot configuration.")
                 self.acquire_journal(path)
                 self.runtime = Runtime(data, Journal(path))
                 self.locations_checked = set(self.runtime.journal.data['checks'])
@@ -240,7 +250,7 @@ async def dolphin_loop(ctx):
                     settled_context = None
                     raise MemoryUnavailable("Waiting for Carnival Games MiniGolf RG9P54, supported executable revision.")
                 snapshot = memory.resolve(ctx.local_player)
-                context = (snapshot.manager, snapshot.roots, id(ctx.runtime))
+                context = (snapshot.manager, snapshot.root, id(ctx.runtime))
                 if context != settled_context:
                     settled_context = context
                     settle_at = time.monotonic() + 2
@@ -265,6 +275,8 @@ async def dolphin_loop(ctx):
                 else:
                     ctx.dolphin_status = "Dolphin connected; game checks active; received item history loading."
             except MemoryUnavailable as error:
+                if ctx.runtime:
+                    ctx.runtime.reset_currency_context()
                 ctx.dolphin_status = str(error)
                 if ctx.dolphin_status == "Waiting for game player state.":
                     settled_context = None

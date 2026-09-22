@@ -10,7 +10,7 @@ def launch_client(*args):
 
     parser = get_base_parser(description="Carnival Games MiniGolf Archipelago Client")
     parser.add_argument('--name', help='Archipelago slot name')
-    parser.add_argument('--local-player', type=int, choices=range(1, 5), default=1,
+    parser.add_argument('--local-player', type=int, choices=(1,), default=1,
                         help='Local golfer whose checks and currency belong to this AP slot (default: 1)')
     parser.add_argument('url', nargs='?', help='Archipelago URI or .apcgm output file')
     parsed = parser.parse_args(args)

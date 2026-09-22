@@ -49,6 +49,7 @@ async def main():
                 fixture.memory.write(popup+0xC0, bytes([1, 1]))
                 fixture.memory.put(fixture.controller+0x44, fixture.root, 4)
                 for _ in range(30):
+                    fixture.memory.put(fixture.manager+0xBC, 5, 4)
                     fixture.memory.put(fixture.controller+0x1C, 0x80400000, 4)
                     fixture.memory.put(fixture.manager+0x104, 0, 4)
                     fixture.memory.put(fixture.root+0x2DC, 2, 4)
@@ -89,6 +90,13 @@ async def main():
                 await asyncio.sleep(.1)
                 assert server_ctx.client_game_state[0, 1] == ClientStatus.CLIENT_GOAL
                 ctx.runtime.poll(fixture.memory, [i.item for i in ctx.items_received])
+                fixture.enter_menu()
+                received = [i.item for i in ctx.items_received]
+                for _ in range(2 * len(received) + 5):
+                    ctx.runtime.poll(fixture.memory, received)
+                    fixture.now += 0.4
+                assert ctx.runtime.journal.data['cursor'] == len(received)
+                assert ctx.runtime.journal.data['pending'] is None
                 balance = fixture.memory.read(fixture.sub+0x58, 18)
                 # Recreate Connected/ReceivedItems, as on a server reconnect, from the saved journal.
                 ctx.on_package('Connected', {'slot_data': ctx.runtime.slot})

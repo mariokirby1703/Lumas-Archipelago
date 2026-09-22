@@ -20,7 +20,8 @@ def build(output):
     required = ('__init__.py', 'world.py', 'Options.py', 'Items.py', 'Locations.py', 'Regions.py',
                 'Rules.py', 'components.py', 'data.py', 'client/client.py', 'client/runtime.py',
                 'client/memory.py', 'client/constants.py', 'client/journal.py', 'client/launch.py',
-                'docs/setup_en.md', 'requirements.txt', 'archipelago.json')
+                'docs/setup_en.md', 'requirements.txt', 'archipelago.json', 'client/__init__.py',
+                'docs/en_Carnival Games MiniGolf.md', 'examples/CarnivalGamesMiniGolf.yaml')
     for name in required:
         if not (source / name).is_file():
             raise FileNotFoundError(name)
@@ -31,6 +32,8 @@ def build(output):
         for path in sorted(source.rglob('*')):
             relative = path.relative_to(source)
             if not path.is_file() or any(part in {'notes', 'test', '__pycache__', '.pytest_cache'} for part in relative.parts):
+                continue
+            if relative.as_posix() == 'build_apworld.py':
                 continue
             if path.suffix not in {'.py', '.md', '.json', '.txt', '.yaml', '.png', '.svg'}:
                 continue

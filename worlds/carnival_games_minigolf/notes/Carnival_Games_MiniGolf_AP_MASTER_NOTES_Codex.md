@@ -1,3 +1,11 @@
+# HISTORICAL REFERENCE ONLY
+
+**HISTORICAL, DO NOT USE AS CURRENT SPEC.**
+
+This original reverse-engineering handoff is not the authoritative specification.
+Use data.py, Options.py, Locations.py, Rules.py, client/runtime.py and docs/setup_en.md.
+Do not restore old behavior without checking current code and live RAM findings.
+
 # Carnival Games MiniGolf (Wii) — Archipelago MASTER NOTES FOR CODEX
 
 **Consolidated through:** 2026-09-11  
