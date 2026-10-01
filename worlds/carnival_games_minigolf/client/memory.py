@@ -30,14 +30,15 @@ class WindowsMEM2:
             kernel.ReadProcessMemory.restype = wintypes.BOOL
             kernel.VirtualQueryEx.restype = ctypes.c_size_t
         self.session = None
+        self.validation_session = None
         self.process = None
         self.base = None
         self.error = "not probed"
 
     def set_session(self, session):
-        if session != self.session:
-            self.close()
-            self.session = session
+        self.session = session
+        if session is not None:
+            self.validation_session = session
 
     def close(self):
         if self.process:
@@ -81,7 +82,7 @@ class WindowsMEM2:
         return buffer.raw
 
     def _valid_session(self, process, base):
-        offset = self.session - 0x90000000
+        offset = self.validation_session - 0x90000000
         if not 0 <= offset <= self.MEM2_SIZE - 0x2F4:
             return False
         player = int.from_bytes(self._read_process(process, base + offset + 0x2EC, 4), "big")
@@ -96,8 +97,8 @@ class WindowsMEM2:
         return 0x80004000 <= vtable < 0x81800000
 
     def _discover(self):
-        if os.name != "nt" or self.session is None:
-            raise OSError("Windows MEM2 fallback has no live session")
+        if os.name != "nt" or self.validation_session is None:
+            raise OSError("Windows MEM2 fallback has no validated session hint")
 
         class MEMORY_BASIC_INFORMATION(ctypes.Structure):
             _fields_ = [("BaseAddress", ctypes.c_void_p), ("AllocationBase", ctypes.c_void_p),
@@ -145,7 +146,8 @@ class WindowsMEM2:
         except OSError as error:
             self.error = str(error)
             self.close()
-            raise
+            self._discover()
+            return self._read_process(self.process, self.base + address - 0x90000000, size)
 
 
 def valid_pointer(address, size=4):

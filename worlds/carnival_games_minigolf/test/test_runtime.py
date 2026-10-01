@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from ..client.constants import MANAGER_PTR, RESULT_VTABLE, ROOT_SUB
 from ..client.journal import Journal
-from ..client.memory import Memory, MemoryUnavailable
+from ..client.memory import Memory, MemoryUnavailable, WindowsMEM2
 from ..client.runtime import Runtime
 from ..data import MINIGAMES
 from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, ITEM_TABLE, UNLOCKS,
@@ -153,6 +153,20 @@ class TestRuntime(unittest.TestCase):
         fallback.set_session(0x92C4EDF4)
         self.assertEqual(memory.integer(0x92C4F0E0), 0x12345678)
         self.assertEqual(fallback.asserted, (0x92C4F0E0, 4))
+
+    def test_mem2_mapping_survives_session_loss_for_late_result_popup(self):
+        fallback = WindowsMEM2.__new__(WindowsMEM2)
+        fallback.session = None
+        fallback.validation_session = None
+        fallback.process = 123
+        fallback.base = 0x100000000
+        fallback.error = None
+        fallback.set_session(0x92C4EDF4)
+        fallback.set_session(None)
+        self.assertIsNone(fallback.session)
+        self.assertEqual(fallback.validation_session, 0x92C4EDF4)
+        self.assertEqual(fallback.process, 123)
+        self.assertEqual(fallback.base, 0x100000000)
 
     def test_failed_mem2_live_read_keeps_persistent_sync_running(self):
         original_read = self.backend.read_bytes

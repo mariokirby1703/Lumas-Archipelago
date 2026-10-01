@@ -77,6 +77,8 @@ its backend exception, the live session/controller/result addresses, and Pro Sho
 test cannot validate Dolphin's real MEM2 mapping. Live validation must show readable values for `session+0x2EC`,
 `session+0x2F0`, `session+0xFC`, the controller VTable, the object-array entry, and result flags. On Windows, the client
 automatically locates and reads the matching Dolphin MEM2 mapping if the Python backend selected an unusable mapping.
+Once validated, that process mapping remains active when a gameplay session disappears, allowing late minigame result
+popups to be read. It is discarded and discovered again only after an actual process-memory read failure.
 
 Every world item is named `[World Name] Access` and opens that world. For example, Rah's Revenge is opened by
 `Rah's Revenge Access`, including when it is selected as the Goal World. When Barker Coins are selected for Goal
