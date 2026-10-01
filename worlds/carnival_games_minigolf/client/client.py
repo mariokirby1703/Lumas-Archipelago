@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import importlib.metadata
 import json
 import time
 from pathlib import Path
@@ -53,18 +54,26 @@ class MiniGolfCommands(ClientCommandProcessor):
             hole_name = f" ({HOLES[hole]})" if isinstance(hole, int) and 0 <= hole < 27 else ""
             minigame = state['minigame']
             minigame_name = MINIGAMES[minigame]['name'] if isinstance(minigame, int) else "none"
+            try:
+                dme_version = importlib.metadata.version("dolphin-memory-engine")
+            except importlib.metadata.PackageNotFoundError:
+                dme_version = "unknown"
             logger.info("Manager: %s | State: %s | Session: %s | Session player: %s | Root: %s | "
                         "Course: %s | Hole def: %s | Derived hole: %s%s | Strokes: %s | Par: %s | "
                         "Hole state: %s | In goal: %s | Controller: %s | VTable: %s | Minigame: %s | "
                         "Object array: %s | Result popup: %s | Win: %s | Perfect: %s | "
-                        "Spider state: %s | Spider objects: %s | Spider complete: %s",
+                        "Spider state: %s | Spider objects: %s | Spider complete: %s | "
+                        "DME version: %s | MEM1 probe: %s | MEM2 probe: %s | "
+                        "Shop visit: %s | Shop pieces injected: %s | Piece bytes: %s | Club ownership: %s",
                         address(state['manager']), state['manager_state'], address(state['session']),
                         state['session_player'], address(state['root']), state['course'], address(state['hole_def']),
                         hole, hole_name, state['strokes'], state['par'], address(state['hole_state']),
                         state['in_goal'], address(state['controller']), address(state['vtable']), minigame_name,
                         address(state['object_array']), address(state['result_popup']), state['win'], state['perfect'],
                         state['spider_state'], state['spider_objects'],
-                        "yes" if state['spider_complete'] else "no" if state['spider_complete'] is not None else "n/a")
+                        "yes" if state['spider_complete'] else "no" if state['spider_complete'] is not None else "n/a",
+                        dme_version, state['mem1_probe'], state['mem2_probe'], state['shop_visit_active'],
+                        state['shop_pieces_injected'], state['piece_bytes'], state['club_ownership'])
         except (ImportError, RuntimeError, OSError, MemoryUnavailable) as error:
             logger.info("Live MiniGolf debug state unavailable: %s", error)
 

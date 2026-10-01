@@ -173,7 +173,7 @@ class TestWorldData(unittest.TestCase):
         self.assertFalse(any("Purchase" in name for name in LOCATION_TABLE))
         self.assertIn("50 Amazeon Coins", COIN_BUNDLE_DATA)
         self.assertIn("-10 Fairytella Coins", COIN_TRAP_DATA)
-        for required, expected in ((1, 2), (5, 8), (27, 41), (41, 62)):
+        for required, expected in ((1, 2), (5, 8), (27, 41), (40, 60)):
             with self.subTest(required=required):
                 world = generate({'goal': 2, 'barker_coins_required': required}).worlds[1]
                 self.assertEqual(sum(item.name == BARKER_COIN for item in world.multiworld.itempool), expected)
@@ -188,7 +188,7 @@ class TestWorldData(unittest.TestCase):
             options['goal'] = rng.randrange(3)
             options['starting_world'] = rng.randrange(9)
             options['goal_world'] = (options['starting_world'] + rng.randrange(1, 9)) % 9
-            options['barker_coins_required'] = rng.randrange(1, 42)
+            options['barker_coins_required'] = rng.randrange(1, 41)
             options['trap_weight'] = rng.randrange(101)
             options['minigame_checks'] = rng.randrange(4)
             mw = generate(options, seed, players=2 if seed % 5 == 0 else 1, fill=True)
@@ -215,7 +215,7 @@ class TestWorldData(unittest.TestCase):
         validate_slot(world.fill_slot_data())
 
     def test_maximum_barker_requirement_fits_with_only_mandatory_checks(self):
-        minimal = dict(barker_coins_required=41, minigame_checks=0, hole_in_one_checks=0,
+        minimal = dict(barker_coins_required=40, minigame_checks=0, hole_in_one_checks=0,
                        barker_coin_checks=0, world_secrets=0, shop_checks=0, barker_shop_checks=0)
         hunt = generate({**minimal, 'goal': 2}, fill=True)
         self.assertEqual(len(hunt.get_locations()), 54)

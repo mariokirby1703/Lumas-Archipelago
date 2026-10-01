@@ -72,9 +72,9 @@ Par Club Piece locations and received Par Club Piece items are separate. The loc
 or better; the received items unlock that world's Pro Shop tiers. Barker counter goals use received Archipelago
 Barker Coins and automatically remove Barker Shop locations.
 
-The maximum requirement of 41 Barker Coins remains generatable with every optional check family disabled. In Goal
+The maximum requirement of 40 Barker Coins remains generatable with every optional check family disabled. In Goal
 World mode, the six Complete and Par Club Piece checks in the Goal World are behind its Access item, leaving exactly
-enough reachable mandatory checks for 41 Barker Coins and the other seven World Access items.
+enough reachable mandatory checks for 40 Barker Coins and the other seven World Access items.
 
 Normal coins can be earned repeatedly in any open world, so Coin Bundles are useful assistance rather than required
 progression. Coin Traps are optional and default to a weight of 10%.

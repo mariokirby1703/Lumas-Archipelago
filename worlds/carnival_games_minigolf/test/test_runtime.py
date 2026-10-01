@@ -134,6 +134,26 @@ class TestRuntime(unittest.TestCase):
         self.memory.put(address, 0x12345678, 4)
         self.assertEqual(self.memory.integer(address), 0x12345678)
 
+    def test_mem2_backend_failure_uses_validated_fallback(self):
+        class Fallback:
+            def __init__(self):
+                self.session = None
+
+            def set_session(self, session):
+                self.session = session
+
+            def read(self, address, size):
+                self.asserted = (address, size)
+                return b'\x12\x34\x56\x78'
+
+        fallback = Fallback()
+        backend = FakeDolphin()
+        backend.read_bytes = lambda address, size: (_ for _ in ()).throw(RuntimeError("bad DME MEM2 map"))
+        memory = Memory(backend, fallback)
+        fallback.set_session(0x92C4EDF4)
+        self.assertEqual(memory.integer(0x92C4F0E0), 0x12345678)
+        self.assertEqual(fallback.asserted, (0x92C4F0E0, 4))
+
     def test_failed_mem2_live_read_keeps_persistent_sync_running(self):
         original_read = self.backend.read_bytes
 
@@ -476,7 +496,8 @@ class TestRuntime(unittest.TestCase):
 
         self.backend.read_bytes = fail_course
         state = self.runtime.debug_state(self.memory)
-        self.assertEqual(state['course'], 'ERR')
+        self.assertTrue(state['course'].startswith('ERR at 0x809002F0:'))
+        self.assertIn('failed course read', state['course'])
         self.assertEqual(state['derived_hole'], 8)
         self.assertEqual(state['par'], 3)
         self.assertEqual(state['controller'], self.controller)
@@ -551,6 +572,79 @@ class TestRuntime(unittest.TestCase):
         checks = self.poll(items)
         self.assertEqual(self.memory.read(self.sub+0x86, 3), bytes(3))
         self.assertIn(club.code, checks)
+
+    def test_shop_state_four_keeps_consumed_pieces_and_owned_club(self):
+        items = [ITEM_TABLE[PAR_CLUB_PIECES[1]]] * 3
+        self.enter_menu(3)
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.memory.read(self.sub+0x89, 3), bytes([1, 1, 1]))
+        self.assertTrue(self.runtime.shop_visit_active)
+        self.assertTrue(self.runtime.shop_pieces_injected)
+
+        self.enter_menu(4)
+        self.memory.write(self.sub+0x89, bytes(3))
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.memory.read(self.sub+0x89, 3), bytes(3))
+        self.assertTrue(self.runtime.shop_visit_active)
+        self.assertTrue(self.runtime.shop_pieces_injected)
+
+        club = next(data for data in self.runtime.locations.values()
+                    if data.kind == 'club' and data.world == 1)
+        self.memory.put(self.sub+62, 1)
+        checks = self.runtime.poll(self.memory, items)
+        self.assertIn(club.code, checks)
+        self.enter_menu(3)
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.memory.read(self.sub+0x89, 3), bytes(3))
+
+        self.enter_menu(2)
+        self.runtime.poll(self.memory, items)
+        self.assertFalse(self.runtime.shop_visit_active)
+        self.enter_menu(3)
+        self.runtime.poll(self.memory, items)
+        self.assertEqual(self.memory.read(self.sub+0x89, 3), bytes(3))
+        self.assertEqual(self.memory.integer(self.sub+62, 1), 1)
+
+    def test_live_dump_mine_shaft_result_flags(self):
+        self.session = 0x92C4EDF4
+        self.controller = 0x92C938C8
+        self.memory.put(self.manager+0x114, self.session, 4)
+        self.memory.put(self.session+0x2EC, 0, 4)
+        self.memory.put(self.session+0x2F0, 12, 4)
+        self.memory.put(self.session+0xFC, self.controller, 4)
+        self.memory.put(self.controller+0x1C, 0x804F4DA8, 4)
+        self.set_hole(12, par=4)
+        popup, array = 0x925DABDC, 0x929B0490
+        self.memory.put(self.manager+0xBC, 6, 4)
+        self.memory.put(self.manager+0x100, array, 4)
+        self.memory.put(self.manager+0x104, 1, 4)
+        self.memory.put(array, popup, 4)
+        self.memory.put(popup+0x1C, 0x804F7918, 4)
+        self.memory.write(popup+0xC0, bytes([1, 1]))
+        checks = self.runtime.poll(self.memory, [])
+        self.assertIn(self.runtime.lookup['win', 4], checks)
+        self.assertIn(self.runtime.lookup['perfect', 4], checks)
+
+    def test_live_dump_egyptian_way_and_hio_truth_signal(self):
+        self.set_hole(1, par=4)
+        self.memory.put(self.manager+0xBC, 5, 4)
+        self.memory.put(self.root+0x2DC, 3, 4)
+        self.memory.put(self.hole_state+0x127, 1)
+        checks = self.runtime.poll(self.memory, [])
+        self.assertIn(self.runtime.lookup['complete', 1], checks)
+        self.assertIn(self.runtime.lookup['par', 1], checks)
+        self.assertNotIn(('hio', 1), self.runtime.lookup)
+
+        self.set_hole(3, par=3)
+        self.memory.put(self.root+0x2DC, 1, 4)
+        checks = self.runtime.poll(self.memory, [])
+        for kind in ('complete', 'par', 'hio'):
+            self.assertIn(self.runtime.lookup[kind, 3], checks)
+
+        other = Runtime(self.slot, Journal(Path(self.tmp.name)/'not-in-goal.json'))
+        self.memory.put(self.hole_state+0x127, 0)
+        no_checks = other.poll(self.memory, [])
+        self.assertFalse({other.lookup[kind, 3] for kind in ('complete', 'par', 'hio')} & no_checks)
 
     def test_level_select_projects_checked_par_locations_only(self):
         received = [ITEM_TABLE[PAR_CLUB_PIECES[0]]] * 3

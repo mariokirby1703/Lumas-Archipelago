@@ -3,7 +3,7 @@ import struct
 from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA,
                      ITEM_TABLE, PAR_CLUB_PIECES, UNLOCKS)
 from ..Locations import LOCATION_TABLE
-from ..data import HOLES, MINIGAMES, WORLDS
+from ..data import HOLES, MINIGAMES, PRIZES, WORLDS
 from .constants import (RESULT_VTABLE, ROOT_LOCKS, ROOT_SUB, SHOP_MANAGER_STATE,
                         MANAGER_STATE_MENU, MANAGER_STATE_MINIGAME, MINIGAME_MENU_POLLS)
 from .memory import MemoryUnavailable, valid_pointer
@@ -12,6 +12,8 @@ ID_TO_NAME = {code: name for name, code in ITEM_TABLE.items()}
 VTABLE_TO_MINIGAME = {data['vtable']: i for i, data in enumerate(MINIGAMES)}
 WORLD_COUNT = len(WORLDS)
 HOLE_COUNT = len(HOLES)
+CLUB_IDS = tuple(next(prize['id'] for prize in PRIZES if prize['kind'] == 'club' and prize['world'] == world)
+                 for world in range(WORLD_COUNT))
 
 
 def validate_slot(data):
@@ -36,7 +38,7 @@ def validate_slot(data):
     if data['counter_mode'] != expected_counter:
         raise ValueError("Invalid Barker counter mode")
     required = data.get('required_coins')
-    if type(required) is not int or not (1 <= required <= 41 if data['counter_mode'] else required == 0):
+    if type(required) is not int or not (1 <= required <= 40 if data['counter_mode'] else required == 0):
         raise ValueError("Invalid Barker requirement")
     total = data.get('total_barker_coins')
     if type(total) is not int or not required <= total <= (required * 3 + 1) // 2:
@@ -63,6 +65,7 @@ class Runtime:
         self.lookup = {(d.kind, d.index): d.code for d in self.locations.values()}
         self.active_minigame = None
         self.pieces_projected = False
+        self.shop_visit_active = False
         self.shop_pieces_injected = False
         self.stable_non_minigame_polls = 0
 
@@ -151,9 +154,14 @@ class Runtime:
             memory.put(sub + 0x85, min(coins, 255))
             memory.put(sub + 0xA1, 1)
         received_names = [ID_TO_NAME[item] for item in items]
-        shop_context = manager_state == SHOP_MANAGER_STATE
-        if not shop_context:
+        if not self.shop_visit_active and snapshot.session is None and manager_state == SHOP_MANAGER_STATE:
+            self.shop_visit_active = True
             self.shop_pieces_injected = False
+        elif self.shop_visit_active and (snapshot.session is not None or manager_state == MANAGER_STATE_MENU):
+            self.shop_visit_active = False
+            self.shop_pieces_injected = False
+
+        if not self.shop_visit_active:
             known_checks = set(checked_locations) | set(self.journal.data['checks']) | checks
             # Menu/select screens display actual Par accomplishments. Gameplay
             # gets no AP inventory projection at all.
@@ -164,9 +172,10 @@ class Runtime:
                 if manager_state != MANAGER_STATE_MENU and not projected_on_previous_poll and any(persistent[0x86:0xA1]):
                     memory.put(sub + 0xA1, 1)
             self.pieces_projected = any(pieces)
-        elif history_ready and not self.shop_pieces_injected:
-            pieces = bytes(int(piece < min(3, received_names.count(name)))
-                           for name in PAR_CLUB_PIECES for piece in range(3))
+        elif history_ready and manager_state == SHOP_MANAGER_STATE and not self.shop_pieces_injected:
+            pieces = bytes(int(persistent[CLUB_IDS[world]] != 1
+                               and piece < min(3, received_names.count(name)))
+                           for world, name in enumerate(PAR_CLUB_PIECES) for piece in range(3))
             memory.write(sub + 0x86, pieces)
             self.shop_pieces_injected = True
             self.pieces_projected = any(pieces)
@@ -186,6 +195,7 @@ class Runtime:
         snapshot = memory.resolve(local_player)
         memory.write(snapshot.root + ROOT_SUB + 0x86, bytes(HOLE_COUNT))
         self.pieces_projected = False
+        self.shop_visit_active = False
         self.shop_pieces_injected = False
 
     @classmethod
@@ -285,48 +295,70 @@ class Runtime:
 
     def debug_state(self, memory, local_player=0):
         snapshot = memory.resolve(local_player)
-        def safe(read):
+        def safe(address, read):
             try:
                 return read()
-            except (MemoryUnavailable, RuntimeError, OSError):
-                return "ERR"
+            except (MemoryUnavailable, RuntimeError, OSError) as error:
+                return f"ERR at 0x{address:08X}: {error}"
 
         result = {"manager": snapshot.manager, "root": snapshot.root, "session": snapshot.session,
-                  "manager_state": safe(lambda: memory.integer(snapshot.manager + 0xBC)),
+                  "manager_state": safe(snapshot.manager + 0xBC, lambda: memory.integer(snapshot.manager + 0xBC)),
                   "session_player": "none", "course": "none", "controller": "none", "vtable": "none",
-                  "hole_def": safe(lambda: memory.integer(snapshot.manager + 0x10C)),
-                  "derived_hole": None, "strokes": safe(lambda: memory.integer(snapshot.root + 0x2DC)),
-                  "par": "ERR", "hole_state": safe(lambda: memory.integer(snapshot.root + 0x19C)),
-                  "in_goal": "ERR", "object_array": safe(lambda: memory.integer(snapshot.manager + 0x100)),
+                  "hole_def": safe(snapshot.manager + 0x10C, lambda: memory.integer(snapshot.manager + 0x10C)),
+                  "derived_hole": None, "strokes": safe(snapshot.root + 0x2DC,
+                                                           lambda: memory.integer(snapshot.root + 0x2DC)),
+                  "par": "unavailable", "hole_state": safe(snapshot.root + 0x19C,
+                                                               lambda: memory.integer(snapshot.root + 0x19C)),
+                  "in_goal": "unavailable", "object_array": safe(snapshot.manager + 0x100,
+                                                                     lambda: memory.integer(snapshot.manager + 0x100)),
                   "result_popup": None, "win": None, "perfect": None,
                   "spider_state": None, "spider_objects": None, "spider_complete": None,
-                  "minigame": self.active_minigame}
+                  "minigame": self.active_minigame, "shop_visit_active": self.shop_visit_active,
+                  "shop_pieces_injected": self.shop_pieces_injected,
+                  "piece_bytes": safe(snapshot.root + ROOT_SUB + 0x86,
+                                       lambda: memory.read(snapshot.root + ROOT_SUB + 0x86, HOLE_COUNT)),
+                  "club_ownership": {WORLDS[world]: safe(snapshot.root + ROOT_SUB + prize,
+                                           lambda p=prize: memory.integer(snapshot.root + ROOT_SUB + p, 1))
+                                     for world, prize in enumerate(CLUB_IDS)},
+                  "mem1_probe": safe(0x80000000, lambda: memory.read(0x80000000, 6)),
+                  "mem2_probe": "no live session"}
         if snapshot.session is not None:
-            result["session_player"] = safe(lambda: memory.integer(snapshot.session + 0x2EC))
-            result["course"] = safe(lambda: memory.integer(snapshot.session + 0x2F0))
-            result["controller"] = safe(lambda: memory.integer(snapshot.session + 0xFC))
+            result["mem2_probe"] = safe(snapshot.session + 0x2EC,
+                                         lambda: memory.read(snapshot.session + 0x2EC, 4))
+            result["session_player"] = safe(snapshot.session + 0x2EC,
+                                              lambda: memory.integer(snapshot.session + 0x2EC))
+            result["course"] = safe(snapshot.session + 0x2F0,
+                                     lambda: memory.integer(snapshot.session + 0x2F0))
+            result["controller"] = safe(snapshot.session + 0xFC,
+                                         lambda: memory.integer(snapshot.session + 0xFC))
         if isinstance(result["controller"], int) and valid_pointer(result["controller"], 0x20):
-            result["vtable"] = safe(lambda: memory.integer(result["controller"] + 0x1C))
+            result["vtable"] = safe(result["controller"] + 0x1C,
+                                     lambda: memory.integer(result["controller"] + 0x1C))
             if isinstance(result["vtable"], int):
                 result["minigame"] = VTABLE_TO_MINIGAME.get(result["vtable"], self.active_minigame)
                 if result["vtable"] == MINIGAMES[9]['vtable']:
-                    result["spider_state"] = safe(lambda: memory.integer(result["controller"] + 0x212, 1))
-                    result["spider_objects"] = safe(lambda: memory.read(result["controller"] + 0x1FC, 11))
+                    result["spider_state"] = safe(result["controller"] + 0x212,
+                                                   lambda: memory.integer(result["controller"] + 0x212, 1))
+                    result["spider_objects"] = safe(result["controller"] + 0x1FC,
+                                                     lambda: memory.read(result["controller"] + 0x1FC, 11))
                     result["spider_complete"] = result["spider_objects"] == bytes([6]) * 11
         if isinstance(result["hole_def"], int):
             result["derived_hole"] = self.derive_hole_id(memory, result["hole_def"])
-            result["par"] = safe(lambda: memory.integer(result["hole_def"] + 0x0C))
+            result["par"] = safe(result["hole_def"] + 0x0C,
+                                 lambda: memory.integer(result["hole_def"] + 0x0C))
         if isinstance(result["hole_state"], int) and valid_pointer(result["hole_state"], 0x128):
-            result["in_goal"] = safe(lambda: memory.integer(result["hole_state"] + 0x127, 1))
-        count = safe(lambda: memory.integer(snapshot.manager + 0x104))
+            result["in_goal"] = safe(result["hole_state"] + 0x127,
+                                     lambda: memory.integer(result["hole_state"] + 0x127, 1))
+        count = safe(snapshot.manager + 0x104, lambda: memory.integer(snapshot.manager + 0x104))
         if (isinstance(result["object_array"], int) and isinstance(count, int) and 0 <= count <= 4096
                 and valid_pointer(result["object_array"], max(4, count * 4))):
             for index in range(count):
-                obj = safe(lambda i=index: memory.integer(result["object_array"] + i * 4))
+                obj = safe(result["object_array"] + index * 4,
+                           lambda i=index: memory.integer(result["object_array"] + i * 4))
                 if isinstance(obj, int) and valid_pointer(obj, 0xC2):
-                    obj_vtable = safe(lambda o=obj: memory.integer(o + 0x1C))
+                    obj_vtable = safe(obj + 0x1C, lambda o=obj: memory.integer(o + 0x1C))
                     if obj_vtable == RESULT_VTABLE:
-                        flags = safe(lambda o=obj: memory.read(o + 0xC0, 2))
+                        flags = safe(obj + 0xC0, lambda o=obj: memory.read(o + 0xC0, 2))
                         result["result_popup"] = obj
                         if isinstance(flags, bytes):
                             result["perfect"], result["win"] = flags

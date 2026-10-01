@@ -1,12 +1,151 @@
 """Big-endian, bounds-checked memory access independent of Dolphin's Python module."""
+import ctypes
 import hashlib
+import os
 from dataclasses import dataclass
+from ctypes import wintypes
 
 from .constants import CODE_SIGNATURES, MANAGER_PTR, SUPPORTED_GAME_ID
 
 
 class MemoryUnavailable(RuntimeError):
     pass
+
+
+class WindowsMEM2:
+    """Read MEM2 directly when py-dolphin-memory-engine selected a bad Windows mapping."""
+    PROCESS_QUERY_INFORMATION = 0x0400
+    PROCESS_VM_READ = 0x0010
+    TH32CS_SNAPPROCESS = 0x00000002
+    MEM_COMMIT = 0x1000
+    PAGE_GUARD = 0x100
+    PAGE_NOACCESS = 0x01
+    MEM2_SIZE = 0x04000000
+
+    def __init__(self):
+        if os.name == "nt":
+            kernel = ctypes.windll.kernel32
+            kernel.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+            kernel.OpenProcess.restype = wintypes.HANDLE
+            kernel.ReadProcessMemory.restype = wintypes.BOOL
+            kernel.VirtualQueryEx.restype = ctypes.c_size_t
+        self.session = None
+        self.process = None
+        self.base = None
+        self.error = "not probed"
+
+    def set_session(self, session):
+        if session != self.session:
+            self.close()
+            self.session = session
+
+    def close(self):
+        if self.process:
+            ctypes.windll.kernel32.CloseHandle(self.process)
+        self.process = None
+        self.base = None
+
+    @staticmethod
+    def _process_ids():
+        class PROCESSENTRY32W(ctypes.Structure):
+            _fields_ = [("dwSize", wintypes.DWORD), ("cntUsage", wintypes.DWORD),
+                        ("th32ProcessID", wintypes.DWORD), ("th32DefaultHeapID", ctypes.c_size_t),
+                        ("th32ModuleID", wintypes.DWORD), ("cntThreads", wintypes.DWORD),
+                        ("th32ParentProcessID", wintypes.DWORD), ("pcPriClassBase", wintypes.LONG),
+                        ("dwFlags", wintypes.DWORD), ("szExeFile", wintypes.WCHAR * 260)]
+        kernel = ctypes.windll.kernel32
+        snapshot = kernel.CreateToolhelp32Snapshot(WindowsMEM2.TH32CS_SNAPPROCESS, 0)
+        if snapshot == wintypes.HANDLE(-1).value:
+            return []
+        entry = PROCESSENTRY32W()
+        entry.dwSize = ctypes.sizeof(entry)
+        result = []
+        try:
+            present = kernel.Process32FirstW(snapshot, ctypes.byref(entry))
+            while present:
+                if entry.szExeFile.lower() in {"dolphin.exe", "dolphinqt2.exe"}:
+                    result.append(entry.th32ProcessID)
+                present = kernel.Process32NextW(snapshot, ctypes.byref(entry))
+        finally:
+            kernel.CloseHandle(snapshot)
+        return result
+
+    @staticmethod
+    def _read_process(process, address, size):
+        buffer = ctypes.create_string_buffer(size)
+        read = ctypes.c_size_t()
+        ok = ctypes.windll.kernel32.ReadProcessMemory(
+            process, ctypes.c_void_p(address), buffer, size, ctypes.byref(read))
+        if not ok or read.value != size:
+            raise OSError(ctypes.get_last_error(), "ReadProcessMemory failed")
+        return buffer.raw
+
+    def _valid_session(self, process, base):
+        offset = self.session - 0x90000000
+        if not 0 <= offset <= self.MEM2_SIZE - 0x2F4:
+            return False
+        player = int.from_bytes(self._read_process(process, base + offset + 0x2EC, 4), "big")
+        course = int.from_bytes(self._read_process(process, base + offset + 0x2F0, 4), "big")
+        controller = int.from_bytes(self._read_process(process, base + offset + 0xFC, 4), "big")
+        if player not in (0, 1) or not 0 <= course < 27 or not valid_pointer(controller, 0x20):
+            return False
+        controller_offset = controller - 0x90000000
+        if not 0 <= controller_offset <= self.MEM2_SIZE - 0x20:
+            return False
+        vtable = int.from_bytes(self._read_process(process, base + controller_offset + 0x1C, 4), "big")
+        return 0x80004000 <= vtable < 0x81800000
+
+    def _discover(self):
+        if os.name != "nt" or self.session is None:
+            raise OSError("Windows MEM2 fallback has no live session")
+
+        class MEMORY_BASIC_INFORMATION(ctypes.Structure):
+            _fields_ = [("BaseAddress", ctypes.c_void_p), ("AllocationBase", ctypes.c_void_p),
+                        ("AllocationProtect", wintypes.DWORD), ("PartitionId", wintypes.WORD),
+                        ("RegionSize", ctypes.c_size_t), ("State", wintypes.DWORD),
+                        ("Protect", wintypes.DWORD), ("Type", wintypes.DWORD)]
+
+        kernel = ctypes.windll.kernel32
+        for pid in self._process_ids():
+            process = kernel.OpenProcess(self.PROCESS_QUERY_INFORMATION | self.PROCESS_VM_READ, False, pid)
+            if not process:
+                continue
+            address = 0
+            info = MEMORY_BASIC_INFORMATION()
+            try:
+                while kernel.VirtualQueryEx(process, ctypes.c_void_p(address), ctypes.byref(info),
+                                            ctypes.sizeof(info)):
+                    base = int(info.BaseAddress or 0)
+                    size = int(info.RegionSize)
+                    readable = (info.State == self.MEM_COMMIT and not info.Protect & self.PAGE_GUARD
+                                and info.Protect & 0xFF != self.PAGE_NOACCESS)
+                    if readable and size >= self.MEM2_SIZE:
+                        try:
+                            if self._valid_session(process, base):
+                                self.process, self.base = process, base
+                                self.error = None
+                                return
+                        except OSError:
+                            pass
+                    next_address = base + size
+                    if next_address <= address:
+                        break
+                    address = next_address
+            finally:
+                if self.process != process:
+                    kernel.CloseHandle(process)
+        self.error = "no Dolphin MEM2 mapping matched the live session"
+        raise OSError(self.error)
+
+    def read(self, address, size):
+        if self.base is None:
+            self._discover()
+        try:
+            return self._read_process(self.process, self.base + address - 0x90000000, size)
+        except OSError as error:
+            self.error = str(error)
+            self.close()
+            raise
 
 
 def valid_pointer(address, size=4):
@@ -16,8 +155,10 @@ def valid_pointer(address, size=4):
 
 
 class Memory:
-    def __init__(self, backend):
+    def __init__(self, backend, mem2_backend=None):
         self.backend = backend
+        self.mem2_backend = mem2_backend if mem2_backend is not None else (WindowsMEM2() if os.name == "nt" else None)
+        self.last_read_error = None
 
     def read(self, address, size):
         if not (0x80000000 <= address <= 0x81800000 - size or
@@ -26,7 +167,17 @@ class Memory:
         try:
             data = bytes(self.backend.read_bytes(address, size))
         except (RuntimeError, OSError) as error:
-            raise MemoryUnavailable(f"Temporary Dolphin memory read failure at {address:#x}") from error
+            self.last_read_error = f"{type(error).__name__}: {error}"
+            if address >= 0x90000000 and self.mem2_backend is not None:
+                try:
+                    data = self.mem2_backend.read(address, size)
+                except (RuntimeError, OSError) as fallback_error:
+                    self.last_read_error += f"; MEM2 fallback: {type(fallback_error).__name__}: {fallback_error}"
+                    raise MemoryUnavailable(
+                        f"Dolphin memory read failure at {address:#010x}: {self.last_read_error}") from fallback_error
+            else:
+                raise MemoryUnavailable(
+                    f"Dolphin memory read failure at {address:#010x}: {self.last_read_error}") from error
         if len(data) != size:
             raise MemoryUnavailable("Short Dolphin read")
         return data
@@ -59,6 +210,8 @@ class Memory:
         session = self.integer(manager + 0x114)
         if not valid_pointer(session, 0x2F4):
             session = None
+        if self.mem2_backend is not None:
+            self.mem2_backend.set_session(session)
         # manager+0x12C is not a reliable player count in every game state.
         root_values = tuple(self.integer(manager + 0x190 + i*4) for i in range(2))
         valid_roots = tuple((i, root) for i, root in enumerate(root_values) if valid_pointer(root, 0x2E0))
