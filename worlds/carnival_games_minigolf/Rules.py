@@ -1,6 +1,6 @@
 from worlds.generic.Rules import set_rule
 
-from .Items import BARKER_COIN, GOAL_WORLD_ACCESS, PAR_CLUB_PIECES, UNLOCKS
+from .Items import BARKER_COIN, PAR_CLUB_PIECES, UNLOCKS
 from .Locations import LOCATION_TABLE
 from .data import HOLES, PRIZES, WORLDS
 
@@ -11,7 +11,7 @@ def world_access(world, index):
     if index == world.goal_world:
         # Barker access is represented by a real locked AP item at the threshold
         # location. The Barker fallback models that automatic client check for Fill.
-        return lambda state: (state.has(GOAL_WORLD_ACCESS, world.player)
+        return lambda state: (state.has(UNLOCKS[index], world.player)
                               or (world.barker_access and state.has(BARKER_COIN, world.player,
                                                                    world.required_coins)))
     return lambda state: state.has(UNLOCKS[index], world.player)
@@ -42,7 +42,7 @@ def set_rules(world):
                                                                        world.required_coins))
     def victory(state):
         if world.goal_mode == 1:
-            return state.has(GOAL_WORLD_ACCESS, world.player) and all(
+            return state.has(UNLOCKS[world.goal_world], world.player) and all(
                 state.can_reach(f"{HOLES[i]} - Par Club Piece", "Location", world.player)
                 for i in range(world.goal_world * 3, world.goal_world * 3 + 3))
         if world.goal_mode == 2:

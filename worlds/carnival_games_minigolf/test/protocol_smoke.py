@@ -14,7 +14,7 @@ from NetUtils import ClientStatus
 from worlds.carnival_games_minigolf.client.client import MiniGolfContext
 from worlds.carnival_games_minigolf.client.constants import RESULT_VTABLE
 from worlds.carnival_games_minigolf.data import MINIGAMES
-from worlds.carnival_games_minigolf.Items import GOAL_WORLD_ACCESS, ITEM_TABLE
+from worlds.carnival_games_minigolf.Items import ITEM_TABLE, UNLOCKS
 from worlds.carnival_games_minigolf.Locations import BARKER_REQUIREMENT_LOCATION, LOCATION_TABLE
 from worlds.carnival_games_minigolf.test.test_runtime import TestRuntime
 
@@ -61,10 +61,15 @@ async def main():
                         checks = ctx.runtime.poll(fixture.memory, [i.item for i in ctx.items_received])
                         ctx.locations_checked |= checks
                     for w, minigame in enumerate(MINIGAMES):
+                        fixture.set_hole(minigame['world'] * 3)
+                        fixture.memory.put(fixture.manager+0xBC, 7, 4)
                         fixture.memory.put(fixture.controller+0x1C, minigame['vtable'], 4)
                         fixture.memory.put(fixture.manager+0x104, 0, 4)
                         ctx.runtime.poll(fixture.memory, [i.item for i in ctx.items_received])
-                        fixture.memory.put(fixture.manager+0x104, 1, 4)
+                        if w == 9:
+                            fixture.memory.write(fixture.controller+0x1FC, bytes([6]) * 11)
+                        else:
+                            fixture.memory.put(fixture.manager+0x104, 1, 4)
                         checks = ctx.runtime.poll(fixture.memory, [i.item for i in ctx.items_received])
                         ctx.locations_checked |= checks
                     await ctx.send_msgs([{'cmd': 'LocationChecks', 'locations': sorted(ctx.locations_checked)}])
@@ -84,7 +89,8 @@ async def main():
                 assert ctx.runtime.victory([i.item for i in ctx.items_received], ctx.checked_locations)
                 if ctx.runtime.slot['goal'] == 1 and ctx.runtime.slot['goal_world_access'] == 1:
                     assert LOCATION_TABLE[BARKER_REQUIREMENT_LOCATION].code in ctx.checked_locations
-                    assert ITEM_TABLE[GOAL_WORLD_ACCESS] in [item.item for item in ctx.items_received]
+                    assert ITEM_TABLE[UNLOCKS[ctx.runtime.slot['goal_world']]] in [
+                        item.item for item in ctx.items_received]
                     assert not any(data.kind == 'barker_shop' for data in ctx.runtime.locations.values())
                 await ctx.send_msgs([{'cmd': 'StatusUpdate', 'status': ClientStatus.CLIENT_GOAL}])
                 await asyncio.sleep(.1)

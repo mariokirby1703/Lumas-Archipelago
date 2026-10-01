@@ -39,7 +39,7 @@ class Goal(Choice):
 class MinigameChecks(Choice):
     """Win Checks creates one Win location per minigame. Perfect Checks creates one Perfect location.
     The nine main minigames support Win and Perfect; a Perfect run completes both.
-    Devil's Brew - Spiders is experimental and supports Win only.
+    Devil's Brew - Spiders supports Win only.
     """
     display_name = "Minigame Checks"
     option_off = 0
@@ -77,7 +77,7 @@ class BarkerShopChecks(DefaultOnToggle):
 
 
 class GoalWorldAccess(Choice):
-    """How Goal World Access enters the multiworld when Goal is Goal World.
+    """How the selected world's Access item enters the multiworld for the Goal World goal.
     World Unlock Item places it normally. Barker Coins locks it on the Barker threshold location.
     """
     display_name = "Goal World Access"
@@ -89,7 +89,7 @@ class BarkerCoinsRequired(Range):
     """Received AP Barker Coins needed for Barker Coin Hunt or Barker Coins Goal World Access."""
     display_name = "Barker Coins Required"
     range_start = 1
-    range_end = 50
+    range_end = 40
     default = 27
 
 
@@ -98,7 +98,7 @@ class TrapWeight(Range):
     display_name = "Trap Weight"
     range_start = 0
     range_end = 100
-    default = 0
+    default = 10
 
 
 @dataclass
@@ -118,8 +118,7 @@ class MiniGolfOptions(PerGameCommonOptions):
 
 
 OPTION_GROUPS = [
-    OptionGroup("Progression", [StartingWorld]),
-    OptionGroup("Goal", [Goal, GoalWorld, GoalWorldAccess, BarkerCoinsRequired]),
+    OptionGroup("Main", [StartingWorld,Goal, GoalWorld, GoalWorldAccess, BarkerCoinsRequired]),
     OptionGroup("Checks", [MinigameChecks, HoleInOneChecks, BarkerCoinChecks,
                            WorldSecrets, ShopChecks, BarkerShopChecks]),
     OptionGroup("Filler", [TrapWeight]),

@@ -26,7 +26,7 @@ class CarnivalGamesMiniGolfWorld(World):
     counter_mode = False  # Item-link proxy worlds do not run generate_early.
     item_name_to_id = Items.ITEM_TABLE
     location_name_to_id = {name: data.code for name, data in Locations.LOCATION_TABLE.items()}
-    item_name_groups = {"World Unlocks": set(Items.UNLOCKS), "Coin Bundles": set(Items.COIN_BUNDLES),
+    item_name_groups = {"World Access": set(Items.UNLOCKS), "Coin Bundles": set(Items.COIN_BUNDLES),
                         "Par Club Pieces": set(Items.PAR_CLUB_PIECES),
                         "Coin Traps": set(Items.COIN_TRAPS), "Traps": set(Items.COIN_TRAPS)}
     location_name_groups = {name: {n for n, d in Locations.LOCATION_TABLE.items() if d.world == i}
@@ -87,10 +87,10 @@ class CarnivalGamesMiniGolfWorld(World):
         if self.goal_world is not None:
             if self.barker_access:
                 self.get_location(Locations.BARKER_REQUIREMENT_LOCATION).place_locked_item(
-                    self.create_item(Items.GOAL_WORLD_ACCESS))
+                    self.create_item(Items.UNLOCKS[self.goal_world]))
                 locked_locations = 1
             else:
-                names.append(Items.GOAL_WORLD_ACCESS)
+                names.append(Items.UNLOCKS[self.goal_world])
         while len(names) < len(self.active_locations) - locked_locations:
             names.append(self.get_filler_item_name())
         barker_count = 0
@@ -104,7 +104,7 @@ class CarnivalGamesMiniGolfWorld(World):
 
     def create_item(self, name):
         classification = ItemClassification.trap if name in Items.COIN_TRAPS else ItemClassification.filler
-        if (name in Items.UNLOCKS or name == Items.GOAL_WORLD_ACCESS
+        if (name in Items.UNLOCKS
                 or (name in Items.PAR_CLUB_PIECES and bool(getattr(self.options, 'shop_checks', True)))
                 or (name == Items.BARKER_COIN and self.counter_mode)):
             classification = ItemClassification.progression
@@ -122,7 +122,7 @@ class CarnivalGamesMiniGolfWorld(World):
         return Items.coin_bundle_name(self.random.randrange(9), amount)
 
     def fill_slot_data(self):
-        return {"schema_version": 7, "game": GAME, "seed_name": self.multiworld.seed_name,
+        return {"schema_version": 9, "game": GAME, "seed_name": self.multiworld.seed_name,
                 "starting_world": self.starting_world, "goal_world": self.goal_world,
                 "goal": self.goal_mode, "goal_world_access": self.options.goal_world_access.value,
                 "counter_mode": self.counter_mode, "required_coins": self.required_coins,

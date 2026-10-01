@@ -1,25 +1,21 @@
 """Polling and item effects, testable with an in-memory Dolphin substitute."""
-import logging
 import struct
-from time import monotonic
-from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, GOAL_WORLD_ACCESS,
+from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA,
                      ITEM_TABLE, PAR_CLUB_PIECES, UNLOCKS)
 from ..Locations import LOCATION_TABLE
 from ..data import HOLES, MINIGAMES, WORLDS
 from .constants import (RESULT_VTABLE, ROOT_LOCKS, ROOT_SUB, SHOP_MANAGER_STATE,
-                        MANAGER_STATE_MENU, MANAGER_STATE_GAMEPLAY, MANAGER_STATE_MINIGAME,
-                        MINIGAME_MENU_POLLS, CURRENCY_SETTLE_SECONDS)
+                        MANAGER_STATE_MENU, MANAGER_STATE_MINIGAME, MINIGAME_MENU_POLLS)
 from .memory import MemoryUnavailable, valid_pointer
 
 ID_TO_NAME = {code: name for name, code in ITEM_TABLE.items()}
 VTABLE_TO_MINIGAME = {data['vtable']: i for i, data in enumerate(MINIGAMES)}
-logger = logging.getLogger("Client")
 WORLD_COUNT = len(WORLDS)
 HOLE_COUNT = len(HOLES)
 
 
 def validate_slot(data):
-    if data.get('schema_version') != 7:
+    if data.get('schema_version') != 9:
         raise ValueError("Unsupported Carnival Games MiniGolf slot-data version")
     start, final = data.get('starting_world'), data.get('goal_world')
     if type(start) is not int or not 0 <= start < WORLD_COUNT:
@@ -40,7 +36,7 @@ def validate_slot(data):
     if data['counter_mode'] != expected_counter:
         raise ValueError("Invalid Barker counter mode")
     required = data.get('required_coins')
-    if type(required) is not int or not (1 <= required <= 50 if data['counter_mode'] else required == 0):
+    if type(required) is not int or not (1 <= required <= 41 if data['counter_mode'] else required == 0):
         raise ValueError("Invalid Barker requirement")
     total = data.get('total_barker_coins')
     if type(total) is not int or not required <= total <= (required * 3 + 1) // 2:
@@ -69,12 +65,8 @@ class Runtime:
         self.pieces_projected = False
         self.shop_pieces_injected = False
         self.stable_non_minigame_polls = 0
-        self.menu_context = None
-        self.menu_since = None
 
     def reset_currency_context(self):
-        self.menu_context = None
-        self.menu_since = None
         self.journal.reset_confirmation()
 
     def reset_transient(self):
@@ -86,9 +78,7 @@ class Runtime:
         names = [ID_TO_NAME.get(item) for item in items]
         coins = names.count(BARKER_COIN)
         unlocked = {self.slot['starting_world']}
-        unlocked.update(i for i, name in enumerate(UNLOCKS) if name in names and i != self.slot['goal_world'])
-        if self.slot['goal_world'] is not None and GOAL_WORLD_ACCESS in names:
-            unlocked.add(self.slot['goal_world'])
+        unlocked.update(i for i, name in enumerate(UNLOCKS) if name in names)
         return unlocked, coins
 
     def poll(self, memory, items, local_player=0, history_ready=True, checked_locations=()):
@@ -137,13 +127,6 @@ class Runtime:
             if memory.read(player_root + ROOT_LOCKS, 9) != locks:
                 memory.write(player_root + ROOT_LOCKS, locks)
                 memory.put(player_root + ROOT_SUB + 0xA1, 1)
-        menu_context = ((snapshot.manager, root, manager_state)
-                        if snapshot.session is None and manager_state == MANAGER_STATE_MENU else None)
-        if menu_context != self.menu_context or menu_context is None:
-            self.menu_context = menu_context
-            self.menu_since = monotonic() if menu_context else None
-            self.journal.reset_confirmation()
-        stable_menu = self.menu_since is not None and monotonic() - self.menu_since >= CURRENCY_SETTLE_SECONDS
         if history_ready:
             for index in range(cursor, len(items)):
                 memory.confirm(snapshot)
@@ -151,25 +134,19 @@ class Runtime:
                 if name is None:
                     raise ValueError(f"Unknown received MiniGolf item ID: {items[index]}")
                 if name in COIN_BUNDLE_DATA:
-                    if not stable_menu:
-                        break
                     world, amount = COIN_BUNDLE_DATA[name]
-                    self.apply_currency(memory, sub, index, name, 0x58 + 2*world, amount, 2)
+                    self.apply_currency(memory, sub, index, 0x58 + 2*world, amount, 2)
                 elif name in COIN_TRAP_DATA:
-                    if not stable_menu:
-                        break
                     world, amount = COIN_TRAP_DATA[name]
-                    self.apply_currency(memory, sub, index, name, 0x58 + 2*world, -amount, 2)
+                    self.apply_currency(memory, sub, index, 0x58 + 2*world, -amount, 2)
                 elif name == BARKER_COIN and not self.slot['counter_mode']:
-                    if not stable_menu:
-                        break
-                    self.apply_currency(memory, sub, index, name, 0x85, 1, 1)
+                    self.apply_currency(memory, sub, index, 0x85, 1, 1)
                 else:
                     self.journal.advance(index)
                 if self.journal.data["pending"] is not None:
                     break
         if (history_ready and self.slot['counter_mode']
-                and stable_menu
+                and snapshot.session is None
                 and memory.integer(sub + 0x85, 1) != min(coins, 255)):
             memory.put(sub + 0x85, min(coins, 255))
             memory.put(sub + 0xA1, 1)
@@ -195,12 +172,11 @@ class Runtime:
             self.pieces_projected = any(pieces)
         return set(self.journal.data['checks']) & {d.code for d in self.locations.values()}
 
-    def apply_currency(self, memory, sub, index, name, offset, amount, size):
+    def apply_currency(self, memory, sub, index, offset, amount, size):
         address = sub + offset
-        before, after = self.journal.grant(memory, sub, index, offset, amount, size)
-        verified = memory.integer(address, size) == after
-        logger.info("Applied received item %s at 0x%08X: %d -> %d; verified=%s",
-                    name, address, before, after, verified)
+        _, after = self.journal.grant(memory, sub, index, offset, amount, size)
+        current = memory.integer(address, size)
+        verified = current >= after if amount > 0 else current == after
         if not verified:
             raise MemoryUnavailable(f"Currency verification failed at 0x{address:08X}")
 
@@ -240,51 +216,66 @@ class Runtime:
             checks.add(self.lookup['hio', hole])
 
     def read_transient(self, memory, snapshot, checks, derived_hole, hole_def, manager_state):
-        minigame = None
+        controller = None
+        detected = None
         if snapshot.session is not None:
             try:
                 controller = memory.integer(snapshot.session + 0xFC)
                 if valid_pointer(controller, 0x20):
-                    minigame = VTABLE_TO_MINIGAME.get(memory.integer(controller + 0x1C))
+                    detected = VTABLE_TO_MINIGAME.get(memory.integer(controller + 0x1C))
             except MemoryUnavailable:
                 pass  # Normal hole detection is independent of controller reads.
-        if minigame is None and manager_state == MANAGER_STATE_MINIGAME and derived_hole is not None and derived_hole % 3 == 0:
-            minigame = derived_hole // 3
-        if minigame is not None:
-            self.active_minigame = minigame
+
+        # Main Adventure controllers can remain alive in holes B/C. They only
+        # identify a current minigame on their world's Adventure hole.
+        current_minigame = None
+        if detected is not None and detected < 9:
+            if derived_hole == MINIGAMES[detected]['world'] * 3:
+                current_minigame = detected
+        elif (detected is None and manager_state == MANAGER_STATE_MINIGAME
+              and derived_hole is not None and derived_hole % 3 == 0):
+            current_minigame = derived_hole // 3
+        if current_minigame is not None:
+            self.active_minigame = current_minigame
             self.stable_non_minigame_polls = 0
+
+        # Spiders has no CMGResultsPopup. Live code requires all eleven object
+        # states to reach 6; it intentionally has no Perfect location.
+        if detected == 9 and controller is not None:
+            if memory.read(controller + 0x1FC, 11) == bytes([6]) * 11:
+                if ('win', 9) in self.lookup:
+                    checks.add(self.lookup['win', 9])
+
         if self.active_minigame is not None:
-            # Normal gameplay state 5 is a new context; state 6 can be the gap
-            # between controller destruction and the late result popup.
-            if minigame is None and manager_state == MANAGER_STATE_GAMEPLAY and derived_hole is not None:
-                self.active_minigame = None
+            results = []
+            try:
+                array = memory.integer(snapshot.manager + 0x100)
+                count = memory.integer(snapshot.manager + 0x104)
+                if 0 < count <= 4096 and valid_pointer(array, count * 4):
+                    pointers = struct.iter_unpack('>I', memory.read(array, count * 4))
+                    for (obj,) in pointers:
+                        try:
+                            if valid_pointer(obj, 0xC2) and memory.integer(obj + 0x1C) == RESULT_VTABLE:
+                                results.append(memory.read(obj + 0xC0, 2))
+                        except MemoryUnavailable:
+                            continue
+            except MemoryUnavailable:
+                pass
+            for perfect, win in results:
+                if win == 1 and ('win', self.active_minigame) in self.lookup:
+                    checks.add(self.lookup['win', self.active_minigame])
+                if perfect == 1 and ('perfect', self.active_minigame) in self.lookup:
+                    checks.add(self.lookup['perfect', self.active_minigame])
+            if current_minigame is None and manager_state in (MANAGER_STATE_MENU, SHOP_MANAGER_STATE):
+                self.stable_non_minigame_polls += 1
+                if self.stable_non_minigame_polls >= MINIGAME_MENU_POLLS:
+                    self.active_minigame = None
             else:
-                results = []
-                try:
-                    array = memory.integer(snapshot.manager + 0x100)
-                    count = memory.integer(snapshot.manager + 0x104)
-                    if 0 < count <= 4096 and valid_pointer(array, count * 4):
-                        pointers = struct.iter_unpack('>I', memory.read(array, count * 4))
-                        for (obj,) in pointers:
-                            try:
-                                if valid_pointer(obj, 0xC2) and memory.integer(obj + 0x1C) == RESULT_VTABLE:
-                                    results.append(memory.read(obj + 0xC0, 2))
-                            except MemoryUnavailable:
-                                continue
-                except MemoryUnavailable:
-                    pass
-                for perfect, win in results:
-                    if win == 1 and ('win', self.active_minigame) in self.lookup:
-                        checks.add(self.lookup['win', self.active_minigame])
-                    if perfect == 1 and ('perfect', self.active_minigame) in self.lookup:
-                        checks.add(self.lookup['perfect', self.active_minigame])
-                if minigame is None and manager_state in (MANAGER_STATE_MENU, SHOP_MANAGER_STATE):
-                    self.stable_non_minigame_polls += 1
-                    if self.stable_non_minigame_polls >= MINIGAME_MENU_POLLS:
-                        self.active_minigame = None
-                else:
-                    self.stable_non_minigame_polls = 0
-                return
+                self.stable_non_minigame_polls = 0
+
+        # A stale controller or latch never suppresses a real normal-hole
+        # completion. State 7 is the sole guard against stale in_goal data while
+        # actually entering an Adventure minigame.
         if snapshot.session is None or manager_state == MANAGER_STATE_MINIGAME:
             return
         hole_state = memory.integer(snapshot.root + 0x19C)
@@ -308,6 +299,7 @@ class Runtime:
                   "par": "ERR", "hole_state": safe(lambda: memory.integer(snapshot.root + 0x19C)),
                   "in_goal": "ERR", "object_array": safe(lambda: memory.integer(snapshot.manager + 0x100)),
                   "result_popup": None, "win": None, "perfect": None,
+                  "spider_state": None, "spider_objects": None, "spider_complete": None,
                   "minigame": self.active_minigame}
         if snapshot.session is not None:
             result["session_player"] = safe(lambda: memory.integer(snapshot.session + 0x2EC))
@@ -317,6 +309,10 @@ class Runtime:
             result["vtable"] = safe(lambda: memory.integer(result["controller"] + 0x1C))
             if isinstance(result["vtable"], int):
                 result["minigame"] = VTABLE_TO_MINIGAME.get(result["vtable"], self.active_minigame)
+                if result["vtable"] == MINIGAMES[9]['vtable']:
+                    result["spider_state"] = safe(lambda: memory.integer(result["controller"] + 0x212, 1))
+                    result["spider_objects"] = safe(lambda: memory.read(result["controller"] + 0x1FC, 11))
+                    result["spider_complete"] = result["spider_objects"] == bytes([6]) * 11
         if isinstance(result["hole_def"], int):
             result["derived_hole"] = self.derive_hole_id(memory, result["hole_def"])
             result["par"] = safe(lambda: memory.integer(result["hole_def"] + 0x0C))
@@ -344,7 +340,7 @@ class Runtime:
             return coins >= self.slot['required_coins']
         final = self.slot['goal_world']
         if goal == 1:
-            if GOAL_WORLD_ACCESS not in {ID_TO_NAME.get(item) for item in items}:
+            if UNLOCKS[final] not in {ID_TO_NAME.get(item) for item in items}:
                 return False
             holes = range(final*3, final*3+3)
         else:

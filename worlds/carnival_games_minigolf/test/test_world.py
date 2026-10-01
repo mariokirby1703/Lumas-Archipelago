@@ -12,8 +12,7 @@ from test.general import gen_steps
 from worlds.AutoWorld import call_all
 
 from ..data import HOLES, PRIZES, WORLDS
-from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, GOAL_WORLD_ACCESS,
-                     PAR_CLUB_PIECES, UNLOCKS)
+from ..Items import BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, PAR_CLUB_PIECES, UNLOCKS
 from ..Locations import BARKER_REQUIREMENT_LOCATION, HIO_IMPOSSIBLE, HIO_POSSIBLE, LOCATION_TABLE
 from ..world import CarnivalGamesMiniGolfWorld
 from . import MiniGolfTestBase
@@ -72,6 +71,7 @@ class TestWorldData(unittest.TestCase):
         self.assertTrue(samples[50] < samples[20] < samples[10] < samples[5])
 
     def test_trap_weight_can_disable_or_fill_with_traps(self):
+        self.assertEqual(generate().worlds[1].options.trap_weight.value, 10)
         disabled = generate({'goal': 1, 'trap_weight': 0}, seed=101).worlds[1]
         enabled = generate({'goal': 1, 'trap_weight': 100}, seed=102).worlds[1]
         self.assertFalse(any(disabled.get_filler_item_name() in COIN_TRAP_DATA for _ in range(1000)))
@@ -105,12 +105,11 @@ class TestWorldData(unittest.TestCase):
                     self.assertTrue(mw.can_beat_game())
                     if goal == 1:
                         self.assertEqual(world.goal_world, final)
-                        self.assertNotIn(UNLOCKS[final], [item.name for item in mw.itempool])
                         if access:
                             self.assertEqual(world.get_location(BARKER_REQUIREMENT_LOCATION).item.name,
-                                             GOAL_WORLD_ACCESS)
+                                             UNLOCKS[final])
                         else:
-                            self.assertIn(GOAL_WORLD_ACCESS, [item.name for item in mw.itempool])
+                            self.assertIn(UNLOCKS[final], [item.name for item in mw.itempool])
                     if goal == 2 or access:
                         self.assertFalse(world.options.barker_shop_checks)
                         self.assertFalse(any(LOCATION_TABLE[n].kind == 'barker_shop' for n in world.active_locations))
@@ -168,12 +167,13 @@ class TestWorldData(unittest.TestCase):
                 state.collect(world.create_item(PAR_CLUB_PIECES[0]), prevent_sweep=True)
 
     def test_names_and_barker_pool_size(self):
+        self.assertEqual(UNLOCKS, tuple(f"{world} Access" for world in WORLDS))
         self.assertEqual(PAR_CLUB_PIECES[2], "Amazeon Par Club Piece")
         self.assertIn("Amazeon Shop: Jub Jub Ball", LOCATION_TABLE)
         self.assertFalse(any("Purchase" in name for name in LOCATION_TABLE))
         self.assertIn("50 Amazeon Coins", COIN_BUNDLE_DATA)
         self.assertIn("-10 Fairytella Coins", COIN_TRAP_DATA)
-        for required, expected in ((1, 2), (5, 8), (27, 41), (50, 75)):
+        for required, expected in ((1, 2), (5, 8), (27, 41), (41, 62)):
             with self.subTest(required=required):
                 world = generate({'goal': 2, 'barker_coins_required': required}).worlds[1]
                 self.assertEqual(sum(item.name == BARKER_COIN for item in world.multiworld.itempool), expected)
@@ -188,7 +188,7 @@ class TestWorldData(unittest.TestCase):
             options['goal'] = rng.randrange(3)
             options['starting_world'] = rng.randrange(9)
             options['goal_world'] = (options['starting_world'] + rng.randrange(1, 9)) % 9
-            options['barker_coins_required'] = rng.randrange(1, 51)
+            options['barker_coins_required'] = rng.randrange(1, 42)
             options['trap_weight'] = rng.randrange(101)
             options['minigame_checks'] = rng.randrange(4)
             mw = generate(options, seed, players=2 if seed % 5 == 0 else 1, fill=True)
@@ -213,3 +213,21 @@ class TestWorldData(unittest.TestCase):
         self.assertEqual(len(mw.get_filled_locations()), 54)
         self.assertTrue(mw.can_beat_game())
         validate_slot(world.fill_slot_data())
+
+    def test_maximum_barker_requirement_fits_with_only_mandatory_checks(self):
+        minimal = dict(barker_coins_required=41, minigame_checks=0, hole_in_one_checks=0,
+                       barker_coin_checks=0, world_secrets=0, shop_checks=0, barker_shop_checks=0)
+        hunt = generate({**minimal, 'goal': 2}, fill=True)
+        self.assertEqual(len(hunt.get_locations()), 54)
+        self.assertTrue(hunt.can_beat_game())
+        self.assertEqual(sum(item.name == BARKER_COIN for item in hunt.itempool), 46)
+        self.assertEqual(sum(item.name in UNLOCKS for item in hunt.itempool), 8)
+
+        goal_world = generate({**minimal, 'goal': 1, 'starting_world': 0, 'goal_world': 1,
+                               'goal_world_access': 1}, fill=True)
+        self.assertEqual(len(goal_world.get_locations()), 55)
+        self.assertTrue(goal_world.can_beat_game())
+        self.assertEqual(sum(item.name == BARKER_COIN for item in goal_world.itempool), 47)
+        self.assertEqual(sum(item.name in UNLOCKS for item in goal_world.itempool), 7)
+        self.assertEqual(goal_world.worlds[1].get_location(BARKER_REQUIREMENT_LOCATION).item.name,
+                         UNLOCKS[1])

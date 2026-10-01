@@ -1,4 +1,4 @@
-# Static data transcribed from the supplied master notes. IDs are stable across options.
+# Static game data. IDs are stable across options.
 
 GAME = 'Carnival Games MiniGolf'
 

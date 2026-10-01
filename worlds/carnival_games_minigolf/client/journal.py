@@ -50,26 +50,30 @@ class Journal:
             before = memory.integer(sub + offset, size)
             pending = {"index": index, "offset": offset, "size": size,
                        "before": before,
-                       "after": max(0, min((1 << (8*size)) - 1, before + amount))}
+                       "after": max(0, min((1 << (8*size)) - 1, before + amount)),
+                       "amount": amount}
             self.data['pending'] = pending
             self.save()  # persist intent before touching guest memory
         if (pending['index'], pending['offset'], pending['size']) != (index, offset, size):
             raise ValueError("Receipt history differs from pending MiniGolf grant")
         current = memory.integer(sub + offset, size)
-        if current not in (pending['before'], pending['after']):
+        positive = pending.get('amount', pending['after'] - pending['before']) > 0
+        survived = current >= pending['after'] if positive else current == pending['after']
+        if current != pending['before'] and not survived:
             raise ValueError("Interrupted coin grant has an ambiguous balance. Use /currency_recover skip "
                              "to retain the current balance, or /currency_recover apply to grant the item again.")
         key = (sub, index, pending['before'], pending['after'])
         now = monotonic()
-        if current == pending['after'] and self.confirmation is not None:
+        if survived and self.confirmation is not None:
             if self.confirmation[0] == key and now - self.confirmation[1] >= CURRENCY_SETTLE_SECONDS:
                 result = pending['before'], pending['after']
                 self.advance(index)
                 self.reset_confirmation()
                 return result
-        if self.confirmation is None or self.confirmation[0] != key or current != pending['after']:
+        if self.confirmation is None or self.confirmation[0] != key or not survived:
             self.confirmation = (key, now)
-        memory.put(sub + offset, pending['after'], size)
+        if current == pending['before']:
+            memory.put(sub + offset, pending['after'], size)
         memory.put(sub + 0xA1, 1)
         result = pending['before'], pending['after']
         return result

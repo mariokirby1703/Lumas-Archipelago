@@ -9,7 +9,7 @@ from ..client.memory import Memory, MemoryUnavailable
 from ..client.runtime import Runtime
 from ..data import MINIGAMES
 from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, ITEM_TABLE, UNLOCKS,
-                     GOAL_WORLD_ACCESS, PAR_CLUB_PIECES, coin_bundle_name, coin_trap_name)
+                     PAR_CLUB_PIECES, coin_bundle_name, coin_trap_name)
 from .test_world import generate
 
 
@@ -35,7 +35,7 @@ class TestRuntime(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.path = Path(self.tmp.name) / 'journal.json'
         self.now = 0.0
-        for module in ('runtime', 'journal'):
+        for module in ('journal',):
             clock = patch(f'worlds.carnival_games_minigolf.client.{module}.monotonic', side_effect=lambda: self.now)
             clock.start()
             self.addCleanup(clock.stop)
@@ -185,18 +185,15 @@ class TestRuntime(unittest.TestCase):
         self.assertEqual(self.memory.integer(self.sub+0x58, 2), 100)
         self.assertEqual(journal.data['cursor'], 1)
 
-    def test_currency_waits_for_menu_and_logs_verified_receipt(self):
+    def test_currency_applies_immediately_without_client_log_spam(self):
         item = ITEM_TABLE[coin_bundle_name(2, 50)]
-        self.poll([item])
-        self.assertEqual(self.memory.integer(self.sub+0x5C, 2), 0)
+        self.runtime.poll(self.memory, [item])
+        self.assertEqual(self.memory.integer(self.sub+0x5C, 2), 50)
         self.assertEqual(self.runtime.journal.data['cursor'], 0)
-        self.enter_menu()
-        with self.assertLogs('Client', level='INFO') as log:
-            self.poll([item])
+        self.now += 0.4
+        self.runtime.poll(self.memory, [item])
         self.assertEqual(self.memory.integer(self.sub+0x5C, 2), 50)
         self.assertEqual(self.runtime.journal.data['cursor'], 1)
-        self.assertIn('50 Amazeon Coins', log.output[0])
-        self.assertIn('verified=True', log.output[0])
 
     def test_incomplete_item_history_only_gates_inventory_writes(self):
         item = ITEM_TABLE[coin_bundle_name(0, 100)]
@@ -388,6 +385,7 @@ class TestRuntime(unittest.TestCase):
         self.memory.write(popup+0xC0, bytes([1, 1]))
 
         self.memory.put(self.controller+0x1C, 0x804FBE00, 4)
+        self.set_hole(3)
         ghoul_checks = self.poll()
         self.assertIn(self.runtime.lookup['win', 1], ghoul_checks)
         self.assertIn(self.runtime.lookup['perfect', 1], ghoul_checks)
@@ -395,14 +393,19 @@ class TestRuntime(unittest.TestCase):
         spider_journal = Journal(Path(self.tmp.name)/'spiders.json')
         spider_runtime = Runtime(self.slot, spider_journal)
         self.memory.put(self.controller+0x1C, 0x804FB868, 4)
+        self.memory.write(self.controller+0x1FC, bytes([6]) * 11)
+        self.memory.put(self.manager+0x104, 0, 4)
         spider_checks = spider_runtime.poll(self.memory, [])
-        self.assertEqual(spider_runtime.active_minigame, 9)
         self.assertIn(spider_runtime.lookup['win', 9], spider_checks)
         self.assertNotIn(('perfect', 9), spider_runtime.lookup)
         self.assertNotIn(spider_runtime.lookup['win', 1], spider_checks)
         self.assertNotIn(spider_runtime.lookup['perfect', 1], spider_checks)
+        incomplete_runtime = Runtime(self.slot, Journal(Path(self.tmp.name)/'spiders-incomplete.json'))
+        self.memory.put(self.controller+0x201, 5)
+        self.assertNotIn(incomplete_runtime.lookup['win', 9], incomplete_runtime.poll(self.memory, []))
 
     def test_latched_minigame_survives_controller_change_for_result(self):
+        self.set_hole(15)
         self.memory.put(self.controller+0x1C, MINIGAMES[5]['vtable'], 4)
         array, popup = 0x80960000, 0x80970000
         self.memory.put(self.manager+0x100, array, 4)
@@ -499,7 +502,7 @@ class TestRuntime(unittest.TestCase):
         self.poll(items)
         self.assertEqual(self.memory.integer(self.sub+0x85, 1), 3)
         self.assertFalse(self.runtime.victory(items, set()))
-        items.append(ITEM_TABLE[GOAL_WORLD_ACCESS])
+        items.append(ITEM_TABLE[UNLOCKS[1]])
         self.poll(items)
         self.assertEqual(self.memory.integer(self.root+0x2CD, 1), 0)
         par_checks = {self.runtime.lookup['par', i] for i in range(3, 6)}
@@ -587,6 +590,7 @@ class TestRuntime(unittest.TestCase):
 
 
     def test_late_popup_after_controller_and_session_loss(self):
+        self.set_hole(3)
         self.memory.put(self.controller+0x1C, MINIGAMES[1]['vtable'], 4)
         self.runtime.poll(self.memory, [])
         self.memory.put(self.manager+0xBC, 6, 4)
@@ -648,10 +652,6 @@ class TestRuntime(unittest.TestCase):
 
     def test_currency_delayed_confirmation_retries_game_writeback(self):
         items = [ITEM_TABLE[coin_bundle_name(0, 500)]]
-        self.enter_menu()
-        self.runtime.poll(self.memory, items)
-        self.assertIsNone(self.runtime.journal.data['pending'])
-        self.now += 0.4
         self.runtime.poll(self.memory, items)
         self.assertEqual(self.memory.integer(self.sub+0x58, 2), 500)
         self.assertEqual(self.runtime.journal.data['cursor'], 0)
@@ -667,10 +667,10 @@ class TestRuntime(unittest.TestCase):
         self.runtime.poll(self.memory, items)
         self.assertEqual(self.runtime.journal.data['cursor'], 1)
 
-    def test_null_session_loading_does_not_grant_currency(self):
+    def test_null_session_result_state_grants_currency_immediately(self):
         self.enter_menu(6)
-        self.poll([ITEM_TABLE[coin_bundle_name(0, 500)]])
-        self.assertEqual(self.memory.integer(self.sub+0x58, 2), 0)
+        self.runtime.poll(self.memory, [ITEM_TABLE[coin_bundle_name(0, 500)]])
+        self.assertEqual(self.memory.integer(self.sub+0x58, 2), 500)
         self.assertEqual(self.runtime.journal.data['cursor'], 0)
 
     def test_projection_writes_do_not_mark_save_dirty(self):
@@ -702,9 +702,6 @@ class TestRuntime(unittest.TestCase):
 
     def test_currency_context_interruption_restarts_confirmation(self):
         items = [ITEM_TABLE[coin_bundle_name(0, 500)]]
-        self.enter_menu()
-        self.runtime.poll(self.memory, items)
-        self.now += 0.4
         self.runtime.poll(self.memory, items)
         self.runtime.reset_currency_context()
         self.now += 10
@@ -712,7 +709,120 @@ class TestRuntime(unittest.TestCase):
         self.assertEqual(self.runtime.journal.data['cursor'], 0)
         self.now += 0.4
         self.runtime.poll(self.memory, items)
+        self.assertEqual(self.runtime.journal.data['cursor'], 1)
+
+    def test_500_bundle_applies_first_poll_in_gameplay_and_shop(self):
+        gameplay_item = ITEM_TABLE[coin_bundle_name(0, 500)]
+        self.memory.put(self.manager+0xBC, 5, 4)
+        self.runtime.poll(self.memory, [gameplay_item])
+        self.assertEqual(self.memory.integer(self.sub+0x58, 2), 500)
         self.assertEqual(self.runtime.journal.data['cursor'], 0)
         self.now += 0.4
-        self.runtime.poll(self.memory, items)
+        self.runtime.poll(self.memory, [gameplay_item])
         self.assertEqual(self.runtime.journal.data['cursor'], 1)
+
+        shop_item = ITEM_TABLE[coin_bundle_name(1, 500)]
+        self.enter_menu(3)
+        self.runtime.poll(self.memory, [gameplay_item, shop_item])
+        self.assertEqual(self.memory.integer(self.sub+0x5A, 2), 500)
+
+    def test_positive_bundle_preserves_locally_earned_coin(self):
+        item = ITEM_TABLE[coin_bundle_name(0, 500)]
+        self.runtime.poll(self.memory, [item])
+        self.memory.put(self.sub+0x58, 501, 2)
+        self.now += 0.4
+        self.runtime.poll(self.memory, [item])
+        self.assertEqual(self.memory.integer(self.sub+0x58, 2), 501)
+        self.assertEqual(self.runtime.journal.data['cursor'], 1)
+
+    def test_stale_jungle_bogey_controller_allows_big_mouth_juju(self):
+        self.set_hole(7, par=3)
+        self.memory.put(self.manager+0xBC, 6, 4)
+        self.memory.put(self.controller+0x1C, MINIGAMES[2]['vtable'], 4)
+        self.memory.put(self.hole_state+0x127, 1)
+        self.memory.put(self.root+0x2DC, 2, 4)
+        checks = self.runtime.poll(self.memory, [])
+        self.assertIn(self.runtime.lookup['complete', 7], checks)
+        self.assertIn(self.runtime.lookup['par', 7], checks)
+        self.assertNotIn(('hio', 7), self.runtime.lookup)
+        self.assertIsNone(self.runtime.active_minigame)
+
+    def test_stale_ghoul_latch_allows_old_toothy_completion(self):
+        self.set_hole(3, par=3)
+        self.memory.put(self.manager+0xBC, 7, 4)
+        self.memory.put(self.controller+0x1C, MINIGAMES[1]['vtable'], 4)
+        self.runtime.poll(self.memory, [])
+        self.assertEqual(self.runtime.active_minigame, 1)
+        self.memory.put(self.manager+0xBC, 6, 4)
+        self.memory.put(self.controller+0x1C, 0x80400000, 4)
+        self.memory.put(self.hole_state+0x127, 1)
+        self.memory.put(self.root+0x2DC, 1, 4)
+        checks = self.runtime.poll(self.memory, [])
+        for kind in ('complete', 'par', 'hio'):
+            self.assertIn(self.runtime.lookup[kind, 3], checks)
+        self.assertEqual(self.runtime.active_minigame, 1)
+
+        other_runtime = Runtime(self.slot, Journal(Path(self.tmp.name)/'old-toothy-zero.json'))
+        self.memory.put(self.hole_state+0x127, 0)
+        hole_checks = {other_runtime.lookup[kind, 3] for kind in ('complete', 'par', 'hio')}
+        self.assertFalse(other_runtime.poll(self.memory, []) & hole_checks)
+
+    def test_actual_adventure_minigame_ignores_stale_in_goal(self):
+        self.set_hole(6, par=3)
+        self.memory.put(self.manager+0xBC, 7, 4)
+        self.memory.put(self.controller+0x1C, MINIGAMES[2]['vtable'], 4)
+        self.memory.put(self.hole_state+0x127, 1)
+        self.memory.put(self.root+0x2DC, 1, 4)
+        hole_checks = {self.runtime.lookup[kind, 6] for kind in ('complete', 'par', 'hio')
+                       if (kind, 6) in self.runtime.lookup}
+        self.assertFalse(self.runtime.poll(self.memory, []) & hole_checks)
+
+    def test_debug_state_reports_live_spider_success(self):
+        self.memory.put(self.controller+0x1C, MINIGAMES[9]['vtable'], 4)
+        self.memory.put(self.controller+0x212, 6)
+        self.memory.write(self.controller+0x1FC, bytes([6]) * 11)
+        state = self.runtime.debug_state(self.memory)
+        self.assertEqual(state['spider_state'], 6)
+        self.assertEqual(state['spider_objects'], bytes([6]) * 11)
+        self.assertTrue(state['spider_complete'])
+
+    def test_spider_success_and_devils_brew_goal_reconcile_together(self):
+        self.set_hole(4, par=4)
+        self.memory.put(self.manager+0xBC, 6, 4)
+        self.memory.put(self.controller+0x1C, MINIGAMES[9]['vtable'], 4)
+        self.memory.write(self.controller+0x1FC, bytes([6]) * 11)
+        self.memory.put(self.controller+0x212, 7)
+        self.memory.put(self.hole_state+0x127, 1)
+        self.memory.put(self.root+0x2DC, 3, 4)
+        checks = self.runtime.poll(self.memory, [])
+        self.assertIn(self.runtime.lookup['win', 9], checks)
+        self.assertIn(self.runtime.lookup['complete', 4], checks)
+        self.assertIn(self.runtime.lookup['par', 4], checks)
+        self.assertNotIn(('hio', 4), self.runtime.lookup)
+
+    def test_spider_success_before_goal_sends_no_hole_checks(self):
+        self.set_hole(4, par=4)
+        self.memory.put(self.manager+0xBC, 6, 4)
+        self.memory.put(self.controller+0x1C, MINIGAMES[9]['vtable'], 4)
+        self.memory.write(self.controller+0x1FC, bytes([6]) * 11)
+        self.memory.put(self.controller+0x212, 6)
+        self.memory.put(self.hole_state+0x127, 0)
+        checks = self.runtime.poll(self.memory, [])
+        self.assertIn(self.runtime.lookup['win', 9], checks)
+        self.assertNotIn(self.runtime.lookup['complete', 4], checks)
+        self.assertNotIn(self.runtime.lookup['par', 4], checks)
+
+    def test_state_six_normal_completion_ignores_stale_controllers_for_all_holes(self):
+        self.memory.put(self.manager+0xBC, 6, 4)
+        self.memory.put(self.hole_state+0x127, 1)
+        self.memory.put(self.root+0x2DC, 2, 4)
+        for hole in range(27):
+            with self.subTest(hole=hole):
+                self.set_hole(hole, par=3)
+                stale = MINIGAMES[9] if hole == 4 else MINIGAMES[hole // 3]
+                self.memory.put(self.controller+0x1C, stale['vtable'], 4)
+                if hole == 4:
+                    self.memory.write(self.controller+0x1FC, bytes([6]) * 11)
+                checks = self.runtime.poll(self.memory, [])
+                self.assertIn(self.runtime.lookup['complete', hole], checks)
+                self.assertIn(self.runtime.lookup['par', hole], checks)

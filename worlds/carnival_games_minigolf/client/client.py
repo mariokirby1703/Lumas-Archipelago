@@ -56,12 +56,15 @@ class MiniGolfCommands(ClientCommandProcessor):
             logger.info("Manager: %s | State: %s | Session: %s | Session player: %s | Root: %s | "
                         "Course: %s | Hole def: %s | Derived hole: %s%s | Strokes: %s | Par: %s | "
                         "Hole state: %s | In goal: %s | Controller: %s | VTable: %s | Minigame: %s | "
-                        "Object array: %s | Result popup: %s | Win: %s | Perfect: %s",
+                        "Object array: %s | Result popup: %s | Win: %s | Perfect: %s | "
+                        "Spider state: %s | Spider objects: %s | Spider complete: %s",
                         address(state['manager']), state['manager_state'], address(state['session']),
                         state['session_player'], address(state['root']), state['course'], address(state['hole_def']),
                         hole, hole_name, state['strokes'], state['par'], address(state['hole_state']),
                         state['in_goal'], address(state['controller']), address(state['vtable']), minigame_name,
-                        address(state['object_array']), address(state['result_popup']), state['win'], state['perfect'])
+                        address(state['object_array']), address(state['result_popup']), state['win'], state['perfect'],
+                        state['spider_state'], state['spider_objects'],
+                        "yes" if state['spider_complete'] else "no" if state['spider_complete'] is not None else "n/a")
         except (ImportError, RuntimeError, OSError, MemoryUnavailable) as error:
             logger.info("Live MiniGolf debug state unavailable: %s", error)
 
