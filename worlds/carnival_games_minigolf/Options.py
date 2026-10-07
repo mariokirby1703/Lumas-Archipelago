@@ -66,7 +66,7 @@ class WorldSecrets(DefaultOnToggle):
 
 class ShopChecks(DefaultOnToggle):
     """Add 63 normal purchases and nine Par Club rewards.
-    Logic assumes repeatable normal coin earnings; bundles are optional assistance.
+    Logic assumes repeatable normal coin earnings.
     """
     display_name = "Shop Checks"
 

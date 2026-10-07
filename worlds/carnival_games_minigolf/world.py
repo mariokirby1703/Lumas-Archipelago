@@ -82,6 +82,14 @@ class CarnivalGamesMiniGolfWorld(World):
         if self.options.shop_checks:
             for name in Items.PAR_CLUB_PIECES:
                 names.extend([name] * 3)
+        # Barker counter modes reserve their small-pool capacity for the required
+        # Barker Coins. Other goals always receive the bounded high-value bundles.
+        if not self.counter_mode:
+            for world in range(len(WORLDS)):
+                names.extend([Items.coin_bundle_name(world, 500)] * Items.PROGRESSION_BUNDLES_PER_WORLD)
+            for amount, count in Items.USEFUL_BUNDLE_COUNTS.items():
+                names.extend(Items.coin_bundle_name(world, amount)
+                             for world in self.random.sample(range(len(WORLDS)), count))
         names.extend([Items.BARKER_COIN] * self.total_barker_coins)
         locked_locations = 0
         if self.goal_world is not None:
@@ -104,7 +112,11 @@ class CarnivalGamesMiniGolfWorld(World):
 
     def create_item(self, name):
         classification = ItemClassification.trap if name in Items.COIN_TRAPS else ItemClassification.filler
-        if (name in Items.UNLOCKS
+        bundle = Items.COIN_BUNDLE_DATA.get(name)
+        if bundle and bundle[1] in (100, 200):
+            classification = ItemClassification.useful
+        if ((bundle and bundle[1] == 500)
+                or name in Items.UNLOCKS
                 or (name in Items.PAR_CLUB_PIECES and bool(getattr(self.options, 'shop_checks', True)))
                 or (name == Items.BARKER_COIN and self.counter_mode)):
             classification = ItemClassification.progression
@@ -117,8 +129,8 @@ class CarnivalGamesMiniGolfWorld(World):
             return Items.coin_trap_name(self.random.randrange(9), amount)
         if not self.counter_mode and self.random.randrange(10) == 0:
             return Items.BARKER_COIN
-        amount = self.random.choices(tuple(Items.COIN_BUNDLE_WEIGHTS),
-                                     weights=tuple(Items.COIN_BUNDLE_WEIGHTS.values()), k=1)[0]
+        amount = self.random.choices(tuple(Items.FILLER_COIN_BUNDLE_WEIGHTS),
+                                     weights=tuple(Items.FILLER_COIN_BUNDLE_WEIGHTS.values()), k=1)[0]
         return Items.coin_bundle_name(self.random.randrange(9), amount)
 
     def fill_slot_data(self):

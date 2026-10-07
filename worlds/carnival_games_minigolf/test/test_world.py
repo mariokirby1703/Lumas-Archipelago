@@ -6,13 +6,14 @@ from collections import Counter
 from argparse import Namespace
 from pathlib import Path
 
-from BaseClasses import CollectionState, MultiWorld
+from BaseClasses import CollectionState, ItemClassification, MultiWorld
 from Fill import distribute_items_restrictive
 from test.general import gen_steps
 from worlds.AutoWorld import call_all
 
 from ..data import HOLES, PRIZES, WORLDS
-from ..Items import BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, PAR_CLUB_PIECES, UNLOCKS
+from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA, PAR_CLUB_PIECES, UNLOCKS,
+                     coin_bundle_name)
 from ..Locations import BARKER_REQUIREMENT_LOCATION, HIO_IMPOSSIBLE, HIO_POSSIBLE, LOCATION_TABLE
 from ..world import CarnivalGamesMiniGolfWorld
 from . import MiniGolfTestBase
@@ -52,10 +53,33 @@ class TestWorldData(unittest.TestCase):
         world = generate({'goal': 1}, seed=20260914).worlds[1]
         generated = (world.get_filler_item_name() for _ in range(10000))
         samples = Counter(COIN_BUNDLE_DATA[name][1] for name in generated if name in COIN_BUNDLE_DATA)
-        self.assertTrue(samples[5] < samples[10] < samples[500] < samples[200] < samples[20])
-        self.assertGreater(samples[50], samples[20])
-        self.assertGreater(samples[100], samples[20])
-        self.assertGreater(samples[50] + samples[100], 4500)
+        self.assertEqual(samples[100] + samples[200] + samples[500], 0)
+        self.assertTrue(samples[5] < samples[10] < samples[20] < samples[50])
+        self.assertGreater(samples[50], 4500)
+
+    def test_bounded_high_value_bundles_fit_minimal_pool(self):
+        minimal = dict(minigame_checks=0, hole_in_one_checks=0, barker_coin_checks=0,
+                       world_secrets=0, shop_checks=0, barker_shop_checks=0)
+        world = generate(minimal, fill=True).worlds[1]
+        pool = world.multiworld.itempool
+        for index in range(len(WORLDS)):
+            bundles = [item for item in pool if item.name == coin_bundle_name(index, 500)]
+            self.assertEqual(len(bundles), 2)
+            self.assertTrue(all(item.classification == ItemClassification.progression for item in bundles))
+        for amount in (100, 200):
+            bundles = [item for item in pool
+                       if item.name in COIN_BUNDLE_DATA and COIN_BUNDLE_DATA[item.name][1] == amount]
+            self.assertEqual(len(bundles), 5)
+            self.assertEqual(len({COIN_BUNDLE_DATA[item.name][0] for item in bundles}), 5)
+            self.assertTrue(all(item.classification == ItemClassification.useful for item in bundles))
+        self.assertEqual(len(world.multiworld.get_locations()), 54)
+        self.assertTrue(world.multiworld.can_beat_game())
+
+    def test_smaller_bundles_remain_filler(self):
+        world = generate().worlds[1]
+        for amount in (5, 10, 20, 50):
+            self.assertEqual(world.create_item(coin_bundle_name(0, amount)).classification,
+                             ItemClassification.filler)
 
     def test_traps_are_classified_and_weighted(self):
         world = generate({'goal': 1, 'trap_weight': 10}, seed=20260915).worlds[1]

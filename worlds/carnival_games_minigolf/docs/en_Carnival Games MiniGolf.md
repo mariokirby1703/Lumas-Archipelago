@@ -26,7 +26,9 @@ targets the PAL `RG9P54` release and uses an external Dolphin client.
 - World Access items, named `[World Name] Access`
 - World-specific Par Club Pieces
 - Barker Coins
-- World-specific Coin Bundles
+- Two progression-classified 500 Coin Bundles for each world
+- Five useful 100 Coin Bundles and five useful 200 Coin Bundles, each spread across different worlds
+- Filler-classified 5, 10, 20, and 50 Coin Bundles
 - Optional world-specific Coin Traps
 
 ## Campaign Options
@@ -76,5 +78,7 @@ The maximum requirement of 40 Barker Coins remains generatable with every option
 World mode, the six Complete and Par Club Piece checks in the Goal World are behind its Access item, leaving exactly
 enough reachable mandatory checks for 40 Barker Coins and the other seven World Access items.
 
-Normal coins can be earned repeatedly in any open world, so Coin Bundles are useful assistance rather than required
-progression. Coin Traps are optional and default to a weight of 10%.
+All Holes and Goal World with item access include the bounded high-value bundle set even when every optional check
+family is disabled. Barker Coin Hunt and Barker-based Goal World access reserve the small-pool capacity for their
+required Barker Coins, so they use the dedicated Barker pool instead. Normal coins can also be earned repeatedly in
+any open world. Coin Traps are optional and default to a weight of 10%.

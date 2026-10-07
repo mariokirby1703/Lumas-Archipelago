@@ -92,6 +92,9 @@ Received Par Club Piece items control Pro Shop progression. Receiving 0, 1, 2, o
 cheapest 2, 4, 6, or 7 normal shop purchases available; all three pieces also allow the Par Club reward.
 
 Coin Bundles, spendable Barker Coins, and enabled Coin Traps apply immediately while the supported game is running.
+For non-counter goals, every world has two progression 500 Coin Bundles; five 100 and five 200 Coin Bundles are
+useful items distributed across different worlds. Smaller bundles remain filler. Barker counter modes reserve their
+limited item-pool capacity for the required Barker Coins.
 Coin Traps default to a 10% filler weight and can be adjusted or disabled in the player YAML.
 The client journals currency deliveries so reconnecting does not apply a confirmed item twice. If an interrupted
 delivery leaves an ambiguous balance, synchronization pauses and the `/currency_recover` commands resolve it.

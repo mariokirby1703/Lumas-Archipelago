@@ -7,6 +7,10 @@ PAR_CLUB_PIECES = tuple(f"{world} Par Club Piece" for world in WORLDS)
 UNLOCKS = tuple(f"{world} Access" for world in WORLDS)
 # Relative frequencies within the bundle pool.
 COIN_BUNDLE_WEIGHTS = {5: 1, 10: 2, 20: 8, 50: 16, 100: 16, 200: 6, 500: 4}
+FILLER_COIN_BUNDLE_WEIGHTS = {amount: weight for amount, weight in COIN_BUNDLE_WEIGHTS.items()
+                              if amount not in (100, 200, 500)}
+PROGRESSION_BUNDLES_PER_WORLD = 2
+USEFUL_BUNDLE_COUNTS = {100: 5, 200: 5}
 COIN_TRAP_WEIGHTS = {5: 4, 10: 3, 20: 2, 50: 1}
 
 
