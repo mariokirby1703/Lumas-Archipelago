@@ -149,8 +149,9 @@ class CarnivalGamesMiniGolfWorld(World):
             item = self.create_item(name)
             if name == Items.BARKER_COIN and self.counter_mode:
                 barker_count += 1
-                if barker_count > self.required_coins:
-                    item.classification = ItemClassification.useful
+                item.classification = (ItemClassification.progression
+                                       if barker_count <= self.required_coins
+                                       else ItemClassification.useful)
             self.multiworld.itempool.append(item)
 
     def create_item(self, name):
@@ -160,8 +161,7 @@ class CarnivalGamesMiniGolfWorld(World):
             classification = ItemClassification.useful
         if ((bundle and bundle[1] == 500)
                 or name in Items.UNLOCKS
-                or (name in Items.PAR_CLUB_PIECES and bool(getattr(self.options, 'shop_checks', True)))
-                or (name == Items.BARKER_COIN and self.counter_mode)):
+                or (name in Items.PAR_CLUB_PIECES and bool(getattr(self.options, 'shop_checks', True)))):
             classification = ItemClassification.progression
         return Items.MiniGolfItem(name, classification, Items.ITEM_TABLE[name], self.player)
 

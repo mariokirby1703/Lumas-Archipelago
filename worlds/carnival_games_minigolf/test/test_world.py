@@ -307,8 +307,12 @@ class TestWorldData(unittest.TestCase):
                         regenerated_state = CollectionState(regenerated.multiworld)
                         if original.barker_access:
                             for _ in range(count):
-                                original_state.collect(original.create_item(BARKER_COIN), prevent_sweep=True)
-                                regenerated_state.collect(regenerated.create_item(BARKER_COIN), prevent_sweep=True)
+                                original_coin = original.create_item(BARKER_COIN)
+                                original_coin.classification = ItemClassification.progression
+                                regenerated_coin = regenerated.create_item(BARKER_COIN)
+                                regenerated_coin.classification = ItemClassification.progression
+                                original_state.collect(original_coin, prevent_sweep=True)
+                                regenerated_state.collect(regenerated_coin, prevent_sweep=True)
                         else:
                             original_state.collect(original.create_item(UNLOCKS[original.goal_world]),
                                                    prevent_sweep=True)
@@ -316,6 +320,58 @@ class TestWorldData(unittest.TestCase):
                                                       prevent_sweep=True)
                         self.assertEqual(original_state.can_reach_region(WORLDS[original.goal_world], 1),
                                          regenerated_state.can_reach_region(WORLDS[regenerated.goal_world], 1))
+
+    def test_universal_tracker_preserves_barker_coin_network_classification(self):
+        for required in (5, 27, 40):
+            with self.subTest(required=required):
+                multiworld = generate(dict(starting_world=0, goal=1, goal_world=1,
+                                           goal_world_access=1, barker_coins_required=required), seed=required)
+                world = multiworld.worlds[1]
+                generated = [item for item in multiworld.itempool if item.name == BARKER_COIN]
+                progression = [item for item in generated if item.advancement]
+                useful = [item for item in generated if item.classification == ItemClassification.useful]
+                self.assertEqual(len(progression), required)
+                self.assertEqual(len(useful), world.total_barker_coins - required)
+                self.assertEqual(world.create_item(BARKER_COIN).classification, ItemClassification.filler)
+
+                state = CollectionState(multiworld)
+                received_progression = required - 1
+                for generated_item in progression[:received_progression] + useful:
+                    reconstructed = world.create_item(BARKER_COIN)
+                    reconstructed.classification |= generated_item.classification
+                    state.collect(reconstructed, prevent_sweep=True)
+                self.assertEqual(state.count(BARKER_COIN, 1), received_progression)
+                self.assertFalse(state.can_reach_region(WORLDS[world.goal_world], 1))
+                self.assertFalse(state.can_reach(BARKER_REQUIREMENT_LOCATION, 'Location', 1))
+
+                reconstructed = world.create_item(BARKER_COIN)
+                reconstructed.classification |= progression[received_progression].classification
+                state.collect(reconstructed, prevent_sweep=True)
+                self.assertEqual(state.count(BARKER_COIN, 1), required)
+                self.assertTrue(state.can_reach_region(WORLDS[world.goal_world], 1))
+                self.assertTrue(state.can_reach(BARKER_REQUIREMENT_LOCATION, 'Location', 1))
+
+        multiworld = generate(dict(starting_world=0, goal=1, goal_world=1,
+                                   goal_world_access=1, barker_coins_required=27), seed=3077)
+        world = multiworld.worlds[1]
+        generated = [item for item in multiworld.itempool if item.name == BARKER_COIN]
+        progression = [item for item in generated if item.advancement]
+        useful = [item for item in generated if item.classification == ItemClassification.useful]
+        state = CollectionState(multiworld)
+        for generated_item in progression[:22] + useful[:8]:
+            reconstructed = world.create_item(BARKER_COIN)
+            reconstructed.classification |= generated_item.classification
+            state.collect(reconstructed, prevent_sweep=True)
+        self.assertEqual(state.count(BARKER_COIN, 1), 22)
+        self.assertFalse(state.can_reach_region(WORLDS[world.goal_world], 1))
+        self.assertFalse(state.can_reach(BARKER_REQUIREMENT_LOCATION, 'Location', 1))
+        for generated_item in progression[22:27]:
+            reconstructed = world.create_item(BARKER_COIN)
+            reconstructed.classification |= generated_item.classification
+            state.collect(reconstructed, prevent_sweep=True)
+        self.assertEqual(state.count(BARKER_COIN, 1), 27)
+        self.assertTrue(state.can_reach_region(WORLDS[world.goal_world], 1))
+        self.assertTrue(state.can_reach(BARKER_REQUIREMENT_LOCATION, 'Location', 1))
 
     def test_high_barker_minimal_fill_has_world_access_chain(self):
         options = dict(starting_world=2, goal=1, goal_world=1, goal_world_access=1,
