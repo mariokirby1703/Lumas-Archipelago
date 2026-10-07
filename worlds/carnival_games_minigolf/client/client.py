@@ -5,7 +5,6 @@ import json
 import time
 from pathlib import Path
 
-import Utils
 from websockets.exceptions import ConnectionClosed
 from CommonClient import ClientCommandProcessor, CommonContext, gui_enabled, logger, server_loop
 from NetUtils import ClientStatus
@@ -114,6 +113,7 @@ class MiniGolfContext(CommonContext):
         self.last_send = 0.0
         self.last_sent = set()
         self.journal_lock = None
+        self.receipt_journals = {}
         if patch_file:
             patch = json.loads(Path(patch_file).read_text(encoding='utf-8'))
             if patch.get('game') != GAME:
@@ -131,31 +131,7 @@ class MiniGolfContext(CommonContext):
         await self.send_connect(game=GAME)
 
     def release_journal(self):
-        if self.journal_lock:
-            self.journal_lock.close()
-            self.journal_lock = None
-
-    def acquire_journal(self, path):
-        # Hold an OS lock for the entire connected session, so two clients cannot
-        # both grant the same receipt from a shared journal.
-        path.parent.mkdir(parents=True, exist_ok=True)
-        handle = path.with_suffix('.lock').open('a+b')
-        try:
-            handle.seek(0)
-            if __import__('sys').platform == 'win32':
-                import msvcrt
-                if handle.read(1) == b'':
-                    handle.write(b'0')
-                    handle.flush()
-                handle.seek(0)
-                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
-            else:
-                import fcntl
-                fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except OSError:
-            handle.close()
-            raise ValueError("Another MiniGolf client is already using this seed and slot") from None
-        self.journal_lock = handle
+        self.journal_lock = None
 
     def on_package(self, cmd, args):
         if cmd == 'Connected':
@@ -174,17 +150,8 @@ class MiniGolfContext(CommonContext):
                 identity = json.dumps([data, self.team, self.slot, self.local_player],
                                       sort_keys=True, separators=(',', ':'))
                 key = hashlib.sha256(identity.encode()).hexdigest()
-                path = Path(Utils.user_path('carnival_games_minigolf', key + '.json'))
-                legacy_identity = json.dumps([data['schema_version'], data['seed_name'], self.team,
-                                              self.slot, self.local_player])
-                legacy_key = hashlib.sha256(legacy_identity.encode()).hexdigest()
-                legacy_path = Path(Utils.user_path('carnival_games_minigolf', legacy_key + '.json'))
-                if not path.exists() and legacy_path.exists():
-                    raise ValueError("A legacy receipt journal exists for this seed. Finish it with the previous "
-                                     "client, or generate a new seed with a dedicated game profile; automatic "
-                                     "migration cannot verify the old slot configuration.")
-                self.acquire_journal(path)
-                self.runtime = Runtime(data, Journal(path))
+                journal = self.receipt_journals.setdefault(key, Journal())
+                self.runtime = Runtime(data, journal)
                 self.locations_checked = set(self.runtime.journal.data['checks'])
                 # AP omits ReceivedItems for an empty inventory, including Sync replies.
                 # A read-only round trip establishes an ordered barrier after Connected

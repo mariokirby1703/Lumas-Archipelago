@@ -1,11 +1,8 @@
 import asyncio
-import hashlib
-import json
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
-
 import Utils
 
 from ..client.client import MiniGolfContext, emulation_active
@@ -33,6 +30,8 @@ class TestClient(unittest.IsolatedAsyncioTestCase):
             try:
                 ctx.on_package('Connected', {'slot_data': generate().worlds[1].fill_slot_data()})
                 self.assertIsNotNone(ctx.runtime)
+                self.assertIsNone(ctx.runtime.journal.path)
+                self.assertFalse(any(Path(directory).iterdir()))
                 self.assertFalse(ctx.history_ready)
                 await asyncio.sleep(0)
                 ctx.send_msgs.assert_awaited_with([{'cmd': 'Get', 'keys': ['_cgm_history_barrier']}])
@@ -46,23 +45,6 @@ class TestClient(unittest.IsolatedAsyncioTestCase):
                 ctx.exit_event.set()
                 ctx.release_journal()
                 await ctx.shutdown()
-
-    async def test_second_client_cannot_open_same_journal(self):
-        with tempfile.TemporaryDirectory() as directory:
-            first, second = MiniGolfContext(), MiniGolfContext()
-            try:
-                path = Path(directory) / 'same.json'
-                first.acquire_journal(path)
-                with self.assertRaisesRegex(ValueError, 'Another MiniGolf client'):
-                    second.acquire_journal(path)
-                first.release_journal()
-                second.acquire_journal(path)
-            finally:
-                for ctx in (first, second):
-                    ctx.exit_event.set()
-                    ctx.release_journal()
-                    await ctx.shutdown()
-
     async def test_journal_identity_covers_slot_configuration_and_key_order(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(Utils, 'user_path',
                 side_effect=lambda *p: str(Path(directory).joinpath(*p))):
@@ -72,32 +54,13 @@ class TestClient(unittest.IsolatedAsyncioTestCase):
             data = generate().worlds[1].fill_slot_data()
             try:
                 ctx.on_package('Connected', {'slot_data': data})
-                original = ctx.runtime.journal.path
+                original = ctx.runtime.journal
                 ctx.on_package('Connected', {'slot_data': dict(reversed(list(data.items())))})
-                self.assertEqual(ctx.runtime.journal.path, original)
+                self.assertIs(ctx.runtime.journal, original)
                 changed = {**data, 'options': {**data['options'], 'trap_weight': 50}}
                 ctx.on_package('Connected', {'slot_data': changed})
-                self.assertNotEqual(ctx.runtime.journal.path, original)
-            finally:
-                ctx.exit_event.set()
-                ctx.release_journal()
-                await ctx.shutdown()
-
-    async def test_legacy_journal_is_not_silently_replayed(self):
-        with tempfile.TemporaryDirectory() as directory, patch.object(Utils, 'user_path',
-                side_effect=lambda *p: str(Path(directory).joinpath(*p))):
-            ctx = MiniGolfContext()
-            ctx.team, ctx.slot = 0, 1
-            data = generate().worlds[1].fill_slot_data()
-            identity = json.dumps([data['schema_version'], data['seed_name'], 0, 1, 0])
-            key = hashlib.sha256(identity.encode()).hexdigest()
-            path = Path(directory) / 'carnival_games_minigolf' / (key + '.json')
-            path.parent.mkdir()
-            path.write_text('{}')
-            try:
-                ctx.on_package('Connected', {'slot_data': data})
-                self.assertIsNone(ctx.runtime)
-                self.assertIn('legacy receipt journal', ctx.runtime_error)
+                self.assertIsNot(ctx.runtime.journal, original)
+                self.assertFalse(any(Path(directory).iterdir()))
             finally:
                 ctx.exit_event.set()
                 ctx.release_journal()

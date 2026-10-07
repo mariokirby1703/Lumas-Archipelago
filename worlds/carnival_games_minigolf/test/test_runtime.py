@@ -121,7 +121,7 @@ class TestRuntime(unittest.TestCase):
         self.poll(items)
         self.assertEqual(self.memory.integer(self.sub+0x58, 2), 0x1234+100)
         self.assertEqual(self.memory.integer(self.sub+0x85, 1), 1)
-        self.runtime = Runtime(self.slot, Journal(self.path))
+        self.runtime = Runtime(self.slot, self.runtime.journal)
         self.poll(items)
         self.assertEqual(self.memory.integer(self.sub+0x58, 2), 0x1234+100)
         self.assertEqual(self.memory.integer(self.sub+0x85, 1), 1)
@@ -288,7 +288,7 @@ class TestRuntime(unittest.TestCase):
         items = [ITEM_TABLE[coin_trap_name(0, 50)]]
         self.poll(items)
         self.assertEqual(self.memory.integer(self.sub+0x58, 2), 50)
-        self.runtime = Runtime(self.slot, Journal(self.path))
+        self.runtime = Runtime(self.slot, self.runtime.journal)
         self.poll(items)
         self.assertEqual(self.memory.integer(self.sub+0x58, 2), 50)
 

@@ -1,6 +1,6 @@
 from worlds.generic.Rules import set_rule
 
-from .Items import BARKER_COIN, PAR_CLUB_PIECES, UNLOCKS
+from .Items import BARKER_COIN, PAR_CLUB_PIECES, UNLOCKS, coin_bundle_name
 from .Locations import LOCATION_TABLE
 from .data import HOLES, PRIZES, WORLDS
 
@@ -24,6 +24,15 @@ def par_count(state, world, index):
 def set_rules(world):
     for i, name in enumerate(WORLDS):
         set_rule(world.get_entrance(f"Menu -> {name}"), world_access(world, i))
+        set_rule(world.get_entrance(f"Menu -> {name} Shop"),
+                 lambda state, index=i: (world_access(world, index)(state)
+                                         or (not world.counter_mode and state.has(
+                                             coin_bundle_name(index, 500), world.player))))
+    shop_ranks = {}
+    for index in range(len(WORLDS)):
+        purchases = sorted((p for p in PRIZES if p['kind'] == 'shop' and p['world'] == index),
+                           key=lambda p: (p['price'], p['id']))
+        shop_ranks.update({prize['id']: rank for rank, prize in enumerate(purchases)})
     shop_cost = 0
     barker_costs = {}
     for prize in sorted((p for p in PRIZES if p['kind'] == 'barker_shop'), key=lambda p: (p['price'], p['id'])):
@@ -31,7 +40,18 @@ def set_rules(world):
         barker_costs[prize['id']] = shop_cost
     for name in world.active_locations:
         data = LOCATION_TABLE[name]
-        if data.pieces:
+        if data.kind == 'shop' and not world.counter_mode and shop_ranks[data.index] < 4:
+            rank = shop_ranks[data.index]
+            bundles = 1 if rank < 2 else 2
+            set_rule(world.get_location(name), lambda state, d=data, b=bundles:
+                     (world_access(world, d.world)(state)
+                      or state.has(coin_bundle_name(d.world, 500), world.player, b))
+                     and par_count(state, world, d.world) >= d.pieces)
+        elif data.kind in {'shop', 'club'}:
+            set_rule(world.get_location(name), lambda state, d=data:
+                     world_access(world, d.world)(state)
+                     and par_count(state, world, d.world) >= d.pieces)
+        elif data.pieces:
             set_rule(world.get_location(name), lambda state, d=data: par_count(state, world, d.world) >= d.pieces)
         elif data.kind == 'barker_shop':
             # All 27 vanilla Barker collectibles remain obtainable even when their checks are disabled.

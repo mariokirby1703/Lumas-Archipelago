@@ -41,5 +41,5 @@ $env:SKIP_REQUIREMENTS_UPDATE = '1'
 ```
 
 The runtime verifies the supported game and executable revision before writing Dolphin memory. Item and
-location IDs remain stable across option choices, and currency delivery uses a local receipt journal to avoid
-reapplying confirmed items after reconnecting.
+location IDs remain stable across option choices. The client does not create game-specific log, journal, or lock
+files in the Archipelago folder or user directory.

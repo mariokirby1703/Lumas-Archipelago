@@ -5,7 +5,7 @@ from BaseClasses import ItemClassification, Tutorial
 from worlds.AutoWorld import WebWorld, World
 
 from . import Items, Locations, Regions, Rules
-from .data import GAME, WORLDS
+from .data import GAME, HOLES, WORLDS
 from .Options import MiniGolfOptions, OPTION_GROUPS
 
 
@@ -41,6 +41,31 @@ class CarnivalGamesMiniGolfWorld(World):
                                     'Barker Shop': {'barker_shop'}}.items()})
 
     def generate_early(self):
+        passthrough = getattr(self.multiworld, "re_gen_passthrough", {}).get(self.game)
+        if passthrough:
+            self.starting_world = passthrough["starting_world"]
+            self.goal_mode = passthrough["goal"]
+            self.goal_world = passthrough["goal_world"]
+            self.barker_access = self.goal_mode == 1 and passthrough["goal_world_access"] == 1
+            self.counter_mode = passthrough["counter_mode"]
+            self.required_coins = passthrough["required_coins"]
+            self.total_barker_coins = passthrough["total_barker_coins"]
+            self.active_locations = tuple(passthrough["locations"])
+            for name, value in passthrough.get("options", {}).items():
+                if hasattr(self.options, name):
+                    getattr(self.options, name).value = value
+            self.options.starting_world.value = self.starting_world
+            self.options.goal.value = self.goal_mode
+            if self.goal_world is not None:
+                self.options.goal_world.value = self.goal_world
+            self.options.goal_world_access.value = passthrough["goal_world_access"]
+            self.options.barker_coins_required.value = self.required_coins or passthrough.get(
+                "options", {}).get("barker_coins_required", self.options.barker_coins_required.value)
+            self.early_world_accesses = passthrough.get("early_world_accesses", [])
+            if not self.early_world_accesses and passthrough.get("early_world_access") is not None:
+                self.early_world_accesses = [passthrough["early_world_access"]]
+            return
+
         self.starting_world = self.options.starting_world.value
         self.goal_mode = self.options.goal.value
         self.goal_world = self.options.goal_world.value if self.goal_mode == 1 else None
@@ -65,11 +90,21 @@ class CarnivalGamesMiniGolfWorld(World):
         capacity = (len(self.active_locations) - unlock_count
                     - (27 if self.options.shop_checks else 0)
                     - (1 if self.goal_world is not None else 0))
-        self.total_barker_coins = min(self.total_barker_coins, capacity)
+        if self.counter_mode:
+            # Keep enough non-Barker slots for every World Access item. The
+            # required coins always remain in the pool; only optional surplus
+            # coins are trimmed when the smallest location set is selected.
+            safe_coin_capacity = max(self.required_coins, capacity - unlock_count)
+            self.total_barker_coins = min(self.total_barker_coins, safe_coin_capacity)
         if self.required_coins + unlock_count > available or self.required_coins > capacity:
             raise ValueError("Carnival Games MiniGolf: Too few enabled checks before the goal for the required "
                              "Barker Coins and world unlocks. Enable Barker Coin Checks, Secrets, Shops or "
                              f"Minigames, or reduce Barker Coins Required to {min(available - unlock_count, capacity)}.")
+        self.early_world_accesses = []
+        if self.counter_mode:
+            candidates = [i for i in range(len(WORLDS)) if i not in (self.starting_world, self.goal_world)]
+            self.random.shuffle(candidates)
+            self.early_world_accesses = candidates
 
     def create_regions(self):
         Regions.create_regions(self)
@@ -78,7 +113,9 @@ class CarnivalGamesMiniGolfWorld(World):
         Rules.set_rules(self)
 
     def create_items(self):
-        names = [name for i, name in enumerate(Items.UNLOCKS) if i not in (self.starting_world, self.goal_world)]
+        chained_accesses = set(self.early_world_accesses)
+        names = [name for i, name in enumerate(Items.UNLOCKS)
+                 if i not in (self.starting_world, self.goal_world) and i not in chained_accesses]
         if self.options.shop_checks:
             for name in Items.PAR_CLUB_PIECES:
                 names.extend([name] * 3)
@@ -92,11 +129,17 @@ class CarnivalGamesMiniGolfWorld(World):
                              for world in self.random.sample(range(len(WORLDS)), count))
         names.extend([Items.BARKER_COIN] * self.total_barker_coins)
         locked_locations = 0
+        chain_world = self.starting_world
+        for access_world in self.early_world_accesses:
+            self.get_location(f"{HOLES[chain_world * 3]} - Complete").place_locked_item(
+                self.create_item(Items.UNLOCKS[access_world]))
+            locked_locations += 1
+            chain_world = access_world
         if self.goal_world is not None:
             if self.barker_access:
                 self.get_location(Locations.BARKER_REQUIREMENT_LOCATION).place_locked_item(
                     self.create_item(Items.UNLOCKS[self.goal_world]))
-                locked_locations = 1
+                locked_locations += 1
             else:
                 names.append(Items.UNLOCKS[self.goal_world])
         while len(names) < len(self.active_locations) - locked_locations:
@@ -139,10 +182,16 @@ class CarnivalGamesMiniGolfWorld(World):
                 "goal": self.goal_mode, "goal_world_access": self.options.goal_world_access.value,
                 "counter_mode": self.counter_mode, "required_coins": self.required_coins,
                 "total_barker_coins": self.total_barker_coins,
+                "early_world_accesses": self.early_world_accesses,
                 "locations": {name: {'code': Locations.LOCATION_TABLE[name].code} for name in self.active_locations},
-                "options": self.options.as_dict("goal", "minigame_checks", "hole_in_one_checks", "barker_coin_checks",
-                                                "world_secrets", "shop_checks", "barker_shop_checks",
-                                                "goal_world_access", "trap_weight")}
+                "options": self.options.as_dict("starting_world", "goal_world", "goal", "minigame_checks",
+                                                "hole_in_one_checks", "barker_coin_checks", "world_secrets",
+                                                "shop_checks", "barker_shop_checks", "goal_world_access",
+                                                "barker_coins_required", "trap_weight")}
+
+    @staticmethod
+    def interpret_slot_data(slot_data):
+        return slot_data
 
     def generate_output(self, output_directory):
         data = {"game": GAME, "player_name": self.multiworld.get_player_name(self.player),

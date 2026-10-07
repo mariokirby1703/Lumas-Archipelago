@@ -19,9 +19,11 @@ from ..world import CarnivalGamesMiniGolfWorld
 from . import MiniGolfTestBase
 
 
-def generate(options=None, seed=0, players=1, fill=False):
+def generate(options=None, seed=0, players=1, fill=False, passthrough=None):
     multiworld = MultiWorld(players)
     multiworld.set_seed(seed)
+    if passthrough is not None:
+        multiworld.re_gen_passthrough = {CarnivalGamesMiniGolfWorld.game: passthrough}
     multiworld.seed_name = f"MiniGolfTest{seed}"
     multiworld.player_name = {}
     args = Namespace()
@@ -174,21 +176,32 @@ class TestWorldData(unittest.TestCase):
         disabled = generate({'shop_checks': 0}).worlds[1]
         self.assertFalse(any(item.name in PAR_CLUB_PIECES for item in disabled.multiworld.itempool))
 
-    def test_shop_logic_uses_received_piece_items(self):
+    def test_shop_logic_allows_early_tiers_via_access_or_coin_bundles(self):
         mw = generate({'starting_world': 0, 'shop_checks': 1})
         world = mw.worlds[1]
-        purchases = sorted((p for p in PRIZES if p['kind'] == 'shop' and p['world'] == 0),
+        shop_world = 1
+        purchases = sorted((p for p in PRIZES if p['kind'] == 'shop' and p['world'] == shop_world),
                            key=lambda p: (p['price'], p['id']))
-        purchase_names = [f"{WORLDS[0]} Shop: {p['name']}" for p in purchases]
-        club = next(p for p in PRIZES if p['kind'] == 'club' and p['world'] == 0)
-        club_name = f"{WORLDS[0]} - Par Club Reward: {club['name']}"
+        purchase_names = [f"{WORLDS[shop_world]} Shop: {p['name']}" for p in purchases]
+        club = next(p for p in PRIZES if p['kind'] == 'club' and p['world'] == shop_world)
+        club_name = f"{WORLDS[shop_world]} - Par Club Reward: {club['name']}"
         state = CollectionState(mw)
-        for piece_count, reachable_count in enumerate((2, 4, 6, 7)):
-            self.assertEqual(sum(state.can_reach(name, 'Location', 1) for name in purchase_names),
-                             reachable_count)
-            self.assertEqual(state.can_reach(club_name, 'Location', 1), piece_count == 3)
-            if piece_count < 3:
-                state.collect(world.create_item(PAR_CLUB_PIECES[0]), prevent_sweep=True)
+        self.assertEqual(sum(state.can_reach(name, 'Location', 1) for name in purchase_names), 0)
+        state.collect(world.create_item(coin_bundle_name(shop_world, 500)), prevent_sweep=True)
+        self.assertEqual(sum(state.can_reach(name, 'Location', 1) for name in purchase_names), 2)
+        state.collect(world.create_item(coin_bundle_name(shop_world, 500)), prevent_sweep=True)
+        self.assertEqual(sum(state.can_reach(name, 'Location', 1) for name in purchase_names), 2)
+        state.collect(world.create_item(PAR_CLUB_PIECES[shop_world]), prevent_sweep=True)
+        self.assertEqual(sum(state.can_reach(name, 'Location', 1) for name in purchase_names), 4)
+        state.collect(world.create_item(PAR_CLUB_PIECES[shop_world]), prevent_sweep=True)
+        self.assertEqual(sum(state.can_reach(name, 'Location', 1) for name in purchase_names), 4)
+        self.assertFalse(state.can_reach(club_name, 'Location', 1))
+        state.collect(world.create_item(PAR_CLUB_PIECES[shop_world]), prevent_sweep=True)
+        self.assertEqual(sum(state.can_reach(name, 'Location', 1) for name in purchase_names), 4)
+        self.assertFalse(state.can_reach(club_name, 'Location', 1))
+        state.collect(world.create_item(UNLOCKS[shop_world]), prevent_sweep=True)
+        self.assertEqual(sum(state.can_reach(name, 'Location', 1) for name in purchase_names), 7)
+        self.assertTrue(state.can_reach(club_name, 'Location', 1))
 
     def test_names_and_barker_pool_size(self):
         self.assertEqual(UNLOCKS, tuple(f"{world} Access" for world in WORLDS))
@@ -233,7 +246,7 @@ class TestWorldData(unittest.TestCase):
         world = mw.worlds[1]
         coins = [location.item for location in mw.get_filled_locations() if location.item.name == BARKER_COIN]
         self.assertEqual(sum(item.classification == ItemClassification.progression for item in coins), 40)
-        self.assertEqual(sum(item.classification == ItemClassification.useful for item in coins), 6)
+        self.assertEqual(sum(item.classification == ItemClassification.useful for item in coins), 0)
         self.assertEqual(len(mw.get_filled_locations()), 54)
         self.assertTrue(mw.can_beat_game())
         validate_slot(world.fill_slot_data())
@@ -244,14 +257,81 @@ class TestWorldData(unittest.TestCase):
         hunt = generate({**minimal, 'goal': 2}, fill=True)
         self.assertEqual(len(hunt.get_locations()), 54)
         self.assertTrue(hunt.can_beat_game())
-        self.assertEqual(sum(item.name == BARKER_COIN for item in hunt.itempool), 46)
-        self.assertEqual(sum(item.name in UNLOCKS for item in hunt.itempool), 8)
+        self.assertEqual(sum(item.name == BARKER_COIN for item in hunt.itempool), 40)
+        self.assertEqual(sum(location.item.name in UNLOCKS for location in hunt.get_filled_locations()), 8)
 
         goal_world = generate({**minimal, 'goal': 1, 'starting_world': 0, 'goal_world': 1,
                                'goal_world_access': 1}, fill=True)
         self.assertEqual(len(goal_world.get_locations()), 55)
         self.assertTrue(goal_world.can_beat_game())
-        self.assertEqual(sum(item.name == BARKER_COIN for item in goal_world.itempool), 47)
-        self.assertEqual(sum(item.name in UNLOCKS for item in goal_world.itempool), 7)
+        self.assertEqual(sum(item.name == BARKER_COIN for item in goal_world.itempool), 40)
+        self.assertEqual(sum(location.item.name in UNLOCKS for location in goal_world.get_filled_locations()), 8)
         self.assertEqual(goal_world.worlds[1].get_location(BARKER_REQUIREMENT_LOCATION).item.name,
                          UNLOCKS[1])
+
+    def test_universal_tracker_regeneration_restores_resolved_logic(self):
+        cases = (
+            dict(starting_world=0, goal=1, goal_world=1, goal_world_access=0,
+                 barker_coins_required=1, minigame_checks=0, hole_in_one_checks=0,
+                 barker_coin_checks=0, world_secrets=0, shop_checks=0, barker_shop_checks=0),
+            dict(starting_world=2, goal=1, goal_world=1, goal_world_access=1,
+                 barker_coins_required=40, minigame_checks=3, hole_in_one_checks=1,
+                 barker_coin_checks=1, world_secrets=0, shop_checks=1, barker_shop_checks=1),
+            # Initial generation must resolve this collision once; regeneration must reuse it.
+            dict(starting_world=4, goal=1, goal_world=4, goal_world_access=1,
+                 barker_coins_required=5, minigame_checks=2, hole_in_one_checks=1,
+                 barker_coin_checks=0, world_secrets=1, shop_checks=0, barker_shop_checks=1),
+            dict(starting_world=8, goal=2, goal_world=3, goal_world_access=0,
+                 barker_coins_required=27, minigame_checks=1, hole_in_one_checks=0,
+                 barker_coin_checks=1, world_secrets=1, shop_checks=0, barker_shop_checks=1),
+        )
+        for seed, options in enumerate(cases, 800):
+            with self.subTest(seed=seed, options=options):
+                original = generate(options, seed).worlds[1]
+                slot_data = original.fill_slot_data()
+                interpreted = original.interpret_slot_data(slot_data)
+                regenerated = generate(options, seed + 10000, passthrough=interpreted).worlds[1]
+                self.assertEqual(regenerated.starting_world, original.starting_world)
+                self.assertEqual(regenerated.goal_world, original.goal_world)
+                self.assertEqual(regenerated.goal_mode, original.goal_mode)
+                self.assertEqual(regenerated.barker_access, original.barker_access)
+                self.assertEqual(regenerated.counter_mode, original.counter_mode)
+                self.assertEqual(regenerated.required_coins, original.required_coins)
+                self.assertEqual(regenerated.total_barker_coins, original.total_barker_coins)
+                self.assertEqual(regenerated.active_locations, original.active_locations)
+                self.assertEqual(regenerated.early_world_accesses, original.early_world_accesses)
+                if original.goal_world is not None:
+                    for count in ({0, max(0, original.required_coins - 1), original.required_coins}
+                                  if original.barker_access else {0}):
+                        original_state = CollectionState(original.multiworld)
+                        regenerated_state = CollectionState(regenerated.multiworld)
+                        if original.barker_access:
+                            for _ in range(count):
+                                original_state.collect(original.create_item(BARKER_COIN), prevent_sweep=True)
+                                regenerated_state.collect(regenerated.create_item(BARKER_COIN), prevent_sweep=True)
+                        else:
+                            original_state.collect(original.create_item(UNLOCKS[original.goal_world]),
+                                                   prevent_sweep=True)
+                            regenerated_state.collect(regenerated.create_item(UNLOCKS[regenerated.goal_world]),
+                                                      prevent_sweep=True)
+                        self.assertEqual(original_state.can_reach_region(WORLDS[original.goal_world], 1),
+                                         regenerated_state.can_reach_region(WORLDS[regenerated.goal_world], 1))
+
+    def test_high_barker_minimal_fill_has_world_access_chain(self):
+        options = dict(starting_world=2, goal=1, goal_world=1, goal_world_access=1,
+                       barker_coins_required=40, minigame_checks=0, hole_in_one_checks=0,
+                       barker_coin_checks=0, world_secrets=0, shop_checks=0, barker_shop_checks=1)
+        for seed in range(100):
+            with self.subTest(seed=seed):
+                multiworld = generate(options, seed=seed, fill=True)
+                world = multiworld.worlds[1]
+                self.assertEqual(len(world.early_world_accesses), 7)
+                chain_world = world.starting_world
+                for index in world.early_world_accesses:
+                    location = multiworld.get_location(f"{HOLES[chain_world * 3]} - Complete", 1)
+                    self.assertTrue(location.locked)
+                    self.assertEqual(location.item.name, UNLOCKS[index])
+                    self.assertNotIn(index, (world.starting_world, world.goal_world))
+                    chain_world = index
+                self.assertFalse(multiworld.get_unfilled_locations())
+                self.assertTrue(multiworld.can_beat_game())

@@ -1,8 +1,20 @@
 import asyncio
+import logging
+import sys
 
 import colorama
-import Utils
 from CommonClient import get_base_parser, handle_url_arg
+
+
+def init_console_logging():
+    root = logging.getLogger()
+    for handler in root.handlers[:]:
+        root.removeHandler(handler)
+        handler.close()
+    root.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter('[%(asctime)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+    root.addHandler(handler)
 
 
 def launch_client(*args):
@@ -20,7 +32,7 @@ def launch_client(*args):
     else:
         parsed = handle_url_arg(parsed, parser=parser)
     colorama.just_fix_windows_console()
-    Utils.init_logging('CarnivalGamesMiniGolfClient', exception_logger='Client')
+    init_console_logging()
     try:
         asyncio.run(main(parsed))
     finally:

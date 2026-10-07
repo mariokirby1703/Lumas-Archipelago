@@ -88,16 +88,19 @@ the maximum still fits when every optional check family is disabled.
 Hole Complete, Par Club Piece, Hole-in-One, minigame, Barker Coin, secret, and shop locations are sent automatically.
 The nine Adventure minigames support Win and Perfect checks. Devil's Brew - Spiders has a Win check only.
 
-Received Par Club Piece items control Pro Shop progression. Receiving 0, 1, 2, or 3 pieces for a world makes its
-cheapest 2, 4, 6, or 7 normal shop purchases available; all three pieces also allow the Par Club reward.
+The first two Pro Shop purchases can be reached with either access to their associated world or the first 500 Coin
+Bundle for that world. Purchases three and four use the same alternative with the second bundle and still require
+the first Par Club Piece. Later purchases and the Par Club reward require World Access as well as their existing
+Par Club Piece thresholds.
 
 Coin Bundles, spendable Barker Coins, and enabled Coin Traps apply immediately while the supported game is running.
 For non-counter goals, every world has two progression 500 Coin Bundles; five 100 and five 200 Coin Bundles are
 useful items distributed across different worlds. Smaller bundles remain filler. Barker counter modes reserve their
 limited item-pool capacity for the required Barker Coins.
 Coin Traps default to a 10% filler weight and can be adjusted or disabled in the player YAML.
-The client journals currency deliveries so reconnecting does not apply a confirmed item twice. If an interrupted
-delivery leaves an ambiguous balance, synchronization pauses and the `/currency_recover` commands resolve it.
+The running client tracks currency deliveries in memory so reconnecting within that process does not apply a
+confirmed item twice. It creates no MiniGolf-specific log, journal, or lock files. If an interrupted delivery leaves
+an ambiguous balance, synchronization pauses and the `/currency_recover` commands resolve it.
 
 If you run into any issues, please get in contact on the official Archipelago Discord's Carnival Games MiniGolf
 thread in Future Game Design. Including `/minigolfdebug` output makes live-state problems much easier to diagnose.

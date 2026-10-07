@@ -1,34 +1,17 @@
-"""Atomic local receipt/check journal, scoped to AP seed, team, slot and local player.
-
-Game saves and disk writes cannot form an atomic transaction. An interrupted grant
-is recovered by comparing its before/after balances; ambiguous cases fail closed.
-"""
-import json
-import os
+"""In-memory receipt and check state for one client process."""
 from time import monotonic
-from pathlib import Path
 
 from .constants import CURRENCY_SETTLE_SECONDS
 
 
 class Journal:
-    def __init__(self, path):
+    def __init__(self, _path=None):
         self.confirmation = None
-        self.path = Path(path)
+        self.path = None
         self.data = {"version": 1, "cursor": 0, "checks": [], "pending": None}
-        if self.path.exists():
-            self.data = json.loads(self.path.read_text(encoding='utf-8'))
-            if self.data.get('version') != 1 or not isinstance(self.data.get('cursor'), int) or self.data['cursor'] < 0:
-                raise ValueError("Unsupported or invalid MiniGolf journal; restore its backup")
 
     def save(self):
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        temporary = self.path.with_suffix('.tmp')
-        with temporary.open('w', encoding='utf-8') as handle:
-            json.dump(self.data, handle, sort_keys=True)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temporary, self.path)
+        pass
 
     def add_checks(self, checks):
         combined = sorted(set(self.data['checks']) | set(checks))
