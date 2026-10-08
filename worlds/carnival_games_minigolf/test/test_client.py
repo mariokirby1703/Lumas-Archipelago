@@ -6,13 +6,22 @@ import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 import Utils
+from worlds.LauncherComponents import components, icon_paths
 
 from ..client.client import MiniGolfContext, emulation_active
 from ..client import launch
+from ..components import ICON
 from .test_world import generate
 
 
 class TestClient(unittest.IsolatedAsyncioTestCase):
+    def test_launcher_component_uses_packaged_logo(self):
+        component = next(component for component in components
+                         if component.display_name == 'Carnival Games MiniGolf Client')
+        self.assertEqual(component.icon, ICON)
+        self.assertEqual(icon_paths[ICON],
+                         'ap:worlds.carnival_games_minigolf/assets/MiniGolf Logo.png')
+
     def test_console_logging_uses_null_handler_without_standard_streams(self):
         logger = logging.Logger('minigolf-frozen-launcher-test')
         with (patch.object(launch.logging, 'getLogger', return_value=logger),

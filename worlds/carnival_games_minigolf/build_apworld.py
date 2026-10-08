@@ -21,7 +21,8 @@ def build(output):
                 'Rules.py', 'components.py', 'data.py', 'client/client.py', 'client/runtime.py',
                 'client/memory.py', 'client/constants.py', 'client/journal.py', 'client/launch.py',
                 'docs/setup_en.md', 'requirements.txt', 'archipelago.json', 'client/__init__.py',
-                'docs/en_Carnival Games MiniGolf.md', 'examples/CarnivalGamesMiniGolf.yaml')
+                'docs/en_Carnival Games MiniGolf.md', 'examples/CarnivalGamesMiniGolf.yaml',
+                'assets/MiniGolf Logo.png')
     for name in required:
         if not (source / name).is_file():
             raise FileNotFoundError(name)
