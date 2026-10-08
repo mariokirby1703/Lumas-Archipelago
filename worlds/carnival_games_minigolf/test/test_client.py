@@ -1,4 +1,6 @@
 import asyncio
+import io
+import logging
 import tempfile
 import unittest
 from pathlib import Path
@@ -6,10 +8,32 @@ from unittest.mock import AsyncMock, patch
 import Utils
 
 from ..client.client import MiniGolfContext, emulation_active
+from ..client import launch
 from .test_world import generate
 
 
 class TestClient(unittest.IsolatedAsyncioTestCase):
+    def test_console_logging_uses_null_handler_without_standard_streams(self):
+        logger = logging.Logger('minigolf-frozen-launcher-test')
+        with (patch.object(launch.logging, 'getLogger', return_value=logger),
+              patch.object(launch.sys, 'stdout', None),
+              patch.object(launch.sys, 'stderr', None)):
+            launch.init_console_logging()
+            logger.info('normal frozen launcher')
+        self.assertEqual(len(logger.handlers), 1)
+        self.assertIsInstance(logger.handlers[0], logging.NullHandler)
+
+    def test_console_logging_writes_to_available_stdout(self):
+        logger = logging.Logger('minigolf-debug-launcher-test')
+        stream = io.StringIO()
+        with (patch.object(launch.logging, 'getLogger', return_value=logger),
+              patch.object(launch.sys, 'stdout', stream)):
+            launch.init_console_logging()
+            logger.info('debug launcher output')
+        self.assertEqual(len(logger.handlers), 1)
+        self.assertIsInstance(logger.handlers[0], logging.StreamHandler)
+        self.assertIn('debug launcher output', stream.getvalue())
+
     def test_process_hook_without_active_emulation_is_rejected(self):
         class Status:
             def __init__(self, name):

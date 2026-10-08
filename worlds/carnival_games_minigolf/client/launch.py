@@ -12,8 +12,11 @@ def init_console_logging():
         root.removeHandler(handler)
         handler.close()
     root.setLevel(logging.INFO)
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(logging.Formatter('[%(asctime)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+    if sys.stdout is None:
+        handler = logging.NullHandler()
+    else:
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter('[%(asctime)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
     root.addHandler(handler)
 
 
