@@ -96,14 +96,14 @@ class Journal:
 
     def confirm(self, index):
         effect = self.data['effects'][str(index)]
-        if effect['state'] != 'prepared':
+        if effect['state'] not in ('prepared', 'verifying'):
             raise ValueError('effect_not_prepared')
         effect['state'] = 'confirmed'
         self.save()
 
     def recover_skip(self, index):
         effect = self.data['effects'][str(index)]
-        if effect['state'] != 'prepared':
+        if effect['state'] not in ('prepared', 'verifying', 'uncertain'):
             raise ValueError('effect_not_uncertain')
         effect['state'] = 'skipped_by_operator'
         self.save()

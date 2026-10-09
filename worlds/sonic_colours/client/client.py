@@ -10,6 +10,7 @@ from CommonClient import ClientCommandProcessor, CommonContext, gui_enabled, log
 from NetUtils import ClientStatus
 from websockets.exceptions import ConnectionClosed
 from ..world_constants import GAME
+from ..Items import BY_ID
 from .diagnostics import diagnostic
 from .hooks import NativeHooks
 from .journal import Journal
@@ -19,6 +20,7 @@ from .state import SaveGuard, WritePolicy
 from .versions import VERSION
 from .deathlink import DeathLink
 from .build_info import implementation_info
+from .status import StatusReporter
 
 
 class SonicCommands(ClientCommandProcessor):
@@ -165,7 +167,10 @@ class SonicContext(CommonContext):
             if self.runtime and self.history_ready:
                 try:
                     inventory([i.item for i in self.items_received])
+                    previous = len(self.runtime.journal.data['receipts'])
                     self.runtime.journal.record_history([i.item for i in self.items_received])
+                    for index in range(previous, len(self.items_received)):
+                        logger.info('Item received / queued: receipt %s, %s', index, BY_ID[self.items_received[index].item])
                 except (ValueError, OSError) as error:
                     self.history_ready = False
                     self.history_desynced = True
@@ -257,7 +262,7 @@ async def dolphin_loop(ctx):
     logger.info('Sonic implementation: %s', json.dumps(ctx.implementation, sort_keys=True))
     ctx.memory = memory = SonicMemory(backend)
     verified = False
-    last_status = None
+    status_reporter = StatusReporter()
     try:
         while not ctx.exit_event.is_set():
             checks, goal = set(), False
@@ -327,11 +332,10 @@ async def dolphin_loop(ctx):
                 await transmit_checks(ctx, checks, goal)
             except (ConnectionClosed, MemoryUnavailable, OSError) as error:
                 ctx.operation_status['ap_transport'] = f'Location transmission pending: {error}'
-            if ctx.dolphin_status != last_status:
+            if status_reporter.ready(ctx.dolphin_status, time.monotonic()):
                 ctx.status_time_utc = datetime.now(timezone.utc).isoformat()
                 logger.info('Current Dolphin status [%s, instance=%s]: %s', ctx.status_time_utc,
                             json.dumps(ctx.dolphin_instance, sort_keys=True), ctx.dolphin_status)
-                last_status = ctx.dolphin_status
             # Five-bit masks persist through normal gameplay, so bulk bit changes
             # capture multiple rings. Sample promptly; capsule pulses will need a
             # native retained event source, not an assumption about this interval.

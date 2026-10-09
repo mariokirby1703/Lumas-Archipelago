@@ -1,3 +1,43 @@
+# Current live-defect fixes
+
+This build adds native results-screen Clear/Rank checks, first-Act access plus
+world-map waypoint cache refresh, pause classification and debounced status
+presentation. Item delivery synchronizes bounded live counters/mirrors and waits
+for separate 0.5/2-second observations before settling a receipt. The scanner
+still targets 20 ms; status debounce never delays pickups or server ACKs.
+
+Start New Game normally while connected; `/sonicnewgame` is optional. Results
+checks require the native completed result presentation (UI state 7 and awarded
+native grade), not a score-derived estimate or a save. B earns B/C; S earns
+S/A/B/C. Already acknowledged checks remain durable across save selection.
+
+For delivery testing use a **fresh seed/journal** and receive Rings, 1-Up and Ring
+Loss during living gameplay. Watch `received / queued`, `Native write attempted`,
+`Immediate readback verified`, then settlement or `uncertain`. Confirm the HUD at
+0.5 and 2 seconds, collect another ordinary ring, take damage and change stages.
+Counter settlement is not a claim that visible HUD behavior was live verified.
+Old confirmed receipts are retained and never re-applied automatically. Crashed
+`prepared`/`verifying` receipts stay uncertain; `/sonicrecover skip INDEX` abandons
+one explicitly. Zero-ring traps stay queued while later safe filler can proceed.
+
+The supplied screenshots establish working Red Ring transport on the previous
+build; this change preserves it. The two new native captures establish missing
+Sweet Mountain bit37, its locked first-waypoint cache, and the pause handler.
+Both introductory result captures validate the relocated results reader. Private
+archive SHA256 manifest was checked; originals are not modified or packaged.
+
+Dolphin reported `noEmu` during this work. Offline tests include actual original
+RAM reads, writable overlays, counter reversion, delayed settlement, all-world
+flags, Sweet Mountain cached waypoint state and WebSocket result acknowledgements.
+The complete Sonic Colours test suite passed: 500 tests. The WebSocket server is
+a local protocol test server; this is not a live Dolphin-to-MultiServer session.
+**Pending live validation:** visible route/link redraw and playability in every
+world; actual HUD/physics after filler/1-Up/trap and later pickups/injury/transition;
+a fresh title-to-intro run without a command. No new Dolphin gameplay is claimed.
+
+The historical report below describes the earlier implementation. Its statements
+about immediately consumed receipts and save-only rank checks are superseded above.
+
 # Immediate checks and native gameplay testing
 
 This change implements production reads, writes and AP LocationChecks. It does

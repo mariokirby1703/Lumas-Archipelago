@@ -39,6 +39,7 @@
     "scene": true,
     "capsule_open": true,
     "permission_bits": true,
-    "colour_permissions": true
+    "colour_permissions": true,
+    "map_availability": true
   }
 }

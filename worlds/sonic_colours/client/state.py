@@ -19,11 +19,14 @@ class Snapshot:
     active_rings: dict = field(default_factory=dict)
     stage_epoch: str | None = None
     pickup_verified: bool = False
+    current_result: dict = field(default_factory=dict)
     awarded_ranks: dict = field(default_factory=dict)
     emerald_rewards: frozenset = frozenset()
     opened_capsules: frozenset = frozenset()
     discovered_wisps: frozenset = frozenset()
     death_state: str = 'unknown'
+    ring_mirror_address: int | None = None
+    world_lives_address: int | None = None
     rings_address: int | None = None
     lives_address: int | None = None
     new_game_verified: bool = False
@@ -209,16 +212,21 @@ class WritePolicy:
         self.memory.verify_revision()
         snapshot = self.snapshot_reader(self.memory)
         token = self.guard.check_stats(snapshot) if operation == 'stats' else self.guard.check(snapshot)
-        if operation != 'permission_bits' and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
+        if operation not in ('permission_bits', 'map_availability') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
             raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
         if operation == 'stats':
-            allowed = {snapshot.rings_address, snapshot.lives_address}
+            allowed = {snapshot.rings_address, snapshot.lives_address, snapshot.ring_mirror_address, snapshot.world_lives_address}
         elif operation == 'colour_permissions':
             stage = snapshot.evidence.get('native_data', {}).get('stage_objects', [{}])[0]
             allowed = {stage.get('stage', 0) + 0x61, stage.get('actor_state', 0) + 0x90}
             if size != 1 or address not in allowed:
                 raise MemoryUnavailable('WRITE_BLOCKED: colour_permission_address_not_allowed')
             return token
+        elif operation == 'map_availability':
+            if snapshot.scene != 'world_map':
+                raise MemoryUnavailable('WRITE_BLOCKED: map availability requires world map')
+            access = snapshot.evidence.get('native_data', {}).get('stage_objects', [{}])[0].get('world_map_access', {})
+            allowed = {access.get('status_address')}
         elif operation == 'permission_bits':
             if snapshot.scene not in ('gameplay', 'world_map', 'global_map', 'game_land_select'):
                 raise MemoryUnavailable('WRITE_BLOCKED: unsafe permission scene')

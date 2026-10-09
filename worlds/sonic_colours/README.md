@@ -7,9 +7,14 @@ state, including the mandatory unsaved intro. A durable AP journal retains
 pickups through death, exit, disconnect and server-ACK retry. Red Ring groups
 use the five physical identities collected across attempts, not save masks.
 
+Native results-screen Clear/Rank checks now report before intro save selection.
+World Access unlocks its first Act and refreshes the current waypoint cache;
+status presentation is debounced independently from pickup polling.
+
 Native Rings, 1-Up and Ring Loss delivery, selected-save World/starting-act access,
 AP Game Land gates, seven colour permission fields and the Super unlock bit have
-real compare/write/readback paths. Save resume uses witnessed native slot,
+real compare/write/readback paths. Item receipts now settle after separate
+0.5/2-second counter observations, rather than immediate readback. Save resume uses witnessed native slot,
 profile and intro result records; no invented guest UUID or padding is written.
 
 **The full integration remains incomplete:** White Boost and tutorial/capsule

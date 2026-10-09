@@ -67,12 +67,18 @@ def test_original_intro_native_stats_writer_and_receipt_once(tmp_path):
         address=runtime.snapshot.rings_address
         assert memory.read_u32(address)==16
         items=[ITEM_TABLE['Rings (+10)'],ITEM_TABLE['1-Up'],ITEM_TABLE['Ring Loss Trap']]
+        tick = [0.]
+        runtime.clock = lambda: tick[0]
         runtime.poll(memory,items,True)
+        assert memory.read_u32(address)==26
+        for time_value in (.6, 2.1, 2.7, 4.2):
+            tick[0] = time_value
+            runtime.poll(memory,items,True)
         assert memory.read_u32(address)==0
         assert [v['state'] for v in journal.data['effects'].values()]==['confirmed']*3
-        assert len(backend.writes)==3
+        assert len(backend.writes)==6
         runtime.poll(memory,items,True)
-        assert len(backend.writes)==3
+        assert len(backend.writes)==6
         assert journal.data['save_identity'] is None
 
 
@@ -133,7 +139,7 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
     # Avoid CommonClient's global user-settings write; the transport is real TCP.
     monkeypatch.setattr(Utils,'persistent_store',lambda *args: None)
     async def scenario():
-        data=generate().worlds[1].fill_slot_data()
+        data=generate({'rank_checks':'all'}).worlds[1].fill_slot_data()
         ctx=SonicContext(journal_directory=tmp_path)
         assert ctx.seed_name is None
         ctx.auth = 'SonicPlayer'
@@ -205,9 +211,25 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
                     await process_server_cmd(ctx, packet)
                 assert ctx.history_ready
                 if memory:
-                    for _ in range(3): runtime.poll(memory, [item.item for item in ctx.items_received], True)
+                    tick = [0.]
+                    runtime.clock = lambda: tick[0]
+                    for time_value in (0., .6, 2.1):
+                        tick[0] = time_value
+                        runtime.poll(memory, [item.item for item in ctx.items_received], True)
                     assert memory.read_u32(runtime.snapshot.rings_address) == 26
                     assert runtime.journal.data['effects']['0']['state'] == 'confirmed'
+                if memory:
+                    for stamp, act in (('201102', 1), ('202546', 2)):
+                        pair = next(p for p in PAIRS if stamp in p[0].name)
+                        checks, goal = runtime.poll(SonicMemory(Overlay(pair)), [], False)
+                        await transmit_checks(ctx, checks, goal)
+                        for _ in range(2):
+                            for packet in decode(await asyncio.wait_for(socket.recv(), 3)):
+                                await process_server_cmd(ctx, packet)
+                        expected = {LOCATION_TABLE[f'Tropical Resort Act {act} - {kind}'].code
+                                    for kind in ('Clear', 'B Rank', 'C Rank')}
+                        assert expected <= ctx.checked_locations
+                        assert runtime.journal.data['save_identity'] is None
                 count=len(received); await transmit_checks(ctx); await asyncio.sleep(.02)
                 assert not any(p['cmd']=='LocationChecks' for p in received[count:])
                 ctx.on_package('RoomInfo', {'seed_name':'different-seed'})

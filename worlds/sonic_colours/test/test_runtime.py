@@ -186,6 +186,10 @@ def test_receipt_effect_exactly_once_with_injected_verified_test_adapter():
         journal.record_history(items)
         runtime.apply_effects(memory, items)
         assert memory.read_u32(0x90001000) == 15
+        runtime.clock = lambda: runtime.inflight[0]['started'] + .6
+        runtime.apply_effects(memory, items)
+        runtime.clock = lambda: journal.data.get('test_clock', 0)
+        journal.data['test_clock'] = runtime.inflight[0]['started'] + 2.1
         runtime.apply_effects(memory, items)
         assert len(backend.writes) == 1
         assert not runtime.pending_effects()
@@ -196,6 +200,5 @@ def test_receipt_effect_exactly_once_with_injected_verified_test_adapter():
             runtime.apply_effects(memory, next_items)
         assert journal.data['effects']['1']['state'] == 'prepared'
         writes = len(backend.writes)
-        with pytest.raises(MemoryUnavailable, match='WRITE_UNCERTAIN'):
-            runtime.apply_effects(memory, next_items)
+        runtime.apply_effects(memory, next_items)
         assert len(backend.writes) == writes

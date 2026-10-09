@@ -35,6 +35,14 @@ def read_stage_objects(memory):
     if vtable == 0x80769D90:
         mode = memory.read_u32(context + 0x74)
         row.update(map_mode=mode, scene={2: 'global_map', 3: 'world_map', 5: 'game_land_select'}.get(mode, 'unclassified'))
+        if mode == 3:
+            maps = [actor for actor in read_actors(memory, context) if memory.read_u32(actor) == 0x807773F8]
+            if len(maps) == 1:
+                actor = maps[0]
+                zone, status = memory.read_u32(actor + 0xa8), memory.read_u32(actor + 0x1f8)
+                if zone <= 6 and 1 <= status <= 4:
+                    row['world_map_access'] = {'actor': actor, 'zone': zone, 'first_act_status': status,
+                                               'status_address': actor + 0x1f8}
     if vtable == STAGE_VTABLE:
         stage = context
         row['stage'] = stage
@@ -53,16 +61,29 @@ def read_stage_objects(memory):
         row.update(state_handler=handler, current_handler=current,
                    death_count=memory.read_u32(stage + 0x468),
                    wisp_permissions=memory.read_u8(stage + 0x61))
+        world = memory.read_ptr_checked(module + 0x38, 0x50)
+        if memory.read_u32(world) != 0x8076AC7C:
+            raise MemoryUnavailable('world_state_vtable_mismatch')
+        row['world_lives_address'] = world + 0x4c
         # Native member-function state machine, not a life-count heuristic.
         row['scene'] = ('gameplay' if handler == current == 0x8001CDB4 else
                         'results' if handler == 0x8001EDE4 else
-                        'dying' if handler == 0x8001DC40 else 'unclassified')
+                        'dying' if handler == 0x8001DC40 else
+                        'paused' if handler == current == 0x8001DF78 else 'unclassified')
+        if row['scene'] == 'results':
+            try:
+                row['result'] = read_result(memory, stage, row['mission'])
+            except MemoryUnavailable as error:
+                row['result_error'] = str(error)
         actor_state = memory.read_u32(stage + 0x114)
         row['actor_state'] = actor_state
         if actor_state:
             actor_state = memory.read_ptr_checked(stage + 0x114, 0x94)
+            if memory.read_u32(actor_state) != 0x8075A228:
+                raise MemoryUnavailable('actor_state_vtable_mismatch')
             row.update(lives=memory.read_s32(actor_state + 0x3c),
                        lives_address=actor_state + 0x3c,
+                       ring_mirror_address=actor_state + 0x40,
                        player_actor_id=memory.read_u32(actor_state + 0x38),
                        current_red_ring_mask=memory.read_u8(actor_state + 0x91) & 31)
             try:
@@ -81,6 +102,9 @@ def read_stage_objects(memory):
             memory.read_u32(module + 0x34) != context or
             memory.read_u32(context) != vtable or
             vtable == 0x80769D90 and memory.read_u32(context + 0x74) != mode or
+            vtable == STAGE_VTABLE and memory.read_u32(module + 0x38) != world or
+            row.get('world_map_access') and (memory.read_u32(row['world_map_access']['actor']) != 0x807773F8
+                or memory.read_u32(row['world_map_access']['actor'] + 0xa8) != row['world_map_access']['zone']) or
             vtable == STAGE_VTABLE and (memory.read_bytes(context + 0x30, 24) != state or
                                        memory.read_u32(context + 0x4c) != name or
                                        memory.read_u32(context + 0x114) != actor_state or
@@ -279,3 +303,26 @@ def read_saved_progress(memory, rows):
             'profile_hex': profile_hex,
             'flag_words_hex': bank.hex(),
             'grade': 'code-derived; not live-validated; no save identity implied'}
+
+
+def read_result(memory, stage, mission):
+    """8001EE74 owns UI at stage+9C; 8019D148 publishes native grade+124.
+
+    UI state 7 is the completed score/rank presentation, not its initial grade.
+    All reads are relative to the native owner and checked again before return.
+    """
+    import math
+    ui = memory.read_ptr_checked(stage + 0x9c, 0x130)
+    if memory.read_u32(ui) != 0x8076CAE4:
+        raise MemoryUnavailable('result_ui_vtable_mismatch')
+    fields = memory.read_bytes(ui + 0xdc, 0x50)
+    state = int.from_bytes(fields[:4], 'big')
+    score = memory.read_u32(ui + 0x120)
+    grade = memory.read_u32(ui + 0x124)
+    time = memory.read_f32(ui + 0xf8)
+    final = (state == 7 and grade <= 4 and memory.read_u32(ui + 0x114) == score
+             and math.isfinite(time) and time > 0)
+    if memory.read_u32(stage + 0x9c) != ui or memory.read_bytes(ui + 0xdc, 0x50) != fields:
+        raise MemoryUnavailable('result_context_changed')
+    return {'mission': mission, 'grade': grade, 'final': final, 'ui': ui,
+            'score': score, 'time': time, 'provenance': 'stage9C_native_UI_state7_grade124'}

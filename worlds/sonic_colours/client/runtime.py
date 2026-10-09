@@ -1,5 +1,6 @@
 from collections import Counter
 import logging
+import time
 from ..Items import BY_ID, RING_VALUES, EMERALDS, WISP_ITEMS, FILLER, TRAPS
 from ..Locations import LOCATION_TABLE, enabled
 from ..Options import SonicColoursOptions, OPTION_NAMES
@@ -123,6 +124,9 @@ class Runtime:
         self.initial_pickup_exclusions = {}
         self.capsule_states = {}
         self.capsule_started = False
+        self.inflight = {}
+        self.deferred = {}
+        self.clock = time.monotonic
 
     def observe_capsules(self, owned_wisps):
         from ..capsules import CAPSULES
@@ -156,6 +160,25 @@ class Runtime:
             self.journal.record_pickups(events, {}, checks)
             logger.info('Pickup detected: opened capsules %s; Location queued: %s',
                         [event['instance_key'] for event in events], sorted(checks))
+
+    def observe_results(self):
+        snapshot = self.snapshot
+        result = snapshot.current_result
+        if (not self.guard.can_record_pickups(snapshot) or snapshot.scene != 'results'
+                or not result.get('final') or result.get('mission') != snapshot.actual_mission
+                or type(result.get('grade')) is not int or not 0 <= result['grade'] <= 4):
+            return
+        checks = {code for name, code in self.slot_data['locations'].items()
+                  if LOCATION_TABLE[name].mission == snapshot.actual_mission
+                  and (LOCATION_TABLE[name].kind == 'clear'
+                       or LOCATION_TABLE[name].kind == 'rank' and result['grade'] <= LOCATION_TABLE[name].index)}
+        checks -= set(self.journal.data['checks'])
+        if checks:
+            self.journal.record_pickups([{'kind': 'result', 'mission': snapshot.actual_mission,
+                'grade': result['grade'], 'stage_epoch': snapshot.stage_epoch,
+                'provenance': result['provenance']}], {}, checks)
+            logger.info('Result detected: %s grade %s; Location queued: %s',
+                        snapshot.actual_mission, result['grade'], sorted(checks))
 
     def observe_pickups(self):
         snapshot = self.snapshot
@@ -205,6 +228,8 @@ class Runtime:
         self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
         self.observe_pickups()
+        self.observe_results()
+        self.settle_effects(memory)
         known = inventory(item_ids) if history_ready else inventory(self.journal.data['receipts'])
         self.observe_capsules(frozenset(known['wisps']))
         self.last_error = self.snapshot.status
@@ -253,41 +278,89 @@ class Runtime:
         self.guard.check(self.snapshot)
         self.hooks.project_permissions(memory, self.snapshot, owned, self.slot_data)
 
+    def settle_effects(self, memory):
+        for index, pending in list(self.inflight.items()):
+            effect = self.journal.data['effects'][str(index)]
+            try:
+                context = list(self.guard.check_stats(self.snapshot))
+            except MemoryUnavailable:
+                continue
+            elapsed = self.clock() - pending['started']
+            if context != effect['context']:
+                effect['state'] = 'uncertain'
+                self.journal.save()
+                del self.inflight[index]
+                logger.warning('Item uncertain: receipt %s actor/context changed; no replay', index)
+                continue
+            values = [memory.read_u32(address) for address in pending['addresses']]
+            correct = all(value >= effect['after'] if pending['positive'] else value == 0 for value in values)
+            if .5 <= elapsed < 2:
+                pending['half_second'] = pending.get('half_second', False) or correct
+            if elapsed >= 2:
+                if correct and pending.get('half_second'):
+                    self.journal.confirm(index)
+                    logger.info('Stable game-effect confirmed: receipt %s, counters %s after %.2fs; HUD verification separate', index, values, elapsed)
+                else:
+                    effect['state'] = 'uncertain'
+                    self.journal.save()
+                    logger.warning('Item uncertain: receipt %s stable counters %s differ; no replay', index, values)
+                del self.inflight[index]
+
     def apply_effects(self, memory, item_ids):
+        self.settle_effects(memory)
+        occupied = {pending['family'] for pending in self.inflight.values()}
         for index, item in enumerate(item_ids):
             name = BY_ID[item]
             if name not in FILLER + TRAPS:
                 continue
             recorded = self.journal.data['effects'].get(str(index))
+            family = 'lives' if name == '1-Up' else 'rings'
             if recorded:
-                if recorded['state'] == 'prepared':
-                    raise MemoryUnavailable(f'WRITE_UNCERTAIN: receipt {index}; /sonicrecover skip {index}')
+                # Persisted but unowned verification is uncertain after a restart.
+                # Do not block independent receipts and never automatically replay.
+                if recorded['state'] in ('prepared', 'verifying', 'uncertain') and index not in self.inflight:
+                    occupied.add(family)
+                    if index not in self.deferred:
+                        self.deferred[index] = 'uncertain'
+                        logger.warning('Item uncertain: receipt %s; explicit reconciliation required, no replay', index)
+                continue
+            if family in occupied:
                 continue
             snapshot = self.snapshot
             self.guard.check_stats(snapshot)
             self.hooks.require('stats')
-            if snapshot.scene != 'gameplay' or snapshot.death_state != 'alive':
-                raise MemoryUnavailable('WRITE_BLOCKED: effect awaits stable living gameplay')
             if name == 'Swim Everywhere Trap':
-                self.hooks.require('swimming')
-                raise MemoryUnavailable('WRITE_BLOCKED: swimming lifecycle not live validated')
-            address = snapshot.lives_address if name == '1-Up' else snapshot.rings_address
-            if address is None or address % 4:
+                continue  # Unsupported trap cannot starve independently safe filler.
+            address = snapshot.lives_address if family == 'lives' else snapshot.rings_address
+            mirror = snapshot.world_lives_address if family == 'lives' else snapshot.ring_mirror_address
+            addresses = list(dict.fromkeys(a for a in (address, mirror) if a is not None))
+            if not addresses or address is None:
                 raise MemoryUnavailable('WRITE_BLOCKED: runtime_stats_pointer_missing')
             before = memory.read_u32(address)
-            if name == 'Ring Loss Trap' and (before == 0 or not BY_MISSION.get(
-                    snapshot.actual_mission, {}).get('normal', False)):
-                raise MemoryUnavailable('WRITE_BLOCKED: ring trap awaits normal act with positive Rings')
-            # Native setter 800A5850 clamps ordinary Rings to 0..9999.
-            limit = 99 if name == '1-Up' else 9999
+            if name == 'Ring Loss Trap' and (before == 0 or not BY_MISSION.get(snapshot.actual_mission, {}).get('normal', False)):
+                if index not in self.deferred:
+                    self.deferred[index] = 'trap context'
+                    logger.info('Item deferred: receipt %s Ring Loss awaits normal act with positive Rings', index)
+                continue  # Keep receipt queued, allow later positive filler.
+            limit = 99 if family == 'lives' else 9999
             if before > limit:
                 raise MemoryUnavailable('WRITE_BLOCKED: stats_out_of_range')
             amount = 1 if name == '1-Up' else int(name.split('+')[1].split(')')[0]) if name in FILLER else 0
             after = 0 if name == 'Ring Loss Trap' else min(limit, before + amount)
+            self.deferred.pop(index, None)
             self.journal.prepare(index, item, list(self.guard.check_stats(snapshot)), before, after)
-            memory.write_u32(address, after, expected=before, operation='stats')
-            self.journal.confirm(index)
-            logger.info('Native item applied: receipt %s, %s, %s -> %s at 0x%08X', index, name, before, after, address)
+            logger.info('Native write attempted: receipt %s, %s, %s -> %s', index, name, before, after)
+            for target in addresses:
+                current = memory.read_u32(target)
+                if current > limit:
+                    raise MemoryUnavailable('WRITE_UNCERTAIN: stat mirror out of range')
+                memory.write_u32(target, after, expected=current, operation='stats')
+            self.journal.data['effects'][str(index)]['state'] = 'verifying'
+            self.journal.save()
+            self.inflight[index] = {'started': self.clock(), 'addresses': addresses,
+                                    'family': family, 'positive': name != 'Ring Loss Trap'}
+            occupied.add(family)
+            logger.info('Immediate readback verified: receipt %s; queued for 0.5s/2s settlement', index)
 
     def pending_effects(self):
         return [i for i, item in enumerate(self.journal.data['receipts'])

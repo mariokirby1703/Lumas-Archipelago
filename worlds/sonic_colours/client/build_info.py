@@ -17,12 +17,14 @@ def implementation_info():
     from .hooks import NativeHooks
     from .runtime import Runtime, detect_checks
     from .state import SaveGuard, WritePolicy
-    from . import hooks, runtime, state, binding, native_read, client, journal
+    from . import hooks, runtime, state, binding, native_read, client, journal, status
     functions = (NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.kill,
                  NativeHooks.swim, Runtime.poll, Runtime.apply_effects, detect_checks,
                  SaveGuard.observe, SaveGuard.check, SaveGuard.check_stats, WritePolicy.__call__,
                  Runtime.observe_pickups, Runtime.observe_capsules, binding.SaveBinding.attribute,
-                 native_read.read_capsules, client.SonicContext.on_package, client.transmit_checks, journal.Journal.save, journal.Journal.record_pickups)
+                 native_read.read_capsules, client.SonicContext.on_package, client.transmit_checks, journal.Journal.save, journal.Journal.record_pickups, Runtime.observe_results, Runtime.settle_effects,
+                 native_read.read_result, native_read.read_stage_objects, native_read.read_player,
+                 status.StatusReporter.ready)
     digest = hashlib.sha256()
     for function in functions:
         digest.update(function.__qualname__.encode())

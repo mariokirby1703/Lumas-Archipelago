@@ -128,6 +128,8 @@ class SonicMemory:
             raise MemoryUnavailable('invalid_write_range')
         if self.write_guard is None:
             raise MemoryUnavailable('WRITE_BLOCKED: no verified write policy')
+        if operation == 'map_availability' and (data != (2).to_bytes(4, 'big') or expected != (1).to_bytes(4, 'big')):
+            raise MemoryUnavailable('WRITE_BLOCKED: map availability only permits locked-to-available')
         token = self.write_guard(operation, address, len(data))
         before = self.read_bytes(address, len(data))
         if before != expected:

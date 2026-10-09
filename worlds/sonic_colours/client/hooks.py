@@ -19,6 +19,8 @@ class NativeHooks:
         self.binding = SaveBinding(journal) if journal is not None else None
         self.chain = None
         self.stable_polls = 0
+        self.save_context_key = None
+        self.stable_save_polls = 0
         self.session_epoch = 0
         self.instance = uuid.uuid4().hex
         self.application = None
@@ -55,11 +57,11 @@ class NativeHooks:
             self.stage_key = key
             self.stage_sequence += 1
         stage_epoch = f'{session}-stage-{self.stage_sequence}' if key is not None else None
-        pickup_verified = (stage.get('scene') in ('gameplay', 'results', 'dying')
+        pickup_verified = (stage.get('scene') in ('gameplay', 'results', 'dying', 'paused')
                            and stage.get('mission') is not None and 'current_red_ring_mask' in stage)
         active_rings = ({stage['mission']: frozenset(i + 1 for i in range(5)
                          if stage.get('current_red_ring_mask', 0) & (1 << i))}
-                        if stage.get('mission') and stage.get('scene') in ('gameplay', 'results', 'dying') else {})
+                        if stage.get('mission') and stage.get('scene') in ('gameplay', 'results', 'dying', 'paused') else {})
         trace = memory.trace_save_chain()
         chain = trace['chain']
         if chain is None:
@@ -71,7 +73,8 @@ class NativeHooks:
                             scene_verified=stage.get('scene', 'unclassified') != 'unclassified',
                             rings_address=stage.get('player', {}).get('rings_address'),
                             lives_address=stage.get('lives_address'),
-                            active_rings=active_rings,
+                        ring_mirror_address=stage.get('ring_mirror_address'), world_lives_address=(stage.get('world_lives_address') if stage.get('player', {}).get('mode') == 0 else None),
+                            active_rings=active_rings, current_result=stage.get('result', {}),
                             stage_epoch=stage_epoch, pickup_verified=pickup_verified,
                             opened_capsules=frozenset(capsule['key'] for capsule in stage.get('capsules', []) if capsule['opened']),
                             death_state='dying' if stage.get('scene') == 'dying' else
@@ -79,6 +82,10 @@ class NativeHooks:
                             status=f"save_container_unavailable: {trace['status']}; prologue/menu state needs native tracing",
                             evidence={'manager_global': 'code-derived: 0x808F3628', 'save_chain_trace': trace,
                                       'native_data': native})
+        save_key = (application, chain)
+        if save_key != self.save_context_key:
+            self.save_context_key, self.stable_save_polls = save_key, 0
+        self.stable_save_polls += 1
         context_key = (application, stage.get('context'), stage.get('mission'), stage.get('scene'),
                        stage.get('player_actor_id'), chain)
         if chain != self.chain or context_key != self.context_key:
@@ -130,6 +137,7 @@ class NativeHooks:
                         persisted_clears=candidates if coherent_progress else frozenset(),
                         persisted_rings={mission: frozenset(rings) for mission, rings in saved.get('physical_red_rings', {}).items()},
                         active_rings=active_rings,
+                        current_result=stage.get('result', {}),
                         stage_epoch=stage_epoch, pickup_verified=pickup_verified,
                         opened_capsules=frozenset(capsule['key'] for capsule in stage.get('capsules', []) if capsule['opened']),
                         # 8019DF48 returns rank-table index 0..3 (S,A,B,C),
@@ -144,10 +152,11 @@ class NativeHooks:
                         scene_verified=scene != 'unclassified',
                         death_state='dying' if scene == 'dying' else 'alive' if scene == 'gameplay' and player else 'unknown',
                         rings_address=player.get('rings_address'), lives_address=stage.get('lives_address'),
+                        ring_mirror_address=stage.get('ring_mirror_address'), world_lives_address=(stage.get('world_lives_address') if stage.get('player', {}).get('mode') == 0 else None),
                         evidence={'chain': chain, 'save_chain_trace': trace,
                                   'progress_c': '66 native bank C reads; only listed subset live-read validated',
                                   'validated_clear_missions': sorted(validated),
-                                  'internal_selected_index': chain[2], 'native_data': native},
+                                  'internal_selected_index': chain[2], 'stable_save_polls': self.stable_save_polls, 'native_data': native},
                         status=('native scene/stats/pickups read; new game confirmation or save attribution required'
                                 if coherent_progress else
                                 'save trace only; coherent native progress unavailable; checks and writes blocked'))
@@ -181,7 +190,11 @@ class NativeHooks:
                 values[bit] = inventory['counts'][colour + ' Unlock'] > 0
         if options['world_unlocks']:
             for zone, item in enumerate(WORLD_ITEMS):
-                values[20 + zone] = zone == slot_data['starting_world'] or inventory['counts'][item] > 0
+                granted = zone == slot_data['starting_world'] or inventory['counts'][item] > 0
+                values[20 + zone] = granted
+                if granted:
+                    first = next(stage for stage in STAGES if stage['zone_index'] == zone and stage['slot'] == 1)
+                    values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == first['mission_id']))] = True
         # Act 1 gates remain native factory defaults. Acts 2/3 use AP Red Ring
         # items, independently from physical collectibles (8016CB5C table).
         values[8] = True  # Game Land entry; no physical 30-Ring prerequisite.
@@ -201,6 +214,12 @@ class NativeHooks:
             after = (before & ~mask) | value
             if before != after:
                 memory.write_u32(address, after, expected=before, operation='permission_bits')
+        if options['world_unlocks'] and snapshot.scene == 'world_map':
+            access = snapshot.evidence['native_data']['stage_objects'][0].get('world_map_access')
+            if access and values.get(20 + access['zone']) and access['first_act_status'] == 1:
+                # 802689B4 reads bank A; native node states 1=locked, 2=available,
+                # 3=entered, 4=cleared. Refresh only this first waypoint cache.
+                memory.write_u32(access['status_address'], 2, expected=1, operation='map_availability')
         if options['wisp_unlocks']:
             if snapshot.scene == 'gameplay':
                 stage = snapshot.evidence['native_data']['stage_objects'][0]
