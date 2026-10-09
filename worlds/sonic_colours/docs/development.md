@@ -1,3 +1,7 @@
+Current schema-3 implementation and validation: [Gameplay overhaul](gameplay_overhaul.md).
+Use [current setup](setup_en.md) for both updated Gecko hooks and new YAMLs.
+The dated report below is historical where the current report supersedes it.
+
 Current implementation: [Immediate checks and native gameplay testing](immediate_checks.md).
 The report below predates native pickup transmission and the selected production writers.
 

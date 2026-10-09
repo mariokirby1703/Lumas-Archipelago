@@ -1,3 +1,7 @@
+Current schema-3 implementation and validation: [Gameplay overhaul](gameplay_overhaul.md).
+Use [current setup](setup_en.md) for both updated Gecko hooks and new YAMLs.
+The dated report below is historical where the current report supersedes it.
+
 # PAL memory evidence and first live probe
 
 All supplied notes were inventoried and structured data parsed. Matching copies

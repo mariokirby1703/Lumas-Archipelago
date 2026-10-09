@@ -3,7 +3,8 @@ from .world_constants import BASE_ID, GAME, WORLDS, WISPS
 
 WORLD_ITEMS = tuple(f'{w} Access' for w in WORLDS)
 WISP_ITEMS = tuple(f'{w} Wisp' for w in WISPS)
-EMERALDS = tuple(f'Chaos Emerald {i}' for i in range(1, 8))
+EMERALDS = tuple(f'{colour} Chaos Emerald' for colour in
+                 ('Green', 'Red', 'Blue', 'Yellow', 'Purple', 'Cyan', 'White'))
 RING_VALUES = {'Red Ring (+1)': 1, 'Red Rings (+5)': 5, 'Red Rings (+10)': 10}
 FILLER = ('Rings (+10)', 'Rings (+25)', 'Rings (+50)', '1-Up')
 TRAPS = ('Ring Loss Trap', 'Swim Everywhere Trap')

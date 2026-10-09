@@ -32,8 +32,11 @@ for stage_index, stage in enumerate(STAGES):
     if stage['zone_index'] >= 7 and stage['slot'] == 3:
         land = stage['zone_index'] - 6
         LOCATION_TABLE[f'Game Land {land} - Chaos Emerald Obtained'] = LocationData(base + 16, mission, 'emerald', land)
+# Native discovery table at PAL 80720B98, queried by 80228B30.
+DISCOVERY_STAGES = {1:(0,3), 2:(1,1), 3:(2,1), 4:(3,1), 5:(1,3), 6:(2,5), 7:(5,1)}
 for i, wisp in enumerate(WISPS):
-    LOCATION_TABLE[f'{wisp} - First Discovery'] = LocationData(BASE_ID + 4000 + i, '', 'wisp', i)
+    mission = next((s['mission_id'] for s in STAGES if (s['zone_index'],s['slot']) == DISCOVERY_STAGES.get(i)), '')
+    LOCATION_TABLE[f'{wisp} - First Discovery'] = LocationData(BASE_ID + 4000 + i, mission, 'wisp', i)
 for capsule in CAPSULES.values():
     if capsule.name:
         if capsule.name in LOCATION_TABLE:
@@ -55,6 +58,7 @@ def enabled(data, options):
         return bool(options.chaos_emerald_checks)
     if data.kind == 'capsule':
         capsule = CAPSULES[data.instance_key]
-        mode = options.wisp_capsule_sanity.value
-        return capsule.eligible and (mode == 2 or mode == 1 and capsule.story)
-    return bool(options.wisp_discovery_checks)
+        return capsule.eligible and bool(options.wisp_capsules)
+    # White Boost has no native colour-unlock flag/event in the PAL accessor.
+    # Keep its stable catalog ID, but don't generate an unreportable location.
+    return data.index != 0 and bool(options.wisp_discovery_checks)

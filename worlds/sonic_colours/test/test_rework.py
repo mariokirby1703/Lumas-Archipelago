@@ -27,14 +27,14 @@ def test_default_wisps_shuffle_in_reachable_spheres_for_100_seeds():
         assert set(Items.WISP_ITEMS) <= obtained
         assert any(l.address is not None for l in spheres[0])
         assert multiworld.can_beat_game()
-    world = generate({'wisp_unlocks': 'vanilla'}).worlds[1]
-    assert not any(i.name in Items.WISP_ITEMS for i in world.multiworld.itempool)
+    world = generate({}).worlds[1]
+    assert {i.name for i in world.multiworld.itempool if i.name in Items.WISP_ITEMS} == set(Items.WISP_ITEMS)
 
 
 def test_removed_features_leave_holes_in_ids_and_options():
     from ..Options import SonicColoursOptions, RankChecks, Goal
     assert 'super_sonic_item' not in SonicColoursOptions.type_hints
-    assert 'd' not in RankChecks.options and 'super_sonic' not in Goal.options
+    assert 'd' not in RankChecks.options and 'super_sonic' in Goal.options
     assert BASE_ID + 22 not in Items.BY_ID
     assert Items.ITEM_TABLE['Red Ring (+1)'] == BASE_ID + 23
     assert not any(name.endswith(' - D Rank') for name in Locations.LOCATION_TABLE)
@@ -59,9 +59,9 @@ def test_capsule_identity_candidates_and_validation_gates():
     key = instance_key(rows[0])
     with pytest.raises(ValueError, match='proof'):
         build_catalog(rows, {key: {'validated': True}})
-    for mode in ('story', 'all'):
-        world = generate({'wisp_capsule_sanity': mode}).worlds[1]
-        expected = 448 if mode == 'story' else 680
+    for mode in (False, True):
+        world = generate({'wisp_capsules': mode}).worlds[1]
+        expected = 680 if mode else 0
         assert sum(Locations.LOCATION_TABLE[n].kind == 'capsule' for n in world.fill_slot_data()['locations']) == expected
 
 
@@ -70,15 +70,14 @@ def test_capsule_opening_is_instance_and_permission_specific(monkeypatch):
     candidates = [c for c in CAPSULES.values() if c.mission == 'stg110'][:2]
     for c in candidates:
         monkeypatch.setitem(CAPSULES, c.key, replace(c, eligible=True, exclusion=None, wisp_item='Cyan Laser Wisp'))
-    data = {'options': {'wisp_unlocks': 1}, 'locations': {
+    data = {'options': {}, 'locations': {
         c.name: c.code for c in candidates}}
     state = snapshot(opened_capsules=frozenset({candidates[0].key}))
     assert not detect_checks(data, state)
     result = detect_checks(data, state, frozenset({'Cyan Laser Wisp'}))
     assert result == {candidates[0].code}
     assert detect_checks(data, state, frozenset({'Cyan Laser Wisp'})) == result
-    data['options']['wisp_unlocks'] = 0
-    assert detect_checks(data, state) == result
+    assert not detect_checks(data, state)
 
 
 def test_typed_evidence_has_no_unproven_promotion():
@@ -171,7 +170,7 @@ def test_emerald_rewards_need_all_three_native_clears_and_logical_events():
     reward = snapshot(emerald_rewards=frozenset({1}), persisted_clears=frozenset(missions[2:]))
     code = Locations.LOCATION_TABLE['Game Land 1 - Chaos Emerald Obtained'].code
     assert code not in detect_checks(data, reward)
-    reward = replace(reward, persisted_clears=frozenset(missions))
+    reward = replace(reward, persisted_clears=frozenset(missions), evidence={'native_data':{'progression_events':{'game_land_clears':4}}})
     assert code in detect_checks(data, reward)
     multiworld = generate({'game_land_checks': False})
     state = CollectionState(multiworld)

@@ -219,22 +219,50 @@ class WritePolicy:
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
         self.memory.verify_revision()
         snapshot = self.snapshot_reader(self.memory)
-        token = self.guard.check_stats(snapshot) if operation in ('stats', 'colour_permissions') else self.guard.check(snapshot)
-        if operation not in ('permission_bits', 'map_availability') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
+        if operation in ('progression_data','progression_reset') and snapshot.save_identity is None:
+            token = self.guard.check_stats(snapshot)
+        else:
+            token = self.guard.check_stats(snapshot) if operation in ('stats', 'colour_permissions') else self.guard.check(snapshot)
+        if operation not in ('permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
             raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
         if operation == 'stats':
             allowed = {snapshot.rings_address, snapshot.lives_address, snapshot.ring_mirror_address, snapshot.world_lives_address}
+        elif operation in ('progression_data','progression_reset'):
+            from .progression_hook import installed_data
+            data = installed_data(self.memory)
+            chain = self.memory.resolve_flags_ptr(allow_working=True)
+            if operation == 'progression_reset':
+                allowed_data = (data+12,data+16) if data is not None and self.memory.read_u32(data)==0 else ()
+            else:
+                allowed_data = (data,data+4,data+8,data+20) if data is not None else ()
+            if data is None or size != 4 or address not in allowed_data:
+                raise MemoryUnavailable('WRITE_BLOCKED: progression data address not allowed')
+            if tuple(snapshot.evidence.get('chain',())) != chain:
+                raise MemoryUnavailable('WRITE_BLOCKED: progression data save owner changed')
+            return token, data, chain
+        elif operation == 'music_cues':
+            if snapshot.scene not in ('world_map','global_map','game_land_select'):
+                raise MemoryUnavailable('WRITE_BLOCKED: music redirects require a stable stage-selection scene')
+            from .music import cue_records
+            table, vector, count, records = cue_records(self.memory)
+            if size != 32 or address not in records.values():
+                raise MemoryUnavailable('WRITE_BLOCKED: music cue address not allowed')
+            return token, table, vector, count
         elif operation == 'colour_permissions':
             stage = snapshot.evidence.get('native_data', {}).get('stage_objects', [{}])[0]
             allowed = {stage.get('stage', 0) + 0x61, stage.get('actor_state', 0) + 0x90}
             if size != 1 or address not in allowed:
                 raise MemoryUnavailable('WRITE_BLOCKED: colour_permission_address_not_allowed')
             return token
-        elif operation == 'map_availability':
+        elif operation in ('map_availability','map_lock'):
             if snapshot.scene != 'world_map':
                 raise MemoryUnavailable('WRITE_BLOCKED: map availability requires world map')
             access = snapshot.evidence.get('native_data', {}).get('stage_objects', [{}])[0].get('world_map_access', {})
             allowed = {access.get('status_address')}
+            if operation == 'map_lock':
+                flags = self.memory.resolve_flags_ptr()[-1]
+                if not access or self.memory.read_progress_bit(flags,20+access['zone']):
+                    raise MemoryUnavailable('WRITE_BLOCKED: cannot lock an authorized world')
         elif operation == 'permission_bits':
             if snapshot.scene not in ('gameplay', 'world_map', 'global_map', 'game_land_select'):
                 raise MemoryUnavailable('WRITE_BLOCKED: unsafe permission scene')

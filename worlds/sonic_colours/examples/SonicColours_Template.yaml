@@ -1,0 +1,281 @@
+# Q. What is this file?
+# A. This file contains options which allow you to configure your multiworld experience while allowing
+#    others to play how they want as well.
+#
+# Q. How do I use it?
+# A. The options in this file are weighted. This means the higher number you assign to a value, the
+#    more chances you have for that option to be chosen. For example, an option like this:
+#
+#    map_shuffle:
+#      on: 5
+#      off: 15
+#
+#    Means you have 5 chances for map shuffle to occur, and 15 chances for map shuffle to be turned
+#    off.
+#
+# Q. I've never seen a file like this before. What characters am I allowed to use?
+# A. This is a .yaml file. You are allowed to use most characters.
+#    To test if your yaml is valid or not, you can use this website:
+#        http://www.yamllint.com/
+#    You can also verify that your Archipelago options are valid at this site:
+#        https://archipelago.gg/check
+
+# Your name in-game, limited to 16 characters.
+#     {player} will be replaced with the player's slot number.
+#     {PLAYER} will be replaced with the player's slot number, if that slot number is greater than 1.
+#     {number} will be replaced with the counter value of the name.
+#     {NUMBER} will be replaced with the counter value of the name, if the counter value is greater than 1.
+name: Player{number}
+
+# Used to describe your yaml. Useful if you have multiple files.
+description: Default Sonic Colours (Wii) Template
+
+game: Sonic Colours (Wii)
+requires:
+  version: 0.6.8 # Version of Archipelago required for this yaml to work as expected.
+  game:
+    Sonic Colours (Wii): 0.3.0 # Version of the world required for this yaml to work as expected.
+
+Sonic Colours (Wii):
+  ################
+  # Game Options #
+  ################
+  progression_balancing:
+    # A system that can move progression earlier, to try and prevent the player from getting stuck and bored early.
+    #
+    # A lower setting means more getting stuck. A higher setting means less getting stuck.
+    #
+    # You can define additional values between the minimum and maximum values.
+    # Minimum value is 0
+    # Maximum value is 99
+    random: 0
+    random-low: 0 # random value weighted towards lower values
+    random-high: 0 # random value weighted towards higher values
+    random-range-0-99: 0 # random value between 0 and 99
+    disabled: 0 # equivalent to 0
+    normal: 50 # equivalent to 50
+    extreme: 0 # equivalent to 99
+
+  accessibility:
+    # Set rules for reachability of your items/locations.
+    #
+    # **Full:** ensure everything can be reached and acquired.
+    #
+    # **Minimal:** ensure what is needed to reach your goal can be acquired.
+    full: 50
+    minimal: 0
+
+  ###############
+  # Progression #
+  ###############
+  goal:
+    # Choose your victory condition: the final boss, all seven bosses, all 180 physical Red Rings, all 21 Game Land stages, or all seven AP Chaos Emeralds.
+    nega_wisp_armor: 50
+    all_bosses: 0
+    all_red_rings: 0
+    all_game_land_stages: 0
+    super_sonic: 0
+
+  starting_act:
+    # Choose the first stage available after the original two-Act introduction. Random includes normal Acts, the six world bosses and Terminal Velocity Acts 1 and 2; it excludes the final boss.
+    tropical_resort_act_1: 0
+    tropical_resort_act_2: 0
+    tropical_resort_act_3: 0
+    tropical_resort_act_4: 0
+    tropical_resort_act_5: 0
+    tropical_resort_act_6: 0
+    sweet_mountain_act_1: 0
+    sweet_mountain_act_2: 0
+    sweet_mountain_act_3: 0
+    sweet_mountain_act_4: 0
+    sweet_mountain_act_5: 0
+    sweet_mountain_act_6: 0
+    starlight_carnival_act_1: 0
+    starlight_carnival_act_2: 0
+    starlight_carnival_act_3: 0
+    starlight_carnival_act_4: 0
+    starlight_carnival_act_5: 0
+    starlight_carnival_act_6: 0
+    planet_wisp_act_1: 0
+    planet_wisp_act_2: 0
+    planet_wisp_act_3: 0
+    planet_wisp_act_4: 0
+    planet_wisp_act_5: 0
+    planet_wisp_act_6: 0
+    aquarium_park_act_1: 0
+    aquarium_park_act_2: 0
+    aquarium_park_act_3: 0
+    aquarium_park_act_4: 0
+    aquarium_park_act_5: 0
+    aquarium_park_act_6: 0
+    asteroid_coaster_act_1: 0
+    asteroid_coaster_act_2: 0
+    asteroid_coaster_act_3: 0
+    asteroid_coaster_act_4: 0
+    asteroid_coaster_act_5: 0
+    asteroid_coaster_act_6: 0
+    tropical_resort_boss: 0
+    sweet_mountain_boss: 0
+    starlight_carnival_boss: 0
+    planet_wisp_boss: 0
+    aquarium_park_boss: 0
+    asteroid_coaster_boss: 0
+    terminal_velocity_act_1: 0
+    terminal_velocity_act_2: 0
+    random: 50
+
+  ##########
+  # Checks #
+  ##########
+  red_ring_checks:
+    # Add a check for each physical Red Ring, or one check per Act for collecting all five. These pickups are separate from the AP Red Ring items used to open Game Land stages.
+    'off': 0
+    singles: 50
+    per_level: 0
+
+  wisp_capsules:
+    # Add an immediate check for every eligible collectible Wisp Capsule in story Acts and Game Land. Coloured capsules require their matching AP Wisp item.
+    'false': 50
+    'true': 0
+
+  rank_checks:
+    # Add minimum-grade checks for S, A, B or C. A better rank also completes every lower enabled threshold. All adds all four checks to each ranked stage.
+    'off': 50
+    s: 0
+    a: 0
+    b: 0
+    c: 0
+    all: 0
+
+  game_land_checks:
+    # Add a Clear check for each of the 21 Game Land stages. Every first stage is free; the second and third stages require AP Red Ring items.
+    'false': 0
+    'true': 50
+
+  chaos_emerald_checks:
+    # Adds seven location checks for obtaining the Chaos Emerald rewards in Game Land. Each reward is earned by completing all three stages in one of the seven Game Land worlds. The checks are separate from the seven Chaos Emerald progression items placed by Archipelago.
+    'false': 0
+    'true': 50
+
+  wisp_discovery_checks:
+    # Add a check when the game first introduces each of the seven coloured Wisps through its vanilla discovery event. Opening ordinary capsules does not count, and discovery does not grant the corresponding AP Wisp item.
+    'false': 50
+    'true': 0
+
+  #############
+  # Game Land #
+  #############
+  game_land_requirement_reduction:
+    # Reduce the AP Red Ring counts needed for Game Land stages 2 and 3. Thresholds remain positive and strictly increasing. Stage 1 in every Game Land world always requires zero.
+    #
+    # You can define additional values between the minimum and maximum values.
+    # Minimum value is 0
+    # Maximum value is 179
+    40: 50
+    random: 0
+    random-low: 0 # random value weighted towards lower values
+    random-high: 0 # random value weighted towards higher values
+    random-range-0-179: 0 # random value between 0 and 179
+
+  ################
+  # Presentation #
+  ################
+  music_randomization:
+    # Shuffle music in normal Acts within each world or across worlds. The same seed uses the same shuffle. Changes apply after the original introduction; Off preserves vanilla music.
+    'off': 50
+    per_world: 0
+    anywhere: 0
+
+  ############
+  # Gameplay #
+  ############
+  level_randomization:
+    # Shuffle normal Acts within each world or across worlds. This client currently requires Off; stage shuffling is not supported.
+    'off': 50
+    per_world: 0
+    anywhere: 0
+
+  death_link:
+    # Share deaths with other players. This client currently requires Off; native death delivery is not supported.
+    'false': 50
+    'true': 0
+
+  #########
+  # Traps #
+  #########
+  trap_percentage:
+    # Percentage of remaining filler slots replaced with traps. Progression items are never replaced.
+    #
+    # You can define additional values between the minimum and maximum values.
+    # Minimum value is 0
+    # Maximum value is 100
+    10: 50
+    random: 0
+    random-low: 0 # random value weighted towards lower values
+    random-high: 0 # random value weighted towards higher values
+    random-range-0-100: 0 # random value between 0 and 100
+
+  ring_loss_trap_weight:
+    # How often Ring Loss Traps appear among trap items. The trap removes Sonic's current rings when safely delivered during an Act.
+    'off': 0
+    low: 0
+    medium: 50
+    high: 0
+
+  swim_trap_weight:
+    # How often swimming traps appear. This client currently requires Off; swimming traps are not supported.
+    'off': 50
+    low: 0
+    medium: 0
+    high: 0
+
+  swim_trap_duration:
+    # Duration in seconds for swimming traps, when supported.
+    #
+    # You can define additional values between the minimum and maximum values.
+    # Minimum value is 5
+    # Maximum value is 60
+    15: 50
+    random: 0
+    random-low: 0 # random value weighted towards lower values
+    random-high: 0 # random value weighted towards higher values
+    random-range-5-60: 0 # random value between 5 and 60
+
+  ###########################
+  # Item & Location Options #
+  ###########################
+  local_items:
+    # Forces these items to be in their native world.
+    []
+
+  non_local_items:
+    # Forces these items to be outside their native world.
+    []
+
+  start_inventory:
+    # Start with the specified amount of these items. Example: {Bomb: 1, Arrow: 3}
+    {}
+
+  start_hints:
+    # Start with these item's locations prefilled into the ``!hint`` command.
+    []
+
+  start_location_hints:
+    # Start with these locations and their item prefilled into the ``!hint`` command.
+    []
+
+  exclude_locations:
+    # Prevent these locations from having an important item.
+    []
+
+  priority_locations:
+    # Prevent these locations from having an unimportant item.
+    []
+
+  item_links:
+    # Share part of your item pool with other players.
+    []
+
+  plando_items:
+    # Generic items plando.
+    []

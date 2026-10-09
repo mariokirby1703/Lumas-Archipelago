@@ -9,13 +9,13 @@ NATIVE_BLOCKERS = {
     'save_identity': 'Native intro/profile witness binding implemented; no globally unique native ID or in-game resume validation.',
     'stats': 'Guarded native counter delivery and durable deferral implemented; visible HUD effects require live verification.',
     'world_access': 'First-Act flags and current waypoint cache project; navigation/render behavior requires live verification.',
-    'wisp_permissions': 'Seven colour save flags resolved; forced tutorial grants and White Boost query still unresolved.',
-    'game_land_gates': 'Native gate routine counts physical Red Rings; AP counter query interception not implemented.',
+    'wisp_permissions': 'Seven colour save/live fields and the native setter hook enforce AP ownership; White Boost/scripted player grants remain unresolved.',
+    'game_land_gates': 'AP ring thresholds project native gate bits without inventing physical collectibles; full Game Land navigation requires gameplay verification.',
     'emeralds': 'Super flag resolved; individual native emerald award inventory and independent boost not resolved.',
     'native_death': 'Player death event observed; safe native invocation and cache-coherent execution not resolved.',
     'swimming': 'No verified reversible swimming state; existing Gecko patch has unresolved goal interference.',
     'stage_shuffle': 'Native mission table read; intro-safe stage dispatch rewrite not implemented.',
-    'music': 'Separate CPK rewrite/readback verified; modified disc not rebuilt or boot/audio-tested.',
+    'music': 'Native normal-Act cue redirects and readback implemented; audible playback requires gameplay verification.',
     'capsule_open': 'Native instance/open transitions report immediately; live coloured model refresh uses the supplied PAL Gecko hook.',
 }
 
@@ -56,8 +56,7 @@ def diagnostic(ctx, memory=None):
                        'item_receipts': runtime.item_details()})
         result.update({'playthrough_state': runtime.guard.state.value, 'identity_status': runtime.guard.reason,
                        'bootstrap_checks': len(runtime.journal.data.get('bootstrap', {}).get('checks', [])),
-                       'super_sonic_ap_permission': owned['super_sonic_allowed'] if
-                       runtime.slot_data['options']['chaos_emerald_items'] else 'vanilla'})
+                       'super_sonic_ap_permission': owned['super_sonic_allowed']})
         if runtime.snapshot:
             stage = next(iter(runtime.snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
             player = stage.get('player', {})

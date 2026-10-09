@@ -52,7 +52,10 @@ def test_options_and_yaml():
     assert set(options) == set(OPTION_NAMES)
     for name, value in options.items():
         cls = SonicColoursOptions.type_hints[name]
-        assert cls.from_any(value).value == cls.from_any(cls.default).value
+        if name == 'starting_act':
+            assert value == cls.default == 'random'
+        else:
+            assert cls.from_any(value).value == cls.from_any(cls.default).value
     world = generate(options, fill=True).worlds[1]
     validate_slot(world.fill_slot_data())
     assert world.multiworld.can_beat_game()
@@ -73,24 +76,24 @@ def test_counts(mode, count):
     assert sum(item.name in Items.EMERALDS for item in world.multiworld.itempool) == 7
     assert all(item.classification & ItemClassification.progression for item in world.multiworld.itempool
                if item.name in Items.RING_VALUES)
-    assert sum(Items.RING_VALUES.get(item.name, 0) for item in world.multiworld.itempool) == 140
+    assert sum(Items.RING_VALUES.get(item.name, 0) for item in world.multiworld.itempool) == 187
     assert len(world.multiworld.precollected_items[1]) == 0
 
 
 @pytest.mark.parametrize('target', range(181))
 def test_exact_packing(target):
-    for strategy in ('small', 'medium', 'large', 'auto'):
-        result = pack_rings(target, strategy, 180)
-        assert sum(result) == target
+    for capacity in (target + 1, 25):
+        result = pack_rings(target, capacity)
+        assert sum(result) == target and len(result) <= capacity
     if target:
         with pytest.raises(ValueError):
-            pack_rings(target, 'auto', 0)
+            pack_rings(target, 0)
 
 
 @pytest.mark.parametrize('settings', [
-    {'red_ring_checks': 'off', 'game_land_checks': 0, 'chaos_emerald_checks': 0, 'chaos_emerald_items': 0},
+    {'red_ring_checks': 'off', 'game_land_checks': 0, 'chaos_emerald_checks': 0},
     {'red_ring_checks': 'per_level'}, {'trap_percentage': 100}, {'trap_percentage': 0},
-    {'wisp_unlocks': 'vanilla', 'world_unlocks': 'vanilla'}, {'starting_act': 'asteroid_coaster_act_6'},
+    {'goal': 'super_sonic'}, {'starting_act': 'asteroid_coaster_act_6'},
 ])
 def test_fill_100_seeds(settings):
     for seed in range(100):
@@ -100,8 +103,7 @@ def test_fill_100_seeds(settings):
 
 
 @pytest.mark.parametrize('option,value', [('level_randomization', 'anywhere'), ('level_randomization', 'per_world'),
-    ('death_link', 1), ('swim_trap_weight', 'low'),
-    ('wisp_discovery_checks', 1)])
+    ('death_link', 1), ('swim_trap_weight', 'low')])
 def test_unverified_options_fail_precisely(option, value):
     for seed in range(100):
         with pytest.raises(ValueError, match='requires_verified_hook'):
@@ -109,8 +111,8 @@ def test_unverified_options_fail_precisely(option, value):
 
 
 def test_low_capacity_error_and_trap_classification():
-    with pytest.raises(ValueError, match='auto/large'):
-        generate({'red_ring_checks': 'off', 'red_ring_bundle_strategy': 'small'})
+    with pytest.raises(ValueError, match='Too few'):
+        pack_rings(187, 1)
     world = generate({'trap_percentage': 100, 'ring_loss_trap_weight': 'off'}).worlds[1]
     assert not any(i.trap for i in world.multiworld.itempool)
     world = generate({'trap_percentage': 100}).worlds[1]

@@ -18,7 +18,7 @@ def implementation_info():
     from .runtime import Runtime, detect_checks
     from .state import SaveGuard, WritePolicy
     from .memory import SonicMemory
-    from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions
+    from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions, progression_hook, music
     functions = (NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
                  NativeHooks.swim, Runtime.poll, Runtime.apply_effects, detect_checks,
                  SaveGuard.observe, SaveGuard.check, SaveGuard.check_stats, WritePolicy.__call__,
@@ -29,7 +29,9 @@ def implementation_info():
                  capsule_refresh.installed, versions.verify_revision, journal.Journal.defer,
                  SonicMemory.write_bytes_verified, SonicMemory.resolve_selected_slot,
                  native_read._read_stage_objects, native_read.read_saved_progress,
-                 NativeHooks.reject_observation, SaveGuard.suspend, client.dolphin_loop)
+                 NativeHooks.reject_observation, SaveGuard.suspend, client.dolphin_loop,
+                 progression_hook.payload, progression_hook.installed_data, progression_hook.configure,
+                 progression_hook.events, progression_hook.identity_tag, music.cue_records, music.apply_music, music.mapping_for)
     digest = hashlib.sha256()
     for function in functions:
         digest.update(function.__qualname__.encode())

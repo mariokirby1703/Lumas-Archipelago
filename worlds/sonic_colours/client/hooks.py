@@ -10,12 +10,13 @@ from .memory import MemoryUnavailable
 from .versions import VERSION
 from .state import Snapshot
 from .native_read import read_saved_progress, read_stage_objects
-from ..world_constants import load_data, STAGES, NORMAL
+from ..world_constants import load_data, STAGES, STARTING_STAGES
 from .binding import SaveBinding
 
 
 class NativeHooks:
     def __init__(self, journal=None):
+        self.journal = journal
         self.binding = SaveBinding(journal) if journal is not None else None
         self.chain = None
         self.stable_polls = 0
@@ -28,6 +29,7 @@ class NativeHooks:
         self.stage_key = None
         self.stage_sequence = 0
         self.capsule_refresh_status = {'available': False, 'reason': 'not observed'}
+        self.progression_status = {'available':False,'reason':'not observed'}
         self.rejected_disc = None
         self.rejected_disc_polls = 0
         self.progress_rows = load_data('progress_bits.json')
@@ -139,6 +141,20 @@ class NativeHooks:
                                    if candidate_set(int(row['bank_C'])))
         else:
             saved = {}
+        from .progression_hook import events, identity_tag
+        try:
+            native_events = events(memory)
+        except MemoryUnavailable as error:
+            native_events = None
+            native['progression_event_error'] = str(error)
+        if (native_events and native_events['owner'] == chain[-1]
+                and (self.journal is None or native_events['seed_tag'] == identity_tag(self.journal.identity))):
+            baseline = self.journal.data.get('native_event_baseline') if self.journal else {}
+            if baseline is not None:
+                native_events = dict(native_events)
+                for key in ('discoveries','game_land_clears'):
+                    native_events[key] &= ~baseline.get(key,0)
+                native['progression_events'] = native_events
         scene = stage.get('scene', 'unclassified')
         # Factory defaults from 8015EBC0, corroborated by original Act 1
         # captures. Neither a command nor a selected-slot number proves New Game.
@@ -165,6 +181,8 @@ class NativeHooks:
                         current_result=stage.get('result', {}),
                         stage_epoch=stage_epoch, pickup_verified=pickup_verified,
                         opened_capsules=frozenset(capsule['key'] for capsule in stage.get('capsules', []) if capsule['opened']),
+                        discovered_wisps=frozenset((2,1,4,5,7,3,6)[i] for i in range(7)
+                            if native.get('progression_events',{}).get('discoveries',0) & (1<<i)),
                         # 8019DF48 returns rank-table index 0..3 (S,A,B,C),
                         # 4 for D; 8015F86C initializes unused records to FF.
                         # Read the awarded record byte, never infer from score.
@@ -216,31 +234,31 @@ class NativeHooks:
         # Only selected, attributed save flags. Do not manufacture physical
         # Red Rings or clears to satisfy AP inventory gates.
         flags = memory.resolve_flags_ptr()[-1]
-        starting_mission = NORMAL[slot_data['options']['starting_act']]['mission_id']
+        starting_mission = STARTING_STAGES[slot_data['options']['starting_act']]['mission_id']
         starting_bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == starting_mission))
         values = {starting_bit: True}
+        starting = STARTING_STAGES[slot_data['options']['starting_act']]
+        for stage in STAGES:
+            if stage['zone_index'] == starting['zone_index'] and stage['slot'] <= starting['slot']:
+                values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))] = True
         options = slot_data['options']
-        if options['wisp_unlocks']:
-            # 8015EC50 uses native colour IDs, not AP catalog order.
-            colours = ('Yellow Drill', 'Cyan Laser', 'Blue Cube', 'Green Hover',
-                       'Purple Frenzy', 'Orange Rocket', 'Pink Spikes')
-            for bit, colour in enumerate(colours):
-                values[bit] = inventory['counts'][colour + ' Wisp'] > 0
-        if options['world_unlocks']:
-            for zone, item in enumerate(WORLD_ITEMS):
-                granted = zone == slot_data['starting_world'] or inventory['counts'][item] > 0
-                values[20 + zone] = granted
-                if granted:
-                    first = next(stage for stage in STAGES if stage['zone_index'] == zone and stage['slot'] == 1)
-                    values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == first['mission_id']))] = True
+        # 8015EC50 uses native colour IDs, not AP catalog order.
+        colours = ('Yellow Drill', 'Cyan Laser', 'Blue Cube', 'Green Hover',
+                   'Purple Frenzy', 'Orange Rocket', 'Pink Spikes')
+        for bit, colour in enumerate(colours):
+            values[bit] = inventory['counts'][colour + ' Wisp'] > 0
+        for zone, item in enumerate(WORLD_ITEMS):
+            granted = zone == slot_data['starting_world'] or inventory['counts'][item] > 0
+            values[20 + zone] = granted
+            first = next(stage for stage in STAGES if stage['zone_index'] == zone and stage['slot'] == 1)
+            values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == first['mission_id']))] = granted
         # Act 1 gates remain native factory defaults. Acts 2/3 use AP Red Ring
         # items, independently from physical collectibles (8016CB5C table).
         values[8] = True  # Game Land entry; no physical 30-Ring prerequisite.
         for key, requirement in slot_data['game_land_gates'].items():
             zone, act = map(int, key.split('-'))
             values[210 + (zone - 1) * 3 + act - 1] = inventory['red_rings'] >= requirement
-        if options['chaos_emerald_items']:
-            values[7] = inventory['super_sonic_allowed']
+        values[7] = inventory['super_sonic_allowed']
         words = {}
         for bit, enabled in values.items():
             offset = bit // 32
@@ -252,17 +270,17 @@ class NativeHooks:
             after = (before & ~mask) | value
             if before != after:
                 memory.write_u32(address, after, expected=before, operation='permission_bits')
-        if options['world_unlocks'] and snapshot.scene == 'world_map':
+        if snapshot.scene == 'world_map':
             access = snapshot.evidence['native_data']['stage_objects'][0].get('world_map_access')
             if access and values.get(20 + access['zone']) and access['first_act_status'] == 1:
                 # 802689B4 reads bank A; native node states 1=locked, 2=available,
                 # 3=entered, 4=cleared. Refresh only this first waypoint cache.
                 memory.write_u32(access['status_address'], 2, expected=1, operation='map_availability')
+            elif access and not values.get(20 + access['zone']) and access['first_act_status'] > 1:
+                memory.write_u32(access['status_address'],1,expected=access['first_act_status'],operation='map_lock')
         self.project_live_permissions(memory, snapshot, inventory, slot_data)
 
     def project_live_permissions(self, memory, snapshot, inventory, slot_data):
-        if not slot_data['options']['wisp_unlocks']:
-            return
         if snapshot.scene == 'gameplay':
             stage = snapshot.evidence['native_data']['stage_objects'][0]
             colours = ('Yellow Drill', 'Cyan Laser', 'Blue Cube', 'Green Hover',

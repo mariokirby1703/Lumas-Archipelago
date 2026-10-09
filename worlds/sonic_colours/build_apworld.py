@@ -1,4 +1,4 @@
-"""Build a deterministic research APWorld without notes, binaries or RAM dumps."""
+"""Build a deterministic Sonic Colours APWorld without notes, binaries or RAM dumps."""
 import argparse
 import ast
 import hashlib

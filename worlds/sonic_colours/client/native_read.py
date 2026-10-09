@@ -253,6 +253,10 @@ def read_capsules(memory, stage, mission, actors):
         result.append({'key': capsule.key, 'actor': actor, 'actor_id': memory.read_u32(actor + 0xc),
                        'wrapper': wrapper, 'record': record, 'opened': bool(opened),
                        'native_colour': native_colour, 'instance': instance, 'object_id': object_id})
+        result[-1].update(collision=memory.read_u32(actor + 0xb4),
+                          interaction=memory.read_u32(actor + 0xb8),
+                          variants=list(memory.read_bytes(actor + 0x148, 3)),
+                          native_enabled=memory.read_u8(actor + 0x146))
         model = memory.read_u32(actor + 0xb0)
         if model:
             model = memory.read_ptr_checked(actor + 0xb0, 0x90)

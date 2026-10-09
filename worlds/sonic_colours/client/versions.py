@@ -30,6 +30,12 @@ def verify_revision(memory):
             memory.revision_observation['capsule_hook_instruction'] = f'0x{instruction:08X}'
             if instruction != ORIGINAL and installed(memory):
                 data = data[:offset] + ORIGINAL.to_bytes(4, 'big') + data[offset + 4:]
+        from .progression_hook import HOOK as PROGRESSION_HOOK, ORIGINAL as PROGRESSION_ORIGINAL, installed_data
+        if section['address'] <= PROGRESSION_HOOK < section['address'] + section['size']:
+            offset = PROGRESSION_HOOK - section['address']
+            word = int.from_bytes(data[offset:offset+4], 'big')
+            if word != PROGRESSION_ORIGINAL and installed_data(memory) is not None:
+                data = data[:offset] + PROGRESSION_ORIGINAL.to_bytes(4,'big') + data[offset+4:]
         digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:
             raise memory.error(f'unknown_revision: text at 0x{section["address"]:08X}, '

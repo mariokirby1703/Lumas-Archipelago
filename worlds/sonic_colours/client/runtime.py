@@ -4,7 +4,7 @@ import time
 from ..Items import BY_ID, RING_VALUES, EMERALDS, WISP_ITEMS, FILLER, TRAPS
 from ..Locations import LOCATION_TABLE, enabled
 from ..Options import SonicColoursOptions, OPTION_NAMES
-from ..world_constants import GAME, SCHEMA_VERSION, STAGES, NORMAL, BY_MISSION, game_land_gates
+from ..world_constants import GAME, SCHEMA_VERSION, STAGES, STARTING_STAGES, BY_MISSION, game_land_gates
 from .memory import MemoryUnavailable
 
 logger = logging.getLogger('Client')
@@ -12,7 +12,7 @@ logger = logging.getLogger('Client')
 
 def validate_slot(data):
     if not isinstance(data, dict) or data.get('game') != GAME or data.get('schema_version') != SCHEMA_VERSION:
-        raise ValueError('Unsupported Sonic Colours slot schema/game: v2 uses Sonic Colours (Wii); regenerate old .apsonic files.')
+        raise ValueError('Sonic Colours schema migration required: this client uses schema 3 (always-on Wisp/World Access, coloured Emeralds and five Goals). Regenerate the seed and .apsonic file with the new world; old seed journals cannot be migrated into another seed.')
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
     options = data.get('options')
@@ -39,23 +39,16 @@ def validate_slot(data):
     expected_locations = {n: d.code for n, d in LOCATION_TABLE.items() if enabled(d, SimpleNamespace(**resolved))}
     if data.get('locations') != expected_locations:
         raise ValueError('slot locations do not match option-selected stable IDs')
-    if options['wisp_capsule_sanity'] and not any(LOCATION_TABLE[n].kind == 'capsule' for n in expected_locations):
-        raise ValueError('wisp_capsule_sanity: no validated accessible capsule instances')
+    if options['wisp_capsules'] and not any(LOCATION_TABLE[n].kind == 'capsule' for n in expected_locations):
+        raise ValueError('wisp_capsules: no validated accessible capsule instances')
     if data.get('logic_policy') != 'provisional_clears_conservative_pickups':
         raise ValueError('slot logic policy mismatch; regenerate with matching world/client')
     if data.get('mandatory_prologue') != ['stg110', 'stg130']:
         raise ValueError('unsupported native prologue contract')
-    if data.get('research_only') is not True:
-        raise ValueError('only research-only slot files supported by this client build')
-    start = NORMAL[options['starting_act']]
+    start = STARTING_STAGES[options['starting_act']]
     if data.get('starting_slot') != start['stage_slot_id'] or data.get('starting_world') != start['zone_index']:
         raise ValueError('starting slot/world mismatch')
-    if options['goal'] == 2 and not options['red_ring_checks']:
-        raise ValueError('all_red_rings requires enabled Red Ring checks')
-    if options['goal'] == 3 and not options['game_land_checks']:
-        raise ValueError('all_game_land requires enabled Game Land checks')
-    for name in ('level_randomization', 'death_link',
-                 'swim_trap_weight', 'wisp_discovery_checks'):
+    for name in ('level_randomization', 'death_link', 'swim_trap_weight'):
         if options[name]:
             raise ValueError(f'{name}: requires_verified_hook')
     return data
@@ -84,6 +77,8 @@ def detect_checks(slot_data, snapshot, owned_wisps=frozenset()):
                 or data.kind == 'rank' and data.mission in snapshot.awarded_ranks
                    and 0 <= snapshot.awarded_ranks[data.mission] <= data.index
                 or data.kind == 'emerald' and data.index in snapshot.emerald_rewards
+                   and snapshot.evidence.get('native_data',{}).get('progression_events',{}).get('game_land_clears',0)
+                       & (7 << ((data.index-1)*3))
                    and all(s['mission_id'] in snapshot.persisted_clears for s in STAGES
                            if s['zone_index'] == data.index + 6)
                 or data.kind == 'capsule' and capsule_check_allowed(slot_data, data, snapshot, owned_wisps)
@@ -96,20 +91,23 @@ def capsule_check_allowed(slot_data, data, snapshot, owned_wisps):
     from ..capsules import CAPSULES
     capsule = CAPSULES[data.instance_key]
     return (capsule.eligible and capsule.key in snapshot.opened_capsules
-            and (not slot_data['options']['wisp_unlocks'] or capsule.wisp_item in owned_wisps))
+            and capsule.wisp_item in owned_wisps)
 
 
-def victory(slot_data, snapshot, ever_collected_mask=None):
+def victory(slot_data, snapshot, ever_collected_mask=None, owned=None, observed_clears=frozenset()):
     goal = slot_data['options']['goal']
+    clears = snapshot.persisted_clears | observed_clears
     if goal == 0:
-        return 'stg790' in snapshot.persisted_clears
+        return 'stg790' in clears
     if goal == 1:
-        return all(s['mission_id'] in snapshot.persisted_clears for s in STAGES if s['zone_index'] < 7)
+        return all(s['mission_id'] in clears for s in STAGES if s['kind'] == 'Boss')
     if goal == 2:
         return all((ever_collected_mask or {}).get(s['mission_id'], 0) == 31
                    for s in STAGES if s['normal'])
     if goal == 3:
-        return all(s['mission_id'] in snapshot.persisted_clears for s in STAGES if s['zone_index'] >= 7)
+        return all(s['mission_id'] in clears for s in STAGES if s['zone_index'] >= 7)
+    if goal == 4:
+        return bool(owned and owned['super_sonic_allowed'])
     raise ValueError('unsupported goal')
 
 
@@ -128,6 +126,8 @@ class Runtime:
         self.deferred = {}
         self.retry_after = {}
         self.clock = time.monotonic
+        self.music_status = {'status':'off' if not self.slot_data['options']['music_randomization'] else 'waiting for attributed stage selection',
+                             'audible_verified':False}
 
     def observe_capsules(self, owned_wisps):
         from ..capsules import CAPSULES
@@ -151,7 +151,7 @@ class Runtime:
             capsule = CAPSULES.get(key)
             if (baseline or previous or not native['opened'] or key in seen or key not in locations
                     or not capsule or capsule.mission != snapshot.actual_mission or not capsule.eligible
-                    or self.slot_data['options']['wisp_unlocks'] and capsule.wisp_item not in owned_wisps):
+                    or capsule.wisp_item not in owned_wisps):
                 continue
             checks.add(locations[key])
             events.append({'kind': 'capsule', 'mission': capsule.mission, 'instance_key': key,
@@ -205,8 +205,6 @@ class Runtime:
         excluded = self.initial_pickup_exclusions.get(mission, 0) & mask
         self.initial_pickup_exclusions[mission] = excluded
         mode = self.slot_data['options']['red_ring_checks']
-        if not mode:
-            return
         ever = self.journal.data['ever_collected_mask'].get(mission, 0)
         added = mask & ~previous & ~ever & ~excluded
         if not added:
@@ -233,7 +231,26 @@ class Runtime:
         self.settle_effects(memory)
         known = inventory(item_ids) if history_ready else inventory(self.journal.data['receipts'])
         self.observe_capsules(frozenset(known['wisps']))
+        # Install native interception even before ReceivedItems finishes. Zero
+        # or durable authenticated permissions do not authorize unknown items.
+        if not history_ready and self.guard.can_record(self.snapshot):
+            try:
+                try:
+                    self.guard.check(self.snapshot)
+                except MemoryUnavailable:
+                    self.guard.check_stats(self.snapshot)
+                from .progression_hook import configure
+                self.hooks.progression_status = configure(memory,self.snapshot,known,self.slot_data,self.journal)
+            except MemoryUnavailable as error:
+                self.hooks.progression_status = {'available':False,'reason':str(error)}
         self.last_error = self.snapshot.status
+        if self.snapshot.scene in ('world_map','global_map','game_land_select'):
+            try:
+                self.guard.check(self.snapshot)
+                from .music import apply_music
+                self.music_status = apply_music(memory,self.slot_data)
+            except MemoryUnavailable as error:
+                self.music_status = {'status':str(error),'audible_verified':False}
         owned = inventory(item_ids) if history_ready else None
         if history_ready:
             self.journal.record_history(item_ids)
@@ -242,7 +259,8 @@ class Runtime:
                                    frozenset(owned['wisps']) if owned else frozenset())
             checks -= {code for name, code in self.slot_data['locations'].items()
                        if LOCATION_TABLE[name].kind in ('ring', 'rings', 'capsule')}
-            goal = victory(self.slot_data, self.snapshot, self.journal.data['ever_collected_mask'])
+            observed = frozenset(e['mission'] for e in self.journal.data['pickup_events'] if e['kind'] == 'result')
+            goal = victory(self.slot_data, self.snapshot, self.journal.data['ever_collected_mask'], owned, observed)
             if self.guard.can_send(self.snapshot):
                 self.journal.add_checks(checks)
                 if goal and not self.journal.data.get('goal_observed'):
@@ -257,6 +275,10 @@ class Runtime:
                         or updated_goal != bootstrap.get('goal', False)):
                     bootstrap.update(checks=updated_checks, observed_missions=updated_missions, goal=updated_goal)
                     self.journal.save()
+        if owned and self.slot_data['options']['goal'] == 4 and owned['super_sonic_allowed']:
+            if not self.journal.data.get('goal_observed'):
+                self.journal.data['goal_observed'] = True
+                self.journal.save()
         if owned:
             # Native permissions and non-idempotent filler are independent. A
             # blocked query hook must not prevent separately verified stats writes.
@@ -273,15 +295,23 @@ class Runtime:
             self.last_error = 'Received history incomplete; independently verified reads remain active.'
         can_send = self.guard.can_send(self.snapshot)
         return (set(self.journal.data['pickup_checks']) | (set(self.journal.data['checks']) if can_send else set()),
-                bool(can_send and self.journal.data.get('goal_observed')))
+                bool((can_send or self.slot_data['options']['goal'] == 4) and self.journal.data.get('goal_observed')))
 
     def project_permissions(self, memory, owned):
+        from .progression_hook import configure
+        def configure_hook():
+            try:
+                self.hooks.progression_status = configure(memory,self.snapshot,owned,self.slot_data,self.journal)
+            except MemoryUnavailable as error:
+                self.hooks.progression_status = {'available':False,'reason':str(error)}
         try:
             self.guard.check(self.snapshot)
         except MemoryUnavailable:
             self.guard.check_stats(self.snapshot)
+            configure_hook()
             self.hooks.project_live_permissions(memory, self.snapshot, owned, self.slot_data)
             return
+        configure_hook()
         self.hooks.project_permissions(memory, self.snapshot, owned, self.slot_data)
 
     def settle_effects(self, memory):

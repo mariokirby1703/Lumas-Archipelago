@@ -2,17 +2,18 @@ from dataclasses import dataclass
 from Options import Choice, DefaultOnToggle, Toggle, Range, DeathLink, PerGameCommonOptions, OptionGroup
 
 class Goal(Choice):
-    """Victory requires an observed native game event."""
+    """Choose your victory condition: the final boss, all seven bosses, all 180 physical Red Rings, all 21 Game Land stages, or all seven AP Chaos Emeralds."""
     display_name = 'Goal'
-    option_final_boss = 0
-    option_all_story_clears = 1
+    option_nega_wisp_armor = 0
+    option_all_bosses = 1
     option_all_red_rings = 2
-    option_all_game_land = 3
+    option_all_game_land_stages = 3
+    option_super_sonic = 4
     default = 0
 
 
 class RedRingChecks(Choice):
-    """Physical Red Ring locations, independent from AP Red Ring inventory."""
+    """Add a check for each physical Red Ring, or one check per Act for collecting all five. These pickups are separate from the AP Red Ring items used to open Game Land stages."""
     display_name = 'Red Ring Checks'
     option_off = 0
     option_singles = 1
@@ -20,33 +21,8 @@ class RedRingChecks(Choice):
     default = 1
 
 
-class WispCapsuleSanity(Choice):
-    """Check individually validated capsule instances. Unvalidated candidates stay excluded."""
-    display_name = "Wisp Capsule Sanity"
-    option_off = 0
-    option_story = 1
-    option_all = 2
-    default = 0
-
-
-class WispUnlocks(Choice):
-    """AP permissions include White Boost; native hook requires validation."""
-    display_name = 'Wisp Unlocks'
-    option_vanilla = 0
-    option_archipelago = 1
-    default = 1
-
-
-class WorldUnlocks(Choice):
-    """World Access items control map access."""
-    display_name = 'World Unlocks'
-    option_vanilla = 0
-    option_archipelago = 1
-    default = 1
-
-
 class StartingAct(Choice):
-    """Initial menu slot, deriving its starting world."""
+    """Choose the first stage available after the original two-Act introduction. Random includes normal Acts, the six world bosses and Terminal Velocity Acts 1 and 2; it excludes the final boss."""
     display_name = 'Starting Act'
     option_tropical_resort_act_1 = 0
     option_tropical_resort_act_2 = 1
@@ -84,11 +60,19 @@ class StartingAct(Choice):
     option_asteroid_coaster_act_4 = 33
     option_asteroid_coaster_act_5 = 34
     option_asteroid_coaster_act_6 = 35
-    default = 0
+    option_tropical_resort_boss = 36
+    option_sweet_mountain_boss = 37
+    option_starlight_carnival_boss = 38
+    option_planet_wisp_boss = 39
+    option_aquarium_park_boss = 40
+    option_asteroid_coaster_boss = 41
+    option_terminal_velocity_act_1 = 42
+    option_terminal_velocity_act_2 = 43
+    default = 'random'
 
 
 class LevelRandomization(Choice):
-    """Experimental: rejected until native mission replacement is validated."""
+    """Shuffle normal Acts within each world or across worlds. This client currently requires Off; stage shuffling is not supported."""
     display_name = 'Level Randomization'
     option_off = 0
     option_per_world = 1
@@ -97,7 +81,7 @@ class LevelRandomization(Choice):
 
 
 class RankChecks(Choice):
-    """Minimum saved awarded quality. All creates S/A/B/C checks; D is excluded."""
+    """Add minimum-grade checks for S, A, B or C. A better rank also completes every lower enabled threshold. All adds all four checks to each ranked stage."""
     display_name = 'Rank Checks'
     option_off = 0
     option_s = 1
@@ -109,7 +93,7 @@ class RankChecks(Choice):
 
 
 class RingLossTrapWeight(Choice):
-    """Relative trap weights: 0, 1, 3, 6."""
+    """How often Ring Loss Traps appear among trap items. The trap removes Sonic's current rings when safely delivered during an Act."""
     display_name = 'Ring Loss Trap Weight'
     option_off = 0
     option_low = 1
@@ -119,7 +103,7 @@ class RingLossTrapWeight(Choice):
 
 
 class SwimTrapWeight(Choice):
-    """Experimental swimming hook is disabled until reversible state is proven."""
+    """How often swimming traps appear. This client currently requires Off; swimming traps are not supported."""
     display_name = 'Swim Trap Weight'
     option_off = 0
     option_low = 1
@@ -129,7 +113,7 @@ class SwimTrapWeight(Choice):
 
 
 class MusicRandomization(Choice):
-    """Patch the player's own PAL CPK with --patch-music before booting the seed. Playback needs in-game validation."""
+    """Shuffle music in normal Acts within each world or across worlds. The same seed uses the same shuffle. Changes apply after the original introduction; Off preserves vanilla music."""
     display_name = 'Music Randomization'
     option_off = 0
     option_per_world = 1
@@ -137,38 +121,23 @@ class MusicRandomization(Choice):
     default = 0
 
 
-class RedRingBundleStrategy(Choice):
-    """Exact AP counter packing with denominations 1, 5 and 10."""
-    display_name = 'Red Ring Bundle Strategy'
-    option_auto = 0
-    option_small = 1
-    option_medium = 2
-    option_large = 3
-    default = 0
-
-
 class GameLandChecks(DefaultOnToggle):
-    """Enable game land checks."""
+    """Add a Clear check for each of the 21 Game Land stages. Every first stage is free; the second and third stages require AP Red Ring items."""
     display_name = 'Game Land Checks'
 
 
 class ChaosEmeraldChecks(DefaultOnToggle):
-    """Enable chaos emerald checks."""
+    """Adds seven location checks for obtaining the Chaos Emerald rewards in Game Land. Each reward is earned by completing all three stages in one of the seven Game Land worlds. The checks are separate from the seven Chaos Emerald progression items placed by Archipelago."""
     display_name = 'Chaos Emerald Checks'
 
 
-class ChaosEmeraldItems(DefaultOnToggle):
-    """Enable chaos emerald items."""
-    display_name = 'Chaos Emerald Items'
-
-
 class WispDiscoveryChecks(Toggle):
-    """Enable wisp discovery checks."""
+    """Add a check when the game first introduces each of the seven coloured Wisps through its vanilla discovery event. Opening ordinary capsules does not count, and discovery does not grant the corresponding AP Wisp item."""
     display_name = 'Wisp Discovery Checks'
 
 
 class GameLandRequirementReduction(Range):
-    """Configure game land requirement reduction."""
+    """Reduce the AP Red Ring counts needed for Game Land stages 2 and 3. Thresholds remain positive and strictly increasing. Stage 1 in every Game Land world always requires zero."""
     display_name = 'Game Land Requirement Reduction'
     range_start = 0
     range_end = 179
@@ -176,7 +145,7 @@ class GameLandRequirementReduction(Range):
 
 
 class TrapPercentage(Range):
-    """Configure trap percentage."""
+    """Percentage of remaining filler slots replaced with traps. Progression items are never replaced."""
     display_name = 'Trap Percentage'
     range_start = 0
     range_end = 100
@@ -184,42 +153,49 @@ class TrapPercentage(Range):
 
 
 class SwimTrapDuration(Range):
-    """Configure swim trap duration."""
+    """Duration in seconds for swimming traps, when supported."""
     display_name = 'Swim Trap Duration'
     range_start = 5
     range_end = 60
     default = 15
 
 
+class WispCapsules(Toggle):
+    """Add an immediate check for every eligible collectible Wisp Capsule in story Acts and Game Land. Coloured capsules require their matching AP Wisp item."""
+    display_name = 'Wisp Capsules'
+
+
+class SonicDeathLink(DeathLink):
+    """Share deaths with other players. This client currently requires Off; native death delivery is not supported."""
+    display_name = 'Death Link'
+
+
 @dataclass
 class SonicColoursOptions(PerGameCommonOptions):
     goal: Goal
-    wisp_capsule_sanity: WispCapsuleSanity
+    wisp_capsules: WispCapsules
     red_ring_checks: RedRingChecks
-    wisp_unlocks: WispUnlocks
-    world_unlocks: WorldUnlocks
     starting_act: StartingAct
     level_randomization: LevelRandomization
     rank_checks: RankChecks
     ring_loss_trap_weight: RingLossTrapWeight
     swim_trap_weight: SwimTrapWeight
     music_randomization: MusicRandomization
-    red_ring_bundle_strategy: RedRingBundleStrategy
     game_land_checks: GameLandChecks
     chaos_emerald_checks: ChaosEmeraldChecks
-    chaos_emerald_items: ChaosEmeraldItems
     wisp_discovery_checks: WispDiscoveryChecks
     game_land_requirement_reduction: GameLandRequirementReduction
     trap_percentage: TrapPercentage
     swim_trap_duration: SwimTrapDuration
-    death_link: DeathLink
+    death_link: SonicDeathLink
 
-OPTION_NAMES = ('wisp_capsule_sanity', 'goal', 'red_ring_checks', 'wisp_unlocks', 'world_unlocks', 'starting_act', 'level_randomization', 'rank_checks', 'ring_loss_trap_weight', 'swim_trap_weight', 'music_randomization', 'red_ring_bundle_strategy', 'game_land_checks', 'chaos_emerald_checks', 'chaos_emerald_items', 'wisp_discovery_checks', 'game_land_requirement_reduction', 'trap_percentage', 'swim_trap_duration', 'death_link')
+OPTION_NAMES = tuple(SonicColoursOptions.__annotations__)
 
 OPTION_GROUPS = [
-    OptionGroup("Progression", [Goal, StartingAct, WorldUnlocks, WispUnlocks, ChaosEmeraldItems]),
-    OptionGroup("Checks", [RedRingChecks, WispCapsuleSanity, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks]),
-    OptionGroup("Game Land", [GameLandRequirementReduction, RedRingBundleStrategy]),
-    OptionGroup("Experimental", [LevelRandomization, MusicRandomization, DeathLink]),
-    OptionGroup("Traps", [TrapPercentage, RingLossTrapWeight, SwimTrapWeight, SwimTrapDuration]),
+    OptionGroup('Progression', [Goal, StartingAct]),
+    OptionGroup('Checks', [RedRingChecks, WispCapsules, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks]),
+    OptionGroup('Game Land', [GameLandRequirementReduction]),
+    OptionGroup('Presentation', [MusicRandomization]),
+    OptionGroup('Gameplay', [LevelRandomization, SonicDeathLink]),
+    OptionGroup('Traps', [TrapPercentage, RingLossTrapWeight, SwimTrapWeight, SwimTrapDuration]),
 ]

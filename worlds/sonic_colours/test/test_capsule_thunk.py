@@ -7,11 +7,13 @@ import pytest
 from ..client.capsule_refresh import payload_words, ORIGINAL
 
 
-def run(mode,owned,opened=0,colour=1,special=0):
+def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
     actor,model,manager,state=0x90010000,0x90020000,0x90030000,0x90040000
     mem={actor:0x80761534,actor+0x110:opened,actor+0x148:special,actor+0x114:colour,
          actor+0xb0:model,actor+0x34:manager,model:0x8077d12c,
-         model+8:actor,model+0x88:mode,actor+0x128:0}
+         model+8:actor,model+0x88:mode,actor+0x128:0,
+         actor+0xb4: 0x90060000 if (mode if interaction is None else interaction) else 0,
+         actor+0x149:alternate}
     regs=list(range(32));regs[1]=0x90050000;regs[2]=0x808f0000;regs[31]=actor
     mem[regs[2]-0x7c48]=0x80720000
     original=regs[:];lr,ctr,cr=0x80012345,0x80045678,0x12345678
@@ -61,6 +63,9 @@ def run(mode,owned,opened=0,colour=1,special=0):
                 mem[model+0x88]=1
             elif ctr==0x800d3da4:
                 assert regs[3]==actor;mem[model+0x88]=0
+            elif ctr==0x800d3ff8:
+                assert regs[3]==actor and regs[4]==manager and not mem[actor+0xb4]
+                mem[actor+0xb4]=0x90060000
             elif ctr==0x800d5490:
                 assert regs[3]==actor and regs[4] in (0x807613c0,0x807613d8)
             elif ctr==0x800d4298:assert regs[3]==actor
@@ -77,7 +82,7 @@ def run(mode,owned,opened=0,colour=1,special=0):
 @pytest.mark.parametrize('colour',range(7))
 def test_each_coloured_capsule_uses_native_model_and_state_transition(colour):
     calls,mode=run(0,True,colour=colour)
-    assert calls==[0x800132d8,0x8003baac,0x800d3eb4,0x800d5490,0x800d4298]
+    assert calls==[0x800132d8,0x8003baac,0x800d3eb4,0x800d3ff8,0x800d5490,0x800d4298]
     assert mode==1
     calls,mode=run(mode,True,colour=colour)
     assert calls==[0x800132d8,0x8003baac] # no duplicate model or actor creation
@@ -91,3 +96,14 @@ def test_revocation_uses_native_ghost_lifecycle_without_collection():
 @pytest.mark.parametrize('kwargs',[{'opened':1},{'colour':7},{'colour':0xffffffff},{'special':1}])
 def test_opened_white_and_special_capsules_are_not_reinitialized(kwargs):
     assert run(0,True,**kwargs)[0]==[]
+
+
+def test_old_model_only_refresh_repairs_interaction_without_model_replacement():
+    calls, mode = run(1, True, interaction=False)
+    assert calls == [0x800132d8,0x8003baac,0x800d3ff8,0x800d5490,0x800d4298]
+    assert mode == 1
+
+
+def test_alternate_native_capsule_keeps_its_colour_and_receives_interaction():
+    calls, mode = run(0, True, colour=5, alternate=1)
+    assert 0x800d3ff8 in calls and mode == 1

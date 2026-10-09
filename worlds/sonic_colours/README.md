@@ -1,39 +1,32 @@
-# Sonic Colours (Wii) ? PAL Archipelago integration
+﻿# Sonic Colours (Wii) PAL — Archipelago 0.3.0
 
-Development version 0.2.0, slot schema 2. **Not yet playable end to end.**
+PAL `SNCP8P`, revision 0; slot schema 3. This build contains native gameplay
+readers and guarded writers, immediate journaled checks, and two Gecko hooks.
+It is ready for targeted testing, but a complete native playthrough has not
+been verified.
 
-The client now sends physical Red Ring and capsule checks from native gameplay
-state, including the mandatory unsaved intro. A durable AP journal retains
-pickups through death, exit, disconnect and server-ACK retry. Red Ring groups
-use the five physical identities collected across attempts, not save masks.
+World Access and all eight Wisp items always use AP ownership. Seven coloured
+Chaos Emerald items always appear as progression and control Super Sonic.
+Five goals, random post-intro Starting Act, automatic Red Ring packing and
+680 optional individual Wisp Capsule checks are supported by the generator.
+Music shuffling redirects the native normal-Act cue table before stage loading.
 
-Native results-screen Clear/Rank checks now report before intro save selection.
-World Access unlocks its first Act and refreshes the current waypoint cache;
-status presentation is debounced independently from pickup polling.
+The capsule hook now initializes the original native pickup collision objects,
+including repair of capsules previously refreshed only visually. The progression
+hook intercepts vanilla World/Wisp/Super grants and records native discovery and
+Game Land clear transitions. Existing opened capsules and clear/rank records
+are preserved.
 
-Native Rings, 1-Up and Ring Loss delivery, selected-save World/starting-act access,
-AP Game Land gates, seven colour permission fields and the Super unlock bit have
-real compare/write/readback paths. Deferred results rewards are durable; uncertain
-receipts never replay and no longer starve later items. Item receipts settle after separate
-0.5/2-second counter observations, rather than immediate readback. Save resume uses witnessed native slot,
-profile and intro result records; no invented guest UUID or padding is written.
+Offline tests exercise original RAM captures, guarded real-address writes,
+PowerPC hook execution, restrictive AP fill and genuine local server protocol
+acknowledgements. These do not establish usable capsules, audible shuffled
+music, or visible counter changes in Dolphin. White Boost scripted grants,
+White's discovery event, native DeathLink/Swim and level shuffling remain gaps.
 
-The supplied PAL Gecko hook reconciles already spawned coloured capsule models
-with live permissions during actor updates. Enable it once before emulation;
-mid-Act Wisp receipt then requires no restart. Wisp names now end in `Wisp`.
-
-**The full integration remains incomplete:** live capsule/HUD validation, White
-Boost and scripted player grants, native DeathLink/Swim, level shuffle and booted music
-validation are outstanding. The normal AP Wisp mode is not fully enforced.
-Use [the in-game test setup](docs/immediate_checks.md) to exercise the implemented
-client. Original-capture write overlays and a local WebSocket server test do not
-constitute live Dolphin gameplay validation.
-
-- [Setup and migration](docs/setup_en.md)
-- [Current implementation report](docs/development.md)
-- [Native changes, evidence, music installation and exact remaining gaps](docs/native_implementation.md)
-- [Native evidence and smallest live probe](docs/ram_research.md)
-- [Example YAML](examples/SonicColours.yaml)
+- [Installation, New Game and YAML migration](docs/setup_en.md)
+- [Current implementation and exact validation limits](docs/gameplay_overhaul.md)
+- [Default YAML](examples/SonicColours.yaml)
+- [Migrated Luma YAML](examples/Luma_Migrated.yaml)
 
 Build: `.venv/Scripts/python.exe worlds/sonic_colours/build_apworld.py`.
-The archive excludes `notes`, tools, tests, original Wii binaries and RAM dumps.
+Original Wii binaries, private notes and RAM dumps are excluded from the APWorld.

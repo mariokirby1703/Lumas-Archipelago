@@ -34,12 +34,16 @@
     "native_death": false,
     "swimming": false,
     "stage_shuffle": false,
-    "music": false,
+    "music": true,
     "new_game_indicator": true,
     "scene": true,
     "capsule_open": true,
     "permission_bits": true,
     "colour_permissions": true,
-    "map_availability": true
+    "map_availability": true,
+    "music_cues": true,
+    "map_lock": true,
+    "progression_data": true,
+    "progression_reset": true
   }
 }

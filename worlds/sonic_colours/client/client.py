@@ -313,6 +313,8 @@ async def dolphin_loop(ctx):
                     pickup_detection={'verified': snap.pickup_verified, 'authorized': ctx.runtime.guard.can_record_pickups(snap)},
                     journal_persistence={'durable_events': len(ctx.runtime.journal.data['pickup_events']), 'earned_checks': len(ctx.runtime.journal.data['checks']), 'persistence_pending': ctx.runtime.journal.persistence_pending},
                     capsule_refresh=ctx.runtime.hooks.capsule_refresh_status,
+                    native_progression=ctx.runtime.hooks.progression_status,
+                    music_randomization=ctx.runtime.music_status,
                     item_writes={'history_ready': ctx.history_ready, 'pending_receipts': ctx.runtime.pending_effects(), 'status': ctx.runtime.last_error})
                 ctx.dolphin_status = (snap.status if snap.evidence.get('executable_error')
                                       else ctx.runtime.guard.reason)

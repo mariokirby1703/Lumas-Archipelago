@@ -14,7 +14,10 @@ def generate(options=None, seed=0, fill=False):
     multiworld.player_name = {1: 'SonicPlayer'}
     args = Namespace()
     for name, option in SonicColoursWorld.options_dataclass.type_hints.items():
-        setattr(args, name, {1: option.from_any((options or {}).get(name, option.default))})
+        # Native replay fixtures use the original starting world. Random Choice
+        # behavior is tested separately against the actual option default.
+        default = 0 if name == 'starting_act' else option.default
+        setattr(args, name, {1: option.from_any((options or {}).get(name, default))})
     multiworld.set_options(args)
     multiworld.state = CollectionState(multiworld)
     for step in gen_steps:

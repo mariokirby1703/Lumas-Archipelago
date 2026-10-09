@@ -130,6 +130,10 @@ class SonicMemory:
             raise MemoryUnavailable('WRITE_BLOCKED: no verified write policy')
         if operation == 'map_availability' and (data != (2).to_bytes(4, 'big') or expected != (1).to_bytes(4, 'big')):
             raise MemoryUnavailable('WRITE_BLOCKED: map availability only permits locked-to-available')
+        if operation == 'progression_reset' and data != bytes(4):
+            raise MemoryUnavailable('WRITE_BLOCKED: disabled progression events may only reset to zero')
+        if operation == 'map_lock' and (data != (1).to_bytes(4,'big') or int.from_bytes(expected,'big') not in (2,3,4)):
+            raise MemoryUnavailable('WRITE_BLOCKED: map lock only permits available/entered/cleared-to-locked cache')
         token = self.write_guard(operation, address, len(data))
         before = self.read_bytes(address, len(data))
         if before != expected:

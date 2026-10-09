@@ -24,7 +24,13 @@ class Overlay:
         self.writes = []
     def read_bytes(self, address, size):
         original = self.original.read_bytes(address, size)
-        return bytes(self.bytes.get(address+i, b) for i, b in enumerate(original))
+        patches = [(a,b) for a,b in self.bytes.items() if address <= a < address+size]
+        if not patches:
+            return original
+        result = bytearray(original)
+        for a,b in patches:
+            result[a-address] = b
+        return bytes(result)
     def write_bytes(self, address, data):
         self.writes.append((address, bytes(data)))
         self.bytes.update((address+i, b) for i, b in enumerate(data))
@@ -85,7 +91,7 @@ def test_original_intro_native_stats_writer_and_receipt_once(tmp_path):
 @pytest.mark.skipif(not PAIRS, reason='private original captures absent')
 @pytest.mark.parametrize('working_record', [False, True])
 def test_original_intro_binding_resume_and_world_gate_write(tmp_path, working_record):
-    data=generate({'wisp_unlocks':'vanilla'}).worlds[1].fill_slot_data()
+    data=generate({}).worlds[1].fill_slot_data()
     with Journal(tmp_path, IDENTITY) as journal:
         hooks=NativeHooks(journal); guard=SaveGuard(journal)
         runtime=Runtime(data,journal,guard,hooks)
@@ -267,7 +273,7 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
 
 def test_capsule_opening_in_intro_is_durable_and_instance_specific(tmp_path):
     from ..capsules import CAPSULES
-    data=generate({'wisp_capsule_sanity':'story','wisp_unlocks':'vanilla'}).worlds[1].fill_slot_data()
+    data=generate({'wisp_capsules':True}).worlds[1].fill_slot_data()
     candidates=[c for c in CAPSULES.values() if c.eligible and c.mission=='stg110' and c.wisp_item=='White Boost Wisp'][:2]
     assert len(candidates)==2
     with Journal(tmp_path,IDENTITY) as journal:
@@ -278,14 +284,14 @@ def test_capsule_opening_in_intro_is_durable_and_instance_specific(tmp_path):
         guard.observe(value)
         native=[{'key':c.key,'opened':False,'actor_id':i} for i,c in enumerate(candidates)]
         runtime.snapshot=replace(value,evidence={'native_data':{'stage_objects':[{'capsules':native}]}})
-        runtime.observe_capsules(frozenset())
+        runtime.observe_capsules(frozenset({'White Boost Wisp'}))
         for c in native:
             c['opened']=True
-            runtime.observe_capsules(frozenset())
+            runtime.observe_capsules(frozenset({'White Boost Wisp'}))
         assert journal.data['pickup_checks']==sorted(c.code for c in candidates)
         assert len(journal.data['pickup_events'])==2
         runtime.snapshot=replace(runtime.snapshot,stage_epoch='retry')
-        runtime.observe_capsules(frozenset())
+        runtime.observe_capsules(frozenset({'White Boost Wisp'}))
         assert len(journal.data['pickup_events'])==2
         assert journal.data['save_identity'] is None
 

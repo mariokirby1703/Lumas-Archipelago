@@ -66,7 +66,7 @@ def test_nonfinal_result_is_not_credited(tmp_path):
 
 @pytest.mark.skipif(not PAIRS, reason='private original captures absent')
 def test_all_world_items_grant_only_first_act_and_starting_act(tmp_path):
-    data=generate({'wisp_unlocks':'vanilla'}).worlds[1].fill_slot_data()
+    data=generate({}).worlds[1].fill_slot_data()
     with Journal(tmp_path,IDENTITY) as journal:
         hooks=NativeHooks(journal);guard=SaveGuard(journal);runtime=Runtime(data,journal,guard,hooks)
         for stamp in ('200443','202546','205502'):
@@ -81,7 +81,7 @@ def test_all_world_items_grant_only_first_act_and_starting_act(tmp_path):
             first=next(s for s in STAGES if s['zone_index']==zone and s['slot']==1)
             bit=int(next(r['bank_A'] for r in hooks.progress_rows if r['mission']==first['mission_id']))
             assert memory.read_progress_bit(flags,20+zone) and memory.read_progress_bit(flags,bit)
-            changed={b for b,v in before.items() if memory.read_progress_bit(flags,b)!=v}
+            changed={b for b,v in before.items() if not v and memory.read_progress_bit(flags,b)}
             # Game Land flags have their own inventory gate projection; no other story act reveal.
             assert {b for b in changed if b<90}<={bit}
 
@@ -133,7 +133,7 @@ def test_supplied_sweet_mountain_first_waypoint_refresh(tmp_path):
     class BoundFixture:
         def check(self,state):return ('test-bound-save',state.session)
     memory.write_guard=WritePolicy(memory,BoundFixture(),hooks.snapshot)
-    data=generate({'wisp_unlocks':'vanilla'}).worlds[1].fill_slot_data()
+    data=generate({}).worlds[1].fill_slot_data()
     hooks.project_permissions(memory,state,inventory([ITEM_TABLE['Sweet Mountain Access']]),data)
     assert memory.read_u32(access['status_address'])==2
     flags=memory.resolve_flags_ptr()[-1]

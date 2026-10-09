@@ -14,6 +14,7 @@ NATIVE_SIGNATURES = (
     (0x8003BAAC, 0x38000001), (0x8003BAB0, 0x88630090),
     (0x800D3DA4, 0x9421FF90), (0x800D3DA8, 0x7C0802A6),
     (0x800D3EB4, 0x9421FF90), (0x800D3EB8, 0x7C0802A6),
+    (0x800D3FF8, 0x9421FEF0), (0x800D3FFC, 0x7C0802A6),
     (0x800D4298, 0x9421FFC0), (0x800D429C, 0x7C0802A6),
     (0x800D5490, 0x9421FFE0), (0x800D5494, 0x7C0802A6),
     (0x807613C8, 0x800D562C), (0x807613E0, 0x800D557C),
@@ -50,7 +51,9 @@ def payload_words():
     a.emit(0x7C002800); a.branch('end',0x40820000)
     a.d(34,0,31,0x110); a.d(11,0,0,0); a.branch('end',0x40820000)
     # Special multi/alternate capsules have different subtype/resource contracts.
-    for offset in (0x148,0x149,0x14a):
+    # +149 changes native use eligibility, not the model's colour contract.
+    # +148/+14A use the multi-Wisp/alternate-content constructor instead.
+    for offset in (0x148,0x14a):
         a.d(34,0,31,offset); a.d(11,0,0,0); a.branch('end',0x40820000)
     a.d(32,4,31,0x114); a.d(10,0,4,6); a.branch('end',0x41810000)
     a.d(32,3,31,0xb0); a.d(11,0,3,0); a.branch('end',0x41820000)
@@ -62,10 +65,20 @@ def payload_words():
     a.d(11,0,3,0); a.branch('end',0x41820000)
     a.d(32,4,31,0x114); a.call(0x8003BAAC)  # native permission query
     a.d(32,4,31,0xb0); a.d(32,0,4,0x88)  # constructor mode 0 ghost / 1 content
-    a.emit(0x7C001800); a.branch('end',0x41820000)  # already reconciled
+    a.emit(0x7C001800); a.branch('matched',0x41820000)
     a.d(10,0,0,1); a.branch('end',0x41810000)
     a.d(11,0,3,0); a.branch('lock',0x41820000)
     a.mr(3,31); a.d(32,4,31,0x34); a.d(14,5,0,1); a.call(0x800D3EB4)
+    a.branch('interaction')
+    a.label('matched')
+    a.d(11,0,3,0); a.branch('end',0x41820000)
+    a.d(32,0,31,0xb4); a.d(11,0,0,0); a.branch('end',0x40820000)
+    a.label('interaction')
+    # Ghosts never traverse 800D3CF8..3D08's native collision initialization.
+    # Repair a previous model-only refresh too; do not duplicate body handles.
+    a.d(32,0,31,0xb4); a.d(11,0,0,0); a.branch('state',0x40820000)
+    a.mr(3,31); a.d(32,4,31,0x34); a.call(0x800D3FF8)
+    a.label('state')
     # Constructor's default state, via the real transition function (exit/entry
     # callbacks), before native visibility/movement picks any specialized state.
     a.mr(3,31); a.d(15,4,0,0x8076); a.d(14,4,4,0x13c0); a.call(0x800D5490)
@@ -94,7 +107,10 @@ def gecko_ini():
     lines += [f'20{HOOK-0x80000000:06X} {ORIGINAL:08X}',
               f'C2{HOOK-0x80000000:06X} {len(words)//2:08X}']
     lines += [f'{words[i]:08X} {words[i+1]:08X}' for i in range(0,len(words),2)]
-    lines += ['E0000000 80008000', '[Gecko_Enabled]', '$AP PAL live coloured capsule refresh']
+    lines += ['E0000000 80008000']
+    from .progression_hook import gecko_lines
+    lines += gecko_lines()
+    lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression']
     return '\n'.join(lines)+'\n'
 
 

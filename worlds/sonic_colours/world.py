@@ -6,13 +6,13 @@ from worlds.AutoWorld import World
 from . import Items, Locations, Regions, Rules
 from .Options import SonicColoursOptions, OPTION_NAMES
 from .web_world import SonicColoursWeb
-from .world_constants import GAME, SCHEMA_VERSION, NORMAL, STAGES, WORLDS, load_data, game_land_gates, pack_rings
+from .world_constants import GAME, SCHEMA_VERSION, STARTING_STAGES, STAGES, WORLDS, load_data, game_land_gates, pack_rings
 
 logger = logging.getLogger(__name__)
 
 
 class SonicColoursWorld(World):
-    """PAL Sonic Colours research integration. Native hooks await live validation."""
+    """Sonic Colours Wii PAL Archipelago integration."""
     game = GAME
     web = SonicColoursWeb()
     options_dataclass = SonicColoursOptions
@@ -27,15 +27,11 @@ class SonicColoursWorld(World):
     def generate_early(self):
         for option, capability in [('level_randomization', 'stage_shuffle'),
                                    ('death_link', 'native_death'),
-                                   ('swim_trap_weight', 'swimming'), ('wisp_discovery_checks', 'wisp_permissions')]:
+                                   ('swim_trap_weight', 'swimming')]:
             if getattr(self.options, option).value:
                 raise ValueError(f'Sonic Colours: {option} requires_verified_hook: {capability}. '
                                  'Use off until PAL live validation; see docs/development.md.')
-        if self.options.goal.value == 2 and not self.options.red_ring_checks:
-            raise ValueError('all_red_rings requires singles or per_level Red Ring checks.')
-        if self.options.goal.value == 3 and not self.options.game_land_checks:
-            raise ValueError('all_game_land requires game_land_checks=true.')
-        self.starting_stage = NORMAL[self.options.starting_act.value]
+        self.starting_stage = STARTING_STAGES[self.options.starting_act.value]
         self.starting_world = self.starting_stage['zone_index']
         self.gates = game_land_gates(self.options.game_land_requirement_reduction.value)
         self.active_locations = tuple(n for n, d in Locations.LOCATION_TABLE.items() if Locations.enabled(d, self.options))
@@ -45,9 +41,9 @@ class SonicColoursWorld(World):
         logger.warning('Sonic Colours: provisional clear accessibility; %d unknown logic entries; '
                        'eight Wisps remain shuffled progression; native feature evidence is separate.',
                        len(self.unknown_logic))
-        if self.options.wisp_capsule_sanity.value and not any(
+        if self.options.wisp_capsules.value and not any(
                 Locations.LOCATION_TABLE[n].kind == 'capsule' for n in self.active_locations):
-            raise ValueError('wisp_capsule_sanity: no validated accessible capsule instances yet; '
+            raise ValueError('wisp_capsules: no validated accessible capsule instances yet; '
                              'requires native opening/identity proof; use off.')
         self.stage_mapping = {s['stage_slot_id']: s['mission_id'] for s in STAGES}
 
@@ -59,16 +55,26 @@ class SonicColoursWorld(World):
 
     def create_items(self):
         names = []
-        if self.options.world_unlocks.value:
-            names += [n for i, n in enumerate(Items.WORLD_ITEMS) if i != self.starting_world]
-        if self.options.wisp_unlocks.value:
-            names += list(Items.WISP_ITEMS)
-        if self.options.chaos_emerald_items:
-            names += list(Items.EMERALDS)
-        needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks or self.options.goal.value == 3)
-        self.ring_target = max(self.gates.values()) if needs_land else 0
-        names += [Items.ring_name(n) for n in pack_rings(self.ring_target,
-                   self.options.red_ring_bundle_strategy.current_key, len(self.active_locations) - len(names))]
+        names += [n for i, n in enumerate(Items.WORLD_ITEMS) if i != self.starting_world]
+        names += list(Items.WISP_ITEMS) + list(Items.EMERALDS)
+        precollected = self.multiworld.precollected_items[self.player]
+        for item in precollected:
+            if item.name in names:
+                names.remove(item.name)
+        # Place the small access inventory before the potentially large single
+        # Ring pool. Otherwise restrictive fill can consume every accessible
+        # Clear with Rings while leaving the Wisps needed for physical pickups.
+        for name in names:
+            if name in Items.WISP_ITEMS or name in Items.WORLD_ITEMS:
+                early = self.multiworld.early_items[self.player]
+                early[name] = early.get(name, 0) + 1
+        needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks
+                          or self.options.goal.value == 3 or self.options.wisp_capsules)
+        self.ring_required = max(self.gates.values()) if needs_land else 0
+        self.ring_target = (4 * self.ring_required + 2) // 3
+        remaining = max(0, self.ring_target - sum(Items.RING_VALUES.get(i.name, 0) for i in precollected))
+        capacity = len(self.active_locations) - len(self.options.exclude_locations.value & set(self.active_locations)) - len(names)
+        names += [Items.ring_name(n) for n in pack_rings(remaining, capacity)]
         filler_count = len(self.active_locations) - len(names)
         if filler_count < 0:
             raise ValueError('Sonic Colours: enable more checks for mandatory progression.')
@@ -90,7 +96,7 @@ class SonicColoursWorld(World):
 
     def fill_slot_data(self):
         return {'schema_version': SCHEMA_VERSION, 'game': GAME, 'seed_name': self.multiworld.seed_name,
-                'research_only': True, 'starting_slot': self.starting_stage['stage_slot_id'],
+                'starting_slot': self.starting_stage['stage_slot_id'],
                 'starting_world': self.starting_world, 'game_land_gates': self.gates,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),
                 'logic_policy': 'provisional_clears_conservative_pickups',
@@ -104,7 +110,7 @@ class SonicColoursWorld(World):
                                     'slot_data': self.fill_slot_data()}, indent=2), encoding='utf-8')
 
     def write_spoiler_header(self, spoiler_handle):
-        spoiler_handle.write(f'\nSonic Colours: RESEARCH ONLY; native hooks not live verified.\n'
+        spoiler_handle.write(f'\nSonic Colours (Wii) PAL\n'
                              f'Starting slot: {self.starting_stage["name"]}\n'
                              f'Unknown logic entries: {len(self.unknown_logic)}\n'
                              'Wisps: shuffled; unknown clear routes provisional, optional pickups conservative.\n')
