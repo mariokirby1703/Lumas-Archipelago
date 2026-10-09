@@ -1,11 +1,11 @@
 2026-10-09 ? rework version 0.2.0, slot schema 2
-Base reviewed: dd23ef600c3046cfa5b4e6670a68aefcf18d7e9e
+Base reviewed for live repair: 6d939372d9ba315eeee31d82e9bce34276f09e58
 Branch: Sonic-Colours-Wii-AP
 
 PowerShell, repository root:
 $env:AP_TEST_WORLDS='sonic_colours'
 .venv/Scripts/python.exe -m pytest worlds/sonic_colours/test -q --disable-warnings
-Result: 418 passed, 2 warnings.
+Result: 439 passed, 2 warnings.
 Includes 100 default fill/sphere runs with all eight shuffled Wisps;
 600 further fill runs and 800 precise unsupported-mode refusals.
 Warnings from existing core: optional _speedups absent; Python 3.11.9 warning.
@@ -18,13 +18,25 @@ README/four CSV files in notes/offline_re are byte-identical to old research.
 The rework document supersedes earlier user decisions.
 
 .venv/Scripts/python.exe worlds/sonic_colours/tools/probe_pal.py
-Result: DME status noEmu; read_failed: emulation_not_running.
-The user confirmed only the Dolphin application is open, not the game.
-Live reads: 0; writes: 0; network gameplay checks sent: 0.
+Result: DME hooked outside sandbox; SNCP8P revision 0 executable text verified.
+Real bounded traces: forced Act 1 gameplay/result, first save selection after
+Act 2, first saved map (user-confirmed visible Slot 2), regular reload,
+regular Act 3 gameplay/result/map after save, and another regular reload.
+Inline flags correction resolves the former invalid_pointer failure.
+Clear bits 150/151/152 observed unset before save, set after save, retained
+after title-menu reload. Only these three bits become validated persisted reads.
+Actual native scene/mission, stable save identity and New Game remain unresolved.
+Scene labels are user reports, never verified CPU/native scene fields.
+The save-selection-pool capture occurred during transition to saved map;
+its operator label must not be treated as verified menu state.
+Recorded RAM reads replay through the production NativeHooks adapter.
+Even validated clear reads cannot bypass the seed/save identity gate.
+Live writes: 0; AP LocationChecks sent/acknowledged: 0.
+No debugger register observation obtained; user deferred it for the night.
 
 .venv/Scripts/python.exe worlds/sonic_colours/build_apworld.py
 Output: build/apworlds/sonic_colours.apworld (version 0.2.0 / schema 2).
 ZIP integrity and separate ZIP-imported catalog access checked.
-No notes, DOL, ELF, CPK or RAM files packaged.
+No notes, DOL, ELF, CPK or live_pal_*.json RAM trace fixtures packaged.
 
 This report does not establish complete native playability. See development.md.

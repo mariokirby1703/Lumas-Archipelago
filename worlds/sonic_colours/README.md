@@ -7,6 +7,10 @@ The eight Wisps are shuffled progression items. New Game/bootstrap/save binding,
 independent read polling and capsule instance validation now have explicit models.
 Native scene/identity and gameplay permission hooks still need PAL evidence.
 
+The live pointer failure has been repaired. Tropical Resort Acts 1..3 clear bits
+have been observed through save and reload; this limited read proof does not enable
+save binding, check transmission or effects. See the [live repair report](docs/live_client_blockers.md).
+
 - [Setup and migration](docs/setup_en.md)
 - [Current implementation report](docs/development.md)
 - [Native evidence and smallest live probe](docs/ram_research.md)

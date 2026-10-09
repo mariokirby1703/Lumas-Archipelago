@@ -21,12 +21,17 @@ manager       = read_u32(0x808F3628)
 container     = read_u32(manager + 0x30)
 index         = read_u8(container)
 selected_save = container + 8 + index * 0x19608
-flags         = read_u32(selected_save + 0x1C)
+flags         = selected_save + 0x1C
 word          = flags + 0x10 + 4 * (bit // 32)
 mask          = 1 << (bit % 32)
 ```
 
-The extra dereference is mandatory. External memory addresses are Wii guest
+The flags are inline. The `lwz` in the bit helper unwraps the caller's stack
+wrapper (see `0x8016C1D4`), not a pointer stored at `selected_save+0x1C`.
+The previous client incorrectly added this dereference. A live PAL Act 1 read
+now resolves manager `0x80B3FAC0`, container `0x9310DDA0`, internal index 1,
+and C bank `0x931273DC`; these heap addresses are observations, never constants.
+External memory addresses are Wii guest
 addresses, not Windows process addresses. `index=0` has not been proven to mean
 a visible UI slot. The resolver accepts internal indices 0..2 as candidates only;
 any visible slot is permitted after identity proof. The game forces Acts 1/2 before

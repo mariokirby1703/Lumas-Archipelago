@@ -1,0 +1,435 @@
+{
+  "read_only": true,
+  "live_writes": 0,
+  "live_checks_sent": 0,
+  "operator_phase": "user_reported_first_save_selection",
+  "phase_is_native_proof": false,
+  "samples": [
+    {
+      "timestamp_utc": "2026-10-09T02:54:27.503183+00:00",
+      "snapshot": {
+        "session": "pal-chain-1",
+        "save_identity": null,
+        "visible_slot": null,
+        "scene": "unclassified",
+        "actual_mission": null,
+        "clicked_slot": null,
+        "stable_polls": 1,
+        "persisted_clears": [],
+        "persisted_rings": {},
+        "awarded_ranks": {},
+        "emerald_rewards": [],
+        "opened_capsules": [],
+        "discovered_wisps": [],
+        "death_state": "unknown",
+        "rings_address": null,
+        "lives_address": null,
+        "new_game_verified": false,
+        "save_identity_verified": false,
+        "progress_verified": false,
+        "scene_verified": false,
+        "fresh_fields": [],
+        "new_save_selected": false,
+        "candidate_clears": [],
+        "evidence": {
+          "chain": [
+            2159278784,
+            2467356064,
+            1,
+            2467460016,
+            2467460044
+          ],
+          "save_chain_trace": {
+            "grade": "code-derived",
+            "steps": [
+              {
+                "step": "manager",
+                "address": "0x808F3628",
+                "raw": "0x80B3FAC0",
+                "reason": "ok"
+              },
+              {
+                "step": "container",
+                "address": "0x80B3FAF0",
+                "raw": "0x9310DDA0",
+                "reason": "ok"
+              },
+              {
+                "step": "selected_index",
+                "address": "0x9310DDA0",
+                "raw": "0x01",
+                "reason": "ok"
+              },
+              {
+                "step": "c_bank",
+                "address": "0x931273DC",
+                "reason": "ok",
+                "hex": "48100000000000000000000000000000000000000000000049240000000000120000000000000000"
+              }
+            ],
+            "chain": [
+              2159278784,
+              2467356064,
+              1,
+              2467460016,
+              2467460044
+            ],
+            "scene": "unresolved",
+            "no_save_yet": "possible; requires independent scene evidence",
+            "status": "candidate_only"
+          },
+          "progress_c": "code-derived; live persistence pending",
+          "internal_selected_index": 1
+        },
+        "status": "candidate_progress_read: native New Game, scene and stable save identity unresolved"
+      },
+      "reads": [
+        {
+          "address": 2156869160,
+          "size": 4,
+          "hex": "80b3fac0"
+        },
+        {
+          "address": 2159278832,
+          "size": 4,
+          "hex": "9310dda0"
+        },
+        {
+          "address": 2467356064,
+          "size": 1,
+          "hex": "01"
+        },
+        {
+          "address": 2467460060,
+          "size": 40,
+          "hex": "48100000000000000000000000000000000000000000000049240000000000120000000000000000"
+        },
+        {
+          "address": 2156869160,
+          "size": 4,
+          "hex": "80b3fac0"
+        },
+        {
+          "address": 2159278832,
+          "size": 4,
+          "hex": "9310dda0"
+        },
+        {
+          "address": 2467356064,
+          "size": 1,
+          "hex": "01"
+        }
+      ]
+    },
+    {
+      "timestamp_utc": "2026-10-09T02:54:27.608390+00:00",
+      "snapshot": {
+        "session": "pal-chain-1",
+        "save_identity": null,
+        "visible_slot": null,
+        "scene": "unclassified",
+        "actual_mission": null,
+        "clicked_slot": null,
+        "stable_polls": 2,
+        "persisted_clears": [],
+        "persisted_rings": {},
+        "awarded_ranks": {},
+        "emerald_rewards": [],
+        "opened_capsules": [],
+        "discovered_wisps": [],
+        "death_state": "unknown",
+        "rings_address": null,
+        "lives_address": null,
+        "new_game_verified": false,
+        "save_identity_verified": false,
+        "progress_verified": false,
+        "scene_verified": false,
+        "fresh_fields": [],
+        "new_save_selected": false,
+        "candidate_clears": [],
+        "evidence": {
+          "chain": [
+            2159278784,
+            2467356064,
+            1,
+            2467460016,
+            2467460044
+          ],
+          "save_chain_trace": {
+            "grade": "code-derived",
+            "steps": [
+              {
+                "step": "manager",
+                "address": "0x808F3628",
+                "raw": "0x80B3FAC0",
+                "reason": "ok"
+              },
+              {
+                "step": "container",
+                "address": "0x80B3FAF0",
+                "raw": "0x9310DDA0",
+                "reason": "ok"
+              },
+              {
+                "step": "selected_index",
+                "address": "0x9310DDA0",
+                "raw": "0x01",
+                "reason": "ok"
+              },
+              {
+                "step": "c_bank",
+                "address": "0x931273DC",
+                "reason": "ok",
+                "hex": "48100000000000000000000000000000000000000000000049240000000000120000000000000000"
+              }
+            ],
+            "chain": [
+              2159278784,
+              2467356064,
+              1,
+              2467460016,
+              2467460044
+            ],
+            "scene": "unresolved",
+            "no_save_yet": "possible; requires independent scene evidence",
+            "status": "candidate_only"
+          },
+          "progress_c": "code-derived; live persistence pending",
+          "internal_selected_index": 1
+        },
+        "status": "candidate_progress_read: native New Game, scene and stable save identity unresolved"
+      },
+      "reads": [
+        {
+          "address": 2156869160,
+          "size": 4,
+          "hex": "80b3fac0"
+        },
+        {
+          "address": 2159278832,
+          "size": 4,
+          "hex": "9310dda0"
+        },
+        {
+          "address": 2467356064,
+          "size": 1,
+          "hex": "01"
+        },
+        {
+          "address": 2467460060,
+          "size": 40,
+          "hex": "48100000000000000000000000000000000000000000000049240000000000120000000000000000"
+        },
+        {
+          "address": 2156869160,
+          "size": 4,
+          "hex": "80b3fac0"
+        },
+        {
+          "address": 2159278832,
+          "size": 4,
+          "hex": "9310dda0"
+        },
+        {
+          "address": 2467356064,
+          "size": 1,
+          "hex": "01"
+        }
+      ]
+    },
+    {
+      "timestamp_utc": "2026-10-09T02:54:27.714673+00:00",
+      "snapshot": {
+        "session": "pal-chain-1",
+        "save_identity": null,
+        "visible_slot": null,
+        "scene": "unclassified",
+        "actual_mission": null,
+        "clicked_slot": null,
+        "stable_polls": 3,
+        "persisted_clears": [],
+        "persisted_rings": {},
+        "awarded_ranks": {},
+        "emerald_rewards": [],
+        "opened_capsules": [],
+        "discovered_wisps": [],
+        "death_state": "unknown",
+        "rings_address": null,
+        "lives_address": null,
+        "new_game_verified": false,
+        "save_identity_verified": false,
+        "progress_verified": false,
+        "scene_verified": false,
+        "fresh_fields": [],
+        "new_save_selected": false,
+        "candidate_clears": [],
+        "evidence": {
+          "chain": [
+            2159278784,
+            2467356064,
+            1,
+            2467460016,
+            2467460044
+          ],
+          "save_chain_trace": {
+            "grade": "code-derived",
+            "steps": [
+              {
+                "step": "manager",
+                "address": "0x808F3628",
+                "raw": "0x80B3FAC0",
+                "reason": "ok"
+              },
+              {
+                "step": "container",
+                "address": "0x80B3FAF0",
+                "raw": "0x9310DDA0",
+                "reason": "ok"
+              },
+              {
+                "step": "selected_index",
+                "address": "0x9310DDA0",
+                "raw": "0x01",
+                "reason": "ok"
+              },
+              {
+                "step": "c_bank",
+                "address": "0x931273DC",
+                "reason": "ok",
+                "hex": "48100000000000000000000000000000000000000000000049240000000000120000000000000000"
+              }
+            ],
+            "chain": [
+              2159278784,
+              2467356064,
+              1,
+              2467460016,
+              2467460044
+            ],
+            "scene": "unresolved",
+            "no_save_yet": "possible; requires independent scene evidence",
+            "status": "candidate_only"
+          },
+          "progress_c": "code-derived; live persistence pending",
+          "internal_selected_index": 1
+        },
+        "status": "candidate_progress_read: native New Game, scene and stable save identity unresolved"
+      },
+      "reads": [
+        {
+          "address": 2156869160,
+          "size": 4,
+          "hex": "80b3fac0"
+        },
+        {
+          "address": 2159278832,
+          "size": 4,
+          "hex": "9310dda0"
+        },
+        {
+          "address": 2467356064,
+          "size": 1,
+          "hex": "01"
+        },
+        {
+          "address": 2467460060,
+          "size": 40,
+          "hex": "48100000000000000000000000000000000000000000000049240000000000120000000000000000"
+        },
+        {
+          "address": 2156869160,
+          "size": 4,
+          "hex": "80b3fac0"
+        },
+        {
+          "address": 2159278832,
+          "size": 4,
+          "hex": "9310dda0"
+        },
+        {
+          "address": 2467356064,
+          "size": 1,
+          "hex": "01"
+        }
+      ]
+    }
+  ],
+  "dme_status": "hooked",
+  "revision_sha": "92aefe33b577493b492f8433ca68b90d25d29d2f6d9c85310a6829481281f8a9",
+  "snapshot": {
+    "session": "pal-chain-1",
+    "save_identity": null,
+    "visible_slot": null,
+    "scene": "unclassified",
+    "actual_mission": null,
+    "clicked_slot": null,
+    "stable_polls": 3,
+    "persisted_clears": [],
+    "persisted_rings": {},
+    "awarded_ranks": {},
+    "emerald_rewards": [],
+    "opened_capsules": [],
+    "discovered_wisps": [],
+    "death_state": "unknown",
+    "rings_address": null,
+    "lives_address": null,
+    "new_game_verified": false,
+    "save_identity_verified": false,
+    "progress_verified": false,
+    "scene_verified": false,
+    "fresh_fields": [],
+    "new_save_selected": false,
+    "candidate_clears": [],
+    "evidence": {
+      "chain": [
+        2159278784,
+        2467356064,
+        1,
+        2467460016,
+        2467460044
+      ],
+      "save_chain_trace": {
+        "grade": "code-derived",
+        "steps": [
+          {
+            "step": "manager",
+            "address": "0x808F3628",
+            "raw": "0x80B3FAC0",
+            "reason": "ok"
+          },
+          {
+            "step": "container",
+            "address": "0x80B3FAF0",
+            "raw": "0x9310DDA0",
+            "reason": "ok"
+          },
+          {
+            "step": "selected_index",
+            "address": "0x9310DDA0",
+            "raw": "0x01",
+            "reason": "ok"
+          },
+          {
+            "step": "c_bank",
+            "address": "0x931273DC",
+            "reason": "ok",
+            "hex": "48100000000000000000000000000000000000000000000049240000000000120000000000000000"
+          }
+        ],
+        "chain": [
+          2159278784,
+          2467356064,
+          1,
+          2467460016,
+          2467460044
+        ],
+        "scene": "unresolved",
+        "no_save_yet": "possible; requires independent scene evidence",
+        "status": "candidate_only"
+      },
+      "progress_c": "code-derived; live persistence pending",
+      "internal_selected_index": 1
+    },
+    "status": "candidate_progress_read: native New Game, scene and stable save identity unresolved"
+  }
+}

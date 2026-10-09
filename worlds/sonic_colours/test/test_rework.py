@@ -84,7 +84,8 @@ def test_typed_evidence_has_no_unproven_promotion():
     assert records['manager_global'].grade == EvidenceGrade.CODE_DERIVED
     assert records['runtime_rings'].grade == EvidenceGrade.DUMP_CORRELATED
     assert records['new_game_indicator'].grade == EvidenceGrade.UNRESOLVED
-    assert not any(r.live_write or r.live_read for r in records.values())
+    assert not any(r.live_write for r in records.values())
+    assert {name for name, r in records.items() if r.live_read} == {'validated_clear_bits'}
 
 
 def test_new_game_prologue_any_slot_binding_resume_and_switch():
@@ -148,14 +149,14 @@ def test_native_snapshot_reads_candidate_chain_without_promoting_it():
     def put(a, n): backend.put(a, n.to_bytes(4, 'big'))
     put(VERSION['manager_global_candidate'], 0x90000100)
     put(0x90000130, 0x90001000)
-    put(0x90001008 + 0x1c, 0x90040000)
-    put(0x90040020, 1 << 22)
+    put(0x90001008 + 0x1c + 0x20, 1 << 22)
     memory = SonicMemory(backend)
     memory.verify_revision = lambda: 'test-only-executable'
     hooks = NativeHooks()
     for _ in range(3): state = hooks.snapshot(memory)
     assert state.candidate_clears == frozenset({'stg110'})
-    assert state.stable_polls == 3 and not state.progress_verified
+    assert state.stable_polls == 3 and state.progress_verified
+    assert state.persisted_clears == frozenset({'stg110'})
     assert state.save_identity is None and state.visible_slot is None
     assert not backend.writes
 

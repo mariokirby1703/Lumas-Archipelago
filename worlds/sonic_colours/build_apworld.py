@@ -19,6 +19,7 @@ def build(destination):
                 if (not path.is_file() or any(p in {'notes', 'test', 'tools', '__pycache__', '.pytest_cache'}
                                              for p in relative.parts)
                         or relative.name == 'build_apworld.py'
+                        or relative.name.startswith('live_pal_') and path.suffix == '.json'
                         or path.suffix not in {'.py', '.json', '.md', '.yaml', '.txt'}):
                     continue
                 content = path.read_bytes()

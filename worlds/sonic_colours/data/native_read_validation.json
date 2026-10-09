@@ -1,0 +1,10 @@
+{
+  "disc_id": "SNCP8P",
+  "revision": 0,
+  "clear_bits": {
+    "stg110": {"bit": 150, "proof": "live_pal_act1.json and live_pal_act1_result.json: unset; live_pal_world_map_slot2.json and live_pal_world_map_slot2_reloaded.json: set after first save and regular title-menu reload"},
+    "stg130": {"bit": 151, "proof": "live_pal_save_selection.json: unset before first save; live_pal_world_map_slot2.json and live_pal_world_map_slot2_reloaded.json: set after first save and regular title-menu reload"},
+    "stg120": {"bit": 152, "proof": "live_pal_act3.json and live_pal_act3_result.json: unset; live_pal_act3_saved.json: set after returning to map and saving; live_pal_act3_reloaded.json: still set after regular title-menu reload"}
+  },
+  "scope": "Persisted selected-save Tropical Resort Acts 1..3 clear bits only. No native mission, scene, prologue completion event, identity or writer is validated. Operator supplied phase labels. No emulator restart tested."
+}

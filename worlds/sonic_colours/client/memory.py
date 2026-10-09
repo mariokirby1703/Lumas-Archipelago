@@ -162,7 +162,66 @@ class SonicMemory:
 
     def resolve_flags_ptr(self):
         chain = self.resolve_selected_slot()
-        return chain + (self.read_ptr_checked(chain[-1] + 0x1c, 0x38),)
+        # 8015f940: lwz r3,0(r3); addi r3,r3,0x1c. The lwz unwraps
+        # the stack-local selected-save wrapper, not a pointer at save+0x1c.
+        return chain + (chain[-1] + 0x1c,)
+
+    def trace_save_chain(self):
+        """Bounded candidate reads with the first failing step preserved."""
+        from .versions import VERSION
+        report = {'grade': 'code-derived', 'steps': [], 'chain': None,
+                  'scene': 'unresolved', 'no_save_yet': 'possible; requires independent scene evidence'}
+
+        def read(step, address, size=4, pointer_size=None):
+            entry = {'step': step, 'address': f'0x{address:08X}'}
+            report['steps'].append(entry)
+            try:
+                value = int.from_bytes(self.read_bytes(address, size), 'big')
+            except MemoryUnavailable as error:
+                entry.update(reason='short_read' if 'partial_read' in str(error) else 'read_failed', detail=str(error))
+                raise
+            entry['raw'] = f'0x{value:0{size * 2}X}'
+            if pointer_size is not None:
+                reason = ('zero' if value == 0 else 'alignment' if value % 4 else
+                          'outside_MEM1_MEM2' if not valid_range(value, pointer_size) else None)
+                if reason:
+                    entry['reason'] = reason
+                    raise MemoryUnavailable(reason)
+            entry['reason'] = 'ok'
+            return value
+
+        try:
+            manager = read('manager', VERSION['manager_global_candidate'], pointer_size=0x34)
+            container = read('container', manager + 0x30, pointer_size=8)
+            index = read('selected_index', container, 1)
+            if index > 2:
+                report['steps'][-1]['reason'] = 'index_out_of_range'
+                raise MemoryUnavailable('index_out_of_range')
+            selected = container + 8 + index * 0x19608
+            if not valid_range(selected, 0x19608):
+                report['steps'].append({'step': 'selected_save', 'address': f'0x{selected:08X}',
+                                        'reason': 'outside_MEM1_MEM2'})
+                raise MemoryUnavailable('outside_MEM1_MEM2')
+            flags = selected + 0x1c
+            entry = {'step': 'c_bank', 'address': f'0x{flags + 0x10:08X}'}
+            report['steps'].append(entry)
+            try:
+                bank = self.read_bytes(flags + 0x10, 40)
+            except MemoryUnavailable as error:
+                entry.update(reason='short_read' if 'partial_read' in str(error) else 'read_failed', detail=str(error))
+                raise
+            entry.update(reason='ok', hex=bank.hex())
+            chain = (manager, container, index, selected, flags)
+            if self.resolve_flags_ptr() != chain:
+                report['steps'].append({'step': 'context_recheck', 'reason': 'context_changed'})
+                raise MemoryUnavailable('context_changed')
+            report['chain'] = chain
+            report['status'] = 'candidate_only'
+        except MemoryUnavailable as error:
+            report['status'] = str(error)
+            report['first_failure'] = next((s for s in report['steps'] if s['reason'] != 'ok'),
+                                           {'step': 'c_bank_or_context', 'reason': str(error)})
+        return report
 
     def read_progress_bit(self, flags, bit):
         if not 0 <= bit <= 302:

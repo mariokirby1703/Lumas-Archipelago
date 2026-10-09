@@ -48,7 +48,7 @@ def test_ranges(address, size):
         SonicMemory(FakeBackend()).read_bytes(address, size)
 
 
-def test_pointer_chain_extra_dereference_and_bits():
+def test_pointer_chain_inline_flags_and_bits():
     backend = FakeBackend()
     memory = SonicMemory(backend, lambda *args: 1)
     def word(a, v): backend.put(a, v.to_bytes(4, 'big'))
@@ -56,14 +56,14 @@ def test_pointer_chain_extra_dereference_and_bits():
     word(0x90000130, 0x90001000)
     backend.put(0x90001000, b'\x01')
     selected = 0x90001000 + 8 + 0x19608
-    word(selected + 0x1c, 0x90040000)
-    assert memory.resolve_flags_ptr() == (0x90000100, 0x90001000, 1, selected, 0x90040000)
-    memory.write_progress_bit(0x90040000, 150, True)
-    assert memory.read_progress_bit(0x90040000, 150)
-    assert not memory.read_progress_bit(0x90040000, 149)
-    memory.write_progress_bit(0x90040000, 150, False)
-    assert not memory.read_progress_bit(0x90040000, 150)
-    word(selected + 0x1c, 0)
+    flags = selected + 0x1c
+    assert memory.resolve_flags_ptr() == (0x90000100, 0x90001000, 1, selected, flags)
+    memory.write_progress_bit(flags, 150, True)
+    assert memory.read_progress_bit(flags, 150)
+    assert not memory.read_progress_bit(flags, 149)
+    memory.write_progress_bit(flags, 150, False)
+    assert not memory.read_progress_bit(flags, 150)
+    word(VERSION['manager_global_candidate'], 0)
     with pytest.raises(MemoryUnavailable, match='invalid_pointer'):
         memory.resolve_flags_ptr()
 

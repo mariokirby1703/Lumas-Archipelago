@@ -3,6 +3,12 @@
 **Release status: incomplete; no real PAL writes or native check transmissions
 have been verified.** Offline behavior and live acceptance are separate below.
 
+The subsequent [live repair report](live_client_blockers.md) supersedes the
+earlier no-emulation result below: actual PAL data reads now resolve the corrected
+inline flags structure. Intro bits 150/151 and regular Act 3 bit 152 survived
+save and title-menu reload. Only that documented subset is promoted to persisted reads; native
+scene, New Game, stable save identity, AP attribution and writes remain blocked.
+
 ## Changes from dd23ef600c3046cfa5b4e6670a68aefcf18d7e9e
 
 The new `START_HERE_CODEX.md` and full rework document supersede the older master
