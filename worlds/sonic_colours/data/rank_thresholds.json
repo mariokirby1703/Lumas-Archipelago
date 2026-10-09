@@ -1,0 +1,407 @@
+{
+  "stg110": {
+    "score_thresholds": [
+      1150000,
+      800000,
+      650000,
+      450000
+    ],
+    "eligible": "unverified"
+  },
+  "stg130": {
+    "score_thresholds": [
+      1150000,
+      700000,
+      550000,
+      400000
+    ],
+    "eligible": "unverified"
+  },
+  "stg120": {
+    "score_thresholds": [
+      1300000,
+      850000,
+      650000,
+      450000
+    ],
+    "eligible": "unverified"
+  },
+  "stg140": {
+    "score_thresholds": [
+      850000,
+      500000,
+      400000,
+      250000
+    ],
+    "eligible": "unverified"
+  },
+  "stg150": {
+    "score_thresholds": [
+      1150000,
+      750000,
+      650000,
+      500000
+    ],
+    "eligible": "unverified"
+  },
+  "stg160": {
+    "score_thresholds": [
+      550000,
+      500000,
+      400000,
+      300000
+    ],
+    "eligible": "unverified"
+  },
+  "stg190": {
+    "score_thresholds": [
+      2000000,
+      1750000,
+      1350000,
+      1000000
+    ],
+    "eligible": "unverified"
+  },
+  "stg210": {
+    "score_thresholds": [
+      1350000,
+      1000000,
+      800000,
+      550000
+    ],
+    "eligible": "unverified"
+  },
+  "stg230": {
+    "score_thresholds": [
+      1250000,
+      950000,
+      750000,
+      500000
+    ],
+    "eligible": "unverified"
+  },
+  "stg220": {
+    "score_thresholds": [
+      900000,
+      650000,
+      500000,
+      350000
+    ],
+    "eligible": "unverified"
+  },
+  "stg260": {
+    "score_thresholds": [
+      1150000,
+      950000,
+      700000,
+      450000
+    ],
+    "eligible": "unverified"
+  },
+  "stg240": {
+    "score_thresholds": [
+      1350000,
+      1000000,
+      800000,
+      450000
+    ],
+    "eligible": "unverified"
+  },
+  "stg250": {
+    "score_thresholds": [
+      900000,
+      800000,
+      700000,
+      400000
+    ],
+    "eligible": "unverified"
+  },
+  "stg290": {
+    "score_thresholds": [
+      2000000,
+      1750000,
+      1350000,
+      1000000
+    ],
+    "eligible": "unverified"
+  },
+  "stg310": {
+    "score_thresholds": [
+      1650000,
+      1350000,
+      1000000,
+      650000
+    ],
+    "eligible": "unverified"
+  },
+  "stg330": {
+    "score_thresholds": [
+      1000000,
+      850000,
+      600000,
+      350000
+    ],
+    "eligible": "unverified"
+  },
+  "stg340": {
+    "score_thresholds": [
+      900000,
+      650000,
+      500000,
+      300000
+    ],
+    "eligible": "unverified"
+  },
+  "stg350": {
+    "score_thresholds": [
+      1100000,
+      850000,
+      700000,
+      350000
+    ],
+    "eligible": "unverified"
+  },
+  "stg320": {
+    "score_thresholds": [
+      2000000,
+      1500000,
+      1250000,
+      950000
+    ],
+    "eligible": "unverified"
+  },
+  "stg360": {
+    "score_thresholds": [
+      900000,
+      600000,
+      500000,
+      350000
+    ],
+    "eligible": "unverified"
+  },
+  "stg390": {
+    "score_thresholds": [
+      2400000,
+      2000000,
+      1650000,
+      1250000
+    ],
+    "eligible": "unverified"
+  },
+  "stg410": {
+    "score_thresholds": [
+      1700000,
+      1400000,
+      1100000,
+      800000
+    ],
+    "eligible": "unverified"
+  },
+  "stg440": {
+    "score_thresholds": [
+      1000000,
+      850000,
+      650000,
+      400000
+    ],
+    "eligible": "unverified"
+  },
+  "stg450": {
+    "score_thresholds": [
+      1200000,
+      1000000,
+      800000,
+      550000
+    ],
+    "eligible": "unverified"
+  },
+  "stg430": {
+    "score_thresholds": [
+      800000,
+      700000,
+      600000,
+      400000
+    ],
+    "eligible": "unverified"
+  },
+  "stg460": {
+    "score_thresholds": [
+      650000,
+      550000,
+      450000,
+      200000
+    ],
+    "eligible": "unverified"
+  },
+  "stg420": {
+    "score_thresholds": [
+      1600000,
+      1250000,
+      900000,
+      500000
+    ],
+    "eligible": "unverified"
+  },
+  "stg490": {
+    "score_thresholds": [
+      1900000,
+      1750000,
+      1350000,
+      1000000
+    ],
+    "eligible": "unverified"
+  },
+  "stg510": {
+    "score_thresholds": [
+      2200000,
+      1500000,
+      1100000,
+      700000
+    ],
+    "eligible": "unverified"
+  },
+  "stg540": {
+    "score_thresholds": [
+      600000,
+      500000,
+      400000,
+      250000
+    ],
+    "eligible": "unverified"
+  },
+  "stg550": {
+    "score_thresholds": [
+      2000000,
+      900000,
+      700000,
+      500000
+    ],
+    "eligible": "unverified"
+  },
+  "stg530": {
+    "score_thresholds": [
+      1700000,
+      1250000,
+      900000,
+      550000
+    ],
+    "eligible": "unverified"
+  },
+  "stg560": {
+    "score_thresholds": [
+      950000,
+      750000,
+      550000,
+      350000
+    ],
+    "eligible": "unverified"
+  },
+  "stg520": {
+    "score_thresholds": [
+      1850000,
+      1250000,
+      950000,
+      650000
+    ],
+    "eligible": "unverified"
+  },
+  "stg590": {
+    "score_thresholds": [
+      1900000,
+      1750000,
+      1350000,
+      1000000
+    ],
+    "eligible": "unverified"
+  },
+  "stg610": {
+    "score_thresholds": [
+      1850000,
+      1500000,
+      1150000,
+      800000
+    ],
+    "eligible": "unverified"
+  },
+  "stg630": {
+    "score_thresholds": [
+      1500000,
+      1300000,
+      1100000,
+      950000
+    ],
+    "eligible": "unverified"
+  },
+  "stg640": {
+    "score_thresholds": [
+      900000,
+      500000,
+      400000,
+      250000
+    ],
+    "eligible": "unverified"
+  },
+  "stg650": {
+    "score_thresholds": [
+      500000,
+      400000,
+      300000,
+      200000
+    ],
+    "eligible": "unverified"
+  },
+  "stg660": {
+    "score_thresholds": [
+      650000,
+      450000,
+      350000,
+      200000
+    ],
+    "eligible": "unverified"
+  },
+  "stg620": {
+    "score_thresholds": [
+      1750000,
+      1600000,
+      1250000,
+      850000
+    ],
+    "eligible": "unverified"
+  },
+  "stg690": {
+    "score_thresholds": [
+      2900000,
+      2300000,
+      1750000,
+      1250000
+    ],
+    "eligible": "unverified"
+  },
+  "stg710": {
+    "score_thresholds": [
+      800000,
+      650000,
+      500000,
+      300000
+    ],
+    "eligible": "unverified"
+  },
+  "stg720": {
+    "score_thresholds": [
+      250000,
+      200000,
+      170000,
+      150000
+    ],
+    "eligible": "unverified"
+  },
+  "stg790": {
+    "score_thresholds": [
+      4000000,
+      3100000,
+      2300000,
+      1500000
+    ],
+    "eligible": "unverified"
+  }
+}

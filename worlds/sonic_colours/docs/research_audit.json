@@ -1,0 +1,449 @@
+{
+  "files": [
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/annotated_disassembly.txt",
+      "size": 45922,
+      "sha256": "4417a8048509f4d0ab0c0230bd9ffeb6bdedf855e9963e44111f69600c227d69",
+      "lines": 1203
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/build_research_package.py",
+      "size": 3978,
+      "sha256": "3874f4aed032ab34edaf2a59e9d8f332b8582899de4506deeca20fc78fbb7890",
+      "lines": 47
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/central_function_callers.csv",
+      "size": 3184,
+      "sha256": "f02ab1ce19d5b6367c9d3eca9a040daf23a1a4814e78a6e66f36df4a9197c6f0",
+      "records": 137,
+      "columns": [
+        "function_address",
+        "caller_address"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/dol_analysis.py",
+      "size": 4150,
+      "sha256": "2d0d833e4695c9033cd45b0ef560f1a8e351f4f62914ebf81abb934d4e454c68",
+      "lines": 94
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/dol_sections.json",
+      "size": 1150,
+      "sha256": "a77e39fe1e840362f0ff98aaea9de9a0b8085bb70d184fe5d7a89359a1ff6e21",
+      "records": 10
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/dol_strings_and_refs.json",
+      "size": 1423,
+      "sha256": "8a5d71129d7dde718651768075ffc7c3d86eb60c94634f5fcb749d2ba83ec627",
+      "records": 14
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/find_code_xrefs.py",
+      "size": 2811,
+      "sha256": "67e4b41aef9a7f0ca18b14ecddc624783cc1471ee2d06c69164c739be9cd3aae",
+      "lines": 58
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/game_land_thresholds_design.csv",
+      "size": 284,
+      "sha256": "3f7b1bdbab48af62f5c07eca980de0cac58e0f3aec56f604537add6a82f328fc",
+      "records": 21,
+      "columns": [
+        "game_land",
+        "act",
+        "vanilla_red_rings",
+        "ap_default_minus_40"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/gecko_hooks_static.json",
+      "size": 10573,
+      "sha256": "7715290e5b604fed9cea3f2566b92e516e02dc4a61962673bbe77658ca03b2c0",
+      "records": 11
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/progress_bits_by_stage.csv",
+      "size": 4778,
+      "sha256": "8528bf129d3ff9e90811dd6e95162282ef097d7f4bb15b796b006431e9613b6e",
+      "records": 66,
+      "columns": [
+        "world",
+        "zone",
+        "slot",
+        "type",
+        "mission",
+        "stage_data",
+        "bank_A",
+        "bank_B",
+        "bank_C",
+        "rank_s",
+        "rank_a",
+        "rank_b",
+        "rank_c"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/README.md",
+      "size": 8551,
+      "sha256": "6e718ba2496e6d107dd8346ebbdf2f7ffe98e80a1f47dfb95ff86b886b79dd60",
+      "lines": 86
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/red_rings_180_numbered.csv",
+      "size": 17139,
+      "sha256": "9ecb0df5654eb405cc6feafaec2e32c0c0431f71ba7bd4f438f928a70ca3f914",
+      "records": 180,
+      "columns": [
+        "world",
+        "act_or_stage",
+        "mission_id",
+        "object_type",
+        "object_id",
+        "orc_file",
+        "layer",
+        "instance",
+        "x",
+        "y",
+        "z",
+        "red_ring_number",
+        "regular_location"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf",
+      "size": 8182636,
+      "sha256": "42f8a01722992c0df90e7469209fc282db5e688f50c82491c04ed77773a182c2"
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/stage_map.csv",
+      "size": 6694,
+      "sha256": "f6d8085be65d502064e3d4d26e626f4ca996bd785b37c415ca94a3f134f1148f",
+      "records": 66,
+      "columns": [
+        "World",
+        "ZoneID",
+        "Slot",
+        "Type",
+        "Mission ID",
+        "Stage Data",
+        "Player Position",
+        "Start Event",
+        "Wisp Types",
+        "Rank S",
+        "Rank A",
+        "Rank B",
+        "Rank C"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/test_research.py",
+      "size": 2292,
+      "sha256": "0d97c7c0f5635351e1232f26dd0eac89654075274007871b8923b3f77a07f970",
+      "lines": 40
+    },
+    {
+      "path": "Sonic_Colours_PAL_Static_RE_v2/wisp_capsules_706_instances.csv",
+      "size": 88003,
+      "sha256": "4f76da984ceffd39961004a89237b9ee601acea7e508f00e0bcf6c36da60cbc1",
+      "records": 706,
+      "columns": [
+        "world",
+        "act_or_stage",
+        "mission_id",
+        "object_type",
+        "object_id",
+        "orc_file",
+        "layer",
+        "instance",
+        "x",
+        "y",
+        "z",
+        "wisp_code",
+        "wisp_hypothesis",
+        "byte_1",
+        "byte_2"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/cpk/cpk_summary.json",
+      "size": 1550,
+      "sha256": "9da1cbf3caa6822199ba061148ea77f5f4916710aa75d8bddc30dfc55b5d2d6b",
+      "records": 8
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/cpk/README.md",
+      "size": 1482,
+      "sha256": "e1c57f0d447597df05e2cdba4f672d89d9222907f4399c2e42a907e9d66b4f49",
+      "lines": 21
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/cpk/stage_map.json",
+      "size": 30446,
+      "sha256": "e17ab68ecb69d78a12bb378e6a644b38f31bc206af806f7ef86626d2e66e6726",
+      "records": 66
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/notes/sonic_colours_pal_research_v5.md",
+      "size": 39490,
+      "sha256": "fe2417686769e0a47d25eb348ae963bb0cf88329efb684c8430d1c0ab2ba1bfb",
+      "lines": 424
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/object_data/analysis_summary.json",
+      "size": 415,
+      "sha256": "dfa8d49b426449677c4de47b8cd587f61fcebb91539c7e128f24203ff86df4d6",
+      "records": 8
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/object_data/export_archipelago_data.py",
+      "size": 7915,
+      "sha256": "5f58ab61252de0424015719beeff0a5bff0ba5ffa4dbde9617ea16f01eed61eb",
+      "lines": 97
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/object_data/other_relevant_stage_objects.csv",
+      "size": 61160,
+      "sha256": "326090ef88843af805c6cd2b405c5fec56c2efc84c3e802042debd5f4e16093d",
+      "records": 648,
+      "columns": [
+        "world",
+        "act_or_stage",
+        "mission_id",
+        "object_type",
+        "object_id",
+        "orc_file",
+        "layer",
+        "instance",
+        "x",
+        "y",
+        "z"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/object_data/README.md",
+      "size": 2996,
+      "sha256": "fc576f48f8c87b01c5c46cb0ac1acfb7c0ba85fe73f8133efdce422472681a91",
+      "lines": 25
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/object_data/stage_object_counts.csv",
+      "size": 94275,
+      "sha256": "445d5f1a0e5e7b44736859552cd377ebbb376aa1148513718a9fe196e94adfef",
+      "records": 2395,
+      "columns": [
+        "mission_id",
+        "world",
+        "slot",
+        "object_type",
+        "instances"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/annotated_disassembly.txt",
+      "size": 45922,
+      "sha256": "4417a8048509f4d0ab0c0230bd9ffeb6bdedf855e9963e44111f69600c227d69",
+      "lines": 1203
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/bitfield_helpers_disasm.txt",
+      "size": 6581,
+      "sha256": "2a6df65a9255cae03f2a04068823e951b00bdf5af98b63297d03ae29a72c6d5f",
+      "lines": 178
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/central_function_callers.csv",
+      "size": 3184,
+      "sha256": "f02ab1ce19d5b6367c9d3eca9a040daf23a1a4814e78a6e66f36df4a9197c6f0",
+      "records": 137,
+      "columns": [
+        "function_address",
+        "caller_address"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/direct_calls.json",
+      "size": 2928404,
+      "sha256": "36f6aaf6a38712916fb9d35136089ebae927ff1aa653240499639fa6456ceac6",
+      "records": 20394
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/dol_analysis.py",
+      "size": 4150,
+      "sha256": "2d0d833e4695c9033cd45b0ef560f1a8e351f4f62914ebf81abb934d4e454c68",
+      "lines": 94
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/dol_sections.json",
+      "size": 1150,
+      "sha256": "a77e39fe1e840362f0ff98aaea9de9a0b8085bb70d184fe5d7a89359a1ff6e21",
+      "records": 10
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/dol_strings_and_refs.json",
+      "size": 1423,
+      "sha256": "8a5d71129d7dde718651768075ffc7c3d86eb60c94634f5fcb749d2ba83ec627",
+      "records": 14
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/find_code_xrefs.py",
+      "size": 2811,
+      "sha256": "67e4b41aef9a7f0ca18b14ecddc624783cc1471ee2d06c69164c739be9cd3aae",
+      "lines": 58
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/game_land_thresholds_design.csv",
+      "size": 284,
+      "sha256": "3f7b1bdbab48af62f5c07eca980de0cac58e0f3aec56f604537add6a82f328fc",
+      "records": 21,
+      "columns": [
+        "game_land",
+        "act",
+        "vanilla_red_rings",
+        "ap_default_minus_40"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/gecko_hooks_static.json",
+      "size": 10573,
+      "sha256": "7715290e5b604fed9cea3f2566b92e516e02dc4a61962673bbe77658ca03b2c0",
+      "records": 11
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/progress_bits_by_stage.csv",
+      "size": 4778,
+      "sha256": "8528bf129d3ff9e90811dd6e95162282ef097d7f4bb15b796b006431e9613b6e",
+      "records": 66,
+      "columns": [
+        "world",
+        "zone",
+        "slot",
+        "type",
+        "mission",
+        "stage_data",
+        "bank_A",
+        "bank_B",
+        "bank_C",
+        "rank_s",
+        "rank_a",
+        "rank_b",
+        "rank_c"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/README.md",
+      "size": 8551,
+      "sha256": "6e718ba2496e6d107dd8346ebbdf2f7ffe98e80a1f47dfb95ff86b886b79dd60",
+      "lines": 86
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/red_rings_180_numbered.csv",
+      "size": 17139,
+      "sha256": "9ecb0df5654eb405cc6feafaec2e32c0c0431f71ba7bd4f438f928a70ca3f914",
+      "records": 180,
+      "columns": [
+        "world",
+        "act_or_stage",
+        "mission_id",
+        "object_type",
+        "object_id",
+        "orc_file",
+        "layer",
+        "instance",
+        "x",
+        "y",
+        "z",
+        "red_ring_number",
+        "regular_location"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/stage_map.csv",
+      "size": 6694,
+      "sha256": "f6d8085be65d502064e3d4d26e626f4ca996bd785b37c415ca94a3f134f1148f",
+      "records": 66,
+      "columns": [
+        "World",
+        "ZoneID",
+        "Slot",
+        "Type",
+        "Mission ID",
+        "Stage Data",
+        "Player Position",
+        "Start Event",
+        "Wisp Types",
+        "Rank S",
+        "Rank A",
+        "Rank B",
+        "Rank C"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/test_research.py",
+      "size": 2292,
+      "sha256": "0d97c7c0f5635351e1232f26dd0eac89654075274007871b8923b3f77a07f970",
+      "lines": 40
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/research/static_re/wisp_capsules_706_instances.csv",
+      "size": 88003,
+      "sha256": "4f76da984ceffd39961004a89237b9ee601acea7e508f00e0bcf6c36da60cbc1",
+      "records": 706,
+      "columns": [
+        "world",
+        "act_or_stage",
+        "mission_id",
+        "object_type",
+        "object_id",
+        "orc_file",
+        "layer",
+        "instance",
+        "x",
+        "y",
+        "z",
+        "wisp_code",
+        "wisp_hypothesis",
+        "byte_1",
+        "byte_2"
+      ]
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/SONIC_COLOURS_WII_PAL_CODEX_MASTER_SPEC.md",
+      "size": 61280,
+      "sha256": "7aef95dc4f9f854d64b63ec11af04f1a0929a818ede70ec8454dc3d7847a81f0",
+      "lines": 505
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/SonicColours.example.yaml",
+      "size": 594,
+      "sha256": "e1e936be6e9e3a7d05b1cf565136ba834c04907dcfc5cf374c6fdaad5e8d2f7a",
+      "lines": 23
+    },
+    {
+      "path": "Sonic_Colours_Wii_PAL_Codex_Handoff/START_HERE.md",
+      "size": 742,
+      "sha256": "1e317ab67d9074b641f3c31e118c655363a8b544e0df9e7f2e916165d3f39fbd",
+      "lines": 8
+    },
+    {
+      "path": "SONIC_COLOURS_WII_PAL_CODEX_MASTER_SPEC.md",
+      "size": 61280,
+      "sha256": "7aef95dc4f9f854d64b63ec11af04f1a0929a818ede70ec8454dc3d7847a81f0",
+      "lines": 505
+    }
+  ],
+  "file_count": 45,
+  "validated_disassembly_instructions": 1264,
+  "validated_direct_calls": 157533,
+  "r13_initialization": "0x808F9520",
+  "manager_global_candidate": "0x808F3628",
+  "live_validation": false,
+  "missing_inputs": [
+    "original main.dol",
+    "CPK and Lua originals/asset index",
+    "raw MEM1/MEM2 captures"
+  ],
+  "runtime_dependencies_on_notes": false
+}

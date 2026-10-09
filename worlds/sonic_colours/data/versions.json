@@ -1,0 +1,39 @@
+{
+  "disc_id": "SNCP8P",
+  "revision": 0,
+  "dol_sha256": "92aefe33b577493b492f8433ca68b90d25d29d2f6d9c85310a6829481281f8a9",
+  "text_sections": [
+    {
+      "address": 2147500032,
+      "size": 10016,
+      "sha256": "2af71af77f62efc1ab60628efee8d497ebf346da2ee046ebf15e2e1a7b914b81"
+    },
+    {
+      "address": 2147554240,
+      "size": 7344704,
+      "sha256": "4cb6d27c8020b147d62f662e1980879bfe351e003cc5ef16300c1a8c2bc1bcd0"
+    }
+  ],
+  "r13_static_candidate": 2156893472,
+  "manager_global_candidate": 2156869160,
+  "live_verified": false,
+  "startup_signature": {
+    "address": 2147500692,
+    "hex": "3da0808f61ad9520"
+  },
+  "capabilities": {
+    "save_identity": false,
+    "progress_c": false,
+    "persisted_red_rings": false,
+    "ranks": false,
+    "world_access": false,
+    "wisp_permissions": false,
+    "game_land_gates": false,
+    "emeralds": false,
+    "stats": false,
+    "native_death": false,
+    "swimming": false,
+    "stage_shuffle": false,
+    "music": false
+  }
+}

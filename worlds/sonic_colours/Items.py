@@ -1,0 +1,28 @@
+from BaseClasses import Item, ItemClassification
+from .world_constants import BASE_ID, GAME, WORLDS, WISPS
+
+WORLD_ITEMS = tuple(f'{w} Access' for w in WORLDS)
+WISP_ITEMS = tuple(f'{w} Unlock' for w in WISPS)
+EMERALDS = tuple(f'Chaos Emerald {i}' for i in range(1, 8))
+RING_VALUES = {'Red Ring (+1)': 1, 'Red Rings (+5)': 5, 'Red Rings (+10)': 10}
+FILLER = ('Rings (+10)', 'Rings (+25)', 'Rings (+50)', '1-Up')
+TRAPS = ('Ring Loss Trap', 'Swim Everywhere Trap')
+NAMES = WORLD_ITEMS + WISP_ITEMS + EMERALDS + ('Super Sonic Unlock',) + tuple(RING_VALUES) + FILLER + TRAPS
+ITEM_TABLE = {name: BASE_ID + i for i, name in enumerate(NAMES)}
+BY_ID = {value: name for name, value in ITEM_TABLE.items()}
+
+
+class SonicColoursItem(Item):
+    game = GAME
+
+
+def classification(name):
+    if name in TRAPS:
+        return ItemClassification.trap
+    if name in FILLER:
+        return ItemClassification.filler
+    return ItemClassification.progression
+
+
+def ring_name(value):
+    return next(name for name, amount in RING_VALUES.items() if amount == value)

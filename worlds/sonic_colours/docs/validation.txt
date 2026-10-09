@@ -1,0 +1,29 @@
+2026-10-09 — Sonic Colours research build
+
+PowerShell, repository root:
+$env:AP_TEST_WORLDS='sonic_colours'
+.venv/Scripts/python.exe -m pytest worlds/sonic_colours/test -q --disable-warnings
+Result: 410 passed, 2 warnings.
+Coverage includes 600 successful fill runs and 900 expected compatibility refusals.
+Warnings: existing optional _speedups unavailable and repository warning about Python 3.11.9.
+
+.venv/Scripts/python.exe -m compileall -q worlds/sonic_colours/client worlds/sonic_colours/test
+Result: exit 0.
+
+.venv/Scripts/python.exe worlds/sonic_colours/tools/audit_research.py
+Result: 45 supplied files read; 1264 disassembled instructions;
+157533 direct calls verified against local ELF; both text-section hashes matched.
+Original research test_research.py cannot run unchanged: /mnt/data and main.dol absent.
+
+.venv/Scripts/python.exe worlds/sonic_colours/build_apworld.py
+Result: build/apworlds/sonic_colours.apworld; archive integrity verified.
+Separate subprocess imported sonic_colours directly from the .apworld ZIP:
+packaged import succeeded; packaged catalog has 66 stages.
+
+Live read-only probe: one Dolphin process, installed DME.
+dolphin.hook(): status 2; is_hooked False; emulation_not_running.
+No successful live memory read. No writes attempted. No live checks sent.
+
+This is offline/static evidence and does not establish game playability.
+
+Optional Ruff lint could not run: ruff is not installed in the repository venv.

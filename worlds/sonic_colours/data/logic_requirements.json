@@ -1,0 +1,1724 @@
+{
+  "stg110": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg110:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg110:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg110:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg110:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg110:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg130": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg130:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg130:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg130:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg130:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg130:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg120": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg120:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg120:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg120:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg120:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg120:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg140": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg140:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg140:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg140:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg140:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg140:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg150": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg150:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg150:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg150:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg150:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg150:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg160": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg160:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg160:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg160:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg160:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg160:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg190": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg210": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg210:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg210:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg210:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg210:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg210:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg230": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg230:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg230:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg230:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg230:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg230:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg220": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg220:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg220:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg220:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg220:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg220:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg260": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg260:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg260:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg260:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg260:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg260:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg240": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg240:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg240:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg240:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg240:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg240:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg250": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg250:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg250:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg250:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg250:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg250:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg290": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg310": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg310:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg310:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg310:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg310:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg310:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg330": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg330:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg330:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg330:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg330:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg330:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg340": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg340:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg340:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg340:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg340:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg340:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg350": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg350:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg350:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg350:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg350:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg350:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg320": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg320:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg320:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg320:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg320:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg320:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg360": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg360:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg360:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg360:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg360:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg360:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg390": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg410": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg410:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg410:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg410:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg410:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg410:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg440": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg440:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg440:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg440:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg440:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg440:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg450": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg450:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg450:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg450:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg450:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg450:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg430": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg430:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg430:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg430:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg430:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg430:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg460": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg460:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg460:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg460:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg460:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg460:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg420": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg420:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg420:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg420:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg420:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg420:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg490": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg510": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg510:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg510:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg510:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg510:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg510:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg540": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg540:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg540:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg540:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg540:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg540:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg550": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg550:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg550:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg550:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg550:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg550:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg530": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg530:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg530:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg530:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg530:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg530:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg560": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg560:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg560:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg560:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg560:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg560:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg520": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg520:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg520:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg520:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg520:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg520:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg590": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg610": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg610:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg610:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg610:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg610:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg610:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg630": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg630:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg630:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg630:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg630:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg630:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg640": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg640:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg640:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg640:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg640:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg640:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg650": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg650:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg650:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg650:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg650:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg650:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg660": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg660:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg660:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg660:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg660:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg660:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg620": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg620:ring:1": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg620:ring:2": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg620:ring:3": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg620:ring:4": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg620:ring:5": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg690": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg710": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg720": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stg790": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgD10": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgB20": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgE50": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgD20": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgB30": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgF30": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgG10": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgG30": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgA10": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgD30": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgG20": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgC50": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgE30": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgB10": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgE40": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgG40": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgC40": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgF40": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgA30": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgE20": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  },
+  "stgC10": {
+    "logic_status": "unknown",
+    "requires_all": [],
+    "requires_any": [],
+    "fallback": "all_wisps",
+    "source": "Awaiting user per-act/per-ring requirements"
+  }
+}
