@@ -126,6 +126,7 @@ class Runtime:
         self.capsule_started = False
         self.inflight = {}
         self.deferred = {}
+        self.retry_after = {}
         self.clock = time.monotonic
 
     def observe_capsules(self, owned_wisps):
@@ -275,33 +276,56 @@ class Runtime:
                 bool(can_send and self.journal.data.get('goal_observed')))
 
     def project_permissions(self, memory, owned):
-        self.guard.check(self.snapshot)
+        try:
+            self.guard.check(self.snapshot)
+        except MemoryUnavailable:
+            self.guard.check_stats(self.snapshot)
+            self.hooks.project_live_permissions(memory, self.snapshot, owned, self.slot_data)
+            return
         self.hooks.project_permissions(memory, self.snapshot, owned, self.slot_data)
 
     def settle_effects(self, memory):
         for index, pending in list(self.inflight.items()):
             effect = self.journal.data['effects'][str(index)]
+            if self.snapshot.scene not in ('gameplay', 'paused'):
+                effect.update(state='uncertain', reason='left living gameplay before verification completed')
+                self.journal.save()
+                del self.inflight[index]
+                logger.warning('Item uncertain: receipt %s left gameplay; no replay, later receipts continue', index)
+                continue
             try:
                 context = list(self.guard.check_stats(self.snapshot))
             except MemoryUnavailable:
                 continue
             elapsed = self.clock() - pending['started']
             if context != effect['context']:
-                effect['state'] = 'uncertain'
+                effect.update(state='uncertain', reason='actor/context changed before verification')
                 self.journal.save()
                 del self.inflight[index]
                 logger.warning('Item uncertain: receipt %s actor/context changed; no replay', index)
                 continue
-            values = [memory.read_u32(address) for address in pending['addresses']]
-            correct = all(value >= effect['after'] if pending['positive'] else value == 0 for value in values)
+            try:
+                values = [memory.read_u32(address) for address in pending['addresses']]
+            except MemoryUnavailable as error:
+                effect.update(state='uncertain', reason=str(error))
+                self.journal.save()
+                del self.inflight[index]
+                logger.warning('Item uncertain: receipt %s verification read failed: %s', index, error)
+                continue
+            correct = all(value == effect['after'] for value in values)
+            coherent = len(set(values)) == 1 and all(0 <= value <= (99 if pending['family'] == 'lives' else 9999) for value in values)
+            effect['last_observed'] = values
+            effect['elapsed'] = elapsed
+            if elapsed >= .02 and correct:
+                pending['later_frame'] = True
             if .5 <= elapsed < 2:
-                pending['half_second'] = pending.get('half_second', False) or correct
+                pending['half_second'] = pending.get('half_second', False) or (coherent and pending.get('later_frame'))
             if elapsed >= 2:
-                if correct and pending.get('half_second'):
+                if coherent and pending.get('later_frame') and pending.get('half_second'):
                     self.journal.confirm(index)
-                    logger.info('Stable game-effect confirmed: receipt %s, counters %s after %.2fs; HUD verification separate', index, values, elapsed)
+                    logger.info('Counter delivery observed: receipt %s, counters %s after %.2fs; HUD verification separate', index, values, elapsed)
                 else:
-                    effect['state'] = 'uncertain'
+                    effect.update(state='uncertain', reason='no later-frame effect witness or counter sources disagree')
                     self.journal.save()
                     logger.warning('Item uncertain: receipt %s stable counters %s differ; no replay', index, values)
                 del self.inflight[index]
@@ -315,46 +339,83 @@ class Runtime:
                 continue
             recorded = self.journal.data['effects'].get(str(index))
             family = 'lives' if name == '1-Up' else 'rings'
-            if recorded:
+            if recorded and recorded['state'] not in ('queued', 'deferred'):
                 # Persisted but unowned verification is uncertain after a restart.
                 # Do not block independent receipts and never automatically replay.
                 if recorded['state'] in ('prepared', 'verifying', 'uncertain') and index not in self.inflight:
-                    occupied.add(family)
+                    if recorded['state'] != 'uncertain':
+                        recorded.update(state='uncertain', reason='client restarted after a native attempt')
+                        self.journal.save()
                     if index not in self.deferred:
                         self.deferred[index] = 'uncertain'
-                        logger.warning('Item uncertain: receipt %s; explicit reconciliation required, no replay', index)
+                        logger.warning('Item uncertain: receipt %s (%s); no replay. Later receipts continue; /sonicitems and /sonicrecover skip %s', index, name, index)
                 continue
-            if family in occupied:
+            if self.clock() < self.retry_after.get(index, 0):
                 continue
             snapshot = self.snapshot
-            self.guard.check_stats(snapshot)
-            self.hooks.require('stats')
+            try:
+                self.guard.check_stats(snapshot)
+                self.hooks.require('stats')
+            except MemoryUnavailable as error:
+                self.journal.defer(index, item, str(error), snapshot.stage_epoch if snapshot.scene == 'results' else None)
+                continue
+            if recorded and recorded.get('wait_epoch') is not None and recorded['wait_epoch'] == snapshot.stage_epoch:
+                continue
+            if family in occupied:
+                self.journal.defer(index, item, 'earlier receipt is actively verifying')
+                continue
             if name == 'Swim Everywhere Trap':
+                self.journal.defer(index, item, 'unsupported native swimming operation')
                 continue  # Unsupported trap cannot starve independently safe filler.
             address = snapshot.lives_address if family == 'lives' else snapshot.rings_address
             mirror = snapshot.world_lives_address if family == 'lives' else snapshot.ring_mirror_address
             addresses = list(dict.fromkeys(a for a in (address, mirror) if a is not None))
             if not addresses or address is None:
-                raise MemoryUnavailable('WRITE_BLOCKED: runtime_stats_pointer_missing')
-            before = memory.read_u32(address)
+                self.journal.defer(index, item, 'runtime_stats_pointer_missing')
+                continue
+            try:
+                before = memory.read_u32(address)
+            except MemoryUnavailable as error:
+                self.journal.defer(index, item, str(error))
+                continue
             if name == 'Ring Loss Trap' and (before == 0 or not BY_MISSION.get(snapshot.actual_mission, {}).get('normal', False)):
                 if index not in self.deferred:
                     self.deferred[index] = 'trap context'
                     logger.info('Item deferred: receipt %s Ring Loss awaits normal act with positive Rings', index)
+                self.journal.defer(index, item, 'normal act with positive rings required')
                 continue  # Keep receipt queued, allow later positive filler.
             limit = 99 if family == 'lives' else 9999
             if before > limit:
-                raise MemoryUnavailable('WRITE_BLOCKED: stats_out_of_range')
+                self.journal.defer(index, item, 'stats_out_of_range')
+                continue
             amount = 1 if name == '1-Up' else int(name.split('+')[1].split(')')[0]) if name in FILLER else 0
             after = 0 if name == 'Ring Loss Trap' else min(limit, before + amount)
             self.deferred.pop(index, None)
             self.journal.prepare(index, item, list(self.guard.check_stats(snapshot)), before, after)
             logger.info('Native write attempted: receipt %s, %s, %s -> %s', index, name, before, after)
-            for target in addresses:
-                current = memory.read_u32(target)
-                if current > limit:
-                    raise MemoryUnavailable('WRITE_UNCERTAIN: stat mirror out of range')
-                memory.write_u32(target, after, expected=current, operation='stats')
+            self.journal.data['effects'][str(index)].update(addresses=addresses, family=family, stage_epoch=snapshot.stage_epoch, reason=None)
+            self.journal.save()
+            completed_writes = 0
+            try:
+                for target in addresses:
+                    current = memory.read_u32(target)
+                    if current > limit:
+                        raise MemoryUnavailable('WRITE_UNCERTAIN: stat mirror out of range')
+                    memory.write_u32(target, after, expected=before if target == address else current, operation='stats')
+                    completed_writes += 1
+            except MemoryUnavailable as error:
+                if completed_writes == 0 and str(error).startswith('WRITE_BLOCKED:'):
+                    # SonicMemory emits WRITE_BLOCKED only before backend mutation.
+                    # This is evidence of no attempt, unlike any WRITE_UNCERTAIN.
+                    self.journal.data['effects'][str(index)].update(state='deferred', reason=str(error))
+                    self.journal.save()
+                    self.retry_after[index] = self.clock() + .25
+                    logger.info('Item deferred before any native write: receipt %s (%s): %s', index, name, error)
+                    continue
+                self.journal.data['effects'][str(index)].update(state='uncertain', reason=str(error))
+                self.journal.save()
+                logger.warning('Item uncertain: receipt %s (%s): %s; later receipts remain eligible', index, name, error)
+                continue
             self.journal.data['effects'][str(index)]['state'] = 'verifying'
             self.journal.save()
             self.inflight[index] = {'started': self.clock(), 'addresses': addresses,
@@ -366,3 +427,16 @@ class Runtime:
         return [i for i, item in enumerate(self.journal.data['receipts'])
                 if BY_ID[item] in FILLER + TRAPS and self.journal.data['effects'].get(str(i), {}).get('state')
                 not in ('confirmed', 'skipped_by_operator')]
+
+    def item_details(self):
+        rows = []
+        for index, item in enumerate(self.journal.data['receipts']):
+            name = BY_ID[item]
+            if name in FILLER + TRAPS:
+                effect = self.journal.data['effects'].get(str(index), {})
+                rows.append({**effect, 'index': index, 'name': name,
+                             'family': 'lives' if name == '1-Up' else 'rings',
+                             'state': 'applying' if effect.get('state') == 'prepared' else effect.get('state', 'queued'),
+                             'journal_state': effect.get('state', 'queued'),
+                             'hud_verified': False})
+        return rows

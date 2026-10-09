@@ -1,3 +1,90 @@
+# Repeated items and live coloured capsules
+
+Wisp item names are now `Cyan Laser Wisp`, `Yellow Drill Wisp`, etc. Numeric
+item IDs are unchanged, so existing server histories and journals remain valid.
+Update explicit item names in future YAML start inventories/plando.
+
+Rings/1-Up/Ring Loss receipts received outside stable living gameplay are
+persisted as deferred. Results-screen deferrals retain the old stage epoch and
+cannot apply to that same actor visit. Delivery resumes in the next living Act.
+A comparison/context rejection before the first guest mutation defers for a safe
+retry; a rejection after any write stays uncertain. A crash/scene exit leaves an
+attempted receipt uncertain and never automatically
+replays it. **Later receipts of the same family continue.** `/sonicitems` shows
+states, addresses, context, targets, observations and recovery reasons;
+`/sonicrecover skip INDEX` durably abandons one uncertain attempt. Keep the old
+journal: do not delete it or re-credit old confirmed items to test a repeat.
+
+Settlement requires an exact target observed after the write on a later poll,
+plus coherent source/mirror observations at 0.5 and 2 seconds. Later ordinary
+pickups/damage need not leave the absolute counter unchanged. Those observations
+are not a proof of HUD rendering or an attribution of every intervening event.
+A source/mirror disagreement or missing witness stays uncertain without replay.
+The old `Stable game-effect confirmed` label is now `Counter delivery observed`.
+
+## Enable the native capsule hook once
+
+The generated [PAL Gecko code](../data/SNCP8P_capsule_refresh.ini) is included in
+the APWorld. With emulation stopped, enable Cheats in Dolphin, open the PAL
+game's Properties -> Gecko Codes -> Add New Code, and paste the hexadecimal
+lines from this file (without the INI section/name lines). Name it
+`AP PAL live coloured capsule refresh` and enable it. Preserve existing codes.
+Alternatively merge its sections into the game's `GameSettings/SNCP8P.ini`;
+do not overwrite existing settings. Start emulation normally afterward. You
+can also export it with the client argument `--export-capsule-gecko OUTPUT_INI`.
+No level restart is needed when receiving an item after this initial setup.
+
+The hook replaces the single instruction at `800D4824`, reproducing its original
+`lwz r0,128(r31)`. Capsule ownership comes from the native `8003BAAC` query.
+The native model's `+88` constructor mode (0 ghost / 1 content) is compared with
+that result each actor update. A mismatch calls `800D3EB4` or `800D3DA4`, whose
+`800D3E54` replacement retains the new model and releases the old model normally.
+Native `800D5490` transitions the original actor, with constructor/default state
+`807613C0` or ghost state `807613D8`; `800D4298` selects normal visibility/movement.
+No actor respawn, vtable/handler copying or `+110` opened write is performed.
+Opened, White and special alternate/multi-colour capsules are excluded.
+
+Region/revision/original-instruction guards protect the Gecko code. The client
+requires the original complete PAL text hashes, normalizing only this hook after
+checking the exact thunk and return branch. Other executable edits are rejected.
+[Dolphin's Gecko implementation](https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Core/GeckoCode.cpp)
+installs the handler and invalidates instruction/JIT caches; DME never installs
+raw executable patches. `/sonicdebug` reports whether the exact hook is present.
+Without it, save/live colour bits still project, but cached capsule refresh is
+explicitly unavailable. White Boost/scripted player grants remain separate gaps.
+
+## One live acceptance session
+
+1. Install this build and the Gecko code; connect to the existing AP seed and
+   use `/sonicitems` to reconcile old uncertain attempts individually with `skip`.
+2. Receive two separate 1-Ups in Act 1. Observe both HUD increments and counters.
+   Receive +10/+25/+50 in Act 2; inspect immediately, at 0.5s and 2s, then collect
+   a vanilla ring/take damage. Receive Ring Loss while holding ordinary rings.
+3. Receive four rewards on a results screen. They must remain deferred, survive
+   client reconnect, and apply only in the next living Act. Red Rings and
+   Clear/Rank server acknowledgements must continue during this process.
+4. Stand beside an unopened transparent Cyan capsule. Receive `Cyan Laser Wisp`:
+   its existing model should fill without restarting. Open it and check one
+   immediate capsule LocationCheck/ACK. Repeat in Asteroid Coaster with Purple.
+5. Check pause, death, stage exit/re-entry and save reload. The native lives
+   captures show stock 5 while the reported HUD shows 4; this is consistent with
+   counting the current life separately, but that visual convention is not yet
+   independently verified. Look for a +1 HUD change rather than assuming stock
+   and remaining-life displays use identical numbers.
+
+**Offline evidence only:** all four new original capture pairs were read through
+the production reader; both ZIP CRCs and extracted-file SHA256 equality passed.
+Tests cover exact cached model modes, repeated real-address counter overlays,
+results deferral/reconnect, uncertain receipt isolation, gameplay changes and
+PPC hook control flow with explicitly stubbed native calls. The final complete
+Sonic Colours suite passed: **526 tests**, including pre-mutation retry and
+post-mutation rejection without replay. Dolphin reported
+`noEmu`; native allocator/render/collision behavior, purple refresh, visible HUD
+updates and engine installation remain live validation requirements. No new
+in-game success is claimed from the interpreter or RAM overlays.
+
+The earlier report below is historical where superseded by this section.
+
 # Current live-defect fixes
 
 This build adds native results-screen Clear/Rank checks, first-Act access plus

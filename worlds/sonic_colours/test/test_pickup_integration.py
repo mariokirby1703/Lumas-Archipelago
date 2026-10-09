@@ -119,7 +119,7 @@ def test_original_capsule_identity_colour_and_consumption(tmp_path):
     capsules=state.evidence['native_data']['stage_objects'][0]['capsules']
     cyan=next(c for c in capsules if c['object_id']==646)
     from ..capsules import CAPSULES
-    assert CAPSULES[cyan['key']].wisp_item=='Cyan Laser Unlock'
+    assert CAPSULES[cyan['key']].wisp_item=='Cyan Laser Wisp'
     assert not cyan['opened']
     backend.write_bytes(cyan['actor']+0x110,b'\x01')
     opened=NativeHooks().snapshot(memory)
@@ -243,7 +243,7 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
 def test_capsule_opening_in_intro_is_durable_and_instance_specific(tmp_path):
     from ..capsules import CAPSULES
     data=generate({'wisp_capsule_sanity':'story','wisp_unlocks':'vanilla'}).worlds[1].fill_slot_data()
-    candidates=[c for c in CAPSULES.values() if c.eligible and c.mission=='stg110' and c.wisp_item=='White Boost Unlock'][:2]
+    candidates=[c for c in CAPSULES.values() if c.eligible and c.mission=='stg110' and c.wisp_item=='White Boost Wisp'][:2]
     assert len(candidates)==2
     with Journal(tmp_path,IDENTITY) as journal:
         guard=SaveGuard(journal);guard.confirm_new_game()
@@ -280,8 +280,8 @@ def test_original_bound_colour_permission_fields_and_no_physical_ring_mutation(t
         memory.write_guard=WritePolicy(memory,guard,hooks.snapshot)
         for _ in range(3):runtime.poll(memory,[],False)
         before=runtime.snapshot.persisted_rings
-        owned=inventory([ITEM_TABLE['Cyan Laser Unlock']])
-        with pytest.raises(MemoryUnavailable,match='tutorial'):
+        owned=inventory([ITEM_TABLE['Cyan Laser Wisp']])
+        with pytest.raises(MemoryUnavailable,match='Gecko'):
             hooks.project_permissions(memory,runtime.snapshot,owned,data)
         stage=runtime.snapshot.evidence['native_data']['stage_objects'][0]
         assert memory.read_u8(stage['stage']+0x61)==2

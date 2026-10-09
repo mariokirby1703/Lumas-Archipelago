@@ -211,7 +211,7 @@ class WritePolicy:
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
         self.memory.verify_revision()
         snapshot = self.snapshot_reader(self.memory)
-        token = self.guard.check_stats(snapshot) if operation == 'stats' else self.guard.check(snapshot)
+        token = self.guard.check_stats(snapshot) if operation in ('stats', 'colour_permissions') else self.guard.check(snapshot)
         if operation not in ('permission_bits', 'map_availability') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
             raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
         if operation == 'stats':

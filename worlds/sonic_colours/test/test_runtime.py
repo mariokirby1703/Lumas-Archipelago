@@ -196,9 +196,8 @@ def test_receipt_effect_exactly_once_with_injected_verified_test_adapter():
         next_items = items + [ITEM_TABLE['Rings (+25)']]
         journal.record_history(next_items)
         backend.corrupt = True
-        with pytest.raises(MemoryUnavailable, match='readback_mismatch'):
-            runtime.apply_effects(memory, next_items)
-        assert journal.data['effects']['1']['state'] == 'prepared'
+        runtime.apply_effects(memory, next_items)
+        assert journal.data['effects']['1']['state'] == 'uncertain'
         writes = len(backend.writes)
         runtime.apply_effects(memory, next_items)
         assert len(backend.writes) == writes

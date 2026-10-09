@@ -187,7 +187,7 @@ class NativeHooks:
             colours = ('Yellow Drill', 'Cyan Laser', 'Blue Cube', 'Green Hover',
                        'Purple Frenzy', 'Orange Rocket', 'Pink Spikes')
             for bit, colour in enumerate(colours):
-                values[bit] = inventory['counts'][colour + ' Unlock'] > 0
+                values[bit] = inventory['counts'][colour + ' Wisp'] > 0
         if options['world_unlocks']:
             for zone, item in enumerate(WORLD_ITEMS):
                 granted = zone == slot_data['starting_world'] or inventory['counts'][item] > 0
@@ -220,17 +220,26 @@ class NativeHooks:
                 # 802689B4 reads bank A; native node states 1=locked, 2=available,
                 # 3=entered, 4=cleared. Refresh only this first waypoint cache.
                 memory.write_u32(access['status_address'], 2, expected=1, operation='map_availability')
-        if options['wisp_unlocks']:
-            if snapshot.scene == 'gameplay':
-                stage = snapshot.evidence['native_data']['stage_objects'][0]
-                mask = sum(1 << bit for bit in range(7) if values[bit])
-                for address in (stage['stage'] + 0x61, stage['actor_state'] + 0x90):
-                    before = memory.read_u8(address)
-                    if before != mask:
-                        memory.write_u8(address, mask, expected=before, operation='colour_permissions')
-            # Save flags cannot revoke native tutorial grants or transition an
-            # already initialized invisible capsule to its available state.
-            raise MemoryUnavailable('Wisp delivery blocked: native tutorial grant/capsule initialization interception required')
+        self.project_live_permissions(memory, snapshot, inventory, slot_data)
+
+    def project_live_permissions(self, memory, snapshot, inventory, slot_data):
+        if not slot_data['options']['wisp_unlocks']:
+            return
+        if snapshot.scene == 'gameplay':
+            stage = snapshot.evidence['native_data']['stage_objects'][0]
+            colours = ('Yellow Drill', 'Cyan Laser', 'Blue Cube', 'Green Hover',
+                       'Purple Frenzy', 'Orange Rocket', 'Pink Spikes')
+            mask = sum(1 << bit for bit, colour in enumerate(colours)
+                       if inventory['counts'][colour + ' Wisp'])
+            for address in (stage['stage'] + 0x61, stage['actor_state'] + 0x90):
+                before = memory.read_u8(address)
+                if before != mask:
+                    memory.write_u8(address, mask, expected=before, operation='colour_permissions')
+        from .capsule_refresh import installed
+        if not installed(memory):
+            raise MemoryUnavailable('Live capsule refresh requires the supplied PAL Gecko code; colour permission writes remain active')
+        # The native per-capsule update hook reconciles model mode against
+        # this same permission byte. No host writes to actor handlers/models.
 
     def kill(self, memory, snapshot):
         self.require('native_death')

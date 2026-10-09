@@ -16,7 +16,13 @@ def verify_revision(memory):
     if revision != VERSION['revision']:
         raise memory.error(f'unknown_revision: observed disc revision {revision}, expected {VERSION["revision"]}')
     for section in VERSION['text_sections']:
-        digest = hashlib.sha256(memory.read_bytes(section['address'], section['size'])).hexdigest()
+        data = memory.read_bytes(section['address'], section['size'])
+        from .capsule_refresh import HOOK, ORIGINAL, installed
+        if section['address'] <= HOOK < section['address'] + section['size']:
+            if installed(memory):
+                offset = HOOK - section['address']
+                data = data[:offset] + ORIGINAL.to_bytes(4, 'big') + data[offset + 4:]
+        digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:
             raise memory.error(f'unknown_revision: text at 0x{section["address"]:08X}, '
                                f'observed SHA256 {digest}, expected {section["sha256"]}')

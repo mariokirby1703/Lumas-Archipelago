@@ -8,6 +8,8 @@ def launch_client(*args):
     from .client import main
     parser = get_base_parser(description='Sonic Colours PAL Archipelago Client (research build)')
     parser.add_argument('--name', help='Archipelago slot name')
+    parser.add_argument('--export-capsule-gecko', metavar='OUTPUT_INI',
+                        help='Export the PAL native live capsule refresh Gecko code and exit')
     parser.add_argument('--patch-music', nargs=2, metavar=('ORIGINAL_CPK', 'OUTPUT_CPK'),
                         help='Build a separate seed music CPK from the .apsonic file, then exit')
     parser.add_argument('url', nargs='?', help='archipelago:// URI or .apsonic file')
@@ -18,6 +20,12 @@ def launch_client(*args):
     else:
         parsed = handle_url_arg(parsed, parser=parser)
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(message)s')
+    if parsed.export_capsule_gecko:
+        from pathlib import Path
+        from .capsule_refresh import gecko_ini
+        Path(parsed.export_capsule_gecko).write_text(gecko_ini(), encoding='utf-8')
+        logging.info('PAL capsule refresh exported. Enable the code in Dolphin before starting emulation.')
+        return
     if parsed.patch_music:
         if not parsed.patch_file:
             parser.error('--patch-music requires a generated .apsonic file')

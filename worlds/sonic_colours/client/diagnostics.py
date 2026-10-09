@@ -7,8 +7,8 @@ from .build_info import implementation_info
 
 NATIVE_BLOCKERS = {
     'save_identity': 'Native intro/profile witness binding implemented; no globally unique native ID or in-game resume validation.',
-    'stats': 'Native Rings/lives fields resolved; production writes await durable save attribution and in-game readback.',
-    'world_access': 'Save flags resolved; native world-entry permission query interception not implemented.',
+    'stats': 'Guarded native counter delivery and durable deferral implemented; visible HUD effects require live verification.',
+    'world_access': 'First-Act flags and current waypoint cache project; navigation/render behavior requires live verification.',
     'wisp_permissions': 'Seven colour save flags resolved; forced tutorial grants and White Boost query still unresolved.',
     'game_land_gates': 'Native gate routine counts physical Red Rings; AP counter query interception not implemented.',
     'emeralds': 'Super flag resolved; individual native emerald award inventory and independent boost not resolved.',
@@ -16,7 +16,7 @@ NATIVE_BLOCKERS = {
     'swimming': 'No verified reversible swimming state; existing Gecko patch has unresolved goal interference.',
     'stage_shuffle': 'Native mission table read; intro-safe stage dispatch rewrite not implemented.',
     'music': 'Separate CPK rewrite/readback verified; modified disc not rebuilt or boot/audio-tested.',
-    'capsule_open': 'ORC catalog available; stable native capsule open-event attribution not resolved.',
+    'capsule_open': 'Native instance/open transitions report immediately; live coloured model refresh uses the supplied PAL Gecko hook.',
 }
 
 
@@ -51,8 +51,9 @@ def diagnostic(ctx, memory=None):
         owned = inventory([i.item for i in ctx.items_received])
         result.update({'save_armed': runtime.guard.armed, 'ap_red_rings': owned['red_rings'],
                        'emerald_count': len(owned['emeralds']), 'wisps': owned['wisps'],
-                       'white_boost': 'White Boost Unlock' in owned['wisps'],
-                       'history_ready': ctx.history_ready, 'pending_effects': runtime.pending_effects()})
+                       'white_boost': 'White Boost Wisp' in owned['wisps'],
+                       'history_ready': ctx.history_ready, 'pending_effects': runtime.pending_effects(),
+                       'item_receipts': runtime.item_details()})
         result.update({'playthrough_state': runtime.guard.state.value, 'identity_status': runtime.guard.reason,
                        'bootstrap_checks': len(runtime.journal.data.get('bootstrap', {}).get('checks', [])),
                        'super_sonic_ap_permission': owned['super_sonic_allowed'] if
@@ -77,6 +78,11 @@ def diagnostic(ctx, memory=None):
                                ('stable_save_identity', runtime.snapshot.save_identity_verified)) if not ready],
                            'progress_verified': runtime.snapshot.progress_verified})
     if memory:
+        from .capsule_refresh import installed
+        try:
+            result['capsule_refresh_hook'] = installed(memory)
+        except MemoryUnavailable as error:
+            result['capsule_refresh_hook'] = str(error)
         result['save_chain_trace'] = memory.trace_save_chain()
         try:
             chain = memory.resolve_flags_ptr()

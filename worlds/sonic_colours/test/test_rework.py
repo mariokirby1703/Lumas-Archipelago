@@ -69,14 +69,14 @@ def test_capsule_opening_is_instance_and_permission_specific(monkeypatch):
     from ..client.runtime import capsule_check_allowed
     candidates = [c for c in CAPSULES.values() if c.mission == 'stg110'][:2]
     for c in candidates:
-        monkeypatch.setitem(CAPSULES, c.key, replace(c, eligible=True, exclusion=None, wisp_item='Cyan Laser Unlock'))
+        monkeypatch.setitem(CAPSULES, c.key, replace(c, eligible=True, exclusion=None, wisp_item='Cyan Laser Wisp'))
     data = {'options': {'wisp_unlocks': 1}, 'locations': {
         c.name: c.code for c in candidates}}
     state = snapshot(opened_capsules=frozenset({candidates[0].key}))
     assert not detect_checks(data, state)
-    result = detect_checks(data, state, frozenset({'Cyan Laser Unlock'}))
+    result = detect_checks(data, state, frozenset({'Cyan Laser Wisp'}))
     assert result == {candidates[0].code}
-    assert detect_checks(data, state, frozenset({'Cyan Laser Unlock'})) == result
+    assert detect_checks(data, state, frozenset({'Cyan Laser Wisp'})) == result
     data['options']['wisp_unlocks'] = 0
     assert detect_checks(data, state) == result
 

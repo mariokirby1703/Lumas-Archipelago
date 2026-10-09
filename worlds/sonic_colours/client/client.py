@@ -47,6 +47,13 @@ class SonicCommands(ClientCommandProcessor):
         """Inspect the small candidate pointer chain; never dumps whole RAM."""
         logger.info(json.dumps(diagnostic(self.ctx, self.ctx.memory), indent=2))
 
+    def _cmd_sonicitems(self):
+        """Show durable per-receipt delivery and reconciliation details."""
+        if self.ctx.runtime:
+            logger.info(json.dumps(self.ctx.runtime.item_details(), indent=2))
+        else:
+            logger.info('Connect to your Sonic Colours slot first.')
+
     def _cmd_sonicrecover(self, action='', index=''):
         """skip INDEX marks an uncertain effect consumed without replaying it."""
         if action != 'skip' or not index.isdecimal() or not self.ctx.runtime:

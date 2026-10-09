@@ -88,11 +88,24 @@ class Journal:
 
     def prepare(self, index, item, context, before, after):
         key = str(index)
-        if key in self.data['effects']:
+        previous = self.data['effects'].get(key, {})
+        if previous.get('state') not in (None, 'queued', 'deferred'):
             raise ValueError('effect_already_recorded_or_uncertain')
-        self.data['effects'][key] = {'state': 'prepared', 'item': item,
+        self.data['effects'][key] = {**previous, 'state': 'prepared', 'item': item,
                                      'context': context, 'before': before, 'after': after}
         self.save()
+
+    def defer(self, index, item, reason, wait_epoch=None):
+        """Persist only changed queue states; a deferral is never an attempt."""
+        key = str(index)
+        effect = self.data['effects'].get(key, {})
+        if effect.get('state') not in (None, 'queued', 'deferred'):
+            return
+        updated = {**effect, 'state': 'deferred', 'item': item, 'reason': reason,
+                   'wait_epoch': effect.get('wait_epoch') or wait_epoch}
+        if updated != effect:
+            self.data['effects'][key] = updated
+            self.save()
 
     def confirm(self, index):
         effect = self.data['effects'][str(index)]

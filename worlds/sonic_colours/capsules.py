@@ -40,7 +40,7 @@ def build_catalog(rows, validation):
         evidence = validation.get(key, {})
         eligible = evidence.get('validated', False)
         item = evidence.get('wisp_item')
-        if eligible and (not stage or item not in {w + ' Unlock' for w in WISPS}
+        if eligible and (not stage or item not in {w + ' Wisp' for w in WISPS}
                          or not evidence.get('native_identity_proof') or not evidence.get('accessibility_proof')):
             raise ValueError('capsule validation lacks mapping, confirmed subtype or proof: ' + key)
         code = BASE_ID + 10000 + index

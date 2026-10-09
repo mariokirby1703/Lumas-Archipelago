@@ -144,7 +144,11 @@ class SonicMemory:
             raise MemoryUnavailable(f'WRITE_UNCERTAIN: {error}') from error
         if self.read_bytes(address, len(data)) != data:
             raise MemoryUnavailable('WRITE_UNCERTAIN: readback_mismatch')
-        if self.write_guard(operation, address, len(data)) != token:
+        try:
+            final_token = self.write_guard(operation, address, len(data))
+        except MemoryUnavailable as error:
+            raise MemoryUnavailable(f'WRITE_UNCERTAIN: context_revalidation_after_write: {error}') from error
+        if final_token != token:
             raise MemoryUnavailable('WRITE_UNCERTAIN: context_changed_after_write')
         self.latest_write = {'time_utc': datetime.now(timezone.utc).isoformat(),
                              'address': f'0x{address:08X}', 'size': len(data), 'operation': operation,

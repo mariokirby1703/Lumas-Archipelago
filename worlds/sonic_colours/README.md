@@ -13,12 +13,17 @@ status presentation is debounced independently from pickup polling.
 
 Native Rings, 1-Up and Ring Loss delivery, selected-save World/starting-act access,
 AP Game Land gates, seven colour permission fields and the Super unlock bit have
-real compare/write/readback paths. Item receipts now settle after separate
+real compare/write/readback paths. Deferred results rewards are durable; uncertain
+receipts never replay and no longer starve later items. Item receipts settle after separate
 0.5/2-second counter observations, rather than immediate readback. Save resume uses witnessed native slot,
 profile and intro result records; no invented guest UUID or padding is written.
 
-**The full integration remains incomplete:** White Boost and tutorial/capsule
-initialization interception, native DeathLink/Swim, level shuffle and booted music
+The supplied PAL Gecko hook reconciles already spawned coloured capsule models
+with live permissions during actor updates. Enable it once before emulation;
+mid-Act Wisp receipt then requires no restart. Wisp names now end in `Wisp`.
+
+**The full integration remains incomplete:** live capsule/HUD validation, White
+Boost and scripted player grants, native DeathLink/Swim, level shuffle and booted music
 validation are outstanding. The normal AP Wisp mode is not fully enforced.
 Use [the in-game test setup](docs/immediate_checks.md) to exercise the implemented
 client. Original-capture write overlays and a local WebSocket server test do not

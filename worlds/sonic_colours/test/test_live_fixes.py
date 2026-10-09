@@ -98,11 +98,11 @@ def test_delayed_verification_fair_trap_and_counter_reversion(tmp_path):
         runtime.snapshot=snapshot(rings_address=0x90001000,ring_mirror_address=0x90001004,lives_address=0x90001008)
         items=[ITEM_TABLE['Ring Loss Trap'],ITEM_TABLE['Rings (+25)']]
         runtime.apply_effects(memory,items)
-        assert '0' not in journal.data['effects'] and journal.data['effects']['1']['state']=='verifying'
+        assert journal.data['effects']['0']['state']=='deferred' and journal.data['effects']['1']['state']=='verifying'
         assert memory.read_u32(0x90001000)==25 and memory.read_u32(0x90001004)==25
         tick[0]=.6;runtime.apply_effects(memory,items)
-        # Simulate native overwrite, the bug immediate readback used to hide.
-        backend.put(0x90001000,(0).to_bytes(4,'big'));backend.put(0x90001004,(0).to_bytes(4,'big'))
+        # A divergent mirror cannot establish coherent continued gameplay.
+        backend.put(0x90001000,(0).to_bytes(4,'big'));backend.put(0x90001004,(24).to_bytes(4,'big'))
         tick[0]=2.1;runtime.apply_effects(memory,items)
         assert journal.data['effects']['1']['state']=='uncertain'
         writes=len(backend.writes);runtime.apply_effects(memory,items)

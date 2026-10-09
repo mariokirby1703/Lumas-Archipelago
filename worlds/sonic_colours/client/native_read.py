@@ -215,6 +215,12 @@ def read_capsules(memory, stage, mission, actors):
         result.append({'key': capsule.key, 'actor': actor, 'actor_id': memory.read_u32(actor + 0xc),
                        'wrapper': wrapper, 'record': record, 'opened': bool(opened),
                        'native_colour': native_colour, 'instance': instance, 'object_id': object_id})
+        model = memory.read_u32(actor + 0xb0)
+        if model:
+            model = memory.read_ptr_checked(actor + 0xb0, 0x90)
+            if memory.read_u32(model) == 0x8077d12c and memory.read_u32(model + 8) == actor:
+                result[-1].update(model=model, model_mode=memory.read_u32(model + 0x88),
+                                  model_state=memory.read_s32(model + 0x80))
     return result
 
 
