@@ -16,6 +16,7 @@ class Snapshot:
     stable_polls: int = 0
     persisted_clears: frozenset = frozenset()
     persisted_rings: dict = field(default_factory=dict)
+    active_rings: dict = field(default_factory=dict)
     awarded_ranks: dict = field(default_factory=dict)
     emerald_rewards: frozenset = frozenset()
     opened_capsules: frozenset = frozenset()

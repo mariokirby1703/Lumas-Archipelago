@@ -186,11 +186,14 @@ async def dolphin_loop(ctx):
                 if not dolphin.is_hooked():
                     verified = False
                     backend.close()
+                    if ctx.runtime:
+                        ctx.runtime.hooks.invalidate_session()
                     dolphin.hook()
                 if not backend.active():
                     verified = False
                     if ctx.runtime:
                         ctx.runtime.guard.disarm()
+                        ctx.runtime.hooks.invalidate_session()
                     raise MemoryUnavailable('Waiting for running Dolphin emulation.')
                 if not verified:
                     memory.verify_revision()
@@ -203,7 +206,7 @@ async def dolphin_loop(ctx):
                     snap = ctx.runtime.snapshot
                     if VERSION['capabilities']['native_death']:
                         local_death = ctx.deathlink.poll(
-                            safe=ctx.runtime.guard.can_send(snap) and snap.scene_verified and snap.scene == 'gameplay',
+                            safe=ctx.runtime.guard.can_send(snap) and snap.scene_verified and snap.scene in ('gameplay', 'dying'),
                             native_state=snap.death_state, now=time.monotonic(),
                             kill=lambda: ctx.runtime.hooks.kill(memory, snap))
                         if local_death:

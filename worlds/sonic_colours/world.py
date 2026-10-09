@@ -25,8 +25,8 @@ class SonicColoursWorld(World):
                         'Traps': set(Items.TRAPS)}
 
     def generate_early(self):
-        for option, capability in [('level_randomization', 'stage_shuffle'), ('music_randomization', 'music'),
-                                   ('rank_checks', 'ranks'), ('death_link', 'native_death'),
+        for option, capability in [('level_randomization', 'stage_shuffle'),
+                                   ('death_link', 'native_death'),
                                    ('swim_trap_weight', 'swimming'), ('wisp_discovery_checks', 'wisp_permissions')]:
             if getattr(self.options, option).value:
                 raise ValueError(f'Sonic Colours: {option} requires_verified_hook: {capability}. '

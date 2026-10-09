@@ -92,7 +92,10 @@ def test_recorded_pal_reads_through_production_adapter(filename):
                 recorded_bytes[address] = value
         class Replay:
             def read_bytes(self, address, size):
-                return bytes(recorded_bytes[address + offset] for offset in range(size))
+                try:
+                    return bytes(recorded_bytes[address + offset] for offset in range(size))
+                except KeyError as error:
+                    raise OSError('read not present in older bounded capture') from error
             def write_bytes(self, *args):
                 pytest.fail('recorded read trace must never write')
         memory = SonicMemory(Replay())

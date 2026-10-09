@@ -100,8 +100,8 @@ def test_fill_100_seeds(settings):
 
 
 @pytest.mark.parametrize('option,value', [('level_randomization', 'anywhere'), ('level_randomization', 'per_world'),
-    ('rank_checks', 'all'), ('rank_checks', 's'), ('death_link', 1), ('swim_trap_weight', 'low'),
-    ('music_randomization', 'anywhere'), ('wisp_discovery_checks', 1)])
+    ('death_link', 1), ('swim_trap_weight', 'low'),
+    ('wisp_discovery_checks', 1)])
 def test_unverified_options_fail_precisely(option, value):
     for seed in range(100):
         with pytest.raises(ValueError, match='requires_verified_hook'):

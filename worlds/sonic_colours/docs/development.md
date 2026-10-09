@@ -3,6 +3,11 @@
 **Release status: incomplete; no real PAL writes or native check transmissions
 have been verified.** Offline behavior and live acceptance are separate below.
 
+The [2026-10-09 native implementation report](native_implementation.md)
+supersedes the scene/stats/physical-ring/rank and music status below. It documents
+original-capture validation, enabled rank/music YAML modes, the actual owned-data
+CPK patch workflow, and the remaining unimplemented native operations.
+
 The subsequent [live repair report](live_client_blockers.md) supersedes the
 earlier no-emulation result below: actual PAL data reads now resolve the corrected
 inline flags structure. Intro bits 150/151 and regular Act 3 bit 152 survived

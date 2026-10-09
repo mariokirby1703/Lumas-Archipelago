@@ -97,7 +97,7 @@ class LevelRandomization(Choice):
 
 
 class RankChecks(Choice):
-    """Minimum awarded quality. All creates four locations. Requires live validation."""
+    """Minimum saved awarded quality. All creates S/A/B/C checks; D is excluded."""
     display_name = 'Rank Checks'
     option_off = 0
     option_s = 1
@@ -129,7 +129,7 @@ class SwimTrapWeight(Choice):
 
 
 class MusicRandomization(Choice):
-    """Experimental: rejected until assets and playback replacement are validated."""
+    """Patch the player's own PAL CPK with --patch-music before booting the seed. Playback needs in-game validation."""
     display_name = 'Music Randomization'
     option_off = 0
     option_per_world = 1

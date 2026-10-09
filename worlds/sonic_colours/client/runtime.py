@@ -50,7 +50,7 @@ def validate_slot(data):
         raise ValueError('all_red_rings requires enabled Red Ring checks')
     if options['goal'] == 3 and not options['game_land_checks']:
         raise ValueError('all_game_land requires enabled Game Land checks')
-    for name in ('level_randomization', 'music_randomization', 'rank_checks', 'death_link',
+    for name in ('level_randomization', 'death_link',
                  'swim_trap_weight', 'wisp_discovery_checks'):
         if options[name]:
             raise ValueError(f'{name}: requires_verified_hook')
@@ -71,7 +71,8 @@ def detect_checks(slot_data, snapshot, owned_wisps=frozenset()):
     checks = set()
     for name, code in slot_data['locations'].items():
         data = LOCATION_TABLE[name]
-        rings = snapshot.persisted_rings.get(data.mission, frozenset())
+        rings = (snapshot.persisted_rings.get(data.mission, frozenset()) |
+                 snapshot.active_rings.get(data.mission, frozenset()))
         if (data.kind == 'clear' and data.mission in snapshot.persisted_clears
                 or data.kind == 'ring' and data.index in rings
                 or data.kind == 'rings' and frozenset(range(1, 6)) <= rings
@@ -100,7 +101,8 @@ def victory(slot_data, snapshot):
     if goal == 1:
         return all(s['mission_id'] in snapshot.persisted_clears for s in STAGES if s['zone_index'] < 7)
     if goal == 2:
-        return all(frozenset(range(1, 6)) <= snapshot.persisted_rings.get(s['mission_id'], frozenset())
+        return all(frozenset(range(1, 6)) <= (snapshot.persisted_rings.get(s['mission_id'], frozenset()) |
+                                           snapshot.active_rings.get(s['mission_id'], frozenset()))
                    for s in STAGES if s['normal'])
     if goal == 3:
         return all(s['mission_id'] in snapshot.persisted_clears for s in STAGES if s['zone_index'] >= 7)
@@ -181,7 +183,8 @@ class Runtime:
             if name == 'Ring Loss Trap' and (before == 0 or not BY_MISSION.get(
                     snapshot.actual_mission, {}).get('normal', False)):
                 raise MemoryUnavailable('WRITE_BLOCKED: ring trap awaits normal act with positive Rings')
-            limit = 99 if name == '1-Up' else 999
+            # Native setter 800A5850 clamps ordinary Rings to 0..9999.
+            limit = 99 if name == '1-Up' else 9999
             if before > limit:
                 raise MemoryUnavailable('WRITE_BLOCKED: stats_out_of_range')
             amount = 1 if name == '1-Up' else int(name.split('+')[1].split(')')[0]) if name in FILLER else 0

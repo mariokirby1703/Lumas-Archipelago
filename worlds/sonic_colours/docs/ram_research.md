@@ -81,7 +81,11 @@ On a disposable new playthrough, observe Act 1 C bit 150, expected word at
 Resolve the base again after save/reload. Record actual native scene transitions
 and freshness fields before any write experiment. No such live write is verified.
 
-The new rework notes and `offline_re` tables supply no additional native addresses.
+The [native implementation report](native_implementation.md) supersedes the
+remaining unresolved scene/stats/ring/rank statements here using the newly
+located original DOL, CPK and thirteen RAM capture pairs.
+
+The earlier rework notes and `offline_re` tables supplied no additional native addresses.
 `data/native_evidence.json` and `client/evidence.py` explicitly classify field
 proof. Unknown New Game, save identity, scene, stats parent and capsule opening
 fields are not replaced with guesses.

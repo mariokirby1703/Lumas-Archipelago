@@ -5,7 +5,10 @@ Development version 0.2.0, slot schema 2. **Not yet playable end to end.**
 The latest rework removes automatic Wisp precollection and the Slot-1-only rule.
 The eight Wisps are shuffled progression items. New Game/bootstrap/save binding,
 independent read polling and capsule instance validation now have explicit models.
-Native scene/identity and gameplay permission hooks still need PAL evidence.
+Native scene/player/stats, physical rings and saved ranks now have regressions
+against thirteen original PAL capture pairs. Durable save identity and gameplay
+permission writers remain incomplete. Rank YAML modes and a separate player-owned
+music CPK patch are implemented; this is still not a gameplay release.
 
 The live pointer failure has been repaired. Tropical Resort Acts 1..3 clear bits
 have been observed through save and reload; this limited read proof does not enable
@@ -13,6 +16,7 @@ save binding, check transmission or effects. See the [live repair report](docs/l
 
 - [Setup and migration](docs/setup_en.md)
 - [Current implementation report](docs/development.md)
+- [Native changes, evidence, music installation and exact remaining gaps](docs/native_implementation.md)
 - [Native evidence and smallest live probe](docs/ram_research.md)
 - [Example YAML](examples/SonicColours.yaml)
 

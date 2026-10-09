@@ -25,6 +25,14 @@ def diagnostic(ctx, memory=None):
                        'super_sonic_ap_permission': owned['super_sonic_allowed'] if
                        runtime.slot_data['options']['chaos_emerald_items'] else 'vanilla'})
         if runtime.snapshot:
+            stage = next(iter(runtime.snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
+            player = stage.get('player', {})
+            result.update(rings=player.get('rings'), lives=stage.get('lives'), boost=player.get('boost'),
+                          clicked_slot=runtime.snapshot.clicked_slot, real_stage_id=stage.get('real_stage_id'),
+                          native_bgm_cue=stage.get('bgm_cue'),
+                          held_wisp=player.get('held_wisp'), death_state=runtime.snapshot.death_state,
+                          physical_red_ring_mask=stage.get('current_red_ring_mask'),
+                          native_death_count=stage.get('death_count'))
             result.update({'scene': runtime.snapshot.scene, 'actual_mission': runtime.snapshot.actual_mission,
                            'native_status': runtime.snapshot.status, 'native_evidence': runtime.snapshot.evidence,
                            'candidate_clears': sorted(runtime.snapshot.candidate_clears),
