@@ -105,8 +105,10 @@ def test_recorded_pal_reads_through_production_adapter(filename):
         state = hooks.snapshot(memory)
         assert sorted(state.candidate_clears) == sample['snapshot']['candidate_clears']
         assert state.evidence['chain'] == tuple(sample['snapshot']['evidence']['chain'])
-        assert state.progress_verified and not state.scene_verified
-        assert state.persisted_clears <= frozenset({'stg110', 'stg130', 'stg120'})
+        # Older bounded captures contain only the trace, not the coherent
+        # selected-save accessor. They remain diagnostics, never check proof.
+        assert not state.progress_verified and not state.scene_verified
+        assert not state.persisted_clears
         assert state.save_identity is None and state.actual_mission is None
 
 
@@ -150,6 +152,7 @@ def test_real_clear_reads_do_not_bypass_native_identity_gate(tmp_path):
         runtime = Runtime(generate().worlds[1].fill_slot_data(), journal, guard, NativeHooks())
         for _ in range(3):
             assert runtime.poll(memory, [], True) == (set(), False)
-        assert runtime.snapshot.persisted_clears == frozenset({'stg110', 'stg130', 'stg120'})
+        assert runtime.snapshot.candidate_clears == frozenset({'stg110', 'stg130', 'stg120'})
+        assert not runtime.snapshot.persisted_clears
         assert not guard.armed and journal.data['save_identity'] is None
         assert not journal.data['checks'] and not backend.writes

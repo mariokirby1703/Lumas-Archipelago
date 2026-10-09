@@ -62,3 +62,22 @@ def test_seed_file_mismatch_and_launcher_registration():
     entries = [c for c in components if c.func is run_client]
     assert len(entries) == 1
     assert entries[0].supports_uri
+
+
+def test_diagnostics_only_report_server_acknowledged_checks(tmp_path):
+    async def scenario():
+        from ..client.diagnostics import diagnostic
+        ctx = SonicContext(journal_directory=tmp_path)
+        ctx.locations_checked.add(847001000)  # local send is not an ACK
+        assert diagnostic(ctx)['latest_acknowledged_location'] is None
+        ctx.checked_locations.add(847001000)  # applied by CommonContext
+        ctx.on_package('RoomUpdate', {'checked_locations': [847001000]})
+        first = diagnostic(ctx)
+        assert first['latest_acknowledged_location']['locations'] == [847001000]
+        assert first['implementation']['loaded_python_paths']['worlds.sonic_colours.client.hooks']
+        assert len(first['implementation']['loaded_code_id']) == 64
+        assert 'save_identity' in first['operation_blockers']
+        ctx.on_package('RoomUpdate', {'checked_locations': [847001000]})
+        assert diagnostic(ctx)['latest_acknowledged_location'] == first['latest_acknowledged_location']
+        await ctx.shutdown()
+    asyncio.run(scenario())

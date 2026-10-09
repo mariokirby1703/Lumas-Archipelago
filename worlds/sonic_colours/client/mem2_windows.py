@@ -32,6 +32,33 @@ def mapped_ram(region: MemoryRegion, size: int) -> bool:
             and region.protect & 0xFF == 0x04 and not region.protect & 0x100)
 
 
+def dolphin_processes():
+    """Diagnostic candidates only: DME itself does not expose its selected PID."""
+    kernel = c.WinDLL('kernel32', use_last_error=True)
+    kernel.CreateToolhelp32Snapshot.argtypes = [w.DWORD, w.DWORD]
+    kernel.CreateToolhelp32Snapshot.restype = w.HANDLE
+    kernel.Process32FirstW.argtypes = kernel.Process32NextW.argtypes = [w.HANDLE, c.POINTER(ProcessEntry)]
+    kernel.CloseHandle.argtypes = [w.HANDLE]
+    snapshot = kernel.CreateToolhelp32Snapshot(2, 0)
+    if snapshot == c.c_void_p(-1).value:
+        raise OSError(c.get_last_error(), 'Cannot enumerate Dolphin')
+    custom = os.environ.get('DME_DOLPHIN_PROCESS_NAME')
+    names = {custom.lower(), custom.lower() + '.exe'} if custom else {
+        'dolphin.exe', 'dolphinqt2.exe', 'dolphinwx.exe'}
+    result = []
+    try:
+        entry = ProcessEntry()
+        entry.size = c.sizeof(entry)
+        found = kernel.Process32FirstW(snapshot, c.byref(entry))
+        while found:
+            if entry.exe.lower() in names:
+                result.append({'pid': entry.pid, 'executable': entry.exe})
+            found = kernel.Process32NextW(snapshot, c.byref(entry))
+    finally:
+        kernel.CloseHandle(snapshot)
+    return result
+
+
 class WindowsMEM2:
     def __init__(self, engine, *, writable: bool = True):
         self.handle = None
@@ -75,6 +102,7 @@ class WindowsMEM2:
         # DME exposes no PID. Refuse ambiguity rather than write to another emulator.
         if len(pids) != 1:
             raise RuntimeError("MEM2 fallback requires exactly one Dolphin process.")
+        self.pid = pids[0]
         self.handle = k.OpenProcess(0x410 | (0x28 if writable else 0), False, pids[0])
         if not self.handle:
             raise OSError(c.get_last_error(), "Cannot open Dolphin")

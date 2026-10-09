@@ -208,5 +208,6 @@ def read_saved_progress(memory, rows):
             memory.read_bytes(flags + 0x10, 64) != bank):
         raise MemoryUnavailable('saved_progress_context_changed')
     return {'physical_red_rings': rings, 'rank_records': records,
+            'chain': chain,
             'flag_words_hex': bank.hex(),
             'grade': 'code-derived; not live-validated; no save identity implied'}

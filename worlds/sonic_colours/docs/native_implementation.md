@@ -1,7 +1,8 @@
 # Native implementation status, 2026-10-09
 
-**This is still not a complete playable AP integration.** No new Dolphin session
-was run: the user requested offline work. The original PAL DOL, CPK and thirteen
+**This is still not a complete playable AP integration.** The latest read-only
+DME probe found Dolphin PID 19212 open with no running emulation; no new live
+gameplay, AP roundtrip or native write was verified. The original PAL DOL, CPK and thirteen
 MEM1/MEM2 capture pairs under `notes/memdumps_and_more` were used directly.
 These results supersede the earlier statements that scene/stats parents and
 physical ring storage were entirely unresolved. They do not establish live writes.
@@ -42,8 +43,11 @@ Physical Red Ring storage is code-derived from `8015F16C/8015F18C` and the save
 caller at `8016CD1C`: bit `320 + zone*30 + act*5 + ring`, indices zero-based.
 All 36 persisted masks are read, with full before/after context checks. Current
 pickups come from the native actor state at +91. Current and saved collections
-remain separate in snapshots; detection unions them and journals events through
-the existing save guard. Received AP Red Ring items never populate these fields.
+remain separate in snapshots. Only the native save-bank masks contribute to
+durable checks and victory; active masks are diagnostic and cannot be credited
+permanently before saving. Native save-bank reads do not alone prove a successful
+NAND flush; that remains part of the unresolved native save lifecycle. Received
+AP Red Ring items never populate these fields.
 
 Rank records are selected-save+AC, stride C, indexed by the actual stage table
 accessor `8007F18C`. The byte at record+0 is the awarded/best rank, score is +4,
@@ -76,7 +80,7 @@ Previous live evidence remains limited to the corrected inline save chain and
 clear bits 150/151/152 through normal save and title-menu reload. No AP server
 acknowledgement or in-game item delivery was verified this turn.
 
-Final checks: **474 tests passed**, including original-capture reads and 1,800
+Previous baseline: **474 tests passed**, including original-capture reads and 1,800
 filled seeds (100 for every supported rank/music mode combination). This is not
 the full requested option matrix: the unimplemented modes below remain rejected.
 The rebuilt APWorld imports its native reader, archive patcher, catalogs and
@@ -141,3 +145,45 @@ workflow does not make the rest of the AP integration playable.
 These are missing production implementations/verification, not completed features
 hidden behind a switch. Existing permission/kill/swim stubs and capability gates
 remain. No full-playability or successful native write claim is made.
+
+## Follow-up fixes
+
+Follow-up validation: **481 tests passed**, including all thirteen original
+capture pairs, packaging manifest verification and a real world-loader subprocess
+with both stale installed Sonic copies present. The production Dolphin loop was
+also run against the actual installed DME/Dolphin process: it reported `noEmu`,
+no verified disc, no read/write/acknowledgement and the correct source paths.
+This is connection/diagnostic validation, not an in-game acceptance test.
+
+The client records successful memory accesses with UTC timestamps, and successful
+writes only after readback and the final context check. Disc verification records
+the observed six-byte ID, revision and text hash failure; it does not replace
+the expected PAL verification. Dolphin process candidates and the verified MEM2
+fallback PID are distinguished because DME does not expose its selected PID.
+An inaccessible or mismatched game disarms the guard and removes the current
+snapshot. Historical reads and revision observations remain explicitly timestamped.
+
+`/sonicstatus` shows loaded core code ID, Python/package paths, source commit and
+dirty state, or the packaged build manifest and verified file hashes. APWorlds
+carry a deterministic content ID and commit attribution. The GUI title includes
+the core code ID. Location acknowledgement telemetry comes from server-confirmed
+`Connected`/`RoomUpdate` state, never from locally attempted sends. Each unresolved
+native operation has its own diagnostic reason.
+
+The checkout's world loader ignores installed Sonic loose/zip copies while the
+repository's Sonic source is present, and logs both paths. This prevents an old
+`custom_worlds` copy from overriding the development branch. Packaged installations
+without the loose source continue using the normal APWorld loader.
+
+Clear checks now require the coherent native save accessor as well as its
+matching chain. The older bounded live traces remain useful diagnostic candidates,
+but do not falsely satisfy the new accessor's progress verification. A missing
+stage table or a switched selected save cannot become verified progress.
+
+Further PAL tracing established that `8016C9B0` appends 16-bit event IDs;
+flow 4 dispatches `8016E760`, which builds and starts a movie context via
+`802EAC74`. Completing event `0x6E` resets flow to zero at `8016C714`.
+Neither flow 4 nor that event is sufficient proof of a save selection. The
+initializer at `8015F9F4` also iterates six native slot blocks; identifying their
+primary/secondary serialization roles is necessary before placing a durable seed
+marker. No speculative save padding or reserved flag bits were written.

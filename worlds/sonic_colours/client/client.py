@@ -3,6 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 import time
+from datetime import datetime, timezone
 
 import Utils
 from CommonClient import ClientCommandProcessor, CommonContext, gui_enabled, logger, server_loop
@@ -17,6 +18,7 @@ from .runtime import Runtime, validate_slot, inventory
 from .state import SaveGuard, WritePolicy
 from .versions import VERSION
 from .deathlink import DeathLink
+from .build_info import implementation_info
 
 
 class SonicCommands(ClientCommandProcessor):
@@ -74,6 +76,11 @@ class SonicContext(CommonContext):
         self.expected_slot_data = None
         self.last_send = 0.0
         self.last_pending = set()
+        self.implementation = implementation_info()
+        self.latest_acknowledged_location = None
+        self.status_time_utc = None
+        self.dolphin_instance = None
+        self.last_observed_checked = set()
         self.journal_directory = Path(journal_directory or Utils.user_path('sonic_colours_journals'))
         if patch_file:
             patch = json.loads(Path(patch_file).read_text(encoding='utf-8'))
@@ -110,6 +117,8 @@ class SonicContext(CommonContext):
             self.locations_checked = set()
             self.finished_game = False
             self.last_pending = set()
+            self.last_observed_checked = set()
+            self.latest_acknowledged_location = None
             try:
                 data = validate_slot(args['slot_data'])
                 if self.expected_slot_data and data != self.expected_slot_data:
@@ -151,6 +160,15 @@ class SonicContext(CommonContext):
                     logger.error('Receipt synchronization blocked: %s', error)
         elif cmd == 'Retrieved' and self.barrier in args.get('keys', {}) and not self.history_desynced:
             self.history_ready = True
+        if cmd in ('Connected', 'RoomUpdate'):
+            # CommonContext has already applied missing_locations before invoking
+            # this callback. Only server-confirmed locations are acknowledgements.
+            newly_checked = self.checked_locations - self.last_observed_checked
+            if newly_checked:
+                self.latest_acknowledged_location = {
+                    'time_utc': datetime.now(timezone.utc).isoformat(),
+                    'locations': sorted(newly_checked), 'packet': cmd}
+            self.last_observed_checked = set(self.checked_locations)
 
     def reset_server_state(self):
         self.release_runtime()
@@ -163,7 +181,7 @@ class SonicContext(CommonContext):
         from kvui import GameManager
 
         class SonicManager(GameManager):
-            base_title = 'Sonic Colours (Wii) Client (PAL development build)'
+            base_title = 'Sonic Colours (Wii) PAL — ' + self.implementation['loaded_code_id'][:12]
             logging_pairs = [('Client', 'Archipelago')]
 
         return SonicManager
@@ -177,6 +195,7 @@ async def dolphin_loop(ctx):
         logger.error(ctx.dolphin_status)
         return
     backend = DMEBackend(dolphin)
+    logger.info('Sonic implementation: %s', json.dumps(ctx.implementation, sort_keys=True))
     ctx.memory = memory = SonicMemory(backend)
     verified = False
     last_status = None
@@ -189,6 +208,7 @@ async def dolphin_loop(ctx):
                     if ctx.runtime:
                         ctx.runtime.hooks.invalidate_session()
                     dolphin.hook()
+                ctx.dolphin_instance = backend.instance_info()
                 if not backend.active():
                     verified = False
                     if ctx.runtime:
@@ -223,20 +243,29 @@ async def dolphin_loop(ctx):
                 ctx.dolphin_status = ctx.runtime.last_error or 'PAL synchronization active.'
             except MemoryUnavailable as error:
                 ctx.dolphin_status = str(error)
+                if ctx.runtime:
+                    ctx.runtime.snapshot = None
+                    ctx.runtime.guard.disarm()
                 if str(error).startswith(('wrong_game', 'unknown_revision')):
                     verified = False
+                    if ctx.runtime:
+                        ctx.runtime.hooks.invalidate_session()
             except ConnectionClosed:
                 ctx.dolphin_status = 'AP disconnected; synchronization stopped.'
                 if ctx.runtime:
+                    ctx.runtime.snapshot = None
                     ctx.runtime.guard.disarm()
             except (OSError, RuntimeError, ValueError) as error:
                 ctx.dolphin_status = f'Synchronization blocked: {error}'
                 verified = False
                 backend.close()
                 if ctx.runtime:
+                    ctx.runtime.snapshot = None
                     ctx.runtime.guard.disarm()
             if ctx.dolphin_status != last_status:
-                logger.info(ctx.dolphin_status)
+                ctx.status_time_utc = datetime.now(timezone.utc).isoformat()
+                logger.info('Current Dolphin status [%s, instance=%s]: %s', ctx.status_time_utc,
+                            json.dumps(ctx.dolphin_instance, sort_keys=True), ctx.dolphin_status)
                 last_status = ctx.dolphin_status
             await asyncio.sleep(1)
     finally:

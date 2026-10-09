@@ -2,6 +2,22 @@ from .versions import VERSION
 from .memory import MemoryUnavailable
 from .runtime import inventory
 from .evidence import evidence_registry
+from .build_info import implementation_info
+
+
+NATIVE_BLOCKERS = {
+    'save_identity': 'No audited durable seed marker or unique native creation ID; first-save UI selection not resolved.',
+    'stats': 'Native Rings/lives fields resolved; production writes await durable save attribution and in-game readback.',
+    'world_access': 'Save flags resolved; native world-entry permission query interception not implemented.',
+    'wisp_permissions': 'Seven colour save flags resolved; forced tutorial grants and White Boost query still unresolved.',
+    'game_land_gates': 'Native gate routine counts physical Red Rings; AP counter query interception not implemented.',
+    'emeralds': 'Super flag resolved; individual native emerald award inventory and independent boost not resolved.',
+    'native_death': 'Player death event observed; safe native invocation and cache-coherent execution not resolved.',
+    'swimming': 'No verified reversible swimming state; existing Gecko patch has unresolved goal interference.',
+    'stage_shuffle': 'Native mission table read; intro-safe stage dispatch rewrite not implemented.',
+    'music': 'Separate CPK rewrite/readback verified; modified disc not rebuilt or boot/audio-tested.',
+    'capsule_open': 'ORC catalog available; stable native capsule open-event attribution not resolved.',
+}
 
 
 def diagnostic(ctx, memory=None):
@@ -9,6 +25,21 @@ def diagnostic(ctx, memory=None):
               'expected_revision': VERSION['revision'], 'live_verified': VERSION['live_verified'],
               'capabilities': VERSION['capabilities'], 'save_armed': False,
               'patches_installed': [], 'death_link': 'disabled: native death unverified'}
+    result.update(implementation=getattr(ctx, 'implementation', None) or implementation_info(),
+                  current_status_time_utc=getattr(ctx, 'status_time_utc', None),
+                  dolphin_instance=getattr(ctx, 'dolphin_instance', None),
+                  latest_acknowledged_location=getattr(ctx, 'latest_acknowledged_location', None),
+                  operation_blockers={name: reason for name, reason in NATIVE_BLOCKERS.items()
+                                      if not VERSION['capabilities'].get(name, False)})
+    # Historical successful accesses remain timestamped; they do not imply that
+    # the current Dolphin connection is active or that the current disc is PAL.
+    current_memory = memory or getattr(ctx, 'memory', None)
+    result.update(latest_successful_read=getattr(current_memory, 'latest_read', None),
+                  latest_successful_write=getattr(current_memory, 'latest_write', None),
+                  last_revision_observation=getattr(current_memory, 'revision_observation', None))
+    instance = result['dolphin_instance'] or {}
+    observed = result['last_revision_observation'] or {}
+    result['current_disc_verified'] = bool(instance.get('emulation_active') and observed.get('verified'))
     result['native_field_grades'] = {name: evidence.grade.value for name, evidence in evidence_registry().items()}
     from ..world_constants import load_data
     result['validated_read_clear_missions'] = sorted(load_data('native_read_validation.json')['clear_bits'])

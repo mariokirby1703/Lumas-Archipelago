@@ -1,0 +1,52 @@
+"""Identify the loaded Sonic implementation independently of AP's version.
+
+The code ID hashes actual loaded code objects. A packaged commit is attribution
+from the build manifest, not a guess based on the surrounding checkout's HEAD.
+"""
+import hashlib
+import json
+import marshal
+import subprocess
+from functools import lru_cache
+from pathlib import Path
+from importlib.resources import files
+
+
+@lru_cache(maxsize=1)
+def implementation_info():
+    from .hooks import NativeHooks
+    from .runtime import Runtime, detect_checks
+    from .state import SaveGuard, WritePolicy
+    from . import hooks, runtime, state
+    functions = (NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.kill,
+                 NativeHooks.swim, Runtime.poll, Runtime.apply_effects, detect_checks,
+                 SaveGuard.observe, SaveGuard.check, WritePolicy.__call__)
+    digest = hashlib.sha256()
+    for function in functions:
+        digest.update(function.__qualname__.encode())
+        digest.update(marshal.dumps(function.__code__))
+    result = {'loaded_code_id': digest.hexdigest(),
+              'loaded_python_paths': {module.__name__: module.__file__
+                                      for module in (hooks, runtime, state)},
+              'package_path': str(files('worlds.sonic_colours')),
+              'commit': None, 'package_build_id': None}
+    manifest = files('worlds.sonic_colours').joinpath('build_manifest.json')
+    if manifest.is_file():
+        data = json.loads(manifest.read_text(encoding='utf-8'))
+        mismatches = [name for name, expected in data['files'].items()
+                      if hashlib.sha256(files('worlds.sonic_colours').joinpath(name).read_bytes()).hexdigest() != expected]
+        result.update(commit=data['commit'], package_build_id=data['build_id'],
+                      build_dirty=data['dirty'], manifest_verified=not mismatches,
+                      manifest_mismatches=mismatches)
+    else:
+        result['build_kind'] = 'source checkout; loaded_code_id identifies this process'
+        root = Path(hooks.__file__).resolve().parents[1]
+        try:
+            result['commit'] = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root,
+                                                       text=True, stderr=subprocess.DEVNULL).strip()
+            result['build_dirty'] = bool(subprocess.check_output(
+                ['git', 'status', '--porcelain', '--', '.'], cwd=root,
+                text=True, stderr=subprocess.DEVNULL).strip())
+        except (OSError, subprocess.CalledProcessError):
+            pass
+    return result

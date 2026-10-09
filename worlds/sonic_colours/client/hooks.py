@@ -84,6 +84,15 @@ class NativeHooks:
         except MemoryUnavailable as error:
             native['saved_progress_error'] = str(error)
         saved = native.get('saved_progress', {})
+        # The trace and the bounded accessor are separate reads. Do not credit
+        # an old slot's trace if selection changed before the accessor ran.
+        coherent_progress = bool(saved) and saved['chain'] == chain
+        if coherent_progress:
+            bank = bytes.fromhex(saved['flag_words_hex'])
+            candidates = frozenset(row['mission'] for row in self.progress_rows
+                                   if candidate_set(int(row['bank_C'])))
+        else:
+            saved = {}
         scene = stage.get('scene', 'unclassified')
         # Factory defaults from 8015EBC0, corroborated by original Act 1
         # captures. Neither a command nor a selected-slot number proves New Game.
@@ -103,7 +112,8 @@ class NativeHooks:
         return Snapshot(session, None, None, scene, stage.get('mission'),
                         clicked_slot=stage.get('clicked_slot'),
                         stable_polls=self.stable_polls, candidate_clears=candidates,
-                        progress_verified=bool(validated), persisted_clears=candidates,
+                        progress_verified=coherent_progress,
+                        persisted_clears=candidates if coherent_progress else frozenset(),
                         persisted_rings={mission: frozenset(rings) for mission, rings in saved.get('physical_red_rings', {}).items()},
                         active_rings=active_rings,
                         # 8019DF48 returns rank-table index 0..3 (S,A,B,C),
@@ -119,7 +129,9 @@ class NativeHooks:
                                   'progress_c': '66 native bank C reads; only listed subset live-read validated',
                                   'validated_clear_missions': sorted(validated),
                                   'internal_selected_index': chain[2], 'native_data': native},
-                        status='native scene/stats/physical rings read; stable save identity and writes remain blocked')
+                        status=('native scene/stats/physical rings read; stable save identity and writes remain blocked'
+                                if coherent_progress else
+                                'save trace only; coherent native progress unavailable; checks and writes blocked'))
 
     def invalidate_session(self):
         if self.application is not None or self.chain is not None:

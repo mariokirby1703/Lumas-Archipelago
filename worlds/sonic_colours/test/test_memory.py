@@ -83,6 +83,7 @@ def test_compare_context_race_and_failed_readback():
     backend.corrupt = True
     with pytest.raises(MemoryUnavailable, match='readback_mismatch'):
         memory.write_u32(0x90001000, 2, expected=0, operation='stats')
+    assert memory.latest_write is None
 
 
 def test_partial_read_and_revision_rejection():
@@ -100,3 +101,16 @@ def test_partial_read_and_revision_rejection():
     backend.read_bytes = lambda a, s: b''
     with pytest.raises(MemoryUnavailable, match='partial_read'):
         memory.read_u32(0x90001000)
+
+
+def test_wrong_game_reports_observed_disc_and_never_claims_verification():
+    backend = FakeBackend()
+    backend.put(0x80000000, b'RMCP01')
+    backend.put(0x80000007, b'\x02')
+    memory = SonicMemory(backend)
+    with pytest.raises(MemoryUnavailable, match='observed.*RMCP01'):
+        verify_revision(memory)
+    assert memory.revision_observation['disc_id'] == 'RMCP01'
+    assert memory.revision_observation['revision'] == 2
+    assert not memory.revision_observation['verified']
+    assert memory.latest_read['time_utc']

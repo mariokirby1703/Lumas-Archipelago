@@ -5,6 +5,7 @@ operation; multi-write transactions cannot guarantee rollback across scene exits
 """
 import os
 import struct
+from datetime import datetime, timezone
 from typing import Protocol
 
 
@@ -30,6 +31,19 @@ class DMEBackend:
 
     def active(self):
         return self.engine.is_hooked() and getattr(self.engine.get_status(), 'name', None) == 'hooked'
+
+    def instance_info(self):
+        status = self.engine.get_status()
+        result = {'dme_status': getattr(status, 'name', str(status)), 'emulation_active': self.active(),
+                  'selected_pid': self.fallback.pid if self.fallback else None,
+                  'pid_attribution': 'verified MEM2 alias' if self.fallback else 'DME does not expose selected PID'}
+        if os.name == 'nt':
+            from .mem2_windows import dolphin_processes
+            try:
+                result['process_candidates'] = dolphin_processes()
+            except OSError as error:
+                result['process_enumeration_error'] = str(error)
+        return result
 
     def _check(self):
         if not self.active():
@@ -74,6 +88,9 @@ class SonicMemory:
     def __init__(self, backend, write_guard=None):
         self.backend = backend
         self.write_guard = write_guard
+        self.latest_read = None
+        self.latest_write = None
+        self.revision_observation = None
 
     def read_bytes(self, address, size):
         if not valid_range(address, size):
@@ -84,6 +101,8 @@ class SonicMemory:
             raise MemoryUnavailable(f'read_failed: {error}') from error
         if len(data) != size:
             raise MemoryUnavailable('partial_read')
+        self.latest_read = {'time_utc': datetime.now(timezone.utc).isoformat(),
+                            'address': f'0x{address:08X}', 'size': size}
         return bytes(data)
 
     def try_read_bytes(self, address, size):
@@ -125,6 +144,9 @@ class SonicMemory:
             raise MemoryUnavailable('WRITE_UNCERTAIN: readback_mismatch')
         if self.write_guard(operation, address, len(data)) != token:
             raise MemoryUnavailable('WRITE_UNCERTAIN: context_changed_after_write')
+        self.latest_write = {'time_utc': datetime.now(timezone.utc).isoformat(),
+                             'address': f'0x{address:08X}', 'size': len(data), 'operation': operation,
+                             'readback_verified': True}
 
     def write_u8(self, address, value, *, expected, operation):
         self.write_bytes_verified(address, bytes([value]), expected=bytes([expected]), operation=operation)

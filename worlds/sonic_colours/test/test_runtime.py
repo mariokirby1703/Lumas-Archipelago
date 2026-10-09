@@ -74,6 +74,18 @@ def test_persisted_ring_modes_and_goal_never_from_inventory():
         assert victory(data, snapshot(persisted_clears=frozenset({'stg790'})))
 
 
+@pytest.mark.parametrize('mode', ['singles', 'per_level'])
+def test_pickups_lost_before_save_are_never_credited(mode):
+    data = generate({'red_ring_checks': mode, 'goal': 'all_red_rings'}).worlds[1].fill_slot_data()
+    rings = frozenset(range(1, 6))
+    picked_up = snapshot(active_rings={'stg120': rings})
+    assert not detect_checks(data, picked_up)
+    assert not victory(data, picked_up)
+    assert not detect_checks(data, snapshot())  # death/exit before save
+    committed = snapshot(persisted_rings={'stg120': rings})
+    assert len(detect_checks(data, committed)) == (5 if mode == 'singles' else 1)
+
+
 @pytest.mark.parametrize('quality,expected', [(0, 4), (1, 3), (2, 2), (3, 1), (4, 0)])
 def test_rank_threshold_comparison(quality, expected):
     locations = {name: data.code for name, data in LOCATION_TABLE.items() if data.kind == 'rank' and data.mission == 'stg120'}

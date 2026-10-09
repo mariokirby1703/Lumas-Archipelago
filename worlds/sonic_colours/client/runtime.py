@@ -71,8 +71,10 @@ def detect_checks(slot_data, snapshot, owned_wisps=frozenset()):
     checks = set()
     for name, code in slot_data['locations'].items():
         data = LOCATION_TABLE[name]
-        rings = (snapshot.persisted_rings.get(data.mission, frozenset()) |
-                 snapshot.active_rings.get(data.mission, frozenset()))
+        # Active masks include pickups that can be lost on death or stage exit.
+        # AP acknowledgements cannot be undone, so only the native save bank
+        # may contribute to durable checks (including the bootstrap journal).
+        rings = snapshot.persisted_rings.get(data.mission, frozenset())
         if (data.kind == 'clear' and data.mission in snapshot.persisted_clears
                 or data.kind == 'ring' and data.index in rings
                 or data.kind == 'rings' and frozenset(range(1, 6)) <= rings
@@ -101,8 +103,7 @@ def victory(slot_data, snapshot):
     if goal == 1:
         return all(s['mission_id'] in snapshot.persisted_clears for s in STAGES if s['zone_index'] < 7)
     if goal == 2:
-        return all(frozenset(range(1, 6)) <= (snapshot.persisted_rings.get(s['mission_id'], frozenset()) |
-                                           snapshot.active_rings.get(s['mission_id'], frozenset()))
+        return all(frozenset(range(1, 6)) <= snapshot.persisted_rings.get(s['mission_id'], frozenset())
                    for s in STAGES if s['normal'])
     if goal == 3:
         return all(s['mission_id'] in snapshot.persisted_clears for s in STAGES if s['zone_index'] >= 7)

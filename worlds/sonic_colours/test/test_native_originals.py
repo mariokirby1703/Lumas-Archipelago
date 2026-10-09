@@ -79,7 +79,20 @@ def test_corrupt_original_root_is_rejected(corruption, reader, reason):
 
 
 @pytest.mark.skipif(not PAIRS, reason='private original RAM captures not installed')
-def test_original_intro_pickup_is_journaled_without_claiming_a_save(tmp_path):
+def test_clear_trace_does_not_credit_checks_when_coherent_accessor_fails():
+    first, second = next(pair for pair in PAIRS if '202546' in pair[0].name)
+    original = DumpBackend(first, second)
+    class Corrupt:
+        def read_bytes(self, address, size):
+            return bytes(size) if address == 0x808F34F8 else original.read_bytes(address, size)
+    state = NativeHooks().snapshot(SonicMemory(Corrupt()))
+    assert state.candidate_clears == frozenset({'stg110'})
+    assert not state.progress_verified and not state.persisted_clears
+    assert not state.persisted_rings and not state.awarded_ranks
+
+
+@pytest.mark.skipif(not PAIRS, reason='private original RAM captures not installed')
+def test_original_unsaved_intro_pickup_is_not_durably_credited(tmp_path):
     from ..client.journal import Journal
     from ..client.runtime import Runtime
     from ..client.state import SaveGuard
@@ -95,8 +108,8 @@ def test_original_intro_pickup_is_journaled_without_claiming_a_save(tmp_path):
         for _ in range(3):
             checks, goal = runtime.poll(memory, [], True)
             assert not checks and not goal and not guard.armed
-        ring = LOCATION_TABLE['Tropical Resort Act 1 - Red Ring 1'].code
-        assert journal.data['bootstrap']['checks'] == [ring]
+        assert runtime.snapshot.active_rings['stg110'] == frozenset({1})
+        assert journal.data['bootstrap']['checks'] == []
         assert journal.data['save_identity'] is None
         assert journal.data['effects'] == {}
 
@@ -123,6 +136,7 @@ def test_original_awarded_b_and_physical_pickups_detect_exact_locations():
     slot = generate({'rank_checks': 'all'}).worlds[1].fill_slot_data()
     names = {'Tropical Resort Act 1 - Clear', 'Tropical Resort Act 1 - B Rank',
              'Tropical Resort Act 1 - C Rank', 'Tropical Resort Act 1 - Red Ring 1',
-             'Tropical Resort Act 1 - Red Ring 5', 'Tropical Resort Act 2 - Red Ring 2',
-             'Tropical Resort Act 2 - Red Ring 4', 'Tropical Resort Act 2 - Red Ring 5'}
+             'Tropical Resort Act 1 - Red Ring 5'}
+    # Act 2's result mask is active here, but has not reached the save bank.
+    assert state.active_rings['stg130'] == frozenset({2, 4, 5})
     assert detect_checks(slot, state) == {LOCATION_TABLE[name].code for name in names}

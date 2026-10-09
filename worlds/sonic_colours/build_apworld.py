@@ -3,6 +3,7 @@ import argparse
 import ast
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 import zipfile
 
@@ -12,6 +13,7 @@ def build(destination):
     destination = Path(destination).resolve()
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_suffix('.tmp')
+    contents = {}
     try:
         with zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for path in sorted(root.rglob('*')):
@@ -31,6 +33,23 @@ def build(destination):
                 info.compress_type = zipfile.ZIP_DEFLATED
                 info.external_attr = 0o644 << 16
                 archive.writestr(info, content)
+                if path.suffix in {'.py', '.json'}:
+                    contents[relative.as_posix()] = hashlib.sha256(content).hexdigest()
+            # Include provenance in the artifact itself. Dirty builds are explicit
+            # and receive a content ID; HEAD alone must never imply identical code.
+            try:
+                commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root,
+                                                 text=True, stderr=subprocess.DEVNULL).strip()
+                dirty = bool(subprocess.check_output(['git', 'status', '--porcelain', '--', '.'],
+                                                     cwd=root, text=True, stderr=subprocess.DEVNULL).strip())
+            except (OSError, subprocess.CalledProcessError):
+                commit, dirty = None, None
+            manifest = {'commit': commit, 'dirty': dirty, 'files': contents,
+                        'build_id': hashlib.sha256(json.dumps(contents, sort_keys=True).encode()).hexdigest()}
+            info = zipfile.ZipInfo('sonic_colours/build_manifest.json', (2026, 10, 9, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            archive.writestr(info, json.dumps(manifest, sort_keys=True))
         with zipfile.ZipFile(temporary) as archive:
             if archive.testzip():
                 raise ValueError('archive integrity failure')

@@ -109,6 +109,19 @@ for folder in (folder for folder in (user_folder, local_folder) if folder):
                 world_sources.append(WorldSource(file_name, is_zip=True, relative=relative))
 
 # import all submodules to trigger AutoWorldRegister
+# In the Sonic development checkout, use this branch's source before installed
+# copies. Custom loose worlds otherwise sort ahead of the repository and can
+# silently supply an older client; APWorld duplicate handling happens too late.
+_sonic_source = os.path.join(local_folder, 'sonic_colours', '__init__.py')
+if os.path.isfile(_sonic_source):
+    _shadowed_sonic = [source for source in world_sources
+                      if source.name == 'sonic_colours' and not (source.relative and not source.is_zip)]
+    for source in _shadowed_sonic:
+        logger.warning('Ignoring installed Sonic Colours copy %s; using checkout source %s',
+                       source.resolved_path, _sonic_source)
+        world_sources.remove(source)
+    del _shadowed_sonic
+del _sonic_source
 logger.info("Processing found worlds")
 world_sources.sort()
 apworlds: list[WorldSource] = []

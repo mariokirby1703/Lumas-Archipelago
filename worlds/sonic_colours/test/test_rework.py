@@ -155,8 +155,8 @@ def test_native_snapshot_reads_candidate_chain_without_promoting_it():
     hooks = NativeHooks()
     for _ in range(3): state = hooks.snapshot(memory)
     assert state.candidate_clears == frozenset({'stg110'})
-    assert state.stable_polls == 3 and state.progress_verified
-    assert state.persisted_clears == frozenset({'stg110'})
+    assert state.stable_polls == 3 and not state.progress_verified
+    assert not state.persisted_clears
     assert state.save_identity is None and state.visible_slot is None
     assert not backend.writes
 
