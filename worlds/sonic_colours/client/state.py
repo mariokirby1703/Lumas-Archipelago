@@ -17,6 +17,8 @@ class Snapshot:
     persisted_clears: frozenset = frozenset()
     persisted_rings: dict = field(default_factory=dict)
     active_rings: dict = field(default_factory=dict)
+    stage_epoch: str | None = None
+    pickup_verified: bool = False
     awarded_ranks: dict = field(default_factory=dict)
     emerald_rewards: frozenset = frozenset()
     opened_capsules: frozenset = frozenset()
@@ -100,11 +102,17 @@ class SaveGuard:
             self.journal.data['bootstrap'] = bootstrap
             self.journal.save()
             self.state = PlaythroughState.MANDATORY_PROLOGUE
-        if bootstrap['session'] != snapshot.session:
+        binding = self.journal.data.get('native_binding', {})
+        recovered_first_save = (snapshot.save_identity_verified and snapshot.new_save_selected
+                                and snapshot.save_identity == binding.get('id')
+                                and bootstrap['epoch'] == binding.get('bootstrap_epoch'))
+        if bootstrap['session'] != snapshot.session and not recovered_first_save:
             self.state = PlaythroughState.UNSAFE
             self.reason = 'unbound_prologue_session_changed: evidence retained; binding needs reconciliation'
             return
         if snapshot.scene == 'save_selection' and snapshot.scene_verified:
+            self.state = PlaythroughState.VANILLA_SAVE_SELECTION
+        if snapshot.scene in ('global_map', 'world_map', 'game_land_select') and snapshot.scene_verified:
             self.state = PlaythroughState.VANILLA_SAVE_SELECTION
         if snapshot.save_identity_verified and snapshot.new_save_selected and snapshot.save_identity:
             if not set(bootstrap['observed_missions']) <= snapshot.persisted_clears:
@@ -135,6 +143,33 @@ class SaveGuard:
     def can_send(self, snapshot):
         return self.can_record(snapshot) and self.journal.data['save_identity'] is not None
 
+    def can_record_pickups(self, snapshot):
+        if not snapshot.scene_verified or not snapshot.pickup_verified or not snapshot.stage_epoch:
+            return False
+        if self.journal.data['save_identity'] is not None:
+            return (self.state in (PlaythroughState.BOUND_PLAYTHROUGH, PlaythroughState.RESUME)
+                    and snapshot.save_identity_verified and snapshot.save_identity == self.journal.data['save_identity'])
+        bootstrap = self.journal.data.get('bootstrap')
+        # Before native save attribution, only the two observed mandatory intro
+        # acts are authorized. Loading another save must never inherit this grant.
+        return bool(bootstrap and bootstrap['session'] == snapshot.session
+                    and self.state == PlaythroughState.MANDATORY_PROLOGUE
+                    and snapshot.actual_mission in ('stg110', 'stg130')
+                    and snapshot.candidate_clears <= frozenset({'stg110', 'stg130'}))
+
+    def can_send_pickups(self, snapshot):
+        return self.can_record_pickups(snapshot)
+
+    def check_stats(self, snapshot):
+        # Runtime stats belong to the current living actor, not the save bank.
+        # A verified seeded intro is sufficient to deliver filler to that actor;
+        # persistent progression writes still require check()'s stronger binding.
+        if (not self.can_record_pickups(snapshot) or snapshot.stable_polls < 3
+                or snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'
+                or snapshot.rings_address is None or snapshot.lives_address is None):
+            raise MemoryUnavailable('WRITE_BLOCKED: stats require a stable attributed living actor')
+        return snapshot.session, snapshot.stage_epoch, snapshot.actual_mission, snapshot.rings_address, snapshot.lives_address
+
     def arm(self, snapshot, *, operator_confirmed, fresh_evidence):
         # Kept as an explicit call for adapter integrations; no slot-number rule.
         if operator_confirmed:
@@ -161,8 +196,8 @@ class SaveGuard:
 class WritePolicy:
     """Resolve context again for EVERY write; only exact validated fields allowed.
 
-    Production capabilities are all false until a reviewed PAL live adapter is
-    implemented. No CLI switch can turn this policy into an unchecked writer.
+    Production stats and selected permission words have explicit allowlists.
+    No CLI switch can turn this policy into an unchecked writer.
     """
     def __init__(self, memory, guard, snapshot_reader):
         self.memory, self.guard, self.snapshot_reader = memory, guard, snapshot_reader
@@ -172,11 +207,25 @@ class WritePolicy:
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
         self.memory.verify_revision()
         snapshot = self.snapshot_reader(self.memory)
-        token = self.guard.check(snapshot)
-        if snapshot.scene != 'gameplay' or snapshot.death_state != 'alive':
+        token = self.guard.check_stats(snapshot) if operation == 'stats' else self.guard.check(snapshot)
+        if operation != 'permission_bits' and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
             raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
         if operation == 'stats':
             allowed = {snapshot.rings_address, snapshot.lives_address}
+        elif operation == 'colour_permissions':
+            stage = snapshot.evidence.get('native_data', {}).get('stage_objects', [{}])[0]
+            allowed = {stage.get('stage', 0) + 0x61, stage.get('actor_state', 0) + 0x90}
+            if size != 1 or address not in allowed:
+                raise MemoryUnavailable('WRITE_BLOCKED: colour_permission_address_not_allowed')
+            return token
+        elif operation == 'permission_bits':
+            if snapshot.scene not in ('gameplay', 'world_map', 'global_map', 'game_land_select'):
+                raise MemoryUnavailable('WRITE_BLOCKED: unsafe permission scene')
+            flags = self.memory.resolve_flags_ptr()[-1]
+            if tuple(snapshot.evidence.get('chain', ())) != self.memory.resolve_flags_ptr():
+                raise MemoryUnavailable('WRITE_BLOCKED: save_chain_changed')
+            # Only words containing World, starting-act, Super/entry and Game Land gate bits.
+            allowed = {flags + 0x10 + offset * 4 for offset in (0, 1, 2, 6, 7)}
         else:
             raise MemoryUnavailable('WRITE_BLOCKED: operation has no reviewed address allowlist')
         if size != 4 or address % 4 or address not in allowed:

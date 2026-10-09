@@ -1,3 +1,6 @@
+Current implementation: [Immediate checks and native gameplay testing](immediate_checks.md).
+The report below predates native pickup transmission and the selected production writers.
+
 # Development report ? rework 0.2.0
 
 **Release status: incomplete; no real PAL writes or native check transmissions

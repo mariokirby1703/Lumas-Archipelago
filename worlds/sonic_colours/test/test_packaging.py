@@ -49,3 +49,37 @@ print(Path(hooks.__file__).resolve())
                             capture_output=True, text=True, timeout=45)
     assert result.returncode == 0, result.stdout + result.stderr
     assert str(root / 'worlds/sonic_colours/client/hooks.py') in result.stdout
+
+def test_real_zip_import_contains_binding_native_reader_and_pickup_runtime(tmp_path):
+    archive = build(tmp_path / 'sonic_colours.apworld')
+    script = '''
+import unittest
+import importlib, importlib.abc, sys, zipimport
+import worlds
+from worlds.AutoWorld import AutoWorldRegister
+AutoWorldRegister.world_types.pop('Sonic Colours (Wii)')
+for name in list(sys.modules):
+    if name == 'worlds.sonic_colours' or name.startswith('worlds.sonic_colours.'):
+        del sys.modules[name]
+importer = zipimport.zipimporter(sys.argv[1])
+spec = importer.find_spec('worlds.sonic_colours')
+class Finder(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        return spec if fullname == 'worlds.sonic_colours' else None
+sys.meta_path.insert(0, Finder())
+from worlds.sonic_colours.client import binding, native_read, runtime
+from worlds.sonic_colours.client.build_info import implementation_info
+from worlds.sonic_colours.capsules import CAPSULES
+for module in (binding, native_read, runtime):
+    assert '.apworld' in module.__file__, module.__file__
+assert sum(c.eligible for c in CAPSULES.values()) == 680
+info=implementation_info()
+assert info['manifest_verified']
+print(info['loaded_code_id'])
+'''
+    root = Path(__file__).resolve().parents[3]
+    result = subprocess.run([sys.executable, '-c', script, str(archive)], cwd=root,
+                            env={**os.environ, 'AP_TEST_WORLDS': 'sonic_colours',
+                                 'SKIP_REQUIREMENTS_UPDATE': '1'},
+                            capture_output=True, text=True, timeout=45)
+    assert result.returncode == 0, result.stdout + result.stderr

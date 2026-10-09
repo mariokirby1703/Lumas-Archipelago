@@ -50,7 +50,9 @@ def test_capsule_identity_candidates_and_validation_gates():
     assert sum(c.exclusion == 'mission_unmapped' for c in CAPSULES.values()) == 18
     assert sum(bool(c.name) and not c.story for c in CAPSULES.values()) == 232
     assert len({c.code for c in CAPSULES.values()}) == 706
-    assert not any(c.eligible for c in CAPSULES.values())
+    assert sum(c.eligible for c in CAPSULES.values()) == 680
+    assert sum(c.eligible and c.story for c in CAPSULES.values()) == 448
+    assert all(__import__("json").loads(c.key)[2] == "00" for c in CAPSULES.values() if c.eligible)
     rows = load_data('wisp_capsules.json')[:2]
     with pytest.raises(ValueError, match='duplicate'):
         build_catalog([rows[0], rows[0]], {})
@@ -58,8 +60,9 @@ def test_capsule_identity_candidates_and_validation_gates():
     with pytest.raises(ValueError, match='proof'):
         build_catalog(rows, {key: {'validated': True}})
     for mode in ('story', 'all'):
-        with pytest.raises(ValueError, match='no validated accessible capsule'):
-            generate({'wisp_capsule_sanity': mode})
+        world = generate({'wisp_capsule_sanity': mode}).worlds[1]
+        expected = 448 if mode == 'story' else 680
+        assert sum(Locations.LOCATION_TABLE[n].kind == 'capsule' for n in world.fill_slot_data()['locations']) == expected
 
 
 def test_capsule_opening_is_instance_and_permission_specific(monkeypatch):
@@ -83,7 +86,7 @@ def test_typed_evidence_has_no_unproven_promotion():
     records = evidence_registry()
     assert records['manager_global'].grade == EvidenceGrade.CODE_DERIVED
     assert records['runtime_rings'].grade == EvidenceGrade.DUMP_CORRELATED
-    assert records['new_game_indicator'].grade == EvidenceGrade.UNRESOLVED
+    assert records['new_game_indicator'].grade == EvidenceGrade.DUMP_CORRELATED
     assert not any(r.live_write for r in records.values())
     assert {name for name, r in records.items() if r.live_read} == {'validated_clear_bits'}
 

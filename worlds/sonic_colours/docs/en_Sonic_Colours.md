@@ -1,3 +1,7 @@
+For the current client and an in-game test YAML, see
+[Immediate checks and native gameplay testing](immediate_checks.md).
+This integration is incomplete; the historical details below do not describe the new pickup policy.
+
 # Sonic Colours (Wii)
 
 `ap-status=Custom` ? PAL `SNCP8P`, revision 0. Development version 0.2.0.

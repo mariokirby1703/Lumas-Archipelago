@@ -1,56 +1,84 @@
 {
   "manager_global": {
-    "grade": "code-derived", "address": 2156869160, "kind": "guest_pointer_global",
+    "grade": "code-derived",
+    "address": 2156869160,
+    "kind": "guest_pointer_global",
     "proof": "ELF startup 0x80004294 initializes r13=0x808F9520; 0x80160C10 reads r13-0x5EF8",
-    "live_read": false, "live_write": false
+    "live_read": false,
+    "live_write": false
   },
   "save_container_member": {
-    "grade": "code-derived", "offset": 48, "kind": "pointer_member",
-    "proof": "0x80160D84 lwz r3,0x30(r3)", "live_read": false, "live_write": false
+    "grade": "code-derived",
+    "offset": 48,
+    "kind": "pointer_member",
+    "proof": "0x80160D84 lwz r3,0x30(r3)",
+    "live_read": false,
+    "live_write": false
   },
   "selected_save": {
-    "grade": "code-derived", "stride": 103944, "offset": 8, "kind": "indexed_structure",
+    "grade": "code-derived",
+    "stride": 103944,
+    "offset": 8,
+    "kind": "indexed_structure",
     "proof": "0x8015FA18; internal index is not a proven visible-slot number",
-    "live_read": false, "live_write": false
+    "live_read": false,
+    "live_write": false
   },
   "flags_pointer": {
-    "grade": "code-derived", "offset": 28, "kind": "inline_structure",
+    "grade": "code-derived",
+    "offset": 28,
+    "kind": "inline_structure",
     "proof": "0x8015F940 returns selected_save+0x1C; 0x8016C1D4 wraps that address on stack before bit helper dereferences it; live Act 1 chain captured in docs/live_pal_act1.json",
-    "live_read": false, "live_write": false
+    "live_read": false,
+    "live_write": false
   },
   "progress_c": {
-    "grade": "code-derived", "kind": "packed_bit_bank",
+    "grade": "code-derived",
+    "kind": "packed_bit_bank",
     "proof": "0x8016C1B4 calls C writer 0x8015EF7C on first clear; live save persistence pending",
-    "live_read": false, "live_write": false
+    "live_read": false,
+    "live_write": false
   },
   "validated_clear_bits": {
-    "grade": "live-read-validated", "kind": "persisted_clear_subset",
+    "grade": "live-read-validated",
+    "kind": "persisted_clear_subset",
     "proof": "Actual PAL traces docs/live_pal_*.json: bits 150/151 unset during forced intro, set after first save, retained after title-menu reload; bit 152 unset in Act 3/result, set after map/save, retained after title-menu reload; phases operator-reported; no native scene or identity proof",
-    "live_read": true, "live_write": false
+    "live_read": true,
+    "live_write": false
   },
   "runtime_rings": {
-    "grade": "dump-correlated", "kind": "transient_field",
-    "proof": "v5 notes: 0x90B25F20 changes with rings in one allocation; parent pointer unresolved",
-    "live_read": false, "live_write": false
+    "grade": "dump-correlated",
+    "kind": "transient_field",
+    "proof": "Bounded actor list/player vtables; player+8C stats, story ring pointer+2C or Game Land shared+98/+4, signed ring value+8; original 13 PAL pairs and guarded writable overlays; native clamp 800A5850.",
+    "live_read": false,
+    "live_write": false
   },
   "runtime_lives": {
-    "grade": "dump-correlated", "kind": "transient_field",
-    "proof": "v5 notes: 0x90B25F1C matched 5 to 4; not a death-state detector",
-    "live_read": false, "live_write": false
+    "grade": "dump-correlated",
+    "kind": "transient_field",
+    "proof": "Stage+114 actor-state, native lives word+3C; validated parent/actor context in original captures; +1 overlay tested, HUD presentation and live write not verified.",
+    "live_read": false,
+    "live_write": false
   },
   "new_game_indicator": {
-    "grade": "unresolved", "kind": "native_menu_transition",
-    "proof": "User confirms forced Acts 1/2 before vanilla save selection; native indicator address absent",
-    "live_read": false, "live_write": false
+    "grade": "dump-correlated",
+    "kind": "native_factory_state",
+    "proof": "Gameplay stg110 plus exact factory flag words from 8015EBC0/8016DEF8 and untouched 66 rank records; original mandatory Act 1 capture. Operator confirms intent separately.",
+    "live_read": false,
+    "live_write": false
   },
   "save_identity": {
-    "grade": "unresolved", "kind": "persistent_identity",
-    "proof": "No stable native identity field supplied; cannot use heap pointer or internal index alone",
-    "live_read": false, "live_write": false
+    "grade": "dump-correlated",
+    "kind": "native_intro_record_witness",
+    "proof": "Production sequence observes fresh intro, Act 2 with first rank record, then first map with two exact intro records/profile/selected slot; durable host bootstrap epoch; original-capture restart/mismatched-profile tests. No native UUID; identical save copies indistinguishable.",
+    "live_read": false,
+    "live_write": false
   },
   "capsule_open": {
-    "grade": "unresolved", "kind": "instance_consumption_event",
-    "proof": "706 static placements; subtype hypothesis and native opening identity unresolved",
-    "live_read": false, "live_write": false
+    "grade": "dump-correlated",
+    "kind": "instance_consumption_event",
+    "proof": "Small Capsule VT80761534, generic wrapper+64, ORC/instance descriptor80770FA0 and static position/subtype identity; 800D4FA8 sets actor+110 on open. Original Act 3 IDs646/387, PAL raw subtype table807163E0, consumed overlay; no live timing validation.",
+    "live_read": false,
+    "live_write": false
   }
 }

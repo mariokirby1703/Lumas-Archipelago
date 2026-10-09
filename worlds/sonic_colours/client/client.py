@@ -111,7 +111,6 @@ class SonicContext(CommonContext):
 
     def on_package(self, cmd, args):
         if cmd == 'Connected':
-            self.release_runtime()
             self.history_ready = False
             self.history_desynced = False
             self.locations_checked = set()
@@ -128,10 +127,12 @@ class SonicContext(CommonContext):
                 identity = {'seed': data['seed_name'], 'team': self.team, 'slot': self.slot,
                             'revision': VERSION['dol_sha256'], 'game': GAME,
                             'slot_digest': hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()}
-                journal = Journal(self.journal_directory, identity)
-                self.runtime = Runtime(data, journal, SaveGuard(journal), NativeHooks())
-                if data['options']['death_link']:
-                    self.deathlink = DeathLink(journal)
+                if not self.runtime or self.runtime.journal.identity != identity:
+                    self.release_runtime()
+                    journal = Journal(self.journal_directory, identity)
+                    self.runtime = Runtime(data, journal, SaveGuard(journal), NativeHooks(journal))
+                    if data['options']['death_link']:
+                        self.deathlink = DeathLink(journal)
                 asyncio.create_task(self.update_death_link(bool(data['options']['death_link'])))
                 # CommonClient processes packets in order. An ordered Get reply
                 # handles AP's omitted empty ReceivedItems without a timeout guess.
@@ -168,10 +169,14 @@ class SonicContext(CommonContext):
                 self.latest_acknowledged_location = {
                     'time_utc': datetime.now(timezone.utc).isoformat(),
                     'locations': sorted(newly_checked), 'packet': cmd}
+                logger.info('Location acknowledged: %s', sorted(newly_checked))
+            if self.runtime:
+                self.runtime.journal.acknowledge(self.checked_locations)
             self.last_observed_checked = set(self.checked_locations)
 
     def reset_server_state(self):
-        self.release_runtime()
+        # Keep the already authenticated seed's native observer while offline.
+        # Reconnecting to another identity replaces it in Connected, before sends.
         super().reset_server_state()
         self.history_ready = False
         self.history_desynced = False
@@ -187,12 +192,36 @@ class SonicContext(CommonContext):
         return SonicManager
 
 
+async def transmit_checks(ctx, checks=(), goal=False):
+    """Send earned durable checks even if Dolphin is stopped or history pending."""
+    if not ctx.runtime or not ctx.server or ctx.slot is None:
+        return
+    identity = ctx.runtime.journal.identity
+    if (identity['team'], identity['slot'], identity['seed']) != (ctx.team, ctx.slot, ctx.seed_name):
+        raise MemoryUnavailable('Location transport identity differs from authenticated AP slot')
+    earned = set(checks) | set(ctx.runtime.journal.data['checks'])
+    pending = earned - ctx.checked_locations
+    if pending and (pending != ctx.last_pending or time.monotonic() - ctx.last_send >= 5):
+        await ctx.send_msgs([{'cmd': 'LocationChecks', 'locations': sorted(pending)}])
+        logger.info('LocationChecks sent: %s', sorted(pending))
+        ctx.last_pending, ctx.last_send = pending.copy(), time.monotonic()
+    if goal and not ctx.finished_game:
+        await ctx.send_msgs([{'cmd': 'StatusUpdate', 'status': ClientStatus.CLIENT_GOAL}])
+        ctx.finished_game = True
+
+
 async def dolphin_loop(ctx):
     try:
         import dolphin_memory_engine as dolphin
     except ImportError:
         ctx.dolphin_status = 'DME missing: install worlds/sonic_colours/requirements.txt'
         logger.error(ctx.dolphin_status)
+        while not ctx.exit_event.is_set():
+            try:
+                await transmit_checks(ctx)
+            except (MemoryUnavailable, ConnectionClosed, OSError, RuntimeError) as error:
+                logger.debug('Pending check transport: %s', error)
+            await asyncio.sleep(1)
         return
     backend = DMEBackend(dolphin)
     logger.info('Sonic implementation: %s', json.dumps(ctx.implementation, sort_keys=True))
@@ -201,6 +230,8 @@ async def dolphin_loop(ctx):
     last_status = None
     try:
         while not ctx.exit_event.is_set():
+            checks, goal = set(), False
+            started = time.monotonic()
             try:
                 if not dolphin.is_hooked():
                     verified = False
@@ -218,7 +249,7 @@ async def dolphin_loop(ctx):
                 if not verified:
                     memory.verify_revision()
                     verified = True
-                if not ctx.runtime or not ctx.server or ctx.slot is None:
+                if not ctx.runtime:
                     raise MemoryUnavailable('PAL executable verified; waiting for AP slot.')
                 memory.write_guard = WritePolicy(memory, ctx.runtime.guard, ctx.runtime.hooks.snapshot)
                 checks, goal = ctx.runtime.poll(memory, [i.item for i in ctx.items_received], ctx.history_ready)
@@ -233,13 +264,6 @@ async def dolphin_loop(ctx):
                             await ctx.send_death('Sonic died.')
                 # Runtime returns durable checks only after current attribution
                 # is valid. Do not bypass its identity gate by rereading journal.
-                pending = checks - ctx.checked_locations
-                if pending and (pending != ctx.last_pending or time.monotonic() - ctx.last_send >= 5):
-                    await ctx.send_msgs([{'cmd': 'LocationChecks', 'locations': sorted(pending)}])
-                    ctx.last_pending, ctx.last_send = pending.copy(), time.monotonic()
-                if goal and not ctx.finished_game:
-                    await ctx.send_msgs([{'cmd': 'StatusUpdate', 'status': ClientStatus.CLIENT_GOAL}])
-                    ctx.finished_game = True
                 ctx.dolphin_status = ctx.runtime.last_error or 'PAL synchronization active.'
             except MemoryUnavailable as error:
                 ctx.dolphin_status = str(error)
@@ -262,12 +286,19 @@ async def dolphin_loop(ctx):
                 if ctx.runtime:
                     ctx.runtime.snapshot = None
                     ctx.runtime.guard.disarm()
+            try:
+                await transmit_checks(ctx, checks, goal)
+            except (ConnectionClosed, MemoryUnavailable, OSError) as error:
+                ctx.dolphin_status = f'Location transmission pending: {error}'
             if ctx.dolphin_status != last_status:
                 ctx.status_time_utc = datetime.now(timezone.utc).isoformat()
                 logger.info('Current Dolphin status [%s, instance=%s]: %s', ctx.status_time_utc,
                             json.dumps(ctx.dolphin_instance, sort_keys=True), ctx.dolphin_status)
                 last_status = ctx.dolphin_status
-            await asyncio.sleep(1)
+            # Five-bit masks persist through normal gameplay, so bulk bit changes
+            # capture multiple rings. Sample promptly; capsule pulses will need a
+            # native retained event source, not an assumption about this interval.
+            await asyncio.sleep(max(0.001, 0.02 - (time.monotonic() - started)) if backend.active() else 1)
     finally:
         backend.close()
         ctx.memory = None

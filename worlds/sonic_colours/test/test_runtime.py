@@ -161,15 +161,18 @@ def test_write_policy_rejects_all_unverified_capabilities():
         backend = FakeBackend()
         memory = SonicMemory(backend)
         policy = WritePolicy(memory, SaveGuard(journal), lambda memory: snapshot())
-        for operation in ('stats', 'progress_c', 'wisp_permissions', 'unknown'):
+        for operation in ('progress_c', 'wisp_permissions', 'unknown'):
             with pytest.raises(MemoryUnavailable, match='requires_verified_hook'):
                 policy(operation, 0x90001000, 4)
+        with pytest.raises(MemoryUnavailable, match='wrong_game'):
+            policy('stats', 0x90001000, 4)
         assert not backend.writes
 
 
 def test_receipt_effect_exactly_once_with_injected_verified_test_adapter():
     class TestGuard:
         def check(self, value): return ['test-session']
+        def check_stats(self, value): return ['test-session']
     class TestHooks:
         def require(self, capability): pass
     data = generate().worlds[1].fill_slot_data()

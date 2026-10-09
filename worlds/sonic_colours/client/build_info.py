@@ -17,17 +17,19 @@ def implementation_info():
     from .hooks import NativeHooks
     from .runtime import Runtime, detect_checks
     from .state import SaveGuard, WritePolicy
-    from . import hooks, runtime, state
+    from . import hooks, runtime, state, binding, native_read
     functions = (NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.kill,
                  NativeHooks.swim, Runtime.poll, Runtime.apply_effects, detect_checks,
-                 SaveGuard.observe, SaveGuard.check, WritePolicy.__call__)
+                 SaveGuard.observe, SaveGuard.check, SaveGuard.check_stats, WritePolicy.__call__,
+                 Runtime.observe_pickups, Runtime.observe_capsules, binding.SaveBinding.attribute,
+                 native_read.read_capsules)
     digest = hashlib.sha256()
     for function in functions:
         digest.update(function.__qualname__.encode())
         digest.update(marshal.dumps(function.__code__))
     result = {'loaded_code_id': digest.hexdigest(),
               'loaded_python_paths': {module.__name__: module.__file__
-                                      for module in (hooks, runtime, state)},
+                                      for module in (hooks, runtime, state, binding, native_read)},
               'package_path': str(files('worlds.sonic_colours')),
               'commit': None, 'package_build_id': None}
     manifest = files('worlds.sonic_colours').joinpath('build_manifest.json')

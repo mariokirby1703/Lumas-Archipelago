@@ -22,21 +22,23 @@
     "hex": "3da0808f61ad9520"
   },
   "capabilities": {
-    "save_identity": false,
+    "save_identity": true,
     "progress_c": false,
     "persisted_red_rings": false,
-    "ranks": false,
-    "world_access": false,
+    "ranks": true,
+    "world_access": true,
     "wisp_permissions": false,
-    "game_land_gates": false,
-    "emeralds": false,
-    "stats": false,
+    "game_land_gates": true,
+    "emeralds": true,
+    "stats": true,
     "native_death": false,
     "swimming": false,
     "stage_shuffle": false,
     "music": false,
-    "new_game_indicator": false,
-    "scene": false,
-    "capsule_open": false
+    "new_game_indicator": true,
+    "scene": true,
+    "capsule_open": true,
+    "permission_bits": true,
+    "colour_permissions": true
   }
 }

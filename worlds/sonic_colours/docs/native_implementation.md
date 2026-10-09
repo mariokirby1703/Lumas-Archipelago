@@ -1,3 +1,12 @@
+# Current native implementation status
+
+The immediate-pickup implementation and current limitations are documented in
+[Immediate checks and native gameplay testing](immediate_checks.md). That report
+supersedes the historical save-only Red Ring policy and all-writers-disabled
+statements below. No live Dolphin write was verified in this change.
+
+## Historical investigation before immediate pickups
+
 # Native implementation status, 2026-10-09
 
 **This is still not a complete playable AP integration.** The latest read-only

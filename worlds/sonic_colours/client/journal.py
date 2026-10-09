@@ -35,10 +35,18 @@ class Journal:
                 import fcntl
                 fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             self.data = (json.loads(self.path.read_text(encoding='utf-8')) if self.path.exists() else
-                         {'version': 1, 'identity': identity, 'save_identity': None, 'receipts': [],
+                         {'version': 2, 'identity': identity, 'save_identity': None, 'receipts': [],
                           'effects': {}, 'checks': [], 'remote_deaths': [], 'remote_cycle': False})
-            if self.data.get('identity') != self.identity or self.data.get('version') != 1:
+            if self.data.get('identity') != self.identity or self.data.get('version') not in (1, 2):
                 raise ValueError('journal identity/schema mismatch')
+            self.data['version'] = 2
+            self.data.setdefault('pickup_events', [])
+            self.data.setdefault('ever_collected_mask', {})
+            self.data.setdefault('pickup_checks', [])
+            self.data.setdefault('acknowledged_locations', [])
+            if any(type(mask) is not int or not 0 <= mask <= 31
+                   for mask in self.data['ever_collected_mask'].values()):
+                raise ValueError('corrupt pickup mask')
         except Exception:
             self.lock.close()
             self.closed = True
@@ -98,8 +106,26 @@ class Journal:
         self.save()
 
     def add_checks(self, checks):
-        self.data['checks'] = sorted(set(self.data['checks']) | set(checks))
+        updated = sorted(set(self.data['checks']) | set(checks))
+        if updated != self.data['checks']:
+            self.data['checks'] = updated
+            self.save()
+
+    def record_pickups(self, events, masks, checks):
+        """One durable transaction before any network send; never Wii-save scoped."""
+        checks = set(checks)
+        self.data['pickup_events'].extend(events)
+        self.data['ever_collected_mask'].update(masks)
+        self.data['pickup_checks'] = sorted(set(self.data['pickup_checks']) | checks)
+        self.data['checks'] = sorted(set(self.data['checks']) | checks)
         self.save()
+
+    def acknowledge(self, locations):
+        confirmed = set(locations) & set(self.data['checks'])
+        updated = set(self.data['acknowledged_locations']) | confirmed
+        if updated != set(self.data['acknowledged_locations']):
+            self.data['acknowledged_locations'] = sorted(updated)
+            self.save()
 
     def close(self):
         if not self.closed:

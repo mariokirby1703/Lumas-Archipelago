@@ -33,7 +33,7 @@ def read_stage_objects(memory):
     vtable = memory.read_u32(context)
     row = {'context': context, 'vtable': vtable, 'application': application}
     if vtable == 0x80769D90:
-        mode = memory.read_u32(context + 0x70)
+        mode = memory.read_u32(context + 0x74)
         row.update(map_mode=mode, scene={2: 'global_map', 3: 'world_map', 5: 'game_land_select'}.get(mode, 'unclassified'))
     if vtable == STAGE_VTABLE:
         stage = context
@@ -66,14 +66,21 @@ def read_stage_objects(memory):
                        player_actor_id=memory.read_u32(actor_state + 0x38),
                        current_red_ring_mask=memory.read_u8(actor_state + 0x91) & 31)
             try:
-                row['player'] = read_player(memory, stage, row['player_actor_id'])
+                actors = read_actors(memory, stage)
+                row['player'] = read_player(memory, stage, row['player_actor_id'], actors)
             except MemoryUnavailable as error:
                 row['player_error'] = str(error)
+            else:
+                try:
+                    row['capsules'] = read_capsules(memory, stage, row['mission'], actors)
+                except MemoryUnavailable as error:
+                    row['capsule_error'] = str(error)
     if (memory.read_u32(APPLICATION_GLOBAL) != application or
             memory.read_u32(application + 4) != document or
             memory.read_u32(document + 0x1c) != module or
             memory.read_u32(module + 0x34) != context or
             memory.read_u32(context) != vtable or
+            vtable == 0x80769D90 and memory.read_u32(context + 0x74) != mode or
             vtable == STAGE_VTABLE and (memory.read_bytes(context + 0x30, 24) != state or
                                        memory.read_u32(context + 0x4c) != name or
                                        memory.read_u32(context + 0x114) != actor_state or
@@ -93,15 +100,13 @@ def read_mission_metadata(memory, name_address, mission):
     count, capacity = memory.read_u32(table + 0x34), memory.read_u32(table + 0x38)
     if not 0 < count <= capacity <= 128:
         raise MemoryUnavailable('mission_metadata_count_invalid')
-    matches = []
-    for index in range(count):
-        address = vector + index * 0x118
-        if memory.read_bytes(address, 16).split(b'\0', 1)[0] == mission.encode('ascii'):
-            matches.append(address)
+    metadata = memory.read_bytes(vector, count * 0x118)
+    matches = [index for index in range(count)
+               if metadata[index * 0x118:index * 0x118 + 16].split(b'\0', 1)[0] == mission.encode('ascii')]
     if len(matches) != 1:
         raise MemoryUnavailable('mission_metadata_not_unique')
-    data = memory.read_bytes(matches[0] + 0x10, 32)
-    bgm = memory.read_bytes(matches[0] + 0xac, 32)
+    record = metadata[matches[0] * 0x118:(matches[0] + 1) * 0x118]
+    data, bgm = record[0x10:0x30], record[0xac:0xcc]
     if (memory.read_u32(STAGE_TABLE_GLOBAL) != table or memory.read_u32(table + 0x30) != vector or
             memory.read_u32(table + 0x34) != count):
         raise MemoryUnavailable('mission_metadata_context_changed')
@@ -115,15 +120,15 @@ def read_mission_metadata(memory, name_address, mission):
             'real_stage_id': real_stage, 'path_data_id': path, 'bgm_cue': cue}
 
 
-def read_player(memory, stage, actor_id):
-    """Resolve the player ID through the native actor list, not RAM patterns."""
+def read_actors(memory, stage):
+    """Traverse once for players and object instances, with native ownership."""
     manager = memory.read_ptr_checked(stage + 0x18, 0x20)
     count = memory.read_u32(manager + 0x14)
     if count > 4096:
         raise MemoryUnavailable('actor_count_out_of_range')
     sentinel = manager + 0x18
     node = memory.read_ptr_checked(sentinel, 8)
-    seen, players = set(), []
+    seen, actors = set(), []
     previous = sentinel
     while node != sentinel:
         if node in seen or len(seen) >= count:
@@ -132,13 +137,71 @@ def read_player(memory, stage, actor_id):
         if memory.read_u32(node + 4) != previous:
             raise MemoryUnavailable('actor_backlink_mismatch')
         actor = memory.read_ptr_checked(node + 8, 0x38)
-        if memory.read_u32(actor + 0xc) == actor_id:
-            if memory.read_u32(actor) != 0x8075AEF8 or memory.read_u32(actor + 0x34) != manager:
-                raise MemoryUnavailable('player_type_or_owner_mismatch')
-            players.append(actor)
+        if memory.read_u32(actor + 0x34) != manager:
+            raise MemoryUnavailable('actor_owner_mismatch')
+        actors.append(actor)
         previous, node = node, memory.read_ptr_checked(node, 8)
-    if len(seen) != count or memory.read_u32(sentinel + 4) != previous or len(players) != 1:
-        raise MemoryUnavailable('player_not_unique_or_list_changed')
+    if len(seen) != count or memory.read_u32(sentinel + 4) != previous or memory.read_u32(manager + 0x14) != count:
+        raise MemoryUnavailable('actor_list_changed')
+    return actors
+
+
+def read_capsules(memory, stage, mission, actors):
+    """ReleaseBoxSmall's retained opened state and native ORC instance handle.
+
+    800D4FA8 sets actor+110 after the item-spawn call; 800D5D38 keeps the
+    actor while its opening animation runs. 80072C34 binds actor+64 to the
+    object wrapper; 80108B0C/80108B34/80108BE0 expose ID, instance and params.
+    """
+    import math
+    import struct
+    from ..capsules import CAPSULES_BY_NATIVE_ID
+    result = []
+    for actor in actors:
+        if memory.read_u32(actor) != 0x80761534:
+            continue
+        wrapper = memory.read_ptr_checked(actor + 0x64, 0x18)
+        if memory.read_u32(wrapper + 4) != actor:
+            raise MemoryUnavailable('capsule_wrapper_owner_mismatch')
+        record = memory.read_ptr_checked(wrapper + 8, 0x28)
+        descriptor = memory.read_ptr_checked(wrapper + 0xc, 0x20)
+        if (memory.read_u32(descriptor) != 0x80770FA0 or memory.read_u32(descriptor + 0x10) != record
+                or memory.read_u32(descriptor + 0x1c) != wrapper):
+            raise MemoryUnavailable('capsule_instance_descriptor_mismatch')
+        object_id = memory.read_u32(record) & 0xfffff
+        instance = memory.read_u32(descriptor + 0x14)
+        count = memory.read_u32(record + 0x1c)
+        if not 0 <= instance < count <= 4096:
+            raise MemoryUnavailable('capsule_instance_index_invalid')
+        vector = memory.read_ptr_checked(record + 0x18, count * 24)
+        xyz = struct.unpack('>3f', memory.read_bytes(vector + instance * 24, 12))
+        params = memory.read_bytes(record + 0x24, 3)
+        capsule = CAPSULES_BY_NATIVE_ID.get((mission, object_id, instance))
+        if not capsule or params[0] != capsule.raw_wisp or any(
+                not math.isfinite(value) or abs(value - expected) > max(0.002, abs(expected) * 1e-6)
+                for value, expected in zip(xyz, capsule.position)):
+            continue  # unknown/alternate/corrupt placements cannot credit a check
+        native_colour = memory.read_s32(actor + 0x114)
+        opened = memory.read_u8(actor + 0x110)
+        if native_colour != capsule.raw_wisp - 1 or opened not in (0, 1):
+            raise MemoryUnavailable('capsule_native_subtype_or_state_mismatch')
+        if (memory.read_u32(actor + 0x64) != wrapper or memory.read_u32(wrapper + 4) != actor
+                or memory.read_u32(wrapper + 8) != record):
+            raise MemoryUnavailable('capsule_context_changed')
+        result.append({'key': capsule.key, 'actor': actor, 'actor_id': memory.read_u32(actor + 0xc),
+                       'wrapper': wrapper, 'record': record, 'opened': bool(opened),
+                       'native_colour': native_colour, 'instance': instance, 'object_id': object_id})
+    return result
+
+
+def read_player(memory, stage, actor_id, actors=None):
+    """Resolve the player ID through the native actor list, not RAM patterns."""
+    manager = memory.read_ptr_checked(stage + 0x18, 0x20)
+    count = memory.read_u32(manager + 0x14)
+    actors = read_actors(memory, stage) if actors is None else actors
+    players = [actor for actor in actors if memory.read_u32(actor + 0xc) == actor_id]
+    if len(players) != 1 or memory.read_u32(players[0]) != 0x8075AEF8:
+        raise MemoryUnavailable('player_type_or_owner_mismatch')
     player = players[0]
     stats = memory.read_ptr_checked(player + 0x8c, 0x9c)
     if memory.read_u32(stats) != 0x8075E088:
@@ -180,6 +243,10 @@ def read_saved_progress(memory, rows):
     rings, records, indices = {}, {}, set()
     table_rows = memory.read_bytes(table, 0x6d8)
     record_bytes = memory.read_bytes(selected + 0xac, 66 * 12)
+    def profile():
+        return (memory.read_bytes(selected, 12) + memory.read_bytes(selected + 0x10, 8)
+                + memory.read_bytes(selected + 0x1a, 1)).hex()
+    profile_hex = profile()
     for row in rows:
         zone, act = int(row['zone']), int(row['slot']) - 1
         offset = zone * 0x78
@@ -205,9 +272,10 @@ def read_saved_progress(memory, rows):
     if (memory.resolve_flags_ptr() != chain or memory.read_u32(STAGE_TABLE_GLOBAL) != table or
             memory.read_bytes(table, 0x6d8) != table_rows or
             memory.read_bytes(selected + 0xac, 66 * 12) != record_bytes or
-            memory.read_bytes(flags + 0x10, 64) != bank):
+            memory.read_bytes(flags + 0x10, 64) != bank or profile() != profile_hex):
         raise MemoryUnavailable('saved_progress_context_changed')
     return {'physical_red_rings': rings, 'rank_records': records,
             'chain': chain,
+            'profile_hex': profile_hex,
             'flag_words_hex': bank.hex(),
             'grade': 'code-derived; not live-validated; no save identity implied'}

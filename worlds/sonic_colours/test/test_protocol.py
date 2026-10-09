@@ -76,7 +76,7 @@ def test_diagnostics_only_report_server_acknowledged_checks(tmp_path):
         assert first['latest_acknowledged_location']['locations'] == [847001000]
         assert first['implementation']['loaded_python_paths']['worlds.sonic_colours.client.hooks']
         assert len(first['implementation']['loaded_code_id']) == 64
-        assert 'save_identity' in first['operation_blockers']
+        assert 'wisp_permissions' in first['operation_blockers']
         ctx.on_package('RoomUpdate', {'checked_locations': [847001000]})
         assert diagnostic(ctx)['latest_acknowledged_location'] == first['latest_acknowledged_location']
         await ctx.shutdown()

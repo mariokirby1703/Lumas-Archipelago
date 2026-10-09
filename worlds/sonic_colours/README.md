@@ -2,17 +2,22 @@
 
 Development version 0.2.0, slot schema 2. **Not yet playable end to end.**
 
-The latest rework removes automatic Wisp precollection and the Slot-1-only rule.
-The eight Wisps are shuffled progression items. New Game/bootstrap/save binding,
-independent read polling and capsule instance validation now have explicit models.
-Native scene/player/stats, physical rings and saved ranks now have regressions
-against thirteen original PAL capture pairs. Durable save identity and gameplay
-permission writers remain incomplete. Rank YAML modes and a separate player-owned
-music CPK patch are implemented; this is still not a gameplay release.
+The client now sends physical Red Ring and capsule checks from native gameplay
+state, including the mandatory unsaved intro. A durable AP journal retains
+pickups through death, exit, disconnect and server-ACK retry. Red Ring groups
+use the five physical identities collected across attempts, not save masks.
 
-The live pointer failure has been repaired. Tropical Resort Acts 1..3 clear bits
-have been observed through save and reload; this limited read proof does not enable
-save binding, check transmission or effects. See the [live repair report](docs/live_client_blockers.md).
+Native Rings, 1-Up and Ring Loss delivery, selected-save World/starting-act access,
+AP Game Land gates, seven colour permission fields and the Super unlock bit have
+real compare/write/readback paths. Save resume uses witnessed native slot,
+profile and intro result records; no invented guest UUID or padding is written.
+
+**The full integration remains incomplete:** White Boost and tutorial/capsule
+initialization interception, native DeathLink/Swim, level shuffle and booted music
+validation are outstanding. The normal AP Wisp mode is not fully enforced.
+Use [the in-game test setup](docs/immediate_checks.md) to exercise the implemented
+client. Original-capture write overlays and a local WebSocket server test do not
+constitute live Dolphin gameplay validation.
 
 - [Setup and migration](docs/setup_en.md)
 - [Current implementation report](docs/development.md)

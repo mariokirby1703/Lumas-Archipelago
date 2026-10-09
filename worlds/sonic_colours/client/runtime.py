@@ -1,9 +1,12 @@
 from collections import Counter
+import logging
 from ..Items import BY_ID, RING_VALUES, EMERALDS, WISP_ITEMS, FILLER, TRAPS
 from ..Locations import LOCATION_TABLE, enabled
 from ..Options import SonicColoursOptions, OPTION_NAMES
 from ..world_constants import GAME, SCHEMA_VERSION, STAGES, NORMAL, BY_MISSION, game_land_gates
 from .memory import MemoryUnavailable
+
+logger = logging.getLogger('Client')
 
 
 def validate_slot(data):
@@ -71,9 +74,8 @@ def detect_checks(slot_data, snapshot, owned_wisps=frozenset()):
     checks = set()
     for name, code in slot_data['locations'].items():
         data = LOCATION_TABLE[name]
-        # Active masks include pickups that can be lost on death or stage exit.
-        # AP acknowledgements cannot be undone, so only the native save bank
-        # may contribute to durable checks (including the bootstrap journal).
+        # This reconciler is for native progress. Physical pickup checks are
+        # produced by observe_pickups(), never imported from a historical save.
         rings = snapshot.persisted_rings.get(data.mission, frozenset())
         if (data.kind == 'clear' and data.mission in snapshot.persisted_clears
                 or data.kind == 'ring' and data.index in rings
@@ -96,14 +98,14 @@ def capsule_check_allowed(slot_data, data, snapshot, owned_wisps):
             and (not slot_data['options']['wisp_unlocks'] or capsule.wisp_item in owned_wisps))
 
 
-def victory(slot_data, snapshot):
+def victory(slot_data, snapshot, ever_collected_mask=None):
     goal = slot_data['options']['goal']
     if goal == 0:
         return 'stg790' in snapshot.persisted_clears
     if goal == 1:
         return all(s['mission_id'] in snapshot.persisted_clears for s in STAGES if s['zone_index'] < 7)
     if goal == 2:
-        return all(frozenset(range(1, 6)) <= snapshot.persisted_rings.get(s['mission_id'], frozenset())
+        return all((ever_collected_mask or {}).get(s['mission_id'], 0) == 31
                    for s in STAGES if s['normal'])
     if goal == 3:
         return all(s['mission_id'] in snapshot.persisted_clears for s in STAGES if s['zone_index'] >= 7)
@@ -116,10 +118,95 @@ class Runtime:
         self.journal, self.guard, self.hooks = journal, guard, hooks
         self.snapshot = None
         self.last_error = None
+        self.pickup_masks = {}
+        self.pickup_started = False
+        self.initial_pickup_exclusions = {}
+        self.capsule_states = {}
+        self.capsule_started = False
+
+    def observe_capsules(self, owned_wisps):
+        from ..capsules import CAPSULES
+        snapshot = self.snapshot
+        if not self.guard.can_record_pickups(snapshot):
+            return
+        stage = next(iter(snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
+        if 'capsules' not in stage:
+            return
+        baseline = not self.capsule_started
+        self.capsule_started = True
+        seen = {event.get('instance_key') for event in self.journal.data['pickup_events'] if event['kind'] == 'capsule'}
+        locations = {LOCATION_TABLE[name].instance_key: code for name, code in self.slot_data['locations'].items()
+                     if LOCATION_TABLE[name].kind == 'capsule'}
+        events, checks = [], set()
+        for native in stage['capsules']:
+            key = native['key']
+            token = snapshot.stage_epoch, key
+            previous = self.capsule_states.get(token, False)
+            self.capsule_states[token] = native['opened']
+            capsule = CAPSULES.get(key)
+            if (baseline or previous or not native['opened'] or key in seen or key not in locations
+                    or not capsule or capsule.mission != snapshot.actual_mission or not capsule.eligible
+                    or self.slot_data['options']['wisp_unlocks'] and capsule.wisp_item not in owned_wisps):
+                continue
+            checks.add(locations[key])
+            events.append({'kind': 'capsule', 'mission': capsule.mission, 'instance_key': key,
+                           'stage_epoch': snapshot.stage_epoch, 'actor_id': native['actor_id'],
+                           'sequence': len(self.journal.data['pickup_events']) + len(events)})
+        if events:
+            self.journal.record_pickups(events, {}, checks)
+            logger.info('Pickup detected: opened capsules %s; Location queued: %s',
+                        [event['instance_key'] for event in events], sorted(checks))
+
+    def observe_pickups(self):
+        snapshot = self.snapshot
+        if not self.guard.can_record_pickups(snapshot):
+            return
+        mission = snapshot.actual_mission
+        if not BY_MISSION.get(mission, {}).get('normal'):
+            return
+        rings = snapshot.active_rings.get(mission, frozenset())
+        if any(type(ring) is not int or not 1 <= ring <= 5 for ring in rings):
+            raise MemoryUnavailable('pickup mask contains invalid physical ring identity')
+        mask = sum(1 << (ring - 1) for ring in rings)
+        epoch = snapshot.stage_epoch
+        if not self.pickup_started:
+            # Baseline on first attribution: never credit state predating this
+            # client's observation. Later stage loads belong to this playthrough.
+            self.pickup_masks[epoch] = mask
+            self.initial_pickup_exclusions[mission] = mask
+            self.pickup_started = True
+            return
+        previous = self.pickup_masks.get(epoch, 0)
+        self.pickup_masks[epoch] = mask
+        excluded = self.initial_pickup_exclusions.get(mission, 0) & mask
+        self.initial_pickup_exclusions[mission] = excluded
+        mode = self.slot_data['options']['red_ring_checks']
+        if not mode:
+            return
+        ever = self.journal.data['ever_collected_mask'].get(mission, 0)
+        added = mask & ~previous & ~ever & ~excluded
+        if not added:
+            return
+        updated = ever | added
+        events = [{'kind': 'red_ring', 'mission': mission, 'ring': ring,
+                   'stage_epoch': epoch, 'playthrough_epoch': self.journal.data.get('bootstrap', {}).get('epoch'),
+                   'sequence': len(self.journal.data['pickup_events']) + index}
+                  for index, ring in enumerate(ring for ring in range(1, 6) if added & (1 << (ring - 1)))]
+        checks = {code for name, code in self.slot_data['locations'].items()
+                  if (LOCATION_TABLE[name].mission == mission and
+                      (mode == 1 and LOCATION_TABLE[name].kind == 'ring' and
+                       added & (1 << (LOCATION_TABLE[name].index - 1)) or
+                       mode == 2 and LOCATION_TABLE[name].kind == 'rings' and updated == 31))}
+        self.journal.record_pickups(events, {mission: updated}, checks)
+        logger.info('Pickup detected: %s rings %s; Location queued: %s',
+                    mission, [event['ring'] for event in events], sorted(checks))
 
     def poll(self, memory, item_ids, history_ready):
         self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
+        self.observe_pickups()
+        known = inventory(item_ids) if history_ready else inventory(self.journal.data['receipts'])
+        self.observe_capsules(frozenset(known['wisps']))
         self.last_error = self.snapshot.status
         owned = inventory(item_ids) if history_ready else None
         if history_ready:
@@ -127,7 +214,9 @@ class Runtime:
         if self.guard.can_record(self.snapshot):
             checks = detect_checks(self.slot_data, self.snapshot,
                                    frozenset(owned['wisps']) if owned else frozenset())
-            goal = victory(self.slot_data, self.snapshot)
+            checks -= {code for name, code in self.slot_data['locations'].items()
+                       if LOCATION_TABLE[name].kind in ('ring', 'rings', 'capsule')}
+            goal = victory(self.slot_data, self.snapshot, self.journal.data['ever_collected_mask'])
             if self.guard.can_send(self.snapshot):
                 self.journal.add_checks(checks)
                 if goal and not self.journal.data.get('goal_observed'):
@@ -135,19 +224,20 @@ class Runtime:
                     self.journal.save()
             else:
                 bootstrap = self.journal.data['bootstrap']
-                bootstrap['checks'] = sorted(set(bootstrap['checks']) | checks)
-                bootstrap['observed_missions'] = sorted(set(bootstrap['observed_missions']) |
-                                                        set(self.snapshot.persisted_clears))
-                bootstrap['goal'] = bootstrap.get('goal', False) or goal
-                self.journal.save()
+                updated_checks = sorted(set(bootstrap['checks']) | checks)
+                updated_missions = sorted(set(bootstrap['observed_missions']) | set(self.snapshot.persisted_clears))
+                updated_goal = bootstrap.get('goal', False) or goal
+                if (updated_checks != bootstrap['checks'] or updated_missions != bootstrap['observed_missions']
+                        or updated_goal != bootstrap.get('goal', False)):
+                    bootstrap.update(checks=updated_checks, observed_missions=updated_missions, goal=updated_goal)
+                    self.journal.save()
         if owned:
             # Native permissions and non-idempotent filler are independent. A
             # blocked query hook must not prevent separately verified stats writes.
             errors = []
-            for operation in (lambda: self.hooks.project_permissions(memory, self.snapshot, owned, self.slot_data),
+            for operation in (lambda: self.project_permissions(memory, owned),
                               lambda: self.apply_effects(memory, item_ids)):
                 try:
-                    self.guard.check(self.snapshot)
                     operation()
                 except MemoryUnavailable as error:
                     errors.append(str(error))
@@ -156,8 +246,12 @@ class Runtime:
         elif not history_ready:
             self.last_error = 'Received history incomplete; independently verified reads remain active.'
         can_send = self.guard.can_send(self.snapshot)
-        return (set(self.journal.data['checks']) if can_send else set(),
+        return (set(self.journal.data['pickup_checks']) | (set(self.journal.data['checks']) if can_send else set()),
                 bool(can_send and self.journal.data.get('goal_observed')))
+
+    def project_permissions(self, memory, owned):
+        self.guard.check(self.snapshot)
+        self.hooks.project_permissions(memory, self.snapshot, owned, self.slot_data)
 
     def apply_effects(self, memory, item_ids):
         for index, item in enumerate(item_ids):
@@ -170,7 +264,7 @@ class Runtime:
                     raise MemoryUnavailable(f'WRITE_UNCERTAIN: receipt {index}; /sonicrecover skip {index}')
                 continue
             snapshot = self.snapshot
-            self.guard.check(snapshot)
+            self.guard.check_stats(snapshot)
             self.hooks.require('stats')
             if snapshot.scene != 'gameplay' or snapshot.death_state != 'alive':
                 raise MemoryUnavailable('WRITE_BLOCKED: effect awaits stable living gameplay')
@@ -190,9 +284,10 @@ class Runtime:
                 raise MemoryUnavailable('WRITE_BLOCKED: stats_out_of_range')
             amount = 1 if name == '1-Up' else int(name.split('+')[1].split(')')[0]) if name in FILLER else 0
             after = 0 if name == 'Ring Loss Trap' else min(limit, before + amount)
-            self.journal.prepare(index, item, list(self.guard.check(snapshot)), before, after)
+            self.journal.prepare(index, item, list(self.guard.check_stats(snapshot)), before, after)
             memory.write_u32(address, after, expected=before, operation='stats')
             self.journal.confirm(index)
+            logger.info('Native item applied: receipt %s, %s, %s -> %s at 0x%08X', index, name, before, after, address)
 
     def pending_effects(self):
         return [i for i, item in enumerate(self.journal.data['receipts'])

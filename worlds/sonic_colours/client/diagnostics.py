@@ -6,7 +6,7 @@ from .build_info import implementation_info
 
 
 NATIVE_BLOCKERS = {
-    'save_identity': 'No audited durable seed marker or unique native creation ID; first-save UI selection not resolved.',
+    'save_identity': 'Native intro/profile witness binding implemented; no globally unique native ID or in-game resume validation.',
     'stats': 'Native Rings/lives fields resolved; production writes await durable save attribution and in-game readback.',
     'world_access': 'Save flags resolved; native world-entry permission query interception not implemented.',
     'wisp_permissions': 'Seven colour save flags resolved; forced tutorial grants and White Boost query still unresolved.',

@@ -2,7 +2,7 @@
 
 The selected-save flags are inline. Three clear bits have individual live
 validation; the shared native accessor decodes all 66. Other reads have original-capture
-regressions. Persistent save identity and every writer remain gated.
+regressions. Writes require an attributed playthrough and exact field allowlists.
 """
 import uuid
 
@@ -10,17 +10,21 @@ from .memory import MemoryUnavailable
 from .versions import VERSION
 from .state import Snapshot
 from .native_read import read_saved_progress, read_stage_objects
-from ..world_constants import load_data
+from ..world_constants import load_data, STAGES, NORMAL
+from .binding import SaveBinding
 
 
 class NativeHooks:
-    def __init__(self):
+    def __init__(self, journal=None):
+        self.binding = SaveBinding(journal) if journal is not None else None
         self.chain = None
         self.stable_polls = 0
         self.session_epoch = 0
         self.instance = uuid.uuid4().hex
         self.application = None
         self.context_key = None
+        self.stage_key = None
+        self.stage_sequence = 0
         self.progress_rows = load_data('progress_bits.json')
         self.read_validation = load_data('native_read_validation.json')
         bits = {row['mission']: int(row['bank_C']) for row in self.progress_rows}
@@ -45,6 +49,14 @@ class NativeHooks:
             self.application = application
             self.session_epoch += 1
         session = f'pal-{self.instance}-{self.session_epoch}'
+        key = ((stage.get('context'), stage.get('mission'), stage.get('actor_state'))
+               if stage.get('mission') else None)
+        if key != self.stage_key:
+            self.stage_key = key
+            self.stage_sequence += 1
+        stage_epoch = f'{session}-stage-{self.stage_sequence}' if key is not None else None
+        pickup_verified = (stage.get('scene') in ('gameplay', 'results', 'dying')
+                           and stage.get('mission') is not None and 'current_red_ring_mask' in stage)
         active_rings = ({stage['mission']: frozenset(i + 1 for i in range(5)
                          if stage.get('current_red_ring_mask', 0) & (1 << i))}
                         if stage.get('mission') and stage.get('scene') in ('gameplay', 'results', 'dying') else {})
@@ -60,6 +72,8 @@ class NativeHooks:
                             rings_address=stage.get('player', {}).get('rings_address'),
                             lives_address=stage.get('lives_address'),
                             active_rings=active_rings,
+                            stage_epoch=stage_epoch, pickup_verified=pickup_verified,
+                            opened_capsules=frozenset(capsule['key'] for capsule in stage.get('capsules', []) if capsule['opened']),
                             death_state='dying' if stage.get('scene') == 'dying' else
                                         'alive' if stage.get('scene') == 'gameplay' and stage.get('player') else 'unknown',
                             status=f"save_container_unavailable: {trace['status']}; prologue/menu state needs native tracing",
@@ -109,18 +123,23 @@ class NativeHooks:
         player = stage.get('player', {})
         # The chain and validated subset are real reads. No scene, UI-slot number or
         # stable save identity can be inferred from their heap addresses alone.
-        return Snapshot(session, None, None, scene, stage.get('mission'),
+        snapshot = Snapshot(session, None, None, scene, stage.get('mission'),
                         clicked_slot=stage.get('clicked_slot'),
                         stable_polls=self.stable_polls, candidate_clears=candidates,
                         progress_verified=coherent_progress,
                         persisted_clears=candidates if coherent_progress else frozenset(),
                         persisted_rings={mission: frozenset(rings) for mission, rings in saved.get('physical_red_rings', {}).items()},
                         active_rings=active_rings,
+                        stage_epoch=stage_epoch, pickup_verified=pickup_verified,
+                        opened_capsules=frozenset(capsule['key'] for capsule in stage.get('capsules', []) if capsule['opened']),
                         # 8019DF48 returns rank-table index 0..3 (S,A,B,C),
                         # 4 for D; 8015F86C initializes unused records to FF.
                         # Read the awarded record byte, never infer from score.
                         awarded_ranks={mission: record['raw_rank'] for mission, record in saved.get('rank_records', {}).items()
                                        if 0 <= record['raw_rank'] <= 3},
+                        emerald_rewards=frozenset(group for group in range(1, 8)
+                            if coherent_progress and all(stage['mission_id'] in candidates for stage in STAGES
+                                if stage['zone_index'] == group + 6)),
                         new_game_verified=new_game, fresh_fields=(fresh_flags, fresh_records),
                         scene_verified=scene != 'unclassified',
                         death_state='dying' if scene == 'dying' else 'alive' if scene == 'gameplay' and player else 'unknown',
@@ -129,14 +148,16 @@ class NativeHooks:
                                   'progress_c': '66 native bank C reads; only listed subset live-read validated',
                                   'validated_clear_missions': sorted(validated),
                                   'internal_selected_index': chain[2], 'native_data': native},
-                        status=('native scene/stats/physical rings read; stable save identity and writes remain blocked'
+                        status=('native scene/stats/pickups read; new game confirmation or save attribution required'
                                 if coherent_progress else
                                 'save trace only; coherent native progress unavailable; checks and writes blocked'))
+        return self.binding.attribute(snapshot, saved) if self.binding else snapshot
 
     def invalidate_session(self):
         if self.application is not None or self.chain is not None:
             self.session_epoch += 1
         self.application = self.chain = self.context_key = None
+        self.stage_key = None
         self.stable_polls = 0
 
     def require(self, capability):
@@ -144,11 +165,53 @@ class NativeHooks:
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {capability}')
 
     def project_permissions(self, memory, snapshot, inventory, slot_data):
-        self.require('world_access')
-        self.require('wisp_permissions')
-        self.require('game_land_gates')
-        self.require('emeralds')
-        raise MemoryUnavailable('WRITE_BLOCKED: native permission projection not implemented')
+        from ..Items import WORLD_ITEMS
+        # Only selected, attributed save flags. Do not manufacture physical
+        # Red Rings or clears to satisfy AP inventory gates.
+        flags = memory.resolve_flags_ptr()[-1]
+        starting_mission = NORMAL[slot_data['options']['starting_act']]['mission_id']
+        starting_bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == starting_mission))
+        values = {starting_bit: True}
+        options = slot_data['options']
+        if options['wisp_unlocks']:
+            # 8015EC50 uses native colour IDs, not AP catalog order.
+            colours = ('Yellow Drill', 'Cyan Laser', 'Blue Cube', 'Green Hover',
+                       'Purple Frenzy', 'Orange Rocket', 'Pink Spikes')
+            for bit, colour in enumerate(colours):
+                values[bit] = inventory['counts'][colour + ' Unlock'] > 0
+        if options['world_unlocks']:
+            for zone, item in enumerate(WORLD_ITEMS):
+                values[20 + zone] = zone == slot_data['starting_world'] or inventory['counts'][item] > 0
+        # Act 1 gates remain native factory defaults. Acts 2/3 use AP Red Ring
+        # items, independently from physical collectibles (8016CB5C table).
+        values[8] = True  # Game Land entry; no physical 30-Ring prerequisite.
+        for key, requirement in slot_data['game_land_gates'].items():
+            zone, act = map(int, key.split('-'))
+            values[210 + (zone - 1) * 3 + act - 1] = inventory['red_rings'] >= requirement
+        if options['chaos_emerald_items']:
+            values[7] = inventory['super_sonic_allowed']
+        words = {}
+        for bit, enabled in values.items():
+            offset = bit // 32
+            mask, value = words.get(offset, (0, 0))
+            words[offset] = mask | (1 << (bit % 32)), value | ((1 << (bit % 32)) if enabled else 0)
+        for offset, (mask, value) in words.items():
+            address = flags + 0x10 + offset * 4
+            before = memory.read_u32(address)
+            after = (before & ~mask) | value
+            if before != after:
+                memory.write_u32(address, after, expected=before, operation='permission_bits')
+        if options['wisp_unlocks']:
+            if snapshot.scene == 'gameplay':
+                stage = snapshot.evidence['native_data']['stage_objects'][0]
+                mask = sum(1 << bit for bit in range(7) if values[bit])
+                for address in (stage['stage'] + 0x61, stage['actor_state'] + 0x90):
+                    before = memory.read_u8(address)
+                    if before != mask:
+                        memory.write_u8(address, mask, expected=before, operation='colour_permissions')
+            # Save flags cannot revoke native tutorial grants or transition an
+            # already initialized invisible capsule to its available state.
+            raise MemoryUnavailable('Wisp delivery blocked: native tutorial grant/capsule initialization interception required')
 
     def kill(self, memory, snapshot):
         self.require('native_death')
