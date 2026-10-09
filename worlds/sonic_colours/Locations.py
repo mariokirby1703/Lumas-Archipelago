@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from BaseClasses import Location
 from .world_constants import BASE_ID, GAME, STAGES, WISPS, RANKS, BY_MISSION
+from .capsules import CAPSULES
 
 
 class SonicColoursLocation(Location):
@@ -13,6 +14,7 @@ class LocationData:
     mission: str
     kind: str
     index: int = 0
+    instance_key: str = ''
 
 
 LOCATION_TABLE = {}
@@ -32,6 +34,11 @@ for stage_index, stage in enumerate(STAGES):
         LOCATION_TABLE[f'Game Land {land} - Chaos Emerald Obtained'] = LocationData(base + 16, mission, 'emerald', land)
 for i, wisp in enumerate(WISPS):
     LOCATION_TABLE[f'{wisp} - First Discovery'] = LocationData(BASE_ID + 4000 + i, '', 'wisp', i)
+for capsule in CAPSULES.values():
+    if capsule.name:
+        if capsule.name in LOCATION_TABLE:
+            raise ValueError('capsule display identity collision: ' + capsule.name)
+        LOCATION_TABLE[capsule.name] = LocationData(capsule.code, capsule.mission, 'capsule', instance_key=capsule.key)
 
 
 def enabled(data, options):
@@ -46,4 +53,8 @@ def enabled(data, options):
         return value == 6 or value == data.index + 1
     if data.kind == 'emerald':
         return bool(options.chaos_emerald_checks)
+    if data.kind == 'capsule':
+        capsule = CAPSULES[data.instance_key]
+        mode = options.wisp_capsule_sanity.value
+        return capsule.eligible and (mode == 2 or mode == 1 and capsule.story)
     return bool(options.wisp_discovery_checks)

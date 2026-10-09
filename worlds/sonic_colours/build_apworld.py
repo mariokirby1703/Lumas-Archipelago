@@ -25,7 +25,7 @@ def build(destination):
                 if path.suffix == '.py':
                     ast.parse(content, filename=str(relative))
                 if relative.as_posix() == 'archipelago.json':
-                    content = json.dumps({**json.loads(content), 'version': 1, 'compatible_version': 1}).encode()
+                    content = json.dumps({**json.loads(content), 'version': 2, 'compatible_version': 2}).encode()
                 info = zipfile.ZipInfo(f'sonic_colours/{relative.as_posix()}', (2026, 10, 9, 0, 0, 0))
                 info.compress_type = zipfile.ZIP_DEFLATED
                 info.external_attr = 0o644 << 16

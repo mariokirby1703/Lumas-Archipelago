@@ -7,8 +7,9 @@ EMERALDS = tuple(f'Chaos Emerald {i}' for i in range(1, 8))
 RING_VALUES = {'Red Ring (+1)': 1, 'Red Rings (+5)': 5, 'Red Rings (+10)': 10}
 FILLER = ('Rings (+10)', 'Rings (+25)', 'Rings (+50)', '1-Up')
 TRAPS = ('Ring Loss Trap', 'Swim Everywhere Trap')
-NAMES = WORLD_ITEMS + WISP_ITEMS + EMERALDS + ('Super Sonic Unlock',) + tuple(RING_VALUES) + FILLER + TRAPS
-ITEM_TABLE = {name: BASE_ID + i for i, name in enumerate(NAMES)}
+NAMES = WORLD_ITEMS + WISP_ITEMS + EMERALDS + tuple(RING_VALUES) + FILLER + TRAPS
+# Offset 22 is retired. Existing counter/filler/trap IDs must not move.
+ITEM_TABLE = {name: BASE_ID + i + (1 if i >= 22 else 0) for i, name in enumerate(NAMES)}
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}
 
 

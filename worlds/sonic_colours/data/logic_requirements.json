@@ -1,1724 +1,1724 @@
 {
   "stg110": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg110:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg110:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg110:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg110:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg110:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg130": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg130:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg130:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg130:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg130:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg130:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg120": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg120:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg120:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg120:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg120:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg120:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg140": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg140:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg140:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg140:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg140:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg140:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg150": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg150:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg150:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg150:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg150:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg150:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg160": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg160:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg160:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg160:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg160:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg160:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg190": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg210": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg210:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg210:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg210:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg210:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg210:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg230": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg230:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg230:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg230:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg230:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg230:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg220": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg220:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg220:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg220:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg220:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg220:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg260": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg260:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg260:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg260:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg260:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg260:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg240": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg240:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg240:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg240:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg240:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg240:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg250": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg250:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg250:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg250:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg250:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg250:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg290": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg310": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg310:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg310:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg310:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg310:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg310:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg330": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg330:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg330:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg330:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg330:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg330:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg340": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg340:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg340:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg340:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg340:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg340:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg350": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg350:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg350:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg350:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg350:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg350:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg320": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg320:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg320:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg320:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg320:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg320:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg360": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg360:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg360:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg360:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg360:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg360:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg390": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg410": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg410:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg410:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg410:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg410:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg410:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg440": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg440:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg440:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg440:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg440:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg440:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg450": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg450:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg450:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg450:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg450:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg450:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg430": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg430:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg430:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg430:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg430:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg430:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg460": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg460:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg460:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg460:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg460:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg460:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg420": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg420:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg420:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg420:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg420:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg420:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg490": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg510": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg510:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg510:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg510:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg510:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg510:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg540": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg540:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg540:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg540:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg540:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg540:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg550": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg550:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg550:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg550:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg550:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg550:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg530": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg530:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg530:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg530:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg530:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg530:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg560": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg560:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg560:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg560:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg560:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg560:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg520": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg520:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg520:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg520:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg520:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg520:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg590": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg610": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg610:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg610:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg610:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg610:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg610:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg630": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg630:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg630:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg630:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg630:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg630:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg640": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg640:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg640:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg640:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg640:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg640:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg650": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg650:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg650:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg650:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg650:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg650:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg660": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg660:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg660:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg660:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg660:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg660:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg620": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg620:ring:1": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg620:ring:2": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg620:ring:3": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg620:ring:4": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg620:ring:5": {
     "logic_status": "unknown",
     "requires_all": [],
     "requires_any": [],
     "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "source": "User-authored per-ring requirements pending; conservative all-Wisp pickup fallback"
   },
   "stg690": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg710": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg720": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stg790": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgD10": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgB20": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgE50": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgD20": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgB30": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgF30": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgG10": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgG30": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgA10": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgD30": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgG20": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgC50": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgE30": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgB10": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgE40": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgG40": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgC40": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgF40": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgA30": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgE20": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   },
   "stgC10": {
-    "logic_status": "unknown",
+    "logic_status": "provisional",
     "requires_all": [],
     "requires_any": [],
-    "fallback": "all_wisps",
-    "source": "Awaiting user per-act/per-ring requirements"
+    "fallback": "accessible_clear",
+    "source": "User rework ?P0-1: provisional clear route, exact requirements pending; not native proof"
   }
 }

@@ -47,8 +47,8 @@ def test_thresholds(reduction):
 def test_options_and_yaml():
     path = Path(__file__).parents[1] / 'examples/SonicColours.yaml'
     data = yaml.safe_load(path.read_text())
-    assert data['game'] == 'Sonic Colours'
-    options = data['Sonic Colours']
+    assert data['game'] == 'Sonic Colours (Wii)'
+    options = data['Sonic Colours (Wii)']
     assert set(options) == set(OPTION_NAMES)
     for name, value in options.items():
         cls = SonicColoursOptions.type_hints[name]
@@ -74,7 +74,7 @@ def test_counts(mode, count):
     assert all(item.classification & ItemClassification.progression for item in world.multiworld.itempool
                if item.name in Items.RING_VALUES)
     assert sum(Items.RING_VALUES.get(item.name, 0) for item in world.multiworld.itempool) == 140
-    assert len(world.multiworld.precollected_items[1]) == 8
+    assert len(world.multiworld.precollected_items[1]) == 0
 
 
 @pytest.mark.parametrize('target', range(181))
@@ -101,7 +101,7 @@ def test_fill_100_seeds(settings):
 
 @pytest.mark.parametrize('option,value', [('level_randomization', 'anywhere'), ('level_randomization', 'per_world'),
     ('rank_checks', 'all'), ('rank_checks', 's'), ('death_link', 1), ('swim_trap_weight', 'low'),
-    ('music_randomization', 'anywhere'), ('wisp_discovery_checks', 1), ('goal', 'super_sonic')])
+    ('music_randomization', 'anywhere'), ('wisp_discovery_checks', 1)])
 def test_unverified_options_fail_precisely(option, value):
     for seed in range(100):
         with pytest.raises(ValueError, match='requires_verified_hook'):

@@ -2,9 +2,9 @@
 import json
 from importlib.resources import files
 
-GAME = "Sonic Colours"
+GAME = "Sonic Colours (Wii)"
 BASE_ID = 847000000
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 def load_data(name):
@@ -17,7 +17,7 @@ NORMAL = tuple(s for s in STAGES if s['normal'])
 WORLDS = tuple(dict.fromkeys(s['world'] for s in STAGES if s['zone_index'] < 7))
 WISPS = ('White Boost', 'Cyan Laser', 'Yellow Drill', 'Orange Rocket',
          'Blue Cube', 'Green Hover', 'Pink Spikes', 'Purple Frenzy')
-RANKS = ('S', 'A', 'B', 'C', 'D')
+RANKS = ('S', 'A', 'B', 'C')
 
 
 def game_land_gates(reduction):

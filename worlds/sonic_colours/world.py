@@ -35,8 +35,6 @@ class SonicColoursWorld(World):
             raise ValueError('all_red_rings requires singles or per_level Red Ring checks.')
         if self.options.goal.value == 3 and not self.options.game_land_checks:
             raise ValueError('all_game_land requires game_land_checks=true.')
-        if self.options.goal.value == 4:
-            raise ValueError('super_sonic goal requires_verified_hook: actual transformation event.')
         self.starting_stage = NORMAL[self.options.starting_act.value]
         self.starting_world = self.starting_stage['zone_index']
         self.gates = game_land_gates(self.options.game_land_requirement_reduction.value)
@@ -44,15 +42,13 @@ class SonicColoursWorld(World):
         self.logic = load_data('logic_requirements.json')
         Rules.validate_logic(self.logic)
         self.unknown_logic = tuple(k for k, v in self.logic.items() if v['logic_status'] == 'unknown')
-        # All-Wisp fallback for unknown clears cannot bootstrap itself. Precollect
-        # permissions explicitly, instead of pretending the starting act is Wisp-free.
-        self.compatibility_wisps = bool(self.unknown_logic and self.options.wisp_unlocks.value)
-        if self.compatibility_wisps:
-            for name in Items.WISP_ITEMS:
-                self.multiworld.push_precollected(self.create_item(name))
-        logger.warning('Sonic Colours: research-only seed; %d unknown logic entries; '
-                       'all-Wisp compatibility start=%s; native writes/checks remain blocked.',
-                       len(self.unknown_logic), self.compatibility_wisps)
+        logger.warning('Sonic Colours: provisional clear accessibility; %d unknown logic entries; '
+                       'eight Wisps remain shuffled progression; native feature evidence is separate.',
+                       len(self.unknown_logic))
+        if self.options.wisp_capsule_sanity.value and not any(
+                Locations.LOCATION_TABLE[n].kind == 'capsule' for n in self.active_locations):
+            raise ValueError('wisp_capsule_sanity: no validated accessible capsule instances yet; '
+                             'requires native opening/identity proof; use off.')
         self.stage_mapping = {s['stage_slot_id']: s['mission_id'] for s in STAGES}
 
     def create_regions(self):
@@ -65,12 +61,10 @@ class SonicColoursWorld(World):
         names = []
         if self.options.world_unlocks.value:
             names += [n for i, n in enumerate(Items.WORLD_ITEMS) if i != self.starting_world]
-        if self.options.wisp_unlocks.value and not self.compatibility_wisps:
+        if self.options.wisp_unlocks.value:
             names += list(Items.WISP_ITEMS)
         if self.options.chaos_emerald_items:
             names += list(Items.EMERALDS)
-        if self.options.super_sonic_item:
-            names.append('Super Sonic Unlock')
         needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks or self.options.goal.value == 3)
         self.ring_target = max(self.gates.values()) if needs_land else 0
         names += [Items.ring_name(n) for n in pack_rings(self.ring_target,
@@ -99,7 +93,8 @@ class SonicColoursWorld(World):
                 'research_only': True, 'starting_slot': self.starting_stage['stage_slot_id'],
                 'starting_world': self.starting_world, 'game_land_gates': self.gates,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),
-                'compatibility_wisps': self.compatibility_wisps,
+                'logic_policy': 'provisional_clears_conservative_pickups',
+                'mandatory_prologue': ['stg110', 'stg130'],
                 'locations': {n: Locations.LOCATION_TABLE[n].code for n in self.active_locations},
                 'options': self.options.as_dict(*OPTION_NAMES)}
 
@@ -112,4 +107,4 @@ class SonicColoursWorld(World):
         spoiler_handle.write(f'\nSonic Colours: RESEARCH ONLY; native hooks not live verified.\n'
                              f'Starting slot: {self.starting_stage["name"]}\n'
                              f'Unknown logic entries: {len(self.unknown_logic)}\n'
-                             f'All-Wisp compatibility start: {self.compatibility_wisps}\n')
+                             'Wisps: shuffled; unknown clear routes provisional, optional pickups conservative.\n')

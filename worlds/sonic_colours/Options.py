@@ -8,7 +8,6 @@ class Goal(Choice):
     option_all_story_clears = 1
     option_all_red_rings = 2
     option_all_game_land = 3
-    option_super_sonic = 4
     default = 0
 
 
@@ -19,6 +18,15 @@ class RedRingChecks(Choice):
     option_singles = 1
     option_per_level = 2
     default = 1
+
+
+class WispCapsuleSanity(Choice):
+    """Check individually validated capsule instances. Unvalidated candidates stay excluded."""
+    display_name = "Wisp Capsule Sanity"
+    option_off = 0
+    option_story = 1
+    option_all = 2
+    default = 0
 
 
 class WispUnlocks(Choice):
@@ -89,14 +97,13 @@ class LevelRandomization(Choice):
 
 
 class RankChecks(Choice):
-    """Minimum awarded quality. All creates five locations. Requires live validation."""
+    """Minimum awarded quality. All creates four locations. Requires live validation."""
     display_name = 'Rank Checks'
     option_off = 0
     option_s = 1
     option_a = 2
     option_b = 3
     option_c = 4
-    option_d = 5
     option_all = 6
     default = 0
 
@@ -155,11 +162,6 @@ class ChaosEmeraldItems(DefaultOnToggle):
     display_name = 'Chaos Emerald Items'
 
 
-class SuperSonicItem(Toggle):
-    """Enable super sonic item."""
-    display_name = 'Super Sonic Item'
-
-
 class WispDiscoveryChecks(Toggle):
     """Enable wisp discovery checks."""
     display_name = 'Wisp Discovery Checks'
@@ -192,6 +194,7 @@ class SwimTrapDuration(Range):
 @dataclass
 class SonicColoursOptions(PerGameCommonOptions):
     goal: Goal
+    wisp_capsule_sanity: WispCapsuleSanity
     red_ring_checks: RedRingChecks
     wisp_unlocks: WispUnlocks
     world_unlocks: WorldUnlocks
@@ -205,18 +208,17 @@ class SonicColoursOptions(PerGameCommonOptions):
     game_land_checks: GameLandChecks
     chaos_emerald_checks: ChaosEmeraldChecks
     chaos_emerald_items: ChaosEmeraldItems
-    super_sonic_item: SuperSonicItem
     wisp_discovery_checks: WispDiscoveryChecks
     game_land_requirement_reduction: GameLandRequirementReduction
     trap_percentage: TrapPercentage
     swim_trap_duration: SwimTrapDuration
     death_link: DeathLink
 
-OPTION_NAMES = ('goal', 'red_ring_checks', 'wisp_unlocks', 'world_unlocks', 'starting_act', 'level_randomization', 'rank_checks', 'ring_loss_trap_weight', 'swim_trap_weight', 'music_randomization', 'red_ring_bundle_strategy', 'game_land_checks', 'chaos_emerald_checks', 'chaos_emerald_items', 'super_sonic_item', 'wisp_discovery_checks', 'game_land_requirement_reduction', 'trap_percentage', 'swim_trap_duration', 'death_link')
+OPTION_NAMES = ('wisp_capsule_sanity', 'goal', 'red_ring_checks', 'wisp_unlocks', 'world_unlocks', 'starting_act', 'level_randomization', 'rank_checks', 'ring_loss_trap_weight', 'swim_trap_weight', 'music_randomization', 'red_ring_bundle_strategy', 'game_land_checks', 'chaos_emerald_checks', 'chaos_emerald_items', 'wisp_discovery_checks', 'game_land_requirement_reduction', 'trap_percentage', 'swim_trap_duration', 'death_link')
 
 OPTION_GROUPS = [
-    OptionGroup("Progression", [Goal, StartingAct, WorldUnlocks, WispUnlocks, ChaosEmeraldItems, SuperSonicItem]),
-    OptionGroup("Checks", [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks]),
+    OptionGroup("Progression", [Goal, StartingAct, WorldUnlocks, WispUnlocks, ChaosEmeraldItems]),
+    OptionGroup("Checks", [RedRingChecks, WispCapsuleSanity, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks]),
     OptionGroup("Game Land", [GameLandRequirementReduction, RedRingBundleStrategy]),
     OptionGroup("Experimental", [LevelRandomization, MusicRandomization, DeathLink]),
     OptionGroup("Traps", [TrapPercentage, RingLossTrapWeight, SwimTrapWeight, SwimTrapDuration]),
