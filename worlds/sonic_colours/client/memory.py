@@ -178,18 +178,21 @@ class SonicMemory:
         container = self.read_ptr_checked(manager + 0x30, 8)
         return manager, container
 
-    def resolve_selected_slot(self):
+    def resolve_selected_slot(self, *, allow_working=False):
         manager, container = self.resolve_save_container()
         index = self.read_u8(container)
-        if index > 2:
+        # 8015F9A4 initializes six records; 8015FA18 addresses the selected
+        # record with this exact stride. Index 3 is a native working record,
+        # never a fourth UI slot. Only read accessors may inspect it.
+        if index > (3 if allow_working else 2):
             raise MemoryUnavailable('unknown_selected_slot')
         selected = container + 8 + index * 0x19608
         if not valid_range(selected, 0x19608):
             raise MemoryUnavailable('invalid_save_range')
         return manager, container, index, selected
 
-    def resolve_flags_ptr(self):
-        chain = self.resolve_selected_slot()
+    def resolve_flags_ptr(self, *, allow_working=False):
+        chain = self.resolve_selected_slot(allow_working=allow_working)
         # 8015f940: lwz r3,0(r3); addi r3,r3,0x1c. The lwz unwraps
         # the stack-local selected-save wrapper, not a pointer at save+0x1c.
         return chain + (chain[-1] + 0x1c,)
@@ -222,7 +225,7 @@ class SonicMemory:
             manager = read('manager', VERSION['manager_global_candidate'], pointer_size=0x34)
             container = read('container', manager + 0x30, pointer_size=8)
             index = read('selected_index', container, 1)
-            if index > 2:
+            if index > 3:
                 report['steps'][-1]['reason'] = 'index_out_of_range'
                 raise MemoryUnavailable('index_out_of_range')
             selected = container + 8 + index * 0x19608
@@ -240,7 +243,7 @@ class SonicMemory:
                 raise
             entry.update(reason='ok', hex=bank.hex())
             chain = (manager, container, index, selected, flags)
-            if self.resolve_flags_ptr() != chain:
+            if self.resolve_flags_ptr(allow_working=True) != chain:
                 report['steps'].append({'step': 'context_recheck', 'reason': 'context_changed'})
                 raise MemoryUnavailable('context_changed')
             report['chain'] = chain

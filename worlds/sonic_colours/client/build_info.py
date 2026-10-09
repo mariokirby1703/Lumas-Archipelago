@@ -27,7 +27,9 @@ def implementation_info():
                  native_read.read_result, native_read.read_stage_objects, native_read.read_player,
                  status.StatusReporter.ready, capsule_refresh.payload_words,
                  capsule_refresh.installed, versions.verify_revision, journal.Journal.defer,
-                 SonicMemory.write_bytes_verified)
+                 SonicMemory.write_bytes_verified, SonicMemory.resolve_selected_slot,
+                 native_read._read_stage_objects, native_read.read_saved_progress,
+                 NativeHooks.reject_observation, SaveGuard.suspend, client.dolphin_loop)
     digest = hashlib.sha256()
     for function in functions:
         digest.update(function.__qualname__.encode())

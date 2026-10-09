@@ -288,13 +288,14 @@ async def dolphin_loop(ctx):
                         ctx.runtime.guard.disarm()
                         ctx.runtime.hooks.invalidate_session()
                     raise MemoryUnavailable('Waiting for running Dolphin emulation.')
-                if not verified:
+                if not verified and not ctx.runtime:
                     memory.verify_revision()
                     verified = True
                 if not ctx.runtime:
                     raise MemoryUnavailable('PAL executable verified; waiting for AP slot.')
                 memory.write_guard = WritePolicy(memory, ctx.runtime.guard, ctx.runtime.hooks.snapshot)
                 checks, goal = ctx.runtime.poll(memory, [i.item for i in ctx.items_received], ctx.history_ready)
+                verified = bool((memory.revision_observation or {}).get('verified'))
                 if ctx.deathlink:
                     snap = ctx.runtime.snapshot
                     if VERSION['capabilities']['native_death']:
@@ -311,18 +312,23 @@ async def dolphin_loop(ctx):
                     gameplay_detection={'scene': snap.scene, 'mission': snap.actual_mission, 'verified': snap.scene_verified},
                     pickup_detection={'verified': snap.pickup_verified, 'authorized': ctx.runtime.guard.can_record_pickups(snap)},
                     journal_persistence={'durable_events': len(ctx.runtime.journal.data['pickup_events']), 'earned_checks': len(ctx.runtime.journal.data['checks']), 'persistence_pending': ctx.runtime.journal.persistence_pending},
+                    capsule_refresh=ctx.runtime.hooks.capsule_refresh_status,
                     item_writes={'history_ready': ctx.history_ready, 'pending_receipts': ctx.runtime.pending_effects(), 'status': ctx.runtime.last_error})
-                ctx.dolphin_status = ctx.runtime.guard.reason
+                ctx.dolphin_status = (snap.status if snap.evidence.get('executable_error')
+                                      else ctx.runtime.guard.reason)
             except MemoryUnavailable as error:
                 ctx.dolphin_status = str(error)
                 ctx.operation_status['gameplay_detection'] = str(error)
+                ctx.operation_status['pickup_detection'] = {'verified': False, 'authorized': False}
+                ctx.operation_status['item_writes'] = {'suspended': True, 'reason': str(error)}
                 if ctx.runtime:
                     ctx.runtime.snapshot = None
-                    ctx.runtime.guard.disarm()
+                    if ctx.runtime.hooks.reject_observation(memory.revision_observation, str(error)):
+                        ctx.runtime.guard.disarm()
+                    else:
+                        ctx.runtime.guard.suspend()
                 if str(error).startswith(('wrong_game', 'unknown_revision')):
                     verified = False
-                    if ctx.runtime:
-                        ctx.runtime.hooks.invalidate_session()
             except ConnectionClosed:
                 ctx.dolphin_status = 'AP disconnected; synchronization stopped.'
                 if ctx.runtime:

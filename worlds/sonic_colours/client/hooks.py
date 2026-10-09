@@ -27,6 +27,9 @@ class NativeHooks:
         self.context_key = None
         self.stage_key = None
         self.stage_sequence = 0
+        self.capsule_refresh_status = {'available': False, 'reason': 'not observed'}
+        self.rejected_disc = None
+        self.rejected_disc_polls = 0
         self.progress_rows = load_data('progress_bits.json')
         self.read_validation = load_data('native_read_validation.json')
         bits = {row['mission']: int(row['bank_C']) for row in self.progress_rows}
@@ -37,13 +40,35 @@ class NativeHooks:
             raise ValueError('native clear validation does not match PAL catalog')
 
     def snapshot(self, memory):
-        memory.verify_revision()
+        try:
+            memory.verify_revision()
+        except MemoryUnavailable as error:
+            self.capsule_refresh_status = {'available': False, 'reason': str(error)}
+            # PAL structures can still be observed read-only when executable
+            # changes are unknown. Never attach pickup/save/write authority.
+            observation = memory.revision_observation or {}
+            if observation.get('disc_id') != VERSION['disc_id']:
+                raise
+            try:
+                rows = read_stage_objects(memory)
+            except MemoryUnavailable:
+                rows = []
+            stage = next(iter(rows), {})
+            return Snapshot(f'pal-{self.instance}-{self.session_epoch}', None, None,
+                            stage.get('scene', 'unclassified'), stage.get('mission'),
+                            status=str(error), evidence={'executable_error': str(error),
+                            'native_data': {'stage_objects': rows}})
+        self.rejected_disc, self.rejected_disc_polls = None, 0
         native = {}
         # Document/scene objects exist independently of a selected save. Failure
         # here must not hide previously validated clear reads.
         try:
             native['stage_objects'] = read_stage_objects(memory)
         except MemoryUnavailable as error:
+            if 'stage_context_changed' in str(error):
+                raise
+            # Save observations are independent of absent scene objects (menus,
+            # loading). An unreadable scene is never a witnessed stage exit.
             native['stage_objects_error'] = str(error)
         stage = next(iter(native.get('stage_objects', [])), {})
         application = stage.get('application')
@@ -53,7 +78,7 @@ class NativeHooks:
         session = f'pal-{self.instance}-{self.session_epoch}'
         key = ((stage.get('context'), stage.get('mission'), stage.get('actor_state'))
                if stage.get('mission') else None)
-        if key != self.stage_key:
+        if 'stage_objects_error' not in native and key != self.stage_key:
             self.stage_key = key
             self.stage_sequence += 1
         stage_epoch = f'{session}-stage-{self.stage_sequence}' if key is not None else None
@@ -169,6 +194,19 @@ class NativeHooks:
         self.stage_key = None
         self.stable_polls = 0
 
+    def reject_observation(self, observation, error):
+        """Confirm another game across three nonzero headers, never zero DME data."""
+        disc = (observation or {}).get('disc_id_hex')
+        if not error.startswith('wrong_game') or not disc or disc == '000000000000':
+            self.rejected_disc, self.rejected_disc_polls = None, 0
+            return False
+        self.rejected_disc_polls = self.rejected_disc_polls + 1 if disc == self.rejected_disc else 1
+        self.rejected_disc = disc
+        if self.rejected_disc_polls == 3:
+            self.invalidate_session()
+            return True
+        return False
+
     def require(self, capability):
         if not VERSION['capabilities'].get(capability, False):
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {capability}')
@@ -236,8 +274,13 @@ class NativeHooks:
                 if before != mask:
                     memory.write_u8(address, mask, expected=before, operation='colour_permissions')
         from .capsule_refresh import installed
-        if not installed(memory):
-            raise MemoryUnavailable('Live capsule refresh requires the supplied PAL Gecko code; colour permission writes remain active')
+        try:
+            available = installed(memory)
+            reason = ('verified PAL C2 hook' if available else
+                      'Live capsule refresh requires the supplied PAL Gecko code; colour permission writes remain active')
+        except MemoryUnavailable as error:
+            available, reason = False, str(error)
+        self.capsule_refresh_status = {'available': available, 'reason': reason}
         # The native per-capsule update hook reconciles model mode against
         # this same permission byte. No host writes to actor handlers/models.
 

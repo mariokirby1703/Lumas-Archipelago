@@ -7,6 +7,12 @@ VERSION = load_data('versions.json')
 
 def verify_revision(memory):
     disc = memory.read_bytes(0x80000000, 6)
+    # DME can briefly return a zero-filled header during a coherent PAL run.
+    # Bound retries; never reuse a previous executable identity for writes.
+    for _ in range(2):
+        if disc != b'\0' * 6:
+            break
+        disc = memory.read_bytes(0x80000000, 6)
     revision = memory.read_u8(0x80000007)
     memory.revision_observation = {'time_utc': datetime.now(timezone.utc).isoformat(),
                                    'disc_id': disc.decode('ascii', errors='backslashreplace'),
@@ -19,8 +25,10 @@ def verify_revision(memory):
         data = memory.read_bytes(section['address'], section['size'])
         from .capsule_refresh import HOOK, ORIGINAL, installed
         if section['address'] <= HOOK < section['address'] + section['size']:
-            if installed(memory):
-                offset = HOOK - section['address']
+            offset = HOOK - section['address']
+            instruction = int.from_bytes(data[offset:offset + 4], 'big')
+            memory.revision_observation['capsule_hook_instruction'] = f'0x{instruction:08X}'
+            if instruction != ORIGINAL and installed(memory):
                 data = data[:offset] + ORIGINAL.to_bytes(4, 'big') + data[offset + 4:]
         digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:

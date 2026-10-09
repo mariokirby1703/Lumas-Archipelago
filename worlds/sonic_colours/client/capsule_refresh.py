@@ -102,18 +102,18 @@ def installed(memory):
     instruction=memory.read_u32(HOOK)
     if instruction == ORIGINAL: return False
     if instruction & 0xFC000003 != 0x48000000:
-        raise MemoryUnavailable('unknown_revision: capsule hook instruction differs')
+        raise MemoryUnavailable(f'unknown_revision: capsule hook instruction differs at 0x{HOOK:08X}: observed 0x{instruction:08X}, expected 0x{ORIGINAL:08X} or verified C2 branch')
     displacement=instruction & 0x03fffffc
     if displacement & 0x02000000: displacement-=0x04000000
     target=HOOK+displacement
     words=payload_words()
     if not valid_range(target,len(words)*4):
-        raise MemoryUnavailable('unknown_revision: capsule thunk range')
+        raise MemoryUnavailable(f'unknown_revision: capsule thunk range; hook 0x{HOOK:08X} observed 0x{instruction:08X}, target 0x{target:08X}')
     actual=memory.read_bytes(target,len(words)*4)
     expected=struct.pack('>'+'I'*(len(words)-1),*words[:-1])
     back=int.from_bytes(actual[-4:],'big')
     delta=back & 0x03fffffc
     if delta & 0x02000000: delta-=0x04000000
     if actual[:-4]!=expected or back & 0xFC000003 != 0x48000000 or target+len(actual)-4+delta != HOOK+4:
-        raise MemoryUnavailable('unknown_revision: unrecognized capsule thunk or return')
+        raise MemoryUnavailable(f'unknown_revision: unrecognized capsule thunk or return; hook 0x{HOOK:08X} observed 0x{instruction:08X}, target 0x{target:08X}')
     return True

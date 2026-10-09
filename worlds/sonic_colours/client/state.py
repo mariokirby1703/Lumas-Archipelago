@@ -114,6 +114,10 @@ class SaveGuard:
             self.state = PlaythroughState.UNSAFE
             self.reason = 'unbound_prologue_session_changed: evidence retained; binding needs reconciliation'
             return
+        if (bootstrap['session'] == snapshot.session and snapshot.scene_verified
+                and snapshot.pickup_verified and snapshot.actual_mission in ('stg110', 'stg130')
+                and snapshot.candidate_clears <= frozenset({'stg110', 'stg130'})):
+            self.state = PlaythroughState.MANDATORY_PROLOGUE
         if snapshot.scene == 'save_selection' and snapshot.scene_verified:
             self.state = PlaythroughState.VANILLA_SAVE_SELECTION
         if snapshot.scene in ('global_map', 'world_map', 'game_land_select') and snapshot.scene_verified:
@@ -195,6 +199,10 @@ class SaveGuard:
         self.armed = False
         self.session = None
         self.state = PlaythroughState.DISCONNECTED
+
+    def suspend(self):
+        """Stop writes for this observation without destroying attribution."""
+        self.armed = False
 
 
 class WritePolicy:

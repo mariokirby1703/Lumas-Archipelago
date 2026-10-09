@@ -12,6 +12,16 @@ STAGE_VTABLE = 0x80759438
 
 
 def read_stage_objects(memory):
+    """Bounded retries for essential ownership, never a cached previous frame."""
+    for attempt in range(3):
+        try:
+            return _read_stage_objects(memory)
+        except MemoryUnavailable:
+            if attempt == 2:
+                raise
+
+
+def _read_stage_objects(memory):
     """Read the active context through the document's global module.
 
     800114D0/80014354 create the document and module. 800150C0 dispatches
@@ -36,7 +46,11 @@ def read_stage_objects(memory):
         mode = memory.read_u32(context + 0x74)
         row.update(map_mode=mode, scene={2: 'global_map', 3: 'world_map', 5: 'game_land_select'}.get(mode, 'unclassified'))
         if mode == 3:
-            maps = [actor for actor in read_actors(memory, context) if memory.read_u32(actor) == 0x807773F8]
+            try:
+                maps = [actor for actor in read_actors(memory, context) if memory.read_u32(actor) == 0x807773F8]
+            except MemoryUnavailable as error:
+                maps = []
+                row['map_actor_error'] = str(error)
             if len(maps) == 1:
                 actor = maps[0]
                 zone, status = memory.read_u32(actor + 0xa8), memory.read_u32(actor + 0x1f8)
@@ -51,10 +65,6 @@ def read_stage_objects(memory):
         if len(mission) != 6 or not mission.startswith(b'stg') or not mission[3:].isalnum():
             raise MemoryUnavailable('invalid_stage_mission_name')
         row['mission'] = mission.decode('ascii')
-        try:
-            row.update(read_mission_metadata(memory, name, row['mission']))
-        except MemoryUnavailable as error:
-            row['metadata_error'] = str(error)
         state = memory.read_bytes(stage + 0x30, 24)
         handler = int.from_bytes(state[20:24], 'big')
         current = int.from_bytes(state[8:12], 'big')
@@ -86,16 +96,6 @@ def read_stage_objects(memory):
                        ring_mirror_address=actor_state + 0x40,
                        player_actor_id=memory.read_u32(actor_state + 0x38),
                        current_red_ring_mask=memory.read_u8(actor_state + 0x91) & 31)
-            try:
-                actors = read_actors(memory, stage)
-                row['player'] = read_player(memory, stage, row['player_actor_id'], actors)
-            except MemoryUnavailable as error:
-                row['player_error'] = str(error)
-            else:
-                try:
-                    row['capsules'] = read_capsules(memory, stage, row['mission'], actors)
-                except MemoryUnavailable as error:
-                    row['capsule_error'] = str(error)
     if (memory.read_u32(APPLICATION_GLOBAL) != application or
             memory.read_u32(application + 4) != document or
             memory.read_u32(document + 0x1c) != module or
@@ -110,6 +110,44 @@ def read_stage_objects(memory):
                                        memory.read_u32(context + 0x114) != actor_state or
                                        actor_state and memory.read_u32(actor_state + 0x38) != row['player_actor_id'])):
         raise MemoryUnavailable('stage_context_changed')
+    # Publish essential scene/mission/pickup ownership before walking mutable
+    # actors. Secondary failures cannot erase the coherent essential frame.
+    if vtable == STAGE_VTABLE:
+        def coherent():
+            return (memory.read_u32(APPLICATION_GLOBAL) == application and
+                    memory.read_u32(application + 4) == document and
+                    memory.read_u32(document + 0x1c) == module and
+                    memory.read_u32(module + 0x34) == stage and
+                    memory.read_u32(module + 0x38) == world and
+                    memory.read_u32(stage + 0x4c) == name and
+                    memory.read_u32(stage + 0x114) == actor_state and
+                    (not actor_state or memory.read_u32(actor_state + 0x38) == row['player_actor_id']) and
+                    memory.read_bytes(stage + 0x30, 24) == state)
+        try:
+            row.update(read_mission_metadata(memory, name, row['mission']))
+        except MemoryUnavailable as error:
+            row['metadata_error'] = str(error)
+        if actor_state:
+            try:
+                actors = read_actors(memory, stage)
+                player = read_player(memory, stage, row['player_actor_id'], actors)
+                if not coherent():
+                    raise MemoryUnavailable('stage_context_changed')
+                row['player'] = player
+            except MemoryUnavailable as error:
+                row['player_error'] = str(error)
+            else:
+                try:
+                    capsules = read_capsules(memory, stage, row['mission'], actors)
+                    if not coherent():
+                        raise MemoryUnavailable('stage_context_changed')
+                    row['capsules'] = capsules
+                except MemoryUnavailable as error:
+                    row['capsule_error'] = str(error)
+        # A real stage replacement during the optional scan invalidates the
+        # whole observation. Optional actor/capsule errors alone do not.
+        if not coherent():
+            raise MemoryUnavailable('stage_context_changed')
     return [row]
 
 
@@ -264,7 +302,7 @@ def read_saved_progress(memory, rows):
     8015F94C, indexed by the native table accessor 8007F18C, written by
     8016CCAC..8016CCC0. The raw rank byte is retained alongside score/time.
     """
-    chain = memory.resolve_flags_ptr()
+    chain = memory.resolve_flags_ptr(allow_working=True)
     selected, flags = chain[-2:]
     bank = memory.read_bytes(flags + 0x10, 64)
     table = memory.read_ptr_checked(STAGE_TABLE_GLOBAL, 0x6d8)
@@ -299,7 +337,7 @@ def read_saved_progress(memory, rows):
                 if word & (1 << (bit % 32)):
                     collected.append(ring + 1)
             rings[row['mission']] = collected
-    if (memory.resolve_flags_ptr() != chain or memory.read_u32(STAGE_TABLE_GLOBAL) != table or
+    if (memory.resolve_flags_ptr(allow_working=True) != chain or memory.read_u32(STAGE_TABLE_GLOBAL) != table or
             memory.read_bytes(table, 0x6d8) != table_rows or
             memory.read_bytes(selected + 0xac, 66 * 12) != record_bytes or
             memory.read_bytes(flags + 0x10, 64) != bank or profile() != profile_hex):

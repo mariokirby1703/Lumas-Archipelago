@@ -74,7 +74,7 @@ class SaveBinding:
             record = current[INTRO[0]]
             if INTRO[0] in snapshot.persisted_clears and 0 <= record['raw_rank'] <= 4 and record['time_raw'] > 0:
                 self.first_record = record
-        if (self.second_act_seen and self.first_record == current[INTRO[0]]
+        if (index <= 2 and self.second_act_seen and self.first_record == current[INTRO[0]]
                 and snapshot.scene in ('global_map', 'world_map') and snapshot.scene_verified
                 and snapshot.persisted_clears == frozenset(INTRO)
                 and 0 <= current[INTRO[1]]['raw_rank'] <= 4 and current[INTRO[1]]['time_raw'] > 0):

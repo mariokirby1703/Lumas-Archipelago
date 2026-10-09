@@ -83,14 +83,21 @@ def test_original_intro_native_stats_writer_and_receipt_once(tmp_path):
 
 
 @pytest.mark.skipif(not PAIRS, reason='private original captures absent')
-def test_original_intro_binding_resume_and_world_gate_write(tmp_path):
+@pytest.mark.parametrize('working_record', [False, True])
+def test_original_intro_binding_resume_and_world_gate_write(tmp_path, working_record):
     data=generate({'wisp_unlocks':'vanilla'}).worlds[1].fill_slot_data()
     with Journal(tmp_path, IDENTITY) as journal:
         hooks=NativeHooks(journal); guard=SaveGuard(journal)
         runtime=Runtime(data,journal,guard,hooks)
         for stamp in ('200443','202546','205502'):
             pair=next(p for p in PAIRS if stamp in p[0].name)
-            runtime.poll(SonicMemory(DumpBackend(*pair)),[],False)
+            backend = Overlay(pair)
+            memory = SonicMemory(backend)
+            if working_record and stamp != '205502':
+                chain = memory.resolve_selected_slot()
+                backend.write_bytes(chain[1] + 8 + 3*0x19608, memory.read_bytes(chain[3], 0x19608))
+                backend.write_bytes(chain[1], b'\x03')
+            runtime.poll(memory,[],False)
         assert journal.data['save_identity']
         assert runtime.snapshot.save_identity_verified
         # New host/Dolphin session can match the persisted native witness.
@@ -131,7 +138,8 @@ def test_original_capsule_identity_colour_and_consumption(tmp_path):
     assert rejected.pickup_verified
 
 
-def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, monkeypatch):
+@pytest.mark.parametrize('working_record, live_hook', [(False, False), (True, False), (True, True)])
+def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, monkeypatch, working_record, live_hook):
     import websockets
     from NetUtils import Endpoint, encode, decode, NetworkSlot, SlotType, NetworkPlayer
     from CommonClient import process_server_cmd
@@ -180,6 +188,14 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
                 if PAIRS:
                     backend = Overlay(PAIRS[0])
                     memory = SonicMemory(backend)
+                    if working_record:
+                        chain = memory.resolve_selected_slot()
+                        backend.write_bytes(chain[1] + 8 + 3 * 0x19608,
+                                            memory.read_bytes(chain[3], 0x19608))
+                        backend.write_bytes(chain[1], b'\x03')
+                    if live_hook:
+                        from .test_regression_97c99654 import hook
+                        hook(backend)
                     memory.write_guard = WritePolicy(memory, guard, runtime.hooks.snapshot)
                     first = runtime.hooks.snapshot(memory)
                     ring_mask_address = first.evidence['native_data']['stage_objects'][0]['actor_state'] + 0x91
@@ -221,7 +237,16 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
                 if memory:
                     for stamp, act in (('201102', 1), ('202546', 2)):
                         pair = next(p for p in PAIRS if stamp in p[0].name)
-                        checks, goal = runtime.poll(SonicMemory(Overlay(pair)), [], False)
+                        result_backend = Overlay(pair)
+                        result_memory = SonicMemory(result_backend)
+                        if working_record:
+                            chain = result_memory.resolve_selected_slot()
+                            result_backend.write_bytes(chain[1] + 8 + 3 * 0x19608,
+                                                       result_memory.read_bytes(chain[3], 0x19608))
+                            result_backend.write_bytes(chain[1], b'\x03')
+                        if live_hook:
+                            hook(result_backend)
+                        checks, goal = runtime.poll(result_memory, [], False)
                         await transmit_checks(ctx, checks, goal)
                         for _ in range(2):
                             for packet in decode(await asyncio.wait_for(socket.recv(), 3)):
@@ -281,8 +306,9 @@ def test_original_bound_colour_permission_fields_and_no_physical_ring_mutation(t
         for _ in range(3):runtime.poll(memory,[],False)
         before=runtime.snapshot.persisted_rings
         owned=inventory([ITEM_TABLE['Cyan Laser Wisp']])
-        with pytest.raises(MemoryUnavailable,match='Gecko'):
-            hooks.project_permissions(memory,runtime.snapshot,owned,data)
+        hooks.project_permissions(memory,runtime.snapshot,owned,data)
+        assert not hooks.capsule_refresh_status['available']
+        assert 'Gecko' in hooks.capsule_refresh_status['reason']
         stage=runtime.snapshot.evidence['native_data']['stage_objects'][0]
         assert memory.read_u8(stage['stage']+0x61)==2
         assert memory.read_u8(stage['actor_state']+0x90)==2

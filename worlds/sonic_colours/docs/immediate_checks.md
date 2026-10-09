@@ -235,3 +235,40 @@ Failed journal fsync now holds transmission and retries local persistence even
 when AP is offline or a per-level mask has no completed check yet. Automatic
 intro detection also seeds the native binding witness on its first observed
 fresh poll, rather than depending on a second poll or a manual command.
+
+## Regression repair after 97c99654
+
+Executable validation takes the capsule-hook instruction from the same text
+section being hashed. An unmodified PAL section does not depend on a separate
+optional hook read. Recognized C2 payloads retain exact instruction and return
+validation; unknown modifications block all writes and new check attribution,
+while scene/mission observations remain read-only. Failures include the actual
+observed hook instruction. Capsule refresh availability is a separate status;
+an absent hook does not throw a permission-delivery error.
+
+Essential scene ownership is retried at most three times. Mutable player and
+capsule scans run separately; their failures do not erase essential mission or
+Red Ring observations. Real owner/context changes still reject the complete
+frame. Rejected reads never advance a stage epoch. Zero-filled headers receive
+two bounded retries, and transient failures suspend writes without discarding
+the same-process intro bootstrap or authenticated server identity.
+
+PAL 8015F9A4 initializes six native records; 8015FA18 computes their addresses
+using stride 19608. The reported pre-save index 03 can therefore be inspected
+through the native accessor. It is treated as a working record for intro
+freshness evidence, not a fourth UI save: persistent writes and first-save
+binding remain restricted to indices 0..2. Its flags and rank records must
+independently satisfy the existing freshness checks. The full lifecycle of
+indices 3..5 has not been live traced.
+
+Offline regressions exercise original captures with writable overlays, bounded
+read failures, modified executable rejection, intro working-record permissions,
+first-save reconciliation and CommonClient WebSocket acknowledgements before
+ReceivedItems. They preserve the existing deferred counter-delivery tests.
+The generated C2 entry/return matches Dolphin's documented codehandler; the PAL
+hook immediately follows a native call and has no live volatile FPR values in
+its remaining instructions. Native model replacement and exit/entry routines
+remain the existing implementations. Tests do not execute their allocator,
+renderer or collision routines. Actual Dolphin-installed hook bytes, capsule
+refresh appearance/collision, GUI transport and counter HUD behavior still
+require live gameplay validation; no emulation was available for this repair.
