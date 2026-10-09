@@ -25,6 +25,8 @@ def diagnostic(ctx, memory=None):
               'expected_revision': VERSION['revision'], 'live_verified': VERSION['live_verified'],
               'capabilities': VERSION['capabilities'], 'save_armed': False,
               'patches_installed': [], 'death_link': 'disabled: native death unverified'}
+    result['operation_status'] = dict(getattr(ctx, 'operation_status', {}))
+    result['authenticated_ap_identity'] = getattr(ctx, 'authenticated_identity', None)
     result.update(implementation=getattr(ctx, 'implementation', None) or implementation_info(),
                   current_status_time_utc=getattr(ctx, 'status_time_utc', None),
                   dolphin_instance=getattr(ctx, 'dolphin_instance', None),

@@ -104,7 +104,7 @@ def test_new_game_prologue_any_slot_binding_resume_and_switch():
             runtime = Runtime(data, journal, guard, hooks)
             memory = SonicMemory(FakeBackend())
             guard.confirm_new_game()
-            hooks.value = snapshot(save_identity=None, visible_slot=None, new_game_verified=True,
+            hooks.value = snapshot(save_identity=None, visible_slot=None, actual_mission='stg110', new_game_verified=True,
                 scene_verified=True, fresh_fields=(True, True), progress_verified=True,
                 persisted_clears=frozenset({'stg110'}))
             assert runtime.poll(memory, [], False) == (set(), False)

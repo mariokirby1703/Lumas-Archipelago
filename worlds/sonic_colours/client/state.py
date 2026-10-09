@@ -59,7 +59,7 @@ class SaveGuard:
         self.session = None
         self.operator_confirmed = False
         self.state = PlaythroughState.UNBOUND_BOOTSTRAP
-        self.reason = 'Choose New Game for a new seed; /sonicnewgame confirms intent.'
+        self.reason = 'Choose New Game for a new seed; native intro detection is automatic.'
 
     def confirm_new_game(self):
         if self.journal.data['save_identity'] is not None:
@@ -93,9 +93,10 @@ class SaveGuard:
             return
         bootstrap = self.journal.data.get('bootstrap')
         if bootstrap is None:
-            if not (self.operator_confirmed and snapshot.new_game_verified and snapshot.scene_verified
+            if not (snapshot.new_game_verified and snapshot.scene_verified
+                    and snapshot.actual_mission == 'stg110'
                     and len(snapshot.fresh_fields) >= 2 and all(snapshot.fresh_fields)):
-                self.reason = 'new_game_indicator_unverified: confirmation needs native menu and freshness evidence'
+                self.reason = 'new_game_indicator_unverified: waiting for native intro and freshness evidence'
                 return
             bootstrap = {'epoch': uuid.uuid4().hex, 'session': snapshot.session, 'checks': [],
                          'observed_missions': [], 'goal': False}

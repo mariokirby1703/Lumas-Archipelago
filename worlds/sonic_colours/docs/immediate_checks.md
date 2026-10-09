@@ -9,9 +9,9 @@ not complete every requested feature. Dolphin was probed through DME and reporte
 Build/install `sonic_colours.apworld` and regenerate the seed with this version.
 For an initial pickup test use `examples/SonicColours_Native_Test.yaml`. Launch
 the registered Sonic Colours client, connect to the AP slot before playing,
-select New Game and issue `/sonicnewgame` before collecting anything. The command
-records intent; exact native factory flags, untouched records and intro Act 1
-must also match. Existing saves cannot establish a new seed binding.
+select New Game before collecting anything. Detection is automatic; `/sonicnewgame`
+is an optional confirmation. exact native factory flags, untouched records and intro Act 1
+must match. Existing saves cannot establish a new seed binding.
 
 Collect a Red Ring in intro Act 1. The log should show `Pickup detected`,
 `Location queued`, `LocationChecks sent`, then `Location acknowledged` from the
@@ -93,3 +93,18 @@ Validation: the complete Sonic suite passed 489 tests before the added ZIP-impor
 regression; that regression and the two packaging tests subsequently passed.
 The effective test suite contains 490 cases, including 13 private original
 RAM capture pairs and a real local WebSocket roundtrip with a lost ACK.
+
+## Server identity repair
+
+The client now tracks the actual `RoomInfo.seed_name` independently of the unset
+CommonClient `seed_name`, requires it before accepting Connected slot data, and
+authenticates the team/slot/server-seed tuple for transport. An idle queue never
+reports a transport identity failure. Diagnostics separate gameplay, pickup,
+journal, transport and item-write status. The WebSocket regression starts with
+`ctx.seed_name=None` and processes RoomInfo/Connect/Connected through CommonClient.
+Dolphin again reported `noEmu`; GUI/live ring delivery acceptance remains pending.
+
+Failed journal fsync now holds transmission and retries local persistence even
+when AP is offline or a per-level mask has no completed check yet. Automatic
+intro detection also seeds the native binding witness on its first observed
+fresh poll, rather than depending on a second poll or a manual command.

@@ -23,7 +23,7 @@ from .build_info import implementation_info
 
 class SonicCommands(ClientCommandProcessor):
     def _cmd_sonicnewgame(self):
-        """Confirm New Game intent. Native menu/freshness evidence is also required."""
+        """Optional New Game confirmation; native detection is automatic and freshness is still required."""
         if not self.ctx.runtime:
             logger.info('Connect to your Sonic Colours (Wii) seed first.')
             return
@@ -72,6 +72,9 @@ class SonicContext(CommonContext):
         self.history_desynced = False
         self.barrier = None
         self.dolphin_status = 'Waiting for Dolphin and AP slot.'
+        self.server_seed = None
+        self.authenticated_identity = None
+        self.operation_status = {}
         self.expected_seed = None
         self.expected_slot_data = None
         self.last_send = 0.0
@@ -110,7 +113,11 @@ class SonicContext(CommonContext):
             self.deathlink.receive(data, time.monotonic())
 
     def on_package(self, cmd, args):
-        if cmd == 'Connected':
+        if cmd == 'RoomInfo':
+            self.authenticated_identity = None
+            seed = args.get('seed_name')
+            self.server_seed = seed if isinstance(seed, str) and seed else None
+        elif cmd == 'Connected':
             self.history_ready = False
             self.history_desynced = False
             self.locations_checked = set()
@@ -122,9 +129,12 @@ class SonicContext(CommonContext):
                 data = validate_slot(args['slot_data'])
                 if self.expected_slot_data and data != self.expected_slot_data:
                     raise ValueError('server slot data differs from loaded .apsonic file')
-                if self.seed_name and data['seed_name'] != self.seed_name:
-                    raise ValueError('RoomInfo and slot seed identity mismatch')
-                identity = {'seed': data['seed_name'], 'team': self.team, 'slot': self.slot,
+                if not self.server_seed:
+                    raise ValueError('Connected requires a valid preceding RoomInfo server seed')
+                if data['seed_name'] != self.server_seed:
+                    raise ValueError(f'RoomInfo/Connected seed mismatch: team={self.team!r} slot={self.slot!r} server_seed={self.server_seed!r} slot_seed={data["seed_name"]!r}')
+                self.authenticated_identity = (self.team, self.slot, self.server_seed)
+                identity = {'seed': self.server_seed, 'team': self.team, 'slot': self.slot,
                             'revision': VERSION['dol_sha256'], 'game': GAME,
                             'slot_digest': hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()}
                 if not self.runtime or self.runtime.journal.identity != identity:
@@ -138,10 +148,11 @@ class SonicContext(CommonContext):
                 # handles AP's omitted empty ReceivedItems without a timeout guess.
                 self.barrier = f'_sonic_history_{time.monotonic_ns()}'
                 asyncio.create_task(self.send_msgs([{'cmd': 'Get', 'keys': [self.barrier]}]))
-                logger.warning('Sonic Colours (Wii) slot connected. For a new seed choose New Game and '
-                               '/sonicnewgame. Intro evidence is retained until a verified save binding; '
+                logger.warning('Sonic Colours (Wii) slot connected. For a new seed choose New Game; '
+                               'the client detects the mandatory intro automatically. Intro evidence is retained until a verified save binding; '
                                '/sonicdebug shows individual native proof gaps.')
             except (ValueError, KeyError, OSError) as error:
+                self.authenticated_identity = None
                 self.release_runtime()
                 self.dolphin_status = f'Slot rejected: {error}'
                 logger.error(self.dolphin_status)
@@ -178,6 +189,8 @@ class SonicContext(CommonContext):
         # Keep the already authenticated seed's native observer while offline.
         # Reconnecting to another identity replaces it in Connected, before sends.
         super().reset_server_state()
+        self.server_seed = None
+        self.authenticated_identity = None
         self.history_ready = False
         self.history_desynced = False
         self.barrier = None
@@ -194,17 +207,34 @@ class SonicContext(CommonContext):
 
 async def transmit_checks(ctx, checks=(), goal=False):
     """Send earned durable checks even if Dolphin is stopped or history pending."""
-    if not ctx.runtime or not ctx.server or ctx.slot is None:
+    if not ctx.runtime:
         return
-    identity = ctx.runtime.journal.identity
-    if (identity['team'], identity['slot'], identity['seed']) != (ctx.team, ctx.slot, ctx.seed_name):
-        raise MemoryUnavailable('Location transport identity differs from authenticated AP slot')
+    if ctx.runtime.journal.persistence_pending:
+        ctx.operation_status['journal_persistence'] = 'retrying failed journal persistence; transport held'
+        ctx.runtime.journal.save()
+        ctx.operation_status['journal_persistence'] = 'durable journal persistence retry succeeded'
+    if not ctx.server or ctx.slot is None:
+        ctx.operation_status['ap_transport'] = 'offline; durable queue retained'
+        return
     earned = set(checks) | set(ctx.runtime.journal.data['checks'])
     pending = earned - ctx.checked_locations
+    if not pending and not (goal and not ctx.finished_game):
+        ctx.operation_status['ap_transport'] = 'idle: no pending checks or goal'
+        return
+    identity = ctx.runtime.journal.identity
+    expected = (identity['team'], identity['slot'], identity['seed'])
+    actual = ctx.authenticated_identity
+    if actual != expected or actual != (ctx.team, ctx.slot, ctx.server_seed):
+        message = ('Location transport identity mismatch: journal team=%r slot=%r seed=%r; '
+                   'authenticated=%r; current team=%r slot=%r server seed=%r' %
+                   (*expected, actual, ctx.team, ctx.slot, ctx.server_seed))
+        ctx.operation_status['ap_transport'] = message
+        raise MemoryUnavailable(message)
     if pending and (pending != ctx.last_pending or time.monotonic() - ctx.last_send >= 5):
         await ctx.send_msgs([{'cmd': 'LocationChecks', 'locations': sorted(pending)}])
         logger.info('LocationChecks sent: %s', sorted(pending))
         ctx.last_pending, ctx.last_send = pending.copy(), time.monotonic()
+        ctx.operation_status['ap_transport'] = 'sent; awaiting server acknowledgement'
     if goal and not ctx.finished_game:
         await ctx.send_msgs([{'cmd': 'StatusUpdate', 'status': ClientStatus.CLIENT_GOAL}])
         ctx.finished_game = True
@@ -264,9 +294,16 @@ async def dolphin_loop(ctx):
                             await ctx.send_death('Sonic died.')
                 # Runtime returns durable checks only after current attribution
                 # is valid. Do not bypass its identity gate by rereading journal.
-                ctx.dolphin_status = ctx.runtime.last_error or 'PAL synchronization active.'
+                snap = ctx.runtime.snapshot
+                ctx.operation_status.update(
+                    gameplay_detection={'scene': snap.scene, 'mission': snap.actual_mission, 'verified': snap.scene_verified},
+                    pickup_detection={'verified': snap.pickup_verified, 'authorized': ctx.runtime.guard.can_record_pickups(snap)},
+                    journal_persistence={'durable_events': len(ctx.runtime.journal.data['pickup_events']), 'earned_checks': len(ctx.runtime.journal.data['checks']), 'persistence_pending': ctx.runtime.journal.persistence_pending},
+                    item_writes={'history_ready': ctx.history_ready, 'pending_receipts': ctx.runtime.pending_effects(), 'status': ctx.runtime.last_error})
+                ctx.dolphin_status = ctx.runtime.guard.reason
             except MemoryUnavailable as error:
                 ctx.dolphin_status = str(error)
+                ctx.operation_status['gameplay_detection'] = str(error)
                 if ctx.runtime:
                     ctx.runtime.snapshot = None
                     ctx.runtime.guard.disarm()
@@ -289,7 +326,7 @@ async def dolphin_loop(ctx):
             try:
                 await transmit_checks(ctx, checks, goal)
             except (ConnectionClosed, MemoryUnavailable, OSError) as error:
-                ctx.dolphin_status = f'Location transmission pending: {error}'
+                ctx.operation_status['ap_transport'] = f'Location transmission pending: {error}'
             if ctx.dolphin_status != last_status:
                 ctx.status_time_utc = datetime.now(timezone.utc).isoformat()
                 logger.info('Current Dolphin status [%s, instance=%s]: %s', ctx.status_time_utc,

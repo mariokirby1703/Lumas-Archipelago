@@ -63,10 +63,10 @@ class SaveBinding:
                            visible_slot=index + 1,
                            evidence={**snapshot.evidence, 'save_binding_proof': binding['kind']},
                            status='seeded native save/profile/intro records attributed; live gameplay verification pending')
-        if not bootstrap or bootstrap['session'] != snapshot.session:
-            return snapshot
         if snapshot.new_game_verified and snapshot.actual_mission == INTRO[0]:
             self.intro_session = snapshot.session
+        if not bootstrap or bootstrap['session'] != snapshot.session:
+            return snapshot
         if self.intro_session != snapshot.session:
             return snapshot
         if snapshot.actual_mission == INTRO[1] and snapshot.scene in ('gameplay', 'results'):

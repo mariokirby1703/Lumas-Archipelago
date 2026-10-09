@@ -22,6 +22,7 @@ class Journal:
         self.path = directory / (digest + '.json')
         self.lock = open(directory / (digest + '.lock'), 'a+b')
         self.closed = False
+        self.persistence_pending = False
         try:
             self.lock.seek(0)
             if self.lock.read(1) == b'':
@@ -55,6 +56,7 @@ class Journal:
     def save(self):
         if self.closed:
             raise RuntimeError('journal closed')
+        self.persistence_pending = True
         fd, temporary = tempfile.mkstemp(prefix=self.path.stem, suffix='.tmp', dir=self.path.parent)
         try:
             with os.fdopen(fd, 'w', encoding='utf-8') as handle:
@@ -71,6 +73,7 @@ class Journal:
         finally:
             if os.path.exists(temporary):
                 os.unlink(temporary)
+        self.persistence_pending = False
 
     def record_history(self, item_ids):
         previous = self.data['receipts']

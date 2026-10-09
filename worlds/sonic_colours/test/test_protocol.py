@@ -1,4 +1,5 @@
 import asyncio
+import pytest
 from pathlib import Path
 import tempfile
 
@@ -14,7 +15,8 @@ def test_connected_receipts_empty_history_barrier_and_reconnect():
     async def scenario(directory):
         data = generate().worlds[1].fill_slot_data()
         ctx = SonicContext(journal_directory=directory)
-        ctx.team, ctx.slot, ctx.seed_name = 0, 1, data['seed_name']
+        ctx.team, ctx.slot = 0, 1
+        ctx.on_package('RoomInfo', {'seed_name': data['seed_name']})
         sent = []
         async def send(messages): sent.extend(messages)
         ctx.send_msgs = send
@@ -54,6 +56,7 @@ def test_seed_file_mismatch_and_launcher_registration():
         data = world.fill_slot_data()
         data['seed_name'] = 'another-seed'
         ctx.team, ctx.slot = 0, 1
+        ctx.on_package('RoomInfo', {'seed_name': data['seed_name']})
         ctx.on_package('Connected', {'slot_data': data})
         assert ctx.runtime is None and 'differs' in ctx.dolphin_status
         await ctx.shutdown()
@@ -80,4 +83,58 @@ def test_diagnostics_only_report_server_acknowledged_checks(tmp_path):
         ctx.on_package('RoomUpdate', {'checked_locations': [847001000]})
         assert diagnostic(ctx)['latest_acknowledged_location'] == first['latest_acknowledged_location']
         await ctx.shutdown()
+    asyncio.run(scenario())
+
+def test_roominfo_mismatch_rejects_slot_and_idle_transport_has_no_identity_error(tmp_path):
+    from ..client.client import transmit_checks
+    async def scenario():
+        data=generate().worlds[1].fill_slot_data()
+        ctx=SonicContext(journal_directory=tmp_path)
+        assert ctx.seed_name is None
+        ctx.team,ctx.slot=0,1
+        ctx.on_package('RoomInfo',{'seed_name':'other-server-seed'})
+        ctx.on_package('Connected',{'slot_data':data})
+        assert ctx.runtime is None and ctx.authenticated_identity is None
+        assert 'mismatch' in ctx.dolphin_status
+        ctx.on_package('RoomInfo',{'seed_name':data['seed_name']})
+        async def send(messages): pass
+        ctx.send_msgs=send
+        ctx.on_package('Connected',{'slot_data':data})
+        ctx.server=object()
+        ctx.authenticated_identity=None
+        await transmit_checks(ctx)
+        assert ctx.operation_status['ap_transport']=='idle: no pending checks or goal'
+        ctx.server=None
+        ctx.release_runtime();await ctx.shutdown()
+    asyncio.run(scenario())
+
+def test_transport_retries_failed_journal_fsync_before_sending(tmp_path, monkeypatch):
+    from ..client.client import transmit_checks
+    from ..client import journal as journal_module
+    async def scenario():
+        data=generate().worlds[1].fill_slot_data()
+        ctx=SonicContext(journal_directory=tmp_path)
+        ctx.team,ctx.slot=0,1
+        ctx.on_package('RoomInfo',{'seed_name':data['seed_name']})
+        sent=[]
+        async def send(messages):sent.extend(messages)
+        ctx.send_msgs=send
+        ctx.on_package('Connected',{'slot_data':data})
+        await asyncio.sleep(0)
+        sent.clear();ctx.server=object()
+        journal=ctx.runtime.journal
+        original=journal_module.os.fsync
+        def failure(fd):raise OSError('test disk persistence failure')
+        monkeypatch.setattr(journal_module.os,'fsync',failure)
+        code=next(iter(data['locations'].values()))
+        with pytest.raises(OSError):
+            journal.record_pickups([{'kind':'red_ring','mission':'stg110','ring':1}],{'stg110':1},{code})
+        assert journal.persistence_pending
+        with pytest.raises(OSError):await transmit_checks(ctx)
+        assert not sent
+        monkeypatch.setattr(journal_module.os,'fsync',original)
+        await transmit_checks(ctx)
+        assert not journal.persistence_pending
+        assert sent==[{'cmd':'LocationChecks','locations':[code]}]
+        ctx.server=None;ctx.release_runtime();await ctx.shutdown()
     asyncio.run(scenario())

@@ -60,7 +60,7 @@ def test_original_intro_native_stats_writer_and_receipt_once(tmp_path):
     backend=Overlay(PAIRS[0]); memory=SonicMemory(backend)
     data=generate().worlds[1].fill_slot_data()
     with Journal(tmp_path, IDENTITY) as journal:
-        hooks=NativeHooks(journal); guard=SaveGuard(journal); guard.confirm_new_game()
+        hooks=NativeHooks(journal); guard=SaveGuard(journal)
         runtime=Runtime(data,journal,guard,hooks)
         memory.write_guard=WritePolicy(memory,guard,hooks.snapshot)
         for _ in range(3): runtime.poll(memory,[],False)
@@ -80,9 +80,9 @@ def test_original_intro_native_stats_writer_and_receipt_once(tmp_path):
 def test_original_intro_binding_resume_and_world_gate_write(tmp_path):
     data=generate({'wisp_unlocks':'vanilla'}).worlds[1].fill_slot_data()
     with Journal(tmp_path, IDENTITY) as journal:
-        hooks=NativeHooks(journal); guard=SaveGuard(journal); guard.confirm_new_game()
+        hooks=NativeHooks(journal); guard=SaveGuard(journal)
         runtime=Runtime(data,journal,guard,hooks)
-        for stamp in ('200443','200443','202546','205502'):
+        for stamp in ('200443','202546','205502'):
             pair=next(p for p in PAIRS if stamp in p[0].name)
             runtime.poll(SonicMemory(DumpBackend(*pair)),[],False)
         assert journal.data['save_identity']
@@ -135,10 +135,16 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
     async def scenario():
         data=generate().worlds[1].fill_slot_data()
         ctx=SonicContext(journal_directory=tmp_path)
-        ctx.seed_name=data['seed_name']
+        assert ctx.seed_name is None
+        ctx.auth = 'SonicPlayer'
         received=[]; checks_received=0
         async def server(socket):
             nonlocal checks_received
+            await socket.send(encode([{'cmd':'RoomInfo','seed_name':data['seed_name'],
+                'version':[0,7,0],'tags':[],'password':False,'games':[],
+                'hint_cost':10,'location_check_points':1}]))
+            for packet in decode(await socket.recv()):
+                assert packet['cmd']=='Connect'
             await socket.send(encode([{'cmd':'Connected','team':0,'slot':1,
                 'players':[NetworkPlayer(0,1,'SonicPlayer','SonicPlayer')],
                 'slot_info':{1:NetworkSlot('SonicPlayer',data['game'],SlotType.player)},
@@ -152,20 +158,36 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
                         if checks_received == 1:
                             continue  # Synthetic packet/ACK loss; retained journal must retry.
                         await socket.send(encode([{'cmd':'RoomUpdate','checked_locations':packet['locations']}]))
+                        await socket.send(encode([{'cmd':'ReceivedItems','index':0,'items':[[ITEM_TABLE['Rings (+10)'],0,1]]}]))
         async with websockets.serve(server,'127.0.0.1',0) as listener:
             ctx.server_address=f'ws://127.0.0.1:{listener.sockets[0].getsockname()[1]}'
             async with websockets.connect(ctx.server_address) as socket:
                 ctx.server=Endpoint(socket)
-                for packet in decode(await socket.recv()): await process_server_cmd(ctx,packet)
+                for _ in range(2):
+                    for packet in decode(await socket.recv()): await process_server_cmd(ctx,packet)
+                assert ctx.seed_name is None
+                assert ctx.authenticated_identity == (0, 1, data['seed_name'])
                 assert not ctx.history_ready
                 runtime=ctx.runtime; guard=runtime.guard
-                guard.confirm_new_game()
-                value=snapshot(save_identity=None, scene_verified=True,pickup_verified=True,
-                    stage_epoch='intro',actual_mission='stg110',new_game_verified=True,fresh_fields=(True,True))
-                guard.observe(value); runtime.snapshot=value; runtime.observe_pickups()
-                runtime.snapshot=replace(value,active_rings={'stg110':frozenset({3})})
-                runtime.observe_pickups()
-                code=LOCATION_TABLE['Tropical Resort Act 1 - Red Ring 3'].code
+                assert not guard.operator_confirmed
+                memory = None
+                if PAIRS:
+                    backend = Overlay(PAIRS[0])
+                    memory = SonicMemory(backend)
+                    memory.write_guard = WritePolicy(memory, guard, runtime.hooks.snapshot)
+                    first = runtime.hooks.snapshot(memory)
+                    ring_mask_address = first.evidence['native_data']['stage_objects'][0]['actor_state'] + 0x91
+                    backend.write_bytes(ring_mask_address, b'\x00')
+                    runtime.poll(memory, [], False)  # Real native automatic New Game proof.
+                    backend.write_bytes(ring_mask_address, b'\x01')
+                    runtime.poll(memory, [], False)
+                else:
+                    value=snapshot(save_identity=None, scene_verified=True,pickup_verified=True,
+                        stage_epoch='intro',actual_mission='stg110',new_game_verified=True,fresh_fields=(True,True))
+                    guard.observe(value); runtime.snapshot=value; runtime.observe_pickups()
+                    runtime.snapshot=replace(value,active_rings={'stg110':frozenset({1})})
+                    runtime.observe_pickups()
+                code=LOCATION_TABLE['Tropical Resort Act 1 - Red Ring 1'].code
                 assert runtime.journal.data['pickup_checks']==[code]
                 assert not runtime.journal.data['acknowledged_locations']
                 await transmit_checks(ctx)
@@ -179,9 +201,17 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
                 assert any(p['cmd']=='LocationChecks' and p['locations']==[code] for p in received)
                 assert runtime.journal.data['acknowledged_locations']==[code]
                 assert not ctx.history_ready and runtime.journal.data['save_identity'] is None
+                for packet in decode(await asyncio.wait_for(socket.recv(), 3)):
+                    await process_server_cmd(ctx, packet)
+                assert ctx.history_ready
+                if memory:
+                    for _ in range(3): runtime.poll(memory, [item.item for item in ctx.items_received], True)
+                    assert memory.read_u32(runtime.snapshot.rings_address) == 26
+                    assert runtime.journal.data['effects']['0']['state'] == 'confirmed'
                 count=len(received); await transmit_checks(ctx); await asyncio.sleep(.02)
                 assert not any(p['cmd']=='LocationChecks' for p in received[count:])
-                ctx.seed_name='different-seed'
+                ctx.on_package('RoomInfo', {'seed_name':'different-seed'})
+                ctx.checked_locations.clear()
                 with pytest.raises(MemoryUnavailable,match='identity'):
                     await transmit_checks(ctx)
             ctx.server=None
@@ -220,7 +250,7 @@ def test_original_bound_colour_permission_fields_and_no_physical_ring_mutation(t
     with Journal(tmp_path,IDENTITY) as journal:
         hooks=NativeHooks(journal);guard=SaveGuard(journal);guard.confirm_new_game()
         runtime=Runtime(data,journal,guard,hooks)
-        for stamp in ('200443','200443','202546','205502'):
+        for stamp in ('200443','202546','205502'):
             pair=next(p for p in PAIRS if stamp in p[0].name)
             runtime.poll(SonicMemory(DumpBackend(*pair)),[],False)
         pair=next(p for p in PAIRS if '212125' in p[0].name)
