@@ -28,7 +28,9 @@ mask          = 1 << (bit % 32)
 
 The extra dereference is mandatory. External memory addresses are Wii guest
 addresses, not Windows process addresses. `index=0` has not been proven to mean
-visible Save Slot 1. The candidate resolver allows 0..2 only and never arms a save.
+a visible UI slot. The resolver accepts internal indices 0..2 as candidates only;
+any visible slot is permitted after identity proof. The game forces Acts 1/2 before
+first save selection. New Game/scene/save identity fields are still unresolved.
 Memory is bounded to MEM1 0x80000000..0x817FFFFF and MEM2
 0x90000000..0x93FFFFFF, with pointer alignment and end bounds checked.
 
@@ -57,16 +59,24 @@ provenance from the supplied spec, not independently recomputed.
 
 ## Smallest next runtime observation
 
-With the exact PAL executable running, back up the save first. Use read-only
-`/sonicdebug` on the save-selection screen, then manually select visible Slot 1
-and reach its world map. Record the candidate chain and selected-index byte.
-Repeat selection with a different visible slot if it can be viewed safely without
-creating/deleting a file. Repeat after Dolphin restart. This establishes mapping
-and pointer lifetime before any write experiment.
+With the exact PAL executable running, back up the save first. Run:
 
-On a disposable fresh Slot 1 only, record all C words, clear Tropical Resort Act 1,
-return to map, reload and compare bit 150. Expected C word address is
-`flags+0x20`, expected mask `0x00400000`. The base pointer may change on reload;
-resolve it again. This is an observation recipe, not authorization to patch a
-populated save. A controlled reversible one-bit write comes only after identity,
-freshness and semantics are proven; no such live write has been performed here.
+```powershell
+.venv/Scripts/python.exe worlds/sonic_colours/tools/probe_pal.py --output build/sonic-pal-probe.json
+```
+
+Capture the small report at the title/New Game screen, forced Act 1/2 results,
+then first vanilla save selection and after choosing any available slot. Confirm
+pointer lifetime, internal-index changes and C candidate bits across restart.
+The probe only reads; it neither binds a seed nor sends AP checks or writes memory.
+It cannot identify a New Game transition from the pointer chain alone.
+
+On a disposable new playthrough, observe Act 1 C bit 150, expected word at
+`flags+0x20`, mask `0x00400000`; Act 2 bit 151 uses `0x00800000` in that word.
+Resolve the base again after save/reload. Record actual native scene transitions
+and freshness fields before any write experiment. No such live write is verified.
+
+The new rework notes and `offline_re` tables supply no additional native addresses.
+`data/native_evidence.json` and `client/evidence.py` explicitly classify field
+proof. Unknown New Game, save identity, scene, stats parent and capsule opening
+fields are not replaced with guesses.

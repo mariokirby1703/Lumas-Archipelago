@@ -34,8 +34,12 @@ def audit():
         entries.append(entry)
     static = notes / 'Sonic_Colours_PAL_Static_RE_v2'
     handoff = notes / 'Sonic_Colours_Wii_PAL_Codex_Handoff'
-    assert (notes / 'SONIC_COLOURS_WII_PAL_CODEX_MASTER_SPEC.md').read_bytes() == (
-        handoff / 'SONIC_COLOURS_WII_PAL_CODEX_MASTER_SPEC.md').read_bytes()
+    legacy_master = notes / 'SONIC_COLOURS_WII_PAL_CODEX_MASTER_SPEC.md'
+    if legacy_master.exists():
+        assert legacy_master.read_bytes() == (handoff / legacy_master.name).read_bytes()
+    for path in (notes / 'offline_re').glob('*'):
+        if path.is_file() and (static / path.name).exists():
+            assert path.read_bytes() == (static / path.name).read_bytes(), path.name
     for path in (handoff / 'research/static_re').iterdir():
         if (static / path.name).is_file():
             assert path.read_bytes() == (static / path.name).read_bytes(), path.name

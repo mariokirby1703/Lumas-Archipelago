@@ -1,28 +1,30 @@
-# Sonic Colours
+# Sonic Colours (Wii)
 
-`ap-status=Custom` — Wii PAL (`SNCP8P`, revision 0) only.
+`ap-status=Custom` ? PAL `SNCP8P`, revision 0. Development version 0.2.0.
 
-**This custom integration is under development and not yet playable end to end.**
-Research generation covers 45 story clears, 21 optional Game Land clears, seven
-optional Chaos Emerald reward checks, and either 180 individual Red Rings or 36
-all-five checks. Ranks reserve separate S/A/B/C/D IDs but are blocked pending native
-rank eligibility and persistence verification. DS and Ultimate are unsupported.
+Eight Wisp unlocks are real shuffled progression items. Default generation does
+not precollect them. Unknown clear routes are explicitly provisional until the
+user supplies exact logic; optional Red Ring routes conservatively require all
+Wisps. No complete native multiworld has been verified yet.
 
-AP Red Ring bundles contain 1, 5 or 10 counter units. Physical Red Ring collection
-and received AP counter units are independent. At the default reduction of 40,
-Game Land second stages require 10..70 units and third stages 80..140 units; all
-seven first stages are free. At maximum reduction the non-free gates remain
-distinct (1..14). Emerald reward checks do not directly grant AP Emerald items.
+Checks: 45 story clears; optional 21 Game Land clears and seven Emerald rewards;
+180 individual Red Rings or 36 all-five checks. S/A/B/C rank IDs reserve four
+thresholds for each of 44 candidates; rank availability is not yet live-proven.
+No D check exists. Emerald rewards require all three stages of their Game Land,
+even when clear locations are off. Actual client goals require native completion.
 
-World Access items, eight Wisp permissions including White Boost, seven individually
-named Chaos Emeralds and optional Super Sonic permission have stable IDs. Ordinary
-Rings and 1-Ups are filler. Trap percentage applies only after progression is
-reserved, rounded half up; per-trap off/low/medium/high weights are 0/1/3/6.
-All-off weights produce ordinary filler. Swimming is disabled pending validation.
+AP Red Ring bundles contain 1, 5 or 10 units independently of physical pickups.
+At reduction 40, Game Land Act 2 gates are 10..70 and Act 3 gates 80..140; first
+acts are free. All 14 non-free gates remain unique and positive at extreme settings.
+Seven AP Emerald items express Super Sonic permission; there is no extra item.
 
-Unknown logic uses an explicit all-Wisp fallback; the research compatibility start
-precollects all eight permissions. This will change to normal Wisp progression
-once verified requirements are supplied. YAML keys and defaults are in the
-[example](../examples/SonicColours.yaml), with live feature restrictions in
-[setup](setup_en.md). Receiving items or reaching a map never constitutes a native
-goal completion.
+Capsule sanity reserves distinct mission/file/layer/object/instance identities:
+456 story candidates, 232 mapped Game Land candidates, 18 unmatched excluded.
+Native opening, subtype and accessibility proof are required per instance before
+activation. Non-off capsule modes reject while no validated subset exists.
+
+Rings/1-Up filler and Ring Loss Trap use a durable guarded scheduler. Trap share
+is computed only from filler after progression, rounded half up; weights are
+0/1/3/6. Native effects and randomizers still have individual proof gaps listed
+in [development](development.md). See [setup](setup_en.md) for New Game, forced
+intro, any-slot binding, resume and schema migration.

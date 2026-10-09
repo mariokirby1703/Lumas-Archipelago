@@ -47,13 +47,15 @@ def test_journal_restart_dedup_and_uncertain_effect():
 def test_save_guard_never_arms_from_static_evidence():
     with tempfile.TemporaryDirectory() as directory, Journal(directory, IDENTITY) as journal:
         guard = SaveGuard(journal)
-        with pytest.raises(MemoryUnavailable, match='mapping_unverified'):
+        with pytest.raises(MemoryUnavailable, match='new_game_indicator_unverified'):
             guard.arm(snapshot(), operator_confirmed=True, fresh_evidence={'clears': True, 'rings': True})
         for value in (snapshot(), snapshot(visible_slot=2), snapshot(session='old'), snapshot(save_identity='other')):
             with pytest.raises(MemoryUnavailable): guard.check(value)
         assert journal.data['save_identity'] is None
         memory = SonicMemory(FakeBackend())
-        with pytest.raises(MemoryUnavailable): NativeHooks().snapshot(memory)
+        memory.verify_revision = lambda: 'test-revision'
+        state = NativeHooks().snapshot(memory)
+        assert state.scene == 'unclassified' and not state.progress_verified
 
 
 def test_persisted_ring_modes_and_goal_never_from_inventory():
@@ -72,7 +74,7 @@ def test_persisted_ring_modes_and_goal_never_from_inventory():
         assert victory(data, snapshot(persisted_clears=frozenset({'stg790'})))
 
 
-@pytest.mark.parametrize('quality,expected', [(0, 5), (1, 4), (2, 3), (3, 2), (4, 1)])
+@pytest.mark.parametrize('quality,expected', [(0, 4), (1, 3), (2, 2), (3, 1), (4, 0)])
 def test_rank_threshold_comparison(quality, expected):
     locations = {name: data.code for name, data in LOCATION_TABLE.items() if data.kind == 'rank' and data.mission == 'stg120'}
     data = {'locations': locations}
@@ -134,8 +136,10 @@ def test_unverified_runtime_queues_without_writes_or_checks():
     with tempfile.TemporaryDirectory() as directory, Journal(directory, IDENTITY) as journal:
         runtime = Runtime(data, journal, SaveGuard(journal), NativeHooks())
         backend = FakeBackend()
-        with pytest.raises(MemoryUnavailable, match='slot_mapping_unverified'):
-            runtime.poll(SonicMemory(backend), [ITEM_TABLE['Rings (+10)']], True)
+        memory = SonicMemory(backend)
+        memory.verify_revision = lambda: 'test-revision'
+        checks, goal = runtime.poll(memory, [ITEM_TABLE['Rings (+10)']], True)
+        assert not checks and not goal
         assert runtime.pending_effects() == [0]
         assert not journal.data['checks'] and not backend.writes
 

@@ -34,6 +34,9 @@
     "native_death": false,
     "swimming": false,
     "stage_shuffle": false,
-    "music": false
+    "music": false,
+    "new_game_indicator": false,
+    "scene": false,
+    "capsule_open": false
   }
 }

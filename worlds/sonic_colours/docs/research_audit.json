@@ -1,6 +1,104 @@
 {
   "files": [
     {
+      "path": "CODEX_SONIC_COLOURS_PAL_IMPLEMENTATION_REWORK.md",
+      "size": 50952,
+      "sha256": "0d4fd71c540ef8f4c04ba8e50c22c87402301c0226ae38e7c96b5e03ef20f226",
+      "lines": 342
+    },
+    {
+      "path": "offline_re/progress_bits_by_stage.csv",
+      "size": 4778,
+      "sha256": "8528bf129d3ff9e90811dd6e95162282ef097d7f4bb15b796b006431e9613b6e",
+      "records": 66,
+      "columns": [
+        "world",
+        "zone",
+        "slot",
+        "type",
+        "mission",
+        "stage_data",
+        "bank_A",
+        "bank_B",
+        "bank_C",
+        "rank_s",
+        "rank_a",
+        "rank_b",
+        "rank_c"
+      ]
+    },
+    {
+      "path": "offline_re/README.md",
+      "size": 8551,
+      "sha256": "6e718ba2496e6d107dd8346ebbdf2f7ffe98e80a1f47dfb95ff86b886b79dd60",
+      "lines": 86
+    },
+    {
+      "path": "offline_re/red_rings_180_numbered.csv",
+      "size": 17139,
+      "sha256": "9ecb0df5654eb405cc6feafaec2e32c0c0431f71ba7bd4f438f928a70ca3f914",
+      "records": 180,
+      "columns": [
+        "world",
+        "act_or_stage",
+        "mission_id",
+        "object_type",
+        "object_id",
+        "orc_file",
+        "layer",
+        "instance",
+        "x",
+        "y",
+        "z",
+        "red_ring_number",
+        "regular_location"
+      ]
+    },
+    {
+      "path": "offline_re/stage_map.csv",
+      "size": 6694,
+      "sha256": "f6d8085be65d502064e3d4d26e626f4ca996bd785b37c415ca94a3f134f1148f",
+      "records": 66,
+      "columns": [
+        "World",
+        "ZoneID",
+        "Slot",
+        "Type",
+        "Mission ID",
+        "Stage Data",
+        "Player Position",
+        "Start Event",
+        "Wisp Types",
+        "Rank S",
+        "Rank A",
+        "Rank B",
+        "Rank C"
+      ]
+    },
+    {
+      "path": "offline_re/wisp_capsules_706_instances.csv",
+      "size": 88003,
+      "sha256": "4f76da984ceffd39961004a89237b9ee601acea7e508f00e0bcf6c36da60cbc1",
+      "records": 706,
+      "columns": [
+        "world",
+        "act_or_stage",
+        "mission_id",
+        "object_type",
+        "object_id",
+        "orc_file",
+        "layer",
+        "instance",
+        "x",
+        "y",
+        "z",
+        "wisp_code",
+        "wisp_hypothesis",
+        "byte_1",
+        "byte_2"
+      ]
+    },
+    {
       "path": "Sonic_Colours_PAL_Static_RE_v2/annotated_disassembly.txt",
       "size": 45922,
       "sha256": "4417a8048509f4d0ab0c0230bd9ffeb6bdedf855e9963e44111f69600c227d69",
@@ -428,13 +526,13 @@
       "lines": 8
     },
     {
-      "path": "SONIC_COLOURS_WII_PAL_CODEX_MASTER_SPEC.md",
-      "size": 61280,
-      "sha256": "7aef95dc4f9f854d64b63ec11af04f1a0929a818ede70ec8454dc3d7847a81f0",
-      "lines": 505
+      "path": "START_HERE_CODEX.md",
+      "size": 1529,
+      "sha256": "589d7908d7308c787fccd105c985c96f9ce6a2686159ba61345397124526e17d",
+      "lines": 11
     }
   ],
-  "file_count": 45,
+  "file_count": 51,
   "validated_disassembly_instructions": 1264,
   "validated_direct_calls": 157533,
   "r13_initialization": "0x808F9520",

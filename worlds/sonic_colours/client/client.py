@@ -16,9 +16,21 @@ from .memory import DMEBackend, SonicMemory, MemoryUnavailable
 from .runtime import Runtime, validate_slot, inventory
 from .state import SaveGuard, WritePolicy
 from .versions import VERSION
+from .deathlink import DeathLink
 
 
 class SonicCommands(ClientCommandProcessor):
+    def _cmd_sonicnewgame(self):
+        """Confirm New Game intent. Native menu/freshness evidence is also required."""
+        if not self.ctx.runtime:
+            logger.info('Connect to your Sonic Colours (Wii) seed first.')
+            return
+        try:
+            self.ctx.runtime.guard.confirm_new_game()
+            logger.info(self.ctx.runtime.guard.reason)
+        except MemoryUnavailable as error:
+            logger.error(str(error))
+
     def _cmd_sonic(self):
         """Show inventory, synchronization and PAL hook status."""
         logger.info(json.dumps(diagnostic(self.ctx), indent=2))
@@ -52,6 +64,7 @@ class SonicContext(CommonContext):
     def __init__(self, address=None, password=None, patch_file=None, journal_directory=None):
         super().__init__(address, password)
         self.runtime = None
+        self.deathlink = None
         self.memory = None
         self.history_ready = False
         self.history_desynced = False
@@ -65,7 +78,7 @@ class SonicContext(CommonContext):
         if patch_file:
             patch = json.loads(Path(patch_file).read_text(encoding='utf-8'))
             if patch.get('game') != GAME:
-                raise ValueError('Not a Sonic Colours .apsonic file')
+                raise ValueError('Expected a Sonic Colours (Wii) v2 .apsonic file; regenerate old seeds/files.')
             self.expected_slot_data = validate_slot(patch['slot_data'])
             self.expected_seed = self.expected_slot_data['seed_name']
             self.auth = patch.get('player_name')
@@ -82,6 +95,12 @@ class SonicContext(CommonContext):
             self.runtime.guard.disarm()
             self.runtime.journal.close()
         self.runtime = None
+        self.deathlink = None
+
+    def on_deathlink(self, data):
+        super().on_deathlink(data)
+        if self.deathlink:
+            self.deathlink.receive(data, time.monotonic())
 
     def on_package(self, cmd, args):
         if cmd == 'Connected':
@@ -102,12 +121,16 @@ class SonicContext(CommonContext):
                             'slot_digest': hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()}
                 journal = Journal(self.journal_directory, identity)
                 self.runtime = Runtime(data, journal, SaveGuard(journal), NativeHooks())
+                if data['options']['death_link']:
+                    self.deathlink = DeathLink(journal)
+                asyncio.create_task(self.update_death_link(bool(data['options']['death_link'])))
                 # CommonClient processes packets in order. An ordered Get reply
                 # handles AP's omitted empty ReceivedItems without a timeout guess.
                 self.barrier = f'_sonic_history_{time.monotonic_ns()}'
                 asyncio.create_task(self.send_msgs([{'cmd': 'Get', 'keys': [self.barrier]}]))
-                logger.warning('Research-only Sonic Colours slot connected. Gameplay checks and writes '
-                               'require PAL save/scene hooks; /sonicdebug shows candidates.')
+                logger.warning('Sonic Colours (Wii) slot connected. For a new seed choose New Game and '
+                               '/sonicnewgame. Intro evidence is retained until a verified save binding; '
+                               '/sonicdebug shows individual native proof gaps.')
             except (ValueError, KeyError, OSError) as error:
                 self.release_runtime()
                 self.dolphin_status = f'Slot rejected: {error}'
@@ -140,7 +163,7 @@ class SonicContext(CommonContext):
         from kvui import GameManager
 
         class SonicManager(GameManager):
-            base_title = 'Sonic Colours Client (PAL research build)'
+            base_title = 'Sonic Colours (Wii) Client (PAL development build)'
             logging_pairs = [('Client', 'Archipelago')]
 
         return SonicManager
@@ -176,7 +199,18 @@ async def dolphin_loop(ctx):
                     raise MemoryUnavailable('PAL executable verified; waiting for AP slot.')
                 memory.write_guard = WritePolicy(memory, ctx.runtime.guard, ctx.runtime.hooks.snapshot)
                 checks, goal = ctx.runtime.poll(memory, [i.item for i in ctx.items_received], ctx.history_ready)
-                pending = (set(ctx.runtime.journal.data['checks']) | checks) - ctx.checked_locations
+                if ctx.deathlink:
+                    snap = ctx.runtime.snapshot
+                    if VERSION['capabilities']['native_death']:
+                        local_death = ctx.deathlink.poll(
+                            safe=ctx.runtime.guard.can_send(snap) and snap.scene_verified and snap.scene == 'gameplay',
+                            native_state=snap.death_state, now=time.monotonic(),
+                            kill=lambda: ctx.runtime.hooks.kill(memory, snap))
+                        if local_death:
+                            await ctx.send_death('Sonic died.')
+                # Runtime returns durable checks only after current attribution
+                # is valid. Do not bypass its identity gate by rereading journal.
+                pending = checks - ctx.checked_locations
                 if pending and (pending != ctx.last_pending or time.monotonic() - ctx.last_send >= 5):
                     await ctx.send_msgs([{'cmd': 'LocationChecks', 'locations': sorted(pending)}])
                     ctx.last_pending, ctx.last_send = pending.copy(), time.monotonic()

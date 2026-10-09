@@ -1,29 +1,30 @@
-2026-10-09 — Sonic Colours research build
+2026-10-09 ? rework version 0.2.0, slot schema 2
+Base reviewed: dd23ef600c3046cfa5b4e6670a68aefcf18d7e9e
+Branch: Sonic-Colours-Wii-AP
 
 PowerShell, repository root:
 $env:AP_TEST_WORLDS='sonic_colours'
 .venv/Scripts/python.exe -m pytest worlds/sonic_colours/test -q --disable-warnings
-Result: 410 passed, 2 warnings.
-Coverage includes 600 successful fill runs and 900 expected compatibility refusals.
-Warnings: existing optional _speedups unavailable and repository warning about Python 3.11.9.
-
-.venv/Scripts/python.exe -m compileall -q worlds/sonic_colours/client worlds/sonic_colours/test
-Result: exit 0.
+Result: 418 passed, 2 warnings.
+Includes 100 default fill/sphere runs with all eight shuffled Wisps;
+600 further fill runs and 800 precise unsupported-mode refusals.
+Warnings from existing core: optional _speedups absent; Python 3.11.9 warning.
+No fake-backend test is presented as live gameplay proof.
 
 .venv/Scripts/python.exe worlds/sonic_colours/tools/audit_research.py
-Result: 45 supplied files read; 1264 disassembled instructions;
-157533 direct calls verified against local ELF; both text-section hashes matched.
-Original research test_research.py cannot run unchanged: /mnt/data and main.dol absent.
+Result: 51 supplied files read; 1264 disassembled instructions;
+157533 direct calls verified; both ELF text-section hashes matched.
+README/four CSV files in notes/offline_re are byte-identical to old research.
+The rework document supersedes earlier user decisions.
+
+.venv/Scripts/python.exe worlds/sonic_colours/tools/probe_pal.py
+Result: DME status noEmu; read_failed: emulation_not_running.
+The user confirmed only the Dolphin application is open, not the game.
+Live reads: 0; writes: 0; network gameplay checks sent: 0.
 
 .venv/Scripts/python.exe worlds/sonic_colours/build_apworld.py
-Result: build/apworlds/sonic_colours.apworld; archive integrity verified.
-Separate subprocess imported sonic_colours directly from the .apworld ZIP:
-packaged import succeeded; packaged catalog has 66 stages.
+Output: build/apworlds/sonic_colours.apworld (version 0.2.0 / schema 2).
+ZIP integrity and separate ZIP-imported catalog access checked.
+No notes, DOL, ELF, CPK or RAM files packaged.
 
-Live read-only probe: one Dolphin process, installed DME.
-dolphin.hook(): status 2; is_hooked False; emulation_not_running.
-No successful live memory read. No writes attempted. No live checks sent.
-
-This is offline/static evidence and does not establish game playability.
-
-Optional Ruff lint could not run: ruff is not installed in the repository venv.
+This report does not establish complete native playability. See development.md.
