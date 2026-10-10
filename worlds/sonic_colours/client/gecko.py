@@ -11,7 +11,7 @@ def branch_target(address, word):
     return address+delta
 
 
-def inspect_c2(memory, hook, original, variants, mutable=()):
+def inspect_c2(memory, hook, original, variants, mutable=(), label='capsule'):
     word=memory.read_u32(hook)
     if word==original:return {'installed':False,'variant':'original PAL'}
     target=branch_target(hook,word)
@@ -29,7 +29,7 @@ def inspect_c2(memory, hook, original, variants, mutable=()):
             raw[start:start+length]=bytes(length)
         back=int.from_bytes(raw[-4:],'big');return_target=branch_target(target+size-4,back)
         mismatch=next((i for i in range(len(words)-1) if raw[i*4:i*4+4]!=expected[i*4:i*4+4]),None)
-        if mismatch is None and return_target==hook+4:
+        if mismatch is None and return_target==hook+4 and (actual_length is None or actual_length==size):
             return {'installed':True,'variant':name,'hook':hook,'target':target,'payload_length':size,
                     'actual_header_length':actual_length,'return_instruction':back,'return_target':return_target}
         failures.append({'variant':name,'expected_length':size,'first_differing_word':mismatch,
@@ -37,6 +37,6 @@ def inspect_c2(memory, hook, original, variants, mutable=()):
                          'actual_word':int.from_bytes(raw[mismatch*4:mismatch*4+4],'big') if mismatch is not None else None,
                          'return_instruction':back,'computed_return':return_target})
     import json
-    raise MemoryUnavailable('unknown_revision: unrecognized capsule thunk or return; '+json.dumps(
+    raise MemoryUnavailable(f'unknown_revision: unrecognized {label} thunk or return; '+json.dumps(
         {'hook':hex(hook),'target':hex(target),'actual_header_length':actual_length,'expected_return':hex(hook+4),
          'comparisons':failures},sort_keys=True))

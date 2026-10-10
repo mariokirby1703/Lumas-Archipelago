@@ -36,6 +36,13 @@ def verify_revision(memory):
             word = int.from_bytes(data[offset:offset+4], 'big')
             if word != PROGRESSION_ORIGINAL and installed_data(memory) is not None:
                 data = data[:offset] + PROGRESSION_ORIGINAL.to_bytes(4,'big') + data[offset+4:]
+        from .gameplay_controls import HOOKS, installed as controls_installed
+        for kind, (control_hook, control_original) in HOOKS.items():
+            if section['address'] <= control_hook < section['address'] + section['size']:
+                offset = control_hook - section['address']
+                word = int.from_bytes(data[offset:offset+4], 'big')
+                if word != control_original and controls_installed(memory, kind) is not None:
+                    data = data[:offset] + control_original.to_bytes(4, 'big') + data[offset+4:]
         digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:
             raise memory.error(f'unknown_revision: text at 0x{section["address"]:08X}, '

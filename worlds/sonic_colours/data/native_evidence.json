@@ -61,10 +61,10 @@
     "live_write": false
   },
   "new_game_indicator": {
-    "grade": "dump-correlated",
+    "grade": "live-read-validated",
     "kind": "native_factory_state",
-    "proof": "Gameplay stg110 plus exact factory flag words from 8015EBC0/8016DEF8 and untouched 66 rank records; original mandatory Act 1 capture. Operator confirms intent separately.",
-    "live_read": false,
+    "proof": "Gameplay stg110 plus exact factory flag words from 8015EBC0/8016DEF8 and untouched 66 rank records; original mandatory Act 1 capture. October 10 live New Game detected automatically without /sonicnewgame, followed by unsaved Act 1 Red Ring 847001001 and genuine server acknowledgement; see docs/oct10_validation.md.",
+    "live_read": true,
     "live_write": false
   },
   "save_identity": {

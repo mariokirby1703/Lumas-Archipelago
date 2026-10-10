@@ -6,12 +6,13 @@ Install `requirements.txt`, build the APWorld, and place it in Archipelago's
 Client**. A source checkout already loads the world; avoid duplicate packages.
 An empty Dolphin window is not running emulation.
 
-## Install both native hooks
+## Install the three native Gecko codes
 
 Stop emulation and enable Cheats in Dolphin. The supplied
-[SNCP8P_capsule_refresh.ini](../data/SNCP8P_capsule_refresh.ini) contains two
+[SNCP8P_capsule_refresh.ini](../data/SNCP8P_capsule_refresh.ini) contains three
 separate Gecko codes: **AP PAL live coloured capsule refresh** and **AP PAL
-authoritative progression**. Add and enable both in the PAL game's Properties
+authoritative progression**, and **AP PAL speed and White Boost gates**.
+Add and enable all three in the PAL game's Properties
 → Gecko Codes. Replace the older AP capsule code with this version; preserve
 unrelated settings/codes. When pasting an individual code, paste only its hex
 lines, excluding INI sections and `$` names.
@@ -31,7 +32,7 @@ The progression hook is required for immediate native vanilla-grant suppression
 and discovery/Game Land event capture. Without it, ordinary check/counter paths
 remain available, but native interception is reported unavailable.
 
-## Generate a new schema-3 seed
+## Generate a new schema-4 seed
 
 Use [the default example](../examples/SonicColours.yaml) or
 [Luma's migrated configuration](../examples/Luma_Migrated.yaml). Old server
@@ -77,8 +78,11 @@ The final boss cannot be a starting stage.
 
 All eight Wisp items are shuffled, with no automatic precollection. Coloured
 capsules require their matching AP item. Capsule locations include 680 eligible
-story/Game Land instances; opened actors are never reset. White Boost and some
-scripted player grants still need a verified native restriction mechanism.
+story/Game Land instances; opened actors are never reset. `boost_lock: false`
+preserves ordinary vanilla Boost. With it enabled, the native ordinary-use
+query requires White Boost Wisp; the gauge is not repeatedly emptied. The
+separate native Boost provider remains untouched. The new gates still need
+live Normal/Super Sonic validation.
 
 AP Red Ring items are independent of the 180 physical pickups. Game Land stage
 1 is free in every group; stages 2/3 use increasing AP thresholds. Reduction 40
@@ -96,6 +100,14 @@ separate Emerald reward presentation event is not independently verified.
 Rings, 1-Ups and Ring Loss Traps use guarded counters/mirrors with later
 observations. Rewards received on results screens defer durably to the next
 living Act. Uncertain attempts do not replay or block later receipts.
+New Rings filler rolls 1–100 once per receipt and persists the roll before
+delivery. Legacy +10/+25/+50 item IDs retain their old fixed meanings.
+Half Boost Refill adds half the actual native maximum, capped at full;
+the original captures use maxima of 100 in story Acts and 50 in Game Land.
+It waits for White Boost Wisp when Boost Lock is enabled.
+Four useful Progressive Game Land Speed items appear when Game Land is used.
+They raise the maximum selectable/simulation speed from 1 to 5; lower speeds
+remain selectable. No extra speed YAML option is needed.
 `/sonicitems` explains receipt states; `/sonicrecover skip INDEX` abandons one
 uncertain attempt. Keep the journal rather than deleting receipt history.
 
@@ -109,3 +121,4 @@ Commands: `/sonic`, `/sonicstatus`, `/sonicdebug`, `/sonicitems`,
 AP transport, counter writes, capsule/progression hooks and music.
 See [validation limits](gameplay_overhaul.md) before interpreting a readback
 or offline test as proof of an in-game effect.
+See [October 10 changes and live evidence](oct10_validation.md) for this build.

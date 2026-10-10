@@ -57,6 +57,14 @@ def _read_stage_objects(memory):
                 if zone <= 6 and 1 <= status <= 4:
                     row['world_map_access'] = {'actor': actor, 'zone': zone, 'first_act_status': status,
                                                'status_address': actor + 0x1f8}
+                    nodes = []
+                    for slot in range(1, 4 if zone == 6 else 8):
+                        address = actor + 0x1f8 + (slot-1)*0x9c
+                        value = memory.read_u32(address)
+                        if not 1 <= value <= 4:
+                            raise MemoryUnavailable('world_map_node_status_invalid')
+                        nodes.append({'slot':slot, 'status':value, 'address':address})
+                    row['world_map_access']['nodes'] = nodes
     if vtable == STAGE_VTABLE:
         stage = context
         row['stage'] = stage
@@ -290,9 +298,13 @@ def read_player(memory, stage, actor_id, actors=None):
         raise MemoryUnavailable('unsupported_player_mode')
     if memory.read_u32(rings) != 0x8075F2A8:
         raise MemoryUnavailable('ring_object_vtable_mismatch')
+    if memory.read_u32(boost) != 0x80763A18:
+        raise MemoryUnavailable('boost_object_vtable_mismatch')
     result = {'actor': player, 'stats': stats, 'mode': mode,
               'rings': memory.read_s32(rings + 8), 'rings_address': rings + 8,
-              'boost': memory.read_f32(boost + 8), 'held_wisp': memory.read_s32(boost + 0x18)}
+              'boost': memory.read_f32(boost + 8), 'boost_max': memory.read_f32(boost + 0x14),
+              'boost_address': boost + 8, 'boost_max_address': boost + 0x14,
+              'held_wisp': memory.read_s32(boost + 0x18)}
     if (memory.read_u32(stage + 0x18) != manager or
             memory.read_u32(manager + 0x14) != count or memory.read_u32(player + 0x8c) != stats):
         raise MemoryUnavailable('player_context_changed')

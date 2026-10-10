@@ -1,18 +1,43 @@
 from collections import Counter
 import logging
 import time
-from ..Items import BY_ID, RING_VALUES, EMERALDS, WISP_ITEMS, FILLER, TRAPS
+import hashlib
+import json
+import math
+import struct
+from ..Items import BY_ID, ITEM_TABLE, RING_VALUES, EMERALDS, WISP_ITEMS, FILLER, LEGACY_FILLER, TRAPS
 from ..Locations import LOCATION_TABLE, enabled
 from ..Options import SonicColoursOptions, OPTION_NAMES
 from ..world_constants import GAME, SCHEMA_VERSION, STAGES, STARTING_STAGES, BY_MISSION, game_land_gates
 from .memory import MemoryUnavailable
 
 logger = logging.getLogger('Client')
+DELIVERY_ITEMS = FILLER + LEGACY_FILLER + TRAPS
+
+
+def rings_amount(journal, index):
+    """One seed/receipt-owned roll, persisted before any native attempt."""
+    key = str(index)
+    effect = journal.data['effects'].get(key, {})
+    if 'rolled_amount' not in effect:
+        # Rejection sampling avoids modulo bias over the 100 possible amounts.
+        identity = json.dumps(journal.identity, sort_keys=True, separators=(',', ':'))
+        nonce = 0
+        while True:
+            value = int.from_bytes(hashlib.sha256(f'{identity}:rings:{index}:{nonce}'.encode()).digest(), 'big')
+            ceiling = (1 << 256) // 100 * 100
+            if value < ceiling:
+                break
+            nonce += 1
+        effect = {'state': 'queued', **effect, 'rolled_amount': value % 100 + 1}
+        journal.data['effects'][key] = effect
+        journal.save()
+    return effect['rolled_amount']
 
 
 def validate_slot(data):
     if not isinstance(data, dict) or data.get('game') != GAME or data.get('schema_version') != SCHEMA_VERSION:
-        raise ValueError('Sonic Colours schema migration required: this client uses schema 3 (always-on Wisp/World Access, coloured Emeralds and five Goals). Regenerate the seed and .apsonic file with the new world; old seed journals cannot be migrated into another seed.')
+        raise ValueError('Sonic Colours schema migration required: this client uses schema 4 (native Boost Lock, Game Land Speed and new filler IDs). Regenerate the seed and .apsonic file with the new world; old seed journals cannot be migrated into another seed.')
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
     options = data.get('options')
@@ -32,6 +57,9 @@ def validate_slot(data):
         resolved[name] = option
     if data.get('game_land_gates') != game_land_gates(options['game_land_requirement_reduction']):
         raise ValueError('slot Game Land gates mismatch')
+    expected_speed = bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'])
+    if type(data.get('game_land_speed_items')) is not bool or data['game_land_speed_items'] != expected_speed:
+        raise ValueError('slot Game Land speed pool contract mismatch')
     expected_mapping = {s['stage_slot_id']: s['mission_id'] for s in STAGES}
     if data.get('stage_mapping') != expected_mapping:
         raise ValueError('unsupported native stage permutation')
@@ -98,7 +126,7 @@ def victory(slot_data, snapshot, ever_collected_mask=None, owned=None, observed_
     goal = slot_data['options']['goal']
     clears = snapshot.persisted_clears | observed_clears
     if goal == 0:
-        return 'stg790' in clears
+        return {'stg790', 'stg720'} <= clears
     if goal == 1:
         return all(s['mission_id'] in clears for s in STAGES if s['kind'] == 'Boss')
     if goal == 2:
@@ -149,9 +177,11 @@ class Runtime:
             previous = self.capsule_states.get(token, False)
             self.capsule_states[token] = native['opened']
             capsule = CAPSULES.get(key)
+            # Native opening is the check witness. Permission enforcement is
+            # separate; reporting must not wait for ReceivedItems (White Boost
+            # capsules are usable without its item when Boost Lock is off).
             if (baseline or previous or not native['opened'] or key in seen or key not in locations
-                    or not capsule or capsule.mission != snapshot.actual_mission or not capsule.eligible
-                    or capsule.wisp_item not in owned_wisps):
+                    or not capsule or capsule.mission != snapshot.actual_mission or not capsule.eligible):
                 continue
             checks.add(locations[key])
             events.append({'kind': 'capsule', 'mission': capsule.mission, 'instance_key': key,
@@ -241,6 +271,11 @@ class Runtime:
                     self.guard.check_stats(self.snapshot)
                 from .progression_hook import configure
                 self.hooks.progression_status = configure(memory,self.snapshot,known,self.slot_data,self.journal)
+                from .gameplay_controls import configure as configure_controls
+                try:
+                    self.hooks.gameplay_controls_status = configure_controls(memory,self.snapshot,known,self.slot_data)
+                except MemoryUnavailable as error:
+                    self.hooks.gameplay_controls_status = {'error':str(error)}
             except MemoryUnavailable as error:
                 self.hooks.progression_status = {'available':False,'reason':str(error)}
         self.last_error = self.snapshot.status
@@ -304,6 +339,11 @@ class Runtime:
                 self.hooks.progression_status = configure(memory,self.snapshot,owned,self.slot_data,self.journal)
             except MemoryUnavailable as error:
                 self.hooks.progression_status = {'available':False,'reason':str(error)}
+            from .gameplay_controls import configure as configure_controls
+            try:
+                self.hooks.gameplay_controls_status = configure_controls(memory,self.snapshot,owned,self.slot_data)
+            except MemoryUnavailable as error:
+                self.hooks.gameplay_controls_status = {'error':str(error)}
         try:
             self.guard.check(self.snapshot)
         except MemoryUnavailable:
@@ -313,6 +353,15 @@ class Runtime:
             return
         configure_hook()
         self.hooks.project_permissions(memory, self.snapshot, owned, self.slot_data)
+
+    def effect_context(self, memory, family):
+        context = list(self.guard.check_stats(self.snapshot))
+        if family == 'boost':
+            if self.snapshot.boost_address is None or self.snapshot.boost_max_address is None:
+                raise MemoryUnavailable('WRITE_BLOCKED: boost model unavailable')
+            context.extend((self.snapshot.boost_address, self.snapshot.boost_max_address,
+                            memory.read_u32(self.snapshot.boost_max_address)))
+        return context
 
     def settle_effects(self, memory):
         for index, pending in list(self.inflight.items()):
@@ -324,7 +373,7 @@ class Runtime:
                 logger.warning('Item uncertain: receipt %s left gameplay; no replay, later receipts continue', index)
                 continue
             try:
-                context = list(self.guard.check_stats(self.snapshot))
+                context = self.effect_context(memory, pending['family'])
             except MemoryUnavailable:
                 continue
             elapsed = self.clock() - pending['started']
@@ -343,7 +392,11 @@ class Runtime:
                 logger.warning('Item uncertain: receipt %s verification read failed: %s', index, error)
                 continue
             correct = all(value == effect['after'] for value in values)
-            coherent = len(set(values)) == 1 and all(0 <= value <= (99 if pending['family'] == 'lives' else 9999) for value in values)
+            if pending['family'] == 'boost':
+                decoded = [struct.unpack('>f', v.to_bytes(4, 'big'))[0] for v in values]
+                coherent = all(math.isfinite(v) and 0 <= v <= effect['maximum'] for v in decoded)
+            else:
+                coherent = len(set(values)) == 1 and all(0 <= value <= (99 if pending['family'] == 'lives' else 9999) for value in values)
             effect['last_observed'] = values
             effect['elapsed'] = elapsed
             if elapsed >= .02 and correct:
@@ -353,6 +406,14 @@ class Runtime:
             if elapsed >= 2:
                 if coherent and pending.get('later_frame') and pending.get('half_second'):
                     self.journal.confirm(index)
+                    if effect.get('rolled_amount'):
+                        logger.info('Rings applied: receipt %s, rolled +%s, counter gain +%s', index,
+                                    effect['rolled_amount'], effect['after'] - effect['before'])
+                    if pending['family'] == 'boost':
+                        before_float, after_float = (struct.unpack('>f', effect[k].to_bytes(4, 'big'))[0]
+                                                     for k in ('before','after'))
+                        logger.info('Half Boost Refill applied: receipt %s, %.2f -> %.2f (maximum %.2f)',
+                                    index, before_float, after_float, effect['maximum'])
                     logger.info('Counter delivery observed: receipt %s, counters %s after %.2fs; HUD verification separate', index, values, elapsed)
                 else:
                     effect.update(state='uncertain', reason='no later-frame effect witness or counter sources disagree')
@@ -365,10 +426,12 @@ class Runtime:
         occupied = {pending['family'] for pending in self.inflight.values()}
         for index, item in enumerate(item_ids):
             name = BY_ID[item]
-            if name not in FILLER + TRAPS:
+            if name not in DELIVERY_ITEMS:
                 continue
             recorded = self.journal.data['effects'].get(str(index))
-            family = 'lives' if name == '1-Up' else 'rings'
+            family = 'lives' if name == '1-Up' else 'boost' if name == 'Half Boost Refill' else 'rings'
+            amount = rings_amount(self.journal, index) if name == 'Rings' else None
+            recorded = self.journal.data['effects'].get(str(index))
             if recorded and recorded['state'] not in ('queued', 'deferred'):
                 # Persisted but unowned verification is uncertain after a restart.
                 # Do not block independent receipts and never automatically replay.
@@ -394,11 +457,15 @@ class Runtime:
             if family in occupied:
                 self.journal.defer(index, item, 'earlier receipt is actively verifying')
                 continue
+            if (family == 'boost' and self.slot_data['options'].get('boost_lock')
+                    and ITEM_TABLE['White Boost Wisp'] not in item_ids):
+                self.journal.defer(index, item, 'White Boost Wisp required while Boost Lock is enabled')
+                continue
             if name == 'Swim Everywhere Trap':
                 self.journal.defer(index, item, 'unsupported native swimming operation')
                 continue  # Unsupported trap cannot starve independently safe filler.
-            address = snapshot.lives_address if family == 'lives' else snapshot.rings_address
-            mirror = snapshot.world_lives_address if family == 'lives' else snapshot.ring_mirror_address
+            address = snapshot.lives_address if family == 'lives' else snapshot.boost_address if family == 'boost' else snapshot.rings_address
+            mirror = snapshot.world_lives_address if family == 'lives' else None if family == 'boost' else snapshot.ring_mirror_address
             addresses = list(dict.fromkeys(a for a in (address, mirror) if a is not None))
             if not addresses or address is None:
                 self.journal.defer(index, item, 'runtime_stats_pointer_missing')
@@ -415,23 +482,45 @@ class Runtime:
                 self.journal.defer(index, item, 'normal act with positive rings required')
                 continue  # Keep receipt queued, allow later positive filler.
             limit = 99 if family == 'lives' else 9999
-            if before > limit:
+            if family != 'boost' and before > limit:
                 self.journal.defer(index, item, 'stats_out_of_range')
                 continue
-            amount = 1 if name == '1-Up' else int(name.split('+')[1].split(')')[0]) if name in FILLER else 0
-            after = 0 if name == 'Ring Loss Trap' else min(limit, before + amount)
+            if family == 'boost':
+                try:
+                    maximum = memory.read_f32(snapshot.boost_max_address)
+                    current = struct.unpack('>f', before.to_bytes(4, 'big'))[0]
+                except (MemoryUnavailable, TypeError):
+                    self.journal.defer(index, item, 'native boost maximum unavailable')
+                    continue
+                if not (math.isfinite(current) and math.isfinite(maximum) and 0 < maximum <= 10000 and 0 <= current <= maximum):
+                    self.journal.defer(index, item, 'native boost values out of range')
+                    continue
+                after = int.from_bytes(struct.pack('>f', min(maximum, current + maximum / 2)), 'big')
+            else:
+                if amount is None:
+                    amount = 1 if name == '1-Up' else int(name.split('+')[1].split(')')[0]) if name in LEGACY_FILLER else 0
+                after = 0 if name == 'Ring Loss Trap' else min(limit, before + amount)
             self.deferred.pop(index, None)
-            self.journal.prepare(index, item, list(self.guard.check_stats(snapshot)), before, after)
+            context = self.effect_context(memory, family)
+            if family == 'boost' and context[-1] != int.from_bytes(struct.pack('>f', maximum), 'big'):
+                self.journal.defer(index, item, 'native boost maximum changed before attempt')
+                continue
+            self.journal.prepare(index, item, context, before, after)
             logger.info('Native write attempted: receipt %s, %s, %s -> %s', index, name, before, after)
             self.journal.data['effects'][str(index)].update(addresses=addresses, family=family, stage_epoch=snapshot.stage_epoch, reason=None)
+            if family == 'boost':
+                self.journal.data['effects'][str(index)]['maximum'] = maximum
             self.journal.save()
             completed_writes = 0
             try:
                 for target in addresses:
+                    if family == 'boost' and self.effect_context(memory, family) != context:
+                        raise MemoryUnavailable('WRITE_BLOCKED: boost model or maximum changed before write')
                     current = memory.read_u32(target)
-                    if current > limit:
+                    if family != 'boost' and current > limit:
                         raise MemoryUnavailable('WRITE_UNCERTAIN: stat mirror out of range')
-                    memory.write_u32(target, after, expected=before if target == address else current, operation='stats')
+                    memory.write_u32(target, after, expected=before if target == address else current,
+                                     operation='boost_stats' if family == 'boost' else 'stats')
                     completed_writes += 1
             except MemoryUnavailable as error:
                 if completed_writes == 0 and str(error).startswith('WRITE_BLOCKED:'):
@@ -455,17 +544,17 @@ class Runtime:
 
     def pending_effects(self):
         return [i for i, item in enumerate(self.journal.data['receipts'])
-                if BY_ID[item] in FILLER + TRAPS and self.journal.data['effects'].get(str(i), {}).get('state')
+                if BY_ID[item] in DELIVERY_ITEMS and self.journal.data['effects'].get(str(i), {}).get('state')
                 not in ('confirmed', 'skipped_by_operator')]
 
     def item_details(self):
         rows = []
         for index, item in enumerate(self.journal.data['receipts']):
             name = BY_ID[item]
-            if name in FILLER + TRAPS:
+            if name in DELIVERY_ITEMS:
                 effect = self.journal.data['effects'].get(str(index), {})
                 rows.append({**effect, 'index': index, 'name': name,
-                             'family': 'lives' if name == '1-Up' else 'rings',
+                             'family': 'lives' if name == '1-Up' else 'boost' if name == 'Half Boost Refill' else 'rings',
                              'state': 'applying' if effect.get('state') == 'prepared' else effect.get('state', 'queued'),
                              'journal_state': effect.get('state', 'queued'),
                              'hud_verified': False})

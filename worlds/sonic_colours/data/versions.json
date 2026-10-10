@@ -31,6 +31,8 @@
     "game_land_gates": true,
     "emeralds": true,
     "stats": true,
+    "boost_stats": true,
+    "gameplay_controls": true,
     "native_death": false,
     "swimming": false,
     "stage_shuffle": false,

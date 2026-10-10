@@ -1,4 +1,5 @@
 import struct
+from dataclasses import replace
 import pytest
 from ..client.capsule_refresh import inspect_installed
 from ..client.memory import SonicMemory, MemoryUnavailable
@@ -7,6 +8,13 @@ from ..world_constants import load_data
 from .test_memory import FakeBackend
 from .test_pickup_integration import Overlay
 from .test_native_originals import PAIRS
+from ..Items import ITEM_TABLE, LEGACY_FILLER
+from ..world_constants import BASE_ID, WISPS
+from ..client.runtime import rings_amount, victory
+from ..client.journal import Journal
+from .test_runtime import IDENTITY, snapshot
+from .test_items_wisps_live import runtime_fixture, settle
+from . import generate
 
 
 def captured(b):
@@ -32,3 +40,87 @@ def test_real_c2_layout_keeps_native_core_intro_detection():
     m.verify_revision()
     s=NativeHooks().snapshot(m)
     assert s.scene=='gameplay' and s.new_game_verified and s.pickup_verified
+
+
+def test_new_item_ids_do_not_alias_retired_or_legacy_ids():
+    assert [ITEM_TABLE[n] for n in LEGACY_FILLER] == [BASE_ID+i for i in (26,27,28)]
+    assert ITEM_TABLE['Rings'] == BASE_ID+32
+    assert ITEM_TABLE['Half Boost Refill'] == BASE_ID+33
+    assert len(set(ITEM_TABLE.values())) == len(ITEM_TABLE)
+    m=generate()
+    assert not any(i.name in LEGACY_FILLER for i in m.itempool)
+
+
+def test_random_rings_roll_survives_results_restart_and_later_receipts(tmp_path):
+    items=[ITEM_TABLE['Rings']]*3
+    with Journal(tmp_path,IDENTITY) as j:
+        r,b,m,tick=runtime_fixture(j);j.record_history(items)
+        r.snapshot=replace(r.snapshot,scene='results')
+        r.apply_effects(m,items)
+        rolls=[rings_amount(j,i) for i in range(3)]
+        assert all(1<=v<=100 for v in rolls) and not b.writes
+    with Journal(tmp_path,IDENTITY) as j:
+        r,b,m,tick=runtime_fixture(j)
+        assert rolls==[rings_amount(j,i) for i in range(3)]
+        r.snapshot=replace(r.snapshot,stage_epoch='act2')
+        r.apply_effects(m,items)
+        for _ in items:settle(r,m,items,tick)
+        assert all(e['state']=='confirmed' for e in j.data['effects'].values())
+        assert m.read_u32(r.snapshot.rings_address)==sum(rolls)
+        writes=len(b.writes);r.apply_effects(m,items);assert len(b.writes)==writes
+
+
+@pytest.mark.parametrize('maximum,current,expected',[(100.,10.,60.),(50.,10.,35.),(100.,90.,100.)])
+def test_half_boost_uses_native_maximum_and_defers_results(tmp_path,maximum,current,expected):
+    items=[ITEM_TABLE['Half Boost Refill']]
+    with Journal(tmp_path,IDENTITY) as j:
+        r,b,m,tick=runtime_fixture(j);j.record_history(items)
+        r.snapshot=replace(r.snapshot,boost_address=0x90002008,boost_max_address=0x90002014,scene='results')
+        b.put(r.snapshot.boost_address,struct.pack('>f',current))
+        b.put(r.snapshot.boost_max_address,struct.pack('>f',maximum))
+        r.apply_effects(m,items);assert not b.writes
+        r.snapshot=replace(r.snapshot,scene='gameplay',stage_epoch='act2')
+        r.apply_effects(m,items);settle(r,m,items,tick)
+        assert m.read_f32(r.snapshot.boost_address)==expected
+        assert j.data['effects']['0']['state']=='confirmed'
+
+
+def test_final_goal_requires_escape_after_boss_and_survives_reload():
+    slot=generate().worlds[1].fill_slot_data()
+    assert not victory(slot,snapshot(persisted_clears=frozenset({'stg790'})))
+    assert not victory(slot,snapshot(persisted_clears=frozenset({'stg720'})))
+    assert victory(slot,snapshot(persisted_clears=frozenset({'stg720','stg790'})))
+    assert victory(slot,snapshot(persisted_clears=frozenset({'stg720'})),observed_clears={'stg790'})
+
+
+@pytest.mark.parametrize('starting', [0, 42, 43])
+def test_terminal_velocity_requires_every_wisp_except_exact_starting_act(starting):
+    from BaseClasses import CollectionState
+    from ..Items import WISP_ITEMS, WORLD_ITEMS
+    from ..world_constants import STAGES
+    multiworld = generate({'starting_act': starting})
+    world = multiworld.worlds[1]
+    state = CollectionState(multiworld)
+    state.collect(world.create_item(WORLD_ITEMS[6]), prevent_sweep=True)
+    for item in WISP_ITEMS[:-1]:
+        state.collect(world.create_item(item), prevent_sweep=True)
+    terminal = [s for s in STAGES if s['zone_index'] == 6]
+    for stage in terminal:
+        reachable = state.can_reach('Map Slot ' + stage['stage_slot_id'], 'Region', 1)
+        assert reachable == (stage['mission_id'] == world.starting_stage['mission_id'])
+    state.collect(world.create_item(WISP_ITEMS[-1]), prevent_sweep=True)
+    assert all(state.can_reach('Map Slot ' + s['stage_slot_id'], 'Region', 1) for s in terminal)
+
+
+@pytest.mark.parametrize('locked', [False, True])
+def test_white_capsule_logic_matches_optional_boost_lock(locked):
+    from BaseClasses import CollectionState
+    from ..capsules import CAPSULES
+    multiworld = generate({'wisp_capsules': True, 'boost_lock': locked})
+    world = multiworld.worlds[1]
+    state = CollectionState(multiworld)
+    capsule = next(c for c in CAPSULES.values() if c.eligible and c.mission == 'stg110'
+                   and c.wisp_item == 'White Boost Wisp')
+    assert multiworld.get_location(capsule.name, 1).access_rule(state) == (not locked)
+    state.collect(world.create_item('White Boost Wisp'), prevent_sweep=True)
+    assert multiworld.get_location(capsule.name, 1).access_rule(state)

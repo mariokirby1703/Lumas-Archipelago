@@ -71,7 +71,8 @@ def test_persisted_ring_modes_and_goal_never_from_inventory():
             assert not detect_checks(data, partial)
             assert detect_checks(data, complete) == {LOCATION_TABLE[name + ' - All 5 Red Rings'].code}
         assert not victory(data, snapshot())
-        assert victory(data, snapshot(persisted_clears=frozenset({'stg790'})))
+        assert not victory(data, snapshot(persisted_clears=frozenset({'stg790'})))
+        assert victory(data, snapshot(persisted_clears=frozenset({'stg790', 'stg720'})))
 
 
 @pytest.mark.parametrize('mode', ['singles', 'per_level'])

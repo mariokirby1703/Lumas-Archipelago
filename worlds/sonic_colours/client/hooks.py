@@ -30,6 +30,7 @@ class NativeHooks:
         self.stage_sequence = 0
         self.capsule_refresh_status = {'available': False, 'reason': 'not observed'}
         self.progression_status = {'available':False,'reason':'not observed'}
+        self.gameplay_controls_status = {'installed':{},'reason':'not observed'}
         self.rejected_disc = None
         self.rejected_disc_polls = 0
         self.progress_rows = load_data('progress_bits.json')
@@ -195,6 +196,7 @@ class NativeHooks:
                         scene_verified=scene != 'unclassified',
                         death_state='dying' if scene == 'dying' else 'alive' if scene == 'gameplay' and player else 'unknown',
                         rings_address=player.get('rings_address'), lives_address=stage.get('lives_address'),
+                        boost_address=player.get('boost_address'), boost_max_address=player.get('boost_max_address'),
                         ring_mirror_address=stage.get('ring_mirror_address'), world_lives_address=(stage.get('world_lives_address') if stage.get('player', {}).get('mode') == 0 else None),
                         evidence={'chain': chain, 'save_chain_trace': trace,
                                   'progress_c': '66 native bank C reads; only listed subset live-read validated',
@@ -239,7 +241,7 @@ class NativeHooks:
         values = {starting_bit: True}
         starting = STARTING_STAGES[slot_data['options']['starting_act']]
         for stage in STAGES:
-            if stage['zone_index'] == starting['zone_index'] and stage['slot'] <= starting['slot']:
+            if stage['zone_index'] == starting['zone_index'] and stage['slot'] <= starting['slot'] and starting['zone_index'] != 6:
                 values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))] = True
         options = slot_data['options']
         # 8015EC50 uses native colour IDs, not AP catalog order.
@@ -249,9 +251,18 @@ class NativeHooks:
             values[bit] = inventory['counts'][colour + ' Wisp'] > 0
         for zone, item in enumerate(WORLD_ITEMS):
             granted = zone == slot_data['starting_world'] or inventory['counts'][item] > 0
+            if zone == 6:
+                from ..Items import WISP_ITEMS
+                full_access = bool((starting['zone_index'] == 6 or inventory['counts'][item]) and all(inventory['counts'][w] for w in WISP_ITEMS))
+                granted = full_access or starting['zone_index'] == 6
+                for stage in STAGES:
+                    if stage['zone_index'] == 6:
+                        bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))
+                        values[bit] = full_access or stage['mission_id'] == starting_mission
             values[20 + zone] = granted
             first = next(stage for stage in STAGES if stage['zone_index'] == zone and stage['slot'] == 1)
-            values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == first['mission_id']))] = granted
+            if zone != 6:
+                values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == first['mission_id']))] = granted
         # Act 1 gates remain native factory defaults. Acts 2/3 use AP Red Ring
         # items, independently from physical collectibles (8016CB5C table).
         values[8] = True  # Game Land entry; no physical 30-Ring prerequisite.
@@ -272,6 +283,16 @@ class NativeHooks:
                 memory.write_u32(address, after, expected=before, operation='permission_bits')
         if snapshot.scene == 'world_map':
             access = snapshot.evidence['native_data']['stage_objects'][0].get('world_map_access')
+            if access and access.get('nodes'):
+                for node in access['nodes']:
+                    stage = next(s for s in STAGES if s['zone_index'] == access['zone'] and s['slot'] == node['slot'])
+                    bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))
+                    permitted = values.get(bit)
+                    if permitted is True and node['status'] == 1:
+                        memory.write_u32(node['address'], 2, expected=1, operation='map_availability')
+                    elif permitted is False and node['status'] > 1:
+                        memory.write_u32(node['address'], 1, expected=node['status'], operation='map_lock')
+                access = None  # All first/starting/TV nodes were handled above.
             if access and values.get(20 + access['zone']) and access['first_act_status'] == 1:
                 # 802689B4 reads bank A; native node states 1=locked, 2=available,
                 # 3=entered, 4=cleared. Refresh only this first waypoint cache.

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from Options import Choice, DefaultOnToggle, Toggle, Range, DeathLink, PerGameCommonOptions, OptionGroup
 
 class Goal(Choice):
-    """Choose your victory condition: the final boss, all seven bosses, all 180 physical Red Rings, all 21 Game Land stages, or all seven AP Chaos Emeralds."""
+    """Nega-Wisp Armor (Final Boss) requires the final boss and the subsequent Terminal Velocity Act 2 escape. Other goals require all seven bosses, all 180 physical Red Rings, all 21 Game Land stages, or all seven AP Chaos Emeralds."""
     display_name = 'Goal'
     option_nega_wisp_armor = 0
     option_all_bosses = 1
@@ -10,6 +10,10 @@ class Goal(Choice):
     option_all_game_land_stages = 3
     option_super_sonic = 4
     default = 0
+
+    @classmethod
+    def get_option_name(cls, value):
+        return 'Nega-Wisp Armor (Final Boss)' if value == 0 else super().get_option_name(value)
 
 
 class RedRingChecks(Choice):
@@ -162,7 +166,7 @@ class SwimTrapDuration(Range):
 
 class WispCapsules(Toggle):
     """Add an immediate check for every eligible collectible Wisp Capsule in story Acts and Game Land. Coloured capsules require their matching AP Wisp item."""
-    display_name = 'Wisp Capsules'
+    display_name = 'Wisp Capsule Sanity'
 
 
 class SonicDeathLink(DeathLink):
@@ -170,10 +174,14 @@ class SonicDeathLink(DeathLink):
     display_name = 'Death Link'
 
 
+class BoostLock(Toggle):
+    """Require the White Boost Wisp item for ordinary Boost use. Off preserves vanilla Boost from the start. Super Sonic's native infinite Boost remains separate."""
+    display_name = 'Boost Lock'
+
+
 @dataclass
 class SonicColoursOptions(PerGameCommonOptions):
     goal: Goal
-    wisp_capsules: WispCapsules
     red_ring_checks: RedRingChecks
     starting_act: StartingAct
     level_randomization: LevelRandomization
@@ -188,12 +196,14 @@ class SonicColoursOptions(PerGameCommonOptions):
     trap_percentage: TrapPercentage
     swim_trap_duration: SwimTrapDuration
     death_link: SonicDeathLink
+    boost_lock: BoostLock
+    wisp_capsules: WispCapsules
 
 OPTION_NAMES = tuple(SonicColoursOptions.__annotations__)
 
 OPTION_GROUPS = [
-    OptionGroup('Progression', [Goal, StartingAct]),
-    OptionGroup('Checks', [RedRingChecks, WispCapsules, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks]),
+    OptionGroup('Progression', [Goal, StartingAct, BoostLock]),
+    OptionGroup('Checks', [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks, WispCapsules]),
     OptionGroup('Game Land', [GameLandRequirementReduction]),
     OptionGroup('Presentation', [MusicRandomization]),
     OptionGroup('Gameplay', [LevelRandomization, SonicDeathLink]),

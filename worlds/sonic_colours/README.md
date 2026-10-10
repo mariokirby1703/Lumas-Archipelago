@@ -1,7 +1,7 @@
-﻿# Sonic Colours (Wii) PAL — Archipelago 0.3.0
+# Sonic Colours (Wii) PAL — Archipelago 0.4.0
 
-PAL `SNCP8P`, revision 0; slot schema 3. This build contains native gameplay
-readers and guarded writers, immediate journaled checks, and two Gecko hooks.
+PAL `SNCP8P`, revision 0; slot schema 4. This build contains native gameplay
+readers and guarded writers, immediate journaled checks, and three Gecko codes.
 It is ready for targeted testing, but a complete native playthrough has not
 been verified.
 
@@ -20,7 +20,7 @@ are preserved.
 Offline tests exercise original RAM captures, guarded real-address writes,
 PowerPC hook execution, restrictive AP fill and genuine local server protocol
 acknowledgements. These do not establish usable capsules, audible shuffled
-music, or visible counter changes in Dolphin. White Boost scripted grants,
+music, or visible counter changes in Dolphin. Scripted White Boost grants,
 White's discovery event, native DeathLink/Swim and level shuffling remain gaps.
 
 - [Installation, New Game and YAML migration](docs/setup_en.md)
@@ -30,3 +30,9 @@ White's discovery event, native DeathLink/Swim and level shuffling remain gaps.
 
 Build: `.venv/Scripts/python.exe worlds/sonic_colours/build_apworld.py`.
 Original Wii binaries, private notes and RAM dumps are excluded from the APWorld.
+
+The October 10 update accepts exact older AP capsule thunks, adds native
+Game Land speed and optional Boost-use gates, randomized Rings and Half Boost
+Refill, and requires the final boss plus the subsequent escape for the default
+goal. Terminal Velocity requires all eight Wisps; a TV starting-stage exception
+applies only to that stage. [Validation and remaining limits](docs/oct10_validation.md).

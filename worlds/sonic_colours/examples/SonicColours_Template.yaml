@@ -34,7 +34,7 @@ game: Sonic Colours (Wii)
 requires:
   version: 0.6.8 # Version of Archipelago required for this yaml to work as expected.
   game:
-    Sonic Colours (Wii): 0.3.0 # Version of the world required for this yaml to work as expected.
+    Sonic Colours (Wii): 0.4.0 # Version of the world required for this yaml to work as expected.
 
 Sonic Colours (Wii):
   ################
@@ -69,7 +69,7 @@ Sonic Colours (Wii):
   # Progression #
   ###############
   goal:
-    # Choose your victory condition: the final boss, all seven bosses, all 180 physical Red Rings, all 21 Game Land stages, or all seven AP Chaos Emeralds.
+    # Nega-Wisp Armor (Final Boss) requires the final boss and the subsequent Terminal Velocity Act 2 escape. Other goals require all seven bosses, all 180 physical Red Rings, all 21 Game Land stages, or all seven AP Chaos Emeralds.
     nega_wisp_armor: 50
     all_bosses: 0
     all_red_rings: 0
@@ -124,6 +124,11 @@ Sonic Colours (Wii):
     terminal_velocity_act_2: 0
     random: 50
 
+  boost_lock:
+    # Require the White Boost Wisp item for ordinary Boost use. Off preserves vanilla Boost from the start. Super Sonic's native infinite Boost remains separate.
+    'false': 50
+    'true': 0
+
   ##########
   # Checks #
   ##########
@@ -132,11 +137,6 @@ Sonic Colours (Wii):
     'off': 0
     singles: 50
     per_level: 0
-
-  wisp_capsules:
-    # Add an immediate check for every eligible collectible Wisp Capsule in story Acts and Game Land. Coloured capsules require their matching AP Wisp item.
-    'false': 50
-    'true': 0
 
   rank_checks:
     # Add minimum-grade checks for S, A, B or C. A better rank also completes every lower enabled threshold. All adds all four checks to each ranked stage.
@@ -159,6 +159,11 @@ Sonic Colours (Wii):
 
   wisp_discovery_checks:
     # Add a check when the game first introduces each of the seven coloured Wisps through its vanilla discovery event. Opening ordinary capsules does not count, and discovery does not grant the corresponding AP Wisp item.
+    'false': 50
+    'true': 0
+
+  wisp_capsules:
+    # Add an immediate check for every eligible collectible Wisp Capsule in story Acts and Game Land. Coloured capsules require their matching AP Wisp item.
     'false': 50
     'true': 0
 

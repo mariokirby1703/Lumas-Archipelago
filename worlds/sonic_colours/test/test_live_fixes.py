@@ -80,6 +80,9 @@ def test_all_world_items_grant_only_first_act_and_starting_act(tmp_path):
             hooks.project_permissions(memory,runtime.snapshot,inventory([ITEM_TABLE[item]]),data)
             first=next(s for s in STAGES if s['zone_index']==zone and s['slot']==1)
             bit=int(next(r['bank_A'] for r in hooks.progress_rows if r['mission']==first['mission_id']))
+            if zone == 6:
+                assert not memory.read_progress_bit(flags,26) and not memory.read_progress_bit(flags,bit)
+                continue  # Terminal Velocity also needs all eight AP Wisps.
             assert memory.read_progress_bit(flags,20+zone) and memory.read_progress_bit(flags,bit)
             changed={b for b,v in before.items() if not v and memory.read_progress_bit(flags,b)}
             # Game Land flags have their own inventory gate projection; no other story act reveal.

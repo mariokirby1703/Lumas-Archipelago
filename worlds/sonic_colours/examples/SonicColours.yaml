@@ -2,9 +2,9 @@ name: SonicPlayer
 game: Sonic Colours (Wii)
 Sonic Colours (Wii):
   goal: nega_wisp_armor
-  wisp_capsules: false
   red_ring_checks: singles
   starting_act: random
+  boost_lock: false
   level_randomization: 'off'
   rank_checks: 'off'
   ring_loss_trap_weight: medium
@@ -17,3 +17,4 @@ Sonic Colours (Wii):
   trap_percentage: 10
   swim_trap_duration: 15
   death_link: false
+  wisp_capsules: false

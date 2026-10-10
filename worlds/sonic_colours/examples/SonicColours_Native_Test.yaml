@@ -4,6 +4,7 @@ Sonic Colours (Wii):
   goal: nega_wisp_armor
   red_ring_checks: singles
   starting_act: tropical_resort_act_1
+  boost_lock: false
   level_randomization: 'off'
   rank_checks: all
   ring_loss_trap_weight: medium

@@ -85,9 +85,9 @@ def test_typed_evidence_has_no_unproven_promotion():
     records = evidence_registry()
     assert records['manager_global'].grade == EvidenceGrade.CODE_DERIVED
     assert records['runtime_rings'].grade == EvidenceGrade.DUMP_CORRELATED
-    assert records['new_game_indicator'].grade == EvidenceGrade.DUMP_CORRELATED
+    assert records['new_game_indicator'].grade == EvidenceGrade.LIVE_READ
     assert not any(r.live_write for r in records.values())
-    assert {name for name, r in records.items() if r.live_read} == {'validated_clear_bits'}
+    assert {name for name, r in records.items() if r.live_read} == {'validated_clear_bits', 'new_game_indicator'}
 
 
 def test_new_game_prologue_any_slot_binding_resume_and_switch():

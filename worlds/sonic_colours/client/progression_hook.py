@@ -101,6 +101,10 @@ def configure(memory, snapshot, inventory, slot, journal=None):
     flags=chain[-1]
     world=sum(1 << (20+i) for i,item in enumerate(WORLD_ITEMS)
               if i == slot['starting_world'] or inventory['counts'][item])
+    from ..Items import WISP_ITEMS
+    if slot['starting_world'] != 6 and not (inventory['counts'][WORLD_ITEMS[6]] and
+                                          all(inventory['counts'][w] for w in WISP_ITEMS)):
+        world &= ~(1 << 26)
     if snapshot.save_identity is None:
         world=1<<20  # only the original mandatory introduction until first save
     colours=('Yellow Drill','Cyan Laser','Blue Cube','Green Hover','Purple Frenzy','Orange Rocket','Pink Spikes')

@@ -116,7 +116,7 @@ def test_low_capacity_error_and_trap_classification():
     world = generate({'trap_percentage': 100, 'ring_loss_trap_weight': 'off'}).worlds[1]
     assert not any(i.trap for i in world.multiworld.itempool)
     world = generate({'trap_percentage': 100}).worlds[1]
-    assert all(i.advancement or i.trap for i in world.multiworld.itempool)
+    assert all(i.advancement or i.trap or i.useful for i in world.multiworld.itempool)
     assert inventory([Items.ITEM_TABLE['Red Rings (+5)'], Items.ITEM_TABLE['Red Rings (+10)']])['red_rings'] == 15
 
 

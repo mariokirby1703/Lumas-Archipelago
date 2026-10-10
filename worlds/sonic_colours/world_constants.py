@@ -4,7 +4,7 @@ from importlib.resources import files
 
 GAME = "Sonic Colours (Wii)"
 BASE_ID = 847000000
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 
 def load_data(name):

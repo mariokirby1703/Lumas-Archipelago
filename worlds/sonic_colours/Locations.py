@@ -52,6 +52,8 @@ def enabled(data, options):
     if data.kind == 'rings':
         return options.red_ring_checks.value == 2
     if data.kind == 'rank':
+        if data.mission == 'stg720':
+            return False  # Ending escape has no ordinary rank results screen.
         value = options.rank_checks.value
         return value == 6 or value == data.index + 1
     if data.kind == 'emerald':

@@ -66,15 +66,24 @@ class SonicColoursWorld(World):
         # Clear with Rings while leaving the Wisps needed for physical pickups.
         for name in names:
             if name in Items.WISP_ITEMS or name in Items.WORLD_ITEMS:
-                early = self.multiworld.early_items[self.player]
+                # Open ordinary worlds before filling the few initially reachable
+                # Clears with Wisps. Terminal Velocity requires all eight Wisps,
+                # so its Access item cannot provide this initial expansion.
+                early = (self.multiworld.local_early_items[self.player]
+                         if name in Items.WORLD_ITEMS[:-1]
+                         else self.multiworld.early_items[self.player])
                 early[name] = early.get(name, 0) + 1
         needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks
                           or self.options.goal.value == 3 or self.options.wisp_capsules)
+        self.game_land_speed_items = needs_land
+        speed_count = max(0, 4 - sum(i.name == Items.GAME_LAND_SPEED for i in precollected)) if needs_land else 0
         self.ring_required = max(self.gates.values()) if needs_land else 0
         self.ring_target = (4 * self.ring_required + 2) // 3
         remaining = max(0, self.ring_target - sum(Items.RING_VALUES.get(i.name, 0) for i in precollected))
         capacity = len(self.active_locations) - len(self.options.exclude_locations.value & set(self.active_locations)) - len(names)
+        capacity = min(capacity, len(self.active_locations) - len(names) - speed_count)
         names += [Items.ring_name(n) for n in pack_rings(remaining, capacity)]
+        names += [Items.GAME_LAND_SPEED] * speed_count
         filler_count = len(self.active_locations) - len(names)
         if filler_count < 0:
             raise ValueError('Sonic Colours: enable more checks for mandatory progression.')
@@ -91,6 +100,16 @@ class SonicColoursWorld(World):
     def create_item(self, name):
         return Items.SonicColoursItem(name, Items.classification(name), Items.ITEM_TABLE[name], self.player)
 
+    def fill_hook(self, progitempool, usefulitempool, filleritempool, fill_locations):
+        # Restrictive fill works backwards. Keep access items in its assumed
+        # inventory while placing the large AP Ring pool, and preserve Clears
+        # for the remaining access items when physical Ring checks are gated.
+        access = set(Items.WORLD_ITEMS) | set(Items.WISP_ITEMS)
+        progitempool.sort(key=lambda item: not (item.player == self.player and item.name in access))
+        fill_locations.sort(key=lambda location: location.player == self.player
+                            and location.name in Locations.LOCATION_TABLE
+                            and Locations.LOCATION_TABLE[location.name].kind == 'clear')
+
     def get_filler_item_name(self):
         return self.random.choice(Items.FILLER)
 
@@ -98,6 +117,7 @@ class SonicColoursWorld(World):
         return {'schema_version': SCHEMA_VERSION, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'starting_slot': self.starting_stage['stage_slot_id'],
                 'starting_world': self.starting_world, 'game_land_gates': self.gates,
+                'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),
                 'logic_policy': 'provisional_clears_conservative_pickups',
                 'mandatory_prologue': ['stg110', 'stg130'],

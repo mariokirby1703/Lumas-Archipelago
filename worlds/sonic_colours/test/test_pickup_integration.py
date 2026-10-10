@@ -271,27 +271,27 @@ def test_real_websocket_checks_before_received_items_and_server_ack(tmp_path, mo
         ctx.release_runtime(); await ctx.shutdown()
     asyncio.run(scenario())
 
-def test_capsule_opening_in_intro_is_durable_and_instance_specific(tmp_path):
+def test_capsule_opening_in_intro_is_durable_without_received_items(tmp_path):
     from ..capsules import CAPSULES
     data=generate({'wisp_capsules':True}).worlds[1].fill_slot_data()
     candidates=[c for c in CAPSULES.values() if c.eligible and c.mission=='stg110' and c.wisp_item=='White Boost Wisp'][:2]
     assert len(candidates)==2
     with Journal(tmp_path,IDENTITY) as journal:
-        guard=SaveGuard(journal);guard.confirm_new_game()
+        guard=SaveGuard(journal)
         runtime=Runtime(data,journal,guard,None)
         value=snapshot(save_identity=None,scene_verified=True,pickup_verified=True,
                        stage_epoch='intro',actual_mission='stg110',new_game_verified=True,fresh_fields=(True,True))
         guard.observe(value)
         native=[{'key':c.key,'opened':False,'actor_id':i} for i,c in enumerate(candidates)]
         runtime.snapshot=replace(value,evidence={'native_data':{'stage_objects':[{'capsules':native}]}})
-        runtime.observe_capsules(frozenset({'White Boost Wisp'}))
+        runtime.observe_capsules(frozenset())
         for c in native:
             c['opened']=True
-            runtime.observe_capsules(frozenset({'White Boost Wisp'}))
+            runtime.observe_capsules(frozenset())
         assert journal.data['pickup_checks']==sorted(c.code for c in candidates)
         assert len(journal.data['pickup_events'])==2
         runtime.snapshot=replace(runtime.snapshot,stage_epoch='retry')
-        runtime.observe_capsules(frozenset({'White Boost Wisp'}))
+        runtime.observe_capsules(frozenset())
         assert len(journal.data['pickup_events'])==2
         assert journal.data['save_identity'] is None
 

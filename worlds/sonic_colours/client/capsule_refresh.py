@@ -42,11 +42,18 @@ class PPC:
 
 def payload_words():
     a=PPC()
-    a.d(37,1,1,-0x60)  # private frame, preserve caller volatile GPRs/LR/CR/CTR
-    a.emit(0x7C0802A6); a.d(36,0,1,8)
-    a.emit(0x7C000026); a.d(36,0,1,12)
-    a.emit(0x7C0902A6); a.d(36,0,1,16)
-    for r in range(3,13): a.d(36,r,1,20+(r-3)*4)
+    # Keep save slots above the native callee's outgoing-argument home area.
+    a.d(37,1,1,-0x1a0)
+    a.emit(0x7C0802A6); a.d(36,0,1,0x40)
+    a.emit(0x7C000026); a.d(36,0,1,0x44)
+    a.emit(0x7C0902A6); a.d(36,0,1,0x48)
+    for r in range(3,13): a.d(36,r,1,0x4c+(r-3)*4)
+    a.emit(0x7C10E2A6); a.d(36,0,1,0x180)  # save GQR0
+    a.d(14,0,0,0); a.emit(0x7C10E3A6)
+    for r in range(14):
+        a.d(54,r,1,0x80+r*8)  # volatile FPR double component
+        a.d(60,r,1,0x100+r*8)  # both paired-single components, GQR0=float
+    a.emit(0xFC00048E); a.d(54,0,1,0xf0)  # mffs f0; save FPSCR
     a.d(32,0,31,0); a.d(15,5,0,0x8076); a.d(14,5,5,0x1534)
     a.emit(0x7C002800); a.branch('end',0x40820000)
     a.d(34,0,31,0x110); a.d(11,0,0,0); a.branch('end',0x40820000)
@@ -88,11 +95,17 @@ def payload_words():
     a.mr(3,31); a.call(0x800D3DA4)  # native ghost model, refcount-replace +B0
     a.mr(3,31); a.d(15,4,0,0x8076); a.d(14,4,4,0x13d8); a.call(0x800D5490)
     a.label('end')
-    for r in range(3,13): a.d(32,r,1,20+(r-3)*4)
-    a.d(32,0,1,16); a.emit(0x7C0903A6)
-    a.d(32,0,1,12); a.emit(0x7C0FF120)
-    a.d(32,0,1,8); a.emit(0x7C0803A6)
-    a.d(14,1,1,0x60); a.emit(ORIGINAL)
+    a.d(14,0,0,0); a.emit(0x7C10E3A6)
+    a.d(50,0,1,0xf0); a.emit(0xFDFE058E)  # restore FPSCR
+    for r in range(14):
+        a.d(56,r,1,0x100+r*8)
+        a.d(50,r,1,0x80+r*8)
+    a.d(32,0,1,0x180); a.emit(0x7C10E3A6)
+    for r in range(3,13): a.d(32,r,1,0x4c+(r-3)*4)
+    a.d(32,0,1,0x48); a.emit(0x7C0903A6)
+    a.d(32,0,1,0x44); a.emit(0x7C0FF120)
+    a.d(32,0,1,0x40); a.emit(0x7C0803A6)
+    a.d(14,1,1,0x1a0); a.emit(ORIGINAL)
     # Gecko patches the final zero word to branch back to HOOK+4.
     if len(a.words)%2 == 0: a.emit(0x60000000)
     a.emit(0)
@@ -110,7 +123,9 @@ def gecko_ini():
     lines += ['E0000000 80008000']
     from .progression_hook import gecko_lines
     lines += gecko_lines()
-    lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression']
+    from .gameplay_controls import gecko_lines as control_lines
+    lines += control_lines()
+    lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates']
     return '\n'.join(lines)+'\n'
 
 

@@ -29,6 +29,8 @@ class Snapshot:
     world_lives_address: int | None = None
     rings_address: int | None = None
     lives_address: int | None = None
+    boost_address: int | None = None
+    boost_max_address: int | None = None
     new_game_verified: bool = False
     save_identity_verified: bool = False
     progress_verified: bool = False
@@ -219,14 +221,30 @@ class WritePolicy:
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
         self.memory.verify_revision()
         snapshot = self.snapshot_reader(self.memory)
-        if operation in ('progression_data','progression_reset') and snapshot.save_identity is None:
+        if operation in ('progression_data','progression_reset','gameplay_controls') and snapshot.save_identity is None:
             token = self.guard.check_stats(snapshot)
         else:
-            token = self.guard.check_stats(snapshot) if operation in ('stats', 'colour_permissions') else self.guard.check(snapshot)
-        if operation not in ('permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
+            token = self.guard.check_stats(snapshot) if operation in ('stats', 'boost_stats', 'colour_permissions') else self.guard.check(snapshot)
+        if operation not in ('permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset', 'gameplay_controls') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
             raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
         if operation == 'stats':
             allowed = {snapshot.rings_address, snapshot.lives_address, snapshot.ring_mirror_address, snapshot.world_lives_address}
+        elif operation == 'boost_stats':
+            allowed = {snapshot.boost_address} - {None}
+            if (snapshot.boost_address is None or snapshot.boost_max_address != snapshot.boost_address + 12
+                    or self.memory.read_u32(snapshot.boost_address - 8) != 0x80763A18):
+                raise MemoryUnavailable('WRITE_BLOCKED: boost model changed')
+            token = (*token, snapshot.boost_address, snapshot.boost_max_address,
+                     self.memory.read_u32(snapshot.boost_max_address))
+        elif operation == 'gameplay_controls':
+            from .gameplay_controls import HOOKS, installed
+            chain = self.memory.resolve_flags_ptr(allow_working=True)
+            if tuple(snapshot.evidence.get('chain', ())) != chain:
+                raise MemoryUnavailable('WRITE_BLOCKED: gameplay control profile changed')
+            data = [installed(self.memory, kind) for kind in HOOKS]
+            if size != 4 or not any(d is not None and address in range(d, d+20, 4) for d in data):
+                raise MemoryUnavailable('WRITE_BLOCKED: gameplay control address not allowed')
+            return token, chain, tuple(data)
         elif operation in ('progression_data','progression_reset'):
             from .progression_hook import installed_data
             data = installed_data(self.memory)
@@ -258,10 +276,18 @@ class WritePolicy:
             if snapshot.scene != 'world_map':
                 raise MemoryUnavailable('WRITE_BLOCKED: map availability requires world map')
             access = snapshot.evidence.get('native_data', {}).get('stage_objects', [{}])[0].get('world_map_access', {})
-            allowed = {access.get('status_address')}
+            allowed = {access.get('status_address')} | {node['address'] for node in access.get('nodes', ())}
             if operation == 'map_lock':
                 flags = self.memory.resolve_flags_ptr()[-1]
-                if not access or self.memory.read_progress_bit(flags,20+access['zone']):
+                from ..world_constants import STAGES, load_data
+                node = next((n for n in access.get('nodes', ()) if n['address'] == address), None)
+                if node:
+                    stage = next(s for s in STAGES if s['zone_index'] == access['zone'] and s['slot'] == node['slot'])
+                    bit = int(next(r['bank_A'] for r in load_data('progress_bits.json') if r['mission'] == stage['mission_id']))
+                    authorized = self.memory.read_progress_bit(flags, bit)
+                else:
+                    authorized = self.memory.read_progress_bit(flags,20+access['zone']) if access else True
+                if not access or authorized:
                     raise MemoryUnavailable('WRITE_BLOCKED: cannot lock an authorized world')
         elif operation == 'permission_bits':
             if snapshot.scene not in ('gameplay', 'world_map', 'global_map', 'game_land_select'):

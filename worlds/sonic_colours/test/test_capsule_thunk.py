@@ -18,6 +18,8 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
     mem[regs[2]-0x7c48]=0x80720000
     original=regs[:];lr,ctr,cr=0x80012345,0x80045678,0x12345678
     initial=(lr,ctr,cr);words=payload_words();pc=0;cmp=0;calls=[]
+    fpr=list(range(100,114));paired=list(range(200,214));fpscr=0x123456;gqr0=0x01010101
+    floating=(fpr[:],paired[:],fpscr,gqr0)
     for _ in range(1000):
         w=words[pc];pc+=1
         if w==0:break
@@ -28,6 +30,10 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
         elif op in (36,37):
             addr=(regs[ra]+imm)&0xffffffff;mem[addr]=regs[rt]
             if op==37:regs[ra]=addr
+        elif op==54:mem[regs[ra]+imm]=fpr[rt]
+        elif op==50:fpr[rt]=mem[regs[ra]+imm]
+        elif op==60:mem[regs[ra]+imm]=(fpr[rt],paired[rt])
+        elif op==56:fpr[rt],paired[rt]=mem[regs[ra]+imm]
         elif op in (10,11):
             lhs=regs[ra];rhs=u if op==10 else imm
             if op==11 and lhs&0x80000000:lhs-=0x100000000
@@ -47,6 +53,10 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
         elif w==0x7c0903a6:ctr=regs[0]
         elif w==0x7c0ff120:cr=regs[0]
         elif w==0x7c0803a6:lr=regs[0]
+        elif w==0x7c10e2a6:regs[0]=gqr0
+        elif w==0x7c10e3a6:gqr0=regs[0]
+        elif w==0xfc00048e:fpr[0]=fpscr
+        elif w==0xfdfe058e:fpscr=fpr[0]
         elif w in (0x7c002800,0x7c00f800,0x7c001800):
             lhs=regs[0];rhs=regs[{0x7c002800:5,0x7c00f800:31,0x7c001800:3}[w]]
             cmp=(lhs>rhs)-(lhs<rhs)
@@ -54,6 +64,10 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
             rs=w>>21&31;rb=w>>11&31;regs[ra]=regs[rs]|regs[rb]
         elif w==0x4e800421:
             lr=pc*4;calls.append((ctr,regs[3:6]))
+            # ABI-permitted native clobbers must not leak into the intercepted
+            # caller. Also exercise the caller's argument-home save area.
+            fpr[:]=[900]*14;paired[:]=[901]*14;fpscr=902;gqr0=903
+            for offset in range(8,0x40,4):mem[regs[1]+offset]=904
             if ctr==0x800132d8:
                 assert regs[3]==manager+8;regs[3]=state
             elif ctr==0x8003baac:
@@ -74,6 +88,7 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
         else:raise AssertionError(hex(w))
     else:raise AssertionError('PPC loop')
     assert regs[1:]==original[1:] and (lr,ctr,cr)==initial
+    assert (fpr,paired,fpscr,gqr0)==floating
     assert regs[0]==0 # displaced original lwz r0,128(r31)
     assert mem[actor+0x110]==opened
     return [c[0] for c in calls],mem[model+0x88]

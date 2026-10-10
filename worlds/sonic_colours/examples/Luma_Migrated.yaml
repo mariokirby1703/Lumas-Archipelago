@@ -5,7 +5,8 @@ Sonic Colours (Wii):
   progression_balancing: normal
   accessibility: full
   goal: nega_wisp_armor
-  starting_act: tropical_resort_act_1
+  starting_act: random
+  boost_lock: false
   red_ring_checks: singles
   rank_checks: c
   game_land_checks: true
