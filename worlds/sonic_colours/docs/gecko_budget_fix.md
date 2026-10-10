@@ -53,3 +53,10 @@ Location acknowledged: [847005000]
 This validates the compact installation, native pickup capture and real AP
 transport/acknowledgement for Game Land 1-1. Other Medal locations, pickup before
 host arming, and death/reconnect persistence for this check remain separate tests.
+
+The user subsequently confirmed that reconnecting the client and replaying
+Game Land 1-1 passed the requested duplicate/completion check. They also tested
+Game Land 2-1's Egg Medal and reported it worked. These are user-confirmed
+results; no additional 2-1 log lines or independent RAM capture were supplied.
+Death persistence, the remaining 19 Medal locations and pickups before host
+arming are still unverified by this session.
