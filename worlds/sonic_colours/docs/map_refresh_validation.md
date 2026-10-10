@@ -54,3 +54,38 @@ uninitialized fields; they are not candidate write addresses. A host write of
 zero to +0xBC would bypass native managed-object release and is not implemented.
 The immediate repair must update native scene-chain visibility and selection,
 and release the affected lock sprite through its actual native lifecycle.
+
+## Native refresh implementation (2026-10-11)
+
+The client now queues one owned world's refresh in the exact installed C2
+data block. Its request contains the current Grand World Map actor, zone and
+selected native profile pointer/index. Production WritePolicy requires a bound
+save, an attributed global-map context, the exact thunk and a currently granted
+bank-A World Access bit. Actor and save memory are not host write targets.
+
+The new `0x80266410` epilogue hook waits for interactive state **9**, confirmed
+in the running Dolphin map on October 11. State 8 is the preceding scripted
+transition. The hook follows the native `0x802671AC` lock lifecycle:
+`0x805E7EE4` queues the lock animation, and `0x805E9D80(handle, 0)` releases
+the actor's managed reference. It gets the existing scene root through its
+native virtual method and applies `chain%02d_on/off` visibility using
+`0x8026399C`, matching `0x80264524`. Terminal Velocity has no chain02..06 pair.
+No whole-map initialization, cinematic queue or save-slot changes are invoked.
+
+Boost/speed thunks now use STM/LM register preservation; prior exact payloads
+remain accepted. Capsule executable instructions are unchanged. The combined
+export retains one signature per directly called capsule routine and shares
+the final conditional scope between controls and Medal capture. All four
+enabled groups fit the standard handler (3256 bytes). Replace the complete
+export, keep all four enabled, and restart emulation when testing this build.
+
+Offline validation covers emitted PPC calls and ABI clobbers, each of six
+worlds, invalid zones, changed profile/actor, transition deferral, duplicate
+suppression, producer authorization, address/scene write rejection and exact
+text normalization with an original capture. Existing capsule, White Boost,
+speed, save, local-map and packaging regression tests also pass.
+
+The live observation above verifies the current map state, not execution of
+the new hook. Immediate lock disappearance, path visibility and selection
+without leaving the map still require installing this build and a controlled
+World Access delivery in Dolphin.

@@ -234,9 +234,23 @@ class WritePolicy:
             token = self.guard.check_stats(snapshot)
         else:
             token = self.guard.check_stats(snapshot) if operation in ('stats', 'boost_stats', 'colour_permissions') else self.guard.check(snapshot)
-        if operation not in ('permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset', 'gameplay_controls', 'egg_medal_controls', 'capsule_controls') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
+        if operation not in ('global_map_refresh', 'permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset', 'gameplay_controls', 'egg_medal_controls', 'capsule_controls') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
             raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
-        if operation == 'stats':
+        if operation == 'global_map_refresh':
+            from .map_refresh import installed_data
+            from .native_read import read_actors
+            if snapshot.scene != 'global_map':
+                raise MemoryUnavailable('WRITE_BLOCKED: refresh requires Grand World Map')
+            data = installed_data(self.memory)
+            context = snapshot.evidence['native_data']['stage_objects'][0]['context']
+            actors = tuple(p for p in read_actors(self.memory, context) if self.memory.read_u32(p) == 0x80777000)
+            if len(actors) != 1 or data is None or size != 4 or address not in range(data, data+16, 4):
+                raise MemoryUnavailable('WRITE_BLOCKED: map refresh owner/address changed')
+            chain = self.memory.resolve_flags_ptr()
+            if tuple(snapshot.evidence.get('chain', ())) != chain:
+                raise MemoryUnavailable('WRITE_BLOCKED: map refresh save changed')
+            return token, data, actors, chain
+        elif operation == 'stats':
             allowed = {snapshot.rings_address, snapshot.lives_address, snapshot.ring_mirror_address, snapshot.world_lives_address}
         elif operation == 'boost_stats':
             allowed = {snapshot.boost_address} - {None}

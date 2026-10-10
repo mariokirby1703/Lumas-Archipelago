@@ -31,6 +31,11 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
         elif op in (36,37):
             addr=(regs[ra]+imm)&0xffffffff;mem[addr]=regs[rt]
             if op==37:regs[ra]=addr
+        elif op in (46,47):
+            addr=regs[ra]+imm
+            for r in range(rt,32):
+                if op==47:mem[addr+(r-rt)*4]=regs[r]
+                else:regs[r]=mem[addr+(r-rt)*4]
         elif op==11:cmp=(regs[ra]>imm)-(regs[ra]<imm)
         elif op==16:
             take={0x41820000:cmp==0,0x40820000:cmp!=0,0x40810000:cmp<=0}[w&0xffff0000]
@@ -45,6 +50,8 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
         elif w==0x7d8802a6:regs[12]=lr
         elif w==0x7ccff120:cr=regs[6]
         elif w==0x7cc803a6:lr=regs[6]
+        elif w==0x7c0ff120:cr=regs[0]
+        elif w==0x7c0803a6:lr=regs[0]
         elif op==31 and w&0x7ff==0x378:regs[ra]=regs[rt]|regs[w>>11&31]
         elif op==31 and w&0x7ff==0:
             lhs=regs[ra];rhs=regs[w>>11&31];cmp=(lhs>rhs)-(lhs<rhs)
@@ -135,6 +142,16 @@ def test_known_previous_gecko_payload_is_still_accepted(kind):
     b.write_bytes(target+20, bytes(4))
     with pytest.raises(MemoryUnavailable, match='unknown_revision'):
         installed(m, kind)
+
+
+@pytest.mark.parametrize('kind', list(HOOKS))
+def test_pre_compaction_payload_is_still_accepted(kind):
+    b = FakeBackend(); m = SonicMemory(b); target=0x80002000
+    hook,_=HOOKS[kind]; words,offset=payload(kind,compact=False)
+    words[-1]=0x48000000|((hook+4-(target+len(words)*4-4))&0x3fffffc)
+    b.put(target,struct.pack('>'+'I'*len(words),*words))
+    b.put(hook,(0x48000000|((target-hook)&0x3fffffc)).to_bytes(4,'big'))
+    assert installed(m,kind)==target+offset
 
 
 @pytest.mark.parametrize('historical', [False, True])

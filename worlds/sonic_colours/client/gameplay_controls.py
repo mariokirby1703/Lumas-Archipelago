@@ -21,13 +21,20 @@ HOOKS = {
 }
 
 
-def payload(kind):
+def payload(kind, compact=True):
     a = PPC(); hook, original = HOOKS[kind]
     output = 3 if kind in ('boost', 'speed_get') else 0 if kind == 'speed_ui' else None
-    a.d(37, 1, 1, -0x40)
-    a.d(36, 0, 1, 16); a.emit(0x7C0802A6); a.d(36, 0, 1, 8)
-    a.emit(0x7C000026); a.d(36, 0, 1, 12)
-    for r in (3, 4, 6, 7, 12): a.d(36, r, 1, 20 + (3, 4, 6, 7, 12).index(r)*4)
+    frame = 0xa0 if compact else 0x40
+    saved = (3, 4, 6, 7, 12)
+    a.d(37, 1, 1, -frame)
+    if compact:
+        a.d(47, 0, 1, 16)
+        a.emit(0x7C0802A6); a.d(36, 0, 1, 144)
+        a.emit(0x7C000026); a.d(36, 0, 1, 148)
+    else:
+        a.d(36, 0, 1, 16); a.emit(0x7C0802A6); a.d(36, 0, 1, 8)
+        a.emit(0x7C000026); a.d(36, 0, 1, 12)
+        for r in saved: a.d(36, r, 1, 20 + saved.index(r)*4)
     a.emit(0x48000005); base = len(a.words)*4
     a.emit(0x7D8802A6); fix = len(a.words); a.d(14, 12, 12, 0)
     a.d(32, 6, 12, 0); a.d(11, 0, 6, 0); a.branch('vanilla', 0x41820000)
@@ -69,16 +76,23 @@ def payload(kind):
     if kind == 'speed_ui': a.d(32, 0, 1, 16)
     a.emit(original)
     a.label('restore')
-    for r in (3, 4, 6, 7, 12):
-        if r != output: a.d(32, r, 1, 20 + (3, 4, 6, 7, 12).index(r)*4)
+    if compact:
+        if output is not None: a.d(36, output, 1, 16+output*4)
+        a.d(32, 0, 1, 148); a.emit(0x7C0FF120)
+        a.d(32, 0, 1, 144); a.emit(0x7C0803A6)
+        a.d(46, 0, 1, 16)
+    else:
+        for r in saved:
+            if r != output: a.d(32, r, 1, 20 + saved.index(r)*4)
     # Keep the UI's displaced r0 output while restoring CR/LR with r6.
-    a.d(32, 6, 1, 12); a.emit(0x7CCFF120)  # mtcrf 255,r6
-    a.d(32, 6, 1, 8); a.emit(0x7CC803A6)  # mtlr r6
-    a.d(32, 6, 1, 28)
-    if output != 0: a.d(32, 0, 1, 16)
-    a.d(14, 1, 1, 0x40); a.branch('return')
+    if not compact:
+        a.d(32, 6, 1, 12); a.emit(0x7CCFF120)
+        a.d(32, 6, 1, 8); a.emit(0x7CC803A6)
+        a.d(32, 6, 1, 28)
+        if output != 0: a.d(32, 0, 1, 16)
+    a.d(14, 1, 1, frame); a.branch('return')
     data = len(a.words)*4; a.words[fix] |= (data-base)&0xffff
-    for _ in range(6): a.emit(0)  # five mutable words and immutable float zero
+    for _ in range(6 if not compact or kind in ('boost_use','boost_query') else 5): a.emit(0)
     a.label('return')
     if len(a.words)%2 == 0: a.emit(0x60000000)
     a.emit(0)
@@ -88,20 +102,18 @@ def payload(kind):
 def installed(memory, kind):
     hook, original = HOOKS[kind]; words, offset = payload(kind)
     from ..world_constants import load_data
+    previous_words, previous_offset = payload(kind, compact=False)
     legacy = load_data('gameplay_hook_legacy.json').get(kind)
-    variants = {kind: words}
-    if legacy and legacy['offset'] == offset:
-        variants['legacy'] = legacy['words']
-    if legacy and legacy['offset'] != offset:
-        # Exact historical layout has a different embedded-data offset.
+    layouts = [(kind, words, offset), ('previous', previous_words, previous_offset)]
+    if legacy: layouts.append(('legacy', legacy['words'], legacy['offset']))
+    for name, candidate, candidate_offset in layouts:
         try:
-            result = inspect_c2(memory, hook, original, variants, ((offset, 20),), label=kind)
-        except MemoryUnavailable:
-            result = inspect_c2(memory, hook, original, {'legacy':legacy['words']},
-                                ((legacy['offset'],20),), label=kind)
-            offset = legacy['offset']
-    else:
-        result = inspect_c2(memory, hook, original, variants, ((offset, 20),), label=kind)
+            result = inspect_c2(memory, hook, original, {name:candidate}, ((candidate_offset,20),), label=kind)
+            offset = candidate_offset
+            break
+        except MemoryUnavailable as error:
+            failure = error
+    else: raise failure
     if not result['installed']: return None
     address = result['target'] + offset
     owner, index, maximum, model, locked = struct.unpack('>5I', memory.read_bytes(address, 20))
@@ -139,7 +151,7 @@ def configure(memory, snapshot, owned, slot):
             'speed_controls_active': all(status[k] for k in ('speed_get', 'speed_set', 'speed_ui'))}
 
 
-def gecko_lines():
+def gecko_lines(close_scope=True):
     lines = ['$AP PAL speed and White Boost gates', '20000000 534E4350', '28000004 00003850', '28000006 00000000']
     # Dolphin skips an entire group if it exceeds the remaining low-MEM1
     # codelist budget. Do not export the inert historical coloured-Wisp query.
@@ -152,5 +164,11 @@ def gecko_lines():
         words, _ = payload(kind)
         lines += [f'20{hook-0x80000000:06X} {original:08X}', f'C2{hook-0x80000000:06X} {len(words)//2:08X}']
         lines += [f'{words[i]:08X} {words[i+1]:08X}' for i in range(0,len(words),2)]
-    lines += ['E0000000 80008000']
+    from .map_refresh import HOOK, ORIGINAL, payload as map_payload
+    words, _ = map_payload()
+    lines += [f'20{HOOK-0x80000000:06X} {ORIGINAL:08X}', f'C2{HOOK-0x80000000:06X} {len(words)//2:08X}']
+    lines += [f'{words[i]:08X} {words[i+1]:08X}' for i in range(0,len(words),2)]
+    # The combined four-group export closes this scope in its Medal group;
+    # a standalone export remains independently terminated.
+    if close_scope: lines += ['E0000000 80008000']
     return lines

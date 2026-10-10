@@ -48,6 +48,7 @@
     "progression_data": true,
     "progression_reset": true,
     "egg_medal_controls": true,
-    "capsule_controls": true
+    "capsule_controls": true,
+    "global_map_refresh": true
   }
 }

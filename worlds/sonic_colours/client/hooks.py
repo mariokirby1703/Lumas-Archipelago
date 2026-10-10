@@ -32,6 +32,7 @@ class NativeHooks:
         self.medal_status = {'available': False, 'reason': 'not observed'}
         self.progression_status = {'available':False,'reason':'not observed'}
         self.gameplay_controls_status = {'installed':{},'reason':'not observed'}
+        self.global_map_refresh_status = {'available':False,'reason':'not observed'}
         self.rejected_disc = None
         self.rejected_disc_polls = 0
         self.progress_rows = load_data('progress_bits.json')
@@ -308,6 +309,8 @@ class NativeHooks:
             elif access and not values.get(20 + access['zone']) and access['first_act_status'] > 1:
                 memory.write_u32(access['status_address'],1,expected=access['first_act_status'],operation='map_lock')
         self.project_live_permissions(memory, snapshot, inventory, slot_data)
+        from .map_refresh import configure
+        self.global_map_refresh_status = configure(memory, snapshot, values)
 
     def project_live_permissions(self, memory, snapshot, inventory, slot_data):
         if snapshot.scene == 'gameplay':

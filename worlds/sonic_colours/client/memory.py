@@ -145,6 +145,19 @@ class SonicMemory:
         if operation == 'map_lock' and (data != (1).to_bytes(4,'big') or int.from_bytes(expected,'big') not in (2,3,4)):
             raise MemoryUnavailable('WRITE_BLOCKED: map lock only permits available/entered/cleared-to-locked cache')
         token = self.write_guard(operation, address, len(data))
+        if operation == 'global_map_refresh':
+            _, request, actors, chain = token
+            value = int.from_bytes(data, 'big')
+            offset = address-request
+            valid = (len(data)==4 and ((offset==0 and value in (0,actors[0]))
+                     or (offset==4 and value in range(1,7))
+                     or (offset==8 and value==chain[1]) or (offset==12 and value==chain[2])))
+            if offset == 0 and value:
+                zone = self.read_u32(request+4)
+                valid = valid and zone in range(1,7) and self.read_progress_bit(chain[-1],20+zone)
+                valid = valid and self.read_u32(request+8)==chain[1] and self.read_u32(request+12)==chain[2]
+            if not valid:
+                raise MemoryUnavailable('WRITE_BLOCKED: invalid or unauthorized Grand World Map request')
         before = self.read_bytes(address, len(data))
         if before != expected:
             raise MemoryUnavailable('WRITE_BLOCKED: compare_failed')

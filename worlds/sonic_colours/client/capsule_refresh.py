@@ -141,7 +141,11 @@ def gecko_ini():
     words=payload_words()
     lines=['[Gecko]', '$AP PAL live coloured capsule refresh',
            '20000000 534E4350', '28000004 00003850', '28000006 00000000']
-    lines += [f'20{address-0x80000000:06X} {word:08X}' for address,word in NATIVE_SIGNATURES]
+    # Keep one entry signature per directly called native callee. The payload
+    # checks capsule/model vtables; the two unused virtual methods are not called.
+    # Full text verification in the client still checks every instruction.
+    lines += [f'20{address-0x80000000:06X} {word:08X}' for address,word in NATIVE_SIGNATURES
+              if address < 0x80700000 and not any(previous == address-4 for previous, _ in NATIVE_SIGNATURES)]
     lines += [f'20{HOOK-0x80000000:06X} {ORIGINAL:08X}',
               f'C2{HOOK-0x80000000:06X} {len(words)//2:08X}']
     lines += [f'{words[i]:08X} {words[i+1]:08X}' for i in range(0,len(words),2)]
@@ -149,7 +153,7 @@ def gecko_ini():
     from .progression_hook import gecko_lines
     lines += gecko_lines()
     from .gameplay_controls import gecko_lines as control_lines
-    lines += control_lines()
+    lines += control_lines(close_scope=False)
     from .medal_hook import gecko_lines as medal_lines
     lines += medal_lines()
     lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Egg Medal pickup capture']

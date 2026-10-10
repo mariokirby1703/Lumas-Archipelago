@@ -40,7 +40,8 @@ def test_shared_guard_installs_all_real_controls_once_and_rejects_wrong_disc():
     memory={0x80000000:0x534e4350,0x80000004:0x3850,0x80000006:0}
     for first,second in table:
         if first>>24==0x20:memory[0x80000000+(first&0xffffff)]=second
-    expected={CAPSULE,PROGRESSION,MEDAL}|{a for name,(a,_) in HOOKS.items() if name!='boost'}
+    from ..client.map_refresh import HOOK as MAP
+    expected={CAPSULE,PROGRESSION,MEDAL,MAP}|{a for name,(a,_) in HOOKS.items() if name!='boost'}
     wrong={**memory,0x80000000:0}
     assert run(wrong)==[]
     assert set(run(memory))==expected

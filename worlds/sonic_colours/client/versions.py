@@ -49,6 +49,12 @@ def verify_revision(memory):
             word = int.from_bytes(data[offset:offset+4], 'big')
             if word != MEDAL_ORIGINAL and medal_data(memory) is not None:
                 data = data[:offset] + MEDAL_ORIGINAL.to_bytes(4, 'big') + data[offset+4:]
+        from .map_refresh import HOOK as MAP_HOOK, ORIGINAL as MAP_ORIGINAL, installed_data as map_data
+        if section['address'] <= MAP_HOOK < section['address'] + section['size']:
+            offset = MAP_HOOK - section['address']
+            word = int.from_bytes(data[offset:offset+4], 'big')
+            if word != MAP_ORIGINAL and map_data(memory) is not None:
+                data = data[:offset] + MAP_ORIGINAL.to_bytes(4, 'big') + data[offset+4:]
         digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:
             raise memory.error(f'unknown_revision: text at 0x{section["address"]:08X}, '
