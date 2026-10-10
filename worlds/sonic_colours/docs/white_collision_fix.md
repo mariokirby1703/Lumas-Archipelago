@@ -37,4 +37,21 @@ workflow remains unchanged. Live acceptance still required: deny White in a
 fresh intro, receive the AP item beside the capsule, touch the same refreshed
 capsule, verify opening/check acknowledgement, then collect released White Wisps
 and verify the gauge fills and Boost works. The pre-fix visible refresh is live
-verified; post-fix collision registration and collection are not yet live verified.
+verified; see the subsequent successful live test below.
+
+## Successful post-fix live test
+
+On October 11, the updated 928-byte C2 payload was read back and matched
+`current_white_collision_refresh` exactly in Dolphin, returning to `0x800D4828`.
+In the fresh mandatory `stg110` intro, the capsule was initially a denied ghost
+with its collision-wrapper enable byte 0. After receiving White Boost Wisp over
+AP, the user confirmed successful contact opening and collecting the released
+Wisps for the Boost gauge, without an Act restart. A subsequent read-only native
+snapshot measured Boost **35.0 / 100.0**, previously **0.0 / 100.0**; the consumed
+capsule was no longer present in the enumerated capsule list.
+
+This validates the White lock/refresh/contact/gauge-delivery sequence for the
+first Tropical Resort Act 1 capsule with the fix from commit `71b80843`.
+Actual Boost-button use, a capsule LocationChecks acknowledgement, all coloured
+capsule types, later Acts and restart persistence were not established by this
+observation. The 138 offline tests remain separate evidence.
