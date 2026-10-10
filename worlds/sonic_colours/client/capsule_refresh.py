@@ -62,7 +62,18 @@ def payload_words():
     # +148/+14A use the multi-Wisp/alternate-content constructor instead.
     for offset in (0x148,0x14a):
         a.d(34,0,31,offset); a.d(11,0,0,0); a.branch('end',0x40820000)
-    a.d(32,4,31,0x114); a.d(10,0,4,6); a.branch('end',0x41810000)
+    a.d(32,4,31,0x114); a.d(11,0,4,-1); a.branch('white',0x41820000)
+    a.d(10,0,4,6); a.branch('end',0x41810000)
+    a.branch('model')
+    a.label('white')
+    # White is signed -1; never route it through the coloured permission query.
+    a.emit(0x48000005); pic_base = len(a.words)*4
+    a.emit(0x7D8802A6); pic_fix = len(a.words); a.d(14,12,12,0)
+    a.d(32,6,12,0); a.d(11,0,6,0); a.branch('end',0x41820000)
+    a.d(34,6,6,0); a.d(32,7,12,4)
+    a.emit(0x7C063800); a.branch('end',0x40820000)
+    a.d(32,3,12,8); a.d(36,3,1,0x74)
+    a.label('model')
     a.d(32,3,31,0xb0); a.d(11,0,3,0); a.branch('end',0x41820000)
     a.d(32,0,3,0); a.d(15,5,0,0x8078); a.d(14,5,5,-0x2ed4)
     a.emit(0x7C002800); a.branch('end',0x40820000)  # cmpw r0,r5 model VT
@@ -70,7 +81,11 @@ def payload_words():
     a.d(32,3,31,0x34); a.d(11,0,3,0); a.branch('end',0x41820000)
     a.d(14,3,3,8); a.d(32,4,2,-0x7c48); a.call(0x800132D8)
     a.d(11,0,3,0); a.branch('end',0x41820000)
-    a.d(32,4,31,0x114); a.call(0x8003BAAC)  # native permission query
+    a.d(32,4,31,0x114); a.d(11,0,4,-1); a.branch('white_permission',0x41820000)
+    a.call(0x8003BAAC)  # native coloured permission query
+    a.branch('permission_ready')
+    a.label('white_permission'); a.d(32,3,1,0x74)
+    a.label('permission_ready')
     a.d(32,4,31,0xb0); a.d(32,0,4,0x88)  # constructor mode 0 ghost / 1 content
     a.emit(0x7C001800); a.branch('matched',0x41820000)
     a.d(10,0,0,1); a.branch('end',0x41810000)
@@ -106,6 +121,10 @@ def payload_words():
     a.d(32,0,1,0x44); a.emit(0x7C0FF120)
     a.d(32,0,1,0x40); a.emit(0x7C0803A6)
     a.d(14,1,1,0x1a0); a.emit(ORIGINAL)
+    a.branch('return')
+    data = len(a.words)*4; a.words[pic_fix] |= (data-pic_base)&0xffff
+    for _ in range(3): a.emit(0)  # owner container, selected index, White permission
+    a.label('return')
     # Gecko patches the final zero word to branch back to HOOK+4.
     if len(a.words)%2 == 0: a.emit(0x60000000)
     a.emit(0)
@@ -125,19 +144,61 @@ def gecko_ini():
     lines += gecko_lines()
     from .gameplay_controls import gecko_lines as control_lines
     lines += control_lines()
-    lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates']
+    from .medal_hook import gecko_lines as medal_lines
+    lines += medal_lines()
+    lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Egg Medal pickup capture']
     return '\n'.join(lines)+'\n'
 
 
 def inspect_installed(memory):
     from .gecko import inspect_c2
     from ..world_constants import load_data
-    variants={'current_collision_refresh':payload_words()}
-    variants.update(load_data('capsule_hook_legacy.json'))
-    result=inspect_c2(memory,HOOK,ORIGINAL,variants)
+    words = payload_words(); offset = data_offset(words)
+    try:
+        result = inspect_c2(memory,HOOK,ORIGINAL,{'current_white_collision_refresh':words}, ((offset,12),))
+    except MemoryUnavailable:
+        result = inspect_c2(memory,HOOK,ORIGINAL,load_data('capsule_hook_legacy.json'))
+    if result['installed'] and result['variant'] == 'current_white_collision_refresh':
+        owner, index, allowed = struct.unpack('>3I', memory.read_bytes(result['target']+offset,12))
+        if owner and not valid_range(owner,1) or index > 3 or allowed > 1:
+            raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
     memory.capsule_hook_observation=result
     return result
 
 
 def installed(memory):
     return inspect_installed(memory)['installed']
+
+
+def data_offset(words=None):
+    # Embedded data follows the branch over the three zero words. The optional
+    # alignment nop precedes the Gecko-patched return word.
+    words = payload_words() if words is None else words
+    end = len(words)-1
+    if words[end-1] == 0x60000000: end -= 1
+    return (end-3)*4
+
+
+def installed_data(memory):
+    result = inspect_installed(memory)
+    if not result['installed'] or result['variant'] != 'current_white_collision_refresh': return None
+    address = result['target'] + data_offset()
+    owner, index, allowed = struct.unpack('>3I', memory.read_bytes(address,12))
+    if owner and not valid_range(owner,1) or index > 3 or allowed > 1:
+        raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
+    return address
+
+
+def configure(memory, snapshot, owned, slot):
+    address = installed_data(memory)
+    if address is None: return {'available':False, 'reason':'Update Gecko code for native White capsule projection'}
+    chain = memory.resolve_flags_ptr(allow_working=True)
+    desired = (chain[1], chain[2], int(not slot['options']['boost_lock'] or bool(owned['counts']['White Boost Wisp'])))
+    before = struct.unpack('>3I', memory.read_bytes(address,12))
+    if before != desired:
+        if before[0]: memory.write_u32(address,0,expected=before[0],operation='capsule_controls')
+        for i,value in enumerate(desired[1:],1):
+            current = memory.read_u32(address+i*4)
+            if current != value: memory.write_u32(address+i*4,value,expected=current,operation='capsule_controls')
+        memory.write_u32(address,desired[0],expected=0,operation='capsule_controls')
+    return {'available':True, 'white_allowed':bool(desired[2])}

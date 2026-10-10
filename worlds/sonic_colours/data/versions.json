@@ -46,6 +46,8 @@
     "music_cues": true,
     "map_lock": true,
     "progression_data": true,
-    "progression_reset": true
+    "progression_reset": true,
+    "egg_medal_controls": true,
+    "capsule_controls": true
   }
 }

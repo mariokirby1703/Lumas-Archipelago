@@ -1,6 +1,7 @@
 name: SonicNativeTest
 game: Sonic Colours (Wii)
 Sonic Colours (Wii):
+  egg_medal_sanity: true
   goal: nega_wisp_armor
   red_ring_checks: singles
   starting_act: tropical_resort_act_1

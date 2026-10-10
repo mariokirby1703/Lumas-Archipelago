@@ -7,7 +7,7 @@ import pytest
 from ..client.capsule_refresh import payload_words, ORIGINAL
 
 
-def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
+def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,white_control=False,profile=1):
     actor,model,manager,state=0x90010000,0x90020000,0x90030000,0x90040000
     mem={actor:0x80761534,actor+0x110:opened,actor+0x148:special,actor+0x114:colour,
          actor+0xb0:model,actor+0x34:manager,model:0x8077d12c,
@@ -18,6 +18,10 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
     mem[regs[2]-0x7c48]=0x80720000
     original=regs[:];lr,ctr,cr=0x80012345,0x80045678,0x12345678
     initial=(lr,ctr,cr);words=payload_words();pc=0;cmp=0;calls=[]
+    from ..client.capsule_refresh import data_offset
+    offset=data_offset(words)
+    for i,v in enumerate((0x90070000 if white_control else 0,1,int(owned))): mem[offset+i*4]=v
+    mem[0x90070000]=profile
     fpr=list(range(100,114));paired=list(range(200,214));fpscr=0x123456;gqr0=0x01010101
     floating=(fpr[:],paired[:],fpscr,gqr0)
     for _ in range(1000):
@@ -45,10 +49,12 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
         elif op==18:
             delta=w&0x3fffffc
             if delta&0x2000000:delta-=0x4000000
+            if w&1:lr=pc*4
             pc=pc-1+delta//4
         elif w==0x7c0802a6:regs[0]=lr
         elif w==0x7c000026:regs[0]=cr
         elif w==0x7c0902a6:regs[0]=ctr
+        elif w==0x7d8802a6:regs[12]=lr
         elif w==0x7d8903a6:ctr=regs[12]
         elif w==0x7c0903a6:ctr=regs[0]
         elif w==0x7c0ff120:cr=regs[0]
@@ -60,6 +66,8 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0):
         elif w in (0x7c002800,0x7c00f800,0x7c001800):
             lhs=regs[0];rhs=regs[{0x7c002800:5,0x7c00f800:31,0x7c001800:3}[w]]
             cmp=(lhs>rhs)-(lhs<rhs)
+        elif op==31 and w&0x7ff==0:
+            lhs=regs[ra];rhs=regs[w>>11&31];cmp=(lhs>rhs)-(lhs<rhs)
         elif op==31 and w&0x7ff==0x378:
             rs=w>>21&31;rb=w>>11&31;regs[ra]=regs[rs]|regs[rb]
         elif w==0x4e800421:
@@ -122,3 +130,21 @@ def test_old_model_only_refresh_repairs_interaction_without_model_replacement():
 def test_alternate_native_capsule_keeps_its_colour_and_receives_interaction():
     calls, mode = run(0, True, colour=5, alternate=1)
     assert 0x800d3ff8 in calls and mode == 1
+
+
+@pytest.mark.parametrize('opened',[0,1])
+def test_white_capsule_permission_is_signed_minus_one_and_preserves_opened(opened):
+    calls,mode=run(1,False,colour=0xffffffff,white_control=True,opened=opened)
+    assert 0x8003baac not in calls
+    assert mode == (1 if opened else 0)
+    if not opened:
+        assert calls == [0x800132d8,0x800d3da4,0x800d5490]
+        calls,mode=run(0,True,colour=0xffffffff,white_control=True)
+        assert calls == [0x800132d8,0x800d3eb4,0x800d3ff8,0x800d5490,0x800d4298]
+        assert mode == 1
+
+
+def test_white_unrelated_save_and_boost_lock_off_keep_vanilla_available():
+    assert run(1,False,colour=0xffffffff,white_control=True,profile=2) == ([],1)
+    calls,mode=run(1,True,colour=0xffffffff,white_control=True)
+    assert calls == [0x800132d8] and mode == 1

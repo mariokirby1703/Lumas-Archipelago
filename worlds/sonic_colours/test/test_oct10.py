@@ -93,21 +93,20 @@ def test_final_goal_requires_escape_after_boss_and_survives_reload():
     assert victory(slot,snapshot(persisted_clears=frozenset({'stg720'})),observed_clears={'stg790'})
 
 
-@pytest.mark.parametrize('starting', [0, 42, 43])
-def test_terminal_velocity_requires_every_wisp_except_exact_starting_act(starting):
+@pytest.mark.parametrize('starting', [0, 35, 41])
+def test_terminal_velocity_requires_every_wisp_without_access_item(starting):
     from BaseClasses import CollectionState
     from ..Items import WISP_ITEMS, WORLD_ITEMS
     from ..world_constants import STAGES
     multiworld = generate({'starting_act': starting})
     world = multiworld.worlds[1]
     state = CollectionState(multiworld)
-    state.collect(world.create_item(WORLD_ITEMS[6]), prevent_sweep=True)
     for item in WISP_ITEMS[:-1]:
         state.collect(world.create_item(item), prevent_sweep=True)
     terminal = [s for s in STAGES if s['zone_index'] == 6]
     for stage in terminal:
         reachable = state.can_reach('Map Slot ' + stage['stage_slot_id'], 'Region', 1)
-        assert reachable == (stage['mission_id'] == world.starting_stage['mission_id'])
+        assert not reachable
     state.collect(world.create_item(WISP_ITEMS[-1]), prevent_sweep=True)
     assert all(state.can_reach('Map Slot ' + s['stage_slot_id'], 'Region', 1) for s in terminal)
 
@@ -124,3 +123,19 @@ def test_white_capsule_logic_matches_optional_boost_lock(locked):
     assert multiworld.get_location(capsule.name, 1).access_rule(state) == (not locked)
     state.collect(world.create_item('White Boost Wisp'), prevent_sweep=True)
     assert multiworld.get_location(capsule.name, 1).access_rule(state)
+
+
+@pytest.mark.parametrize('current, expected', [(0.,50.),(50.,100.),(90.,100.)])
+def test_half_boost_without_white_ownership_stores_gauge_and_remains_durable(tmp_path,current,expected):
+    items=[ITEM_TABLE['Half Boost Refill']]
+    with Journal(tmp_path,IDENTITY) as j:
+        r,b,m,tick=runtime_fixture(j);j.record_history(items)
+        r.slot_data['options']['boost_lock']=1
+        r.snapshot=replace(r.snapshot,boost_address=0x90002008,boost_max_address=0x90002014)
+        b.put(r.snapshot.boost_address,struct.pack('>f',current))
+        b.put(r.snapshot.boost_max_address,struct.pack('>f',100.))
+        r.apply_effects(m,items);settle(r,m,items,tick)
+        assert m.read_f32(r.snapshot.boost_address)==expected
+        assert j.data['effects']['0']['state']=='confirmed'
+        assert ITEM_TABLE['White Boost Wisp'] not in j.data['receipts']
+        assert r.item_details()[0]['journal_state']=='confirmed'

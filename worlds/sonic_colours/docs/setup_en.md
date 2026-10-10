@@ -6,13 +6,13 @@ Install `requirements.txt`, build the APWorld, and place it in Archipelago's
 Client**. A source checkout already loads the world; avoid duplicate packages.
 An empty Dolphin window is not running emulation.
 
-## Install the three native Gecko codes
+## Install the four native Gecko codes
 
 Stop emulation and enable Cheats in Dolphin. The supplied
-[SNCP8P_capsule_refresh.ini](../data/SNCP8P_capsule_refresh.ini) contains three
+[SNCP8P_capsule_refresh.ini](../data/SNCP8P_capsule_refresh.ini) contains four
 separate Gecko codes: **AP PAL live coloured capsule refresh** and **AP PAL
-authoritative progression**, and **AP PAL speed and White Boost gates**.
-Add and enable all three in the PAL game's Properties
+authoritative progression**, and **AP PAL speed and White Boost gates**, and **AP PAL Egg Medal pickup capture**.
+Add and enable all four in the PAL game's Properties
 → Gecko Codes. Replace the older AP capsule code with this version; preserve
 unrelated settings/codes. When pasting an individual code, paste only its hex
 lines, excluding INI sections and `$` names.
@@ -104,7 +104,7 @@ New Rings filler rolls 1–100 once per receipt and persists the roll before
 delivery. Legacy +10/+25/+50 item IDs retain their old fixed meanings.
 Half Boost Refill adds half the actual native maximum, capped at full;
 the original captures use maxima of 100 in story Acts and 50 in Game Land.
-It waits for White Boost Wisp when Boost Lock is enabled.
+It fills the gauge even without White Boost Wisp. With Boost Lock enabled, the stored gauge remains unusable for ordinary Boost until that item arrives.
 Four useful Progressive Game Land Speed items appear when Game Land is used.
 They raise the maximum selectable/simulation speed from 1 to 5; lower speeds
 remain selectable. No extra speed YAML option is needed.
@@ -122,3 +122,26 @@ AP transport, counter writes, capsule/progression hooks and music.
 See [validation limits](gameplay_overhaul.md) before interpreting a readback
 or offline test as proof of an in-game effect.
 See [October 10 changes and live evidence](oct10_validation.md) for this build.
+
+
+## Schema 5, Egg Medals and Terminal Velocity
+
+Regenerate a new seed with this world. Schema-4 slots are rejected; journals are
+retained under their original seed/slot-data identities. Existing saves are not
+converted to another seed. Terminal Velocity Access's item ID is retired and
+other IDs are unchanged. Terminal Velocity unlocks automatically with all eight
+AP Wisps and cannot be a Starting Act. Its unlock is not the goal: the default
+goal still needs the final boss and Terminal Velocity Act 2 escape.
+
+`egg_medal_sanity: true` adds 21 individual Game Land Egg Medal locations.
+The fourth Gecko code captures each native pickup before the actor is removed;
+a guarded client arms only the validated ORC instance in the bound playthrough.
+Events remain latched across stage exit, then enter the durable pickup journal
+and ordinary LocationChecks/acknowledgement transport. They require neither a
+Clear nor saving. Game Land stage Ring gates remain, and medal traversal logic
+conservatively requires all eight Wisps until individual routes are verified.
+
+Update the capsule code too. It includes White ghost/interaction projection,
+separate from the White grant/use gates. Receiving White refreshes an unopened
+capsule on its native update without restarting the Act. Opened capsules are
+never reconstructed. These new native behaviors need in-game testing.

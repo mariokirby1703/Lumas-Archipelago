@@ -1,6 +1,7 @@
 name: SonicPlayer
 game: Sonic Colours (Wii)
 Sonic Colours (Wii):
+  egg_medal_sanity: false
   goal: nega_wisp_armor
   red_ring_checks: singles
   starting_act: random

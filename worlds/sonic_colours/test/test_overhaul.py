@@ -27,8 +27,8 @@ def test_schema_and_stable_emerald_ids():
     assert [ITEM_TABLE[n] for n in EMERALDS] == list(range(BASE_ID+15,BASE_ID+22))
     assert not {'wisp_unlocks','world_unlocks','chaos_emerald_items','red_ring_bundle_strategy','wisp_capsule_sanity'} & set(OPTION_NAMES)
     assert set(Goal.options) == {'nega_wisp_armor','all_bosses','all_red_rings','all_game_land_stages','super_sonic'}
-    assert StartingAct.default == 'random' and len(StartingAct.options) == 44
-    assert len(STARTING_STAGES) == 44 and 'stg790' not in {s['mission_id'] for s in STARTING_STAGES}
+    assert StartingAct.default == 'random' and len(StartingAct.options) == 42
+    assert len(STARTING_STAGES) == 42 and 'stg790' not in {s['mission_id'] for s in STARTING_STAGES}
     assert sum(s['kind']=='Boss' for s in STARTING_STAGES) == 6
 
 
@@ -204,7 +204,7 @@ def test_previous_seed_hook_events_are_baselined_not_credited(tmp_path):
                        for name,code in r.slot_data['locations'].items())
 
 
-@pytest.mark.parametrize('starting',range(44))
+@pytest.mark.parametrize('starting',range(42))
 def test_every_starting_act_has_a_fillable_seed(starting):
     m=generate({'starting_act':starting},starting,fill=True)
     assert m.can_beat_game() and not m.get_unfilled_locations()
@@ -214,6 +214,6 @@ def test_every_starting_act_has_a_fillable_seed(starting):
 @pytest.mark.parametrize('goal',range(5))
 def test_capsule_and_rank_checks_fill_with_every_goal(goal):
     from ..Locations import LOCATION_TABLE
-    m=generate({'goal':goal,'wisp_capsules':True,'rank_checks':'all','starting_act':42},goal,fill=True)
+    m=generate({'goal':goal,'wisp_capsules':True,'rank_checks':'all','starting_act':0},goal,fill=True)
     assert m.can_beat_game() and not m.get_unfilled_locations()
     assert sum(LOCATION_TABLE[l.name].kind=='capsule' for l in m.get_locations(1) if l.address)==680

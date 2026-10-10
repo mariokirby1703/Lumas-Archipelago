@@ -315,6 +315,7 @@ async def dolphin_loop(ctx):
                     capsule_refresh=ctx.runtime.hooks.capsule_refresh_status,
                     native_progression=ctx.runtime.hooks.progression_status,
                     native_gameplay_controls=ctx.runtime.hooks.gameplay_controls_status,
+                    native_egg_medals=ctx.runtime.hooks.medal_status,
                     music_randomization=ctx.runtime.music_status,
                     item_writes={'history_ready': ctx.history_ready, 'pending_receipts': ctx.runtime.pending_effects(), 'status': ctx.runtime.last_error})
                 ctx.dolphin_status = (snap.status if snap.evidence.get('executable_error')

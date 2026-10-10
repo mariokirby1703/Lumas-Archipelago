@@ -134,7 +134,12 @@ def configure(memory, snapshot, owned, slot):
             if current != value:
                 memory.write_u32(address+i*4, value, expected=current, operation='gameplay_controls')
         memory.write_u32(address, values[0], expected=0, operation='gameplay_controls')
-    return {'installed': status, 'maximum_speed': maximum+1, 'boost_locked': bool(locked)}
+    from .capsule_refresh import configure as configure_capsules
+    try:
+        capsules = configure_capsules(memory, snapshot, owned, slot)
+    except MemoryUnavailable as error:
+        capsules = {'available': False, 'reason': str(error)}
+    return {'white_capsules': capsules, 'installed': status, 'maximum_speed': maximum+1, 'boost_locked': bool(locked)}
 
 
 def gecko_lines():

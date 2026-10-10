@@ -43,6 +43,12 @@ def verify_revision(memory):
                 word = int.from_bytes(data[offset:offset+4], 'big')
                 if word != control_original and controls_installed(memory, kind) is not None:
                     data = data[:offset] + control_original.to_bytes(4, 'big') + data[offset+4:]
+        from .medal_hook import HOOK as MEDAL_HOOK, ORIGINAL as MEDAL_ORIGINAL, installed_data as medal_data
+        if section['address'] <= MEDAL_HOOK < section['address'] + section['size']:
+            offset = MEDAL_HOOK - section['address']
+            word = int.from_bytes(data[offset:offset+4], 'big')
+            if word != MEDAL_ORIGINAL and medal_data(memory) is not None:
+                data = data[:offset] + MEDAL_ORIGINAL.to_bytes(4, 'big') + data[offset+4:]
         digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:
             raise memory.error(f'unknown_revision: text at 0x{section["address"]:08X}, '

@@ -152,6 +152,13 @@ def _read_stage_objects(memory):
                     row['capsules'] = capsules
                 except MemoryUnavailable as error:
                     row['capsule_error'] = str(error)
+                try:
+                    medals = read_medals(memory, stage, row['mission'], actors)
+                    if not coherent():
+                        raise MemoryUnavailable('stage_context_changed')
+                    row['medals'] = medals
+                except MemoryUnavailable as error:
+                    row['medal_error'] = str(error)
         # A real stage replacement during the optional scan invalidates the
         # whole observation. Optional actor/capsule errors alone do not.
         if not coherent():
@@ -271,6 +278,44 @@ def read_capsules(memory, stage, mission, actors):
             if memory.read_u32(model) == 0x8077d12c and memory.read_u32(model + 8) == actor:
                 result[-1].update(model=model, model_mode=memory.read_u32(model + 0x88),
                                   model_state=memory.read_s32(model + 0x80))
+    return result
+
+
+def read_medals(memory, stage, mission, actors):
+    """Validate the immutable ORC identity before arming a native pickup hook."""
+    from ..medals import BY_NATIVE_ID
+    import struct
+    from .medal_hook import VTABLE
+    import math
+    result = []
+    manager = memory.read_ptr_checked(stage + 0x18, 0x20)
+    for actor in actors:
+        if memory.read_u32(actor) != VTABLE:
+            continue
+        wrapper = memory.read_ptr_checked(actor + 0x64, 0x18)
+        record = memory.read_ptr_checked(wrapper + 8, 0x24)
+        descriptor = memory.read_ptr_checked(wrapper + 12, 0x20)
+        if (memory.read_u32(actor+0x34) != manager or memory.read_u32(wrapper+4) != actor
+                or memory.read_u32(descriptor) != 0x80770FA0
+                or memory.read_u32(descriptor+0x10) != record or memory.read_u32(descriptor+0x1c) != wrapper):
+            raise MemoryUnavailable('medal_native_owner_mismatch')
+        object_id, instance = memory.read_u32(record) & 0xfffff, memory.read_u32(descriptor+0x14)
+        row = BY_NATIVE_ID.get((mission, object_id, instance))
+        count = memory.read_u32(record+0x1c)
+        if row is None or not 0 <= instance < count <= 4096:
+            continue
+        vector = memory.read_ptr_checked(record+0x18, count*24)
+        xyz = struct.unpack('>3f', memory.read_bytes(vector+instance*24, 12))
+        if any(not math.isfinite(v) or abs(v-e) > max(.002, abs(e)*1e-6)
+               for v, e in zip(xyz, row['position'])):
+            continue
+        if (memory.read_u32(actor+0x64) != wrapper or memory.read_u32(wrapper+8) != record
+                or memory.read_u32(descriptor+0x14) != instance):
+            raise MemoryUnavailable('medal_native_context_changed')
+        result.append(dict(row, actor=actor, actor_id=memory.read_u32(actor+12),
+                           wrapper=wrapper, record=record, manager=manager, instance=instance))
+    if len(result) > 1:
+        raise MemoryUnavailable('medal_native_identity_not_unique')
     return result
 
 

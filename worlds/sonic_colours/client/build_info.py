@@ -19,7 +19,7 @@ def implementation_info():
     from .state import SaveGuard, WritePolicy
     from .memory import SonicMemory
     from .gecko import inspect_c2, branch_target
-    from . import gameplay_controls
+    from . import gameplay_controls, medal_hook
     from .runtime import rings_amount
     from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions, progression_hook, music
     functions = (NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
@@ -35,7 +35,8 @@ def implementation_info():
                  NativeHooks.reject_observation, SaveGuard.suspend, client.dolphin_loop,
                  progression_hook.payload, progression_hook.installed_data, progression_hook.configure,
                  progression_hook.events, progression_hook.identity_tag, music.cue_records, music.apply_music, music.mapping_for,
-                 gameplay_controls.payload, gameplay_controls.installed, gameplay_controls.configure)
+                 gameplay_controls.payload, gameplay_controls.installed, gameplay_controls.configure, capsule_refresh.configure, capsule_refresh.installed_data,
+                 native_read.read_medals, medal_hook.payload, medal_hook.installed_data, medal_hook.configure, medal_hook.observe)
     digest = hashlib.sha256()
     for function in functions:
         digest.update(function.__qualname__.encode())

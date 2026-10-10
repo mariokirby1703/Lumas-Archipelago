@@ -4,7 +4,7 @@ from importlib.resources import files
 
 GAME = "Sonic Colours (Wii)"
 BASE_ID = 847000000
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 
 def load_data(name):
@@ -15,7 +15,7 @@ STAGES = load_data('stage_map.json')
 BY_MISSION = {s['mission_id']: s for s in STAGES}
 NORMAL = tuple(s for s in STAGES if s['normal'])
 # Keep the original 36 explicit Choice values stable, then append bosses/TV.
-STARTING_STAGES = NORMAL + tuple(s for s in STAGES if s['zone_index'] < 7
+STARTING_STAGES = NORMAL + tuple(s for s in STAGES if s['zone_index'] < 6
                                 and not s['normal'] and s['mission_id'] != 'stg790')
 WORLDS = tuple(dict.fromkeys(s['world'] for s in STAGES if s['zone_index'] < 7))
 WISPS = ('White Boost', 'Cyan Laser', 'Yellow Drill', 'Orange Rocket',

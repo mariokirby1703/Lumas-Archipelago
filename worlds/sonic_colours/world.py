@@ -68,7 +68,7 @@ class SonicColoursWorld(World):
             early = self.multiworld.local_early_items[self.player]
             early.setdefault(self.random.choice(access), 1)
         needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks
-                          or self.options.goal.value == 3 or self.options.wisp_capsules)
+                          or self.options.goal.value == 3 or self.options.wisp_capsules or self.options.egg_medal_sanity)
         self.game_land_speed_items = needs_land
         speed_count = max(0, 4 - sum(i.name == Items.GAME_LAND_SPEED for i in precollected)) if needs_land else 0
         self.ring_required = max(self.gates.values()) if needs_land else 0

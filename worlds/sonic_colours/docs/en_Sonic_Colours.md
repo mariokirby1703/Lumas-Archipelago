@@ -1,6 +1,6 @@
 ﻿# Sonic Colours (Wii)
 
-PAL `SNCP8P`, revision 0. Install both supplied native Gecko hooks and connect
+PAL `SNCP8P`, revision 0. Install the four supplied native Gecko codes and connect
 before starting a fresh vanilla New Game. The mandatory Tropical Resort
 Acts 1 and 2 still run before save selection. Checks are immediate and durable.
 
@@ -10,12 +10,13 @@ All Bosses, All Red Rings, All Game Land Stages and Super Sonic. All Red Rings
 requires all 180 physical pickups across attempts, independently of the selected
 Red Ring check mode. Super Sonic requires all seven AP Emerald items.
 
-Random Starting Act includes normal Acts, six world bosses and Terminal Velocity
-Acts 1/2. It applies after the vanilla intro and does not mark stages cleared.
+Random Starting Act includes normal Acts, six world bosses. Terminal Velocity cannot be a Starting Act. It applies after the vanilla intro and does not mark stages cleared.
 Physical Red Rings provide checks; AP Red Ring items open Game Land. Reduction
 40 needs 140 AP rings and generates 187 total value, using singles where possible.
 
 Optional Wisp Capsules adds 680 eligible individual story/Game Land capsules.
+Optional Egg Medal Sanity adds 21 immediate Game Land native pickup checks.
+Terminal Velocity opens with all eight Wisps, with no separate Access item.
 Optional Rank Checks uses minimum S/A/B/C grades. Wisp Discovery Checks follows
 seven native coloured-Wisp introduction events, independently of capsules;
 White's native discovery event remains unresolved.

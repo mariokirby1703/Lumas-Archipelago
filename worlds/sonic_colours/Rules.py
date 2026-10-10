@@ -25,8 +25,6 @@ def validate_logic(logic):
 
 
 def requirements(world, state, key):
-    if key == world.starting_stage['mission_id'] and world.starting_world == 6:
-        return True
     entry = world.logic[key]
     if entry['logic_status'] == 'unknown':
         return state.has_all(WISP_ITEMS, world.player)
@@ -44,13 +42,14 @@ def set_rules(world):
     player = world.player
     for i, name in enumerate(WORLDS):
         entrance = world.get_region(name).entrances[0]
-        if i != world.starting_world:
+        if i == 6:
+            set_rule(entrance, lambda state: state.has_all(WISP_ITEMS, player))
+        elif i != world.starting_world:
             set_rule(entrance, lambda state, item=WORLD_ITEMS[i]: state.has(item, player))
     for stage in STAGES:
         region = world.get_region('Map Slot ' + stage['stage_slot_id'])
-        if stage['zone_index'] == 6 and stage['mission_id'] != world.starting_stage['mission_id']:
-            set_rule(region.entrances[0], lambda state: (world.starting_world == 6 or state.has(WORLD_ITEMS[6], player))
-                     and state.has_all(WISP_ITEMS, player))
+        if stage['zone_index'] == 6:
+            set_rule(region.entrances[0], lambda state: state.has_all(WISP_ITEMS, player))
         if stage['zone_index'] >= 7:
             gate = world.gates[f'{stage["zone_index"] - 6}-{stage["slot"]}']
             set_rule(region.entrances[0], lambda state, count=gate: sum(
@@ -67,6 +66,11 @@ def set_rules(world):
                     set_rule(location, lambda state: True)
                 else:
                     set_rule(location, lambda state, item=item: state.has(item, player))
+            elif data.kind == 'medal':
+                # The placement catalog proves identity, not an ability-free route.
+                # Until individual routes are verified, require every Wisp in
+                # addition to the physical Game Land stage's AP Ring gate.
+                set_rule(location, lambda state: state.has_all(WISP_ITEMS, player))
             elif data.kind == 'emerald':
                 missions = tuple(s['mission_id'] for s in STAGES if s['zone_index'] == stage['zone_index'])
                 set_rule(location, lambda state, missions=missions: all(can_complete(world, state, m) for m in missions))

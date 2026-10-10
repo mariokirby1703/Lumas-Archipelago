@@ -1,7 +1,7 @@
-# Sonic Colours (Wii) PAL — Archipelago 0.4.0
+# Sonic Colours (Wii) PAL — Archipelago 0.5.0
 
-PAL `SNCP8P`, revision 0; slot schema 4. This build contains native gameplay
-readers and guarded writers, immediate journaled checks, and three Gecko codes.
+PAL `SNCP8P`, revision 0; slot schema 5. This build contains native gameplay
+readers and guarded writers, immediate journaled checks, and four Gecko codes.
 It is ready for targeted testing, but a complete native playthrough has not
 been verified.
 
@@ -35,10 +35,18 @@ Original Wii binaries, private notes and RAM dumps are excluded from the APWorld
 The October 10 update accepts exact older AP capsule thunks, adds native
 Game Land speed and optional Boost-use gates, randomized Rings and Half Boost
 Refill, and requires the final boss plus the subsequent escape for the default
-goal. Terminal Velocity requires all eight Wisps; a TV starting-stage exception
-applies only to that stage. [Validation and remaining limits](docs/oct10_validation.md).
+goal. Terminal Velocity automatically opens with all eight Wisps; its separate Access
+item and starting-stage exception are retired. [Validation and remaining limits](docs/oct10_validation.md).
 
 The remaining-requirements patch corrects the Yellow Drill/White gate mix-up,
 removes blanket early World/Wisp fill and synthetic Clear events, and renames
 the AP counters to Red Ring, 5 Red Rings and 10 Red Rings without changing IDs.
 [Exact changes, evidence and unfinished requirements](docs/oct10_remaining_fixes.md).
+
+Schema 5 adds opt-in Egg Medal Sanity (21 immediate native pickup checks),
+White capsule ghost/interaction projection and Half Boost Refill without White
+ownership. Update all four Gecko codes and generate a new seed. Story Speed
+Sanity and Movement Unlocks are not exposed: a safe native story locomotion cap
+and ability-specific transitions have not been established. The new medal and
+White hooks are code-derived and tested offline; complete gameplay validation
+is still required. See [new abilities validation](docs/new_abilities_validation.md).

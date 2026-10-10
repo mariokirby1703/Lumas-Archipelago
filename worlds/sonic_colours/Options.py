@@ -26,7 +26,7 @@ class RedRingChecks(Choice):
 
 
 class StartingAct(Choice):
-    """Choose the first stage available after the original two-Act introduction. Random includes normal Acts, the six world bosses and Terminal Velocity Acts 1 and 2; it excludes the final boss."""
+    """Choose the first stage available after the original two-Act introduction. Random includes normal Acts, the six world bosses; it excludes Terminal Velocity and the final boss."""
     display_name = 'Starting Act'
     option_tropical_resort_act_1 = 0
     option_tropical_resort_act_2 = 1
@@ -70,8 +70,6 @@ class StartingAct(Choice):
     option_planet_wisp_boss = 39
     option_aquarium_park_boss = 40
     option_asteroid_coaster_boss = 41
-    option_terminal_velocity_act_1 = 42
-    option_terminal_velocity_act_2 = 43
     default = 'random'
 
 
@@ -169,6 +167,11 @@ class WispCapsules(Toggle):
     display_name = 'Wisp Capsule Sanity'
 
 
+class EggMedalSanity(Toggle):
+    """Add one immediate native Egg Medal pickup check in each of the 21 Game Land stages. Requires the PAL Egg Medal Gecko pickup code; stage Ring gates and traversal requirements still apply."""
+    display_name = 'Egg Medal Sanity'
+
+
 class SonicDeathLink(DeathLink):
     """Share deaths with other players. This client currently requires Off; native death delivery is not supported."""
     display_name = 'Death Link'
@@ -198,12 +201,13 @@ class SonicColoursOptions(PerGameCommonOptions):
     death_link: SonicDeathLink
     boost_lock: BoostLock
     wisp_capsules: WispCapsules
+    egg_medal_sanity: EggMedalSanity
 
 OPTION_NAMES = tuple(SonicColoursOptions.__annotations__)
 
 OPTION_GROUPS = [
     OptionGroup('Progression', [Goal, StartingAct, BoostLock]),
-    OptionGroup('Checks', [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks, WispCapsules]),
+    OptionGroup('Checks', [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks, WispCapsules, EggMedalSanity]),
     OptionGroup('Game Land', [GameLandRequirementReduction]),
     OptionGroup('Presentation', [MusicRandomization]),
     OptionGroup('Gameplay', [LevelRandomization, SonicDeathLink]),

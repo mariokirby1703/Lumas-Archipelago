@@ -29,6 +29,7 @@ class NativeHooks:
         self.stage_key = None
         self.stage_sequence = 0
         self.capsule_refresh_status = {'available': False, 'reason': 'not observed'}
+        self.medal_status = {'available': False, 'reason': 'not observed'}
         self.progression_status = {'available':False,'reason':'not observed'}
         self.gameplay_controls_status = {'installed':{},'reason':'not observed'}
         self.rejected_disc = None
@@ -249,16 +250,16 @@ class NativeHooks:
                    'Purple Frenzy', 'Orange Rocket', 'Pink Spikes')
         for bit, colour in enumerate(colours):
             values[bit] = inventory['counts'][colour + ' Wisp'] > 0
-        for zone, item in enumerate(WORLD_ITEMS):
-            granted = zone == slot_data['starting_world'] or inventory['counts'][item] > 0
+        for zone in range(7):
+            granted = zone == slot_data['starting_world'] or (zone < 6 and inventory['counts'][WORLD_ITEMS[zone]] > 0)
             if zone == 6:
                 from ..Items import WISP_ITEMS
-                full_access = bool((starting['zone_index'] == 6 or inventory['counts'][item]) and all(inventory['counts'][w] for w in WISP_ITEMS))
-                granted = full_access or starting['zone_index'] == 6
+                full_access = all(inventory['counts'][w] for w in WISP_ITEMS)
+                granted = full_access
                 for stage in STAGES:
                     if stage['zone_index'] == 6:
                         bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))
-                        values[bit] = full_access or stage['mission_id'] == starting_mission
+                        values[bit] = full_access
             values[20 + zone] = granted
             first = next(stage for stage in STAGES if stage['zone_index'] == zone and stage['slot'] == 1)
             if zone != 6:
@@ -316,7 +317,7 @@ class NativeHooks:
         observation = {}
         try:
             observation = inspect_installed(memory)
-            available = observation['installed'] and observation['variant']=='current_collision_refresh'
+            available = observation['installed'] and observation['variant'] in ('current_collision_refresh','current_white_collision_refresh')
             reason = ('verified PAL C2 collision/model hook' if available else
                       'Recognized older model-only AP capsule hook; core remains enabled, update the Gecko code for collision repair' if observation['installed'] else
                       'Live capsule refresh requires the supplied PAL Gecko code; colour permission writes remain active')

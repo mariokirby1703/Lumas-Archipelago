@@ -221,11 +221,11 @@ class WritePolicy:
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
         self.memory.verify_revision()
         snapshot = self.snapshot_reader(self.memory)
-        if operation in ('progression_data','progression_reset','gameplay_controls') and snapshot.save_identity is None:
+        if operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls') and snapshot.save_identity is None:
             token = self.guard.check_stats(snapshot)
         else:
             token = self.guard.check_stats(snapshot) if operation in ('stats', 'boost_stats', 'colour_permissions') else self.guard.check(snapshot)
-        if operation not in ('permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset', 'gameplay_controls') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
+        if operation not in ('permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset', 'gameplay_controls', 'egg_medal_controls', 'capsule_controls') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
             raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
         if operation == 'stats':
             allowed = {snapshot.rings_address, snapshot.lives_address, snapshot.ring_mirror_address, snapshot.world_lives_address}
@@ -236,6 +236,24 @@ class WritePolicy:
                 raise MemoryUnavailable('WRITE_BLOCKED: boost model changed')
             token = (*token, snapshot.boost_address, snapshot.boost_max_address,
                      self.memory.read_u32(snapshot.boost_max_address))
+        elif operation == 'capsule_controls':
+            from .capsule_refresh import installed_data
+            data = installed_data(self.memory)
+            chain = self.memory.resolve_flags_ptr(allow_working=True)
+            if tuple(snapshot.evidence.get('chain', ())) != chain or data is None:
+                raise MemoryUnavailable('WRITE_BLOCKED: White capsule control profile changed')
+            if size != 4 or address not in range(data, data+12, 4):
+                raise MemoryUnavailable('WRITE_BLOCKED: White capsule control address not allowed')
+            return token, chain, data
+        elif operation == 'egg_medal_controls':
+            from .medal_hook import installed_data
+            data = installed_data(self.memory)
+            chain = self.memory.resolve_flags_ptr()
+            if tuple(snapshot.evidence.get('chain', ())) != chain or data is None:
+                raise MemoryUnavailable('WRITE_BLOCKED: medal capture profile changed')
+            if size != 4 or address not in range(data, data+44, 4):
+                raise MemoryUnavailable('WRITE_BLOCKED: medal capture address not allowed')
+            return token, chain, data
         elif operation == 'gameplay_controls':
             from .gameplay_controls import HOOKS, installed
             chain = self.memory.resolve_flags_ptr(allow_working=True)

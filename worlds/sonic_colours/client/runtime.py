@@ -37,7 +37,7 @@ def rings_amount(journal, index):
 
 def validate_slot(data):
     if not isinstance(data, dict) or data.get('game') != GAME or data.get('schema_version') != SCHEMA_VERSION:
-        raise ValueError('Sonic Colours schema migration required: this client uses schema 4 (native Boost Lock, Game Land Speed and new filler IDs). Regenerate the seed and .apsonic file with the new world; old seed journals cannot be migrated into another seed.')
+        raise ValueError('Sonic Colours schema migration required: this client uses schema 5 (automatic Terminal Velocity access and Egg Medal checks). Regenerate the seed and .apsonic file with the new world; old seed journals cannot be migrated into another seed.')
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
     options = data.get('options')
@@ -57,7 +57,7 @@ def validate_slot(data):
         resolved[name] = option
     if data.get('game_land_gates') != game_land_gates(options['game_land_requirement_reduction']):
         raise ValueError('slot Game Land gates mismatch')
-    expected_speed = bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'])
+    expected_speed = bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'] or options['egg_medal_sanity'])
     if type(data.get('game_land_speed_items')) is not bool or data['game_land_speed_items'] != expected_speed:
         raise ValueError('slot Game Land speed pool contract mismatch')
     expected_mapping = {s['stage_slot_id']: s['mission_id'] for s in STAGES}
@@ -258,6 +258,14 @@ class Runtime:
         self.guard.observe(self.snapshot)
         self.observe_pickups()
         self.observe_results()
+        if self.slot_data['options']['egg_medal_sanity'] and self.guard.can_record(self.snapshot):
+            try:
+                self.guard.check(self.snapshot)
+                from .medal_hook import observe, configure
+                observe(memory, self.snapshot, self.journal, self.slot_data)
+                self.hooks.medal_status = configure(memory, self.snapshot, self.journal)
+            except MemoryUnavailable as error:
+                self.hooks.medal_status = {'available': False, 'reason': str(error)}
         self.settle_effects(memory)
         known = inventory(item_ids) if history_ready else inventory(self.journal.data['receipts'])
         self.observe_capsules(frozenset(known['wisps']))
@@ -456,10 +464,6 @@ class Runtime:
                 continue
             if family in occupied:
                 self.journal.defer(index, item, 'earlier receipt is actively verifying')
-                continue
-            if (family == 'boost' and self.slot_data['options'].get('boost_lock')
-                    and ITEM_TABLE['White Boost Wisp'] not in item_ids):
-                self.journal.defer(index, item, 'White Boost Wisp required while Boost Lock is enabled')
                 continue
             if name == 'Swim Everywhere Trap':
                 self.journal.defer(index, item, 'unsupported native swimming operation')

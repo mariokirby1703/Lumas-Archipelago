@@ -70,9 +70,11 @@ sys.meta_path.insert(0, Finder())
 from worlds.sonic_colours.client import binding, native_read, runtime
 from worlds.sonic_colours.client.build_info import implementation_info
 from worlds.sonic_colours.capsules import CAPSULES
+from worlds.sonic_colours.medals import MEDALS
 for module in (binding, native_read, runtime):
     assert '.apworld' in module.__file__, module.__file__
 assert sum(c.eligible for c in CAPSULES.values()) == 680
+assert len(MEDALS) == 21
 info=implementation_info()
 assert info['manifest_verified']
 print(info['loaded_code_id'])

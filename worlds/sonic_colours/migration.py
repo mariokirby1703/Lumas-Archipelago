@@ -25,10 +25,20 @@ def migrate_yaml(document):
     if isinstance(goal,dict):options['goal']={GOALS.get(k,k):v for k,v in goal.items()}
     elif goal in GOALS:
         options['goal']=GOALS[goal];changes.append(f'Goal {goal} migrated to {options["goal"]}.')
+    if options.get('starting_act') in ('terminal_velocity_act_1','terminal_velocity_act_2',42,43):
+        options['starting_act']='tropical_resort_act_1'
+        changes.append('Retired Terminal Velocity starting Act; selected Tropical Resort Act 1 for the new seed.')
     for key in ('start_inventory','start_inventory_from_pool','start_hints','local_items','non_local_items'):
         value=options.get(key)
         colours=('Green','Red','Blue','Yellow','Purple','Cyan','White')
         names={f'Chaos Emerald {i+1}':f'{c} Chaos Emerald' for i,c in enumerate(colours)}
+        names.update({'Red Ring (+1)':'Red Ring','Red Rings (+5)':'5 Red Rings','Red Rings (+10)':'10 Red Rings'})
+        if isinstance(value,dict) and 'Terminal Velocity Access' in value:
+            value={k:v for k,v in value.items() if k!='Terminal Velocity Access'}
+            changes.append(f'Removed retired Terminal Velocity Access from {key}.')
+        elif isinstance(value,list) and 'Terminal Velocity Access' in value:
+            value=[k for k in value if k!='Terminal Velocity Access']
+            changes.append(f'Removed retired Terminal Velocity Access from {key}.')
         if isinstance(value,dict):options[key]={names.get(k,k):v for k,v in value.items()}
         elif isinstance(value,list):options[key]=[names.get(k,k) for k in value]
     return result,changes

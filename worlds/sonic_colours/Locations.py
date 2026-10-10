@@ -43,8 +43,14 @@ for capsule in CAPSULES.values():
             raise ValueError('capsule display identity collision: ' + capsule.name)
         LOCATION_TABLE[capsule.name] = LocationData(capsule.code, capsule.mission, 'capsule', instance_key=capsule.key)
 
+from .medals import MEDALS
+for medal in MEDALS:
+    LOCATION_TABLE[medal['location_name']] = LocationData(medal['code'], medal['mission_id'], 'medal', medal['index'])
+
 
 def enabled(data, options):
+    if data.kind == 'medal':
+        return bool(options.egg_medal_sanity)
     if data.kind == 'clear':
         return BY_MISSION[data.mission]['zone_index'] < 7 or bool(options.game_land_checks)
     if data.kind == 'ring':

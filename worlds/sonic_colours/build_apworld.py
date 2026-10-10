@@ -22,7 +22,7 @@ def build(destination):
                                              for p in relative.parts)
                         or relative.name == 'build_apworld.py'
                         or relative.name.startswith('live_pal_') and path.suffix == '.json'
-                        or path.suffix not in {'.py', '.json', '.md', '.yaml', '.txt', '.ini'}):
+                        or path.suffix not in {'.py', '.json', '.md', '.yaml', '.txt', '.ini', '.csv'}):
                     continue
                 content = path.read_bytes()
                 if path.suffix == '.py':
@@ -33,7 +33,7 @@ def build(destination):
                 info.compress_type = zipfile.ZIP_DEFLATED
                 info.external_attr = 0o644 << 16
                 archive.writestr(info, content)
-                if path.suffix in {'.py', '.json', '.ini'}:
+                if path.suffix in {'.py', '.json', '.ini', '.csv'}:
                     contents[relative.as_posix()] = hashlib.sha256(content).hexdigest()
             # Include provenance in the artifact itself. Dirty builds are explicit
             # and receive a content ID; HEAD alone must never imply identical code.
