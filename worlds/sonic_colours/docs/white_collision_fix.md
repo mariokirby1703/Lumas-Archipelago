@@ -71,3 +71,13 @@ body. The originally tested Cyan actor was no longer enumerated after moving on.
 The transformation itself is user-observed; this later snapshot was already back
 in normal player mode with no held Wisp. Capsule AP acknowledgement and other
 coloured transformations remain unverified by this test.
+
+## Reward delivery observations
+
+In the same live test session, the user confirmed repeated Rings and 1-Up
+deliveries worked, followed by Ring Loss Trap and a subsequent Rings delivery.
+The user also confirmed that Rings, 1-Up and Boost Refill received during the
+results-screen deferral test were successfully held and delivered afterward.
+These are user-observed gameplay results. Individual HUD deltas, receipt indices,
+receipt logs and restart/reconnect during deferral were not captured; therefore
+this session does not establish exactly-once delivery across a process restart.
