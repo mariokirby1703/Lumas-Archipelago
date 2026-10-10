@@ -52,6 +52,7 @@ capsule was no longer present in the enumerated capsule list.
 
 This validates the White lock/refresh/contact/gauge-delivery sequence for the
 first Tropical Resort Act 1 capsule with the fix from commit `71b80843`.
-Actual Boost-button use, a capsule LocationChecks acknowledgement, all coloured
-capsule types, later Acts and restart persistence were not established by this
-observation. The 138 offline tests remain separate evidence.
+The user subsequently confirmed that pressing Boost works after the unlock.
+A capsule LocationChecks acknowledgement, all coloured capsule types, later
+Acts and restart persistence were not established by this observation. The
+138 offline tests remain separate evidence.
