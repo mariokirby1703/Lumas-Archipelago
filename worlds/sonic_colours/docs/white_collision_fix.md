@@ -56,3 +56,18 @@ The user subsequently confirmed that pressing Boost works after the unlock.
 A capsule LocationChecks acknowledgement, all coloured capsule types, later
 Acts and restart persistence were not established by this observation. The
 138 offline tests remain separate evidence.
+
+## Cyan live test in the same mandatory intro
+
+The user next stood beside locked Cyan capsule object 23 in `stg110`.
+Read-only pre-unlock observation: native colour 1, unopened ghost model mode 0,
+state -1, no collision body, stage/actor-state permissions 0 and held Wisp -1.
+After receiving Cyan Laser Wisp through AP without restarting, the user confirmed
+the requested appearance, contact opening and Laser transformation test worked.
+The subsequent snapshot measured stage and actor-state permissions **2** (Cyan
+bit), and a later Cyan capsule (object 93) had available model mode/state 1 and
+a collision body. An unowned Yellow Drill capsule remained a ghost without a
+body. The originally tested Cyan actor was no longer enumerated after moving on.
+The transformation itself is user-observed; this later snapshot was already back
+in normal player mode with no held Wisp. Capsule AP acknowledgement and other
+coloured transformations remain unverified by this test.
