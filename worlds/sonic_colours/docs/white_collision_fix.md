@@ -81,3 +81,9 @@ results-screen deferral test were successfully held and delivered afterward.
 These are user-observed gameplay results. Individual HUD deltas, receipt indices,
 receipt logs and restart/reconnect during deferral were not captured; therefore
 this session does not establish exactly-once delivery across a process restart.
+
+In a subsequent targeted test, the user confirmed the requested sequence:
+receive a 1-Up on the results screen, close and reconnect the AP client while
+Dolphin continues running, then enter the next Act. The deferred life arrived
+once as requested. This is user-confirmed restart persistence for that 1-Up;
+receipt logs and independent before/after counter captures were not supplied.
