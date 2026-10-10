@@ -43,3 +43,14 @@ the same Grand World Map actor/context remained loaded. The user still saw the
 lock and could not select the world before a map reload. Other denied World
 Access bits remained false. The stale map actor was captured locally before
 reload; no map/UI guest writes were performed.
+
+After the user reloaded the Grand World Map, world permission bits were unchanged
+(Tropical Resort, Sweet Mountain and Aquarium Park enabled). The managed lock
+sprite handle at Grand World Map actor +0xBC changed from `0x80AE53E0` to zero.
+This is the second entry in the actor's +0xB0, stride-8 lock-sprite collection,
+matching the code-derived world-index loop at `0x80264CE4`..`0x80264D58`.
+Other actor differences include recreated resource handles and transient or
+uninitialized fields; they are not candidate write addresses. A host write of
+zero to +0xBC would bypass native managed-object release and is not implemented.
+The immediate repair must update native scene-chain visibility and selection,
+and release the affected lock sprite through its actual native lifecycle.

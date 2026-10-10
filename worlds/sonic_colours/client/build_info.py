@@ -38,7 +38,7 @@ def implementation_info():
                  gameplay_controls.payload, gameplay_controls.installed, gameplay_controls.configure, capsule_refresh.configure, capsule_refresh.installed_data,
                  native_read.read_medals, medal_hook.payload, medal_hook.installed_data, medal_hook.configure, medal_hook.observe,
                  music_bank.plan, music_bank.rewrite_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch,
-                 client.log_diagnostic)
+                 client.log_diagnostic, gameplay_controls.gecko_lines)
     digest = hashlib.sha256()
     for function in functions:
         digest.update(function.__qualname__.encode())

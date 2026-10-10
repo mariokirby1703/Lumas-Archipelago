@@ -141,11 +141,16 @@ def configure(memory, snapshot, owned, slot):
 
 def gecko_lines():
     lines = ['$AP PAL speed and White Boost gates', '20000000 534E4350', '28000004 00003850', '28000006 00000000']
-    for index, (kind, (hook, original)) in enumerate(HOOKS.items()):
+    # Dolphin skips an entire group if it exceeds the remaining low-MEM1
+    # codelist budget. Do not export the inert historical coloured-Wisp query.
+    # Keep recognizing/neutralizing it above for previously installed builds.
+    # One shared conditional scope installs all real controls on the first
+    # handler pass; each original instruction must match. Once installed, the
+    # first displaced instruction fails its condition on subsequent passes.
+    for kind, (hook, original) in HOOKS.items():
+        if kind == 'boost': continue
         words, _ = payload(kind)
         lines += [f'20{hook-0x80000000:06X} {original:08X}', f'C2{hook-0x80000000:06X} {len(words)//2:08X}']
         lines += [f'{words[i]:08X} {words[i+1]:08X}' for i in range(0,len(words),2)]
-        lines += ['E0000000 80008000']
-        # Reapply disc/revision guards after each conditional block reset.
-        if index != len(HOOKS)-1: lines += ['20000000 534E4350', '28000004 00003850', '28000006 00000000']
+    lines += ['E0000000 80008000']
     return lines

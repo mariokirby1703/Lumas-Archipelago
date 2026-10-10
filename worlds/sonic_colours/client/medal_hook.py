@@ -89,7 +89,8 @@ def observe(memory, snapshot, journal, slot):
 
 def configure(memory, snapshot, journal):
     address = installed_data(memory)
-    if address is None: return {'available': False, 'reason': 'Enable AP PAL Egg Medal pickup capture'}
+    if address is None:
+        return {'available': False, 'reason': 'Egg Medal hook not installed: check enabled code and Gecko RAM-table capacity; use the current compact export'}
     chain = memory.resolve_flags_ptr()
     stage = next(iter(snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
     medals = stage.get('medals', ()) if snapshot.scene == 'gameplay' else ()
