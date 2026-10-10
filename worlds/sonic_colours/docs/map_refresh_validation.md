@@ -24,12 +24,22 @@ global map remains the observed workaround.
 The user also observed `/sonicstatus` becoming a very tall blank GUI rectangle
 after client restart/reconnect. Previously each JSON document, including dozens
 of rank records and native evidence, was one log record and one Kivy label.
-The client now outputs diagnostics in records bounded to 1,800 characters and
-12 newlines, preserving the complete JSON text in order. The same output path
-covers `/sonic`, `/sonicstatus`, `/sonicdebug`, `/sonicitems` and `/sonicmusic`.
-The shared Archipelago GUI is unchanged.
+The initial split-record fix was rejected by the user because GUI copying acts
+on individual records. Diagnostics now use one copyable JSON record with each
+top-level field on its own line and compact nested values. `/sonic` and
+`/sonicstatus` retain operational statuses, identity and counters, while directing
+full native evidence to `/sonicdebug` and receipt history to `/sonicitems`.
+The detailed commands also produce one record. The shared GUI is unchanged.
 
-Automated tests verify exact content reconstruction for large nested evidence,
-long strings and Unicode, plus status before and after runtime reconnect.
+Automated tests verify single-record JSON content for large nested evidence,
+long strings and Unicode, plus status before and after runtime reconnect and
+full evidence retention through `/sonicdebug`.
 Actual Kivy rendering after reconnect still requires user validation. Neither
 these tests nor the output fix establish an immediate native map refresh.
+
+The next controlled live comparison reproduced the issue with Sweet Mountain:
+its native world permission (bank A bit 21) changed from false to true while
+the same Grand World Map actor/context remained loaded. The user still saw the
+lock and could not select the world before a map reload. Other denied World
+Access bits remained false. The stale map actor was captured locally before
+reload; no map/UI guest writes were performed.

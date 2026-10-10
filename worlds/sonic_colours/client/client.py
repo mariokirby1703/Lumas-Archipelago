@@ -24,24 +24,13 @@ from .status import StatusReporter
 
 
 def log_diagnostic(value):
-    """Keep individual GUI textures small, including after reconnect.
-
-    Kivy receives one RecycleView label per log record. An entire RAM/status
-    document can exceed a texture's height; escaping markup alone cannot fix it.
-    """
-    lines = json.dumps(value, indent=2).splitlines(keepends=True)
-    block = ''
-    count = 0
-    for line in lines:
-        while line:
-            if count >= 12 or len(block) >= 1800:
-                logger.info(block)
-                block, count = '', 0
-            part, line = line[:1800-len(block)], line[1800-len(block):]
-            block += part
-            count += part.count('\n')
-    if block:
-        logger.info(block)
+    """One copyable GUI record; compact nested values avoid excessive height."""
+    if isinstance(value, dict):
+        text = '{\n' + ',\n'.join('  '+json.dumps(key)+': '+json.dumps(item)
+                                  for key, item in value.items()) + '\n}'
+    else:
+        text = json.dumps(value)
+    logger.info(text)
 
 
 class SonicCommands(ClientCommandProcessor):
@@ -69,7 +58,14 @@ class SonicCommands(ClientCommandProcessor):
 
     def _cmd_sonic(self):
         """Show inventory, synchronization and PAL hook status."""
-        log_diagnostic(diagnostic(self.ctx))
+        report = diagnostic(self.ctx)
+        if 'native_evidence' in report:
+            report.pop('native_evidence')
+            report['native_evidence_command'] = '/sonicdebug'
+        if 'item_receipts' in report:
+            report['item_receipt_count'] = len(report.pop('item_receipts'))
+            report['item_receipts_command'] = '/sonicitems'
+        log_diagnostic(report)
 
     def _cmd_sonicstatus(self):
         """Show current connection and write-block reason."""
