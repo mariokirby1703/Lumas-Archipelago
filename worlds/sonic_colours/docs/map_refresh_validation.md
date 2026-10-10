@@ -85,7 +85,31 @@ suppression, producer authorization, address/scene write rejection and exact
 text normalization with an original capture. Existing capsule, White Boost,
 speed, save, local-map and packaging regression tests also pass.
 
-The live observation above verifies the current map state, not execution of
-the new hook. Immediate lock disappearance, path visibility and selection
-without leaving the map still require installing this build and a controlled
-World Access delivery in Dolphin.
+The initial live observation above verified the map state before installation.
+Execution of the hook was then verified in the controlled delivery below.
+
+### Successful controlled Dolphin test
+
+The user installed production build `9210ca9c`, replaced the four-group export,
+restarted both applications, connected the same AP game and loaded the existing
+save. Read-only Dolphin observation verified the new refresh data block at
+`0x80002E58`, all six active Boost/speed thunks and the Medal thunk. The
+historical inert coloured-Wisp query remains uninstalled as intended.
+
+Before delivery, map context `0x90AB6CC0`, actor `0x90B508C0`, interactive state
+9 had Starlight Carnival bank-A bit 22 false and lock handle `0x80ADE5A0` at
+actor +0xC4. After the user sent **Starlight Carnival Access**, the same
+context/actor remained loaded, bit 22 was true, the lock handle was zero and
+the request was consumed (`00000000 00000002 9310DDA0 00000002`). The user
+confirmed that the lock disappeared and the world could be selected directly
+without reloading the map: "jap das klappt!". This is actual gameplay
+verification of Starlight Carnival, not a claim that all six targets were
+individually tested in Dolphin.
+
+A follow-up host-only fix accepts a cleared request as a native completion
+acknowledgement only when the requested lock is also released. This avoids a
+false readback error when the native update consumes the mailbox immediately.
+A dropped write with an unchanged lock still fails. The extra producer and
+readback tests are offline; the native thunk tested above remains unchanged.
+The complete Sonic suite passed 1127 tests (468 seconds). After the follow-up
+mailbox handling change, all 46 targeted map/memory/runtime tests passed.

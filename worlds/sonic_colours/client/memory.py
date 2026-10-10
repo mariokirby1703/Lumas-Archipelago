@@ -169,7 +169,14 @@ class SonicMemory:
             self.backend.write_bytes(address, data)
         except (RuntimeError, OSError, ValueError) as error:
             raise MemoryUnavailable(f'WRITE_UNCERTAIN: {error}') from error
-        if self.read_bytes(address, len(data)) != data:
+        readback = self.read_bytes(address, len(data))
+        # This exact native mailbox is consumed asynchronously by the map's
+        # update hook. A cleared request plus the released target lock is its
+        # completion acknowledgement, not a failed ordinary-memory write.
+        consumed = (operation == 'global_map_refresh' and offset == 0 and value
+                    and readback == bytes(4)
+                    and self.read_u32(actors[0]+0xb4+zone*8) == 0)
+        if readback != data and not consumed:
             raise MemoryUnavailable('WRITE_UNCERTAIN: readback_mismatch')
         try:
             final_token = self.write_guard(operation, address, len(data))

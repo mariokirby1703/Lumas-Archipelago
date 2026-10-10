@@ -134,6 +134,23 @@ def test_write_rejects_other_world_and_bad_owner():
     assert not b.writes
 
 
+def test_consumed_mailbox_readback_requires_released_target_lock():
+    b=FakeBackend();m=SonicMemory(b);data=install(b);actor=0x90010000
+    chain=(0x90020000,0x90030000,1,0x90040000,0x9004001c)
+    m.write_guard=lambda *args:('bound',data,(actor,),chain)
+    b.put(data+4,(3).to_bytes(4,'big'));b.put(data+8,chain[1].to_bytes(4,'big'));b.put(data+12,(1).to_bytes(4,'big'))
+    b.put(chain[-1]+0x10,(1<<23).to_bytes(4,'big'))
+    b.put(actor+0xb4+3*8,(0x90060000).to_bytes(4,'big'))
+    # A dropped mailbox write with an unchanged lock is NOT an acknowledgement.
+    b.write_bytes=lambda address,raw:None
+    with pytest.raises(MemoryUnavailable,match='readback_mismatch'):
+        m.write_u32(data,actor,expected=0,operation='global_map_refresh')
+    # Simulate the exact thunk's synchronous completion between write/readback.
+    b.write_bytes=lambda address,raw:b.put(actor+0xb4+3*8,bytes(4))
+    m.write_u32(data,actor,expected=0,operation='global_map_refresh')
+    assert m.latest_write['readback_verified']
+
+
 def test_original_pal_epilogue_and_chain_formats():
     elf=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not elf.exists():pytest.skip('private executable absent')
