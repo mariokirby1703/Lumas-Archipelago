@@ -35,3 +35,21 @@ before collecting the Game Land 1-1 medal.
 The exporter does not enlarge or relocate Dolphin's table or inject executable
 bytes through DME. More hooks need additional space reductions or a separately
 verified installation strategy; 40 bytes is not a general expansion budget.
+
+## Live validation after the compact export
+
+After updating all four codes and restarting, read-only Dolphin inspection in
+Game Land 1-1 (`stgD10`) verified the Medal thunk installed and armed for the
+catalogued object 57. Its native latch was zero before collection. All six
+required Boost/speed hooks were installed; the intentionally omitted inert
+`boost` query hook was absent. The user then collected the medal and supplied:
+
+```text
+Pickup detected: Egg Medals ['Game Land 1-1 - Egg Medal']; Location queued: [847005000]
+LocationChecks sent: [847005000]
+Location acknowledged: [847005000]
+```
+
+This validates the compact installation, native pickup capture and real AP
+transport/acknowledgement for Game Land 1-1. Other Medal locations, pickup before
+host arming, and death/reconnect persistence for this check remain separate tests.
