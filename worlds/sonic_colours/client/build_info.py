@@ -23,7 +23,7 @@ def implementation_info():
     from .runtime import rings_amount
     from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions, progression_hook, music
     functions = (NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
-                 NativeHooks.swim, Runtime.poll, Runtime.apply_effects, Runtime.effect_context, rings_amount, detect_checks,
+                 NativeHooks.swim, Runtime.poll, Runtime.configure_native_hooks, Runtime.apply_effects, Runtime.effect_context, rings_amount, detect_checks,
                  SaveGuard.observe, SaveGuard.check, SaveGuard.check_stats, WritePolicy.__call__,
                  Runtime.observe_pickups, Runtime.observe_capsules, binding.SaveBinding.attribute,
                  native_read.read_capsules, client.SonicContext.on_package, client.transmit_checks, journal.Journal.save, journal.Journal.record_pickups, Runtime.observe_results, Runtime.settle_effects,

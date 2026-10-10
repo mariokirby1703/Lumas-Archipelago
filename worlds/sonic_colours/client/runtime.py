@@ -277,13 +277,7 @@ class Runtime:
                     self.guard.check(self.snapshot)
                 except MemoryUnavailable:
                     self.guard.check_stats(self.snapshot)
-                from .progression_hook import configure
-                self.hooks.progression_status = configure(memory,self.snapshot,known,self.slot_data,self.journal)
-                from .gameplay_controls import configure as configure_controls
-                try:
-                    self.hooks.gameplay_controls_status = configure_controls(memory,self.snapshot,known,self.slot_data)
-                except MemoryUnavailable as error:
-                    self.hooks.gameplay_controls_status = {'error':str(error)}
+                self.configure_native_hooks(memory, known)
             except MemoryUnavailable as error:
                 self.hooks.progression_status = {'available':False,'reason':str(error)}
         self.last_error = self.snapshot.status
@@ -340,26 +334,40 @@ class Runtime:
         return (set(self.journal.data['pickup_checks']) | (set(self.journal.data['checks']) if can_send else set()),
                 bool((can_send or self.slot_data['options']['goal'] == 4) and self.journal.data.get('goal_observed')))
 
+    def configure_native_hooks(self, memory, owned):
+        """Project authenticated ownership into independent native controls.
+
+        Configure White first, including before ReceivedItems completes. A
+        missing optional speed/query control cannot strand its capsule data.
+        Each writer retains its own executable/profile/scene checks.
+        """
+        from .capsule_refresh import configure as configure_capsules
+        from .progression_hook import configure as configure_progression
+        from .gameplay_controls import configure as configure_controls
+        try:
+            capsules = configure_capsules(memory, self.snapshot, owned, self.slot_data)
+        except MemoryUnavailable as error:
+            capsules = {'available': False, 'reason': str(error)}
+        try:
+            self.hooks.progression_status = configure_progression(
+                memory, self.snapshot, owned, self.slot_data, self.journal)
+        except MemoryUnavailable as error:
+            self.hooks.progression_status = {'available': False, 'reason': str(error)}
+        try:
+            controls = configure_controls(memory, self.snapshot, owned, self.slot_data)
+        except MemoryUnavailable as error:
+            controls = {'error': str(error), 'installed': {}}
+        self.hooks.gameplay_controls_status = {**controls, 'white_capsules': capsules}
+
     def project_permissions(self, memory, owned):
-        from .progression_hook import configure
-        def configure_hook():
-            try:
-                self.hooks.progression_status = configure(memory,self.snapshot,owned,self.slot_data,self.journal)
-            except MemoryUnavailable as error:
-                self.hooks.progression_status = {'available':False,'reason':str(error)}
-            from .gameplay_controls import configure as configure_controls
-            try:
-                self.hooks.gameplay_controls_status = configure_controls(memory,self.snapshot,owned,self.slot_data)
-            except MemoryUnavailable as error:
-                self.hooks.gameplay_controls_status = {'error':str(error)}
         try:
             self.guard.check(self.snapshot)
         except MemoryUnavailable:
             self.guard.check_stats(self.snapshot)
-            configure_hook()
+            self.configure_native_hooks(memory, owned)
             self.hooks.project_live_permissions(memory, self.snapshot, owned, self.slot_data)
             return
-        configure_hook()
+        self.configure_native_hooks(memory, owned)
         self.hooks.project_permissions(memory, self.snapshot, owned, self.slot_data)
 
     def effect_context(self, memory, family):

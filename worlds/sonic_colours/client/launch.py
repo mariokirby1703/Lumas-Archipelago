@@ -9,9 +9,9 @@ def launch_client(*args):
     parser = get_base_parser(description='Sonic Colours PAL Archipelago Client')
     parser.add_argument('--name', help='Archipelago slot name')
     parser.add_argument('--export-capsule-gecko', metavar='OUTPUT_INI',
-                        help='Export both PAL native capsule/progression Gecko codes and exit')
+                        help='Export all four PAL native Gecko code groups and exit')
     parser.add_argument('--migrate-yaml', nargs=2, metavar=('OLD_YAML','NEW_YAML'),
-                        help='Migrate a player YAML to schema 3 and exit; seed files and journals are not migrated')
+                        help='Migrate a player YAML to schema 5 and exit; seed files and journals are not migrated')
     parser.add_argument('--patch-music', nargs=2, metavar=('ORIGINAL_CPK', 'OUTPUT_CPK'),
                         help='Build a separate seed music CPK from the .apsonic file, then exit')
     parser.add_argument('url', nargs='?', help='archipelago:// URI or .apsonic file')
@@ -36,7 +36,7 @@ def launch_client(*args):
         from pathlib import Path
         from .capsule_refresh import gecko_ini
         Path(parsed.export_capsule_gecko).write_text(gecko_ini(), encoding='utf-8')
-        logging.info('PAL capsule/progression hooks exported. Enable both codes in Dolphin before starting emulation.')
+        logging.info('Four PAL native code groups exported. Enable all four in Dolphin before starting emulation; runtime verification is still required.')
         return
     if parsed.patch_music:
         if not parsed.patch_file:
