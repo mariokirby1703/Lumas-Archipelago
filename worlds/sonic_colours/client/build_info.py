@@ -37,7 +37,8 @@ def implementation_info():
                  progression_hook.events, progression_hook.identity_tag, music.cue_records, music.apply_music, music.mapping_for,
                  gameplay_controls.payload, gameplay_controls.installed, gameplay_controls.configure, capsule_refresh.configure, capsule_refresh.installed_data,
                  native_read.read_medals, medal_hook.payload, medal_hook.installed_data, medal_hook.configure, medal_hook.observe,
-                 music_bank.plan, music_bank.rewrite_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch)
+                 music_bank.plan, music_bank.rewrite_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch,
+                 client.log_diagnostic)
     digest = hashlib.sha256()
     for function in functions:
         digest.update(function.__qualname__.encode())

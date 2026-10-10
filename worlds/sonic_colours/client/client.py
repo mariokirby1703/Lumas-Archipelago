@@ -23,6 +23,27 @@ from .build_info import implementation_info
 from .status import StatusReporter
 
 
+def log_diagnostic(value):
+    """Keep individual GUI textures small, including after reconnect.
+
+    Kivy receives one RecycleView label per log record. An entire RAM/status
+    document can exceed a texture's height; escaping markup alone cannot fix it.
+    """
+    lines = json.dumps(value, indent=2).splitlines(keepends=True)
+    block = ''
+    count = 0
+    for line in lines:
+        while line:
+            if count >= 12 or len(block) >= 1800:
+                logger.info(block)
+                block, count = '', 0
+            part, line = line[:1800-len(block)], line[1800-len(block):]
+            block += part
+            count += part.count('\n')
+    if block:
+        logger.info(block)
+
+
 class SonicCommands(ClientCommandProcessor):
     @mark_raw
     def _cmd_sonicmusic(self, manifest=''):
@@ -33,7 +54,7 @@ class SonicCommands(ClientCommandProcessor):
         if manifest.strip():
             self.ctx.music_resource_manifest = manifest.strip().strip('"')
             self.ctx.runtime.select_resource_music(self.ctx.music_resource_manifest)
-        logger.info(json.dumps(self.ctx.runtime.music_status, indent=2))
+        log_diagnostic(self.ctx.runtime.music_status)
 
     def _cmd_sonicnewgame(self):
         """Optional New Game confirmation; native detection is automatic and freshness is still required."""
@@ -48,7 +69,7 @@ class SonicCommands(ClientCommandProcessor):
 
     def _cmd_sonic(self):
         """Show inventory, synchronization and PAL hook status."""
-        logger.info(json.dumps(diagnostic(self.ctx), indent=2))
+        log_diagnostic(diagnostic(self.ctx))
 
     def _cmd_sonicstatus(self):
         """Show current connection and write-block reason."""
@@ -56,12 +77,12 @@ class SonicCommands(ClientCommandProcessor):
 
     def _cmd_sonicdebug(self):
         """Inspect the small candidate pointer chain; never dumps whole RAM."""
-        logger.info(json.dumps(diagnostic(self.ctx, self.ctx.memory), indent=2))
+        log_diagnostic(diagnostic(self.ctx, self.ctx.memory))
 
     def _cmd_sonicitems(self):
         """Show durable per-receipt delivery and reconciliation details."""
         if self.ctx.runtime:
-            logger.info(json.dumps(self.ctx.runtime.item_details(), indent=2))
+            log_diagnostic(self.ctx.runtime.item_details())
         else:
             logger.info('Connect to your Sonic Colours slot first.')
 
