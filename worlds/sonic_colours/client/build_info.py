@@ -18,6 +18,7 @@ def implementation_info():
     from .runtime import Runtime, detect_checks
     from .state import SaveGuard, WritePolicy
     from .memory import SonicMemory
+    from .gecko import inspect_c2, branch_target
     from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions, progression_hook, music
     functions = (NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
                  NativeHooks.swim, Runtime.poll, Runtime.apply_effects, detect_checks,
@@ -26,7 +27,7 @@ def implementation_info():
                  native_read.read_capsules, client.SonicContext.on_package, client.transmit_checks, journal.Journal.save, journal.Journal.record_pickups, Runtime.observe_results, Runtime.settle_effects,
                  native_read.read_result, native_read.read_stage_objects, native_read.read_player,
                  status.StatusReporter.ready, capsule_refresh.payload_words,
-                 capsule_refresh.installed, versions.verify_revision, journal.Journal.defer,
+                 capsule_refresh.installed, capsule_refresh.inspect_installed, inspect_c2, branch_target, versions.verify_revision, journal.Journal.defer,
                  SonicMemory.write_bytes_verified, SonicMemory.resolve_selected_slot,
                  native_read._read_stage_objects, native_read.read_saved_progress,
                  NativeHooks.reject_observation, SaveGuard.suspend, client.dolphin_loop,

@@ -291,14 +291,17 @@ class NativeHooks:
                 before = memory.read_u8(address)
                 if before != mask:
                     memory.write_u8(address, mask, expected=before, operation='colour_permissions')
-        from .capsule_refresh import installed
+        from .capsule_refresh import inspect_installed
+        observation = {}
         try:
-            available = installed(memory)
-            reason = ('verified PAL C2 hook' if available else
+            observation = inspect_installed(memory)
+            available = observation['installed'] and observation['variant']=='current_collision_refresh'
+            reason = ('verified PAL C2 collision/model hook' if available else
+                      'Recognized older model-only AP capsule hook; core remains enabled, update the Gecko code for collision repair' if observation['installed'] else
                       'Live capsule refresh requires the supplied PAL Gecko code; colour permission writes remain active')
         except MemoryUnavailable as error:
             available, reason = False, str(error)
-        self.capsule_refresh_status = {'available': available, 'reason': reason}
+        self.capsule_refresh_status = {**observation, 'available': available, 'reason': reason}
         # The native per-capsule update hook reconciles model mode against
         # this same permission byte. No host writes to actor handlers/models.
 
