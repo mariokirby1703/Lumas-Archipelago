@@ -13,6 +13,8 @@ from .memory import MemoryUnavailable, valid_range
 HOOKS = {
     'boost': (0x801014E0, 0x8863002C),
     'boost_use': (0x800CD730, 0xC0230008),
+    'boost_query': (0x8020E208, 0xC0230008),
+    'boost_add': (0x80101510, 0xEC20082A),
     'speed_get': (0x8026FF40, 0x80630004),
     'speed_set': (0x8026FF68, 0x90830004),
     'speed_ui': (0x802EEB10, 0x901B0118),
@@ -31,17 +33,23 @@ def payload(kind):
     a.d(32, 6, 12, 0); a.d(11, 0, 6, 0); a.branch('vanilla', 0x41820000)
     a.d(34, 6, 6, 0); a.d(32, 7, 12, 4)
     a.emit(0x7C063800); a.branch('vanilla', 0x40820000)  # cmpw r6,r7
-    if kind in ('boost', 'boost_use'):
+    if kind in ('boost', 'boost_use', 'boost_query', 'boost_add'):
         if kind == 'boost':
-            a.d(11, 0, 4, 0); a.branch('vanilla', 0x40820000)
-        else:
+            # Index zero is a coloured transformation, not White Boost.
+            # Keep this compatibility hook inert; never deny native Drill.
+            a.branch('vanilla')
+        elif kind == 'boost_use':
             # 800CD708's receiver r30 is the native player; mode 1 uses
             # the separate native Boost provider (800381E0/8020E1CC).
             a.d(32, 6, 30, 0x8c); a.d(32, 6, 6, 0x24)
             a.d(11, 0, 6, 1); a.branch('vanilla', 0x41820000)
         a.d(32, 7, 12, 12); a.emit(0x7C033800); a.branch('vanilla', 0x40820000)
         a.d(32, 7, 12, 16); a.d(11, 0, 7, 1); a.branch('vanilla', 0x40820000)
-        if kind == 'boost': a.d(14, 3, 0, 0)
+        if kind == 'boost': a.d(14, 3, 0, 0)  # unreachable compatibility body
+        elif kind == 'boost_add':
+            # Preserve the pre-existing gauge; deny only the new pickup/script
+            # amount. Super's separate provider bypasses this native routine.
+            a.d(48, 1, 3, 8)
         else: a.d(48, 1, 12, 20)  # query returns zero, gauge is untouched
         a.branch('restore')
     else:
@@ -79,7 +87,21 @@ def payload(kind):
 
 def installed(memory, kind):
     hook, original = HOOKS[kind]; words, offset = payload(kind)
-    result = inspect_c2(memory, hook, original, {kind: words}, ((offset, 20),), label=kind)
+    from ..world_constants import load_data
+    legacy = load_data('gameplay_hook_legacy.json').get(kind)
+    variants = {kind: words}
+    if legacy and legacy['offset'] == offset:
+        variants['legacy'] = legacy['words']
+    if legacy and legacy['offset'] != offset:
+        # Exact historical layout has a different embedded-data offset.
+        try:
+            result = inspect_c2(memory, hook, original, variants, ((offset, 20),), label=kind)
+        except MemoryUnavailable:
+            result = inspect_c2(memory, hook, original, {'legacy':legacy['words']},
+                                ((legacy['offset'],20),), label=kind)
+            offset = legacy['offset']
+    else:
+        result = inspect_c2(memory, hook, original, variants, ((offset, 20),), label=kind)
     if not result['installed']: return None
     address = result['target'] + offset
     owner, index, maximum, model, locked = struct.unpack('>5I', memory.read_bytes(address, 20))
@@ -98,14 +120,16 @@ def configure(memory, snapshot, owned, slot):
     values = (chain[1], chain[2], maximum, model, locked)
     status = {}
     for kind in HOOKS:
+        # Neutralize the previously installed erroneous coloured-Wisp gate too.
+        desired = (*values[:4], 0) if kind == 'boost' else values
         address = installed(memory, kind)
         status[kind] = bool(address)
         if address is None: continue
-        if tuple(struct.unpack('>5I', memory.read_bytes(address, 20))) == values:
+        if tuple(struct.unpack('>5I', memory.read_bytes(address, 20))) == desired:
             continue
         if memory.read_u32(address):
             memory.write_u32(address, 0, expected=memory.read_u32(address), operation='gameplay_controls')
-        for i, value in enumerate(values[1:], 1):
+        for i, value in enumerate(desired[1:], 1):
             current = memory.read_u32(address+i*4)
             if current != value:
                 memory.write_u32(address+i*4, value, expected=current, operation='gameplay_controls')

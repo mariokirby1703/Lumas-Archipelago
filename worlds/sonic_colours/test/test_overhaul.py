@@ -43,8 +43,8 @@ def test_goals_and_ring_pool_reachability(checks,goal):
         assert all(counts[n] == 1 for n in EMERALDS)
         assert sum(RING_VALUES.get(i.name,0) for i in m.itempool) == 187
         if checks=='singles':
-            assert counts['Red Ring (+1)']==187 and not counts['Red Rings (+5)'] and not counts['Red Rings (+10)']
-        else:assert counts['Red Rings (+5)'] + counts['Red Rings (+10)'] > 0
+            assert counts['Red Ring']==187 and not counts['5 Red Rings'] and not counts['10 Red Rings']
+        else:assert counts['5 Red Rings'] + counts['10 Red Rings'] > 0
         validate_slot(w.fill_slot_data())
 
 

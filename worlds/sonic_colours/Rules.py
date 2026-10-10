@@ -34,6 +34,12 @@ def requirements(world, state, key):
             and (not entry['requires_any'] or state.has_any(entry['requires_any'], world.player)))
 
 
+def can_complete(world, state, mission):
+    stage = BY_MISSION[mission]
+    return (state.can_reach('Map Slot ' + stage['stage_slot_id'], 'Region', world.player)
+            and requirements(world, state, mission))
+
+
 def set_rules(world):
     player = world.player
     for i, name in enumerate(WORLDS):
@@ -45,21 +51,10 @@ def set_rules(world):
         if stage['zone_index'] == 6 and stage['mission_id'] != world.starting_stage['mission_id']:
             set_rule(region.entrances[0], lambda state: (world.starting_world == 6 or state.has(WORLD_ITEMS[6], player))
                      and state.has_all(WISP_ITEMS, player))
-        if stage['zone_index'] < 7:
-            event_name = 'Story Clear Event ' + stage['mission_id']
-            clear_event = SonicColoursLocation(player, event_name, None, region)
-            clear_event.place_locked_item(Item(event_name, ItemClassification.progression, None, player))
-            set_rule(clear_event, lambda state, mission=stage['mission_id']: requirements(world, state, mission))
-            region.locations.append(clear_event)
         if stage['zone_index'] >= 7:
             gate = world.gates[f'{stage["zone_index"] - 6}-{stage["slot"]}']
             set_rule(region.entrances[0], lambda state, count=gate: sum(
                 state.count(n, player) * amount for n, amount in RING_VALUES.items()) >= count)
-            event_name = 'Game Land Clear Event ' + stage['mission_id']
-            event = SonicColoursLocation(player, event_name, None, region)
-            event.place_locked_item(Item(event_name, ItemClassification.progression, None, player))
-            set_rule(event, lambda state, mission=stage['mission_id']: requirements(world, state, mission))
-            region.locations.append(event)
         for location in region.locations:
             if location.address is None:
                 continue
@@ -74,15 +69,14 @@ def set_rules(world):
                     set_rule(location, lambda state, item=item: state.has(item, player))
             elif data.kind == 'emerald':
                 missions = tuple(s['mission_id'] for s in STAGES if s['zone_index'] == stage['zone_index'])
-                set_rule(location, lambda state, missions=missions: state.has_all(
-                    ('Game Land Clear Event ' + m for m in missions), player))
+                set_rule(location, lambda state, missions=missions: all(can_complete(world, state, m) for m in missions))
             else:
                 set_rule(location, lambda state, keys=keys: all(requirements(world, state, k) for k in keys))
     goal = world.options.goal.value
     if goal == 0:
-        names = ['Story Clear Event stg790', 'Story Clear Event stg720']
+        names = ['stg790', 'stg720']
     elif goal == 1:
-        names = ['Story Clear Event ' + s['mission_id'] for s in STAGES if s['kind'] == 'Boss']
+        names = [s['mission_id'] for s in STAGES if s['kind'] == 'Boss']
     elif goal == 2:
         names = []
     else:
@@ -95,10 +89,10 @@ def set_rules(world):
                 and all(requirements(world, state, f'{s["mission_id"]}:ring:{i}') for i in range(1, 6))
                 for s in STAGES if s['normal']))
     elif goal == 3:
-        set_rule(event, lambda state: state.has_all(('Game Land Clear Event ' + s['mission_id']
-                for s in STAGES if s['zone_index'] >= 7), player))
+        set_rule(event, lambda state: all(can_complete(world, state, s['mission_id'])
+                for s in STAGES if s['zone_index'] >= 7))
     elif goal == 4:
         set_rule(event, lambda state: state.has_all(EMERALDS, player))
     else:
-        set_rule(event, lambda state: state.has_all(names, player))
+        set_rule(event, lambda state: all(can_complete(world, state, mission) for mission in names))
     world.multiworld.completion_condition[player] = lambda state: state.has('Sonic Colours Victory', player)

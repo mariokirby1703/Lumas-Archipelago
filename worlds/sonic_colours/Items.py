@@ -5,7 +5,7 @@ WORLD_ITEMS = tuple(f'{w} Access' for w in WORLDS)
 WISP_ITEMS = tuple(f'{w} Wisp' for w in WISPS)
 EMERALDS = tuple(f'{colour} Chaos Emerald' for colour in
                  ('Green', 'Red', 'Blue', 'Yellow', 'Purple', 'Cyan', 'White'))
-RING_VALUES = {'Red Ring (+1)': 1, 'Red Rings (+5)': 5, 'Red Rings (+10)': 10}
+RING_VALUES = {'Red Ring': 1, '5 Red Rings': 5, '10 Red Rings': 10}
 LEGACY_FILLER = ('Rings (+10)', 'Rings (+25)', 'Rings (+50)')
 FILLER = ('Rings', '1-Up', 'Half Boost Refill')
 TRAPS = ('Ring Loss Trap', 'Swim Everywhere Trap')

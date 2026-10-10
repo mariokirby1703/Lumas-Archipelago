@@ -18,15 +18,28 @@ from .test_runtime import IDENTITY, snapshot
 
 
 def test_default_wisps_shuffle_in_reachable_spheres_for_100_seeds():
+    layouts = set()
+    wisp_spheres = set()
     for seed in range(100):
         multiworld = generate(seed=seed, fill=True)
         assert not multiworld.precollected_items[1]
         assert Counter(i.name for i in multiworld.itempool if i.name in Items.WISP_ITEMS) == Counter(Items.WISP_ITEMS)
         spheres = list(multiworld.get_spheres())
         obtained = {location.item.name for sphere in spheres for location in sphere if location.item}
+        early = multiworld.local_early_items[1]
+        assert len(early) == 1 and not set(early) & set(Items.WISP_ITEMS)
+        assert not multiworld.early_items[1]
+        assert sum(l.address is None for l in multiworld.get_locations()) == 1
+        assert {l.item.name for l in multiworld.get_locations() if l.address is None} == {'Sonic Colours Victory'}
+        layouts.add(tuple(sorted((l.item.name, l.name) for l in multiworld.get_locations()
+                                 if l.item.name in Items.WISP_ITEMS + Items.WORLD_ITEMS)))
+        wisp_spheres.add(tuple(sorted((l.item.name, index) for index, sphere in enumerate(spheres)
+                                     for l in sphere if l.item.name in Items.WISP_ITEMS)))
         assert set(Items.WISP_ITEMS) <= obtained
         assert any(l.address is not None for l in spheres[0])
         assert multiworld.can_beat_game()
+    assert len(layouts) > 90
+    assert len(wisp_spheres) > 10
     world = generate({}).worlds[1]
     assert {i.name for i in world.multiworld.itempool if i.name in Items.WISP_ITEMS} == set(Items.WISP_ITEMS)
 
@@ -36,7 +49,7 @@ def test_removed_features_leave_holes_in_ids_and_options():
     assert 'super_sonic_item' not in SonicColoursOptions.type_hints
     assert 'd' not in RankChecks.options and 'super_sonic' in Goal.options
     assert BASE_ID + 22 not in Items.BY_ID
-    assert Items.ITEM_TABLE['Red Ring (+1)'] == BASE_ID + 23
+    assert Items.ITEM_TABLE['Red Ring'] == BASE_ID + 23
     assert not any(name.endswith(' - D Rank') for name in Locations.LOCATION_TABLE)
     assert sum(d.kind == 'rank' for d in Locations.LOCATION_TABLE.values()) == 176
     assert GAME == 'Sonic Colours (Wii)'
@@ -163,7 +176,7 @@ def test_native_snapshot_reads_candidate_chain_without_promoting_it():
     assert not backend.writes
 
 
-def test_emerald_rewards_need_all_three_native_clears_and_logical_events():
+def test_emerald_rewards_need_native_clears_and_logical_route_requirements():
     data = generate({'game_land_checks': False}).worlds[1].fill_slot_data()
     from ..world_constants import STAGES
     missions = [s['mission_id'] for s in STAGES if s['zone_index'] == 7]
@@ -174,8 +187,8 @@ def test_emerald_rewards_need_all_three_native_clears_and_logical_events():
     assert code in detect_checks(data, reward)
     multiworld = generate({'game_land_checks': False})
     state = CollectionState(multiworld)
-    for _ in range(14): state.collect(multiworld.worlds[1].create_item('Red Rings (+10)'), prevent_sweep=True)
     location = multiworld.get_location('Game Land 1 - Chaos Emerald Obtained', 1)
     assert not location.access_rule(state)
-    state.sweep_for_advancements()
+    for _ in range(14): state.collect(multiworld.worlds[1].create_item('10 Red Rings'), prevent_sweep=True)
     assert location.access_rule(state)
+    assert not any('Clear Event' in l.name for l in multiworld.get_locations())

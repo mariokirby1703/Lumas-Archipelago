@@ -61,18 +61,12 @@ class SonicColoursWorld(World):
         for item in precollected:
             if item.name in names:
                 names.remove(item.name)
-        # Place the small access inventory before the potentially large single
-        # Ring pool. Otherwise restrictive fill can consume every accessible
-        # Clear with Rings while leaving the Wisps needed for physical pickups.
-        for name in names:
-            if name in Items.WISP_ITEMS or name in Items.WORLD_ITEMS:
-                # Open ordinary worlds before filling the few initially reachable
-                # Clears with Wisps. Terminal Velocity requires all eight Wisps,
-                # so its Access item cannot provide this initial expansion.
-                early = (self.multiworld.local_early_items[self.player]
-                         if name in Items.WORLD_ITEMS[:-1]
-                         else self.multiworld.early_items[self.player])
-                early[name] = early.get(name, 0) + 1
+        access = [n for n in Items.WORLD_ITEMS[:6] if n in names]
+        if access:
+            # One ordinary world expands the initial check pool. The remaining
+            # access items and every Wisp use ordinary randomized fill.
+            early = self.multiworld.local_early_items[self.player]
+            early.setdefault(self.random.choice(access), 1)
         needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks
                           or self.options.goal.value == 3 or self.options.wisp_capsules)
         self.game_land_speed_items = needs_land
@@ -82,7 +76,29 @@ class SonicColoursWorld(World):
         remaining = max(0, self.ring_target - sum(Items.RING_VALUES.get(i.name, 0) for i in precollected))
         capacity = len(self.active_locations) - len(self.options.exclude_locations.value & set(self.active_locations)) - len(names)
         capacity = min(capacity, len(self.active_locations) - len(names) - speed_count)
-        names += [Items.ring_name(n) for n in pack_rings(remaining, capacity)]
+        ring_items = [Items.ring_name(n) for n in pack_rings(remaining, capacity)]
+        names += ring_items
+        from worlds.generic.Rules import add_item_rule
+        for location in self.multiworld.get_locations(self.player):
+            data = Locations.LOCATION_TABLE.get(location.name)
+            if data and any(s['mission_id'] == data.mission and s['zone_index'] >= 7
+                            and s['slot'] > 1 for s in STAGES):
+                add_item_rule(location, lambda item: item.player != self.player
+                              or item.name not in Items.WISP_ITEMS + Items.WORLD_ITEMS)
+        # With Singles, the ring pool can otherwise exhaust every Clear before
+        # access items can be placed. Reserve completion routes only when the
+        # remaining check capacity can hold the entire AP Ring pool. No early
+        # item, world, sphere or location is forced by this constraint.
+        nonclear_capacity = sum(Locations.LOCATION_TABLE[n].kind != 'clear'
+                                and n not in self.options.exclude_locations.value
+                                for n in self.active_locations)
+        if len(ring_items) > 100 and nonclear_capacity >= len(ring_items):
+            from worlds.generic.Rules import add_item_rule
+            for location in self.multiworld.get_locations(self.player):
+                data = Locations.LOCATION_TABLE.get(location.name)
+                if data and data.kind == 'clear':
+                    add_item_rule(location, lambda item: item.player != self.player
+                                  or item.name not in Items.RING_VALUES)
         names += [Items.GAME_LAND_SPEED] * speed_count
         filler_count = len(self.active_locations) - len(names)
         if filler_count < 0:
@@ -99,16 +115,6 @@ class SonicColoursWorld(World):
 
     def create_item(self, name):
         return Items.SonicColoursItem(name, Items.classification(name), Items.ITEM_TABLE[name], self.player)
-
-    def fill_hook(self, progitempool, usefulitempool, filleritempool, fill_locations):
-        # Restrictive fill works backwards. Keep access items in its assumed
-        # inventory while placing the large AP Ring pool, and preserve Clears
-        # for the remaining access items when physical Ring checks are gated.
-        access = set(Items.WORLD_ITEMS) | set(Items.WISP_ITEMS)
-        progitempool.sort(key=lambda item: not (item.player == self.player and item.name in access))
-        fill_locations.sort(key=lambda location: location.player == self.player
-                            and location.name in Locations.LOCATION_TABLE
-                            and Locations.LOCATION_TABLE[location.name].kind == 'clear')
 
     def get_filler_item_name(self):
         return self.random.choice(Items.FILLER)

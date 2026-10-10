@@ -117,7 +117,7 @@ def test_low_capacity_error_and_trap_classification():
     assert not any(i.trap for i in world.multiworld.itempool)
     world = generate({'trap_percentage': 100}).worlds[1]
     assert all(i.advancement or i.trap or i.useful for i in world.multiworld.itempool)
-    assert inventory([Items.ITEM_TABLE['Red Rings (+5)'], Items.ITEM_TABLE['Red Rings (+10)']])['red_rings'] == 15
+    assert inventory([Items.ITEM_TABLE['5 Red Rings'], Items.ITEM_TABLE['10 Red Rings']])['red_rings'] == 15
 
 
 def test_plans_are_bijections_and_not_native_patches():

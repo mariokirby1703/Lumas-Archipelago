@@ -20,7 +20,8 @@ are preserved.
 Offline tests exercise original RAM captures, guarded real-address writes,
 PowerPC hook execution, restrictive AP fill and genuine local server protocol
 acknowledgements. These do not establish usable capsules, audible shuffled
-music, or visible counter changes in Dolphin. Scripted White Boost grants,
+music, or visible counter changes in Dolphin. White pickup/script and ordinary
+Boost gates are implemented but need live validation with the updated Gecko code.
 White's discovery event, native DeathLink/Swim and level shuffling remain gaps.
 
 - [Installation, New Game and YAML migration](docs/setup_en.md)
@@ -36,3 +37,8 @@ Game Land speed and optional Boost-use gates, randomized Rings and Half Boost
 Refill, and requires the final boss plus the subsequent escape for the default
 goal. Terminal Velocity requires all eight Wisps; a TV starting-stage exception
 applies only to that stage. [Validation and remaining limits](docs/oct10_validation.md).
+
+The remaining-requirements patch corrects the Yellow Drill/White gate mix-up,
+removes blanket early World/Wisp fill and synthetic Clear events, and renames
+the AP counters to Red Ring, 5 Red Rings and 10 Red Rings without changing IDs.
+[Exact changes, evidence and unfinished requirements](docs/oct10_remaining_fixes.md).
