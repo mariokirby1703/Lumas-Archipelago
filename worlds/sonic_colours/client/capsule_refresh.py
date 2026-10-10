@@ -17,6 +17,7 @@ NATIVE_SIGNATURES = (
     (0x800D3FF8, 0x9421FEF0), (0x800D3FFC, 0x7C0802A6),
     (0x800D4298, 0x9421FFC0), (0x800D429C, 0x7C0802A6),
     (0x800D5490, 0x9421FFE0), (0x800D5494, 0x7C0802A6),
+    (0x800D517C, 0x9421FFC0), (0x800D5180, 0x7C0802A6),
     (0x807613C8, 0x800D562C), (0x807613E0, 0x800D557C),
 )
 
@@ -101,6 +102,11 @@ def payload_words():
     a.d(32,0,31,0xb4); a.d(11,0,0,0); a.branch('state',0x40820000)
     a.mr(3,31); a.d(32,4,31,0x34); a.call(0x800D3FF8)
     a.label('state')
+    # Ghost entry disables EXISTING bodies through 800D517C(actor, 0).
+    # Creating a body only when absent does not restore those registrations.
+    # Use the native wrapper/physics registration routine, then allow native
+    # lifecycle selection to apply any specialized visibility/movement gates.
+    a.mr(3,31); a.d(14,4,0,1); a.call(0x800D517C)
     # Constructor's default state, via the real transition function (exit/entry
     # callbacks), before native visibility/movement picks any specialized state.
     a.mr(3,31); a.d(15,4,0,0x8076); a.d(14,4,4,0x13c0); a.call(0x800D5490)
@@ -157,8 +163,14 @@ def inspect_installed(memory):
     try:
         result = inspect_c2(memory,HOOK,ORIGINAL,{'current_white_collision_refresh':words}, ((offset,12),))
     except MemoryUnavailable:
-        result = inspect_c2(memory,HOOK,ORIGINAL,load_data('capsule_hook_legacy.json'))
-    if result['installed'] and result['variant'] == 'current_white_collision_refresh':
+        previous = load_data('capsule_white_previous.json')
+        offset = data_offset(previous)
+        try:
+            result = inspect_c2(memory,HOOK,ORIGINAL,{'previous_white_collision_refresh':previous}, ((offset,12),))
+        except MemoryUnavailable:
+            result = inspect_c2(memory,HOOK,ORIGINAL,load_data('capsule_hook_legacy.json'))
+    if result['installed'] and result['variant'] in ('current_white_collision_refresh','previous_white_collision_refresh'):
+        result['white_data_offset'] = offset
         owner, index, allowed = struct.unpack('>3I', memory.read_bytes(result['target']+offset,12))
         if owner and not valid_range(owner,1) or index > 3 or allowed > 1:
             raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
@@ -181,8 +193,8 @@ def data_offset(words=None):
 
 def installed_data(memory):
     result = inspect_installed(memory)
-    if not result['installed'] or result['variant'] != 'current_white_collision_refresh': return None
-    address = result['target'] + data_offset()
+    if not result['installed'] or 'white_data_offset' not in result: return None
+    address = result['target'] + result['white_data_offset']
     owner, index, allowed = struct.unpack('>3I', memory.read_bytes(address,12))
     if owner and not valid_range(owner,1) or index > 3 or allowed > 1:
         raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
@@ -201,4 +213,5 @@ def configure(memory, snapshot, owned, slot):
             current = memory.read_u32(address+i*4)
             if current != value: memory.write_u32(address+i*4,value,expected=current,operation='capsule_controls')
         memory.write_u32(address,desired[0],expected=0,operation='capsule_controls')
-    return {'available':True, 'white_allowed':bool(desired[2])}
+    return {'available':True, 'white_allowed':bool(desired[2]),
+            'collision_reenable_installed': memory.capsule_hook_observation['variant'] == 'current_white_collision_refresh'}

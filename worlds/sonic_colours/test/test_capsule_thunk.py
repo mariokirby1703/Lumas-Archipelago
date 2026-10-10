@@ -88,6 +88,9 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,whit
             elif ctr==0x800d3ff8:
                 assert regs[3]==actor and regs[4]==manager and not mem[actor+0xb4]
                 mem[actor+0xb4]=0x90060000
+            elif ctr==0x800d517c:
+                assert regs[3]==actor and regs[4]==1 and mem[actor+0xb4]
+                mem[mem[actor+0xb4]+0x54]=1
             elif ctr==0x800d5490:
                 assert regs[3]==actor and regs[4] in (0x807613c0,0x807613d8)
             elif ctr==0x800d4298:assert regs[3]==actor
@@ -99,13 +102,15 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,whit
     assert (fpr,paired,fpscr,gqr0)==floating
     assert regs[0]==0 # displaced original lwz r0,128(r31)
     assert mem[actor+0x110]==opened
+    if 0x800d517c in [c[0] for c in calls]:
+        assert mem[mem[actor+0xb4]+0x54] == 1
     return [c[0] for c in calls],mem[model+0x88]
 
 
 @pytest.mark.parametrize('colour',range(7))
 def test_each_coloured_capsule_uses_native_model_and_state_transition(colour):
     calls,mode=run(0,True,colour=colour)
-    assert calls==[0x800132d8,0x8003baac,0x800d3eb4,0x800d3ff8,0x800d5490,0x800d4298]
+    assert calls==[0x800132d8,0x8003baac,0x800d3eb4,0x800d3ff8,0x800d517c,0x800d5490,0x800d4298]
     assert mode==1
     calls,mode=run(mode,True,colour=colour)
     assert calls==[0x800132d8,0x8003baac] # no duplicate model or actor creation
@@ -123,8 +128,17 @@ def test_opened_white_and_special_capsules_are_not_reinitialized(kwargs):
 
 def test_old_model_only_refresh_repairs_interaction_without_model_replacement():
     calls, mode = run(1, True, interaction=False)
-    assert calls == [0x800132d8,0x8003baac,0x800d3ff8,0x800d5490,0x800d4298]
+    assert calls == [0x800132d8,0x8003baac,0x800d3ff8,0x800d517c,0x800d5490,0x800d4298]
     assert mode == 1
+
+
+@pytest.mark.parametrize('colour',[-1,0,1,2,3,4,5,6])
+def test_ghost_with_existing_disabled_body_uses_native_registration(colour):
+    calls, mode = run(0, True, colour=colour & 0xffffffff,
+                      white_control=colour == -1, interaction=True)
+    assert mode == 1
+    assert 0x800d3ff8 not in calls  # retain the existing body
+    assert calls[-3:] == [0x800d517c,0x800d5490,0x800d4298]
 
 
 def test_alternate_native_capsule_keeps_its_colour_and_receives_interaction():
@@ -140,7 +154,7 @@ def test_white_capsule_permission_is_signed_minus_one_and_preserves_opened(opene
     if not opened:
         assert calls == [0x800132d8,0x800d3da4,0x800d5490]
         calls,mode=run(0,True,colour=0xffffffff,white_control=True)
-        assert calls == [0x800132d8,0x800d3eb4,0x800d3ff8,0x800d5490,0x800d4298]
+        assert calls == [0x800132d8,0x800d3eb4,0x800d3ff8,0x800d517c,0x800d5490,0x800d4298]
         assert mode == 1
 
 

@@ -49,6 +49,22 @@ def install(b,target=0x80002000):
     return target+capsule_refresh.data_offset(words)
 
 
+def test_previous_white_thunk_retains_exact_guarded_ownership_data():
+    from ..world_constants import load_data
+    b=FakeBackend();m=SonicMemory(b);target=0x80002000
+    words=load_data('capsule_white_previous.json')
+    offset=capsule_refresh.data_offset(words)
+    words[-1]=0x48000000 | ((capsule_refresh.HOOK+4-(target+len(words)*4-4))&0x3fffffc)
+    b.write_bytes(target,struct.pack('>'+'I'*len(words),*words))
+    b.write_bytes(capsule_refresh.HOOK,(0x48000000 | ((target-capsule_refresh.HOOK)&0x3fffffc)).to_bytes(4,'big'))
+    b.write_bytes(target+offset,struct.pack('>3I',0x90001000,2,1))
+    result=capsule_refresh.inspect_installed(m)
+    assert result['variant']=='previous_white_collision_refresh'
+    assert capsule_refresh.installed_data(m)==target+offset
+    b.write_bytes(target+offset+8,(2).to_bytes(4,'big'))
+    with pytest.raises(MemoryUnavailable):capsule_refresh.inspect_installed(m)
+
+
 @pytest.mark.skipif(not PAIRS,reason='original PAL RAM absent')
 def test_white_control_guard_exact_fields_and_new_permissions():
     b=Overlay(PAIRS[0]);m=SonicMemory(b);address=install(b)

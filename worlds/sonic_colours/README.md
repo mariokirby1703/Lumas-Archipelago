@@ -12,6 +12,9 @@ Five goals, random post-intro Starting Act, automatic Red Ring packing and
 Music shuffling redirects the native normal-Act cue table before stage loading.
 An optional seed-specific PAL CPK copy also redirects compatible title, menu,
 map, boss and Game Land music. See [stabilization and resource setup](docs/stabilization.md).
+The live White-capsule test exposed disabled collision bodies after refresh;
+[the native reactivation fix](docs/white_collision_fix.md) requires the updated
+capsule code and still needs post-fix contact/pickup validation.
 
 The capsule hook now initializes the original native pickup collision objects,
 including repair of capsules previously refreshed only visually. The progression
