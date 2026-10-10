@@ -11,17 +11,18 @@ STAGE_TABLE_GLOBAL = 0x808F34F8  # 8007EB2C
 STAGE_VTABLE = 0x80759438
 
 
-def read_stage_objects(memory):
+def read_stage_objects(memory, include_pickups=True):
     """Bounded retries for essential ownership, never a cached previous frame."""
     for attempt in range(3):
         try:
-            return _read_stage_objects(memory)
+            return (_read_stage_objects(memory) if include_pickups else
+                    _read_stage_objects(memory, include_pickups=False))
         except MemoryUnavailable:
             if attempt == 2:
                 raise
 
 
-def _read_stage_objects(memory):
+def _read_stage_objects(memory, include_pickups=True):
     """Read the active context through the document's global module.
 
     800114D0/80014354 create the document and module. 800150C0 dispatches
@@ -145,6 +146,11 @@ def _read_stage_objects(memory):
             except MemoryUnavailable as error:
                 row['player_error'] = str(error)
             else:
+                if not include_pickups:
+                    # Write authorization needs the live player/profile/scene,
+                    # not an additional scan of every collectible model.
+                    if not coherent(): raise MemoryUnavailable('stage_context_changed')
+                    return [row]
                 try:
                     capsules = read_capsules(memory, stage, row['mission'], actors)
                     if not coherent():

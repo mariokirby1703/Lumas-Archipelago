@@ -1,0 +1,1307 @@
+{
+  "bank_sha256": "48eef93bd2744820a95432e848c687c71bc166e3549889720402535ff7757842",
+  "cues": [
+    {
+      "name": "bgm_sys_theme",
+      "id": 0,
+      "synth": "Synth/bgm_sys_theme",
+      "udata": "<NULL>",
+      "flags": 0,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_sys_op",
+      "id": 10,
+      "synth": "Synth/bgm_sys_op",
+      "udata": "<NULL>",
+      "flags": 0,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_sys_end",
+      "id": 20,
+      "synth": "Synth/bgm_sys_end",
+      "udata": "<NULL>",
+      "flags": 0,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_stg110_rso",
+      "id": 1000,
+      "synth": "Synth/bgm_stg110_rso",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg120_rso",
+      "id": 1001,
+      "synth": "Synth/bgm_stg120_rso",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg130_rso",
+      "id": 1002,
+      "synth": "Synth/bgm_stg130_rso",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg140_rso",
+      "id": 1003,
+      "synth": "Synth/bgm_stg140_rso",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg150_rso",
+      "id": 1004,
+      "synth": "Synth/bgm_stg150_rso",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg160_rso",
+      "id": 1005,
+      "synth": "Synth/bgm_stg160_rso",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg210_fct",
+      "id": 1010,
+      "synth": "Synth/bgm_stg210_fct",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg220_fct",
+      "id": 1011,
+      "synth": "Synth/bgm_stg220_fct",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg230_fct",
+      "id": 1012,
+      "synth": "Synth/bgm_stg230_fct",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg240_fct",
+      "id": 1013,
+      "synth": "Synth/bgm_stg240_fct",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg250_fct",
+      "id": 1014,
+      "synth": "Synth/bgm_stg250_fct",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg260_fct",
+      "id": 1015,
+      "synth": "Synth/bgm_stg260_fct",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg310_shp",
+      "id": 1020,
+      "synth": "Synth/bgm_stg310_shp",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg320_shp",
+      "id": 1021,
+      "synth": "Synth/bgm_stg320_shp",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg330_shp",
+      "id": 1022,
+      "synth": "Synth/bgm_stg330_shp",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg340_shp",
+      "id": 1023,
+      "synth": "Synth/bgm_stg340_shp",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg350_shp",
+      "id": 1024,
+      "synth": "Synth/bgm_stg350_shp",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg360_shp",
+      "id": 1025,
+      "synth": "Synth/bgm_stg360_shp",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg410_pla",
+      "id": 1030,
+      "synth": "Synth/bgm_stg410_pla",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg420_pla",
+      "id": 1031,
+      "synth": "Synth/bgm_stg420_pla",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg430_pla",
+      "id": 1032,
+      "synth": "Synth/bgm_stg430_pla",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg440_pla",
+      "id": 1033,
+      "synth": "Synth/bgm_stg440_pla",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg450_pla",
+      "id": 1034,
+      "synth": "Synth/bgm_stg450_pla",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg460_pla",
+      "id": 1035,
+      "synth": "Synth/bgm_stg460_pla",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg510_qua",
+      "id": 1040,
+      "synth": "Synth/bgm_stg510_qua",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "filter",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg520_qua",
+      "id": 1041,
+      "synth": "Synth/bgm_stg520_qua",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "filter",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg530_qua",
+      "id": 1042,
+      "synth": "Synth/bgm_stg530_qua",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "filter",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg540_qua",
+      "id": 1043,
+      "synth": "Synth/bgm_stg540_qua",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "filter",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg550_qua",
+      "id": 1044,
+      "synth": "Synth/bgm_stg550_qua",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "filter",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg560_qua",
+      "id": 1045,
+      "synth": "Synth/bgm_stg560_qua",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "filter",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg610_ast",
+      "id": 1050,
+      "synth": "Synth/bgm_stg610_ast",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg620_ast",
+      "id": 1051,
+      "synth": "Synth/bgm_stg620_ast",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg630_ast",
+      "id": 1052,
+      "synth": "Synth/bgm_stg630_ast",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg640_ast",
+      "id": 1053,
+      "synth": "Synth/bgm_stg640_ast",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg650_ast",
+      "id": 1054,
+      "synth": "Synth/bgm_stg650_ast",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg660_ast",
+      "id": 1055,
+      "synth": "Synth/bgm_stg660_ast",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg710_elv",
+      "id": 1060,
+      "synth": "Synth/bgm_stg710_elv",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg720_elv",
+      "id": 1061,
+      "synth": "Synth/bgm_stg720_elv",
+      "udata": "<NULL>",
+      "flags": 0,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_boss_coreboss",
+      "id": 2000,
+      "synth": "Synth/bgm_boss_coreboss",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_boss_Jellyboss",
+      "id": 2010,
+      "synth": "Synth/bgm_boss_Jellyboss",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_boss_shipboss",
+      "id": 2020,
+      "synth": "Synth/bgm_boss_shipboss",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_boss_lastboss_1",
+      "id": 2030,
+      "synth": "Synth/bgm_boss_lastboss_1",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_boss_lastboss_2",
+      "id": 2040,
+      "synth": "Synth/bgm_boss_lastboss_2",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_mlt_a",
+      "id": 3000,
+      "synth": "Synth/bgm_mlt_a",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_mlt_b",
+      "id": 3010,
+      "synth": "Synth/bgm_mlt_b",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_mlt_c",
+      "id": 3020,
+      "synth": "Synth/bgm_mlt_c",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_mlt_d",
+      "id": 3030,
+      "synth": "Synth/bgm_mlt_d",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_mlt_e",
+      "id": 3040,
+      "synth": "Synth/bgm_mlt_e",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_mlt_f",
+      "id": 3050,
+      "synth": "Synth/bgm_mlt_f",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_mlt_g",
+      "id": 3060,
+      "synth": "Synth/bgm_mlt_g",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        1,
+        0,
+        1,
+        [
+          "boost",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_mlt_title",
+      "id": 3100,
+      "synth": "Synth/bgm_mlt_title",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_jingle_mlt_clear",
+      "id": 3110,
+      "synth": "Synth/bgm_jingle_mlt_clear",
+      "udata": "<NULL>",
+      "flags": 0,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_mlt_result",
+      "id": 3120,
+      "synth": "Synth/bgm_mlt_result",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_wmap",
+      "id": 4000,
+      "synth": "Synth/bgm_worldmap",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_zmap_rso",
+      "id": 4010,
+      "synth": "Synth/bgm_zmap_rso",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_zmap_fct",
+      "id": 4020,
+      "synth": "Synth/bgm_zmap_fct",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_zmap_shp",
+      "id": 4030,
+      "synth": "Synth/bgm_zmap_shp",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_zmap_pla",
+      "id": 4040,
+      "synth": "Synth/bgm_zmap_pla",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_zmap_qua",
+      "id": 4050,
+      "synth": "Synth/bgm_zmap_qua",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_zmap_ast",
+      "id": 4060,
+      "synth": "Synth/bgm_zmap_ast",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_zmap_elv",
+      "id": 4070,
+      "synth": "Synth/bgm_zmap_elv",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_sys_title",
+      "id": 5000,
+      "synth": "Synth/bgm_sys_title",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_sys_option",
+      "id": 5010,
+      "synth": "Synth/bgm_sys_option",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_sys_save",
+      "id": 5011,
+      "synth": "Synth/bgm_sys_save",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_sys_result",
+      "id": 5020,
+      "synth": "Synth/bgm_sys_result",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_jingle_stg_clear",
+      "id": 6000,
+      "synth": "Synth/bgm_jingle_stg_clear",
+      "udata": "<NULL>",
+      "flags": 0,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_jingle_boss_clear",
+      "id": 6010,
+      "synth": "Synth/bgm_jingle_boss_clear",
+      "udata": "<NULL>",
+      "flags": 0,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_jingle_drown",
+      "id": 6200,
+      "synth": "Synth/bgm_jingle_drown",
+      "udata": "<NULL>",
+      "flags": 0,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_jingle_gameover",
+      "id": 6300,
+      "synth": "Synth/bgm_jingle_gameover",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_jingle_super_sonic",
+      "id": 6500,
+      "synth": "Synth/bgm_jingle_super_sonic",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_pha_spn",
+      "id": 6100,
+      "synth": "Synth/bgm_pha_spn",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_pha_spn_wtr",
+      "id": 6101,
+      "synth": "Synth/bgm_pha_spn_wtr",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_pha_spk",
+      "id": 6110,
+      "synth": "Synth/bgm_pha_spk",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_pha_ast",
+      "id": 6120,
+      "synth": "Synth/bgm_pha_ast",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_pha_rod",
+      "id": 6130,
+      "synth": "Synth/bgm_pha_rod",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_pha_lsr",
+      "id": 6140,
+      "synth": "Synth/bgm_pha_lsr",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_pha_rkt",
+      "id": 6150,
+      "synth": "Synth/bgm_pha_rkt",
+      "udata": "<NULL>",
+      "flags": 0,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_pha_pzl",
+      "id": 6160,
+      "synth": "Synth/bgm_pha_pzl",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_pha_multi_common",
+      "id": 6460,
+      "synth": "Synth/bgm_pha_multi_common",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_pha_multi_united",
+      "id": 6470,
+      "synth": "Synth/bgm_pha_multi_united",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        [
+          "filter"
+        ]
+      ]
+    },
+    {
+      "name": "bgm_stg730_elv",
+      "id": 1062,
+      "synth": "Synth/bgm_stg730_elv",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_jingle_mlt_drown",
+      "id": 3200,
+      "synth": "Synth/bgm_jingle_mlt_drown",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_sys_challenge",
+      "id": 6600,
+      "synth": "Synth/bgm_sys_challenge",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    },
+    {
+      "name": "bgm_sys_challenge_result",
+      "id": 6601,
+      "synth": "Synth/bgm_sys_challenge_result",
+      "udata": "<NULL>",
+      "flags": 1,
+      "compatibility": [
+        0,
+        0,
+        0,
+        []
+      ]
+    }
+  ]
+}

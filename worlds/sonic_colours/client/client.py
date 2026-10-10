@@ -6,7 +6,7 @@ import time
 from datetime import datetime, timezone
 
 import Utils
-from CommonClient import ClientCommandProcessor, CommonContext, gui_enabled, logger, server_loop
+from CommonClient import ClientCommandProcessor, CommonContext, gui_enabled, logger, server_loop, mark_raw
 from NetUtils import ClientStatus
 from websockets.exceptions import ConnectionClosed
 from ..world_constants import GAME
@@ -24,6 +24,17 @@ from .status import StatusReporter
 
 
 class SonicCommands(ClientCommandProcessor):
+    @mark_raw
+    def _cmd_sonicmusic(self, manifest=''):
+        """Select a seed BGM patch manifest (path may contain spaces), or show music status. This does not install game resources."""
+        if not self.ctx.runtime:
+            logger.info('Connect to your Sonic Colours slot first.')
+            return
+        if manifest.strip():
+            self.ctx.music_resource_manifest = manifest.strip().strip('"')
+            self.ctx.runtime.select_resource_music(self.ctx.music_resource_manifest)
+        logger.info(json.dumps(self.ctx.runtime.music_status, indent=2))
+
     def _cmd_sonicnewgame(self):
         """Optional New Game confirmation; native detection is automatic and freshness is still required."""
         if not self.ctx.runtime:
@@ -72,7 +83,7 @@ class SonicContext(CommonContext):
     items_handling = 0b111
     command_processor = SonicCommands
 
-    def __init__(self, address=None, password=None, patch_file=None, journal_directory=None):
+    def __init__(self, address=None, password=None, patch_file=None, journal_directory=None, music_resource_manifest=None):
         super().__init__(address, password)
         self.runtime = None
         self.deathlink = None
@@ -86,6 +97,7 @@ class SonicContext(CommonContext):
         self.operation_status = {}
         self.expected_seed = None
         self.expected_slot_data = None
+        self.music_resource_manifest = music_resource_manifest
         self.last_send = 0.0
         self.last_pending = set()
         self.implementation = implementation_info()
@@ -150,6 +162,8 @@ class SonicContext(CommonContext):
                     self.release_runtime()
                     journal = Journal(self.journal_directory, identity)
                     self.runtime = Runtime(data, journal, SaveGuard(journal), NativeHooks(journal))
+                    if self.music_resource_manifest:
+                        self.runtime.select_resource_music(self.music_resource_manifest)
                     if data['options']['death_link']:
                         self.deathlink = DeathLink(journal)
                 asyncio.create_task(self.update_death_link(bool(data['options']['death_link'])))
@@ -282,6 +296,7 @@ async def dolphin_loop(ctx):
                         ctx.runtime.hooks.invalidate_session()
                     dolphin.hook()
                 ctx.dolphin_instance = backend.instance_info()
+                backend.assert_instance(ctx.dolphin_instance)
                 if not backend.active():
                     verified = False
                     if ctx.runtime:
@@ -365,7 +380,8 @@ async def dolphin_loop(ctx):
 
 
 async def main(args):
-    ctx = SonicContext(args.connect, args.password, args.patch_file)
+    ctx = SonicContext(args.connect, args.password, args.patch_file,
+                       music_resource_manifest=getattr(args, 'music_resource_manifest', None))
     ctx.auth = args.name or ctx.auth
     ctx.server_task = asyncio.create_task(server_loop(ctx), name='ServerLoop')
     if gui_enabled and not getattr(args, 'nogui', False):

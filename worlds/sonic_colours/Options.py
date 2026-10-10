@@ -115,7 +115,7 @@ class SwimTrapWeight(Choice):
 
 
 class MusicRandomization(Choice):
-    """Shuffle music in normal Acts within each world or across worlds. The same seed uses the same shuffle. Changes apply after the original introduction; Off preserves vanilla music."""
+    """Deterministic music shuffle. Runtime redirects cover normal Acts after the intro. The optional seed CPK patch also redirects compatible title/menu, map, boss, Terminal Velocity, Game Land and results BGM before startup. Timed sequences and critical jingles are preserved. Off preserves vanilla music."""
     display_name = 'Music Randomization'
     option_off = 0
     option_per_world = 1

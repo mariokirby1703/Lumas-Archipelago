@@ -50,6 +50,13 @@ class DMEBackend:
             self.close()
             raise MemoryUnavailable('emulation_not_running')
 
+    def assert_instance(self, info=None):
+        info = self.instance_info() if info is None else info
+        if info.get('process_enumeration_error'):
+            raise MemoryUnavailable('dolphin_instance_unverified: process enumeration failed')
+        if 'process_candidates' in info and len(info['process_candidates']) != 1:
+            raise MemoryUnavailable('dolphin_instance_unverified: exactly one Dolphin process is required; DME cannot select an explicit PID')
+
     def _fallback(self):
         if os.name != 'nt':
             raise MemoryUnavailable('MEM2 unavailable in DME')
@@ -69,6 +76,9 @@ class DMEBackend:
 
     def write_bytes(self, address, data):
         self._check()
+        # Repeat process attribution at the mutation boundary, not just when
+        # attaching. No automatic selection between concurrently running games.
+        self.assert_instance()
         # Choose one backend BEFORE mutation. A failed write may have partially
         # applied; retrying through another alias would conceal uncertainty.
         if address >= 0x90000000 and self.fallback:

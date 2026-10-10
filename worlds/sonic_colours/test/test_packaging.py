@@ -20,6 +20,8 @@ def test_apworld_has_verifiable_build_identity_without_private_assets(tmp_path):
             json.dumps(manifest['files'], sort_keys=True).encode()).hexdigest()
         for name, digest in manifest['files'].items():
             assert hashlib.sha256(archive.read('sonic_colours/' + name)).hexdigest() == digest
+        assert 'assets/Colours Logo.png' in manifest['files']
+        assert archive.read('sonic_colours/assets/Colours Logo.png').startswith(bytes.fromhex('89504e470d0a1a0a'))
         assert not any('/notes/' in name or name.endswith(('.dol', '.cpk', '.raw'))
                        for name in archive.namelist())
 

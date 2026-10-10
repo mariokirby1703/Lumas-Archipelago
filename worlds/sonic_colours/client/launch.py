@@ -14,6 +14,10 @@ def launch_client(*args):
                         help='Migrate a player YAML to schema 5 and exit; seed files and journals are not migrated')
     parser.add_argument('--patch-music', nargs=2, metavar=('ORIGINAL_CPK', 'OUTPUT_CPK'),
                         help='Build a separate seed music CPK from the .apsonic file, then exit')
+    parser.add_argument('--patch-all-music', nargs=2, metavar=('ORIGINAL_CPK', 'OUTPUT_CPK'),
+                        help='Redirect compatible stage, boss, map, title, menu and Game Land BGM in a separate PAL CPK, then exit')
+    parser.add_argument('--music-resource-manifest', metavar='PATCHED_CPK_JSON',
+                        help='Select the seed BGM resource manifest and suppress duplicate runtime shuffling; loaded Dolphin playback remains unverified')
     parser.add_argument('url', nargs='?', help='archipelago:// URI or .apsonic file')
     parsed = parser.parse_args(args)
     parsed.patch_file = None
@@ -38,7 +42,9 @@ def launch_client(*args):
         Path(parsed.export_capsule_gecko).write_text(gecko_ini(), encoding='utf-8')
         logging.info('Four PAL native code groups exported. Enable all four in Dolphin before starting emulation; runtime verification is still required.')
         return
-    if parsed.patch_music:
+    if parsed.patch_music and parsed.patch_all_music:
+        parser.error('choose --patch-music or --patch-all-music')
+    if parsed.patch_music or parsed.patch_all_music:
         if not parsed.patch_file:
             parser.error('--patch-music requires a generated .apsonic file')
         import json
@@ -49,8 +55,12 @@ def launch_client(*args):
         mode = {1: 'per_world', 2: 'anywhere'}.get(slot['options']['music_randomization'])
         if mode is None:
             parser.error('music_randomization is off in this seed')
-        patch_music(*parsed.patch_music, slot['seed_name'], mode)
-        logging.info('Music CPK and manifest created. Install into a separate disc copy; audible playback unverified.')
+        if parsed.patch_all_music:
+            from .music_bank import patch
+            patch(*parsed.patch_all_music, slot['seed_name'], mode)
+        else:
+            patch_music(*parsed.patch_music, slot['seed_name'], mode)
+        logging.info('Separate seed music CPK and manifest verified. Install into a separate disc copy and restart emulation; file creation does not verify Dolphin playback.')
         return
     asyncio.run(main(parsed))
 

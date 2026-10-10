@@ -1,4 +1,4 @@
-# Sonic Colours (Wii) PAL — Archipelago 0.5.0
+# Sonic Colours (Wii) PAL — Archipelago 0.5.1
 
 PAL `SNCP8P`, revision 0; slot schema 5. This build contains native gameplay
 readers and guarded writers, immediate journaled checks, and four Gecko codes.
@@ -10,6 +10,8 @@ Chaos Emerald items always appear as progression and control Super Sonic.
 Five goals, random post-intro Starting Act, automatic Red Ring packing and
 680 optional individual Wisp Capsule checks are supported by the generator.
 Music shuffling redirects the native normal-Act cue table before stage loading.
+An optional seed-specific PAL CPK copy also redirects compatible title, menu,
+map, boss and Game Land music. See [stabilization and resource setup](docs/stabilization.md).
 
 The capsule hook now initializes the original native pickup collision objects,
 including repair of capsules previously refreshed only visually. The progression

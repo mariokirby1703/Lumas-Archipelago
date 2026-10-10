@@ -154,6 +154,7 @@ class Runtime:
         self.deferred = {}
         self.retry_after = {}
         self.clock = time.monotonic
+        self.resource_music = None
         self.music_status = {'status':'off' if not self.slot_data['options']['music_randomization'] else 'waiting for attributed stage selection',
                              'audible_verified':False}
 
@@ -281,11 +282,14 @@ class Runtime:
             except MemoryUnavailable as error:
                 self.hooks.progression_status = {'available':False,'reason':str(error)}
         self.last_error = self.snapshot.status
-        if self.snapshot.scene in ('world_map','global_map','game_land_select'):
+        if self.resource_music and not self.resource_music['resource_verified']:
+            self.music_status = self.resource_music
+        elif self.snapshot.scene in ('world_map','global_map','game_land_select'):
             try:
                 self.guard.check(self.snapshot)
                 from .music import apply_music
-                self.music_status = apply_music(memory,self.slot_data)
+                result = apply_music(memory, self.slot_data, resource=bool(self.resource_music))
+                self.music_status = {**(self.resource_music or {}), **result}
             except MemoryUnavailable as error:
                 self.music_status = {'status':str(error),'audible_verified':False}
         owned = inventory(item_ids) if history_ready else None
@@ -333,6 +337,16 @@ class Runtime:
         can_send = self.guard.can_send(self.snapshot)
         return (set(self.journal.data['pickup_checks']) | (set(self.journal.data['checks']) if can_send else set()),
                 bool((can_send or self.slot_data['options']['goal'] == 4) and self.journal.data.get('goal_observed')))
+
+    def select_resource_music(self, path):
+        from .music_bank import load_manifest
+        try:
+            self.resource_music = load_manifest(path, self.slot_data)
+        except (ValueError, OSError, KeyError, StopIteration) as error:
+            self.resource_music = {'status': f'Music resource rejected: {error}',
+                                   'resource_verified': False, 'audible_verified': False}
+        self.music_status = self.resource_music
+        logger.info(self.music_status['status'])
 
     def configure_native_hooks(self, memory, owned):
         """Project authenticated ownership into independent native controls.

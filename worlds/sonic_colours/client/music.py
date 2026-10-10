@@ -39,8 +39,10 @@ def cue_records(memory):
     return table, vector, count, result
 
 
-def apply_music(memory, slot):
-    mapping = mapping_for(slot)
+def apply_music(memory, slot, resource=False):
+    # A seed-specific bank already redirects every supported original alias.
+    # Restore vanilla mission aliases to avoid composing two different shuffles.
+    mapping = {s['mission_id']: s['bgm'] for s in NORMAL} if resource else mapping_for(slot)
     _, _, _, records = cue_records(memory)
     changed = 0
     for mission, address in records.items():
@@ -49,5 +51,6 @@ def apply_music(memory, slot):
         if target != before:
             memory.write_bytes_verified(address,target,expected=before,operation='music_cues')
             changed += 1
-    return {'status':'native cue table verified; takes effect on the next stage load',
+    return {'status':('original mission aliases verified for selected resource bank' if resource else
+                     'native cue table verified; takes effect on the next stage load'),
             'seed':slot['seed_name'],'changed_cues':changed,'audible_verified':False}

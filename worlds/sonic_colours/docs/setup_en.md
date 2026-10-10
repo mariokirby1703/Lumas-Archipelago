@@ -113,11 +113,14 @@ uncertain attempt. Keep the journal rather than deleting receipt history.
 
 Music `per_world`/`anywhere` redirects the native 36-normal-Act cue table at a
 safe attributed map, taking effect on the next load. Off restores vanilla cues.
-Boss/Game Land music remains vanilla; audible playback still needs live testing.
+An optional separate seed CPK extends this to compatible title/menu, map,
+boss and Game Land BGM, including the mandatory intro. See
+[resource setup and validation limits](stabilization.md). Audible playback still
+needs live testing; generating a resource copy does not install it in Dolphin.
 Level randomization, Death Link and swimming traps currently require Off.
 
 Commands: `/sonic`, `/sonicstatus`, `/sonicdebug`, `/sonicitems`,
-`/sonicnewgame`, `/sonicrecover`. Status distinguishes detection, journal,
+`/sonicnewgame`, `/sonicrecover`, `/sonicmusic`. Status distinguishes detection, journal,
 AP transport, counter writes, capsule/progression hooks and music.
 See [validation limits](gameplay_overhaul.md) before interpreting a readback
 or offline test as proof of an in-game effect.

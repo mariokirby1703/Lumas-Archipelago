@@ -220,7 +220,16 @@ class WritePolicy:
         if not VERSION['capabilities'].get(operation, False):
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
         self.memory.verify_revision()
-        snapshot = self.snapshot_reader(self.memory)
+        # The production reader normally verifies the whole executable itself.
+        # This policy has JUST done that; use its lean scene/profile snapshot
+        # without hashing the same 7 MB twice or rescanning collectible actors.
+        # Custom readers retain the ordinary path and full policy verification.
+        from .hooks import NativeHooks
+        owner = getattr(self.snapshot_reader, '__self__', None)
+        if isinstance(owner, NativeHooks) and getattr(self.snapshot_reader, '__func__', None) is NativeHooks.snapshot:
+            snapshot = owner._snapshot_after_revision(self.memory)
+        else:
+            snapshot = self.snapshot_reader(self.memory)
         if operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls') and snapshot.save_identity is None:
             token = self.guard.check_stats(snapshot)
         else:

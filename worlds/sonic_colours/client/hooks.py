@@ -43,9 +43,15 @@ class NativeHooks:
                     for mission, record in self.read_validation['clear_bits'].items())):
             raise ValueError('native clear validation does not match PAL catalog')
 
-    def snapshot(self, memory):
+    def _snapshot_after_revision(self, memory):
+        """WritePolicy only: a full executable check immediately precedes this."""
+        if not (memory.revision_observation or {}).get('verified'):
+            raise MemoryUnavailable('WRITE_BLOCKED: fresh executable verification required')
+        return self.snapshot(memory, verify_executable=False, include_pickups=False)
+
+    def snapshot(self, memory, verify_executable=True, include_pickups=True):
         try:
-            memory.verify_revision()
+            if verify_executable: memory.verify_revision()
         except MemoryUnavailable as error:
             self.capsule_refresh_status = {'available': False, 'reason': str(error)}
             # PAL structures can still be observed read-only when executable
@@ -67,7 +73,8 @@ class NativeHooks:
         # Document/scene objects exist independently of a selected save. Failure
         # here must not hide previously validated clear reads.
         try:
-            native['stage_objects'] = read_stage_objects(memory)
+            native['stage_objects'] = (read_stage_objects(memory) if include_pickups else
+                                       read_stage_objects(memory, include_pickups=False))
         except MemoryUnavailable as error:
             if 'stage_context_changed' in str(error):
                 raise
