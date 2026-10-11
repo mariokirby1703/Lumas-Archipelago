@@ -176,3 +176,11 @@ def test_host_neutralizes_coloured_gate_without_disabling_white_lock(historical)
     assert m.read_u32(installed(m, 'boost')+16) == 0
     for kind in ('boost_use', 'boost_query', 'boost_add'):
         assert m.read_u32(installed(m, kind)+16) == 1
+
+
+def test_temporary_boost_allows_use_but_denies_vanilla_add():
+    assert run('boost_use', selected=25, locked=2) == 25
+    assert run('boost_query', selected=25, locked=2) == 25
+    assert run('boost_add', selected=25, locked=2) == 25
+    assert run('boost_use', selected=0, locked=2) == 0
+    assert run('boost_add', selected=25, locked=0) == 30

@@ -116,7 +116,7 @@ class SonicColoursWorld(World):
         return Items.SonicColoursItem(name, Items.classification(name), Items.ITEM_TABLE[name], self.player)
 
     def get_filler_item_name(self):
-        return self.random.choice(Items.FILLER)
+        return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
         return {'schema_version': SCHEMA_VERSION, 'game': GAME, 'seed_name': self.multiworld.seed_name,

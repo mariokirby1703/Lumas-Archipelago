@@ -138,3 +138,26 @@ def test_half_boost_without_white_ownership_stores_gauge_and_remains_durable(tmp
         assert j.data['effects']['0']['state']=='confirmed'
         assert ITEM_TABLE['White Boost Wisp'] not in j.data['receipts']
         assert r.item_details()[0]['journal_state']=='confirmed'
+
+
+@pytest.mark.parametrize('item_name,current,maximum,expected', [
+    ('Full Boost Refill',10.,100.,100.),('Full Boost Refill',30.,50.,50.),
+    ('Half Boost Refill',10.,50.,35.)])
+def test_refill_temporary_permission_depletion_reconnect(tmp_path,item_name,current,maximum,expected):
+    items=[ITEM_TABLE[item_name]]
+    with Journal(tmp_path,IDENTITY) as j:
+        r,b,m,tick=runtime_fixture(j);j.record_history(items)
+        r.snapshot=replace(r.snapshot,boost_address=0x90002008,boost_max_address=0x90002014)
+        b.put(r.snapshot.boost_address,struct.pack('>f',current))
+        b.put(r.snapshot.boost_max_address,struct.pack('>f',maximum))
+        assert not r.temporary_boost_allowed(m)
+        r.apply_effects(m,items);settle(r,m,items,tick)
+        assert m.read_f32(r.snapshot.boost_address)==expected
+        assert r.temporary_boost_allowed(m)
+        b.put(r.snapshot.boost_address,struct.pack('>f',0.))
+        assert not r.temporary_boost_allowed(m)
+        # A subsequent vanilla value cannot resurrect an exhausted AP grant.
+        b.put(r.snapshot.boost_address,struct.pack('>f',25.))
+        assert not r.temporary_boost_allowed(m)
+        assert ITEM_TABLE['White Boost Wisp'] not in j.data['receipts']
+        writes=len(b.writes);r.apply_effects(m,items);assert len(b.writes)==writes

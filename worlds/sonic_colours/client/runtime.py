@@ -370,7 +370,7 @@ class Runtime:
         except MemoryUnavailable as error:
             self.hooks.progression_status = {'available': False, 'reason': str(error)}
         try:
-            controls = configure_controls(memory, self.snapshot, owned, self.slot_data)
+            controls = configure_controls(memory, self.snapshot, owned, self.slot_data, temporary_boost=self.temporary_boost_allowed(memory))
         except MemoryUnavailable as error:
             controls = {'error': str(error), 'installed': {}}
         self.hooks.gameplay_controls_status = {**controls, 'white_capsules': capsules}
@@ -385,6 +385,36 @@ class Runtime:
             return
         self.configure_native_hooks(memory, owned)
         self.hooks.project_permissions(memory, self.snapshot, owned, self.slot_data)
+
+    def boost_grant_context(self, memory):
+        context = self.effect_context(memory, 'boost')
+        backend = getattr(memory, 'backend', None)
+        if not hasattr(backend, 'instance_info'):
+            return context  # offline adapters cannot assert a live process
+        info = backend.instance_info()
+        candidates = info.get('process_candidates', [])
+        if len(candidates) != 1:
+            raise MemoryUnavailable('WRITE_BLOCKED: temporary Boost process attribution unavailable')
+        stage = next(iter(self.snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
+        # Exclude only host-generated session/epoch UUIDs. Require the same
+        # live Dolphin PID, attributed native stage/player/provider and mission.
+        return [candidates[0]['pid'], self.snapshot.save_identity,
+                stage.get('stage'), stage.get('player_actor_id'), *context[2:]]
+
+    def temporary_boost_allowed(self, memory):
+        grant = self.journal.data.get('temporary_boost')
+        if not grant or grant.get('consumed'):
+            return False
+        try:
+            context = self.boost_grant_context(memory)
+            gauge = memory.read_f32(self.snapshot.boost_address)
+        except MemoryUnavailable:
+            return False
+        if context != grant['context'] or gauge <= 0:
+            grant['consumed'] = True
+            self.journal.save()
+            return False
+        return math.isfinite(gauge) and gauge > 0
 
     def effect_context(self, memory, family):
         context = list(self.guard.check_stats(self.snapshot))
@@ -444,8 +474,8 @@ class Runtime:
                     if pending['family'] == 'boost':
                         before_float, after_float = (struct.unpack('>f', effect[k].to_bytes(4, 'big'))[0]
                                                      for k in ('before','after'))
-                        logger.info('Half Boost Refill applied: receipt %s, %.2f -> %.2f (maximum %.2f)',
-                                    index, before_float, after_float, effect['maximum'])
+                        logger.info('%s applied: receipt %s, %.2f -> %.2f (maximum %.2f)',
+                                    BY_ID[effect['item']], index, before_float, after_float, effect['maximum'])
                     logger.info('Counter delivery observed: receipt %s, counters %s after %.2fs; HUD verification separate', index, values, elapsed)
                 else:
                     effect.update(state='uncertain', reason='no later-frame effect witness or counter sources disagree')
@@ -461,7 +491,7 @@ class Runtime:
             if name not in DELIVERY_ITEMS:
                 continue
             recorded = self.journal.data['effects'].get(str(index))
-            family = 'lives' if name == '1-Up' else 'boost' if name == 'Half Boost Refill' else 'rings'
+            family = 'lives' if name == '1-Up' else 'boost' if name in ('Half Boost Refill', 'Full Boost Refill') else 'rings'
             amount = rings_amount(self.journal, index) if name == 'Rings' else None
             recorded = self.journal.data['effects'].get(str(index))
             if recorded and recorded['state'] not in ('queued', 'deferred'):
@@ -523,7 +553,7 @@ class Runtime:
                 if not (math.isfinite(current) and math.isfinite(maximum) and 0 < maximum <= 10000 and 0 <= current <= maximum):
                     self.journal.defer(index, item, 'native boost values out of range')
                     continue
-                after = int.from_bytes(struct.pack('>f', min(maximum, current + maximum / 2)), 'big')
+                after = int.from_bytes(struct.pack('>f', maximum if name == 'Full Boost Refill' else min(maximum, current + maximum / 2)), 'big')
             else:
                 if amount is None:
                     amount = 1 if name == '1-Up' else int(name.split('+')[1].split(')')[0]) if name in LEGACY_FILLER else 0
@@ -533,6 +563,7 @@ class Runtime:
             if family == 'boost' and context[-1] != int.from_bytes(struct.pack('>f', maximum), 'big'):
                 self.journal.defer(index, item, 'native boost maximum changed before attempt')
                 continue
+            grant_context = self.boost_grant_context(memory) if family == 'boost' else None
             self.journal.prepare(index, item, context, before, after)
             logger.info('Native write attempted: receipt %s, %s, %s -> %s', index, name, before, after)
             self.journal.data['effects'][str(index)].update(addresses=addresses, family=family, stage_epoch=snapshot.stage_epoch, reason=None)
@@ -563,6 +594,8 @@ class Runtime:
                 self.journal.save()
                 logger.warning('Item uncertain: receipt %s (%s): %s; later receipts remain eligible', index, name, error)
                 continue
+            if family == 'boost':
+                self.journal.data['temporary_boost'] = {'context': grant_context, 'receipt': index, 'consumed': False}
             self.journal.data['effects'][str(index)]['state'] = 'verifying'
             self.journal.save()
             self.inflight[index] = {'started': self.clock(), 'addresses': addresses,
@@ -582,7 +615,7 @@ class Runtime:
             if name in DELIVERY_ITEMS:
                 effect = self.journal.data['effects'].get(str(index), {})
                 rows.append({**effect, 'index': index, 'name': name,
-                             'family': 'lives' if name == '1-Up' else 'boost' if name == 'Half Boost Refill' else 'rings',
+                             'family': 'lives' if name == '1-Up' else 'boost' if name in ('Half Boost Refill', 'Full Boost Refill') else 'rings',
                              'state': 'applying' if effect.get('state') == 'prepared' else effect.get('state', 'queued'),
                              'journal_state': effect.get('state', 'queued'),
                              'hud_verified': False})

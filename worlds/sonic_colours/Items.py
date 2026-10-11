@@ -7,7 +7,8 @@ EMERALDS = tuple(f'{colour} Chaos Emerald' for colour in
                  ('Green', 'Red', 'Blue', 'Yellow', 'Purple', 'Cyan', 'White'))
 RING_VALUES = {'Red Ring': 1, '5 Red Rings': 5, '10 Red Rings': 10}
 LEGACY_FILLER = ('Rings (+10)', 'Rings (+25)', 'Rings (+50)')
-FILLER = ('Rings', '1-Up', 'Half Boost Refill')
+FILLER_WEIGHTS = {'Rings': 40, '1-Up': 30, 'Half Boost Refill': 20, 'Full Boost Refill': 10}
+FILLER = tuple(FILLER_WEIGHTS)
 TRAPS = ('Ring Loss Trap', 'Swim Everywhere Trap')
 # Keep retired Terminal Velocity Access offset 6 out of the public item table.
 NAMES = tuple(f'{w} Access' for w in WORLDS) + WISP_ITEMS + EMERALDS + tuple(RING_VALUES) + LEGACY_FILLER + ('1-Up',) + TRAPS
@@ -19,6 +20,7 @@ GAME_LAND_SPEED = 'Progressive Game Land Speed'
 ITEM_TABLE[GAME_LAND_SPEED] = BASE_ID + 34
 RANDOM_CAPSULES = 'Random Capsules'
 ITEM_TABLE[RANDOM_CAPSULES] = BASE_ID + 35
+ITEM_TABLE['Full Boost Refill'] = BASE_ID + 36
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}
 
 

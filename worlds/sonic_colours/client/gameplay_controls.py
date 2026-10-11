@@ -21,7 +21,8 @@ HOOKS = {
 }
 
 
-def payload(kind, compact=True):
+def payload(kind, compact=True, temporary=True):
+    if not compact: temporary = False
     a = PPC(); hook, original = HOOKS[kind]
     output = 3 if kind in ('boost', 'speed_get') else 0 if kind == 'speed_ui' else None
     frame = 0xa0 if compact else 0x40
@@ -51,7 +52,7 @@ def payload(kind, compact=True):
             a.d(32, 6, 30, 0x8c); a.d(32, 6, 6, 0x24)
             a.d(11, 0, 6, 1); a.branch('vanilla', 0x41820000)
         a.d(32, 7, 12, 12); a.emit(0x7C033800); a.branch('vanilla', 0x40820000)
-        a.d(32, 7, 12, 16); a.d(11, 0, 7, 1); a.branch('vanilla', 0x40820000)
+        a.d(32, 7, 12, 16); a.d(11, 0, 7, 0 if kind == 'boost_add' and temporary else 1); a.branch('vanilla', 0x41820000 if kind == 'boost_add' and temporary else 0x40820000)
         if kind == 'boost': a.d(14, 3, 0, 0)  # unreachable compatibility body
         elif kind == 'boost_add':
             # Preserve the pre-existing gauge; deny only the new pickup/script
@@ -92,7 +93,7 @@ def payload(kind, compact=True):
         if output != 0: a.d(32, 0, 1, 16)
     a.d(14, 1, 1, frame); a.branch('return')
     data = len(a.words)*4; a.words[fix] |= (data-base)&0xffff
-    for _ in range(6 if not compact or kind in ('boost_use','boost_query') else 5): a.emit(0)
+    for _ in range(3 if compact and temporary and kind.startswith('speed') else 6 if not compact or kind in ('boost_use','boost_query') else 5): a.emit(0)
     a.label('return')
     if len(a.words)%2 == 0: a.emit(0x60000000)
     a.emit(0)
@@ -102,13 +103,15 @@ def payload(kind, compact=True):
 def installed(memory, kind):
     hook, original = HOOKS[kind]; words, offset = payload(kind)
     from ..world_constants import load_data
-    previous_words, previous_offset = payload(kind, compact=False)
+    previous_words, previous_offset = payload(kind, compact=False, temporary=False)
     legacy = load_data('gameplay_hook_legacy.json').get(kind)
-    layouts = [(kind, words, offset), ('previous', previous_words, previous_offset)]
+    old_compact, old_offset = payload(kind, temporary=False)
+    layouts = [(kind, words, offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
     if legacy: layouts.append(('legacy', legacy['words'], legacy['offset']))
     for name, candidate, candidate_offset in layouts:
         try:
-            result = inspect_c2(memory, hook, original, {name:candidate}, ((candidate_offset,20),), label=kind)
+            size = 12 if name == kind and kind.startswith('speed') else 20
+            result = inspect_c2(memory, hook, original, {name:candidate}, ((candidate_offset,size),), label=kind)
             offset = candidate_offset
             break
         except MemoryUnavailable as error:
@@ -116,20 +119,23 @@ def installed(memory, kind):
     else: raise failure
     if not result['installed']: return None
     address = result['target'] + offset
-    owner, index, maximum, model, locked = struct.unpack('>5I', memory.read_bytes(address, 20))
+    values = struct.unpack('>'+'I'*(size//4), memory.read_bytes(address,size))
+    owner, index, maximum, model, locked = (*values, 0, 0) if size == 12 else values
+    if not hasattr(memory, 'gameplay_data_sizes'): memory.gameplay_data_sizes = {}
+    memory.gameplay_data_sizes[address] = size
     if (owner and not valid_range(owner, 1) or index > 3 or maximum > 4
-            or model and not valid_range(model, 0x30) or locked > 1):
+            or model and not valid_range(model, 0x30) or locked > 2):
         raise MemoryUnavailable('unknown_revision: invalid native gameplay control data')
     return address
 
 
-def configure(memory, snapshot, owned, slot):
+def configure(memory, snapshot, owned, slot, temporary_boost=False):
     from ..Items import GAME_LAND_SPEED
     chain = memory.resolve_flags_ptr(allow_working=True)
     maximum = min(4, owned['counts'][GAME_LAND_SPEED]) if slot.get('game_land_speed_items') else 4
     model = snapshot.boost_address - 8 if snapshot.boost_address is not None else 0
     locked = int(bool(slot['options'].get('boost_lock') and not owned['counts']['White Boost Wisp']))
-    values = (chain[1], chain[2], maximum, model, locked)
+    values = (chain[1], chain[2], maximum, model, 2 if locked and temporary_boost else locked)
     status = {}
     for kind in HOOKS:
         # Neutralize the previously installed erroneous coloured-Wisp gate too.
@@ -137,7 +143,9 @@ def configure(memory, snapshot, owned, slot):
         address = installed(memory, kind)
         status[kind] = bool(address)
         if address is None: continue
-        if tuple(struct.unpack('>5I', memory.read_bytes(address, 20))) == desired:
+        size = memory.gameplay_data_sizes[address]
+        desired = desired[:size//4]
+        if tuple(struct.unpack('>'+'I'*(size//4), memory.read_bytes(address, size))) == desired:
             continue
         if memory.read_u32(address):
             memory.write_u32(address, 0, expected=memory.read_u32(address), operation='gameplay_controls')
@@ -146,7 +154,7 @@ def configure(memory, snapshot, owned, slot):
             if current != value:
                 memory.write_u32(address+i*4, value, expected=current, operation='gameplay_controls')
         memory.write_u32(address, values[0], expected=0, operation='gameplay_controls')
-    return {'installed': status, 'maximum_speed': maximum+1, 'boost_locked': bool(locked),
+    return {'installed': status, 'maximum_speed': maximum+1, 'boost_locked': bool(locked and not temporary_boost), 'temporary_boost':bool(locked and temporary_boost),
             'boost_lock_active': bool(locked and model and all(status[k] for k in ('boost_use', 'boost_query', 'boost_add'))),
             'speed_controls_active': all(status[k] for k in ('speed_get', 'speed_set', 'speed_ui'))}
 
