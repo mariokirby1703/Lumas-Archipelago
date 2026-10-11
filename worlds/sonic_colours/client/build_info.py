@@ -40,7 +40,7 @@ def implementation_info():
                  music_bank.plan, music_bank.rewrite_bank, music_bank.recover_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch, journal.Journal.record_permissions,
                  live_music.apply, live_music.probe_bank, live_music.recover_original,
                  direct_hooks.plan, direct_hooks.install, direct_hooks.inspect, client.log_diagnostic, gameplay_controls.gecko_lines,
-                 map_refresh.payload, map_refresh.installed_data, map_refresh.configure, map_transition.payload, capsule_refresh.gecko_ini)
+                 map_refresh.payload, map_refresh.installed_data, map_refresh.configure, map_transition.payload, map_transition.installed, capsule_refresh.gecko_ini)
     digest = hashlib.sha256()
     for function in functions:
         digest.update(function.__qualname__.encode())

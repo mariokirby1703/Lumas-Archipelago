@@ -192,3 +192,11 @@ four groups together and restart emulation when installing the new export.
 The null/non-null instruction paths and original executable signatures are
 tested offline. A repeat Act-6 completion in Dolphin remains required; the
 reported crash itself is live-confirmed, the repair is not yet live-verified.
+
+On 2026-10-11 the user-installed export exposed a verifier regression: the
+`8026C938` C2 was missing from executable hash normalization. Exact payload,
+header length and return-branch verification now precede normalization of
+that single displaced instruction. A read-only check against running Dolphin
+then recovered the complete original PAL executable hash successfully.
+Corrupted payloads, wrong returns and unrelated executable changes remain
+rejected. This verifies installed-code recognition, not the Act-6 crash repair.

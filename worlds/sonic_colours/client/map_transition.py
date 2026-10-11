@@ -10,6 +10,13 @@ ORIGINAL = 0x806407EC
 CLEANUP = 0x8026C984
 
 
+def installed(memory):
+    from .gecko import inspect_c2
+    return inspect_c2(memory, HOOK, ORIGINAL,
+                      {'optional_map_path_cleanup': payload()},
+                      label='optional world-map path cleanup')['installed']
+
+
 def payload():
     # r3 is the displaced output. CR is overwritten by the original routine
     # before its next conditional branch. r12/CTR are volatile at this ABI.
