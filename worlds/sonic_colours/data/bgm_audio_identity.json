@@ -1,0 +1,316 @@
+{
+  "bank_sha256": "48eef93bd2744820a95432e848c687c71bc166e3549889720402535ff7757842",
+  "cues": {
+    "bgm_sys_theme": [
+      "Synth/bgm_sys_theme_wav.aax"
+    ],
+    "bgm_sys_op": [
+      "Synth/bgm_sys_op_wav.aax"
+    ],
+    "bgm_sys_end": [
+      "Synth/bgm_sys_end_wav.aax"
+    ],
+    "bgm_stg110_rso": [
+      "Synth/bgm_stg110_rso_wav.aax",
+      "Synth/bgm_stg110_rso_fx_wav.aax"
+    ],
+    "bgm_stg120_rso": [
+      "Synth/bgm_stg120_rso_wav.aax",
+      "Synth/bgm_stg120_rso_fx_wav.aax"
+    ],
+    "bgm_stg130_rso": [
+      "Synth/bgm_stg110_rso_wav.aax",
+      "Synth/bgm_stg110_rso_fx_wav.aax"
+    ],
+    "bgm_stg140_rso": [
+      "Synth/bgm_stg130_rso_wav.aax",
+      "Synth/bgm_stg130_rso_fx_wav.aax"
+    ],
+    "bgm_stg150_rso": [
+      "Synth/bgm_stg120_rso_wav.aax",
+      "Synth/bgm_stg120_rso_fx_wav.aax"
+    ],
+    "bgm_stg160_rso": [
+      "Synth/bgm_stg130_rso_wav.aax",
+      "Synth/bgm_stg130_rso_fx_wav.aax"
+    ],
+    "bgm_stg210_fct": [
+      "Synth/bgm_stg210_fct_wav.aax",
+      "Synth/bgm_stg210_fct_fx_wav.aax"
+    ],
+    "bgm_stg220_fct": [
+      "Synth/bgm_stg220_fct_wav.aax",
+      "Synth/bgm_stg220_fct_fx_wav.aax"
+    ],
+    "bgm_stg230_fct": [
+      "Synth/bgm_stg230_fct_wav.aax",
+      "Synth/bgm_stg230_fct_fx_wav.aax"
+    ],
+    "bgm_stg240_fct": [
+      "Synth/bgm_stg210_fct_wav.aax",
+      "Synth/bgm_stg210_fct_fx_wav.aax"
+    ],
+    "bgm_stg250_fct": [
+      "Synth/bgm_stg220_fct_wav.aax",
+      "Synth/bgm_stg220_fct_fx_wav.aax"
+    ],
+    "bgm_stg260_fct": [
+      "Synth/bgm_stg230_fct_wav.aax",
+      "Synth/bgm_stg230_fct_fx_wav.aax"
+    ],
+    "bgm_stg310_shp": [
+      "Synth/bgm_stg310_shp_nomal_wav.aax",
+      "Synth/bgm_stg310_shp_fx_wav.aax"
+    ],
+    "bgm_stg320_shp": [
+      "Synth/bgm_stg320_shp_nomal_wav.aax",
+      "Synth/bgm_stg320_shp_fx_wav.aax"
+    ],
+    "bgm_stg330_shp": [
+      "Synth/bgm_stg330_shp_nomal_wav.aax",
+      "Synth/bgm_stg330_shp_fx_wav.aax"
+    ],
+    "bgm_stg340_shp": [
+      "Synth/bgm_stg320_shp_nomal_wav.aax",
+      "Synth/bgm_stg320_shp_fx_wav.aax"
+    ],
+    "bgm_stg350_shp": [
+      "Synth/bgm_stg310_shp_nomal_wav.aax",
+      "Synth/bgm_stg310_shp_fx_wav.aax"
+    ],
+    "bgm_stg360_shp": [
+      "Synth/bgm_stg320_shp_nomal_wav.aax",
+      "Synth/bgm_stg320_shp_fx_wav.aax"
+    ],
+    "bgm_stg410_pla": [
+      "Synth/bgm_stg410_pla_wav.aax",
+      "Synth/bgm_stg410_pla_fx_wav.aax"
+    ],
+    "bgm_stg420_pla": [
+      "Synth/bgm_stg420_pla_wav.aax",
+      "Synth/bgm_stg420_pla_fx_wav.aax"
+    ],
+    "bgm_stg430_pla": [
+      "Synth/bgm_stg430_pla_wav.aax",
+      "Synth/bgm_stg430_pla_fx_wav.aax"
+    ],
+    "bgm_stg440_pla": [
+      "Synth/bgm_stg410_pla_wav.aax",
+      "Synth/bgm_stg410_pla_fx_wav.aax"
+    ],
+    "bgm_stg450_pla": [
+      "Synth/bgm_stg420_pla_wav.aax",
+      "Synth/bgm_stg420_pla_fx_wav.aax"
+    ],
+    "bgm_stg460_pla": [
+      "Synth/bgm_stg430_pla_wav.aax",
+      "Synth/bgm_stg430_pla_fx_wav.aax"
+    ],
+    "bgm_stg510_qua": [
+      "Synth/bgm_stg510_qua_nomal_wav.aax",
+      "Synth/bgm_stg510_qua_fx_wav.aax"
+    ],
+    "bgm_stg520_qua": [
+      "Synth/bgm_stg520_qua_nomal_wav.aax",
+      "Synth/bgm_stg520_qua_fx_wav.aax"
+    ],
+    "bgm_stg530_qua": [
+      "Synth/bgm_stg530_qua_nomal_wav.aax",
+      "Synth/bgm_stg530_qua_fx_wav.aax"
+    ],
+    "bgm_stg540_qua": [
+      "Synth/bgm_stg510_qua_nomal_wav.aax",
+      "Synth/bgm_stg510_qua_fx_wav.aax"
+    ],
+    "bgm_stg550_qua": [
+      "Synth/bgm_stg520_qua_nomal_wav.aax",
+      "Synth/bgm_stg520_qua_fx_wav.aax"
+    ],
+    "bgm_stg560_qua": [
+      "Synth/bgm_stg530_qua_nomal_wav.aax",
+      "Synth/bgm_stg530_qua_fx_wav.aax"
+    ],
+    "bgm_stg610_ast": [
+      "Synth/bgm_stg610_ast_normal_wav.aax",
+      "Synth/bgm_stg610_ast_fx_wav.aax"
+    ],
+    "bgm_stg620_ast": [
+      "Synth/bgm_stg620_ast_normal_wav.aax",
+      "Synth/bgm_stg620_ast_fx_wav.aax"
+    ],
+    "bgm_stg630_ast": [
+      "Synth/bgm_stg630_ast_normal_wav.aax",
+      "Synth/bgm_stg630_ast_fx_wav.aax"
+    ],
+    "bgm_stg640_ast": [
+      "Synth/bgm_stg610_ast_normal_wav.aax",
+      "Synth/bgm_stg610_ast_fx_wav.aax"
+    ],
+    "bgm_stg650_ast": [
+      "Synth/bgm_stg620_ast_normal_wav.aax",
+      "Synth/bgm_stg620_ast_fx_wav.aax"
+    ],
+    "bgm_stg660_ast": [
+      "Synth/bgm_stg630_ast_normal_wav.aax",
+      "Synth/bgm_stg630_ast_fx_wav.aax"
+    ],
+    "bgm_stg710_elv": [
+      "Synth/bgm_stg710_elv_wav.aax",
+      "Synth/bgm_stg710_elv_fx_wav.aax"
+    ],
+    "bgm_stg720_elv": [
+      "Synth/bgm_stg720_elv_wav.aax",
+      "Synth/bgm_stg720_elv_fx_wav.aax"
+    ],
+    "bgm_boss_coreboss": [
+      "Synth/bgm_boss_coreboss_wav.aax",
+      "Synth/bgm_boss_coreboss_fx_wav.aax"
+    ],
+    "bgm_boss_Jellyboss": [
+      "Synth/bgm_boss_Jellyboss_normal_wav.aax",
+      "Synth/bgm_boss_Jellyboss_fx_wav.aax"
+    ],
+    "bgm_boss_shipboss": [
+      "Synth/bgm_boss_shipboss_wav.aax",
+      "Synth/bgm_boss_shipboss_fx_wav.aax"
+    ],
+    "bgm_boss_lastboss_1": [
+      "Synth/bgm_boss_lastboss_1_wav.aax",
+      "Synth/bgm_boss_lastboss_1_fx_wav.aax"
+    ],
+    "bgm_boss_lastboss_2": [
+      "Synth/bgm_boss_lastboss_2_wav.aax",
+      "Synth/bgm_boss_lastboss_2_fx_wav.aax"
+    ],
+    "bgm_mlt_a": [
+      "Synth/bgm_mlt_a_nomal_wav.aax",
+      "Synth/bgm_mlt_a_fx_wav.aax"
+    ],
+    "bgm_mlt_b": [
+      "Synth/bgm_mlt_b_nomal_wav.aax",
+      "Synth/bgm_mlt_b_fx_wav.aax"
+    ],
+    "bgm_mlt_c": [
+      "Synth/bgm_mlt_c_nomal_wav.aax",
+      "Synth/bgm_mlt_c_fx_wav.aax"
+    ],
+    "bgm_mlt_d": [
+      "Synth/bgm_mlt_d_nomal_wav.aax",
+      "Synth/bgm_mlt_d_fx_wav.aax"
+    ],
+    "bgm_mlt_e": [
+      "Synth/bgm_mlt_e_nomal_wav.aax",
+      "Synth/bgm_mlt_e_fx_wav.aax"
+    ],
+    "bgm_mlt_f": [
+      "Synth/bgm_mlt_f_nomal_wav.aax",
+      "Synth/bgm_mlt_f_fx_wav.aax"
+    ],
+    "bgm_mlt_g": [
+      "Synth/bgm_mlt_g_nomal_wav.aax",
+      "Synth/bgm_mlt_g_fx_wav.aax"
+    ],
+    "bgm_mlt_title": [
+      "Synth/bgm_mlt_title_wav.aax"
+    ],
+    "bgm_jingle_mlt_clear": [
+      "Synth/bgm_jingle_mlt_clear_wav.aax"
+    ],
+    "bgm_mlt_result": [
+      "Synth/bgm_mlt_result_wav.aax"
+    ],
+    "bgm_wmap": [
+      "Synth/bgm_worldmap_wav.aax"
+    ],
+    "bgm_zmap_rso": [
+      "Synth/bgm_zmap_rso_wav.aax"
+    ],
+    "bgm_zmap_fct": [
+      "Synth/bgm_zmap_fct_wav.aax"
+    ],
+    "bgm_zmap_shp": [
+      "Synth/bgm_zmap_shp_wav.aax"
+    ],
+    "bgm_zmap_pla": [
+      "Synth/bgm_zmap_pla_wav.aax"
+    ],
+    "bgm_zmap_qua": [
+      "Synth/bgm_zmap_qua_wav.aax"
+    ],
+    "bgm_zmap_ast": [
+      "Synth/bgm_zmap_ast_wav.aax"
+    ],
+    "bgm_zmap_elv": [
+      "Synth/bgm_zmap_elv_wav.aax"
+    ],
+    "bgm_sys_title": [
+      "Synth/bgm_sys_title_wav.aax"
+    ],
+    "bgm_sys_option": [
+      "Synth/bgm_sys_option_wav.aax"
+    ],
+    "bgm_sys_save": [
+      "Synth/bgm_sys_save_wav.aax"
+    ],
+    "bgm_sys_result": [
+      "Synth/bgm_sys_result_wav.aax"
+    ],
+    "bgm_jingle_stg_clear": [
+      "Synth/bgm_jingle_stg_clear_wav.aax"
+    ],
+    "bgm_jingle_boss_clear": [
+      "Synth/bgm_jingle_boss_clear_wav.aax"
+    ],
+    "bgm_jingle_drown": [
+      "Synth/bgm_jingle_drown_wav.aax"
+    ],
+    "bgm_jingle_gameover": [
+      "Synth/bgm_jingle_gameover_wav.aax"
+    ],
+    "bgm_jingle_super_sonic": [
+      "Synth/bgm_jingle_super_sonic_wav.aax"
+    ],
+    "bgm_pha_spn": [
+      "Synth/bgm_pha_spn_wav.aax"
+    ],
+    "bgm_pha_spn_wtr": [
+      "Synth/bgm_pha_spn_wtr_wav.aax"
+    ],
+    "bgm_pha_spk": [
+      "Synth/bgm_pha_spk_wav.aax"
+    ],
+    "bgm_pha_ast": [
+      "Synth/bgm_pha_ast_wav.aax"
+    ],
+    "bgm_pha_rod": [
+      "Synth/bgm_pha_rod_wav.aax"
+    ],
+    "bgm_pha_lsr": [
+      "Synth/bgm_pha_lsr_wav.aax"
+    ],
+    "bgm_pha_rkt": [
+      "Synth/bgm_pha_rkt_wav.aax"
+    ],
+    "bgm_pha_pzl": [
+      "Synth/bgm_pha_pzl_wav.aax"
+    ],
+    "bgm_pha_multi_common": [
+      "Synth/bgm_pha_multi_common_wav.aax"
+    ],
+    "bgm_pha_multi_united": [
+      "Synth/bgm_pha_multi_united_wav.aax"
+    ],
+    "bgm_stg730_elv": [
+      "Synth/bgm_stg730_elv_wav.aax"
+    ],
+    "bgm_jingle_mlt_drown": [
+      "Synth/bgm_jingle_mlt_drown_wav.aax"
+    ],
+    "bgm_sys_challenge": [
+      "Synth/bgm_sys_challenge_wav.aax"
+    ],
+    "bgm_sys_challenge_result": [
+      "Synth/bgm_sys_challenge_result_wav.aax"
+    ]
+  }
+}

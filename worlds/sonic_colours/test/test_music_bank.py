@@ -85,3 +85,10 @@ def test_gui_client_command_preserves_windows_manifest_paths_with_spaces():
     assert selected == [path] and ctx.music_resource_manifest == path
     command('/sonicmusic')
     assert selected == [path]
+
+
+def test_reported_aquarium_seed_changes_actual_audio_not_aliases():
+    mapping = music_bank.plan('53608322755801233751', 'anywhere')
+    for name in (*[f'bgm_stg5{i}0_qua' for i in range(1,7)], 'bgm_zmap_qua'):
+        assert music_bank.AUDIO['cues'][name] != music_bank.AUDIO['cues'][mapping[name]]
+        assert music_bank.CUES[name]['compatibility'] == music_bank.CUES[mapping[name]]['compatibility']

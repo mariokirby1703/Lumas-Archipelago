@@ -13,6 +13,9 @@ from .cpk import CPK, UTF
 
 CATALOG = load_data('bgm_cues.json')
 CUES = {row['name']: row for row in CATALOG['cues']}
+AUDIO = load_data('bgm_audio_identity.json')
+if AUDIO['bank_sha256'] != CATALOG['bank_sha256'] or set(AUDIO['cues']) != set(CUES):
+    raise ValueError('PAL audio identity catalog mismatch')
 PROTECTED = frozenset(name for name in CUES if name.startswith(('bgm_jingle_', 'bgm_pha_'))
                       or name in ('bgm_sys_theme', 'bgm_sys_op', 'bgm_sys_end'))
 
@@ -38,7 +41,31 @@ def plan(seed, mode):
     rng = random.Random(int.from_bytes(hashlib.sha256(f'{seed}:sonic-bgm-bank-v1'.encode()).digest(), 'big'))
     for key in sorted(groups):
         names = sorted(groups[key]); donors = names.copy(); rng.shuffle(donors)
-        result.update(zip(names, donors))
+        # Eliminate self-maps without retry loops or a biased fallback seed.
+        fixed = [i for i, (name, donor) in enumerate(zip(names, donors)) if name == donor]
+        if len(names) > 1:
+            if len(fixed) == 1:
+                i = fixed[0]; j = (i + 1) % len(names)
+                donors[i], donors[j] = donors[j], donors[i]
+            elif fixed:
+                original_fixed = [donors[i] for i in fixed]
+                for i, donor in zip(fixed, original_fixed[1:] + original_fixed[:1]): donors[i] = donor
+        # Distinct cues can be aliases of the very same AAX music (Aquarium
+        # Acts 1/4, 2/5 and 3/6). Find a seeded perfect matching by audio identity.
+        choices = {n: [d for d in donors if AUDIO['cues'][n] != AUDIO['cues'][d]] for n in names}
+        assigned = {}
+        def assign(name, seen):
+            for donor in choices[name]:
+                if donor in seen: continue
+                seen.add(donor)
+                if donor not in assigned or assign(assigned[donor], seen):
+                    assigned[donor] = name
+                    return True
+            return False
+        if all(assign(n, set()) for n in names):
+            result.update({name: donor for donor, name in assigned.items()})
+        else:
+            result.update(zip(names, donors))
     return result
 
 
