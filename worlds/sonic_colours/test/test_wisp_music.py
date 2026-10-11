@@ -25,7 +25,7 @@ def test_every_original_transformation_is_in_the_global_source_destination_pool(
     for seed in range(100):
         mapping = mb.plan(str(seed), 'anywhere')
         assert set(mapping.values()) == set(mapping)
-        assert all(mapping[n] != n for n in WISPS)
+        assert all(mapping[n] != n for n in mb.WISP_CUES - mb.FINITE_CUES)
         assert any(mapping[n] not in mb.WISP_CUES for n in WISPS)
         assert any(n not in mb.WISP_CUES and d in mb.WISP_CUES for n, d in mapping.items())
 
@@ -45,7 +45,7 @@ def test_original_pal_metadata_is_reproducible_and_not_guessed_from_names():
 
 
 @pytest.mark.skipif(not SOURCE.exists(), reason='original PAL CPK absent')
-@pytest.mark.parametrize('wisp', WISPS)
+@pytest.mark.parametrize('wisp', sorted(mb.WISP_CUES - mb.FINITE_CUES))
 @pytest.mark.parametrize('destination', DESTINATIONS)
 def test_bidirectional_wisp_cross_category_audio_preserves_every_control(wisp, destination):
     original = bank()
@@ -80,9 +80,9 @@ def test_resident_writer_wisp_force_reload_off_and_integrity_guards():
     pair = ('bgm_stg120_rso', 'bgm_pha_pzl')
     result = live_music.apply(memory, slot, pair)
     assert result['audible_verified'] is False and set(result['transformation_cues']) == set(WISPS)
-    assert result['pool_size'] == 87 and result['excluded_cues'] == []
-    assert result['randomized_cues'] == 87
-    assert set(result['finite_audio_donors']) == mb.FINITE_CUES
+    assert result['pool_size'] == 78 and set(result['excluded_cues']) == mb.FINITE_CUES
+    assert result['randomized_cues'] == 78
+    assert set(result['excluded_finite_tracks']) == mb.FINITE_CUES
     assert all(n != d and d in mb.FINITE_CUES for n,d in result['finite_audio_destinations'].items())
     leaf = mb.GRAPHS['graphs'][pair[0]][0]; donor = mb.GRAPHS['graphs'][pair[1]][0]
     assert memory.read_u32(base+leaf['cell']) == donor['original_ref']
@@ -96,6 +96,9 @@ def test_resident_writer_wisp_force_reload_off_and_integrity_guards():
     live_music.apply(memory, slot, ('bgm_pha_lsr', 'bgm_jingle_super_sonic'))
     assert len(backend.writes) == 3
     checked = len(writes)
+    with pytest.raises(MemoryUnavailable, match='finite cues stay vanilla'):
+        live_music.apply(memory, slot, ('bgm_stg110_rso', 'bgm_jingle_boss_clear'))
+    assert len(backend.writes) == 3 and len(writes) == checked
     damaged = bytearray(original); damaged[-1] ^= 1; backend.put(base, damaged)
     with pytest.raises(MemoryUnavailable): live_music.apply(memory, slot, pair)
     assert len(backend.writes) == 3 and len(writes) == checked

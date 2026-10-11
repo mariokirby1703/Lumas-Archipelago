@@ -9,7 +9,7 @@ World Access and all eight Wisp items always use AP ownership. Seven coloured
 Chaos Emerald items always appear as progression and control Super Sonic.
 Five goals, a fixed mandatory introduction, automatic Red Ring packing and
 680 optional individual Wisp Capsule checks are supported by the generator.
-Music On shuffles all 87 BGM cues, including jingles, results, cutscenes and Wisp themes, in one global pool
+Music On shuffles all 78 looping BGM cues in one global pool; the nine finite tracks stay vanilla
 through the verified resident CSB bank, retaining destination control graphs.
 No external music files are required. See [global music and Wisp correction](docs/global_music_and_wisps.md)
 for the implementation and remaining audible validation.

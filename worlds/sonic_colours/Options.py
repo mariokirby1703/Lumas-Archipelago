@@ -58,7 +58,7 @@ class SwimTrapWeight(Choice):
 
 
 class MusicRandomization(DefaultOnToggle):
-    """Shuffle all 87 original BGM cues in one global pool, including Acts, maps, bosses, menus, Game Land, Wisps, results and musical jingles. No category exclusions. Destination audio controls are retained. Default On. Existing tracks may require a scene change."""
+    """Shuffle all 78 looping BGM cues in one global pool, including Acts, maps, bosses, menus, Game Land and Wisps. The nine finite tracks stay vanilla as sources and destinations. Destination audio controls are retained. Default On. Existing tracks may require a scene change."""
     display_name = 'Music Randomization'
 
 

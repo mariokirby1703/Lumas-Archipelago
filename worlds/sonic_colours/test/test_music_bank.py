@@ -24,10 +24,11 @@ def test_seed_music_bank_permutations_cover_all_87_cues(seed,mode):
     m=music_bank.plan(str(seed),mode)
     assert m==music_bank.plan(str(seed),mode)
     assert set(m)==set(m.values())==set(music_bank.CUES)
-    assert len(m) == 87 and all(n != d for n, d in m.items())
+    assert len(m) == 87 and all(m[n] != n for n in music_bank.SHUFFLE_CUES)
+    assert all(m[n] == n for n in music_bank.FINITE_CUES)
     if mode=='anywhere':
         assert any(music_bank.CUES[n]['compatibility']!=music_bank.CUES[d]['compatibility'] for n,d in m.items())
-    assert all(music_bank.AUDIO['cues'][n] != music_bank.AUDIO['cues'][d] for n,d in m.items())
+    assert all(music_bank.AUDIO['cues'][n] != music_bank.AUDIO['cues'][m[n]] for n in music_bank.SHUFFLE_CUES)
 
 
 @pytest.mark.skipif(not SOURCE.exists(),reason='original PAL CPK absent')

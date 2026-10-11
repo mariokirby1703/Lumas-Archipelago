@@ -1,7 +1,7 @@
 """Global PAL audio-content shuffle retaining each destination's control graph.
 
 Change only leaf AAX references in the resident CSB. Cue identity, native filter,
-boost/sleep graphs and audio bytes remain intact. Every catalog cue participates.
+boost/sleep graphs and audio bytes remain intact. Finite cues remain vanilla.
 """
 import hashlib
 import json
@@ -22,6 +22,7 @@ for name, evidence in PLAYBACK['cues'].items():
     if evidence['leaf_audio'] != [l['audio'] for l in GRAPHS['graphs'][name]]:
         raise ValueError('PAL playback audio graph mismatch')
 FINITE_CUES = frozenset(n for n,r in PLAYBACK['cues'].items() if not r['audio_has_loop'])
+SHUFFLE_CUES = frozenset(CUES) - FINITE_CUES
 if GRAPHS['bank_sha256'] != CATALOG['bank_sha256'] or set(GRAPHS['graphs']) != set(CUES):
     raise ValueError('PAL BGM graph catalog mismatch')
 if AUDIO['bank_sha256'] != CATALOG['bank_sha256'] or set(AUDIO['cues']) != set(CUES):
@@ -49,11 +50,10 @@ def plan(seed, mode):
         raise ValueError('BGM bank requires a seed and supported music mode')
     result = {name: name for name in CUES}
     if mode == 'off': return result
-    rng = random.Random(int.from_bytes(hashlib.sha256(f'{seed}:sonic-bgm-all87-v1'.encode()).digest(), 'big'))
-    names = sorted(CUES); rng.shuffle(names)
-    donors = sorted(CUES); rng.shuffle(donors)
-    # One bipartite matching across ALL cues. Exclude only self/audio aliases,
-    # never categories, flags, formats, durations or gameplay contexts.
+    rng = random.Random(int.from_bytes(hashlib.sha256(f'{seed}:sonic-bgm-looping-v1'.encode()).digest(), 'big'))
+    names = sorted(SHUFFLE_CUES); rng.shuffle(names)
+    donors = sorted(SHUFFLE_CUES); rng.shuffle(donors)
+    # One global pool of looping music; finite cues are fixed, never donors.
     choices = {n: [d for d in donors if AUDIO['cues'][n] != AUDIO['cues'][d]] for n in names}
     assigned = {}
     def assign(name, seen):
@@ -65,10 +65,12 @@ def plan(seed, mode):
                 return True
         return False
     if all(assign(n, set()) for n in names):
-        return {name: donor for donor, name in assigned.items()}
+        result.update({name: donor for donor, name in assigned.items()})
+        return result
     # A seeded cycle is always a cue derangement if audio aliases prevent a
-    # perfect audio-identity matching. It still includes every original cue.
-    return dict(zip(names, names[1:] + names[:1]))
+    # perfect audio-identity matching. Finite cues still remain vanilla.
+    result.update(dict(zip(names, names[1:] + names[:1])))
+    return result
 
 
 def rewrite_bank(original, mapping):
@@ -76,6 +78,8 @@ def rewrite_bank(original, mapping):
         raise ValueError('original PAL BGM bank SHA256 mismatch')
     if set(mapping) != set(CUES) or set(mapping.values()) != set(CUES):
         raise ValueError('BGM mapping must be a permutation of the complete original cue catalog')
+    if any(mapping[n] != n for n in FINITE_CUES):
+        raise ValueError('finite BGM cues must remain vanilla as sources and destinations')
     bank = UTF(original)
     offset, size = next(row['utf'] for row in bank.rows if row['name'] == 'CUE')
     base = bank.binary + offset; cue = UTF(original[base:base+size])

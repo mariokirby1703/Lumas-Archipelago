@@ -39,14 +39,14 @@ class SonicCommands(ClientCommandProcessor):
         if not self.ctx.runtime or not self.ctx.authenticated_identity:
             logger.info('Connect to your Sonic Colours slot first.')
             return
-        from .music_bank import CUES
+        from .music_bank import SHUFFLE_CUES
         if destination=='off' and not donor:
             self.ctx.runtime.music_test_pair=None
-        elif (destination in CUES and donor in CUES
+        elif (destination in SHUFFLE_CUES and donor in SHUFFLE_CUES
               and self.ctx.runtime.slot_data['options']['music_randomization']):
             self.ctx.runtime.music_test_pair=(destination,donor)
         else:
-            logger.info('Usage: /sonicmusictest ELIGIBLE_DESTINATION ELIGIBLE_DONOR, or /sonicmusictest off. Music must be On.')
+            logger.info('Usage: /sonicmusictest LOOPING_DESTINATION LOOPING_DONOR, or /sonicmusictest off. Music must be On; finite tracks stay vanilla.')
             return
         self.ctx.runtime.next_music_poll=0
         logger.info('Music test pair: %s. Change scenes to restart the cue; /sonicmusictest off restores the seed mapping.',

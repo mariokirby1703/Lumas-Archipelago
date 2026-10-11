@@ -50,7 +50,8 @@ def test_bgm_87_cues_seed_permutation_and_safe_recovery():
     # Every genuine music cue participates, including musical jingles.
     perm=music_bank.plan('schema6-test','anywhere')
     assert set(perm)==set(music_bank.CUES)
-    assert len(perm) == 87 and all(perm[n]!=n for n in perm)
+    assert len(perm) == 87 and all(perm[n]!=n for n in music_bank.SHUFFLE_CUES)
+    assert all(perm[n]==n for n in music_bank.FINITE_CUES)
     assert any(perm[n]!=n for n in ('bgm_wmap', 'bgm_mlt_a', 'bgm_sys_title'))
 
 
