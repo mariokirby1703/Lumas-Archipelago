@@ -48,6 +48,15 @@ def set_rules(world):
             set_rule(entrance, lambda state, item=WORLD_ITEMS[i]: state.has(item, player))
     for stage in STAGES:
         region = world.get_region('Map Slot ' + stage['stage_slot_id'])
+        if stage['zone_index'] < 6 and stage['slot'] > 1:
+            zone, slot = stage['zone_index'], stage['slot']
+            previous = next(s['mission_id'] for s in STAGES if s['zone_index'] == zone and s['slot'] == slot - 1)
+            all_acts = tuple(s['mission_id'] for s in STAGES if s['zone_index'] == zone and 1 <= s['slot'] <= 6)
+            if slot == 7 and world.options.world_progression.value == 1:
+                set_rule(region.entrances[0], lambda state, missions=all_acts: all(
+                    can_complete(world, state, m) for m in missions))
+            elif world.options.world_progression.value == 0:
+                set_rule(region.entrances[0], lambda state, mission=previous: can_complete(world, state, mission))
         if stage['zone_index'] == 6:
             set_rule(region.entrances[0], lambda state: state.has_all(WISP_ITEMS, player))
         if stage['zone_index'] >= 7:

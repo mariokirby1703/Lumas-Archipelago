@@ -52,10 +52,7 @@ def test_options_and_yaml():
     assert set(options) == set(OPTION_NAMES)
     for name, value in options.items():
         cls = SonicColoursOptions.type_hints[name]
-        if name == 'starting_act':
-            assert value == cls.default == 'random'
-        else:
-            assert cls.from_any(value).value == cls.from_any(cls.default).value
+        assert cls.from_any(value).value == cls.from_any(cls.default).value
     world = generate(options, fill=True).worlds[1]
     validate_slot(world.fill_slot_data())
     assert world.multiworld.can_beat_game()
@@ -93,7 +90,7 @@ def test_exact_packing(target):
 @pytest.mark.parametrize('settings', [
     {'red_ring_checks': 'off', 'game_land_checks': 0, 'chaos_emerald_checks': 0},
     {'red_ring_checks': 'per_level'}, {'trap_percentage': 100}, {'trap_percentage': 0},
-    {'goal': 'super_sonic'}, {'starting_act': 'asteroid_coaster_act_6'},
+    {'goal': 'super_sonic'}, {'world_progression': 'open_acts'},
 ])
 def test_fill_100_seeds(settings):
     for seed in range(100):
@@ -102,8 +99,7 @@ def test_fill_100_seeds(settings):
         assert not multiworld.get_unfilled_locations()
 
 
-@pytest.mark.parametrize('option,value', [('level_randomization', 'anywhere'), ('level_randomization', 'per_world'),
-    ('death_link', 1), ('swim_trap_weight', 'low')])
+@pytest.mark.parametrize('option,value', [('death_link', 1), ('swim_trap_weight', 'low')])
 def test_unverified_options_fail_precisely(option, value):
     for seed in range(100):
         with pytest.raises(ValueError, match='requires_verified_hook'):

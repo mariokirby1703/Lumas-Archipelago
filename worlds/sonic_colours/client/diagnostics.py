@@ -8,14 +8,14 @@ from .build_info import implementation_info
 NATIVE_BLOCKERS = {
     'save_identity': 'Native intro/profile witness binding implemented; no globally unique native ID or in-game resume validation.',
     'stats': 'Guarded native counter delivery and durable deferral implemented; visible HUD effects require live verification.',
-    'world_access': 'First-Act flags and current waypoint cache project; navigation/render behavior requires live verification.',
+    'world_access': 'Sequential / Open Acts permission policy implemented; both modes need live map/boss validation.',
     'wisp_permissions': 'Seven colour save/live fields and the native setter hook enforce AP ownership; White Boost/scripted player grants remain unresolved.',
     'game_land_gates': 'AP ring thresholds project native gate bits without inventing physical collectibles; full Game Land navigation requires gameplay verification.',
     'emeralds': 'Super flag resolved; individual native emerald award inventory and independent boost not resolved.',
     'native_death': 'Player death event observed; safe native invocation and cache-coherent execution not resolved.',
     'swimming': 'No verified reversible swimming state; existing Gecko patch has unresolved goal interference.',
     'stage_shuffle': 'Native mission table read; intro-safe stage dispatch rewrite not implemented.',
-    'music': 'Native normal-Act cue redirects and readback implemented; audible playback requires gameplay verification.',
+    'music': 'Verified original 87-cue CSB in MEM2 can be seed-shuffled without files; all playback paths require live testing.',
     'capsule_open': 'Native instance/open transitions report immediately; live coloured model refresh uses the supplied PAL Gecko hook.',
 }
 
@@ -31,6 +31,7 @@ def diagnostic(ctx, memory=None):
                   current_status_time_utc=getattr(ctx, 'status_time_utc', None),
                   dolphin_instance=getattr(ctx, 'dolphin_instance', None),
                   latest_acknowledged_location=getattr(ctx, 'latest_acknowledged_location', None),
+                  experimental_direct_hooks=getattr(ctx, 'direct_hook_status', None),
                   operation_blockers={name: reason for name, reason in NATIVE_BLOCKERS.items()
                                       if not VERSION['capabilities'].get(name, False)})
     # Historical successful accesses remain timestamped; they do not imply that

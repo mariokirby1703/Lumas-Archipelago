@@ -141,7 +141,7 @@ def test_progression_payload_and_data_allowlist(tmp_path):
 def test_native_music_table_redirects_readback(tmp_path):
     pair=next(p for p in PAIRS if '205502' in p[0].name)
     b=Overlay(pair);m=SonicMemory(b)
-    slot=generate({'music_randomization':'anywhere'}).worlds[1].fill_slot_data()
+    slot=generate({'music_randomization':True}).worlds[1].fill_slot_data()
     class Attributed:
         def check(self,s):return 'fixture attributed map'
     h=NativeHooks();m.write_guard=WritePolicy(m,Attributed(),h.snapshot)
@@ -172,9 +172,9 @@ def test_music_off_restores_prior_seed_native_redirect():
     class Attributed:
         def check(self,s):return 'fixture attributed map'
     h=NativeHooks();m.write_guard=WritePolicy(m,Attributed(),h.snapshot)
-    slot=generate({'music_randomization':'anywhere'}).worlds[1].fill_slot_data()
+    slot=generate({'music_randomization':True}).worlds[1].fill_slot_data()
     assert apply_music(m,slot)['changed_cues']>0
-    vanilla=generate({'music_randomization':'off'}).worlds[1].fill_slot_data()
+    vanilla=generate({'music_randomization':False}).worlds[1].fill_slot_data()
     assert apply_music(m,vanilla)['changed_cues']>0
     from ..world_constants import NORMAL
     expected={s['mission_id']:s['bgm'] for s in NORMAL}
@@ -204,9 +204,9 @@ def test_previous_seed_hook_events_are_baselined_not_credited(tmp_path):
                        for name,code in r.slot_data['locations'].items())
 
 
-@pytest.mark.parametrize('starting',range(42))
-def test_every_starting_act_has_a_fillable_seed(starting):
-    m=generate({'starting_act':starting},starting,fill=True)
+@pytest.mark.parametrize('mode',['sequential','open_acts'])
+def test_both_world_progression_modes_have_a_fillable_seed(mode):
+    m=generate({'world_progression':mode},1 if mode == 'open_acts' else 0,fill=True)
     assert m.can_beat_game() and not m.get_unfilled_locations()
     assert m.worlds[1].starting_stage['mission_id']!='stg790'
 
@@ -214,6 +214,6 @@ def test_every_starting_act_has_a_fillable_seed(starting):
 @pytest.mark.parametrize('goal',range(5))
 def test_capsule_and_rank_checks_fill_with_every_goal(goal):
     from ..Locations import LOCATION_TABLE
-    m=generate({'goal':goal,'wisp_capsules':True,'rank_checks':'all','starting_act':0},goal,fill=True)
+    m=generate({'goal':goal,'wisp_capsules':True,'rank_checks':'all'},goal,fill=True)
     assert m.can_beat_game() and not m.get_unfilled_locations()
     assert sum(LOCATION_TABLE[l.name].kind=='capsule' for l in m.get_locations(1) if l.address)==680

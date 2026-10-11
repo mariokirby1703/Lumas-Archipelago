@@ -115,6 +115,9 @@ class SonicContext(CommonContext):
         self.expected_seed = None
         self.expected_slot_data = None
         self.music_resource_manifest = music_resource_manifest
+        self.experimental_direct_hooks = False
+        self.direct_hook_status = {'status':'disabled; existing Gecko hooks still supported'}
+        self.direct_hook_attempted = False
         self.last_send = 0.0
         self.last_pending = set()
         self.implementation = implementation_info()
@@ -326,6 +329,23 @@ async def dolphin_loop(ctx):
                 if not ctx.runtime:
                     raise MemoryUnavailable('PAL executable verified; waiting for AP slot.')
                 memory.write_guard = WritePolicy(memory, ctx.runtime.guard, ctx.runtime.hooks.snapshot)
+                if ctx.experimental_direct_hooks and ctx.direct_hook_status.get('status', '').startswith('FAILED'):
+                    raise MemoryUnavailable('EXPERIMENT BLOCKED: restart Dolphin and client after a partial experimental install')
+                if ctx.experimental_direct_hooks and not ctx.direct_hook_attempted:
+                    # Intentional once-per-session experiment. Never automatically
+                    # retry a partially installed native hook or hide a failed write.
+                    ctx.direct_hook_attempted = True
+                    try:
+                        from .direct_hooks import install, inspect
+                        ctx.direct_hook_status = (install(memory) if not inspect(memory) else
+                                                  {'installed_in_guest_ram':True, 'jit_execution_verified':False,
+                                                   'status':'existing experimental signatures recognized'})
+                        logger.warning('EXPERIMENTAL guest code: %s', ctx.direct_hook_status)
+                    except (MemoryUnavailable, ValueError, OSError) as error:
+                        ctx.direct_hook_status = {'status':'FAILED; restart Dolphin: '+str(error)}
+                        logger.error('EXPERIMENTAL hook installation failed, restart Dolphin: %s', error)
+                        # A partial installation cannot safely continue writing.
+                        raise MemoryUnavailable('EXPERIMENT BLOCKED: '+str(error))
                 checks, goal = ctx.runtime.poll(memory, [i.item for i in ctx.items_received], ctx.history_ready)
                 verified = bool((memory.revision_observation or {}).get('verified'))
                 if ctx.deathlink:
@@ -350,6 +370,7 @@ async def dolphin_loop(ctx):
                     global_map_refresh=ctx.runtime.hooks.global_map_refresh_status,
                     native_egg_medals=ctx.runtime.hooks.medal_status,
                     music_randomization=ctx.runtime.music_status,
+                    experimental_direct_hooks=ctx.direct_hook_status,
                     item_writes={'history_ready': ctx.history_ready, 'pending_receipts': ctx.runtime.pending_effects(), 'status': ctx.runtime.last_error})
                 ctx.dolphin_status = (snap.status if snap.evidence.get('executable_error')
                                       else ctx.runtime.guard.reason)
@@ -401,6 +422,7 @@ async def main(args):
     ctx = SonicContext(args.connect, args.password, args.patch_file,
                        music_resource_manifest=getattr(args, 'music_resource_manifest', None))
     ctx.auth = args.name or ctx.auth
+    ctx.experimental_direct_hooks = bool(getattr(args, 'experimental_direct_hooks', False))
     ctx.server_task = asyncio.create_task(server_loop(ctx), name='ServerLoop')
     if gui_enabled and not getattr(args, 'nogui', False):
         ctx.run_gui()

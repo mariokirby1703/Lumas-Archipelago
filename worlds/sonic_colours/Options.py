@@ -25,63 +25,6 @@ class RedRingChecks(Choice):
     default = 1
 
 
-class StartingAct(Choice):
-    """Choose the first stage available after the original two-Act introduction. Random includes normal Acts, the six world bosses; it excludes Terminal Velocity and the final boss."""
-    display_name = 'Starting Act'
-    option_tropical_resort_act_1 = 0
-    option_tropical_resort_act_2 = 1
-    option_tropical_resort_act_3 = 2
-    option_tropical_resort_act_4 = 3
-    option_tropical_resort_act_5 = 4
-    option_tropical_resort_act_6 = 5
-    option_sweet_mountain_act_1 = 6
-    option_sweet_mountain_act_2 = 7
-    option_sweet_mountain_act_3 = 8
-    option_sweet_mountain_act_4 = 9
-    option_sweet_mountain_act_5 = 10
-    option_sweet_mountain_act_6 = 11
-    option_starlight_carnival_act_1 = 12
-    option_starlight_carnival_act_2 = 13
-    option_starlight_carnival_act_3 = 14
-    option_starlight_carnival_act_4 = 15
-    option_starlight_carnival_act_5 = 16
-    option_starlight_carnival_act_6 = 17
-    option_planet_wisp_act_1 = 18
-    option_planet_wisp_act_2 = 19
-    option_planet_wisp_act_3 = 20
-    option_planet_wisp_act_4 = 21
-    option_planet_wisp_act_5 = 22
-    option_planet_wisp_act_6 = 23
-    option_aquarium_park_act_1 = 24
-    option_aquarium_park_act_2 = 25
-    option_aquarium_park_act_3 = 26
-    option_aquarium_park_act_4 = 27
-    option_aquarium_park_act_5 = 28
-    option_aquarium_park_act_6 = 29
-    option_asteroid_coaster_act_1 = 30
-    option_asteroid_coaster_act_2 = 31
-    option_asteroid_coaster_act_3 = 32
-    option_asteroid_coaster_act_4 = 33
-    option_asteroid_coaster_act_5 = 34
-    option_asteroid_coaster_act_6 = 35
-    option_tropical_resort_boss = 36
-    option_sweet_mountain_boss = 37
-    option_starlight_carnival_boss = 38
-    option_planet_wisp_boss = 39
-    option_aquarium_park_boss = 40
-    option_asteroid_coaster_boss = 41
-    default = 'random'
-
-
-class LevelRandomization(Choice):
-    """Shuffle normal Acts within each world or across worlds. This client currently requires Off; stage shuffling is not supported."""
-    display_name = 'Level Randomization'
-    option_off = 0
-    option_per_world = 1
-    option_anywhere = 2
-    default = 0
-
-
 class RankChecks(Choice):
     """Add minimum-grade checks for S, A, B or C. A better rank also completes every lower enabled threshold. All adds all four checks to each ranked stage."""
     display_name = 'Rank Checks'
@@ -114,12 +57,16 @@ class SwimTrapWeight(Choice):
     default = 0
 
 
-class MusicRandomization(Choice):
-    """Deterministic music shuffle. Runtime redirects cover normal Acts after the intro. The optional seed CPK patch also redirects compatible title/menu, map, boss, Terminal Velocity, Game Land and results BGM before startup. Timed sequences and critical jingles are preserved. Off preserves vanilla music."""
+class MusicRandomization(DefaultOnToggle):
+    """Shuffle all compatible BGM using the verified in-memory PAL CSB bank. Default On. Playback of existing tracks may require a scene change."""
     display_name = 'Music Randomization'
-    option_off = 0
-    option_per_world = 1
-    option_anywhere = 2
+
+
+class WorldProgression(Choice):
+    """Sequential unlocks the next Act after clearing the previous one; Open Acts allows all six Acts and opens the boss only after all six are cleared."""
+    display_name = 'World Progression'
+    option_sequential = 0
+    option_open_acts = 1
     default = 0
 
 
@@ -167,9 +114,9 @@ class WispCapsules(Toggle):
     display_name = 'Wisp Capsule Sanity'
 
 
-class EggMedalSanity(Toggle):
-    """Add one immediate native Egg Medal pickup check in each of the 21 Game Land stages. Requires the PAL Egg Medal Gecko pickup code; stage Ring gates and traversal requirements still apply."""
-    display_name = 'Egg Medal Sanity'
+class EggmanHeartSanity(Toggle):
+    """Add one immediate native Eggman Heart pickup check in each of the 21 Game Land stages. Requires the PAL Eggman Heart native pickup code; stage Ring gates and traversal requirements still apply."""
+    display_name = 'Eggman Heart Sanity'
 
 
 class SonicDeathLink(DeathLink):
@@ -186,8 +133,7 @@ class BoostLock(Toggle):
 class SonicColoursOptions(PerGameCommonOptions):
     goal: Goal
     red_ring_checks: RedRingChecks
-    starting_act: StartingAct
-    level_randomization: LevelRandomization
+    world_progression: WorldProgression
     rank_checks: RankChecks
     ring_loss_trap_weight: RingLossTrapWeight
     swim_trap_weight: SwimTrapWeight
@@ -201,15 +147,15 @@ class SonicColoursOptions(PerGameCommonOptions):
     death_link: SonicDeathLink
     boost_lock: BoostLock
     wisp_capsules: WispCapsules
-    egg_medal_sanity: EggMedalSanity
+    eggman_heart_sanity: EggmanHeartSanity
 
 OPTION_NAMES = tuple(SonicColoursOptions.__annotations__)
 
 OPTION_GROUPS = [
-    OptionGroup('Progression', [Goal, StartingAct, BoostLock]),
-    OptionGroup('Checks', [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks, WispCapsules, EggMedalSanity]),
+    OptionGroup('Progression', [Goal, WorldProgression, BoostLock]),
+    OptionGroup('Checks', [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks, WispCapsules, EggmanHeartSanity]),
     OptionGroup('Game Land', [GameLandRequirementReduction]),
     OptionGroup('Presentation', [MusicRandomization]),
-    OptionGroup('Gameplay', [LevelRandomization, SonicDeathLink]),
+    OptionGroup('Gameplay', [SonicDeathLink]),
     OptionGroup('Traps', [TrapPercentage, RingLossTrapWeight, SwimTrapWeight, SwimTrapDuration]),
 ]

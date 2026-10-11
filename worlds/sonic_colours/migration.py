@@ -25,9 +25,30 @@ def migrate_yaml(document):
     if isinstance(goal,dict):options['goal']={GOALS.get(k,k):v for k,v in goal.items()}
     elif goal in GOALS:
         options['goal']=GOALS[goal];changes.append(f'Goal {goal} migrated to {options["goal"]}.')
-    if options.get('starting_act') in ('terminal_velocity_act_1','terminal_velocity_act_2',42,43):
-        options['starting_act']='tropical_resort_act_1'
-        changes.append('Retired Terminal Velocity starting Act; selected Tropical Resort Act 1 for the new seed.')
+    for old in ('starting_act', 'level_randomization'):
+        if old in options:
+            options.pop(old)
+            changes.append(f'Removed unsupported {old}; restored fixed vanilla introduction.')
+    if 'egg_medal_sanity' in options:
+        options['eggman_heart_sanity'] = options.pop('egg_medal_sanity')
+        changes.append('Renamed Egg Medal Sanity to Eggman Heart Sanity.')
+    if 'world_progression' not in options:
+        options['world_progression'] = 'sequential'
+        changes.append('Added sequential World Progression.')
+    if 'music_randomization' in options:
+        music = options['music_randomization']
+        if isinstance(music, dict):
+            off = sum(weight for key, weight in music.items()
+                      if key in ('off', 'false', False, 0))
+            on = sum(weight for key, weight in music.items()
+                     if key not in ('off', 'false', False, 0))
+            options['music_randomization'] = {'true': on, 'false': off}
+        else:
+            options['music_randomization'] = bool(music) and music not in ('off', 'false', False, 0)
+        changes.append('Converted Music Randomization to On/Off.')
+    else:
+        options['music_randomization'] = True
+        changes.append('Enabled Music Randomization by default.')
     for key in ('start_inventory','start_inventory_from_pool','start_hints','local_items','non_local_items'):
         value=options.get(key)
         colours=('Green','Red','Blue','Yellow','Purple','Cyan','White')

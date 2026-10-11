@@ -228,6 +228,29 @@ class WritePolicy:
         owner = getattr(self.snapshot_reader, '__self__', None)
         if isinstance(owner, NativeHooks) and getattr(self.snapshot_reader, '__func__', None) is NativeHooks.snapshot:
             snapshot = owner._snapshot_after_revision(self.memory)
+        if operation == 'experimental_code':
+            # ONLY reachable through the explicit, dangerous --experimental-direct-hooks
+            # launcher switch, with a complete exact-address write plan.
+            txn = getattr(self.memory, '_direct_hook_transaction', None)
+            if not isinstance(txn, dict) or address not in txn:
+                raise MemoryUnavailable('WRITE_BLOCKED: no explicit experimental PPC plan')
+            before, after = txn[address]
+            if size != len(before) or len(before) != len(after):
+                raise MemoryUnavailable('WRITE_BLOCKED: experimental PPC size mismatch')
+            return 'opt_in_experimental_ppc', address, len(before)
+        if operation == 'music_bank':
+            import hashlib
+            from .live_music import ORIGINAL_SIZE, probe_bank
+            txn = getattr(self.memory, '_music_bank_transaction', None)
+            if not isinstance(txn, tuple) or len(txn) != 3:
+                raise MemoryUnavailable('WRITE_BLOCKED: no authenticated CSB transaction')
+            bank, current, expected = txn
+            if address != bank or size != ORIGINAL_SIZE or size % 4:
+                raise MemoryUnavailable('WRITE_BLOCKED: CSB write range not authorized')
+            observed_bank, raw, _ = probe_bank(self.memory)
+            if observed_bank != bank or hashlib.sha256(raw).hexdigest() not in (current, expected):
+                raise MemoryUnavailable('WRITE_BLOCKED: native CSB bank changed during transaction')
+            return 'verified_native_pal_music_bank', bank, current, expected
         else:
             snapshot = self.snapshot_reader(self.memory)
         if operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls') and snapshot.save_identity is None:

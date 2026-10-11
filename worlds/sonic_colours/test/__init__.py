@@ -16,7 +16,7 @@ def generate(options=None, seed=0, fill=False):
     for name, option in SonicColoursWorld.options_dataclass.type_hints.items():
         # Native replay fixtures use the original starting world. Random Choice
         # behavior is tested separately against the actual option default.
-        default = 0 if name == 'starting_act' else option.default
+        default = option.default
         setattr(args, name, {1: option.from_any((options or {}).get(name, default))})
     multiworld.set_options(args)
     multiworld.state = CollectionState(multiworld)

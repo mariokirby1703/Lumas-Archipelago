@@ -1,21 +1,20 @@
 name: SonicPlayer
 game: Sonic Colours (Wii)
 Sonic Colours (Wii):
-  egg_medal_sanity: false
   goal: nega_wisp_armor
+  world_progression: sequential
   red_ring_checks: singles
-  starting_act: random
-  boost_lock: false
-  level_randomization: 'off'
   rank_checks: 'off'
-  ring_loss_trap_weight: medium
-  swim_trap_weight: 'off'
-  music_randomization: 'off'
   game_land_checks: true
   chaos_emerald_checks: true
   wisp_discovery_checks: false
-  game_land_requirement_reduction: 40
-  trap_percentage: 10
-  swim_trap_duration: 15
-  death_link: false
   wisp_capsules: false
+  eggman_heart_sanity: false
+  boost_lock: false
+  game_land_requirement_reduction: 40
+  music_randomization: true
+  ring_loss_trap_weight: medium
+  swim_trap_weight: 'off'
+  swim_trap_duration: 15
+  trap_percentage: 10
+  death_link: false

@@ -245,13 +245,19 @@ class NativeHooks:
         # Only selected, attributed save flags. Do not manufacture physical
         # Red Rings or clears to satisfy AP inventory gates.
         flags = memory.resolve_flags_ptr()[-1]
-        starting_mission = STARTING_STAGES[slot_data['options']['starting_act']]['mission_id']
-        starting_bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == starting_mission))
-        values = {starting_bit: True}
-        starting = STARTING_STAGES[slot_data['options']['starting_act']]
+        from ..world_progression import available_story_stages
+        values = {}
+        clears = set(snapshot.persisted_clears)
         for stage in STAGES:
-            if stage['zone_index'] == starting['zone_index'] and stage['slot'] <= starting['slot'] and starting['zone_index'] != 6:
-                values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))] = True
+            if stage['zone_index'] < 6:
+                world_owned = stage['zone_index'] == 0 or inventory['counts'][WORLD_ITEMS[stage['zone_index']]] > 0
+                available = world_owned and stage['mission_id'] in available_story_stages(
+                    stage['zone_index'], clears, slot_data['options']['world_progression'])
+                values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))] = available
+        # The mandatory intro remains native/vanilla before first save selection.
+        if snapshot.save_identity is None:
+            for mission in ('stg110', 'stg130'):
+                values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == mission))] = True
         options = slot_data['options']
         # 8015EC50 uses native colour IDs, not AP catalog order.
         colours = ('Yellow Drill', 'Cyan Laser', 'Blue Cube', 'Green Hover',
@@ -259,7 +265,7 @@ class NativeHooks:
         for bit, colour in enumerate(colours):
             values[bit] = inventory['counts'][colour + ' Wisp'] > 0
         for zone in range(7):
-            granted = zone == slot_data['starting_world'] or (zone < 6 and inventory['counts'][WORLD_ITEMS[zone]] > 0)
+            granted = zone == 0 or (zone < 6 and inventory['counts'][WORLD_ITEMS[zone]] > 0)
             if zone == 6:
                 from ..Items import WISP_ITEMS
                 full_access = all(inventory['counts'][w] for w in WISP_ITEMS)
@@ -269,9 +275,6 @@ class NativeHooks:
                         bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))
                         values[bit] = full_access
             values[20 + zone] = granted
-            first = next(stage for stage in STAGES if stage['zone_index'] == zone and stage['slot'] == 1)
-            if zone != 6:
-                values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == first['mission_id']))] = granted
         # Act 1 gates remain native factory defaults. Acts 2/3 use AP Red Ring
         # items, independently from physical collectibles (8016CB5C table).
         values[8] = True  # Game Land entry; no physical 30-Ring prerequisite.

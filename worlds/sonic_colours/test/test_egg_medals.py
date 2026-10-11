@@ -118,7 +118,7 @@ def test_native_pickup_latch_durable_restart_exit_and_dedup(tmp_path,medal):
     native=read_medals(m,stage,medal['mission_id'],[actor])
     snap=snapshot(scene='gameplay',actual_mission=medal['mission_id'],evidence={'chain':chain,
         'native_data':{'stage_objects':[{'medals':native}]}})
-    slot=generate({'egg_medal_sanity':True}).worlds[1].fill_slot_data()
+    slot=generate({'eggman_heart_sanity':True}).worlds[1].fill_slot_data()
     with Journal(tmp_path,IDENTITY) as j:
         medal_hook.configure(m,snap,j)
         medal_hook.observe(m,snap,j,slot);assert not j.data['pickup_checks']
@@ -155,9 +155,9 @@ def test_medal_thunk_only_exact_normalization_and_mutable_words():
 
 
 def test_disabled_option_and_conservative_traversal_rule():
-    off=generate();on=generate({'egg_medal_sanity':True})
-    assert not any(l.name.endswith(' - Egg Medal') for l in off.get_locations())
-    locations=[l for l in on.get_locations() if l.name.endswith(' - Egg Medal')]
+    off=generate();on=generate({'eggman_heart_sanity':True})
+    assert not any(l.name.endswith(' - Eggman Heart') for l in off.get_locations())
+    locations=[l for l in on.get_locations() if l.name.endswith(' - Eggman Heart')]
     assert len(locations)==21 and len({l.address for l in locations})==21
     state=CollectionState(on);assert not any(l.access_rule(state) for l in locations)
     for name in WISP_ITEMS:state.collect(on.worlds[1].create_item(name),prevent_sweep=True)
@@ -167,7 +167,7 @@ def test_disabled_option_and_conservative_traversal_rule():
 
 @pytest.mark.parametrize('seed',range(100))
 def test_medals_white_lock_and_goals_fill_without_tv_item(seed):
-    m=generate({'egg_medal_sanity':True,'boost_lock':seed%2,'goal':seed%5,
+    m=generate({'eggman_heart_sanity':True,'boost_lock':seed%2,'goal':seed%5,
                 'red_ring_checks':('off','singles','per_level')[seed%3],
                 'rank_checks':('off','c','all')[seed%3]},seed,fill=True)
     assert m.can_beat_game() and not m.get_unfilled_locations()
@@ -185,7 +185,7 @@ def test_native_medal_capture_reaches_real_websocket_ack_without_item_history(tm
     from ..client.client import SonicContext, transmit_checks
     monkeypatch.setattr(Utils,'persistent_store',lambda *args:None)
     async def scenario():
-        slot=generate({'egg_medal_sanity':True}).worlds[1].fill_slot_data()
+        slot=generate({'eggman_heart_sanity':True}).worlds[1].fill_slot_data()
         ctx=SonicContext(journal_directory=tmp_path);ctx.auth='SonicPlayer'
         assert ctx.seed_name is None
         received=[]

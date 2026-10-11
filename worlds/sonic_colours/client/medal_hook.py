@@ -54,14 +54,14 @@ def payload():
 
 def installed_data(memory):
     words, offset = payload()
-    result = inspect_c2(memory, HOOK, ORIGINAL, {'egg_medal': words}, ((offset, 44),), 'Egg Medal')
+    result = inspect_c2(memory, HOOK, ORIGINAL, {'egg_medal': words}, ((offset, 44),), 'Eggman Heart')
     if not result['installed']: return None
     address = result['target'] + offset
     values = struct.unpack('>11I', memory.read_bytes(address, 44))
     if (any(v and not valid_range(v, 4) for v in (values[0], values[2], values[4], values[5], values[6]))
             or values[1] > 3 or values[7] >= 4096 or values[8] >= 1 << 21
             or values[8] and values[8] & (values[8]-1) or values[10] >= 1 << 21):
-        raise MemoryUnavailable('unknown_revision: invalid Egg Medal capture data')
+        raise MemoryUnavailable('unknown_revision: invalid Eggman Heart capture data')
     return address
 
 
@@ -74,7 +74,7 @@ def observe(memory, snapshot, journal, slot):
     if (owner, index) != (chain[1], chain[2]) or memory.read_u32(address+36) != identity_tag(journal.identity): return
     from ..medals import MEDALS
     mask = memory.read_u32(address+40)
-    selected = {name: code for name, code in slot['locations'].items() if name.endswith(' - Egg Medal')}
+    selected = {name: code for name, code in slot['locations'].items() if name.endswith(' - Eggman Heart')}
     rows = [r for r in MEDALS if mask & (1 << r['index']) and r['location_name'] in selected
             and selected[r['location_name']] not in journal.data['pickup_checks']]
     if rows:
@@ -83,14 +83,14 @@ def observe(memory, snapshot, journal, slot):
                                 'provenance': 'PAL_802F27C4_native_pickup', 'stage_epoch': snapshot.stage_epoch}
                                for r in rows], {}, {selected[r['location_name']] for r in rows})
         import logging
-        logging.getLogger('Client').info('Pickup detected: Egg Medals %s; Location queued: %s',
+        logging.getLogger('Client').info('Pickup detected: Eggman Hearts %s; Location queued: %s',
             [r['location_name'] for r in rows], [selected[r['location_name']] for r in rows])
 
 
 def configure(memory, snapshot, journal):
     address = installed_data(memory)
     if address is None:
-        return {'available': False, 'reason': 'Egg Medal hook not installed: check enabled code and Gecko RAM-table capacity; use the current compact export'}
+        return {'available': False, 'reason': 'Eggman Heart hook not installed: check enabled code and Gecko RAM-table capacity; use the current compact export'}
     chain = memory.resolve_flags_ptr()
     stage = next(iter(snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
     medals = stage.get('medals', ()) if snapshot.scene == 'gameplay' else ()
@@ -115,7 +115,7 @@ def configure(memory, snapshot, journal):
 
 def gecko_lines():
     words, _ = payload()
-    return (['$AP PAL Egg Medal pickup capture', '20000000 534E4350', '28000004 00003850',
+    return (['$AP PAL Eggman Heart pickup capture', '20000000 534E4350', '28000004 00003850',
              '28000006 00000000', f'20{HOOK-0x80000000:06X} {ORIGINAL:08X}',
              f'C2{HOOK-0x80000000:06X} {len(words)//2:08X}']
             + [f'{words[i]:08X} {words[i+1]:08X}' for i in range(0, len(words), 2)]

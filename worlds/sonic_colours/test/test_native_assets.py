@@ -47,7 +47,7 @@ def test_original_archive_music_redirects(mode):
 
 
 @pytest.mark.parametrize('rank', ['off', 's', 'a', 'b', 'c', 'all'])
-@pytest.mark.parametrize('music', ['off', 'per_world', 'anywhere'])
+@pytest.mark.parametrize('music', [False, True])
 def test_rank_music_option_fill_matrix(rank, music):
     for seed in range(100):
         world = generate({'rank_checks': rank, 'music_randomization': music},

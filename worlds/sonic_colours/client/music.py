@@ -6,7 +6,7 @@ from ..world_constants import NORMAL
 
 
 def mapping_for(slot):
-    return plan_music(slot['seed_name'], ('off', 'per_world', 'anywhere')[slot['options']['music_randomization']],
+    return plan_music(slot['seed_name'], 'anywhere' if slot['options']['music_randomization'] else 'off',
                       {s['bgm'] for s in NORMAL})
 
 

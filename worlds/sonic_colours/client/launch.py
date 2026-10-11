@@ -8,6 +8,8 @@ def launch_client(*args):
     from .client import main
     parser = get_base_parser(description='Sonic Colours PAL Archipelago Client')
     parser.add_argument('--name', help='Archipelago slot name')
+    parser.add_argument('--experimental-direct-hooks', action='store_true',
+                        help='DANGEROUS: inject PPC code into candidate Gecko-disabled guest MEM1 scratch region; may crash, JIT coherency unverified')
     parser.add_argument('--export-capsule-gecko', metavar='OUTPUT_INI',
                         help='Export all four PAL native Gecko code groups and exit')
     parser.add_argument('--migrate-yaml', nargs=2, metavar=('OLD_YAML','NEW_YAML'),
@@ -52,7 +54,7 @@ def launch_client(*args):
         from .runtime import validate_slot
         from .asset_patch import patch_music
         slot = validate_slot(json.loads(Path(parsed.patch_file).read_text(encoding='utf-8'))['slot_data'])
-        mode = {1: 'per_world', 2: 'anywhere'}.get(slot['options']['music_randomization'])
+        mode = 'anywhere' if slot['options']['music_randomization'] else None
         if mode is None:
             parser.error('music_randomization is off in this seed')
         if parsed.patch_all_music:

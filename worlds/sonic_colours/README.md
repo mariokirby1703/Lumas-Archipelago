@@ -1,6 +1,6 @@
-# Sonic Colours (Wii) PAL — Archipelago 0.5.1
+# Sonic Colours (Wii) PAL — Archipelago 0.6.0
 
-PAL `SNCP8P`, revision 0; slot schema 5. This build contains native gameplay
+PAL `SNCP8P`, revision 0; slot schema 6. This build contains native gameplay
 readers and guarded writers, immediate journaled checks, and four Gecko codes.
 It is ready for targeted testing, but a complete native playthrough has not
 been verified.
@@ -55,3 +55,20 @@ Sanity and Movement Unlocks are not exposed: a safe native story locomotion cap
 and ability-specific transitions have not been established. The new medal and
 White hooks are code-derived and tested offline; complete gameplay validation
 is still required. See [new abilities validation](docs/new_abilities_validation.md).
+
+## v0.6.0 / schema 6 testing patch (unverified in Dolphin)
+
+- Public **Eggman Heart Sanity** (21 Game Land locations; the native class is still EggmanMedal).
+- **Music Randomization** is On/Off (default On). The client now recognizes the
+  exact PAL `sound/bgm.strm.csb` 87-cue bank resident in MEM2 and mutates only
+  compatible CUE synth references in place, without an extra CPK. A loaded song
+  may not switch until a new cue is started. No audible Dolphin validation yet.
+- **Starting Act / Level Randomization removed**. Tropical Resort vanilla intro
+  is fixed. **World Progression** is Sequential (default) or Open Acts.
+- `--experimental-direct-hooks` offers DME-only hook installation with all Gecko
+  codes disabled. **WARNING:** potential crashes, unstable code arena and Dolphin
+  JIT cache non-coherency; never use your only save. This is NOT verified as a
+  stable Gecko replacement. See [experimental guide](docs/runtime_experiments.md).
+
+Regenerate both APWorld and seed. Previous schema-5 seeds do not work in this
+schema-6 client; do not delete or repurpose your old journals.

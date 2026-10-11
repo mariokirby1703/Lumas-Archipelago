@@ -1,0 +1,59 @@
+{
+  "read_only": true,
+  "scene": [
+    {
+      "context": 2427154400,
+      "vtable": 2155189304,
+      "application": 2156976896,
+      "stage": 2427154400,
+      "mission": "stgE30",
+      "state_handler": 2147601844,
+      "current_handler": 2147601844,
+      "death_count": 0,
+      "wisp_permissions": 32,
+      "world_lives_address": 2427154252,
+      "scene": "gameplay",
+      "actor_state": 2427608800,
+      "lives": 3,
+      "lives_address": 2427608860,
+      "ring_mirror_address": 2427608864,
+      "player_actor_id": 13720,
+      "current_red_ring_mask": 0,
+      "clicked_slot": "11:1",
+      "real_stage_id": "stgE10",
+      "path_data_id": "stgE30",
+      "bgm_cue": "bgm_mlt_e",
+      "player": {
+        "actor": 2431419232,
+        "stats": 2431419648,
+        "mode": 2,
+        "rings": 6,
+        "rings_address": 2158964200,
+        "boost": 0.0,
+        "boost_max": 50.0,
+        "boost_address": 2431419848,
+        "boost_max_address": 2431419860,
+        "held_wisp": -1
+      }
+    }
+  ],
+  "capsules": [
+    {
+      "actor": "0x90b61fe0",
+      "colour": -1,
+      "variants": [
+        0,
+        0,
+        1
+      ],
+      "opened": 0,
+      "enabled": 1,
+      "collision": "0x90b62300",
+      "interaction": "0x0",
+      "model": "0x90edf460",
+      "model_vtable": "0x8077d12c",
+      "model_mode": 1,
+      "actor_fields_110_150": "00000000ffffffffffffffff000000000000000000000000000000003f80000041a0000040a0000042a00000420c0000c1f00000000001000000010000000000"
+    }
+  ]
+}

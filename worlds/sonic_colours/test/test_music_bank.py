@@ -53,7 +53,7 @@ def test_original_bgm_rewrite_changes_only_cue_synth_references(mode):
 
 @pytest.mark.skipif(not SOURCE.exists(),reason='original PAL CPK absent')
 def test_actual_cpk_copy_and_seed_resource_selection(tmp_path):
-    world=generate({'music_randomization':'anywhere'}).worlds[1]
+    world=generate({'music_randomization':True}).worlds[1]
     slot=world.fill_slot_data();out=tmp_path/'music.cpk'
     before=SOURCE.stat().st_size
     manifest=music_bank.patch(SOURCE,out,slot['seed_name'],'anywhere')

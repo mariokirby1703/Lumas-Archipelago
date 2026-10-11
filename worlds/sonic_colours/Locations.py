@@ -50,7 +50,7 @@ for medal in MEDALS:
 
 def enabled(data, options):
     if data.kind == 'medal':
-        return bool(options.egg_medal_sanity)
+        return bool(options.eggman_heart_sanity)
     if data.kind == 'clear':
         return BY_MISSION[data.mission]['zone_index'] < 7 or bool(options.game_land_checks)
     if data.kind == 'ring':

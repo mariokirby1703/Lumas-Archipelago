@@ -8,7 +8,7 @@ import struct
 from ..Items import BY_ID, ITEM_TABLE, RING_VALUES, EMERALDS, WISP_ITEMS, FILLER, LEGACY_FILLER, TRAPS
 from ..Locations import LOCATION_TABLE, enabled
 from ..Options import SonicColoursOptions, OPTION_NAMES
-from ..world_constants import GAME, SCHEMA_VERSION, STAGES, STARTING_STAGES, BY_MISSION, game_land_gates
+from ..world_constants import GAME, SCHEMA_VERSION, STAGES, BY_MISSION, game_land_gates
 from .memory import MemoryUnavailable
 
 logger = logging.getLogger('Client')
@@ -37,7 +37,7 @@ def rings_amount(journal, index):
 
 def validate_slot(data):
     if not isinstance(data, dict) or data.get('game') != GAME or data.get('schema_version') != SCHEMA_VERSION:
-        raise ValueError('Sonic Colours schema migration required: this client uses schema 5 (automatic Terminal Velocity access and Egg Medal checks). Regenerate the seed and .apsonic file with the new world; old seed journals cannot be migrated into another seed.')
+        raise ValueError('Sonic Colours schema migration required: this client uses schema 6 (World Progression modes, Eggman Hearts, On/Off music). Regenerate the seed and .apsonic file with the new world; old seed journals cannot be migrated into another seed.')
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
     options = data.get('options')
@@ -57,7 +57,7 @@ def validate_slot(data):
         resolved[name] = option
     if data.get('game_land_gates') != game_land_gates(options['game_land_requirement_reduction']):
         raise ValueError('slot Game Land gates mismatch')
-    expected_speed = bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'] or options['egg_medal_sanity'])
+    expected_speed = bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'] or options['eggman_heart_sanity'])
     if type(data.get('game_land_speed_items')) is not bool or data['game_land_speed_items'] != expected_speed:
         raise ValueError('slot Game Land speed pool contract mismatch')
     expected_mapping = {s['stage_slot_id']: s['mission_id'] for s in STAGES}
@@ -73,10 +73,9 @@ def validate_slot(data):
         raise ValueError('slot logic policy mismatch; regenerate with matching world/client')
     if data.get('mandatory_prologue') != ['stg110', 'stg130']:
         raise ValueError('unsupported native prologue contract')
-    start = STARTING_STAGES[options['starting_act']]
-    if data.get('starting_slot') != start['stage_slot_id'] or data.get('starting_world') != start['zone_index']:
-        raise ValueError('starting slot/world mismatch')
-    for name in ('level_randomization', 'death_link', 'swim_trap_weight'):
+    if data.get('starting_world') != 0 or 'starting_slot' in data:
+        raise ValueError('expected fixed Tropical Resort starting world and vanilla intro')
+    for name in ('death_link', 'swim_trap_weight'):
         if options[name]:
             raise ValueError(f'{name}: requires_verified_hook')
     return data
@@ -155,8 +154,9 @@ class Runtime:
         self.retry_after = {}
         self.clock = time.monotonic
         self.resource_music = None
-        self.music_status = {'status':'off' if not self.slot_data['options']['music_randomization'] else 'waiting for attributed stage selection',
+        self.music_status = {'status':'off' if not self.slot_data['options']['music_randomization'] else 'waiting for verified in-memory CSB bank',
                              'audible_verified':False}
+        self.next_music_poll = 0.0
 
     def observe_capsules(self, owned_wisps):
         from ..capsules import CAPSULES
@@ -259,7 +259,7 @@ class Runtime:
         self.guard.observe(self.snapshot)
         self.observe_pickups()
         self.observe_results()
-        if self.slot_data['options']['egg_medal_sanity'] and self.guard.can_record(self.snapshot):
+        if self.slot_data['options']['eggman_heart_sanity'] and self.guard.can_record(self.snapshot):
             try:
                 self.guard.check(self.snapshot)
                 from .medal_hook import observe, configure
@@ -282,16 +282,18 @@ class Runtime:
             except MemoryUnavailable as error:
                 self.hooks.progression_status = {'available':False,'reason':str(error)}
         self.last_error = self.snapshot.status
-        if self.resource_music and not self.resource_music['resource_verified']:
-            self.music_status = self.resource_music
-        elif self.snapshot.scene in ('world_map','global_map','game_land_select'):
+        # The original CSB resource lives in MEM2 and is independently
+        # identified by its full PAL digest. Unlike the old 36-Act mission
+        # alias patch, this covers world maps, Game Land, menus and bosses.
+        # Attempt immediately, including title / mandatory prologue, then
+        # check periodically in case Sonic reloads the bank after a scene change.
+        if self.clock() >= self.next_music_poll:
+            self.next_music_poll = self.clock() + (10.0 if self.music_status.get('bank_address') else 2.0)
             try:
-                self.guard.check(self.snapshot)
-                from .music import apply_music
-                result = apply_music(memory, self.slot_data, resource=bool(self.resource_music))
-                self.music_status = {**(self.resource_music or {}), **result}
+                from .live_music import apply
+                self.music_status = apply(memory, self.slot_data)
             except MemoryUnavailable as error:
-                self.music_status = {'status':str(error),'audible_verified':False}
+                self.music_status = {'status':str(error), 'audible_verified':False}
         owned = inventory(item_ids) if history_ready else None
         if history_ready:
             self.journal.record_history(item_ids)

@@ -60,11 +60,12 @@ def payload_words():
     a.d(34,0,31,0x110); a.d(11,0,0,0); a.branch('end',0x40820000)
     # Special multi/alternate capsules have different subtype/resource contracts.
     # +149 changes native use eligibility, not the model's colour contract.
-    # +148/+14A use the multi-Wisp/alternate-content constructor instead.
-    for offset in (0x148,0x14a):
+    # +148 multi-Wisp capsules remain excluded; +14A random capsules use their own AP permission.
+    for offset in (0x148,):
         a.d(34,0,31,offset); a.d(11,0,0,0); a.branch('end',0x40820000)
     a.d(32,4,31,0x114); a.d(11,0,4,-1); a.branch('white',0x41820000)
     a.d(10,0,4,6); a.branch('end',0x41810000)
+    a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('end',0x40820000)
     a.branch('model')
     a.label('white')
     # White is signed -1; never route it through the coloured permission query.
@@ -73,7 +74,14 @@ def payload_words():
     a.d(32,6,12,0); a.d(11,0,6,0); a.branch('end',0x41820000)
     a.d(34,6,6,0); a.d(32,7,12,4)
     a.emit(0x7C063800); a.branch('end',0x40820000)
-    a.d(32,3,12,8); a.d(36,3,1,0x74)
+    a.d(32,3,12,8)
+    # Permission word: bit 0 White Boost, bit 1 Random Capsules. Preserve
+    # +14A so the native constructor selects its question-mark model/content.
+    a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('ordinary_white',0x41820000)
+    a.d(28,3,3,2); a.d(11,0,3,0); a.branch('permission_saved',0x41820000)
+    a.d(14,3,0,1); a.branch('permission_saved')
+    a.label('ordinary_white'); a.d(28,3,3,1)
+    a.label('permission_saved'); a.d(36,3,1,0x74)
     a.label('model')
     a.d(32,3,31,0xb0); a.d(11,0,3,0); a.branch('end',0x41820000)
     a.d(32,0,3,0); a.d(15,5,0,0x8078); a.d(14,5,5,-0x2ed4)
@@ -156,27 +164,29 @@ def gecko_ini():
     lines += control_lines(close_scope=False)
     from .medal_hook import gecko_lines as medal_lines
     lines += medal_lines()
-    lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Egg Medal pickup capture']
+    lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Eggman Heart pickup capture']
     return '\n'.join(lines)+'\n'
 
 
 def inspect_installed(memory):
     from .gecko import inspect_c2
     from ..world_constants import load_data
-    words = payload_words(); offset = data_offset(words)
-    try:
-        result = inspect_c2(memory,HOOK,ORIGINAL,{'current_white_collision_refresh':words}, ((offset,12),))
-    except MemoryUnavailable:
-        previous = load_data('capsule_white_previous.json')
-        offset = data_offset(previous)
+    candidates = [('current_white_collision_refresh', payload_words()),
+                  ('before_random_capsule_refresh', load_data('capsule_before_random.json')),
+                  ('previous_white_collision_refresh', load_data('capsule_white_previous.json'))]
+    for variant, words in candidates:
+        offset = data_offset(words)
         try:
-            result = inspect_c2(memory,HOOK,ORIGINAL,{'previous_white_collision_refresh':previous}, ((offset,12),))
+            result = inspect_c2(memory, HOOK, ORIGINAL, {variant: words}, ((offset, 12),))
+            break
         except MemoryUnavailable:
-            result = inspect_c2(memory,HOOK,ORIGINAL,load_data('capsule_hook_legacy.json'))
-    if result['installed'] and result['variant'] in ('current_white_collision_refresh','previous_white_collision_refresh'):
+            continue
+    else:
+        result = inspect_c2(memory, HOOK, ORIGINAL, load_data('capsule_hook_legacy.json'))
+    if result['installed'] and result['variant'] in ('current_white_collision_refresh','before_random_capsule_refresh','previous_white_collision_refresh'):
         result['white_data_offset'] = offset
         owner, index, allowed = struct.unpack('>3I', memory.read_bytes(result['target']+offset,12))
-        if owner and not valid_range(owner,1) or index > 3 or allowed > 1:
+        if owner and not valid_range(owner,1) or index > 3 or allowed > (3 if result['variant'] == 'current_white_collision_refresh' else 1):
             raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
     memory.capsule_hook_observation=result
     return result
@@ -200,7 +210,7 @@ def installed_data(memory):
     if not result['installed'] or 'white_data_offset' not in result: return None
     address = result['target'] + result['white_data_offset']
     owner, index, allowed = struct.unpack('>3I', memory.read_bytes(address,12))
-    if owner and not valid_range(owner,1) or index > 3 or allowed > 1:
+    if owner and not valid_range(owner,1) or index > 3 or allowed > (3 if result['variant'] == 'current_white_collision_refresh' else 1):
         raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
     return address
 
@@ -209,7 +219,10 @@ def configure(memory, snapshot, owned, slot):
     address = installed_data(memory)
     if address is None: return {'available':False, 'reason':'Update Gecko code for native White capsule projection'}
     chain = memory.resolve_flags_ptr(allow_working=True)
-    desired = (chain[1], chain[2], int(not slot['options']['boost_lock'] or bool(owned['counts']['White Boost Wisp'])))
+    white = int(not slot['options']['boost_lock'] or bool(owned['counts']['White Boost Wisp']))
+    random_allowed = bool(owned['counts']['Random Capsules'])
+    current_hook = memory.capsule_hook_observation['variant'] == 'current_white_collision_refresh'
+    desired = (chain[1], chain[2], white | (2 if random_allowed and current_hook else 0))
     before = struct.unpack('>3I', memory.read_bytes(address,12))
     if before != desired:
         if before[0]: memory.write_u32(address,0,expected=before[0],operation='capsule_controls')
@@ -217,5 +230,5 @@ def configure(memory, snapshot, owned, slot):
             current = memory.read_u32(address+i*4)
             if current != value: memory.write_u32(address+i*4,value,expected=current,operation='capsule_controls')
         memory.write_u32(address,desired[0],expected=0,operation='capsule_controls')
-    return {'available':True, 'white_allowed':bool(desired[2]),
+    return {'available':True, 'white_allowed':bool(white), 'random_capsules_allowed':random_allowed and current_hook,
             'collision_reenable_installed': memory.capsule_hook_observation['variant'] == 'current_white_collision_refresh'}

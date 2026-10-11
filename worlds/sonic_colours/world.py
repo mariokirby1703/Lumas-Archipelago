@@ -6,7 +6,7 @@ from worlds.AutoWorld import World
 from . import Items, Locations, Regions, Rules
 from .Options import SonicColoursOptions, OPTION_NAMES
 from .web_world import SonicColoursWeb
-from .world_constants import GAME, SCHEMA_VERSION, STARTING_STAGES, STAGES, WORLDS, load_data, game_land_gates, pack_rings
+from .world_constants import GAME, SCHEMA_VERSION, STAGES, WORLDS, load_data, game_land_gates, pack_rings
 
 logger = logging.getLogger(__name__)
 
@@ -25,14 +25,13 @@ class SonicColoursWorld(World):
                         'Traps': set(Items.TRAPS)}
 
     def generate_early(self):
-        for option, capability in [('level_randomization', 'stage_shuffle'),
-                                   ('death_link', 'native_death'),
+        for option, capability in [('death_link', 'native_death'),
                                    ('swim_trap_weight', 'swimming')]:
             if getattr(self.options, option).value:
                 raise ValueError(f'Sonic Colours: {option} requires_verified_hook: {capability}. '
                                  'Use off until PAL live validation; see docs/development.md.')
-        self.starting_stage = STARTING_STAGES[self.options.starting_act.value]
-        self.starting_world = self.starting_stage['zone_index']
+        self.starting_stage = next(s for s in STAGES if s['mission_id'] == 'stg110')
+        self.starting_world = 0
         self.gates = game_land_gates(self.options.game_land_requirement_reduction.value)
         self.active_locations = tuple(n for n, d in Locations.LOCATION_TABLE.items() if Locations.enabled(d, self.options))
         self.logic = load_data('logic_requirements.json')
@@ -56,7 +55,7 @@ class SonicColoursWorld(World):
     def create_items(self):
         names = []
         names += [n for i, n in enumerate(Items.WORLD_ITEMS) if i != self.starting_world]
-        names += list(Items.WISP_ITEMS) + list(Items.EMERALDS)
+        names += list(Items.WISP_ITEMS) + list(Items.EMERALDS) + [Items.RANDOM_CAPSULES]
         precollected = self.multiworld.precollected_items[self.player]
         for item in precollected:
             if item.name in names:
@@ -68,7 +67,7 @@ class SonicColoursWorld(World):
             early = self.multiworld.local_early_items[self.player]
             early.setdefault(self.random.choice(access), 1)
         needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks
-                          or self.options.goal.value == 3 or self.options.wisp_capsules or self.options.egg_medal_sanity)
+                          or self.options.goal.value == 3 or self.options.wisp_capsules or self.options.eggman_heart_sanity)
         self.game_land_speed_items = needs_land
         speed_count = max(0, 4 - sum(i.name == Items.GAME_LAND_SPEED for i in precollected)) if needs_land else 0
         self.ring_required = max(self.gates.values()) if needs_land else 0
@@ -121,8 +120,7 @@ class SonicColoursWorld(World):
 
     def fill_slot_data(self):
         return {'schema_version': SCHEMA_VERSION, 'game': GAME, 'seed_name': self.multiworld.seed_name,
-                'starting_slot': self.starting_stage['stage_slot_id'],
-                'starting_world': self.starting_world, 'game_land_gates': self.gates,
+                'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),
                 'logic_policy': 'provisional_clears_conservative_pickups',
@@ -137,6 +135,6 @@ class SonicColoursWorld(World):
 
     def write_spoiler_header(self, spoiler_handle):
         spoiler_handle.write(f'\nSonic Colours (Wii) PAL\n'
-                             f'Starting slot: {self.starting_stage["name"]}\n'
+                             'Starting world: Tropical Resort (vanilla intro)\n'
                              f'Unknown logic entries: {len(self.unknown_logic)}\n'
                              'Wisps: shuffled; unknown clear routes provisional, optional pickups conservative.\n')

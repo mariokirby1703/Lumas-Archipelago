@@ -93,12 +93,11 @@ def test_final_goal_requires_escape_after_boss_and_survives_reload():
     assert victory(slot,snapshot(persisted_clears=frozenset({'stg720'})),observed_clears={'stg790'})
 
 
-@pytest.mark.parametrize('starting', [0, 35, 41])
-def test_terminal_velocity_requires_every_wisp_without_access_item(starting):
+def test_terminal_velocity_requires_every_wisp_without_access_item():
     from BaseClasses import CollectionState
     from ..Items import WISP_ITEMS, WORLD_ITEMS
     from ..world_constants import STAGES
-    multiworld = generate({'starting_act': starting})
+    multiworld = generate()
     world = multiworld.worlds[1]
     state = CollectionState(multiworld)
     for item in WISP_ITEMS[:-1]:

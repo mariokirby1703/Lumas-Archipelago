@@ -117,7 +117,7 @@ def validate_resource_bank(data, mapping):
 def load_manifest(path, slot):
     """Validate an explicitly selected resource patch, never infer installation."""
     path = Path(path); manifest = json.loads(path.read_text(encoding='utf-8'))
-    mode = ('off', 'per_world', 'anywhere')[slot['options']['music_randomization']]
+    mode = 'anywhere' if slot['options']['music_randomization'] else 'off'
     if (manifest.get('format') != 'sonic-pal-bgm-bank-v1' or manifest.get('seed') != slot['seed_name']
             or manifest.get('mode') != mode or mode == 'off'
             or manifest.get('music_mapping') != plan(slot['seed_name'], mode)

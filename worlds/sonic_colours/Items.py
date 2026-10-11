@@ -17,6 +17,8 @@ ITEM_TABLE.pop('Terminal Velocity Access')
 ITEM_TABLE.update({'Rings': BASE_ID + 32, 'Half Boost Refill': BASE_ID + 33})
 GAME_LAND_SPEED = 'Progressive Game Land Speed'
 ITEM_TABLE[GAME_LAND_SPEED] = BASE_ID + 34
+RANDOM_CAPSULES = 'Random Capsules'
+ITEM_TABLE[RANDOM_CAPSULES] = BASE_ID + 35
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}
 
 

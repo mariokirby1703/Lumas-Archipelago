@@ -7,20 +7,20 @@ import pytest
 from ..client.capsule_refresh import payload_words, ORIGINAL
 
 
-def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,white_control=False,profile=1):
+def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,white_control=False,profile=1,random_capsule=False,random_owned=False):
     actor,model,manager,state=0x90010000,0x90020000,0x90030000,0x90040000
     mem={actor:0x80761534,actor+0x110:opened,actor+0x148:special,actor+0x114:colour,
          actor+0xb0:model,actor+0x34:manager,model:0x8077d12c,
          model+8:actor,model+0x88:mode,actor+0x128:0,
          actor+0xb4: 0x90060000 if (mode if interaction is None else interaction) else 0,
-         actor+0x149:alternate}
+         actor+0x149:alternate,actor+0x14a:int(random_capsule)}
     regs=list(range(32));regs[1]=0x90050000;regs[2]=0x808f0000;regs[31]=actor
     mem[regs[2]-0x7c48]=0x80720000
     original=regs[:];lr,ctr,cr=0x80012345,0x80045678,0x12345678
     initial=(lr,ctr,cr);words=payload_words();pc=0;cmp=0;calls=[]
     from ..client.capsule_refresh import data_offset
     offset=data_offset(words)
-    for i,v in enumerate((0x90070000 if white_control else 0,1,int(owned))): mem[offset+i*4]=v
+    for i,v in enumerate((0x90070000 if white_control else 0,1,int(owned) | (2 if random_owned else 0))): mem[offset+i*4]=v
     mem[0x90070000]=profile
     fpr=list(range(100,114));paired=list(range(200,214));fpscr=0x123456;gqr0=0x01010101
     floating=(fpr[:],paired[:],fpscr,gqr0)
@@ -30,6 +30,7 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,whit
         op=w>>26;rt=w>>21&31;ra=w>>16&31;u=w&0xffff;imm=u if u<0x8000 else u-0x10000
         if op in (14,15):regs[rt]=((regs[ra] if ra else 0)+(imm<<(16 if op==15 else 0)))&0xffffffff
         elif op==24:regs[ra]=regs[rt]|u
+        elif op==28:regs[ra]=regs[rt]&u
         elif op in (32,34):regs[rt]=mem.get((regs[ra]+imm)&0xffffffff,0)
         elif op in (36,37):
             addr=(regs[ra]+imm)&0xffffffff;mem[addr]=regs[rt]
@@ -162,3 +163,14 @@ def test_white_unrelated_save_and_boost_lock_off_keep_vanilla_available():
     assert run(1,False,colour=0xffffffff,white_control=True,profile=2) == ([],1)
     calls,mode=run(1,True,colour=0xffffffff,white_control=True)
     assert calls == [0x800132d8] and mode == 1
+
+
+def test_random_capsule_permission_is_independent_of_white():
+    calls, mode = run(1, True, colour=0xffffffff, white_control=True, random_capsule=True)
+    assert mode == 0
+    calls, mode = run(0, False, colour=0xffffffff, white_control=True,
+                      random_capsule=True, random_owned=True)
+    assert mode == 1
+    assert 0x800D3EB4 in calls
+    calls, mode = run(1, False, colour=0xffffffff, white_control=True, random_owned=True)
+    assert mode == 0
