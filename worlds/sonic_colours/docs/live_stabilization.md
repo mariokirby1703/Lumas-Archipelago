@@ -48,21 +48,29 @@ return branches. See `stabilization_live_hooks.json`. The complete export is
 exactly but cannot silently arm the new operations.
 
 At the subsequent Game Land 2-1 observation the Heart hook's 14 data words were
-all zero. Installation is therefore verified, but live arming and pickup delivery
-are not yet established for this build. The client authenticated seed
+all zero. The client authenticated seed
 `68104729174819435588` without a saved binding. Read-only comparison of the native
 profile, selected slot and both intro records exactly matched the existing
 journal for seed `53608322755801233751`. Cross-seed protection correctly refused
-to arm; reconnecting to that original AP game is needed before collecting.
-Do not treat installation readback as a working live Heart check.
+to arm. After reconnecting to that original AP game, read-only Dolphin inspection
+confirmed stage `stgD20`, object 70, instance zero and armed bit 3. The user then
+collected the Heart and supplied the client log:
+
+```text
+Pickup detected: Eggman Hearts ['Game Land 2-1 - Eggman Heart']; Location queued: [847005003], LocationChecks sent: [847005003], Location acknowledged: [847005003]
+```
+
+This confirms live pickup-to-server acknowledgement for Game Land 2-1, rather
+than installation readback alone. Death/restart durability for this new capture
+still needs its own live check.
 
 Offline validation: the full suite passed 1145 tests (199.23 seconds), and the
 generation matrix filled 400 reachable seeds across both progression modes,
 five goals and the requested option combinations. The initial run exposed a
 duplicate snapshot scan in WritePolicy; it was corrected before the final run.
 
-Still requiring controlled gameplay validation: all Heart pickups (particularly
-2-1 and 4-1), both Random Capsule variants and their original rewards, temporary
+Still requiring controlled gameplay validation: the remaining Heart pickups
+(particularly 4-1), both Random Capsule variants and their original rewards, temporary
 refill use/depletion before White ownership, audible Aquarium music after scene
 reload, and Act 6 first in Open Acts followed by all six genuine clears. The
 reported camera failure cannot be declared resolved solely from offline tests.
