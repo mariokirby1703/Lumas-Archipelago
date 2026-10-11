@@ -14,7 +14,7 @@ HOOK = 0x8015ECC0
 ORIGINAL = 0x2C050000  # cmpwi r5,0
 
 
-def payload():
+def payload(compact_permission=True):
     a=PPC()
     a.d(37,1,1,-0x90)
     a.emit(0x7C0802A6); a.d(36,0,1,8)
@@ -40,8 +40,14 @@ def payload():
     a.d(14,6,0,1); a.emit(0x7CC62030)  # slw r6,r6,r4
     a.label('permission_test')
     a.emit(0x7CE73038)  # and r7,r7,r6
-    a.d(14,5,0,0); a.d(11,0,7,0); a.branch('end',0x41820000)
-    a.d(14,5,0,1); a.branch('end')
+    if compact_permission:
+        a.emit(0x7CE50034)  # cntlzw r5,r7
+        a.emit(0x54A5D97E)  # srwi r5,r5,5
+        a.emit(0x68A50001)  # xori r5,r5,1: permission = mask != 0
+    else:
+        a.d(14,5,0,0); a.d(11,0,7,0); a.branch('end',0x41820000)
+        a.d(14,5,0,1)
+    a.branch('end')
     a.label('clears')
     # Intercept story availability at the setter, before native map animations.
     # Completion/rank banks are deliberately outside 30..71 and immutable here.
@@ -81,9 +87,14 @@ def installed_data(memory):
         result = inspect_c2(memory, HOOK, ORIGINAL, {'story_permissions':words}, ((offset,32),))
     except MemoryUnavailable:
         from ..world_constants import load_data
-        old = load_data('progression_hook_previous.json'); offset = old['offset']
-        result = inspect_c2(memory, HOOK, ORIGINAL, {'previous':old['words']}, ((offset,24),))
-    memory.story_permissions_installed = result.get('variant') == 'story_permissions'
+        old_words, offset = payload(False)
+        try:
+            result = inspect_c2(memory, HOOK, ORIGINAL, {'before_compact_permission':old_words}, ((offset,32),))
+        except MemoryUnavailable:
+            old = load_data('progression_hook_previous.json'); offset = old['offset']
+            result = inspect_c2(memory, HOOK, ORIGINAL, {'previous':old['words']}, ((offset,24),))
+    if result.get('variant') == 'before_compact_permission': offset = payload(False)[1]
+    memory.story_permissions_installed = result.get('variant') in ('story_permissions', 'before_compact_permission')
     if not result['installed']: return None
     address = result['target'] + offset
     owner,world,colours,discoveries,clears,seed_tag = struct.unpack('>6I',memory.read_bytes(address,24))

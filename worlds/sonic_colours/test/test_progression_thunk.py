@@ -6,8 +6,8 @@ import pytest
 from ..client.progression_hook import payload
 
 
-def execute(bit, value, worlds=1<<20, colours=0, bound=True, discoveries=0, clears=0, story=0):
-    words, data = payload()
+def execute(bit, value, worlds=1<<20, colours=0, bound=True, discoveries=0, clears=0, story=0, compact_permission=True):
+    words, data = payload(compact_permission)
     origin=0x80002000
     actor, flags=0x90010000,0x90020000
     regs=list(range(32));regs[1]=0x90030000;regs[3]=actor;regs[4]=bit;regs[5]=value
@@ -53,6 +53,9 @@ def execute(bit, value, worlds=1<<20, colours=0, bound=True, discoveries=0, clea
         elif op==31 and w&0x7ff==0x30:regs[ra]=(regs[rt]<<(regs[rb]&31))&0xffffffff
         elif op==31 and w&0x7ff==0x378:regs[ra]=regs[rt]|regs[rb]
         elif op==31 and w&0x7ff==0x38:regs[ra]=regs[rt]&regs[rb]
+        elif w==0x7ce50034:regs[5]=32-regs[7].bit_length()
+        elif w==0x54a5d97e:regs[5] >>= 5
+        elif op==26:regs[ra]=regs[rt]^u
         elif w==0x60000000:pass
         else:raise AssertionError(hex(w))
     else:raise AssertionError('PPC loop')
@@ -102,3 +105,9 @@ def test_native_story_boss_setter_veto_precedes_map_animation(zone):
     assert execute(boss_bit, 1, story=1 << (boss_bit-30))[0] == 1
     # Genuine bank C completion remains immutable to this hook.
     assert execute(boss_bit+120, 1, story=0)[0] == 1
+
+@pytest.mark.parametrize('bit', range(32))
+def test_compact_permission_matches_previous_native_logic(bit):
+    for enabled in (False, True):
+        args = dict(worlds=(1 << bit) if enabled else 0, colours=(1 << bit) if enabled else 0, story=(1 << bit) if enabled else 0)
+        assert execute(bit, 1, **args) == execute(bit, 1, compact_permission=False, **args)

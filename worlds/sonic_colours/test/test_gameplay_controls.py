@@ -15,8 +15,9 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
     words, data = payload(kind); base=0x80002000
     regs=[0]*32;regs[1]=0x90001000;regs[3]=0x90002000;regs[4]=colour if kind=='boost' else selected
     regs[0]=selected;regs[27]=0x90003000;regs[29]=0x90004000
-    regs[30]=0x90006000
+    regs[30]=0x90006000; regs[2]=0x808FC5C0
     mem={0x90005000:profile,regs[3]+4:selected,regs[3]+0x2c:1,regs[29]+0x114:0}
+    mem[0x808F6040]=0.
     mem.update({regs[3]+8:float(selected),regs[30]+0x8c:0x90007000,0x90007024:mode})
     for i,v in enumerate((0x90005000,expected_profile,maximum,regs[3],locked,0.)):mem[base+data+i*4]=v
     before=regs[:];lr,cr=0x80010000,0x12345678;original=(lr,cr);cmp=0;pc=0;f1=delta

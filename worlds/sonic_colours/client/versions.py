@@ -61,6 +61,12 @@ def verify_revision(memory):
             word = int.from_bytes(data[offset:offset+4], 'big')
             if word != PATH_ORIGINAL and path_installed(memory):
                 data = data[:offset] + PATH_ORIGINAL.to_bytes(4, 'big') + data[offset+4:]
+        from .map_transition import UPDATE_HOOK, UPDATE_ORIGINAL, update_installed
+        if section['address'] <= UPDATE_HOOK < section['address'] + section['size']:
+            offset = UPDATE_HOOK - section['address']
+            word = int.from_bytes(data[offset:offset+4], 'big')
+            if word != UPDATE_ORIGINAL and update_installed(memory):
+                data = data[:offset] + UPDATE_ORIGINAL.to_bytes(4, 'big') + data[offset+4:]
         digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:
             raise memory.error(f'unknown_revision: text at 0x{section["address"]:08X}, '

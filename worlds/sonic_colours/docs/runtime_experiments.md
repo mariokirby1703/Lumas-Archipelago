@@ -89,3 +89,21 @@ Live evidence identifies the special capsule before collection; after pickup
 its actor was removed. The Eggman outcome was reported by the player, not
 independently captured. The new lock/unlock and preserved random pickup
 behavior still require live Dolphin validation.
+
+
+### Tropical Resort Act 6 partial-completion map transition (2026-10-11)
+
+User observed `Invalid read from 0x00000008, PC=0x8026CA2C` after
+clearing Act 6 with Acts 4 and 5 still incomplete. Read-only live DME confirmed
+PAL SNCP8P and original `80C407EC` at 8026CA18 / `80060008` at 8026CA2C.
+The existing 8026C938 guard covers event -3 cleanup only; phase-1 updates
+dereference the same optional actor+7EC path before cleanup.
+
+A second exact-verified C2 at 8026CA18 now advances through the original
+completed-animation state path at 8026CB6C when +7EC is null. Non-null paths
+retain the displaced load and native timing/float comparison. No clear flags,
+save records or Act availability are fabricated. Compact equivalent control
+payloads keep all four Gecko groups within the 3256-byte handler capacity;
+previous installed payloads remain individually verified. Offline instruction
+execution and full PAL hash checks pass. The repaired Act-6 return still needs
+live gameplay validation after updating the complete codes and APWorld.

@@ -21,7 +21,7 @@ HOOKS = {
 }
 
 
-def payload(kind, compact=True, temporary=True, drain=True):
+def payload(kind, compact=True, temporary=True, drain=True, lean=True):
     if not compact: temporary = False
     a = PPC(); hook, original = HOOKS[kind]
     output = 3 if kind in ('boost', 'speed_get') else 0 if kind == 'speed_ui' else None
@@ -36,8 +36,12 @@ def payload(kind, compact=True, temporary=True, drain=True):
         a.d(36, 0, 1, 16); a.emit(0x7C0802A6); a.d(36, 0, 1, 8)
         a.emit(0x7C000026); a.d(36, 0, 1, 12)
         for r in saved: a.d(36, r, 1, 20 + saved.index(r)*4)
+    # Share the displaced load/store across both ownership branches. Keep
+    # older exact layouts available to the verifier during client updates.
+    if lean and compact and kind == 'speed_get': a.emit(original)
     a.emit(0x48000005); base = len(a.words)*4
     a.emit(0x7D8802A6); fix = len(a.words); a.d(14, 12, 12, 0)
+    if lean and compact and kind == 'speed_ui': a.d(32, 0, 1, 16)
     a.d(32, 6, 12, 0); a.d(11, 0, 6, 0); a.branch('vanilla', 0x41820000)
     a.d(34, 6, 6, 0); a.d(32, 7, 12, 4)
     a.emit(0x7C063800); a.branch('vanilla', 0x40820000)  # cmpw r6,r7
@@ -65,24 +69,28 @@ def payload(kind, compact=True, temporary=True, drain=True):
             # Preserve the pre-existing gauge; deny only the new pickup/script
             # amount. Super's separate provider bypasses this native routine.
             a.d(48, 1, 3, 8)
-        else: a.d(48, 1, 12, 20)  # query returns zero, gauge is untouched
+        else:
+            # PAL r2=808FC5C0; original lower-clamp float at 808F6040
+            # is zero. Reuse it instead of allocating another data word.
+            a.d(48, 1, 2 if lean and compact else 12, -0x6580 if lean and compact else 20)
         a.branch('restore')
     else:
         if kind == 'speed_ui':
             a.d(32, 6, 29, 0x114); a.d(11, 0, 6, 0); a.branch('vanilla', 0x40820000)
-            a.d(32, 0, 1, 16)
-        if kind == 'speed_get': a.emit(original)
+            if not (lean and compact): a.d(32, 0, 1, 16)
+        if kind == 'speed_get' and not (lean and compact): a.emit(original)
         a.d(32, 7, 12, 8)
         target = 3 if kind == 'speed_get' else 4 if kind == 'speed_set' else 0
         a.emit(0x7C003800 | target << 16)  # cmpw target,r7
         a.branch('selected', 0x40810000)
         a.mr(target, 7)
         a.label('selected')
-        if kind != 'speed_get': a.emit(original)
-        a.branch('restore')
+        if not (lean and compact):
+            if kind != 'speed_get': a.emit(original)
+            a.branch('restore')
     a.label('vanilla')
-    if kind == 'speed_ui': a.d(32, 0, 1, 16)
-    a.emit(original)
+    if kind == 'speed_ui' and not (lean and compact): a.d(32, 0, 1, 16)
+    if not (lean and compact and kind == 'speed_get'): a.emit(original)
     a.label('restore')
     if compact:
         if output is not None: a.d(36, output, 1, 16+output*4)
@@ -100,7 +108,7 @@ def payload(kind, compact=True, temporary=True, drain=True):
         if output != 0: a.d(32, 0, 1, 16)
     a.d(14, 1, 1, frame); a.branch('return')
     data = len(a.words)*4; a.words[fix] |= (data-base)&0xffff
-    for _ in range(3 if compact and temporary and kind.startswith('speed') else 6 if not compact or kind in ('boost_use','boost_query') else 5): a.emit(0)
+    for _ in range(3 if compact and temporary and kind.startswith('speed') else 6 if not compact or kind in ('boost_use','boost_query') and not lean else 5): a.emit(0)
     a.label('return')
     if len(a.words)%2 == 0: a.emit(0x60000000)
     a.emit(0)
@@ -110,15 +118,16 @@ def payload(kind, compact=True, temporary=True, drain=True):
 def installed(memory, kind):
     hook, original = HOOKS[kind]; words, offset = payload(kind)
     from ..world_constants import load_data
-    previous_words, previous_offset = payload(kind, compact=False, temporary=False)
+    previous_words, previous_offset = payload(kind, compact=False, temporary=False, lean=False)
     legacy = load_data('gameplay_hook_legacy.json').get(kind)
-    old_compact, old_offset = payload(kind, temporary=False)
-    no_drain, no_drain_offset = payload(kind, drain=False)
-    layouts = [(kind, words, offset), ('before_drain', no_drain, no_drain_offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
+    old_compact, old_offset = payload(kind, temporary=False, lean=False)
+    no_drain, no_drain_offset = payload(kind, drain=False, lean=False)
+    before_lean, before_lean_offset = payload(kind, lean=False)
+    layouts = [(kind, words, offset), ('before_lean', before_lean, before_lean_offset), ('before_drain', no_drain, no_drain_offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
     if legacy: layouts.append(('legacy', legacy['words'], legacy['offset']))
     for name, candidate, candidate_offset in layouts:
         try:
-            size = 12 if name == kind and kind.startswith('speed') else 20
+            size = 12 if name in (kind, 'before_lean') and kind.startswith('speed') else 20
             result = inspect_c2(memory, hook, original, {name:candidate}, ((candidate_offset,size),), label=kind)
             offset = candidate_offset
             break
@@ -126,7 +135,7 @@ def installed(memory, kind):
             failure = error
     else: raise failure
     if not result['installed']: return None
-    if kind == 'boost_add': memory.boost_consumption_safe = name == kind
+    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'before_lean')
     address = result['target'] + offset
     values = struct.unpack('>'+'I'*(size//4), memory.read_bytes(address,size))
     owner, index, maximum, model, locked = (*values, 0, 0) if size == 12 else values
