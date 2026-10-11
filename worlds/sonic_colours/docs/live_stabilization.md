@@ -49,8 +49,17 @@ exactly but cannot silently arm the new operations.
 
 At the subsequent Game Land 2-1 observation the Heart hook's 14 data words were
 all zero. Installation is therefore verified, but live arming and pickup delivery
-are not yet established for this build. Client status is needed before collecting.
+are not yet established for this build. The client authenticated seed
+`68104729174819435588` without a saved binding. Read-only comparison of the native
+profile, selected slot and both intro records exactly matched the existing
+journal for seed `53608322755801233751`. Cross-seed protection correctly refused
+to arm; reconnecting to that original AP game is needed before collecting.
 Do not treat installation readback as a working live Heart check.
+
+Offline validation: the full suite passed 1145 tests (199.23 seconds), and the
+generation matrix filled 400 reachable seeds across both progression modes,
+five goals and the requested option combinations. The initial run exposed a
+duplicate snapshot scan in WritePolicy; it was corrected before the final run.
 
 Still requiring controlled gameplay validation: all Heart pickups (particularly
 2-1 and 4-1), both Random Capsule variants and their original rewards, temporary
