@@ -1,4 +1,4 @@
-# Sonic Colours (Wii) Archipelago player YAML, v0.6.0 / slot schema 6
+# Sonic Colours (Wii) Archipelago player YAML, experimental v0.7.0 / slot schema 7
 # Run this with the matching APWorld and an entirely NEW seed.
 # The normal PAL Wii intro is always Tropical Resort Acts 1 and 2.
 # For experimental native code without Gecko, use the client CLI opt-in
@@ -22,6 +22,7 @@ Sonic Colours (Wii):
   wisp_capsules: false
   eggman_heart_sanity: false
   boost_lock: false
+  movement_unlocks: false
   game_land_requirement_reduction: 40
   # true enables original PAL CSB synth shuffling directly in RAM;
   # audible playback in maps/Game Land is experimental.

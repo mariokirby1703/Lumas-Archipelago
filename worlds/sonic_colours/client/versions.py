@@ -21,8 +21,23 @@ def verify_revision(memory):
         raise memory.error(f'wrong_game: observed {disc!r} (hex={disc.hex()}), expected PAL SNCP8P')
     if revision != VERSION['revision']:
         raise memory.error(f'unknown_revision: observed disc revision {revision}, expected {VERSION["revision"]}')
+    # Direct guest PPC experiments are NOT ordinary Gecko codes. Only
+    # recognized, byte-authenticated trampoline plans may be normalized.
+    from .direct_hooks import plan as direct_plan, recognize_branch
+    direct_plans = [direct_plan(include_movement=False), direct_plan(include_movement=True)]
     for section in VERSION['text_sections']:
         data = memory.read_bytes(section['address'], section['size'])
+        # Only touch candidate sites not normalized as exact supported Gecko
+        # hooks above. Partially installed experiments may contain a mix of
+        # original and exact trampoline words; unknown branches still fail.
+        for direct in direct_plans:
+            for site, original, arena, code, label in direct:
+                if section['address'] <= site < section['address'] + section['size']:
+                    off = site - section['address']
+                    word = int.from_bytes(data[off:off+4], 'big')
+                    if word != original and recognize_branch(memory, site, original, (site, original, arena, code, label)):
+                        data = data[:off] + original.to_bytes(4,'big') + data[off+4:]
+
         from .capsule_refresh import HOOK, ORIGINAL, installed
         if section['address'] <= HOOK < section['address'] + section['size']:
             offset = HOOK - section['address']

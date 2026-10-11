@@ -22,7 +22,7 @@ class SonicColoursWorld(World):
     location_name_to_id = {n: d.code for n, d in Locations.LOCATION_TABLE.items()}
     item_name_groups = {'Wisps': set(Items.WISP_ITEMS), 'World Access': set(Items.WORLD_ITEMS),
                         'Chaos Emeralds': set(Items.EMERALDS), 'Red Rings': set(Items.RING_VALUES),
-                        'Traps': set(Items.TRAPS)}
+                        'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS)}
 
     def generate_early(self):
         for option, capability in [('death_link', 'native_death'),
@@ -56,6 +56,8 @@ class SonicColoursWorld(World):
         names = []
         names += [n for i, n in enumerate(Items.WORLD_ITEMS) if i != self.starting_world]
         names += list(Items.WISP_ITEMS) + list(Items.EMERALDS) + [Items.RANDOM_CAPSULES]
+        if self.options.movement_unlocks.value:
+            names += list(Items.MOVEMENT_POOL)
         precollected = self.multiworld.precollected_items[self.player]
         for item in precollected:
             if item.name in names:

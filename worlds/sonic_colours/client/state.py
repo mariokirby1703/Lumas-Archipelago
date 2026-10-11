@@ -253,12 +253,34 @@ class WritePolicy:
             if observed_bank != bank or hashlib.sha256(raw).hexdigest() not in (current, expected):
                 raise MemoryUnavailable('WRITE_BLOCKED: native CSB bank changed during transaction')
             return 'verified_native_pal_music_bank', bank, current, expected
-        if operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls') and snapshot.save_identity is None:
+        if operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls','movement_controls') and snapshot.save_identity is None:
             token = self.guard.check_stats(snapshot)
         else:
             token = self.guard.check_stats(snapshot) if operation in ('stats', 'boost_stats', 'colour_permissions') else self.guard.check(snapshot)
-        if operation not in ('global_map_refresh', 'permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset', 'gameplay_controls', 'egg_medal_controls', 'capsule_controls') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
+        if operation not in ('global_map_refresh', 'permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset', 'gameplay_controls', 'egg_medal_controls', 'capsule_controls', 'movement_controls') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
             raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
+        if operation == 'movement_controls':
+            from .movement_gate import payload, observed
+            from .direct_hooks import plan, _branch
+            plans = [row for row in plan(include_movement=True) if row[4] == 'movement']
+            if len(plans) != 1:
+                raise MemoryUnavailable('WRITE_BLOCKED: missing movement plan')
+            hook, original, arena, code, label = plans[0]
+            words, _, off = payload()
+            base = arena+off
+            current = bytearray(self.memory.read_bytes(arena, len(code)))
+            current[off:off+8] = bytes(8)
+            if (self.memory.read_u32(hook) != _branch(hook,arena)
+                    or current != code or size != 4 or address not in (base,base+4)):
+                raise MemoryUnavailable('WRITE_BLOCKED: unverified movement trampoline/data address')
+            if snapshot.scene != 'gameplay' or snapshot.death_state != 'alive':
+                raise MemoryUnavailable('WRITE_BLOCKED: movement gate requires living player')
+            stage = next(iter(snapshot.evidence.get('native_data',{}).get('stage_objects',[])),{})
+            player = stage.get('player',{}).get('actor')
+            if player is None:
+                raise MemoryUnavailable('WRITE_BLOCKED: movement actor unavailable')
+            ctrl = observed(self.memory, player)['controller']
+            return token, ctrl, base
         if operation == 'global_map_refresh':
             from .map_refresh import installed_data
             from .native_read import read_actors

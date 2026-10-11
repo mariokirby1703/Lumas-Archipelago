@@ -1,3 +1,13 @@
+> **Experimental schema 7 movement research build (October 11, 2026).**
+> The new opt-in Movement Unlocks option creates Wall Jump, Homing Attack,
+> Mid-Air Boost (Jump Dash), Double Jump, Ground Pound, two Progressive
+> Crouch levels, **Swim and Breath as separate items**. Native state locks
+> are ONLY available in the **unverified no-Gecko direct-PPC experiment**;
+> standard Gecko does not implement them. Underwater Swim/Breath locks,
+> Hover's scripted ghost spawn and the cached unowned world castle are
+> **not fixed yet**. See [movement_schema7_experimental.md](docs/movement_schema7_experimental.md).
+> New schema-7 seeds are required; normal AP 0.6.7+ client compatibility remains.
+
 # Sonic Colours (Wii) PAL — Archipelago 0.6.0
 
 PAL `SNCP8P`, revision 0; slot schema 6. This build contains native gameplay

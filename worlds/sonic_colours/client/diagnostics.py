@@ -15,6 +15,7 @@ NATIVE_BLOCKERS = {
     'native_death': 'Player death event observed; safe native invocation and cache-coherent execution not resolved.',
     'swimming': 'No verified reversible swimming state; existing Gecko patch has unresolved goal interference.',
     'stage_shuffle': 'Native mission table read; intro-safe stage dispatch rewrite not implemented.',
+    'movement': 'Opt-in direct PPC transition gate only; JIT and native Swim/Breath gates not live verified.',
     'music': 'Verified original 87-cue CSB in MEM2 can be seed-shuffled without files; all playback paths require live testing.',
     'capsule_open': 'Native instance/open transitions report immediately; live coloured model refresh uses the supplied PAL Gecko hook.',
 }
@@ -61,6 +62,7 @@ def diagnostic(ctx, memory=None):
         if runtime.snapshot:
             stage = next(iter(runtime.snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
             player = stage.get('player', {})
+            result.update(movement=player.get('movement'), movement_unlocks=runtime.movement_status)
             result.update(rings=player.get('rings'), lives=stage.get('lives'), boost=player.get('boost'),
                           clicked_slot=runtime.snapshot.clicked_slot, real_stage_id=stage.get('real_stage_id'),
                           native_bgm_cue=stage.get('bgm_cue'),

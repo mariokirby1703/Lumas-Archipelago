@@ -356,6 +356,14 @@ def read_player(memory, stage, actor_id, actors=None):
               'boost': memory.read_f32(boost + 8), 'boost_max': memory.read_f32(boost + 0x14),
               'boost_address': boost + 8, 'boost_max_address': boost + 0x14,
               'held_wisp': memory.read_s32(boost + 0x18)}
+    # Non-invasive movement sampling: no guessed position/timer RAM writes.
+    try:
+        from .movement_gate import observed
+        result['movement'] = observed(memory, player)
+        result['movement']['stats_flags'] = f'0x{memory.read_u32(stats+0x10):08X}'
+        result['movement']['underwater_bits_correlated'] = bool(memory.read_u32(stats+0x10) & 0x00200800 == 0x00200800)
+    except MemoryUnavailable as error:
+        result['movement'] = {'status':'read-only controller unavailable','reason':str(error)}
     if (memory.read_u32(stage + 0x18) != manager or
             memory.read_u32(manager + 0x14) != count or memory.read_u32(player + 0x8c) != stats):
         raise MemoryUnavailable('player_context_changed')

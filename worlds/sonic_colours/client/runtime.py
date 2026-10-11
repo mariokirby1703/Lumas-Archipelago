@@ -37,7 +37,7 @@ def rings_amount(journal, index):
 
 def validate_slot(data):
     if not isinstance(data, dict) or data.get('game') != GAME or data.get('schema_version') != SCHEMA_VERSION:
-        raise ValueError('Sonic Colours schema migration required: this client uses schema 6 (World Progression modes, Eggman Hearts, On/Off music). Regenerate the seed and .apsonic file with the new world; old seed journals cannot be migrated into another seed.')
+        raise ValueError('Sonic Colours schema 7 required: movement/Swim/Breath item IDs and options. Regenerate seed and .apsonic; do not reuse old seed journals.')
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
     options = data.get('options')
@@ -157,6 +157,10 @@ class Runtime:
         self.music_status = {'status':'off' if not self.slot_data['options']['music_randomization'] else 'waiting for verified in-memory CSB bank',
                              'audible_verified':False}
         self.next_music_poll = 0.0
+        self.experimental_direct_hooks = False
+        self.movement_status = {'status': 'Movement Unlocks off or waiting for Dolphin',
+                                'native_gate_verified': False, 'swim_gate_verified': False,
+                                'breath_gate_verified': False}
 
     def observe_capsules(self, owned_wisps):
         from ..capsules import CAPSULES
@@ -372,6 +376,19 @@ class Runtime:
         except MemoryUnavailable as error:
             controls = {'error': str(error), 'installed': {}}
         self.hooks.gameplay_controls_status = {**controls, 'white_capsules': capsules}
+        if self.slot_data['options']['movement_unlocks']:
+            from .movement_gate import configure
+            if self.experimental_direct_hooks:
+                try:
+                    self.movement_status = configure(memory, self.snapshot, owned)
+                except MemoryUnavailable as error:
+                    self.movement_status = {'status': str(error), 'native_gate_verified':False}
+            else:
+                self.movement_status = {'status':'Movement items enabled but native locks INACTIVE: standard Gecko lacks space; use an isolated --experimental-direct-hooks test with Gecko disabled',
+                                        'native_gate_verified':False,
+                                        'swim_gate_verified':False, 'breath_gate_verified':False}
+        else:
+            self.movement_status = {'status':'Movement Unlocks off; vanilla native movement'}
 
     def project_permissions(self, memory, owned):
         try:

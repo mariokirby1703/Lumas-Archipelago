@@ -11,6 +11,7 @@ Sonic Colours (Wii):
   wisp_capsules: false
   eggman_heart_sanity: false
   boost_lock: false
+  movement_unlocks: false
   game_land_requirement_reduction: 40
   music_randomization: true
   ring_loss_trap_weight: medium

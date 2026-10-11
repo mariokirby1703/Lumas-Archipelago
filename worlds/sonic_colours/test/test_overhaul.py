@@ -102,7 +102,7 @@ def test_supplied_yaml_migrates_and_generates():
     assert m.can_beat_game() and m.worlds[1].ring_target==187
     old={'Sonic Colours (Wii)':{'goal':'all_story_clears','wisp_capsule_sanity':'story','wisp_unlocks':'vanilla','world_unlocks':'vanilla','chaos_emerald_items':False}}
     new,changes=migrate_yaml(old)
-    assert new['Sonic Colours (Wii)']=={'goal':'all_bosses','wisp_capsules':True,'world_progression':'sequential','music_randomization':True} and changes
+    assert new['Sonic Colours (Wii)']=={'goal':'all_bosses','wisp_capsules':True,'world_progression':'sequential','music_randomization':True,'movement_unlocks':False} and changes
     with pytest.raises(ValueError,match='schema migration'):
         validate_slot({**m.worlds[1].fill_slot_data(),'schema_version':2})
 

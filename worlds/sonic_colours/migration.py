@@ -35,6 +35,9 @@ def migrate_yaml(document):
     if 'world_progression' not in options:
         options['world_progression'] = 'sequential'
         changes.append('Added sequential World Progression.')
+    if 'movement_unlocks' not in options:
+        options['movement_unlocks'] = False
+        changes.append('Added experimental Movement Unlocks default Off; Swim and Breath are separate items when enabled.')
     if 'music_randomization' in options:
         music = options['music_randomization']
         if isinstance(music, dict):

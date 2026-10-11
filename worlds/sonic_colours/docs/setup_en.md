@@ -1,4 +1,4 @@
-﻿# Sonic Colours (Wii) setup
+# Sonic Colours (Wii) setup
 
 PAL `SNCP8P`, revision 0, Archipelago 0.6.7+ and 64-bit Dolphin are required.
 Install `requirements.txt`, build the APWorld, and place it in Archipelago's
@@ -32,7 +32,7 @@ The progression hook is required for immediate native vanilla-grant suppression
 and discovery/Game Land event capture. Without it, ordinary check/counter paths
 remain available, but native interception is reported unavailable.
 
-## Generate a new schema-4 seed
+## Generate a new schema-7 seed
 
 Use [the default example](../examples/SonicColours.yaml) or
 [Luma's migrated configuration](../examples/Luma_Migrated.yaml). Old server
@@ -69,10 +69,11 @@ acknowledgements. Death, stage exit and reconnect do not erase physical Red Ring
 identities. An existing unrelated save, save switch or rollback stops write
 attribution. Back up your Dolphin Wii save before testing.
 
-`starting_act: random` selects among 36 normal Acts, six world bosses and
-Terminal Velocity Acts 1/2. Explicit choices remain available. After the intro
-save, the selected stage and its path become available without fake clears.
-The final boss cannot be a starting stage.
+The mandatory vanilla Tropical Resort Acts 1 and 2 remain fixed; there is no
+`starting_act` option in schema 7. Movement Unlocks is a separate experimental
+toggle. When enabled, the seed receives nine movement progression items, but
+normal Gecko installations cannot enforce the new state-transition gates.
+See [Movement Research](movement_schema7_experimental.md) before trying it.
 
 ## Items and optional checks
 

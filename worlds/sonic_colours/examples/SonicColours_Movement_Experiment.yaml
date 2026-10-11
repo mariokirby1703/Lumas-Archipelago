@@ -1,0 +1,23 @@
+# Experimental: extra Movement items; no-Gecko direct-hook test only.
+# Swim/Breath native locks not yet implemented. DO NOT use for real multiworld.
+name: SonicPlayer
+game: Sonic Colours (Wii)
+Sonic Colours (Wii):
+  goal: nega_wisp_armor
+  world_progression: sequential
+  red_ring_checks: singles
+  rank_checks: 'off'
+  game_land_checks: true
+  chaos_emerald_checks: true
+  wisp_discovery_checks: false
+  wisp_capsules: false
+  eggman_heart_sanity: false
+  boost_lock: true
+  movement_unlocks: true
+  game_land_requirement_reduction: 40
+  music_randomization: true
+  ring_loss_trap_weight: medium
+  swim_trap_weight: 'off'
+  swim_trap_duration: 15
+  trap_percentage: 10
+  death_link: false

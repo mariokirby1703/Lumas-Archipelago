@@ -34,6 +34,73 @@ def log_diagnostic(value):
 
 
 class SonicCommands(ClientCommandProcessor):
+    def _cmd_soniccapsules(self):
+        """Read-only capsule/ghost-spawn evidence, including missing models."""
+        snap = self.ctx.runtime.snapshot if self.ctx.runtime else None
+        if snap is None:
+            logger.info('Connect to Dolphin and a Sonic Colours slot first.')
+            return
+        stage = next(iter(snap.evidence.get('native_data', {}).get('stage_objects', [])), {})
+        from ..capsules import CAPSULES
+        rows = []
+        for record in stage.get('capsules', []):
+            definition = CAPSULES.get(record['key'])
+            rows.append({'key': record['key'], 'wisp': definition.wisp_item if definition else None,
+                         'eligible': bool(definition and definition.eligible),
+                         'actor': f"0x{record['actor']:08X}", 'opened':record['opened'],
+                         'model_present': bool(record.get('model')), 'model_mode':record.get('model_mode'),
+                         'collision':record.get('collision'), 'native_enabled':record.get('native_enabled')})
+        log_diagnostic({'mission':snap.actual_mission,'captured_actors':len(rows),
+                        'unmodeled_capsules':[row for row in rows if not row['opened'] and not row['model_present']],
+                        'capsules':rows,'capture_error':stage.get('capsule_error'),
+                        'note':'Read-only evidence; scripted ghost spawn is not yet fixed.'})
+
+    def _cmd_sonicmap(self):
+        """Read-only Grand Map cache versus AP access for unowned castles."""
+        snap = self.ctx.runtime.snapshot if self.ctx.runtime else None
+        if not snap or snap.scene != 'global_map' or not self.ctx.memory:
+            logger.info('Open the Grand World Map with Dolphin connected first.')
+            return
+        from .native_read import read_actors
+        from ..Items import WORLD_ITEMS
+        stage = next(iter(snap.evidence.get('native_data', {}).get('stage_objects', [])), {})
+        try:
+            actors=[a for a in read_actors(self.ctx.memory, stage['context'])
+                    if self.ctx.memory.read_u32(a)==0x80777000]
+            if len(actors) != 1:
+                raise MemoryUnavailable('Grand World Map actor not unique')
+            actor=actors[0]
+            owned=inventory([i.item for i in self.ctx.items_received])['counts']
+            rows=[]
+            for zone in range(1,6):
+                present=bool(self.ctx.memory.read_u32(actor+0xB4+zone*8))
+                allowed=bool(owned[WORLD_ITEMS[zone]])
+                rows.append({'world':WORLD_ITEMS[zone].removesuffix(' Access'),
+                             'ap_owned':allowed,'castle_cache_present':present,
+                             'cached_ui_mismatch':present and not allowed})
+            log_diagnostic({'mission':snap.actual_mission, 'scene':snap.scene,
+                            'history_ready':self.ctx.history_ready,'worlds':rows,
+                            'note':'Presence of native cache handles is not proof of selectable map UI; reported visual-only mismatch still needs live repair.'})
+        except (KeyError, MemoryUnavailable) as error:
+            log_diagnostic({'error':str(error),'scene':snap.scene})
+
+    def _cmd_sonicmovement(self):
+        """Show current native movement states and AP permissions (READ ONLY)."""
+        if not self.ctx.runtime:
+            logger.info('Connect to a Sonic Colours slot first.')
+            return
+        from .movement_gate import permissions
+        snap = self.ctx.runtime.snapshot
+        stage = next(iter(snap.evidence.get('native_data',{}).get('stage_objects',[])),{}) if snap else {}
+        player = stage.get('player',{})
+        owned = inventory([i.item for i in self.ctx.items_received])
+        log_diagnostic({'mission':snap.actual_mission if snap else None,
+                        'movement':player.get('movement'),
+                        'owned_mask':permissions(owned['counts']),
+                        'swim_item':bool(owned['counts']['Swim']),
+                        'breath_item':bool(owned['counts']['Breath']),
+                        'movement_status':self.ctx.runtime.movement_status})
+
     def _cmd_sonicmusictest(self, destination='', donor=''):
         """Audible test: DESTINATION_CUE DONOR_CUE, or off to restore the seed mapping."""
         if not self.ctx.runtime or not self.ctx.authenticated_identity:
@@ -209,6 +276,7 @@ class SonicContext(CommonContext):
                     self.release_runtime()
                     journal = Journal(self.journal_directory, identity)
                     self.runtime = Runtime(data, journal, SaveGuard(journal), NativeHooks(journal))
+                    self.runtime.experimental_direct_hooks = self.experimental_direct_hooks
                     if self.music_resource_manifest:
                         self.runtime.select_resource_music(self.music_resource_manifest)
                     if data['options']['death_link']:
@@ -373,7 +441,8 @@ async def dolphin_loop(ctx):
                     ctx.direct_hook_attempted = True
                     try:
                         from .direct_hooks import install, inspect
-                        ctx.direct_hook_status = (install(memory) if not inspect(memory) else
+                        movement = bool(ctx.runtime.slot_data['options']['movement_unlocks'])
+                        ctx.direct_hook_status = (install(memory, enable_movement=movement) if not inspect(memory, enable_movement=movement) else
                                                   {'installed_in_guest_ram':True, 'jit_execution_verified':False,
                                                    'status':'existing experimental signatures recognized'})
                         logger.warning('EXPERIMENTAL guest code: %s', ctx.direct_hook_status)
@@ -403,6 +472,7 @@ async def dolphin_loop(ctx):
                     capsule_refresh=ctx.runtime.hooks.capsule_refresh_status,
                     native_progression=ctx.runtime.hooks.progression_status,
                     native_gameplay_controls=ctx.runtime.hooks.gameplay_controls_status,
+                    movement_unlocks=ctx.runtime.movement_status,
                     global_map_refresh=ctx.runtime.hooks.global_map_refresh_status,
                     native_egg_medals=ctx.runtime.hooks.medal_status,
                     music_randomization=ctx.runtime.music_status,

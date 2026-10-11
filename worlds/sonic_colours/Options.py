@@ -124,6 +124,16 @@ class SonicDeathLink(DeathLink):
     display_name = 'Death Link'
 
 
+class MovementUnlocks(Toggle):
+    """EXPERIMENTAL: shuffle Wall Jump, Homing Attack, Mid-Air Boost (Jump Dash),
+    Double Jump, Ground Pound, 2 Progressive Crouch stages, Swim and Breath.
+    State-transition locks require opt-in experimental guest hooks and are NOT
+    active with the ordinary four Gecko groups. Native Swim/Breath gating is
+    still research-only; consult the movement diagnostics before playing a seed.
+    """
+    display_name = 'Movement Unlocks (Experimental)'
+
+
 class BoostLock(Toggle):
     """Require the White Boost Wisp item for ordinary Boost use. Off preserves vanilla Boost from the start. Super Sonic's native infinite Boost remains separate."""
     display_name = 'Boost Lock'
@@ -146,13 +156,14 @@ class SonicColoursOptions(PerGameCommonOptions):
     swim_trap_duration: SwimTrapDuration
     death_link: SonicDeathLink
     boost_lock: BoostLock
+    movement_unlocks: MovementUnlocks
     wisp_capsules: WispCapsules
     eggman_heart_sanity: EggmanHeartSanity
 
 OPTION_NAMES = tuple(SonicColoursOptions.__annotations__)
 
 OPTION_GROUPS = [
-    OptionGroup('Progression', [Goal, WorldProgression, BoostLock]),
+    OptionGroup('Progression', [Goal, WorldProgression, BoostLock, MovementUnlocks]),
     OptionGroup('Checks', [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks, WispCapsules, EggmanHeartSanity]),
     OptionGroup('Game Land', [GameLandRequirementReduction]),
     OptionGroup('Presentation', [MusicRandomization]),

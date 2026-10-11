@@ -21,6 +21,12 @@ ITEM_TABLE[GAME_LAND_SPEED] = BASE_ID + 34
 RANDOM_CAPSULES = 'Random Capsules'
 ITEM_TABLE[RANDOM_CAPSULES] = BASE_ID + 35
 ITEM_TABLE['Full Boost Refill'] = BASE_ID + 36
+# Append-only IDs. Never renumber existing Archipelago inventory/locations.
+MOVEMENT_ITEMS = ('Wall Jump', 'Homing Attack', 'Mid-Air Boost', 'Double Jump',
+                  'Ground Pound', 'Progressive Crouch', 'Swim', 'Breath')
+MOVEMENT_POOL = ('Wall Jump', 'Homing Attack', 'Mid-Air Boost', 'Double Jump',
+                 'Ground Pound', 'Progressive Crouch', 'Progressive Crouch', 'Swim', 'Breath')
+ITEM_TABLE.update({name: BASE_ID + 37 + i for i, name in enumerate(MOVEMENT_ITEMS)})
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}
 
 

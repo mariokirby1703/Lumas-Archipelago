@@ -26,6 +26,13 @@ def validate_logic(logic):
 
 def requirements(world, state, key):
     entry = world.logic[key]
+    # At minimum, avoid claiming Aquarium Park's water-dependent stage checks
+    # are obtainable with locked underwater traversal or reduced breath.
+    # This is deliberately a coarse conservative prerequisite, not detailed
+    # ring-by-ring routing. The native Swim/Breath gate remains unverified.
+    if (world.options.movement_unlocks.value and key.startswith('stg5')
+            and not state.has_all(('Swim', 'Breath'), world.player)):
+        return False
     if entry['logic_status'] == 'unknown':
         return state.has_all(WISP_ITEMS, world.player)
     return (state.has_all(entry['requires_all'], world.player)

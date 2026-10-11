@@ -1,7 +1,7 @@
 {
   "disc_id": "SNCP8P",
   "revision": 0,
-  "dol_sha256": "92aefe33b577493b492f8433ca68b90d25d29d2f6d9c85310a6829481281f8a9",
+  "dol_sha256": "92aefe33b577493b492f8433ca68b90d25d29d2d6f9c85310a6829481281f8a9",
   "text_sections": [
     {
       "address": 2147500032,
@@ -51,6 +51,7 @@
     "capsule_controls": true,
     "global_map_refresh": true,
     "music_bank": true,
-    "experimental_code": true
+    "experimental_code": true,
+    "movement_controls": true
   }
 }
