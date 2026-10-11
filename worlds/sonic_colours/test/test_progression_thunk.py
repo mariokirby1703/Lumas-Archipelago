@@ -6,14 +6,14 @@ import pytest
 from ..client.progression_hook import payload
 
 
-def execute(bit, value, worlds=1<<20, colours=0, bound=True, discoveries=0, clears=0):
+def execute(bit, value, worlds=1<<20, colours=0, bound=True, discoveries=0, clears=0, story=0):
     words, data = payload()
     origin=0x80002000
     actor, flags=0x90010000,0x90020000
     regs=list(range(32));regs[1]=0x90030000;regs[3]=actor;regs[4]=bit;regs[5]=value
     original=regs[:];lr=0x80011234;cr=0x12345678;oldlr=lr
     mem={actor:flags,origin+data:flags if bound else 0,origin+data+4:worlds,
-         origin+data+8:colours,origin+data+12:discoveries,origin+data+16:clears}
+         origin+data+8:colours,origin+data+12:discoveries,origin+data+16:clears,origin+data+24:story & 0xffffffff,origin+data+28:story >> 32}
     pc=0;cmp=0
     for _ in range(300):
         w=words[pc];pc+=1
@@ -26,6 +26,11 @@ def execute(bit, value, worlds=1<<20, colours=0, bound=True, discoveries=0, clea
             else:
                 mem[addr]=regs[rt]
                 if op==37:regs[ra]=addr
+        elif op in (46,47):
+            addr=regs[ra]+imm
+            for r in range(rt,32):
+                if op==47:mem[addr+(r-rt)*4]=regs[r]
+                else:regs[r]=mem[addr+(r-rt)*4]
         elif op in (10,11):
             lhs=regs[ra];rhs=u if op==10 else imm
             if op==11 and lhs&0x80000000:lhs-=0x100000000
@@ -84,7 +89,16 @@ def test_game_land_clear_event_is_monotonic_and_does_not_modify_clear(bit):
     assert execute(bit,1,clears=0x1fffff)[2]==0x1fffff
 
 
-@pytest.mark.parametrize('bit',[8,19,27,30,90,150,251,273,400])
+@pytest.mark.parametrize('bit',[8,19,27,72,90,150,251,273,400])
 def test_unrelated_flags_keep_vanilla_value(bit):
     assert execute(bit,1)==(1,0,0)
     assert execute(bit,0)==(0,0,0)
+
+
+@pytest.mark.parametrize('zone', range(6))
+def test_native_story_boss_setter_veto_precedes_map_animation(zone):
+    boss_bit = 30 + zone*7 + 6
+    assert execute(boss_bit, 1, story=0)[0] == 0
+    assert execute(boss_bit, 1, story=1 << (boss_bit-30))[0] == 1
+    # Genuine bank C completion remains immutable to this hook.
+    assert execute(boss_bit+120, 1, story=0)[0] == 1

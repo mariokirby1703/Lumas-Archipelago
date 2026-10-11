@@ -302,15 +302,11 @@ class NativeHooks:
                     permitted = values.get(bit)
                     if permitted is True and node['status'] == 1:
                         memory.write_u32(node['address'], 2, expected=1, operation='map_availability')
-                    elif permitted is False and node['status'] > 1:
-                        memory.write_u32(node['address'], 1, expected=node['status'], operation='map_lock')
                 access = None  # All first/starting/TV nodes were handled above.
             if access and values.get(20 + access['zone']) and access['first_act_status'] == 1:
                 # 802689B4 reads bank A; native node states 1=locked, 2=available,
                 # 3=entered, 4=cleared. Refresh only this first waypoint cache.
                 memory.write_u32(access['status_address'], 2, expected=1, operation='map_availability')
-            elif access and not values.get(20 + access['zone']) and access['first_act_status'] > 1:
-                memory.write_u32(access['status_address'],1,expected=access['first_act_status'],operation='map_lock')
         self.project_live_permissions(memory, snapshot, inventory, slot_data)
         from .map_refresh import configure
         self.global_map_refresh_status = configure(memory, snapshot, values)

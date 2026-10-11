@@ -54,11 +54,12 @@ def test_all_21_medal_identities_against_original_orc():
 def native_fixture(medal=MEDALS[0]):
     b=FakeBackend(); m=SonicMemory(b)
     stage,manager,actor,wrapper,record,descriptor,vector = (0x90001000+i*0x1000 for i in range(7))
-    values={stage+0x18:manager, actor:medal_hook.VTABLE, actor+0xc:123,
+    values={stage:0x80759438,stage+0x4c:0x90009000,stage+0x18:manager, actor:medal_hook.VTABLE, actor+0xc:123,
             actor+0x34:manager,actor+0x64:wrapper,wrapper+4:actor,wrapper+8:record,wrapper+12:descriptor,
             descriptor:0x80770FA0,descriptor+0x10:record,descriptor+0x1c:wrapper,
             descriptor+0x14:medal['instance_index'],record:medal['object_id'],
             record+0x18:vector,record+0x1c:1}
+    b.put(0x90009000,medal['mission_id'].encode().ljust(8,b'\0'))
     for address,value in values.items(): b.put(address,value.to_bytes(4,'big'))
     b.put(vector,struct.pack('>3f',*medal['position']))
     return b,m,stage,actor
@@ -85,6 +86,12 @@ def execute_pickup(b, actor, target=0x80002000):
         elif op in (36,37):
             addr=regs[ra]+imm;b.write_bytes(addr,regs[rt].to_bytes(4,'big'))
             if op==37:regs[ra]=addr
+        elif w==0x54c6033e:regs[6]&=0xfffff
+        elif op in (46,47):
+            addr=regs[ra]+imm
+            for r in range(rt,32):
+                if op==47:b.write_bytes(addr+(r-rt)*4,regs[r].to_bytes(4,'big'))
+                else:regs[r]=int.from_bytes(b.read_bytes(addr+(r-rt)*4,4),'big')
         elif op==11:cmp=(regs[ra]>imm)-(regs[ra]<imm)
         elif op==16:
             if {0x41820000:cmp==0,0x40820000:cmp!=0}[w&0xffff0000]:pc=pc-1+imm//4
@@ -109,7 +116,7 @@ def execute_pickup(b, actor, target=0x80002000):
     assert (lr,cr)==before
 
 
-@pytest.mark.parametrize('medal', [MEDALS[0],MEDALS[7]])
+@pytest.mark.parametrize('medal', MEDALS)
 def test_native_pickup_latch_durable_restart_exit_and_dedup(tmp_path,medal):
     b,m,stage,actor=native_fixture(medal);data=install(b)
     chain=(0x90080000,0x90081000,1,0x90082000)
@@ -117,7 +124,7 @@ def test_native_pickup_latch_durable_restart_exit_and_dedup(tmp_path,medal):
     m.write_guard=lambda *args: 'test bound control'
     native=read_medals(m,stage,medal['mission_id'],[actor])
     snap=snapshot(scene='gameplay',actual_mission=medal['mission_id'],evidence={'chain':chain,
-        'native_data':{'stage_objects':[{'medals':native}]}})
+        'native_data':{'stage_objects':[{'stage':stage,'mission':medal['mission_id'],'medals':native}]}})
     slot=generate({'eggman_heart_sanity':True}).worlds[1].fill_slot_data()
     with Journal(tmp_path,IDENTITY) as j:
         medal_hook.configure(m,snap,j)
@@ -215,7 +222,8 @@ def test_native_medal_capture_reaches_real_websocket_ack_without_item_history(tm
                 b.put(chain[1],b'\x01');m.resolve_flags_ptr=lambda **kw:chain
                 m.write_guard=lambda *args:'test bound capture'
                 native=read_medals(m,stage,MEDALS[0]['mission_id'],[actor])
-                snap=snapshot(evidence={'native_data':{'stage_objects':[{'medals':native}]}})
+                medal=MEDALS[0]
+                snap=snapshot(actual_mission=medal['mission_id'],evidence={'native_data':{'stage_objects':[{'stage':stage,'mission':medal['mission_id'],'medals':native}]}})
                 journal=ctx.runtime.journal
                 medal_hook.configure(m,snap,journal)
                 execute_pickup(b,actor)
@@ -232,3 +240,23 @@ def test_native_medal_capture_reaches_real_websocket_ack_without_item_history(tm
             ctx.release_runtime()
     asyncio.run(scenario())
 
+
+
+@pytest.mark.parametrize('medal', MEDALS)
+def test_stage_armed_before_late_actor_creation_and_wrong_mission_rejected(tmp_path, medal):
+    b,m,stage,actor=native_fixture(medal);data=install(b)
+    chain=(0x90080000,0x90081000,1,0x90082000)
+    b.put(chain[1],b'\x01');m.resolve_flags_ptr=lambda **kw:chain
+    m.write_guard=lambda *args:'offline stage capture'
+    snap=snapshot(actual_mission=medal['mission_id'],evidence={'chain':chain,
+        'native_data':{'stage_objects':[{'stage':stage,'mission':medal['mission_id'],'medals':[]}]}})
+    with Journal(tmp_path,IDENTITY) as journal:
+        status=medal_hook.configure(m,snap,journal)
+        assert status['armed'] and not status['actor_found']
+        # Collection happens without any host actor observation or second poll.
+        execute_pickup(b,actor)
+        assert m.read_u32(data+40)==1 << medal['index']
+        b.put(data+40,bytes(4))
+        b.put(0x90009000,b'stgX99\0\0')
+        execute_pickup(b,actor)
+        assert m.read_u32(data+40)==0

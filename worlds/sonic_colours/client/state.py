@@ -228,6 +228,8 @@ class WritePolicy:
         owner = getattr(self.snapshot_reader, '__self__', None)
         if isinstance(owner, NativeHooks) and getattr(self.snapshot_reader, '__func__', None) is NativeHooks.snapshot:
             snapshot = owner._snapshot_after_revision(self.memory)
+        else:
+            snapshot = self.snapshot_reader(self.memory)
         if operation == 'experimental_code':
             # ONLY reachable through the explicit, dangerous --experimental-direct-hooks
             # launcher switch, with a complete exact-address write plan.
@@ -251,8 +253,6 @@ class WritePolicy:
             if observed_bank != bank or hashlib.sha256(raw).hexdigest() not in (current, expected):
                 raise MemoryUnavailable('WRITE_BLOCKED: native CSB bank changed during transaction')
             return 'verified_native_pal_music_bank', bank, current, expected
-        else:
-            snapshot = self.snapshot_reader(self.memory)
         if operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls') and snapshot.save_identity is None:
             token = self.guard.check_stats(snapshot)
         else:
@@ -297,7 +297,7 @@ class WritePolicy:
             chain = self.memory.resolve_flags_ptr()
             if tuple(snapshot.evidence.get('chain', ())) != chain or data is None:
                 raise MemoryUnavailable('WRITE_BLOCKED: medal capture profile changed')
-            if size != 4 or address not in range(data, data+44, 4):
+            if size != 4 or address not in range(data, data+self.memory.medal_data_size, 4):
                 raise MemoryUnavailable('WRITE_BLOCKED: medal capture address not allowed')
             return token, chain, data
         elif operation == 'gameplay_controls':
@@ -306,7 +306,7 @@ class WritePolicy:
             if tuple(snapshot.evidence.get('chain', ())) != chain:
                 raise MemoryUnavailable('WRITE_BLOCKED: gameplay control profile changed')
             data = [installed(self.memory, kind) for kind in HOOKS]
-            if size != 4 or not any(d is not None and address in range(d, d+20, 4) for d in data):
+            if size != 4 or not any(d is not None and address in range(d, d+self.memory.gameplay_data_sizes.get(d,20), 4) for d in data):
                 raise MemoryUnavailable('WRITE_BLOCKED: gameplay control address not allowed')
             return token, chain, tuple(data)
         elif operation in ('progression_data','progression_reset'):
@@ -316,7 +316,7 @@ class WritePolicy:
             if operation == 'progression_reset':
                 allowed_data = (data+12,data+16) if data is not None and self.memory.read_u32(data)==0 else ()
             else:
-                allowed_data = (data,data+4,data+8,data+20) if data is not None else ()
+                allowed_data = ((data,data+4,data+8,data+20) + ((data+24,data+28) if self.memory.story_permissions_installed else ())) if data is not None else ()
             if data is None or size != 4 or address not in allowed_data:
                 raise MemoryUnavailable('WRITE_BLOCKED: progression data address not allowed')
             if tuple(snapshot.evidence.get('chain',())) != chain:

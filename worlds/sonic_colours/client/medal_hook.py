@@ -1,6 +1,6 @@
 """Capture the EggmanMedal native pickup before it removes its own actor.
 
-Host arms an exact ORC-validated actor in an attributed Game Land playthrough.
+Host arms an exact ORC-validated stage identity in an attributed Game Land playthrough.
 Gecko captures the native consumed event, never a score delta or disappearance.
 The seed-owned 21-bit latch survives stage exit between host observations.
 """
@@ -16,36 +16,51 @@ VTABLE = 0x8077E714
 
 def payload():
     a = PPC()
-    a.d(37, 1, 1, -0x50)
+    a.d(37, 1, 1, -0xa0)
     a.d(36, 0, 1, 16); a.emit(0x7C0802A6); a.d(36, 0, 1, 8)
     a.emit(0x7C000026); a.d(36, 0, 1, 12)
     registers = (3, 4, 5, 6, 7, 12)
-    for i, r in enumerate(registers): a.d(36, r, 1, 20+i*4)
+    a.d(47, 3, 1, 20)
     a.emit(0x48000005); base = len(a.words)*4
     a.emit(0x7D8802A6); fix = len(a.words); a.d(14, 12, 12, 0)
     def equal(ra, rb):
         a.emit(0x7C000000 | ra << 16 | rb << 11); a.branch('end', 0x40820000)
     a.d(32, 6, 12, 0); a.d(11, 0, 6, 0); a.branch('end', 0x41820000)
     a.d(34, 6, 6, 0); a.d(32, 7, 12, 4); equal(6, 7)
-    a.d(32, 6, 12, 8); equal(6, 28)
+    # Authenticate the currently picked actor, not a host-observed actor pointer.
+    a.d(32, 5, 12, 8); a.d(11, 0, 5, 0); a.branch('end', 0x41820000)
+    a.d(32, 6, 5, 0); a.d(15, 7, 0, 0x8076); a.d(14, 7, 7, -0x6bc8); equal(6, 7)
+    a.d(32, 6, 5, 0x18); a.d(32, 7, 12, 20); equal(6, 7)
+    a.d(32, 5, 5, 0x4c)
+    for field, offset in ((0, 48), (4, 52)):
+        a.d(32, 6, 5, field); a.d(32, 7, 12, offset); equal(6, 7)
     a.d(32, 6, 28, 0); a.d(15, 7, 0, 0x8078); a.d(14, 7, 7, -0x18ec); equal(6, 7)
-    for actor_offset, data_offset in ((0xc, 12), (0x64, 16), (0x34, 20)):
-        a.d(32, 6, 28, actor_offset); a.d(32, 7, 12, data_offset); equal(6, 7)
-    a.d(32, 5, 12, 16)
+    a.d(32, 6, 28, 0x34); a.d(32, 7, 12, 20); equal(6, 7)
+    a.d(32, 5, 28, 0x64)
     a.d(32, 6, 5, 4); equal(6, 28)
-    a.d(32, 6, 5, 8); a.d(32, 7, 12, 24); equal(6, 7)
-    a.d(32, 5, 5, 12)
-    a.d(32, 6, 5, 0x14); a.d(32, 7, 12, 28); equal(6, 7)
-    a.d(32, 6, 12, 40); a.d(32, 7, 12, 32)
-    a.emit(0x7CC63B78); a.d(36, 6, 12, 40)  # or r6,r6,r7
+    a.d(32, 4, 5, 8)
+    a.d(32, 3, 5, 12)
+    a.d(32, 6, 3, 0); a.d(15, 7, 0, 0x8077); a.d(14, 7, 7, 0x0fa0); equal(6, 7)
+    a.d(32, 6, 3, 0x10); equal(6, 4)
+    a.d(32, 6, 3, 0x1c); equal(6, 5)
+    a.d(32, 6, 3, 0x14); a.d(32, 7, 12, 16); equal(6, 7)
+    a.d(32, 6, 4, 0); a.emit(0x54C6033E)  # rlwinm r6,r6,0,12,31: native ORC ID
+    a.d(32, 7, 12, 12); equal(6, 7)
+    a.d(32, 5, 4, 0x18)
+    # All 21 PAL Heart records have exactly one placement, instance zero.
+    a.d(32, 6, 4, 0x1c); a.d(11, 0, 6, 1); a.branch('end', 0x40820000)
+    for field, offset in ((0, 24), (4, 28), (8, 32)):
+        a.d(32, 6, 5, field); a.d(32, 7, 12, offset); equal(6, 7)
+    a.d(32, 6, 12, 40); a.d(32, 7, 12, 44)
+    a.emit(0x7CC63B78); a.d(36, 6, 12, 40)
     a.label('end')
-    for i, r in enumerate(registers): a.d(32, r, 1, 20+i*4)
+    a.d(46, 3, 1, 20)
     a.d(32, 0, 1, 12); a.emit(0x7C0FF120)
     a.d(32, 0, 1, 8); a.emit(0x7C0803A6)
-    a.d(32, 0, 1, 16); a.d(14, 1, 1, 0x50); a.emit(ORIGINAL)
+    a.d(32, 0, 1, 16); a.d(14, 1, 1, 0xa0); a.emit(ORIGINAL)
     a.branch('return')
     offset = len(a.words)*4; a.words[fix] |= (offset-base)&0xffff
-    for _ in range(11): a.emit(0)
+    for _ in range(14): a.emit(0)
     a.label('return')
     if len(a.words)%2 == 0: a.emit(0x60000000)
     a.emit(0)
@@ -54,14 +69,27 @@ def payload():
 
 def installed_data(memory):
     words, offset = payload()
-    result = inspect_c2(memory, HOOK, ORIGINAL, {'egg_medal': words}, ((offset, 44),), 'Eggman Heart')
+    try:
+        result = inspect_c2(memory, HOOK, ORIGINAL, {'egg_medal': words}, ((offset, 56),), 'Eggman Heart')
+    except MemoryUnavailable:
+        from ..world_constants import load_data
+        old = load_data('medal_hook_previous.json'); offset = old['offset']
+        result = inspect_c2(memory, HOOK, ORIGINAL, {'previous':old['words']}, ((offset,44),), 'Eggman Heart')
+    memory.medal_stage_capture = result.get('variant') == 'egg_medal'
     if not result['installed']: return None
+    memory.medal_data_size = 56 if memory.medal_stage_capture else 44
     address = result['target'] + offset
-    values = struct.unpack('>11I', memory.read_bytes(address, 44))
-    if (any(v and not valid_range(v, 4) for v in (values[0], values[2], values[4], values[5], values[6]))
-            or values[1] > 3 or values[7] >= 4096 or values[8] >= 1 << 21
-            or values[8] and values[8] & (values[8]-1) or values[10] >= 1 << 21):
-        raise MemoryUnavailable('unknown_revision: invalid Eggman Heart capture data')
+    if not memory.medal_stage_capture:
+        old = struct.unpack('>11I', memory.read_bytes(address,44))
+        if (any(v and not valid_range(v,4) for v in (old[0],old[2],old[4],old[5],old[6]))
+                or old[1] > 3 or old[7] >= 4096 or old[8] >= 1 << 21
+                or old[8] and old[8] & (old[8]-1) or old[10] >= 1 << 21):
+            raise MemoryUnavailable('unknown_revision: invalid legacy Eggman Heart data')
+    values = struct.unpack('>14I', memory.read_bytes(address,56)) if memory.medal_stage_capture else (0,)*14
+    if (any(v and not valid_range(v, 4) for v in (values[0], values[2], values[5]))
+            or values[1] > 3 or values[4] != 0 or values[10] >= 1 << 21
+            or values[11] >= 1 << 21 or values[11] and values[11] & (values[11]-1)):
+        raise MemoryUnavailable('unknown_revision: invalid Eggman Heart stage capture data')
     return address
 
 
@@ -91,26 +119,33 @@ def configure(memory, snapshot, journal):
     address = installed_data(memory)
     if address is None:
         return {'available': False, 'reason': 'Eggman Heart hook not installed: check enabled code and Gecko RAM-table capacity; use the current compact export'}
+    if not memory.medal_stage_capture:
+        return {'available':False,'armed':False,'reason':'Update Gecko codes for stage-level Heart capture'}
     chain = memory.resolve_flags_ptr()
     stage = next(iter(snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
-    medals = stage.get('medals', ()) if snapshot.scene == 'gameplay' else ()
-    row = medals[0] if len(medals) == 1 else None
-    values = (chain[1], chain[2], row['actor'] if row else 0, row['actor_id'] if row else 0,
-              row['wrapper'] if row else 0, row['manager'] if row else 0, row['record'] if row else 0,
-              row['instance'] if row else 0, 1 << row['index'] if row else 0, identity_tag(journal.identity))
-    old = struct.unpack('>10I', memory.read_bytes(address, 40))
-    if old == values: return {'available': True, 'armed': bool(row)}
+    from ..medals import MEDALS
+    row = next((r for r in MEDALS if r['mission_id'] == stage.get('mission', snapshot.actual_mission)), None)
+    context = stage.get('stage', 0) if snapshot.scene == 'gameplay' else 0
+    if not context: row = None
+    manager = memory.read_ptr_checked(context+0x18, 0x20) if row else 0
+    position = struct.unpack('>3I', struct.pack('>3f', *row['position'])) if row else (0,0,0)
+    mission = struct.unpack('>2I', row['mission_id'].encode().ljust(8,b'\0')) if row else (0,0)
+    values = (chain[1], chain[2], context if row else 0, row['object_id'] if row else 0,
+              row['instance_index'] if row else 0, manager, *position, identity_tag(journal.identity),
+              memory.read_u32(address+40), 1 << row['index'] if row else 0, *mission)
+    old = struct.unpack('>14I', memory.read_bytes(address, 56))
+    if old == values: return {'pickup_recorded':bool(row and row['code'] in journal.data['pickup_checks']), 'acknowledged':bool(row and row['code'] in journal.data.get('acknowledged_locations',())), 'available': True, 'armed': bool(row), 'strategy':'stage_identity', 'mission':stage.get('mission'), 'expected_location':row['location_name'] if row else None, 'actor_found':bool(stage.get('medals')), 'pickup_latch':memory.read_u32(address+40), 'reason':None if row else 'No attributed Game Land stage identity'}
     # Actor zero disables capture during a multiword context change.
     if old[2]: memory.write_u32(address+8, 0, expected=old[2], operation='egg_medal_controls')
     if old[9] != values[9]:
         before = memory.read_u32(address+40)
         if before: memory.write_u32(address+40, 0, expected=before, operation='egg_medal_controls')
     for i, value in enumerate(values):
-        if i == 2: continue
+        if i in (2, 10): continue
         before = memory.read_u32(address+i*4)
         if before != value: memory.write_u32(address+i*4, value, expected=before, operation='egg_medal_controls')
     if values[2]: memory.write_u32(address+8, values[2], expected=0, operation='egg_medal_controls')
-    return {'available': True, 'armed': bool(row)}
+    return {'pickup_recorded':bool(row and row['code'] in journal.data['pickup_checks']), 'acknowledged':bool(row and row['code'] in journal.data.get('acknowledged_locations',())), 'available': True, 'armed': bool(row), 'strategy':'stage_identity', 'mission':stage.get('mission'), 'expected_location':row['location_name'] if row else None, 'actor_found':bool(stage.get('medals')), 'pickup_latch':memory.read_u32(address+40), 'reason':None if row else 'No attributed Game Land stage identity'}
 
 
 def gecko_lines():

@@ -44,42 +44,43 @@ class PPC:
 def payload_words():
     a=PPC()
     # Keep save slots above the native callee's outgoing-argument home area.
-    a.d(37,1,1,-0x1a0)
+    a.d(37,1,1,-0x200)
     a.emit(0x7C0802A6); a.d(36,0,1,0x40)
     a.emit(0x7C000026); a.d(36,0,1,0x44)
     a.emit(0x7C0902A6); a.d(36,0,1,0x48)
-    for r in range(3,13): a.d(36,r,1,0x4c+(r-3)*4)
+    a.d(47,3,1,0x184)
     a.emit(0x7C10E2A6); a.d(36,0,1,0x180)  # save GQR0
     a.d(14,0,0,0); a.emit(0x7C10E3A6)
     for r in range(14):
         a.d(54,r,1,0x80+r*8)  # volatile FPR double component
         a.d(60,r,1,0x100+r*8)  # both paired-single components, GQR0=float
     a.emit(0xFC00048E); a.d(54,0,1,0xf0)  # mffs f0; save FPSCR
-    a.d(32,0,31,0); a.d(15,5,0,0x8076); a.d(14,5,5,0x1534)
-    a.emit(0x7C002800); a.branch('end',0x40820000)
-    a.d(34,0,31,0x110); a.d(11,0,0,0); a.branch('end',0x40820000)
-    # Special multi/alternate capsules have different subtype/resource contracts.
-    # +149 changes native use eligibility, not the model's colour contract.
-    # +148 multi-Wisp capsules remain excluded; +14A random capsules use their own AP permission.
-    for offset in (0x148,):
-        a.d(34,0,31,offset); a.d(11,0,0,0); a.branch('end',0x40820000)
-    a.d(32,4,31,0x114); a.d(11,0,4,-1); a.branch('white',0x41820000)
-    a.d(10,0,4,6); a.branch('end',0x41810000)
-    a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('end',0x40820000)
-    a.branch('model')
-    a.label('white')
-    # White is signed -1; never route it through the coloured permission query.
     a.emit(0x48000005); pic_base = len(a.words)*4
     a.emit(0x7D8802A6); pic_fix = len(a.words); a.d(14,12,12,0)
     a.d(32,6,12,0); a.d(11,0,6,0); a.branch('end',0x41820000)
     a.d(34,6,6,0); a.d(32,7,12,4)
     a.emit(0x7C063800); a.branch('end',0x40820000)
+    a.d(32,0,31,0); a.d(15,5,0,0x8076); a.d(14,5,5,0x1534)
+    a.emit(0x7C002800); a.branch('end',0x40820000)
+    a.d(34,0,31,0x110); a.d(11,0,0,0); a.branch('end',0x40820000)
+    # The native question-mark model is shared by multi/random capsules.
+    # +149 changes native use eligibility, not the model's colour contract.
+    # Both +148 multi-Wisp and +14A EggMask variants use Random Capsules;
+    # preserve both markers so native model/reward selection stays intact.
+    a.d(34,0,31,0x148); a.d(11,0,0,0); a.branch('white',0x40820000)
+    a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('white',0x40820000)
+    a.d(32,4,31,0x114); a.d(11,0,4,-1); a.branch('white',0x41820000)
+    a.d(10,0,4,6); a.branch('end',0x41810000)
+    a.branch('model')
+    a.label('white')
+    # White is signed -1; never route it through the coloured permission query.
     a.d(32,3,12,8)
     # Permission word: bit 0 White Boost, bit 1 Random Capsules. Preserve
     # +14A so the native constructor selects its question-mark model/content.
-    a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('ordinary_white',0x41820000)
-    a.d(28,3,3,2); a.d(11,0,3,0); a.branch('permission_saved',0x41820000)
-    a.d(14,3,0,1); a.branch('permission_saved')
+    a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('random_permission',0x40820000)
+    a.d(34,0,31,0x148); a.d(11,0,0,0); a.branch('ordinary_white',0x41820000)
+    a.label('random_permission'); a.d(28,3,3,2); a.emit(0x5463F87E)  # srwi r3,r3,1
+    a.branch('permission_saved')
     a.label('ordinary_white'); a.d(28,3,3,1)
     a.label('permission_saved'); a.d(36,3,1,0x74)
     a.label('model')
@@ -90,6 +91,8 @@ def payload_words():
     a.d(32,3,31,0x34); a.d(11,0,3,0); a.branch('end',0x41820000)
     a.d(14,3,3,8); a.d(32,4,2,-0x7c48); a.call(0x800132D8)
     a.d(11,0,3,0); a.branch('end',0x41820000)
+    a.d(34,0,31,0x148); a.d(11,0,0,0); a.branch('white_permission',0x40820000)
+    a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('white_permission',0x40820000)
     a.d(32,4,31,0x114); a.d(11,0,4,-1); a.branch('white_permission',0x41820000)
     a.call(0x8003BAAC)  # native coloured permission query
     a.branch('permission_ready')
@@ -130,11 +133,11 @@ def payload_words():
         a.d(56,r,1,0x100+r*8)
         a.d(50,r,1,0x80+r*8)
     a.d(32,0,1,0x180); a.emit(0x7C10E3A6)
-    for r in range(3,13): a.d(32,r,1,0x4c+(r-3)*4)
+    a.d(46,3,1,0x184)
     a.d(32,0,1,0x48); a.emit(0x7C0903A6)
     a.d(32,0,1,0x44); a.emit(0x7C0FF120)
     a.d(32,0,1,0x40); a.emit(0x7C0803A6)
-    a.d(14,1,1,0x1a0); a.emit(ORIGINAL)
+    a.d(14,1,1,0x200); a.emit(ORIGINAL)
     a.branch('return')
     data = len(a.words)*4; a.words[pic_fix] |= (data-pic_base)&0xffff
     for _ in range(3): a.emit(0)  # owner container, selected index, White permission
@@ -152,8 +155,6 @@ def gecko_ini():
     # Keep one entry signature per directly called native callee. The payload
     # checks capsule/model vtables; the two unused virtual methods are not called.
     # Full text verification in the client still checks every instruction.
-    lines += [f'20{address-0x80000000:06X} {word:08X}' for address,word in NATIVE_SIGNATURES
-              if address < 0x80700000 and not any(previous == address-4 for previous, _ in NATIVE_SIGNATURES)]
     lines += [f'20{HOOK-0x80000000:06X} {ORIGINAL:08X}',
               f'C2{HOOK-0x80000000:06X} {len(words)//2:08X}']
     lines += [f'{words[i]:08X} {words[i+1]:08X}' for i in range(0,len(words),2)]
@@ -165,6 +166,15 @@ def gecko_ini():
     from .medal_hook import gecko_lines as medal_lines
     lines += medal_lines()
     lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Eggman Heart pickup capture']
+    # Exact revision/full text is authenticated by DME before any owner word
+    # is published. Every hook is inert before that; retain the full disc ID.
+    lines = [line for line in lines if line != '28000006 00000000']
+    # Progression additionally requires an exact attributed flags owner. Its
+    # original setter instruction guards installation; full PAL disc/text
+    # verification remains mandatory before publishing any nonzero owner.
+    start = lines.index('$AP PAL authoritative progression')
+    end = lines.index('$AP PAL speed and White Boost gates')
+    lines = lines[:start] + [line for line in lines[start:end] if line != '28000004 00003850'] + lines[end:]
     return '\n'.join(lines)+'\n'
 
 
@@ -172,6 +182,7 @@ def inspect_installed(memory):
     from .gecko import inspect_c2
     from ..world_constants import load_data
     candidates = [('current_white_collision_refresh', payload_words()),
+                  ('previous_random_capsule_refresh', load_data('capsule_random_previous.json')),
                   ('before_random_capsule_refresh', load_data('capsule_before_random.json')),
                   ('previous_white_collision_refresh', load_data('capsule_white_previous.json'))]
     for variant, words in candidates:
@@ -183,10 +194,10 @@ def inspect_installed(memory):
             continue
     else:
         result = inspect_c2(memory, HOOK, ORIGINAL, load_data('capsule_hook_legacy.json'))
-    if result['installed'] and result['variant'] in ('current_white_collision_refresh','before_random_capsule_refresh','previous_white_collision_refresh'):
+    if result['installed'] and result['variant'] in ('current_white_collision_refresh','previous_random_capsule_refresh','before_random_capsule_refresh','previous_white_collision_refresh'):
         result['white_data_offset'] = offset
         owner, index, allowed = struct.unpack('>3I', memory.read_bytes(result['target']+offset,12))
-        if owner and not valid_range(owner,1) or index > 3 or allowed > (3 if result['variant'] == 'current_white_collision_refresh' else 1):
+        if owner and not valid_range(owner,1) or index > 3 or allowed > (3 if result['variant'] in ('current_white_collision_refresh','previous_random_capsule_refresh') else 1):
             raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
     memory.capsule_hook_observation=result
     return result
@@ -210,7 +221,7 @@ def installed_data(memory):
     if not result['installed'] or 'white_data_offset' not in result: return None
     address = result['target'] + result['white_data_offset']
     owner, index, allowed = struct.unpack('>3I', memory.read_bytes(address,12))
-    if owner and not valid_range(owner,1) or index > 3 or allowed > (3 if result['variant'] == 'current_white_collision_refresh' else 1):
+    if owner and not valid_range(owner,1) or index > 3 or allowed > (3 if result['variant'] in ('current_white_collision_refresh','previous_random_capsule_refresh') else 1):
         raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
     return address
 

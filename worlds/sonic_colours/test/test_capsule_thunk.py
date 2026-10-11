@@ -7,7 +7,8 @@ import pytest
 from ..client.capsule_refresh import payload_words, ORIGINAL
 
 
-def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,white_control=False,profile=1,random_capsule=False,random_owned=False):
+def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,white_control=None,profile=1,random_capsule=False,random_owned=False):
+    if white_control is None: white_control = colour not in (-1, 0xffffffff)
     actor,model,manager,state=0x90010000,0x90020000,0x90030000,0x90040000
     mem={actor:0x80761534,actor+0x110:opened,actor+0x148:special,actor+0x114:colour,
          actor+0xb0:model,actor+0x34:manager,model:0x8077d12c,
@@ -31,10 +32,16 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,whit
         if op in (14,15):regs[rt]=((regs[ra] if ra else 0)+(imm<<(16 if op==15 else 0)))&0xffffffff
         elif op==24:regs[ra]=regs[rt]|u
         elif op==28:regs[ra]=regs[rt]&u
+        elif w==0x5463f87e:regs[3] >>= 1
         elif op in (32,34):regs[rt]=mem.get((regs[ra]+imm)&0xffffffff,0)
         elif op in (36,37):
             addr=(regs[ra]+imm)&0xffffffff;mem[addr]=regs[rt]
             if op==37:regs[ra]=addr
+        elif op in (46,47):
+            addr=regs[ra]+imm
+            for r in range(rt,32):
+                if op==47:mem[addr+(r-rt)*4]=regs[r]
+                else:regs[r]=mem[addr+(r-rt)*4]
         elif op==54:mem[regs[ra]+imm]=fpr[rt]
         elif op==50:fpr[rt]=mem[regs[ra]+imm]
         elif op==60:mem[regs[ra]+imm]=(fpr[rt],paired[rt])
@@ -122,7 +129,7 @@ def test_revocation_uses_native_ghost_lifecycle_without_collection():
     assert calls==[0x800132d8,0x8003baac,0x800d3da4,0x800d5490] and mode==0
 
 
-@pytest.mark.parametrize('kwargs',[{'opened':1},{'colour':7},{'colour':0xffffffff},{'special':1}])
+@pytest.mark.parametrize('kwargs',[{'opened':1},{'colour':7},{'colour':0xffffffff}])
 def test_opened_white_and_special_capsules_are_not_reinitialized(kwargs):
     assert run(0,True,**kwargs)[0]==[]
 
@@ -136,7 +143,7 @@ def test_old_model_only_refresh_repairs_interaction_without_model_replacement():
 @pytest.mark.parametrize('colour',[-1,0,1,2,3,4,5,6])
 def test_ghost_with_existing_disabled_body_uses_native_registration(colour):
     calls, mode = run(0, True, colour=colour & 0xffffffff,
-                      white_control=colour == -1, interaction=True)
+                      white_control=True, interaction=True)
     assert mode == 1
     assert 0x800d3ff8 not in calls  # retain the existing body
     assert calls[-3:] == [0x800d517c,0x800d5490,0x800d4298]
@@ -174,3 +181,11 @@ def test_random_capsule_permission_is_independent_of_white():
     assert 0x800D3EB4 in calls
     calls, mode = run(1, False, colour=0xffffffff, white_control=True, random_owned=True)
     assert mode == 0
+
+
+@pytest.mark.parametrize('special,random_capsule', [(1,False),(0,True),(1,True)])
+def test_all_question_mark_model_variants_require_random_item(special,random_capsule):
+    assert run(1,True,colour=0xffffffff,white_control=True,special=special,
+               random_capsule=random_capsule)[1] == 0
+    assert run(0,False,colour=0xffffffff,white_control=True,special=special,
+               random_capsule=random_capsule,random_owned=True)[1] == 1
