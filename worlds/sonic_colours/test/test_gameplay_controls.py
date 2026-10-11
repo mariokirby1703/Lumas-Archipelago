@@ -11,7 +11,7 @@ from .test_native_originals import PAIRS
 from . import generate
 
 
-def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_profile=1, mode=0):
+def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_profile=1, mode=0, delta=5.):
     words, data = payload(kind); base=0x80002000
     regs=[0]*32;regs[1]=0x90001000;regs[3]=0x90002000;regs[4]=colour if kind=='boost' else selected
     regs[0]=selected;regs[27]=0x90003000;regs[29]=0x90004000
@@ -19,7 +19,7 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
     mem={0x90005000:profile,regs[3]+4:selected,regs[3]+0x2c:1,regs[29]+0x114:0}
     mem.update({regs[3]+8:float(selected),regs[30]+0x8c:0x90007000,0x90007024:mode})
     for i,v in enumerate((0x90005000,expected_profile,maximum,regs[3],locked,0.)):mem[base+data+i*4]=v
-    before=regs[:];lr,cr=0x80010000,0x12345678;original=(lr,cr);cmp=0;pc=0;f1=5.0
+    before=regs[:];lr,cr=0x80010000,0x12345678;original=(lr,cr);cmp=0;pc=0;f1=delta
     for _ in range(300):
         w=words[pc];pc+=1
         if not w:break
@@ -28,6 +28,7 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
         elif op in (32,34):regs[rt]=mem.get((regs[ra]+imm)&0xffffffff,0)
         elif op==48:f1=mem[regs[ra]+imm]
         elif w==0xec20082a:f1=float(selected)+f1
+        elif w==0xfc011040:cmp=(f1>0)-(f1<0)  # native f2 lower clamp is zero
         elif op in (36,37):
             addr=(regs[ra]+imm)&0xffffffff;mem[addr]=regs[rt]
             if op==37:regs[ra]=addr
@@ -38,7 +39,7 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
                 else:regs[r]=mem[addr+(r-rt)*4]
         elif op==11:cmp=(regs[ra]>imm)-(regs[ra]<imm)
         elif op==16:
-            take={0x41820000:cmp==0,0x40820000:cmp!=0,0x40810000:cmp<=0}[w&0xffff0000]
+            take={0x41820000:cmp==0,0x40820000:cmp!=0,0x40810000:cmp<=0,0x41800000:cmp<0}[w&0xffff0000]
             if take:pc=pc-1+imm//4
         elif op==18:
             delta=w&0x3fffffc
@@ -183,4 +184,37 @@ def test_temporary_boost_allows_use_but_denies_vanilla_add():
     assert run('boost_query', selected=25, locked=2) == 25
     assert run('boost_add', selected=25, locked=2) == 25
     assert run('boost_use', selected=0, locked=2) == 0
+
+
+@pytest.mark.parametrize('locked', [0, 1, 2])
+@pytest.mark.parametrize('delta', [-0.25, -1., -10., 0., 5., 50.])
+def test_boost_consumption_is_never_blocked_by_white_ownership(locked, delta):
+    expected = 100.+delta if delta < 0 or locked == 0 else 100.
+    assert run('boost_add', selected=100, locked=locked, delta=delta) == expected
+    assert run('boost_add', selected=100, locked=locked, delta=delta, profile=2) == 100.+delta
+
+
+def test_previous_refill_hook_is_identifiable_but_marked_drain_unsafe():
+    b = FakeBackend(); m = SonicMemory(b); target = 0x80002000
+    hook, _ = HOOKS['boost_add']; words, offset = payload('boost_add', drain=False)
+    words[-1] = 0x48000000 | ((hook+4-(target+len(words)*4-4)) & 0x3fffffc)
+    b.put(target, struct.pack('>'+'I'*len(words), *words))
+    b.put(hook, (0x48000000 | ((target-hook) & 0x3fffffc)).to_bytes(4,'big'))
+    assert installed(m, 'boost_add') == target+offset
+    assert m.boost_consumption_safe is False
+    install(b, 'boost_add', target)
+    assert installed(m, 'boost_add') == target+payload('boost_add')[1]
+    assert m.boost_consumption_safe is True
+
+
+def test_pal_boost_delta_and_zero_lower_bound_evidence():
+    from pathlib import Path
+    from ..tools.ppc import Executable
+    p = Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    if not p.exists(): pytest.skip('original PAL executable absent')
+    e = Executable(p)
+    assert e.read(0x8000428C,8) == bytes.fromhex('3C40808F6042C5C0')
+    assert e.read(0x808FC5C0-0x6580,4) == bytes(4)
+    assert e.read(0x801014F8,4) == bytes.fromhex('C0429A80')
+    assert e.read(0x80101508,16) == bytes.fromhex('C0030008C0630014EC20082AD0230008')
     assert run('boost_add', selected=25, locked=0) == 30

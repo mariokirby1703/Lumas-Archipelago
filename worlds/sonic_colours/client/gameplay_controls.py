@@ -21,7 +21,7 @@ HOOKS = {
 }
 
 
-def payload(kind, compact=True, temporary=True):
+def payload(kind, compact=True, temporary=True, drain=True):
     if not compact: temporary = False
     a = PPC(); hook, original = HOOKS[kind]
     output = 3 if kind in ('boost', 'speed_get') else 0 if kind == 'speed_ui' else None
@@ -55,6 +55,13 @@ def payload(kind, compact=True, temporary=True):
         a.d(32, 7, 12, 16); a.d(11, 0, 7, 0 if kind == 'boost_add' and temporary else 1); a.branch('vanilla', 0x41820000 if kind == 'boost_add' and temporary else 0x40820000)
         if kind == 'boost': a.d(14, 3, 0, 0)  # unreachable compatibility body
         elif kind == 'boost_add':
+            if temporary and drain:
+                # The original 801014F0 routine also handles negative Boost
+                # consumption. f1 is its delta; f2 is its native zero lower
+                # clamp bound (loaded at 801014F8). Deny positive grants only.
+                # Preserve f0/f2/f3 and restore the caller's saved CR below.
+                a.emit(0xFC011040)  # fcmpu cr0,f1,f2
+                a.branch('vanilla', 0x41800000)  # negative delta consumes gauge
             # Preserve the pre-existing gauge; deny only the new pickup/script
             # amount. Super's separate provider bypasses this native routine.
             a.d(48, 1, 3, 8)
@@ -106,7 +113,8 @@ def installed(memory, kind):
     previous_words, previous_offset = payload(kind, compact=False, temporary=False)
     legacy = load_data('gameplay_hook_legacy.json').get(kind)
     old_compact, old_offset = payload(kind, temporary=False)
-    layouts = [(kind, words, offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
+    no_drain, no_drain_offset = payload(kind, drain=False)
+    layouts = [(kind, words, offset), ('before_drain', no_drain, no_drain_offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
     if legacy: layouts.append(('legacy', legacy['words'], legacy['offset']))
     for name, candidate, candidate_offset in layouts:
         try:
@@ -118,6 +126,7 @@ def installed(memory, kind):
             failure = error
     else: raise failure
     if not result['installed']: return None
+    if kind == 'boost_add': memory.boost_consumption_safe = name == kind
     address = result['target'] + offset
     values = struct.unpack('>'+'I'*(size//4), memory.read_bytes(address,size))
     owner, index, maximum, model, locked = (*values, 0, 0) if size == 12 else values
@@ -155,6 +164,7 @@ def configure(memory, snapshot, owned, slot, temporary_boost=False):
                 memory.write_u32(address+i*4, value, expected=current, operation='gameplay_controls')
         memory.write_u32(address, values[0], expected=0, operation='gameplay_controls')
     return {'installed': status, 'maximum_speed': maximum+1, 'boost_locked': bool(locked and not temporary_boost), 'temporary_boost':bool(locked and temporary_boost),
+            'boost_consumption_safe':getattr(memory, 'boost_consumption_safe', False),
             'boost_lock_active': bool(locked and model and all(status[k] for k in ('boost_use', 'boost_query', 'boost_add'))),
             'speed_controls_active': all(status[k] for k in ('speed_get', 'speed_set', 'speed_ui'))}
 

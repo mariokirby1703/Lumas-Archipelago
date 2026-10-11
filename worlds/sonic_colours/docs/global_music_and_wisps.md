@@ -1,5 +1,23 @@
 # Global BGM and native Wisp correction
 
+## Half Boost Refill consumption with White Boost locked
+
+The original PAL `801014F0` routine applies signed gauge deltas: f0 is the
+existing gauge, f1 is the delta and f2 is the zero lower clamp loaded from
+`808F6040`. The old pickup gate discarded negative consumption along with
+positive grants, so temporary AP refill energy could fail to drain.
+The updated `boost_add` C2 passes negative deltas to the original add/clamp
+while still rejecting positive vanilla grants without White Boost ownership.
+The incoming CR and GPRs are restored, and f0/f2/f3 remain unchanged.
+Temporary refill permission still expires on depletion or stage-context change.
+
+Read-only Dolphin inspection confirmed the previous hook with temporary mode 2
+and gauge 82.80014. Signed-delta instruction tests, original ELF constants,
+legacy-hook recognition and the complete 3256-byte Gecko budget pass offline.
+Post-update gauge drain and exhaustion still require live gameplay validation.
+Install the rebuilt APWorld and full updated Gecko export, then restart both
+client and emulation. No additional Gecko group is introduced.
+
 ## Native Wisp enum
 
 AP item IDs and names are unchanged. PAL colour/permission indices are:
