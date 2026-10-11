@@ -9,7 +9,7 @@ World Access and all eight Wisp items always use AP ownership. Seven coloured
 Chaos Emerald items always appear as progression and control Super Sonic.
 Five goals, a fixed mandatory introduction, automatic Red Ring packing and
 680 optional individual Wisp Capsule checks are supported by the generator.
-Music On shuffles Acts, maps, Game Land, bosses and menus in one global pool
+Music On shuffles Acts, maps, Game Land, bosses, menus and Wisp themes in one global pool
 through the verified resident CSB bank, retaining destination control graphs.
 No external music files are required. See [global music and Wisp correction](docs/global_music_and_wisps.md)
 for the implementation and remaining audible validation.
@@ -62,7 +62,8 @@ is still required. See [new abilities validation](docs/new_abilities_validation.
 - Public **Eggman Heart Sanity** (21 Game Land locations; the native class is still EggmanMedal).
 - **Music Randomization** is On/Off (default On). The client now recognizes the
   exact PAL `sound/bgm.strm.csb` 87-cue bank resident in MEM2 and mutates only
-  compatible CUE synth references in place, without an extra CPK. A loaded song
+  globally assigned audio leaves while retaining destination control graphs,
+  including all ten Wisp cues, without an extra CPK. A loaded song
   may not switch until a new cue is started. No audible Dolphin validation yet.
 - **Starting Act / Level Randomization removed**. Tropical Resort vanilla intro
   is fixed. **World Progression** is Sequential (default) or Open Acts.

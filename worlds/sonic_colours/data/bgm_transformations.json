@@ -1,0 +1,277 @@
+{
+  "bank_sha256": "48eef93bd2744820a95432e848c687c71bc166e3549889720402535ff7757842",
+  "native_selector": "0x801F8DB0",
+  "native_selector_sha256": "d78c1cbbf98b8a47e7a53eaa9d81d783caeeb8af385135902da3b18acb6584af",
+  "protected_override": "bgm_jingle_super_sonic",
+  "cues": {
+    "bgm_pha_ast": {
+      "transformation": "Green Hover",
+      "native_colour": 6,
+      "selector_cell": "0x80771988",
+      "selection": "actor+EC native colour",
+      "cue_id": 6120,
+      "cue_flags": 1,
+      "audio": "Synth/bgm_pha_ast_wav.aax",
+      "volume": 1000,
+      "p3d_volume": 1000,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 677684
+      },
+      "aax_loop_segments": [
+        1
+      ],
+      "aax_sha256": "52effe35122634e9c13dc69935c2091f65a62431f4549dba6fc3d43800f95b0c",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_ast/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    },
+    "bgm_pha_lsr": {
+      "transformation": "Cyan Laser",
+      "native_colour": 1,
+      "selector_cell": "0x80771974",
+      "selection": "actor+EC native colour",
+      "cue_id": 6140,
+      "cue_flags": 1,
+      "audio": "Synth/bgm_pha_lsr_wav.aax",
+      "volume": 1399,
+      "p3d_volume": 1000,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 384010
+      },
+      "aax_loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "ba050eb5774dec96a91d9a8ea8ac07e72ac26cccb0222fe3f4bf1051e5d63779",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_lsr/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    },
+    "bgm_pha_multi_common": {
+      "transformation": "Multi-Wisp common",
+      "selector_cell": "0x808F1F80",
+      "selection": "actor+64 mode 2, actor+F0 variant 0",
+      "cue_id": 6460,
+      "cue_flags": 1,
+      "audio": "Synth/bgm_pha_multi_common_wav.aax",
+      "volume": 1000,
+      "p3d_volume": 1000,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 737276
+      },
+      "aax_loop_segments": [
+        1
+      ],
+      "aax_sha256": "4479c78523b40ba418ccbb8e035de448458f905ac944feffc646b8bab9433d67",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_multi_common/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    },
+    "bgm_pha_multi_united": {
+      "transformation": "Multi-Wisp united",
+      "selector_cell": "0x808F1F84",
+      "selection": "actor+64 mode 2, actor+F0 variant 1",
+      "cue_id": 6470,
+      "cue_flags": 1,
+      "audio": "Synth/bgm_pha_multi_united_wav.aax",
+      "volume": 1000,
+      "p3d_volume": 1000,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 737277
+      },
+      "aax_loop_segments": [
+        1
+      ],
+      "aax_sha256": "0e25bbe4ded0b5d1ddecd9039399d45ab949617457863cc20eff3a7a42c43336",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_multi_united/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    },
+    "bgm_pha_pzl": {
+      "transformation": "Blue Cube",
+      "native_colour": 5,
+      "selector_cell": "0x80771984",
+      "selection": "actor+EC native colour",
+      "cue_id": 6160,
+      "cue_flags": 1,
+      "audio": "Synth/bgm_pha_pzl_wav.aax",
+      "volume": 1200,
+      "p3d_volume": 800,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 847077
+      },
+      "aax_loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "350f3936da3c4e351c942f43f1fd68f0231d546aca9e4ca8c7aad23e9575baa3",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_pzl/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    },
+    "bgm_pha_rkt": {
+      "transformation": "Orange Rocket",
+      "native_colour": 3,
+      "selector_cell": "0x8077197C",
+      "selection": "actor+EC native colour",
+      "cue_id": 6150,
+      "cue_flags": 0,
+      "audio": "Synth/bgm_pha_rkt_wav.aax",
+      "volume": 1000,
+      "p3d_volume": 1000,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 353534
+      },
+      "aax_loop_segments": [
+        0
+      ],
+      "aax_sha256": "f1539fcdacc5117cfda9cef3b49ba1d15e6431763950821452ce85cdb5bb1bb1",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_rkt/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    },
+    "bgm_pha_rod": {
+      "transformation": "Purple Frenzy",
+      "native_colour": 4,
+      "selector_cell": "0x80771980",
+      "selection": "actor+EC native colour",
+      "cue_id": 6130,
+      "cue_flags": 1,
+      "audio": "Synth/bgm_pha_rod_wav.aax",
+      "volume": 1200,
+      "p3d_volume": 1000,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 231141
+      },
+      "aax_loop_segments": [
+        1
+      ],
+      "aax_sha256": "7cc4053e9b06dfe3f41d63ed47f9eaa0e2348f4ea1bd3d5c8073113acc492e3b",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_rod/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    },
+    "bgm_pha_spk": {
+      "transformation": "Pink Spikes",
+      "native_colour": 2,
+      "selector_cell": "0x80771978",
+      "selection": "actor+EC native colour",
+      "cue_id": 6110,
+      "cue_flags": 1,
+      "audio": "Synth/bgm_pha_spk_wav.aax",
+      "volume": 1200,
+      "p3d_volume": 1000,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 581346
+      },
+      "aax_loop_segments": [
+        1
+      ],
+      "aax_sha256": "1e576494db42710dffb8fc68cadf0574b7712356c1015db246da0fb365a77fb7",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_spk/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    },
+    "bgm_pha_spn": {
+      "transformation": "Yellow Drill",
+      "native_colour": 0,
+      "selector_cell": "0x80771970",
+      "selection": "actor+EC native colour",
+      "cue_id": 6100,
+      "cue_flags": 1,
+      "audio": "Synth/bgm_pha_spn_wav.aax",
+      "volume": 1000,
+      "p3d_volume": 1000,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 255709
+      },
+      "aax_loop_segments": [
+        1
+      ],
+      "aax_sha256": "dc1034d49feeb0dc483ae39521c516408ada13ec4a20d7e45e9ae09bc24967af",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_spn/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    },
+    "bgm_pha_spn_wtr": {
+      "transformation": "Yellow Drill (underwater)",
+      "selector_cell": "0x808F1F78",
+      "selection": "native colour 0 and actor+DD nonzero",
+      "cue_id": 6101,
+      "cue_flags": 1,
+      "audio": "Synth/bgm_pha_spn_wtr_wav.aax",
+      "volume": 1100,
+      "p3d_volume": 1000,
+      "sound": {
+        "fmt": 0,
+        "nch": 2,
+        "stmflg": 1,
+        "sfreq": 48000,
+        "nsmpl": 647998
+      },
+      "aax_loop_segments": [
+        1
+      ],
+      "aax_sha256": "9625fbe02f185cb7077c2db947686fd89563a2214f0d660cac5349f8cd19556f",
+      "filter_graph": {
+        "parameter": "Synth/bgm_pha_spn_wtr/filter",
+        "type": 0,
+        "bytes": 304
+      }
+    }
+  }
+}

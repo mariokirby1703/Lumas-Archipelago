@@ -19,11 +19,25 @@ if GRAPHS['bank_sha256'] != CATALOG['bank_sha256'] or set(GRAPHS['graphs']) != s
     raise ValueError('PAL BGM graph catalog mismatch')
 if AUDIO['bank_sha256'] != CATALOG['bank_sha256'] or set(AUDIO['cues']) != set(CUES):
     raise ValueError('PAL audio identity catalog mismatch')
-PROTECTED = frozenset(name for name in CUES if name.startswith(('bgm_jingle_', 'bgm_pha_'))
+TRANSFORMATIONS = load_data('bgm_transformations.json')
+WISP_CUES = frozenset(TRANSFORMATIONS['cues'])
+if (TRANSFORMATIONS['bank_sha256'] != CATALOG['bank_sha256'] or
+        WISP_CUES != {n for n in CUES if n.startswith('bgm_pha_')}):
+    raise ValueError('PAL transformation cue catalog mismatch')
+for name, evidence in TRANSFORMATIONS['cues'].items():
+    if (evidence['cue_id'] != CUES[name]['id'] or evidence['cue_flags'] != CUES[name]['flags'] or
+            len(GRAPHS['graphs'][name]) != 1 or
+            evidence['audio'] != GRAPHS['graphs'][name][0]['audio'] or
+            any(evidence['sound'].get(k) != v for k, v in
+                {'fmt': 0, 'nch': 2, 'stmflg': 1, 'sfreq': 48000}.items())):
+        raise ValueError('PAL transformation audio/graph evidence mismatch')
+PROTECTED = frozenset(name for name in CUES if name.startswith('bgm_jingle_')
                       or name in ('bgm_sys_theme', 'bgm_sys_op', 'bgm_sys_end'))
+LEGACY_PROTECTED = PROTECTED | WISP_CUES
 
 
 def group(name):
+    if name in WISP_CUES: return 'transformations'
     if name.startswith('bgm_stg'): return 'stage_' + name.rsplit('_', 1)[1]
     if name.startswith('bgm_boss_'): return 'boss'
     if name in {f'bgm_mlt_{letter}' for letter in 'abcdefg'}: return 'game_land'
@@ -125,7 +139,7 @@ def recover_bank(data):
     for row, cells in zip(cues.rows,cues.cells):
         source=CUES[row['name']]; donor=donors.get(row['synth'])
         if not donor or (row['synth'] != source['synth'] and
-                (row['name'] in PROTECTED or donor['name'] in PROTECTED or
+                (row['name'] in LEGACY_PROTECTED or donor['name'] in LEGACY_PROTECTED or
                  source['compatibility'] != donor['compatibility'])):
             raise ValueError('invalid legacy CUE redirect')
         cue_changed |= row['synth'] != source['synth']

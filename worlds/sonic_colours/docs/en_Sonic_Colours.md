@@ -21,7 +21,10 @@ Optional Rank Checks uses minimum S/A/B/C grades. Wisp Discovery Checks follows
 seven native coloured-Wisp introduction events, independently of capsules;
 White's native discovery event remains unresolved.
 
-Music shuffling changes the native normal-Act cue table before loading an Act.
+Music Randomization uses one global pool for Acts, maps, Game Land, bosses,
+menus and all ten Wisp transformation cues. No extra music assets are required.
+Audible cross-category playback and Rocket's finite-track handling remain to
+be verified; see [music validation details](global_music_and_wisps.md).
 Visible capsule/counter effects and audible music still require live validation.
 Level shuffling, Death Link and swimming traps are unavailable in this build.
 

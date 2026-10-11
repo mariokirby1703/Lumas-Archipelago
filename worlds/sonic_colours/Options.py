@@ -58,7 +58,7 @@ class SwimTrapWeight(Choice):
 
 
 class MusicRandomization(DefaultOnToggle):
-    """Shuffle Acts, maps, bosses, Game Land and menu music together in one global pool. Destination audio controls are retained; synchronized cutscenes and critical jingles stay vanilla. Default On. Existing tracks may require a scene change."""
+    """Shuffle Acts, maps, bosses, Game Land, menus and Wisp transformation music together in one global pool. Destination audio controls are retained; synchronized cutscenes and critical jingles stay vanilla. Default On. Existing tracks may require a scene change."""
     display_name = 'Music Randomization'
 
 

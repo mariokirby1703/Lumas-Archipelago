@@ -9,7 +9,7 @@ Guest code and Dolphin JIT state are never modified by this module.
 import hashlib
 import struct
 from .memory import MemoryUnavailable, valid_range
-from .music_bank import CATALOG, CUES, PROTECTED, plan, rewrite_bank, recover_bank
+from .music_bank import CATALOG, CUES, PROTECTED, WISP_CUES, plan, rewrite_bank, recover_bank
 from .cpk import UTF
 
 ORIGINAL_SHA256 = CATALOG['bank_sha256']
@@ -87,6 +87,10 @@ def apply(memory, slot, test_pair=None):
             'bank_address':f'0x{base:08X}', 'scope':'one global pool / destination control graphs retained',
             'strategy':'destination_graph_audio_leaves_v1',
             'protected_cues':sorted(PROTECTED),
+            'transformation_cues':sorted(WISP_CUES),
+            'finite_audio_donors':['bgm_pha_rkt'],
+            'finite_audio_destinations':[n for n,d in mapping.items() if d == 'bgm_pha_rkt'],
+            'wisp_music_mapping':{n:mapping[n] for n in sorted(WISP_CUES)},
             'test_pair':test_pair,
             'randomized_cues':sum(name!=donor for name,donor in mapping.items()),
             'seed':slot['seed_name'],'audible_verified':False,
