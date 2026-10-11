@@ -354,7 +354,9 @@ class WritePolicy:
                 if not access or authorized:
                     raise MemoryUnavailable('WRITE_BLOCKED: cannot lock an authorized world')
         elif operation == 'permission_bits':
-            if snapshot.scene not in ('gameplay', 'world_map', 'global_map', 'game_land_select'):
+            from ..world_progression import verified_result_clear
+            if (snapshot.scene not in ('gameplay', 'world_map', 'global_map', 'game_land_select')
+                    and verified_result_clear(snapshot) is None):
                 raise MemoryUnavailable('WRITE_BLOCKED: unsafe permission scene')
             flags = self.memory.resolve_flags_ptr()[-1]
             if tuple(snapshot.evidence.get('chain', ())) != self.memory.resolve_flags_ptr():

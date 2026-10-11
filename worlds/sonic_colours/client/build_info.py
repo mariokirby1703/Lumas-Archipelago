@@ -22,7 +22,8 @@ def implementation_info():
     from . import gameplay_controls, medal_hook, music_bank, map_refresh, map_transition, live_music, direct_hooks
     from .runtime import rings_amount
     from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions, progression_hook, music
-    functions = (NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
+    from ..world_progression import progression_clears, verified_result_clear
+    functions = (progression_clears, verified_result_clear, NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
                  NativeHooks.swim, Runtime.poll, Runtime.configure_native_hooks, Runtime.select_resource_music, Runtime.apply_effects, Runtime.effect_context, Runtime.boost_grant_context, Runtime.temporary_boost_allowed, rings_amount, detect_checks,
                  SaveGuard.observe, SaveGuard.check, SaveGuard.check_stats, WritePolicy.__call__, NativeHooks._snapshot_after_revision,
                  Runtime.observe_pickups, Runtime.observe_capsules, binding.SaveBinding.attribute,

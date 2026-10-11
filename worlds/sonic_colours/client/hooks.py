@@ -245,9 +245,9 @@ class NativeHooks:
         # Only selected, attributed save flags. Do not manufacture physical
         # Red Rings or clears to satisfy AP inventory gates.
         flags = memory.resolve_flags_ptr()[-1]
-        from ..world_progression import available_story_stages
+        from ..world_progression import available_story_stages, progression_clears
         values = {}
-        clears = set(snapshot.persisted_clears)
+        clears = progression_clears(snapshot)
         for stage in STAGES:
             if stage['zone_index'] < 6:
                 world_owned = stage['zone_index'] == 0 or inventory['counts'][WORLD_ITEMS[stage['zone_index']]] > 0

@@ -107,3 +107,23 @@ payloads keep all four Gecko groups within the 3256-byte handler capacity;
 previous installed payloads remain individually verified. Offline instruction
 execution and full PAL hash checks pass. The repaired Act-6 return still needs
 live gameplay validation after updating the complete codes and APWorld.
+
+
+### Boss permission timing before the first map return (2026-10-11)
+
+User completed all six Acts, but the boss was selectable only after reloading
+the map. Both permission writers formerly used persisted clears alone, so the
+sixth completion was absent while the results screen was active. They now use
+the coherent native final-result mission as an additional permission input.
+The reviewed flag-word writer permits this only on an attributed, verified
+final results screen; an incomplete/mismatched/unverified result is rejected.
+Native clear/rank records and the persisted-clear snapshot are never altered.
+This prepares the native boss availability bit and setter mask before map
+construction, instead of waiting for a poll of the newly saved progress.
+
+Offline regression tests cover six worlds, both progression modes, partial
+completion, invalid results, and the actual guarded permission-word writes.
+First-time boss-path animation/selection still requires live validation on a
+world's sixth first completion. Suppressing all inter-Act animations in
+open_acts is a separate native animation-selection change and is not claimed
+implemented by this timing fix.

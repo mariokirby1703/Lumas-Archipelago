@@ -148,12 +148,12 @@ def configure(memory, snapshot, inventory, slot, journal=None):
         journal.data['native_event_baseline'] = {'discoveries':0,'game_land_clears':0}
         journal.save()
     from ..world_constants import STAGES, load_data
-    from ..world_progression import available_story_stages
+    from ..world_progression import available_story_stages, progression_clears
     rows = load_data('progress_bits.json')
     story = 0
     for zone in range(6):
         if not world & (1 << (20+zone)): continue
-        available = available_story_stages(zone, set(snapshot.persisted_clears), slot['options']['world_progression'])
+        available = available_story_stages(zone, progression_clears(snapshot), slot['options']['world_progression'])
         if snapshot.save_identity is None and zone == 0: available = {'stg110','stg130'}
         for row in rows:
             if row['mission'] in available: story |= 1 << (int(row['bank_A'])-30)
