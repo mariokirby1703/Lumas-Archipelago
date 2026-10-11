@@ -165,6 +165,8 @@ def gecko_ini():
     lines += control_lines(close_scope=False)
     from .medal_hook import gecko_lines as medal_lines
     lines += medal_lines()
+    from .map_transition import gecko_lines as transition_lines
+    lines[-1:-1] = transition_lines()
     lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Eggman Heart pickup capture']
     # Exact revision/full text is authenticated by DME before any owner word
     # is published. Every hook is inert before that; retain the full disc ID.
@@ -175,6 +177,23 @@ def gecko_ini():
     start = lines.index('$AP PAL authoritative progression')
     end = lines.index('$AP PAL speed and White Boost gates')
     lines = lines[:start] + [line for line in lines[start:end] if line != '28000004 00003850'] + lines[end:]
+    # The production export is one transaction: retain every displaced-text
+    # guard and one full disc guard, then terminate once after all four groups.
+    # The first patched instruction prevents reinstalling any C2 next frame.
+    # Standalone group exporters keep their own guards/scopes.
+    compact = []
+    seen_disc = set()
+    for line in lines:
+        if line in ('20000000 534E4350', '28000004 00003850'):
+            if line in seen_disc:
+                continue
+            seen_disc.add(line)
+        if line == 'E0000000 80008000':
+            continue
+        if line == '[Gecko_Enabled]':
+            compact.append('E0000000 80008000')
+        compact.append(line)
+    lines = compact
     return '\n'.join(lines)+'\n'
 
 

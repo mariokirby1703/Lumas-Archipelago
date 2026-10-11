@@ -1,0 +1,1002 @@
+{
+  "bank_sha256": "48eef93bd2744820a95432e848c687c71bc166e3549889720402535ff7757842",
+  "strategy": "destination_graph_audio_leaves_v1",
+  "graphs": {
+    "bgm_sys_theme": [
+      {
+        "node": "Synth/bgm_sys_theme",
+        "cell": 5290,
+        "original_ref": 648,
+        "audio": "Synth/bgm_sys_theme_wav.aax"
+      }
+    ],
+    "bgm_sys_op": [
+      {
+        "node": "Synth/bgm_sys_op",
+        "cell": 5313,
+        "original_ref": 693,
+        "audio": "Synth/bgm_sys_op_wav.aax"
+      }
+    ],
+    "bgm_sys_end": [
+      {
+        "node": "Synth/bgm_sys_end",
+        "cell": 5336,
+        "original_ref": 736,
+        "audio": "Synth/bgm_sys_end_wav.aax"
+      }
+    ],
+    "bgm_stg110_rso": [
+      {
+        "node": "Synth/bgm_stg110_rso/bgm_stg110_rso",
+        "cell": 5382,
+        "original_ref": 930,
+        "audio": "Synth/bgm_stg110_rso_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg110_rso/bgm_stg110_rso_fx",
+        "cell": 5405,
+        "original_ref": 1048,
+        "audio": "Synth/bgm_stg110_rso_fx_wav.aax"
+      }
+    ],
+    "bgm_stg120_rso": [
+      {
+        "node": "Synth/bgm_stg120_rso/bgm_stg120_rso",
+        "cell": 5451,
+        "original_ref": 1301,
+        "audio": "Synth/bgm_stg120_rso_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg120_rso/bgm_stg120_rso_fx",
+        "cell": 5474,
+        "original_ref": 1419,
+        "audio": "Synth/bgm_stg120_rso_fx_wav.aax"
+      }
+    ],
+    "bgm_stg130_rso": [
+      {
+        "node": "Synth/bgm_stg130_rso/bgm_stg110_rso",
+        "cell": 5520,
+        "original_ref": 930,
+        "audio": "Synth/bgm_stg110_rso_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg130_rso/bgm_stg110_rso_fx",
+        "cell": 5543,
+        "original_ref": 1048,
+        "audio": "Synth/bgm_stg110_rso_fx_wav.aax"
+      }
+    ],
+    "bgm_stg140_rso": [
+      {
+        "node": "Synth/bgm_stg140_rso/bgm_stg130_rso",
+        "cell": 5589,
+        "original_ref": 1982,
+        "audio": "Synth/bgm_stg130_rso_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg140_rso/bgm_stg130_rso_fx",
+        "cell": 5612,
+        "original_ref": 2100,
+        "audio": "Synth/bgm_stg130_rso_fx_wav.aax"
+      }
+    ],
+    "bgm_stg150_rso": [
+      {
+        "node": "Synth/bgm_stg150_rso/bgm_stg120_rso",
+        "cell": 5658,
+        "original_ref": 1301,
+        "audio": "Synth/bgm_stg120_rso_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg150_rso/bgm_stg120_rso_fx",
+        "cell": 5681,
+        "original_ref": 1419,
+        "audio": "Synth/bgm_stg120_rso_fx_wav.aax"
+      }
+    ],
+    "bgm_stg160_rso": [
+      {
+        "node": "Synth/bgm_stg160_rso/bgm_stg130_rso",
+        "cell": 5727,
+        "original_ref": 1982,
+        "audio": "Synth/bgm_stg130_rso_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg160_rso/bgm_stg130_rso_fx",
+        "cell": 5750,
+        "original_ref": 2100,
+        "audio": "Synth/bgm_stg130_rso_fx_wav.aax"
+      }
+    ],
+    "bgm_stg210_fct": [
+      {
+        "node": "Synth/bgm_stg210_fct/bgm_stg210_fct_normal",
+        "cell": 5796,
+        "original_ref": 2987,
+        "audio": "Synth/bgm_stg210_fct_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg210_fct/bgm_stg210_fct_fx",
+        "cell": 5819,
+        "original_ref": 3112,
+        "audio": "Synth/bgm_stg210_fct_fx_wav.aax"
+      }
+    ],
+    "bgm_stg220_fct": [
+      {
+        "node": "Synth/bgm_stg220_fct/bgm_stg220_fct",
+        "cell": 5865,
+        "original_ref": 3365,
+        "audio": "Synth/bgm_stg220_fct_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg220_fct/bgm_stg220_fct_fx",
+        "cell": 5888,
+        "original_ref": 3483,
+        "audio": "Synth/bgm_stg220_fct_fx_wav.aax"
+      }
+    ],
+    "bgm_stg230_fct": [
+      {
+        "node": "Synth/bgm_stg230_fct/bgm_stg230_fct",
+        "cell": 5934,
+        "original_ref": 3736,
+        "audio": "Synth/bgm_stg230_fct_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg230_fct/bgm_stg230_fct_fx",
+        "cell": 5957,
+        "original_ref": 3854,
+        "audio": "Synth/bgm_stg230_fct_fx_wav.aax"
+      }
+    ],
+    "bgm_stg240_fct": [
+      {
+        "node": "Synth/bgm_stg240_fct/bgm_stg210_fct_normal",
+        "cell": 6003,
+        "original_ref": 2987,
+        "audio": "Synth/bgm_stg210_fct_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg240_fct/bgm_stg210_fct_fx",
+        "cell": 6026,
+        "original_ref": 3112,
+        "audio": "Synth/bgm_stg210_fct_fx_wav.aax"
+      }
+    ],
+    "bgm_stg250_fct": [
+      {
+        "node": "Synth/bgm_stg250_fct/bgm_stg220_fct",
+        "cell": 6072,
+        "original_ref": 3365,
+        "audio": "Synth/bgm_stg220_fct_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg250_fct/bgm_stg220_fct_fx",
+        "cell": 6095,
+        "original_ref": 3483,
+        "audio": "Synth/bgm_stg220_fct_fx_wav.aax"
+      }
+    ],
+    "bgm_stg260_fct": [
+      {
+        "node": "Synth/bgm_stg260_fct/bgm_stg230_fct",
+        "cell": 6141,
+        "original_ref": 3736,
+        "audio": "Synth/bgm_stg230_fct_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg260_fct/bgm_stg230_fct_fx",
+        "cell": 6164,
+        "original_ref": 3854,
+        "audio": "Synth/bgm_stg230_fct_fx_wav.aax"
+      }
+    ],
+    "bgm_stg310_shp": [
+      {
+        "node": "Synth/bgm_stg310_shp/bgm_stg310_shp_normal",
+        "cell": 6210,
+        "original_ref": 5072,
+        "audio": "Synth/bgm_stg310_shp_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg310_shp/bgm_stg310_shp_fx",
+        "cell": 6233,
+        "original_ref": 5203,
+        "audio": "Synth/bgm_stg310_shp_fx_wav.aax"
+      }
+    ],
+    "bgm_stg320_shp": [
+      {
+        "node": "Synth/bgm_stg320_shp/bgm_stg320_shp_nomal",
+        "cell": 6279,
+        "original_ref": 5468,
+        "audio": "Synth/bgm_stg320_shp_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg320_shp/bgm_stg320_shp_fx",
+        "cell": 6302,
+        "original_ref": 5598,
+        "audio": "Synth/bgm_stg320_shp_fx_wav.aax"
+      }
+    ],
+    "bgm_stg330_shp": [
+      {
+        "node": "Synth/bgm_stg330_shp/bgm_stg330_shp_nomal",
+        "cell": 6348,
+        "original_ref": 5863,
+        "audio": "Synth/bgm_stg330_shp_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg330_shp/bgm_stg330_shp_fx",
+        "cell": 6371,
+        "original_ref": 5993,
+        "audio": "Synth/bgm_stg330_shp_fx_wav.aax"
+      }
+    ],
+    "bgm_stg340_shp": [
+      {
+        "node": "Synth/bgm_stg340_shp/bgm_stg320_shp_nomal",
+        "cell": 6417,
+        "original_ref": 5468,
+        "audio": "Synth/bgm_stg320_shp_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg340_shp/bgm_stg320_shp_fx",
+        "cell": 6440,
+        "original_ref": 5598,
+        "audio": "Synth/bgm_stg320_shp_fx_wav.aax"
+      }
+    ],
+    "bgm_stg350_shp": [
+      {
+        "node": "Synth/bgm_stg350_shp/bgm_stg310_shp_normal",
+        "cell": 6486,
+        "original_ref": 5072,
+        "audio": "Synth/bgm_stg310_shp_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg350_shp/bgm_stg310_shp_fx",
+        "cell": 6509,
+        "original_ref": 5203,
+        "audio": "Synth/bgm_stg310_shp_fx_wav.aax"
+      }
+    ],
+    "bgm_stg360_shp": [
+      {
+        "node": "Synth/bgm_stg360_shp/bgm_stg320_shp_nomal",
+        "cell": 6555,
+        "original_ref": 5468,
+        "audio": "Synth/bgm_stg320_shp_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg360_shp/bgm_stg320_shp_fx",
+        "cell": 6578,
+        "original_ref": 5598,
+        "audio": "Synth/bgm_stg320_shp_fx_wav.aax"
+      }
+    ],
+    "bgm_stg410_pla": [
+      {
+        "node": "Synth/bgm_stg410_pla/bgm_stg410_pla_normal",
+        "cell": 6624,
+        "original_ref": 7247,
+        "audio": "Synth/bgm_stg410_pla_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg410_pla/bgm_stg410_pla_fx",
+        "cell": 6647,
+        "original_ref": 7372,
+        "audio": "Synth/bgm_stg410_pla_fx_wav.aax"
+      }
+    ],
+    "bgm_stg420_pla": [
+      {
+        "node": "Synth/bgm_stg420_pla/bgm_stg420_pla",
+        "cell": 6693,
+        "original_ref": 7625,
+        "audio": "Synth/bgm_stg420_pla_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg420_pla/bgm_stg420_pla_fx",
+        "cell": 6716,
+        "original_ref": 7743,
+        "audio": "Synth/bgm_stg420_pla_fx_wav.aax"
+      }
+    ],
+    "bgm_stg430_pla": [
+      {
+        "node": "Synth/bgm_stg430_pla/bgm_stg430_pla",
+        "cell": 6762,
+        "original_ref": 7996,
+        "audio": "Synth/bgm_stg430_pla_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg430_pla/bgm_stg430_pla_fx",
+        "cell": 6785,
+        "original_ref": 8114,
+        "audio": "Synth/bgm_stg430_pla_fx_wav.aax"
+      }
+    ],
+    "bgm_stg440_pla": [
+      {
+        "node": "Synth/bgm_stg440_pla/bgm_stg410_pla_normal",
+        "cell": 6831,
+        "original_ref": 7247,
+        "audio": "Synth/bgm_stg410_pla_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg440_pla/bgm_stg410_pla_fx",
+        "cell": 6854,
+        "original_ref": 7372,
+        "audio": "Synth/bgm_stg410_pla_fx_wav.aax"
+      }
+    ],
+    "bgm_stg450_pla": [
+      {
+        "node": "Synth/bgm_stg450_pla/bgm_stg420_pla",
+        "cell": 6900,
+        "original_ref": 7625,
+        "audio": "Synth/bgm_stg420_pla_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg450_pla/bgm_stg420_pla_fx",
+        "cell": 6923,
+        "original_ref": 7743,
+        "audio": "Synth/bgm_stg420_pla_fx_wav.aax"
+      }
+    ],
+    "bgm_stg460_pla": [
+      {
+        "node": "Synth/bgm_stg460_pla/bgm_stg430_pla",
+        "cell": 6969,
+        "original_ref": 7996,
+        "audio": "Synth/bgm_stg430_pla_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg460_pla/bgm_stg430_pla_fx",
+        "cell": 6992,
+        "original_ref": 8114,
+        "audio": "Synth/bgm_stg430_pla_fx_wav.aax"
+      }
+    ],
+    "bgm_stg510_qua": [
+      {
+        "node": "Synth/bgm_stg510_qua/bgm_stg510_qua_normal",
+        "cell": 7038,
+        "original_ref": 9368,
+        "audio": "Synth/bgm_stg510_qua_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg510_qua/bgm_stg510_qua_fx",
+        "cell": 7061,
+        "original_ref": 9499,
+        "audio": "Synth/bgm_stg510_qua_fx_wav.aax"
+      }
+    ],
+    "bgm_stg520_qua": [
+      {
+        "node": "Synth/bgm_stg520_qua/bgm_stg520_qua_nomal",
+        "cell": 7107,
+        "original_ref": 9800,
+        "audio": "Synth/bgm_stg520_qua_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg520_qua/bgm_stg520_qua_fx",
+        "cell": 7130,
+        "original_ref": 9930,
+        "audio": "Synth/bgm_stg520_qua_fx_wav.aax"
+      }
+    ],
+    "bgm_stg530_qua": [
+      {
+        "node": "Synth/bgm_stg530_qua/bgm_stg530_qua_nomal",
+        "cell": 7176,
+        "original_ref": 10231,
+        "audio": "Synth/bgm_stg530_qua_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg530_qua/bgm_stg530_qua_fx",
+        "cell": 7199,
+        "original_ref": 10361,
+        "audio": "Synth/bgm_stg530_qua_fx_wav.aax"
+      }
+    ],
+    "bgm_stg540_qua": [
+      {
+        "node": "Synth/bgm_stg540_qua/bgm_stg510_qua_normal",
+        "cell": 7245,
+        "original_ref": 9368,
+        "audio": "Synth/bgm_stg510_qua_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg540_qua/bgm_stg510_qua_fx",
+        "cell": 7268,
+        "original_ref": 9499,
+        "audio": "Synth/bgm_stg510_qua_fx_wav.aax"
+      }
+    ],
+    "bgm_stg550_qua": [
+      {
+        "node": "Synth/bgm_stg550_qua/bgm_stg520_qua_nomal",
+        "cell": 7314,
+        "original_ref": 9800,
+        "audio": "Synth/bgm_stg520_qua_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg550_qua/bgm_stg520_qua_fx",
+        "cell": 7337,
+        "original_ref": 9930,
+        "audio": "Synth/bgm_stg520_qua_fx_wav.aax"
+      }
+    ],
+    "bgm_stg560_qua": [
+      {
+        "node": "Synth/bgm_stg560_qua/bgm_stg530_qua_nomal",
+        "cell": 7383,
+        "original_ref": 10231,
+        "audio": "Synth/bgm_stg530_qua_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg560_qua/bgm_stg530_qua_fx",
+        "cell": 7406,
+        "original_ref": 10361,
+        "audio": "Synth/bgm_stg530_qua_fx_wav.aax"
+      }
+    ],
+    "bgm_stg610_ast": [
+      {
+        "node": "Synth/bgm_stg610_ast/bgm_stg610_ast_normal",
+        "cell": 7452,
+        "original_ref": 11723,
+        "audio": "Synth/bgm_stg610_ast_normal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg610_ast/bgm_stg610_ast_fx",
+        "cell": 7475,
+        "original_ref": 11855,
+        "audio": "Synth/bgm_stg610_ast_fx_wav.aax"
+      }
+    ],
+    "bgm_stg620_ast": [
+      {
+        "node": "Synth/bgm_stg620_ast/bgm_stg620_ast_normal",
+        "cell": 7521,
+        "original_ref": 12122,
+        "audio": "Synth/bgm_stg620_ast_normal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg620_ast/bgm_stg620_ast_fx",
+        "cell": 7544,
+        "original_ref": 12254,
+        "audio": "Synth/bgm_stg620_ast_fx_wav.aax"
+      }
+    ],
+    "bgm_stg630_ast": [
+      {
+        "node": "Synth/bgm_stg630_ast/bgm_stg630_ast_normal",
+        "cell": 7590,
+        "original_ref": 12521,
+        "audio": "Synth/bgm_stg630_ast_normal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg630_ast/bgm_stg630_ast_fx",
+        "cell": 7613,
+        "original_ref": 12653,
+        "audio": "Synth/bgm_stg630_ast_fx_wav.aax"
+      }
+    ],
+    "bgm_stg640_ast": [
+      {
+        "node": "Synth/bgm_stg640_ast/bgm_stg610_ast_normal",
+        "cell": 7659,
+        "original_ref": 11723,
+        "audio": "Synth/bgm_stg610_ast_normal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg640_ast/bgm_stg610_ast_fx",
+        "cell": 7682,
+        "original_ref": 11855,
+        "audio": "Synth/bgm_stg610_ast_fx_wav.aax"
+      }
+    ],
+    "bgm_stg650_ast": [
+      {
+        "node": "Synth/bgm_stg650_ast/bgm_stg620_ast_normal",
+        "cell": 7728,
+        "original_ref": 12122,
+        "audio": "Synth/bgm_stg620_ast_normal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg650_ast/bgm_stg620_ast_fx",
+        "cell": 7751,
+        "original_ref": 12254,
+        "audio": "Synth/bgm_stg620_ast_fx_wav.aax"
+      }
+    ],
+    "bgm_stg660_ast": [
+      {
+        "node": "Synth/bgm_stg660_ast/bgm_stg630_ast_normal",
+        "cell": 7797,
+        "original_ref": 12521,
+        "audio": "Synth/bgm_stg630_ast_normal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg660_ast/bgm_stg630_ast_fx",
+        "cell": 7820,
+        "original_ref": 12653,
+        "audio": "Synth/bgm_stg630_ast_fx_wav.aax"
+      }
+    ],
+    "bgm_stg710_elv": [
+      {
+        "node": "Synth/bgm_stg710_elv/bgm_stg710_elv",
+        "cell": 7866,
+        "original_ref": 13899,
+        "audio": "Synth/bgm_stg710_elv_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg710_elv/bgm_stg710_elv_fx",
+        "cell": 7889,
+        "original_ref": 14017,
+        "audio": "Synth/bgm_stg710_elv_fx_wav.aax"
+      }
+    ],
+    "bgm_stg720_elv": [
+      {
+        "node": "Synth/bgm_stg720_elv/bgm_stg720_elv",
+        "cell": 7935,
+        "original_ref": 14270,
+        "audio": "Synth/bgm_stg720_elv_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_stg720_elv/bgm_stg720_elv_fx",
+        "cell": 7958,
+        "original_ref": 14388,
+        "audio": "Synth/bgm_stg720_elv_fx_wav.aax"
+      }
+    ],
+    "bgm_boss_coreboss": [
+      {
+        "node": "Synth/bgm_boss_coreboss/bgm_boss_coreboss_normal",
+        "cell": 8004,
+        "original_ref": 14641,
+        "audio": "Synth/bgm_boss_coreboss_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_boss_coreboss/bgm_boss_coreboss_fx",
+        "cell": 8027,
+        "original_ref": 14781,
+        "audio": "Synth/bgm_boss_coreboss_fx_wav.aax"
+      }
+    ],
+    "bgm_boss_Jellyboss": [
+      {
+        "node": "Synth/bgm_boss_Jellyboss/bgm_boss_Jellyboss_normal",
+        "cell": 8073,
+        "original_ref": 15050,
+        "audio": "Synth/bgm_boss_Jellyboss_normal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_boss_Jellyboss/bgm_boss_Jellyboss_fx",
+        "cell": 8096,
+        "original_ref": 15202,
+        "audio": "Synth/bgm_boss_Jellyboss_fx_wav.aax"
+      }
+    ],
+    "bgm_boss_shipboss": [
+      {
+        "node": "Synth/bgm_boss_shipboss/bgm_boss_shipboss",
+        "cell": 8142,
+        "original_ref": 15453,
+        "audio": "Synth/bgm_boss_shipboss_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_boss_shipboss/bgm_boss_shipboss_fx",
+        "cell": 8165,
+        "original_ref": 15586,
+        "audio": "Synth/bgm_boss_shipboss_fx_wav.aax"
+      }
+    ],
+    "bgm_boss_lastboss_1": [
+      {
+        "node": "Synth/bgm_boss_lastboss_1/bgm_boss_lastboss_1",
+        "cell": 8211,
+        "original_ref": 15848,
+        "audio": "Synth/bgm_boss_lastboss_1_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_boss_lastboss_1/bgm_boss_lastboss_1_fx",
+        "cell": 8234,
+        "original_ref": 15991,
+        "audio": "Synth/bgm_boss_lastboss_1_fx_wav.aax"
+      }
+    ],
+    "bgm_boss_lastboss_2": [
+      {
+        "node": "Synth/bgm_boss_lastboss_2/bgm_boss_lastboss_2",
+        "cell": 8280,
+        "original_ref": 16259,
+        "audio": "Synth/bgm_boss_lastboss_2_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_boss_lastboss_2/bgm_boss_lastboss_2_fx",
+        "cell": 8303,
+        "original_ref": 16402,
+        "audio": "Synth/bgm_boss_lastboss_2_fx_wav.aax"
+      }
+    ],
+    "bgm_mlt_a": [
+      {
+        "node": "Synth/bgm_mlt_a/bgm_mlt_a_nomal",
+        "cell": 8349,
+        "original_ref": 16642,
+        "audio": "Synth/bgm_mlt_a_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_mlt_a/bgm_mlt_a_fx",
+        "cell": 8372,
+        "original_ref": 16747,
+        "audio": "Synth/bgm_mlt_a_fx_wav.aax"
+      }
+    ],
+    "bgm_mlt_b": [
+      {
+        "node": "Synth/bgm_mlt_b/bgm_mlt_b_nomal",
+        "cell": 8418,
+        "original_ref": 16957,
+        "audio": "Synth/bgm_mlt_b_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_mlt_b/bgm_mlt_b_fx",
+        "cell": 8441,
+        "original_ref": 17062,
+        "audio": "Synth/bgm_mlt_b_fx_wav.aax"
+      }
+    ],
+    "bgm_mlt_c": [
+      {
+        "node": "Synth/bgm_mlt_c/bgm_mlt_c_nomal",
+        "cell": 8487,
+        "original_ref": 17272,
+        "audio": "Synth/bgm_mlt_c_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_mlt_c/bgm_mlt_c_fx",
+        "cell": 8510,
+        "original_ref": 17377,
+        "audio": "Synth/bgm_mlt_c_fx_wav.aax"
+      }
+    ],
+    "bgm_mlt_d": [
+      {
+        "node": "Synth/bgm_mlt_d/bgm_mlt_d_nomal",
+        "cell": 8556,
+        "original_ref": 17587,
+        "audio": "Synth/bgm_mlt_d_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_mlt_d/bgm_mlt_d_fx",
+        "cell": 8579,
+        "original_ref": 17692,
+        "audio": "Synth/bgm_mlt_d_fx_wav.aax"
+      }
+    ],
+    "bgm_mlt_e": [
+      {
+        "node": "Synth/bgm_mlt_e/bgm_mlt_e_nomal",
+        "cell": 8625,
+        "original_ref": 17902,
+        "audio": "Synth/bgm_mlt_e_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_mlt_e/bgm_mlt_e_fx",
+        "cell": 8648,
+        "original_ref": 18007,
+        "audio": "Synth/bgm_mlt_e_fx_wav.aax"
+      }
+    ],
+    "bgm_mlt_f": [
+      {
+        "node": "Synth/bgm_mlt_f/bgm_mlt_f_nomal",
+        "cell": 8694,
+        "original_ref": 18217,
+        "audio": "Synth/bgm_mlt_f_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_mlt_f/bgm_mlt_f_fx",
+        "cell": 8717,
+        "original_ref": 18322,
+        "audio": "Synth/bgm_mlt_f_fx_wav.aax"
+      }
+    ],
+    "bgm_mlt_g": [
+      {
+        "node": "Synth/bgm_mlt_g/bgm_mlt_g_nomal",
+        "cell": 8763,
+        "original_ref": 18532,
+        "audio": "Synth/bgm_mlt_g_nomal_wav.aax"
+      },
+      {
+        "node": "Synth/bgm_mlt_g/bgm_mlt_g_fx",
+        "cell": 8786,
+        "original_ref": 18637,
+        "audio": "Synth/bgm_mlt_g_fx_wav.aax"
+      }
+    ],
+    "bgm_mlt_title": [
+      {
+        "node": "Synth/bgm_mlt_title",
+        "cell": 8809,
+        "original_ref": 18727,
+        "audio": "Synth/bgm_mlt_title_wav.aax"
+      }
+    ],
+    "bgm_jingle_mlt_clear": [
+      {
+        "node": "Synth/bgm_jingle_mlt_clear",
+        "cell": 8832,
+        "original_ref": 18782,
+        "audio": "Synth/bgm_jingle_mlt_clear_wav.aax"
+      }
+    ],
+    "bgm_mlt_result": [
+      {
+        "node": "Synth/bgm_mlt_result",
+        "cell": 8855,
+        "original_ref": 18838,
+        "audio": "Synth/bgm_mlt_result_wav.aax"
+      }
+    ],
+    "bgm_wmap": [
+      {
+        "node": "Synth/bgm_worldmap",
+        "cell": 8878,
+        "original_ref": 18886,
+        "audio": "Synth/bgm_worldmap_wav.aax"
+      }
+    ],
+    "bgm_zmap_rso": [
+      {
+        "node": "Synth/bgm_zmap_rso",
+        "cell": 8901,
+        "original_ref": 18932,
+        "audio": "Synth/bgm_zmap_rso_wav.aax"
+      }
+    ],
+    "bgm_zmap_fct": [
+      {
+        "node": "Synth/bgm_zmap_fct",
+        "cell": 8924,
+        "original_ref": 18978,
+        "audio": "Synth/bgm_zmap_fct_wav.aax"
+      }
+    ],
+    "bgm_zmap_shp": [
+      {
+        "node": "Synth/bgm_zmap_shp",
+        "cell": 8947,
+        "original_ref": 19024,
+        "audio": "Synth/bgm_zmap_shp_wav.aax"
+      }
+    ],
+    "bgm_zmap_pla": [
+      {
+        "node": "Synth/bgm_zmap_pla",
+        "cell": 8970,
+        "original_ref": 19070,
+        "audio": "Synth/bgm_zmap_pla_wav.aax"
+      }
+    ],
+    "bgm_zmap_qua": [
+      {
+        "node": "Synth/bgm_zmap_qua",
+        "cell": 8993,
+        "original_ref": 19116,
+        "audio": "Synth/bgm_zmap_qua_wav.aax"
+      }
+    ],
+    "bgm_zmap_ast": [
+      {
+        "node": "Synth/bgm_zmap_ast",
+        "cell": 9016,
+        "original_ref": 19162,
+        "audio": "Synth/bgm_zmap_ast_wav.aax"
+      }
+    ],
+    "bgm_zmap_elv": [
+      {
+        "node": "Synth/bgm_zmap_elv",
+        "cell": 9039,
+        "original_ref": 19208,
+        "audio": "Synth/bgm_zmap_elv_wav.aax"
+      }
+    ],
+    "bgm_sys_title": [
+      {
+        "node": "Synth/bgm_sys_title",
+        "cell": 9062,
+        "original_ref": 19255,
+        "audio": "Synth/bgm_sys_title_wav.aax"
+      }
+    ],
+    "bgm_sys_option": [
+      {
+        "node": "Synth/bgm_sys_option",
+        "cell": 9085,
+        "original_ref": 19304,
+        "audio": "Synth/bgm_sys_option_wav.aax"
+      }
+    ],
+    "bgm_sys_save": [
+      {
+        "node": "Synth/bgm_sys_save",
+        "cell": 9108,
+        "original_ref": 19352,
+        "audio": "Synth/bgm_sys_save_wav.aax"
+      }
+    ],
+    "bgm_sys_result": [
+      {
+        "node": "Synth/bgm_sys_result",
+        "cell": 9131,
+        "original_ref": 19400,
+        "audio": "Synth/bgm_sys_result_wav.aax"
+      }
+    ],
+    "bgm_jingle_stg_clear": [
+      {
+        "node": "Synth/bgm_jingle_stg_clear",
+        "cell": 9154,
+        "original_ref": 19456,
+        "audio": "Synth/bgm_jingle_stg_clear_wav.aax"
+      }
+    ],
+    "bgm_jingle_boss_clear": [
+      {
+        "node": "Synth/bgm_jingle_boss_clear",
+        "cell": 9177,
+        "original_ref": 19519,
+        "audio": "Synth/bgm_jingle_boss_clear_wav.aax"
+      }
+    ],
+    "bgm_jingle_drown": [
+      {
+        "node": "Synth/bgm_jingle_drown",
+        "cell": 9200,
+        "original_ref": 19578,
+        "audio": "Synth/bgm_jingle_drown_wav.aax"
+      }
+    ],
+    "bgm_jingle_gameover": [
+      {
+        "node": "Synth/bgm_jingle_gameover",
+        "cell": 9223,
+        "original_ref": 19635,
+        "audio": "Synth/bgm_jingle_gameover_wav.aax"
+      }
+    ],
+    "bgm_jingle_super_sonic": [
+      {
+        "node": "Synth/bgm_jingle_super_sonic",
+        "cell": 9246,
+        "original_ref": 19698,
+        "audio": "Synth/bgm_jingle_super_sonic_wav.aax"
+      }
+    ],
+    "bgm_pha_spn": [
+      {
+        "node": "Synth/bgm_pha_spn",
+        "cell": 9269,
+        "original_ref": 19753,
+        "audio": "Synth/bgm_pha_spn_wav.aax"
+      }
+    ],
+    "bgm_pha_spn_wtr": [
+      {
+        "node": "Synth/bgm_pha_spn_wtr",
+        "cell": 9292,
+        "original_ref": 19835,
+        "audio": "Synth/bgm_pha_spn_wtr_wav.aax"
+      }
+    ],
+    "bgm_pha_spk": [
+      {
+        "node": "Synth/bgm_pha_spk",
+        "cell": 9315,
+        "original_ref": 19921,
+        "audio": "Synth/bgm_pha_spk_wav.aax"
+      }
+    ],
+    "bgm_pha_ast": [
+      {
+        "node": "Synth/bgm_pha_ast",
+        "cell": 9338,
+        "original_ref": 19999,
+        "audio": "Synth/bgm_pha_ast_wav.aax"
+      }
+    ],
+    "bgm_pha_rod": [
+      {
+        "node": "Synth/bgm_pha_rod",
+        "cell": 9361,
+        "original_ref": 20077,
+        "audio": "Synth/bgm_pha_rod_wav.aax"
+      }
+    ],
+    "bgm_pha_lsr": [
+      {
+        "node": "Synth/bgm_pha_lsr",
+        "cell": 9384,
+        "original_ref": 20155,
+        "audio": "Synth/bgm_pha_lsr_wav.aax"
+      }
+    ],
+    "bgm_pha_rkt": [
+      {
+        "node": "Synth/bgm_pha_rkt",
+        "cell": 9407,
+        "original_ref": 20233,
+        "audio": "Synth/bgm_pha_rkt_wav.aax"
+      }
+    ],
+    "bgm_pha_pzl": [
+      {
+        "node": "Synth/bgm_pha_pzl",
+        "cell": 9430,
+        "original_ref": 20311,
+        "audio": "Synth/bgm_pha_pzl_wav.aax"
+      }
+    ],
+    "bgm_pha_multi_common": [
+      {
+        "node": "Synth/bgm_pha_multi_common",
+        "cell": 9453,
+        "original_ref": 20398,
+        "audio": "Synth/bgm_pha_multi_common_wav.aax"
+      }
+    ],
+    "bgm_pha_multi_united": [
+      {
+        "node": "Synth/bgm_pha_multi_united",
+        "cell": 9476,
+        "original_ref": 20503,
+        "audio": "Synth/bgm_pha_multi_united_wav.aax"
+      }
+    ],
+    "bgm_stg730_elv": [
+      {
+        "node": "Synth/bgm_stg730_elv",
+        "cell": 9499,
+        "original_ref": 20602,
+        "audio": "Synth/bgm_stg730_elv_wav.aax"
+      }
+    ],
+    "bgm_jingle_mlt_drown": [
+      {
+        "node": "Synth/bgm_jingle_mlt_drown",
+        "cell": 9522,
+        "original_ref": 20658,
+        "audio": "Synth/bgm_jingle_mlt_drown_wav.aax"
+      }
+    ],
+    "bgm_sys_challenge": [
+      {
+        "node": "Synth/bgm_sys_challenge",
+        "cell": 9545,
+        "original_ref": 20717,
+        "audio": "Synth/bgm_sys_challenge_wav.aax"
+      }
+    ],
+    "bgm_sys_challenge_result": [
+      {
+        "node": "Synth/bgm_sys_challenge_result",
+        "cell": 9568,
+        "original_ref": 20780,
+        "audio": "Synth/bgm_sys_challenge_result_wav.aax"
+      }
+    ]
+  }
+}

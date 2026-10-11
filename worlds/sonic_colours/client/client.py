@@ -34,6 +34,33 @@ def log_diagnostic(value):
 
 
 class SonicCommands(ClientCommandProcessor):
+    def _cmd_sonicmusictest(self, destination='', donor=''):
+        """Audible test: DESTINATION_CUE DONOR_CUE, or off to restore the seed mapping."""
+        if not self.ctx.runtime or not self.ctx.authenticated_identity:
+            logger.info('Connect to your Sonic Colours slot first.')
+            return
+        from .music_bank import CUES, PROTECTED
+        if destination=='off' and not donor:
+            self.ctx.runtime.music_test_pair=None
+        elif (destination in CUES and donor in CUES and destination not in PROTECTED and donor not in PROTECTED
+              and self.ctx.runtime.slot_data['options']['music_randomization']):
+            self.ctx.runtime.music_test_pair=(destination,donor)
+        else:
+            logger.info('Usage: /sonicmusictest ELIGIBLE_DESTINATION ELIGIBLE_DONOR, or /sonicmusictest off. Music must be On.')
+            return
+        self.ctx.runtime.next_music_poll=0
+        logger.info('Music test pair: %s. Change scenes to restart the cue; /sonicmusictest off restores the seed mapping.',
+                    self.ctx.runtime.music_test_pair)
+
+    def _cmd_sonicsync(self):
+        """Request the complete AP receipt history; never discard the durable journal."""
+        if not self.ctx.runtime or not self.ctx.authenticated_identity:
+            logger.info('Connect to your Sonic Colours slot first.')
+            return
+        logger.info('Requesting complete ReceivedItems history: server=%s durable=%s',
+                    len(self.ctx.items_received),len(self.ctx.runtime.journal.data['receipts']))
+        asyncio.create_task(self.ctx.send_msgs([{'cmd':'Sync'}]))
+
     @mark_raw
     def _cmd_sonicmusic(self, manifest=''):
         """Select a seed BGM patch manifest (path may contain spaces), or show music status. This does not install game resources."""
@@ -200,6 +227,15 @@ class SonicContext(CommonContext):
                 self.dolphin_status = f'Slot rejected: {error}'
                 logger.error(self.dolphin_status)
         elif cmd == 'ReceivedItems':
+            if self.runtime and self.authenticated_identity == (
+                    self.runtime.journal.identity['team'],self.runtime.journal.identity['slot'],
+                    self.runtime.journal.identity['seed']):
+                try:
+                    grants=[item[0] for item in args.get('items',())]
+                    inventory(grants)
+                    self.runtime.journal.record_permissions(grants)
+                except (ValueError,OSError) as error:
+                    logger.error('Permission receipt persistence blocked: %s',error)
             index = args.get('index', -1)
             if index == 0:
                 self.history_ready, self.history_desynced = True, False

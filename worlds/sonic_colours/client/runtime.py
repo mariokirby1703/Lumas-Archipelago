@@ -268,17 +268,15 @@ class Runtime:
             except MemoryUnavailable as error:
                 self.hooks.medal_status = {'available': False, 'reason': str(error)}
         self.settle_effects(memory)
-        known = inventory(item_ids) if history_ready else inventory(self.journal.data['receipts'])
+        durable = list(item_ids if history_ready else self.journal.data['receipts'])
+        durable += [item for item in self.journal.data.get('permission_receipts',()) if item not in durable]
+        known = inventory(durable)
         self.observe_capsules(frozenset(known['wisps']))
         # Install native interception even before ReceivedItems finishes. Zero
         # or durable authenticated permissions do not authorize unknown items.
         if not history_ready and self.guard.can_record(self.snapshot):
             try:
-                try:
-                    self.guard.check(self.snapshot)
-                except MemoryUnavailable:
-                    self.guard.check_stats(self.snapshot)
-                self.configure_native_hooks(memory, known)
+                self.project_permissions(memory, known)
             except MemoryUnavailable as error:
                 self.hooks.progression_status = {'available':False,'reason':str(error)}
         self.last_error = self.snapshot.status
@@ -291,10 +289,10 @@ class Runtime:
             self.next_music_poll = self.clock() + (10.0 if self.music_status.get('bank_address') else 2.0)
             try:
                 from .live_music import apply
-                self.music_status = apply(memory, self.slot_data)
+                self.music_status = apply(memory, self.slot_data, getattr(self,'music_test_pair',None))
             except MemoryUnavailable as error:
                 self.music_status = {'status':str(error), 'audible_verified':False}
-        owned = inventory(item_ids) if history_ready else None
+        owned = known if history_ready else None
         if history_ready:
             self.journal.record_history(item_ids)
         if self.guard.can_record(self.snapshot):

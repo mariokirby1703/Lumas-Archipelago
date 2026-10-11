@@ -7,11 +7,12 @@ been verified.
 
 World Access and all eight Wisp items always use AP ownership. Seven coloured
 Chaos Emerald items always appear as progression and control Super Sonic.
-Five goals, random post-intro Starting Act, automatic Red Ring packing and
+Five goals, a fixed mandatory introduction, automatic Red Ring packing and
 680 optional individual Wisp Capsule checks are supported by the generator.
-Music shuffling redirects the native normal-Act cue table before stage loading.
-An optional seed-specific PAL CPK copy also redirects compatible title, menu,
-map, boss and Game Land music. See [stabilization and resource setup](docs/stabilization.md).
+Music On shuffles Acts, maps, Game Land, bosses and menus in one global pool
+through the verified resident CSB bank, retaining destination control graphs.
+No external music files are required. See [global music and Wisp correction](docs/global_music_and_wisps.md)
+for the implementation and remaining audible validation.
 The live White-capsule test exposed disabled collision bodies after refresh;
 [the native reactivation fix](docs/white_collision_fix.md) requires the updated
 capsule code and still needs post-fix contact/pickup validation.

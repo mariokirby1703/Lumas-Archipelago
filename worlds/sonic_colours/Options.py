@@ -58,7 +58,7 @@ class SwimTrapWeight(Choice):
 
 
 class MusicRandomization(DefaultOnToggle):
-    """Shuffle all compatible BGM using the verified in-memory PAL CSB bank. Default On. Playback of existing tracks may require a scene change."""
+    """Shuffle Acts, maps, bosses, Game Land and menu music together in one global pool. Destination audio controls are retained; synchronized cutscenes and critical jingles stay vanilla. Default On. Existing tracks may require a scene change."""
     display_name = 'Music Randomization'
 
 

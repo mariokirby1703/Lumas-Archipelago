@@ -1,4 +1,4 @@
-"""Seed cue redirects in the PAL mission table, before native stage loading."""
+"""Preserve vanilla mission aliases for the global resident audio-bank shuffle."""
 from .memory import MemoryUnavailable
 from .native_read import STAGE_TABLE_GLOBAL
 from .audio import plan_music
@@ -6,8 +6,9 @@ from ..world_constants import NORMAL
 
 
 def mapping_for(slot):
-    return plan_music(slot['seed_name'], 'anywhere' if slot['options']['music_randomization'] else 'off',
-                      {s['bgm'] for s in NORMAL})
+    # CSB leaf adaptation supplies all categories in one shuffle. A second
+    # stage-only permutation would compose two mappings and defeat controls.
+    return {s['mission_id']:s['bgm'] for s in NORMAL}
 
 
 def cue_records(memory):

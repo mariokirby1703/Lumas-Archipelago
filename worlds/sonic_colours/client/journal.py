@@ -86,6 +86,25 @@ class Journal:
             self.data['receipts'] = list(item_ids)
             self.save()
 
+    def record_permissions(self, item_ids):
+        """Singleton grants witnessed from the authenticated AP server.
+
+        Independent of the ordered consumable ledger. Never admit counters,
+        progressive items, filler or traps here; a truncated history cannot
+        replay them or erase a previously witnessed permanent permission.
+        """
+        from ..Items import ITEM_TABLE, WORLD_ITEMS, WISP_ITEMS, EMERALDS, RANDOM_CAPSULES
+        allowed={ITEM_TABLE[n] for n in WORLD_ITEMS+WISP_ITEMS+EMERALDS+(RANDOM_CAPSULES,)}
+        old=set(self.data.get('permission_receipts',()))
+        new=old | (set(item_ids)&allowed)
+        if new!=old:
+            self.data['permission_receipts']=sorted(new)
+            try:
+                self.save()
+            except OSError:
+                self.data['permission_receipts']=sorted(old)
+                raise
+
     def prepare(self, index, item, context, before, after):
         key = str(index)
         previous = self.data['effects'].get(key, {})

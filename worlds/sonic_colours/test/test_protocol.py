@@ -11,6 +11,33 @@ from worlds.LauncherComponents import components
 from . import generate
 
 
+def test_authenticated_singleton_permission_survives_truncated_consumable_history(tmp_path):
+    async def scenario():
+        data=generate().worlds[1].fill_slot_data()
+        ctx=SonicContext(journal_directory=tmp_path);ctx.team,ctx.slot=0,1
+        async def send(messages):pass
+        ctx.send_msgs=send
+        ctx.on_package('RoomInfo',{'seed_name':data['seed_name']})
+        ctx.on_package('Connected',{'slot_data':data});await asyncio.sleep(0)
+        journal=ctx.runtime.journal
+        original=[ITEM_TABLE['Rings']]*40
+        journal.record_history(original)
+        green=ITEM_TABLE['Green Hover Wisp']
+        ctx.items_received=[NetworkItem(green,0,1)]
+        ctx.on_package('ReceivedItems',{'index':0,'items':[[green,0,1]]})
+        assert ctx.history_desynced and not ctx.history_ready
+        assert journal.data['receipts']==original
+        assert journal.data['permission_receipts']==[green]
+        journal.record_permissions([green,ITEM_TABLE['Rings'],ITEM_TABLE['1-Up'],ITEM_TABLE['Progressive Game Land Speed']])
+        assert journal.data['permission_receipts']==[green]
+        ctx.on_package('RoomInfo',{'seed_name':'another-seed'})
+        blue=ITEM_TABLE['Blue Cube Wisp']
+        ctx.on_package('ReceivedItems',{'index':1,'items':[[blue,0,1]]})
+        assert journal.data['permission_receipts']==[green]
+        ctx.release_runtime();await ctx.shutdown()
+    asyncio.run(scenario())
+
+
 def test_connected_receipts_empty_history_barrier_and_reconnect():
     async def scenario(directory):
         data = generate().worlds[1].fill_slot_data()

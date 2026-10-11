@@ -1,12 +1,12 @@
-"""Seed-aware PAL BGM cue redirects in a separate original-data CPK copy.
+"""Global PAL audio-content shuffle retaining each destination's control graph.
 
-Cue IDs, names, flags, timing/control graphs and audio bytes stay intact. Only
-the cue's synth reference changes to a compatible, existing BGM synth. Timed
-opening/ending music, transformation cues and critical jingles are protected.
+Change only leaf AAX references in the resident CSB. Cue identity, native filter,
+boost/sleep graphs, audio bytes and synchronized/critical music remain intact.
 """
 import hashlib
 import json
 import random
+import struct
 from pathlib import Path
 from ..world_constants import load_data
 from .cpk import CPK, UTF
@@ -14,6 +14,9 @@ from .cpk import CPK, UTF
 CATALOG = load_data('bgm_cues.json')
 CUES = {row['name']: row for row in CATALOG['cues']}
 AUDIO = load_data('bgm_audio_identity.json')
+GRAPHS = load_data('bgm_graphs.json')
+if GRAPHS['bank_sha256'] != CATALOG['bank_sha256'] or set(GRAPHS['graphs']) != set(CUES):
+    raise ValueError('PAL BGM graph catalog mismatch')
 if AUDIO['bank_sha256'] != CATALOG['bank_sha256'] or set(AUDIO['cues']) != set(CUES):
     raise ValueError('PAL audio identity catalog mismatch')
 PROTECTED = frozenset(name for name in CUES if name.startswith(('bgm_jingle_', 'bgm_pha_'))
@@ -36,7 +39,7 @@ def plan(seed, mode):
     groups = {}
     for name, row in CUES.items():
         if name in PROTECTED: continue
-        key = json.dumps(row['compatibility']), group(name) if mode == 'per_world' else 'global'
+        key = group(name) if mode == 'per_world' else 'global'
         groups.setdefault(key, []).append(name)
     rng = random.Random(int.from_bytes(hashlib.sha256(f'{seed}:sonic-bgm-bank-v1'.encode()).digest(), 'big'))
     for key in sorted(groups):
@@ -83,22 +86,66 @@ def rewrite_bank(original, mapping):
     output = bytearray(original)
     for name, donor in mapping.items():
         source, target = CUES[name], CUES[donor]
-        if ((name in PROTECTED and donor != name) or donor in PROTECTED and donor != name
-                or source['compatibility'] != target['compatibility']):
+        if ((name in PROTECTED and donor != name) or donor in PROTECTED and donor != name):
             raise ValueError('incompatible or protected BGM redirect')
         i, j = indices[name], indices[donor]
         for key in ('id', 'flags', 'synth'):
             if cue.rows[i][key] != source[key]: raise ValueError('PAL cue identity mismatch')
-        position, fmt = cue.cells[i]['synth']
-        donor_position, donor_fmt = cue.cells[j]['synth']
-        if position is None or donor_position is None or fmt != '>I' or donor_fmt != fmt:
-            raise ValueError('PAL cue synth field is not independently writable')
-        output[base+position:base+position+4] = original[base+donor_position:base+donor_position+4]
-    verify = UTF(bytes(output)[base:base+size])
-    for row in verify.rows:
-        if row['synth'] != CUES[mapping[row['name']]]['synth']:
-            raise ValueError('BGM synth redirect readback mismatch')
+        # Keep the destination's root, ISAAC control graph and every DSP field.
+        # A one-leaf destination plays the donor's normal audio; a two-leaf
+        # destination retains normal/fx control, duplicating a single donor
+        # reference where the source has no separate boost audio stem.
+        destination = GRAPHS['graphs'][name]
+        audio = GRAPHS['graphs'][donor]
+        for k, leaf in enumerate(destination):
+            pos = leaf['cell']
+            if struct.unpack_from('>I', original, pos)[0] != leaf['original_ref']:
+                raise ValueError('PAL synth leaf layout mismatch')
+            reference = audio[min(k, len(audio)-1)]['original_ref']
+            struct.pack_into('>I', output, pos, reference)
+    if recover_bank(bytes(output)) != original:
+        raise ValueError('BGM graph adaptation readback mismatch')
     return bytes(output)
+
+
+def recover_bank(data):
+    """Validate either exact legacy cue redirects or current audio-leaf edits.
+
+    Reconstruct ALL allowed cells, hash every immutable byte, then prove that
+    each destination's leaf vector comes from one eligible donor. Unknown refs,
+    damaged graphs, protected edits and mixed legacy/current layouts are rejected.
+    """
+    outer = UTF(data)
+    offset, size = next(r['utf'] for r in outer.rows if r['name'] == 'CUE')
+    base = outer.binary + offset; cues = UTF(data[base:base+size])
+    if len(cues.rows) != len(CUES) or {r['name'] for r in cues.rows} != set(CUES):
+        raise ValueError('unknown CUE catalog')
+    original = bytearray(data); cue_changed = False; leaves_changed = False
+    donors = {r['synth']:r for r in CUES.values()}
+    for row, cells in zip(cues.rows,cues.cells):
+        source=CUES[row['name']]; donor=donors.get(row['synth'])
+        if not donor or (row['synth'] != source['synth'] and
+                (row['name'] in PROTECTED or donor['name'] in PROTECTED or
+                 source['compatibility'] != donor['compatibility'])):
+            raise ValueError('invalid legacy CUE redirect')
+        cue_changed |= row['synth'] != source['synth']
+        pos,fmt=cells['synth']
+        if pos is None or fmt != '>I': raise ValueError('invalid CUE cell')
+        ref=cues.data.index(source['synth'].encode()+b'\0',cues.strings,cues.binary)-cues.strings
+        struct.pack_into('>I',original,base+pos,ref)
+    for name, leaves in GRAPHS['graphs'].items():
+        observed=tuple(struct.unpack_from('>I',data,leaf['cell'])[0] for leaf in leaves)
+        expected=tuple(leaf['original_ref'] for leaf in leaves)
+        leaves_changed |= observed != expected
+        allowed = (name,) if name in PROTECTED else tuple(n for n in CUES if n not in PROTECTED)
+        if not any(observed == tuple(GRAPHS['graphs'][d][min(k,len(GRAPHS['graphs'][d])-1)]['original_ref']
+                                     for k in range(len(leaves))) for d in allowed):
+            raise ValueError('invalid or mixed donor audio leaves')
+        for leaf in leaves: struct.pack_into('>I',original,leaf['cell'],leaf['original_ref'])
+    if cue_changed and leaves_changed: raise ValueError('mixed legacy and graph audio redirects')
+    if hashlib.sha256(original).hexdigest() != CATALOG['bank_sha256']:
+        raise ValueError('CSB differs beyond authorized music fields')
+    return bytes(original)
 
 
 def patch(source, output, seed, mode):
@@ -123,21 +170,7 @@ def patch(source, output, seed, mode):
 
 
 def validate_resource_bank(data, mapping):
-    bank = UTF(data)
-    offset, size = next(row['utf'] for row in bank.rows if row['name'] == 'CUE')
-    base = bank.binary + offset; cue = UTF(data[base:base+size])
-    if len(cue.rows) != len(CUES): raise ValueError('resource cue catalog mismatch')
-    original = bytearray(data)
-    for i, row in enumerate(cue.rows):
-        if row['name'] not in CUES: raise ValueError('unknown resource BGM cue')
-        position, fmt = cue.cells[i]['synth']
-        if position is None or fmt != '>I': raise ValueError('resource synth layout mismatch')
-        # Recover the original reference from the unchanged string pool. The
-        # original bank hash then verifies ALL unrelated fields and graphs.
-        string = CUES[row['name']]['synth'].encode()+b'\0'
-        original_offset = cue.data.index(string, cue.strings, cue.binary)-cue.strings
-        original[base+position:base+position+4] = original_offset.to_bytes(4, 'big')
-    if rewrite_bank(bytes(original), mapping) != data:
+    if rewrite_bank(recover_bank(data), mapping) != data:
         raise ValueError('resource bank differs from the seed redirects')
 
 
@@ -162,5 +195,5 @@ def load_manifest(path, slot):
         raise ValueError('selected music resource bank does not match its manifest')
     validate_resource_bank(data, manifest['music_mapping'])
     return {'status': 'seed resource verified on disk; loaded Dolphin resource and playback unverified',
-            'seed': manifest['seed'], 'scope': 'compatible_bgm_bank', 'runtime_cue_policy': 'original',
+            'seed': manifest['seed'], 'scope': 'global_audio_content_bank', 'runtime_cue_policy': 'original',
             'resource_verified': True, 'audible_verified': False}

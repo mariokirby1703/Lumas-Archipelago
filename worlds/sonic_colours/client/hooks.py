@@ -10,7 +10,7 @@ from .memory import MemoryUnavailable
 from .versions import VERSION
 from .state import Snapshot
 from .native_read import read_saved_progress, read_stage_objects
-from ..world_constants import load_data, STAGES, STARTING_STAGES
+from ..world_constants import load_data, STAGES, STARTING_STAGES, NATIVE_COLOURS, WISPS
 from .binding import SaveBinding
 
 
@@ -191,7 +191,7 @@ class NativeHooks:
                         current_result=stage.get('result', {}),
                         stage_epoch=stage_epoch, pickup_verified=pickup_verified,
                         opened_capsules=frozenset(capsule['key'] for capsule in stage.get('capsules', []) if capsule['opened']),
-                        discovered_wisps=frozenset((2,1,4,5,7,3,6)[i] for i in range(7)
+                        discovered_wisps=frozenset(WISPS.index(NATIVE_COLOURS[i]) for i in range(7)
                             if native.get('progression_events',{}).get('discoveries',0) & (1<<i)),
                         # 8019DF48 returns rank-table index 0..3 (S,A,B,C),
                         # 4 for D; 8015F86C initializes unused records to FF.
@@ -260,8 +260,8 @@ class NativeHooks:
                 values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == mission))] = True
         options = slot_data['options']
         # 8015EC50 uses native colour IDs, not AP catalog order.
-        colours = ('Yellow Drill', 'Cyan Laser', 'Blue Cube', 'Green Hover',
-                   'Purple Frenzy', 'Orange Rocket', 'Pink Spikes')
+        from ..world_constants import NATIVE_COLOURS
+        colours = NATIVE_COLOURS
         for bit, colour in enumerate(colours):
             values[bit] = inventory['counts'][colour + ' Wisp'] > 0
         for zone in range(7):
@@ -314,8 +314,8 @@ class NativeHooks:
     def project_live_permissions(self, memory, snapshot, inventory, slot_data):
         if snapshot.scene == 'gameplay':
             stage = snapshot.evidence['native_data']['stage_objects'][0]
-            colours = ('Yellow Drill', 'Cyan Laser', 'Blue Cube', 'Green Hover',
-                       'Purple Frenzy', 'Orange Rocket', 'Pink Spikes')
+            from ..world_constants import NATIVE_COLOURS
+            colours = NATIVE_COLOURS
             mask = sum(1 << bit for bit, colour in enumerate(colours)
                        if inventory['counts'][colour + ' Wisp'])
             for address in (stage['stage'] + 0x61, stage['actor_state'] + 0x90):

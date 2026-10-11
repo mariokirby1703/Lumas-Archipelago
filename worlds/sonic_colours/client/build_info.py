@@ -19,7 +19,7 @@ def implementation_info():
     from .state import SaveGuard, WritePolicy
     from .memory import SonicMemory, DMEBackend
     from .gecko import inspect_c2, branch_target
-    from . import gameplay_controls, medal_hook, music_bank, map_refresh, live_music, direct_hooks
+    from . import gameplay_controls, medal_hook, music_bank, map_refresh, map_transition, live_music, direct_hooks
     from .runtime import rings_amount
     from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions, progression_hook, music
     functions = (NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
@@ -37,10 +37,10 @@ def implementation_info():
                  progression_hook.events, progression_hook.identity_tag, music.cue_records, music.apply_music, music.mapping_for,
                  gameplay_controls.payload, gameplay_controls.installed, gameplay_controls.configure, capsule_refresh.configure, capsule_refresh.installed_data,
                  native_read.read_medals, medal_hook.payload, medal_hook.installed_data, medal_hook.configure, medal_hook.observe,
-                 music_bank.plan, music_bank.rewrite_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch,
+                 music_bank.plan, music_bank.rewrite_bank, music_bank.recover_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch, journal.Journal.record_permissions,
                  live_music.apply, live_music.probe_bank, live_music.recover_original,
                  direct_hooks.plan, direct_hooks.install, direct_hooks.inspect, client.log_diagnostic, gameplay_controls.gecko_lines,
-                 map_refresh.payload, map_refresh.installed_data, map_refresh.configure, capsule_refresh.gecko_ini)
+                 map_refresh.payload, map_refresh.installed_data, map_refresh.configure, map_transition.payload, capsule_refresh.gecko_ini)
     digest = hashlib.sha256()
     for function in functions:
         digest.update(function.__qualname__.encode())

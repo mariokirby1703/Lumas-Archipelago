@@ -115,7 +115,8 @@ def configure(memory, snapshot, inventory, slot, journal=None):
         world |= 1 << 26
     if snapshot.save_identity is None:
         world=1<<20  # only the original mandatory introduction until first save
-    colours=('Yellow Drill','Cyan Laser','Blue Cube','Green Hover','Purple Frenzy','Orange Rocket','Pink Spikes')
+    from ..world_constants import NATIVE_COLOURS
+    colours=NATIVE_COLOURS
     mask=sum(1<<i for i,name in enumerate(colours) if inventory['counts'][name+' Wisp'])
     mask |= 0x80 if inventory['super_sonic_allowed'] else 0
     # Disable interception before resetting seed-owned event data. The seed tag

@@ -147,7 +147,7 @@ def test_native_music_table_redirects_readback(tmp_path):
     h=NativeHooks();m.write_guard=WritePolicy(m,Attributed(),h.snapshot)
     before={mission:m.read_bytes(a,32) for mission,a in cue_records(m)[3].items()}
     status=apply_music(m,slot)
-    assert status['changed_cues']>0 and not status['audible_verified']
+    assert status['changed_cues']==0 and not status['audible_verified']
     assert mapping_for(slot)==mapping_for(slot)
     for mission,address in cue_records(m)[3].items():
         assert m.read_bytes(address,32).split(b'\0',1)[0].decode()==mapping_for(slot)[mission]
@@ -173,10 +173,14 @@ def test_music_off_restores_prior_seed_native_redirect():
         def check(self,s):return 'fixture attributed map'
     h=NativeHooks();m.write_guard=WritePolicy(m,Attributed(),h.snapshot)
     slot=generate({'music_randomization':True}).worlds[1].fill_slot_data()
-    assert apply_music(m,slot)['changed_cues']>0
+    # Simulate the retired stage-only shuffle, then restore its vanilla alias.
+    from ..world_constants import NORMAL
+    addresses=cue_records(m)[3]
+    first,second=NORMAL[:2]
+    address=addresses[first['mission_id']]
+    m.backend.write_bytes(address,second['bgm'].encode().ljust(32,b'\0'))
     vanilla=generate({'music_randomization':False}).worlds[1].fill_slot_data()
     assert apply_music(m,vanilla)['changed_cues']>0
-    from ..world_constants import NORMAL
     expected={s['mission_id']:s['bgm'] for s in NORMAL}
     for mission,address in cue_records(m)[3].items():
         assert m.read_bytes(address,32).split(b'\0',1)[0].decode()==expected[mission]

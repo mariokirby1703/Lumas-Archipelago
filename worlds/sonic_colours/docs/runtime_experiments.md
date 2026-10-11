@@ -1,5 +1,9 @@
 # Sonic Colours Wii PAL v0.6.0: live experiments
 
+Current global music implementation and validation limits are described in
+[global_music_and_wisps.md](global_music_and_wisps.md). The notes below retain
+the original experiment context; direct injection remains experimental.
+
 This is an intentionally experimental build for PAL `SNCP8P` revision 0 only.
 **Do not test on your only save. Back up Dolphin data and use a disposable seed.**
 The package contains no game binaries or patched game files.
@@ -11,16 +15,17 @@ The package contains no game binaries or patched game files.
    permission layer. Both modes still require gameplay and generation testing.
 2. Music On (default) finds the original 87-cue CSB at the captured address
    `0x9017E8A0` (or a candidate pointer), but **only after hashing and fully
-   validating the bank**. It replaces compatible synth references in-place;
+   validating the bank**. It now replaces terminal audio references across
+   one global pool while retaining destination control graphs;
    music Off reverts them to original. It does not overwrite an ISO/CPK, or
    write any game code. The existing playing track may be cached; play into a
    world map, Game Land, or reload a scene to listen for new music. The default
-   seed `SonicSmoke42` changed 63 original cue mappings in offline tests. Actual
+   seed mapping is deterministic across eligible music categories. Actual
    playback in Dolphin remains unverified.
 3. The direct PPC injector is **opt-in only**. It writes 10 unmodified Gecko
    payloads into `0x80001800..0x80003000`, a former codehandler area that was
    all zero in specific captures with Gecko disabled. The complete current Gecko
-   export occupies 3256 bytes of its table budget. Original DOL text starts `0x80004000`.
+   export occupies 3248 bytes of its table budget. Original DOL text starts `0x80004000`.
    But ZERO in captured memory DOES NOT prove this scratch region is permanently
    reserved or executable. Dolphin may overwrite it, and DME does not provide
    JIT/ICache invalidation. A successful readback does NOT prove execution.

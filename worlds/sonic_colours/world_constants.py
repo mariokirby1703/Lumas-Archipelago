@@ -20,6 +20,11 @@ STARTING_STAGES = NORMAL + tuple(s for s in STAGES if s['zone_index'] < 6
 WORLDS = tuple(dict.fromkeys(s['world'] for s in STAGES if s['zone_index'] < 7))
 WISPS = ('White Boost', 'Cyan Laser', 'Yellow Drill', 'Orange Rocket',
          'Blue Cube', 'Green Hover', 'Pink Spikes', 'Purple Frenzy')
+# PAL native colour/permission indices, distinct from the stable AP item order.
+# 80765390's indexed sound table: 1 laser, 2 spike, 3 rocket, 4 rodeo,
+# 5 puzzle, 6 astronautes; capsule ORC colour is native index + 1.
+NATIVE_COLOURS = ('Yellow Drill', 'Cyan Laser', 'Pink Spikes', 'Orange Rocket',
+                  'Purple Frenzy', 'Blue Cube', 'Green Hover')
 RANKS = ('S', 'A', 'B', 'C')
 
 
