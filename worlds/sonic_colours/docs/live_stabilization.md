@@ -64,13 +64,23 @@ This confirms live pickup-to-server acknowledgement for Game Land 2-1, rather
 than installation readback alone. Death/restart durability for this new capture
 still needs its own live check.
 
+The user also collected the Game Land 4-1 Heart and supplied:
+
+```text
+Pickup detected: Eggman Hearts ['Game Land 4-1 - Eggman Heart']; Location queued: [847005009], LocationChecks sent: [847005009], Location acknowledged: [847005009]
+```
+
+Pickup-to-server acknowledgement is therefore live confirmed for both 2-1 and
+4-1. The other placements remain covered offline, rather than individually
+verified in gameplay.
+
 Offline validation: the full suite passed 1145 tests (199.23 seconds), and the
 generation matrix filled 400 reachable seeds across both progression modes,
 five goals and the requested option combinations. The initial run exposed a
 duplicate snapshot scan in WritePolicy; it was corrected before the final run.
 
-Still requiring controlled gameplay validation: the remaining Heart pickups
-(particularly 4-1), both Random Capsule variants and their original rewards, temporary
+Still requiring controlled gameplay validation: the remaining Heart pickups,
+both Random Capsule variants and their original rewards, temporary
 refill use/depletion before White ownership, audible Aquarium music after scene
 reload, and Act 6 first in Open Acts followed by all six genuine clears. The
 reported camera failure cannot be declared resolved solely from offline tests.
