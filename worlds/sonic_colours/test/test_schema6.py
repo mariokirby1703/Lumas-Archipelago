@@ -42,7 +42,7 @@ def test_native_patch_plan_stays_within_disabled_gecko_scratch():
     assert len({hook for hook,_,_,_,_ in hooks})==len(hooks)
     assert hooks[0][2]==direct_hooks.ARENA_START
     assert hooks[-1][2]+len(hooks[-1][3]) <= direct_hooks.ARENA_END
-    assert sum(len(code) for _,_,_,code,_ in hooks)==2952
+    assert sum(len(code) for _,_,_,code,_ in hooks) < direct_hooks.ARENA_END-direct_hooks.ARENA_START
 
 
 def test_bgm_87_cues_seed_permutation_and_safe_recovery():
@@ -75,3 +75,19 @@ def test_random_capsules_item_is_generated_once_with_stable_id():
     assert ITEM_TABLE[RANDOM_CAPSULES] == BASE_ID + 35
     assert classification(RANDOM_CAPSULES) == ItemClassification.progression
     assert sum(item.name == RANDOM_CAPSULES for item in world.itempool) == 1
+
+
+def test_full_refill_id_and_weighted_filler_distribution():
+    from ..Items import ITEM_TABLE, FILLER_WEIGHTS
+    assert ITEM_TABLE['Full Boost Refill'] == 847000036
+    world = generate().worlds[1]
+    from collections import Counter
+    counts = Counter(world.get_filler_item_name() for _ in range(20000))
+    for name, weight in FILLER_WEIGHTS.items():
+        assert abs(counts[name] / 20000 - weight / 100) < .02
+
+
+def test_complete_gecko_export_fits_native_table_budget():
+    from ..client.capsule_refresh import gecko_ini
+    lines = [line for line in gecko_ini().splitlines() if len(line)==17 and line[0] in '0123456789ABCDEF']
+    assert len(lines)*8 <= 3256

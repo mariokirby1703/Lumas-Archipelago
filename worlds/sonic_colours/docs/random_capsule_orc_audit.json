@@ -1,0 +1,1949 @@
+{
+  "source": "original PAL CPK",
+  "records": [
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 163,
+      "instances": 1,
+      "params": "40a0000041f0000041a00000420c0000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 282,
+      "instances": 1,
+      "params": "40a0000041f0000041a00000420c0000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 283,
+      "instances": 1,
+      "params": "40a0000041f0000041a00000420c0000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 284,
+      "instances": 1,
+      "params": "40a0000041f0000041a00000420c0000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 298,
+      "instances": 1,
+      "params": "40a0000041f0000041a00000420c0000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "MultiBoostBox",
+      "object_id": 156,
+      "instances": 1,
+      "params": "01000000000000712130851500000000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "MultiPhantomBox",
+      "object_id": 216,
+      "instances": 1,
+      "params": "00010000000000dadb31224200000000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "MultiPhantomBox",
+      "object_id": 120,
+      "instances": 1,
+      "params": "01000100000000ef02b2467800000000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "MultiPhantomBox",
+      "object_id": 63,
+      "instances": 1,
+      "params": "00010000000000dc2a5daf4900000000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "MultiPhantomBox",
+      "object_id": 220,
+      "instances": 1,
+      "params": "00010000000000e10000000000000000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "MultiPhantomBox",
+      "object_id": 243,
+      "instances": 1,
+      "params": "00010000000000f4db31224200000000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 299,
+      "instances": 1,
+      "params": "02010000000000000000013d11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 317,
+      "instances": 1,
+      "params": "02010000000000000020000f00000000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 321,
+      "instances": 1,
+      "params": "02000000000000000000014211c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 322,
+      "instances": 1,
+      "params": "02000000000000000000014300000000"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 331,
+      "instances": 1,
+      "params": "01000000000000000000014c90d3ad39"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 162,
+      "instances": 1,
+      "params": "0200000000000000000000bb11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 187,
+      "instances": 1,
+      "params": "02000000000000000000003d11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 61,
+      "instances": 1,
+      "params": "01000000000000000000013b11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 315,
+      "instances": 1,
+      "params": "010000000000000000000017510ee5b9"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 344,
+      "instances": 1,
+      "params": "02000000000000000000015911c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 345,
+      "instances": 1,
+      "params": "01000000000000000000015a11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 346,
+      "instances": 1,
+      "params": "02000000000000000000015b11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 347,
+      "instances": 1,
+      "params": "01000000000000000000015c11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 348,
+      "instances": 1,
+      "params": "01000000000000000000015d11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 349,
+      "instances": 1,
+      "params": "02000000000000000000015e11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 350,
+      "instances": 1,
+      "params": "02000000000000000000015f11c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 351,
+      "instances": 1,
+      "params": "01000000000000000000016011c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 352,
+      "instances": 1,
+      "params": "02000000000000000000016111c07909"
+    },
+    {
+      "mission": "stgA10",
+      "file": "stgA10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 353,
+      "instances": 1,
+      "params": "010000000000000000000162be5b263b"
+    },
+    {
+      "mission": "stgA30",
+      "file": "stgA30_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 99,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgA30",
+      "file": "stgA30_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 100,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgA30",
+      "file": "stgA30_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 113,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgA30",
+      "file": "stgA30_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 148,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgA30",
+      "file": "stgA30_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 149,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 41,
+      "instances": 1,
+      "params": "01000000000000000000002a11c07909"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 42,
+      "instances": 1,
+      "params": "01000000000000000000002b11c07909"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 43,
+      "instances": 1,
+      "params": "01000000000000000000002c7ae1acc8"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 233,
+      "instances": 1,
+      "params": "01000000000000000000019c11c07909"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 412,
+      "instances": 1,
+      "params": "01000000000000000000019d11c07909"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 413,
+      "instances": 1,
+      "params": "01000000000000000000019e11c07909"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 414,
+      "instances": 1,
+      "params": "01000000000000000000019f11c07909"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 415,
+      "instances": 1,
+      "params": "0100000000000000001001a089f114a1"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 533,
+      "instances": 1,
+      "params": "01000000000000000000021611c07909"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 534,
+      "instances": 1,
+      "params": "01000000000000000000001011c07909"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 16,
+      "instances": 1,
+      "params": "01000000000000000000021711c07909"
+    },
+    {
+      "mission": "stgB10",
+      "file": "stgB10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 535,
+      "instances": 1,
+      "params": "01000000000000000000004a02b24678"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 129,
+      "instances": 1,
+      "params": "02000000000000000000008211c07909"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 130,
+      "instances": 1,
+      "params": "02000000000000000000009a11c07909"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 154,
+      "instances": 1,
+      "params": "02000000000000000000008adb312242"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 97,
+      "instances": 1,
+      "params": "0200000000000000000000f211c07909"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 242,
+      "instances": 1,
+      "params": "02000000000000000000006311c07909"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 99,
+      "instances": 1,
+      "params": "0200010000000000000000f311c07909"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 243,
+      "instances": 1,
+      "params": "0200010000000000000000b711c07909"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 183,
+      "instances": 1,
+      "params": "0200000000000000000000f411c07909"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 244,
+      "instances": 1,
+      "params": "02000000000000000000000e11c07909"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 14,
+      "instances": 1,
+      "params": "0200010000000000000000f511c07909"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 245,
+      "instances": 1,
+      "params": "0200010000000000000000f72978ecb4"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 301,
+      "instances": 2,
+      "params": "0200000000000000001000ff7cc40477"
+    },
+    {
+      "mission": "stgB20",
+      "file": "stgB20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 35,
+      "instances": 2,
+      "params": "0200000000000000000000215363a03d"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 86,
+      "instances": 1,
+      "params": "02010000000000000000005702b24678"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 123,
+      "instances": 1,
+      "params": "020100000000000000000108db312242"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 121,
+      "instances": 1,
+      "params": "02010000000000000000007c11c07909"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 124,
+      "instances": 1,
+      "params": "02010000000000000000008311c07909"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 131,
+      "instances": 1,
+      "params": "02010000000000000000006800000000"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 368,
+      "instances": 1,
+      "params": "020100000000000000000173db312242"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 443,
+      "instances": 2,
+      "params": "02000000000000000000007711c07909"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 119,
+      "instances": 1,
+      "params": "0200010000000000000001bc11c07909"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 444,
+      "instances": 1,
+      "params": "0200010000000000000001bd11c07909"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 445,
+      "instances": 1,
+      "params": "0200010000000000000001be11c07909"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 446,
+      "instances": 1,
+      "params": "0200010000000000000001bfb41cbc4c"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 448,
+      "instances": 2,
+      "params": "02010000000000000000001b11c07909"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 27,
+      "instances": 1,
+      "params": "0200010000000000000001c111c07909"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 449,
+      "instances": 1,
+      "params": "02000100000000000000014711c07909"
+    },
+    {
+      "mission": "stgB30",
+      "file": "stgB30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 327,
+      "instances": 1,
+      "params": "0200000000000000000000845363a03d"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 467,
+      "instances": 1,
+      "params": "40a0000041f000004170000042200000"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 469,
+      "instances": 1,
+      "params": "40a0000041f000004170000042200000"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "MultiPhantomBox",
+      "object_id": 160,
+      "instances": 1,
+      "params": "00030000000000a32a5daf4900000000"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "MultiPhantomBox",
+      "object_id": 163,
+      "instances": 1,
+      "params": "00030000000000dc03eaeda000000000"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "MultiPhantomBox",
+      "object_id": 123,
+      "instances": 1,
+      "params": "000300000000007edb31224200000000"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 32,
+      "instances": 1,
+      "params": "04000000000000000000006011c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 96,
+      "instances": 1,
+      "params": "0100000000000000000000f011c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 240,
+      "instances": 1,
+      "params": "0400000000000000000000f311c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 243,
+      "instances": 1,
+      "params": "0100000000000000000000f411c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 244,
+      "instances": 1,
+      "params": "0400000000000000000000f611c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 246,
+      "instances": 1,
+      "params": "0100000000000000000000f711c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 247,
+      "instances": 1,
+      "params": "0100000000000000000000f811c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 248,
+      "instances": 1,
+      "params": "0400000000000000000000fb11c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 251,
+      "instances": 1,
+      "params": "01000000000000000000010211c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 258,
+      "instances": 1,
+      "params": "0400000000000000010000d2510ee5b9"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 474,
+      "instances": 1,
+      "params": "040000000000000005200101510ee5b9"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 301,
+      "instances": 1,
+      "params": "04000000000000000520012e510ee5b9"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 571,
+      "instances": 1,
+      "params": "00000000000000000000023c11c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 572,
+      "instances": 1,
+      "params": "00000000000000000000023ddb312242"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 574,
+      "instances": 1,
+      "params": "00000000000000000000023f11c07909"
+    },
+    {
+      "mission": "stgC10",
+      "file": "stgC10_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 575,
+      "instances": 1,
+      "params": "000000000000000000000032741e282a"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 19,
+      "instances": 1,
+      "params": "07000000000000000000001811c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 24,
+      "instances": 1,
+      "params": "07000000000000000000001d11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 29,
+      "instances": 1,
+      "params": "07000000000000000000002092fb78b4"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 37,
+      "instances": 1,
+      "params": "07000000000000000000002611c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 38,
+      "instances": 1,
+      "params": "07000000000000000000002313d2116a"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 39,
+      "instances": 1,
+      "params": "07000000000000000000002cb8846788"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 45,
+      "instances": 1,
+      "params": "07000000000000000000002f510ee5b9"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 14,
+      "instances": 1,
+      "params": "07000000000000000000003511c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 53,
+      "instances": 1,
+      "params": "07000000000000000000003eb8846788"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 68,
+      "instances": 1,
+      "params": "07000100000000000000004511c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 69,
+      "instances": 1,
+      "params": "07000100000000000000004619561729"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 90,
+      "instances": 1,
+      "params": "07000000000000000000005b11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 91,
+      "instances": 1,
+      "params": "07000000000000000000005c92fb78b4"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 95,
+      "instances": 1,
+      "params": "070000000000000000000060b8846788"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 103,
+      "instances": 1,
+      "params": "070000000000000002000069510ee5b9"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 125,
+      "instances": 1,
+      "params": "07000000000000000000007e510ee5b9"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 128,
+      "instances": 1,
+      "params": "070000000000000005200084510ee5b9"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 133,
+      "instances": 1,
+      "params": "07000000000000000000008611c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 134,
+      "instances": 1,
+      "params": "070000000000000005200088510ee5b9"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 141,
+      "instances": 1,
+      "params": "070000000000000000000090db312242"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 159,
+      "instances": 1,
+      "params": "0700000000000000000000aa11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 170,
+      "instances": 1,
+      "params": "0700000000000000000000b811c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 184,
+      "instances": 1,
+      "params": "0700000000000000000000ba286fca5c"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 200,
+      "instances": 1,
+      "params": "0700010000000000000000c911c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 201,
+      "instances": 1,
+      "params": "0700010000000000000000ca11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 202,
+      "instances": 1,
+      "params": "0700010000000000000000cb11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 203,
+      "instances": 1,
+      "params": "0700010000000000000000cc11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 204,
+      "instances": 1,
+      "params": "0700010000000000000000cd19561729"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 137,
+      "instances": 1,
+      "params": "07000000000000000520008a510ee5b9"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 112,
+      "instances": 1,
+      "params": "07000000000000000000007111c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 113,
+      "instances": 1,
+      "params": "07000000000000000000001411c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 20,
+      "instances": 1,
+      "params": "070000000000000000000015db312242"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 122,
+      "instances": 1,
+      "params": "07000000000000000000008111c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 129,
+      "instances": 1,
+      "params": "07000000000000000000004a11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 74,
+      "instances": 1,
+      "params": "07000000000000000000008200000000"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 3,
+      "instances": 1,
+      "params": "07000000000000000000009411c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 148,
+      "instances": 1,
+      "params": "07000000000000000000001e11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 30,
+      "instances": 1,
+      "params": "07000000000000000000009511c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 149,
+      "instances": 1,
+      "params": "07000000000000000000004d11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 77,
+      "instances": 1,
+      "params": "07000000000000000000009811c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 152,
+      "instances": 1,
+      "params": "07000000000000000000003111c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 49,
+      "instances": 1,
+      "params": "07000000000000000000009911c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 153,
+      "instances": 1,
+      "params": "07000000000000000000008f11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 143,
+      "instances": 1,
+      "params": "07000000000000000000009a11c07909"
+    },
+    {
+      "mission": "stgC40",
+      "file": "stgC40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 154,
+      "instances": 1,
+      "params": "07000000000000000000009b03eaeda0"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 136,
+      "instances": 1,
+      "params": "04000000000000000000009911c07909"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 153,
+      "instances": 1,
+      "params": "02000000000000000000009a2978ecb4"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 87,
+      "instances": 1,
+      "params": "02000000000000000000005811c07909"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 88,
+      "instances": 1,
+      "params": "02000000000000000000005911c07909"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 89,
+      "instances": 1,
+      "params": "02000000000000000000005a11c07909"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 90,
+      "instances": 1,
+      "params": "02000000000000000000005b11c07909"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 91,
+      "instances": 1,
+      "params": "02000000000000000000005c11c07909"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 92,
+      "instances": 1,
+      "params": "02000000000000000000005d11c07909"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 93,
+      "instances": 1,
+      "params": "02000000000000000000006711c07909"
+    },
+    {
+      "mission": "stgC50",
+      "file": "stgC50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 103,
+      "instances": 1,
+      "params": "0200000000000000000000915363a03d"
+    },
+    {
+      "mission": "stgE20",
+      "file": "stgE20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 73,
+      "instances": 1,
+      "params": "04000000000000000000004b11c07909"
+    },
+    {
+      "mission": "stgE20",
+      "file": "stgE20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 75,
+      "instances": 1,
+      "params": "04000000000000000000001811c07909"
+    },
+    {
+      "mission": "stgE20",
+      "file": "stgE20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 24,
+      "instances": 1,
+      "params": "0401000000000000000000c211c07909"
+    },
+    {
+      "mission": "stgE20",
+      "file": "stgE20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 194,
+      "instances": 1,
+      "params": "04010000000000000000000b11c07909"
+    },
+    {
+      "mission": "stgE20",
+      "file": "stgE20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 11,
+      "instances": 1,
+      "params": "0401000000000000000000c311c07909"
+    },
+    {
+      "mission": "stgE20",
+      "file": "stgE20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 195,
+      "instances": 1,
+      "params": "0401000000000000000000c4db312242"
+    },
+    {
+      "mission": "stgE30",
+      "file": "stgE30_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 96,
+      "instances": 1,
+      "params": "40a0000042a0000041a00000420c0000"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 48,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 50,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 47,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 49,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "EggMaskBox",
+      "object_id": 33,
+      "instances": 1,
+      "params": "40a0000041f0000041700000420c0000"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 19,
+      "instances": 1,
+      "params": "03000000000000000000001411c07909"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 20,
+      "instances": 1,
+      "params": "03000000000000000000001711c07909"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 23,
+      "instances": 1,
+      "params": "03000000000000000000001811c07909"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 24,
+      "instances": 1,
+      "params": "03000000000000000000001911c07909"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 25,
+      "instances": 1,
+      "params": "0300000000000000000000228a7c5220"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 43,
+      "instances": 1,
+      "params": "03000000000000000000002c11c07909"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 44,
+      "instances": 1,
+      "params": "03000000000000000000002d11c07909"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 45,
+      "instances": 1,
+      "params": "03000000000000000000002e11c07909"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 46,
+      "instances": 1,
+      "params": "0300000000000000000000305266a23f"
+    },
+    {
+      "mission": "stgE40",
+      "file": "stgE40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 72,
+      "instances": 1,
+      "params": "030000000000000000000016042f80c0"
+    },
+    {
+      "mission": "stgE50",
+      "file": "stgE50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 137,
+      "instances": 1,
+      "params": "06000000000000000000003a11c07909"
+    },
+    {
+      "mission": "stgE50",
+      "file": "stgE50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 58,
+      "instances": 1,
+      "params": "06010000000000000000004f11c07909"
+    },
+    {
+      "mission": "stgE50",
+      "file": "stgE50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 79,
+      "instances": 1,
+      "params": "06000000000000000000008a11c07909"
+    },
+    {
+      "mission": "stgE50",
+      "file": "stgE50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 138,
+      "instances": 1,
+      "params": "06010000000000000000008b11c07909"
+    },
+    {
+      "mission": "stgE50",
+      "file": "stgE50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 139,
+      "instances": 1,
+      "params": "06010000000000000000008c11c07909"
+    },
+    {
+      "mission": "stgE50",
+      "file": "stgE50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 140,
+      "instances": 1,
+      "params": "06010000000000000000008e89f114a1"
+    },
+    {
+      "mission": "stgE50",
+      "file": "stgE50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 156,
+      "instances": 1,
+      "params": "0600000000000000000000117cc40477"
+    },
+    {
+      "mission": "stgE50",
+      "file": "stgE50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 6,
+      "instances": 1,
+      "params": "06010000000000000000002a7cc40477"
+    },
+    {
+      "mission": "stgE50",
+      "file": "stgE50_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 301,
+      "instances": 1,
+      "params": "060000000000000000000000c2c80000"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "MultiBoostBox",
+      "object_id": 148,
+      "instances": 1,
+      "params": "01000000000000a33e4d11dc00000000"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 100,
+      "instances": 1,
+      "params": "01010000000000000000006321308515"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 202,
+      "instances": 1,
+      "params": "01010000000000000000015721308515"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 347,
+      "instances": 1,
+      "params": "01010000000000000000015c11c07909"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 348,
+      "instances": 1,
+      "params": "010100000000000000000058db312242"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 352,
+      "instances": 1,
+      "params": "010100000000000000000161db312242"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 182,
+      "instances": 1,
+      "params": "0101000000000000000000b711c07909"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 183,
+      "instances": 1,
+      "params": "01010000000000000000000b11c07909"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 11,
+      "instances": 1,
+      "params": "0101000000000000000000be11c07909"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 190,
+      "instances": 1,
+      "params": "01010000000000000000006011c07909"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 96,
+      "instances": 1,
+      "params": "01010000000000000000008311c07909"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 131,
+      "instances": 1,
+      "params": "0101000000000000000000bf11c07909"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 191,
+      "instances": 1,
+      "params": "0101000000000000000000c211c07909"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 194,
+      "instances": 1,
+      "params": "0101000000000000000000c311c07909"
+    },
+    {
+      "mission": "stgF30",
+      "file": "stgF30_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 195,
+      "instances": 1,
+      "params": "0101000000000000000000c9db312242"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 99,
+      "instances": 1,
+      "params": "0100000000000000000000d611c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 214,
+      "instances": 1,
+      "params": "010000000000000000000035510ee5b9"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 47,
+      "instances": 1,
+      "params": "070000000000000000000031db312242"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 190,
+      "instances": 1,
+      "params": "0100000000000000000000bf11c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 191,
+      "instances": 1,
+      "params": "01000000000000000000012b11c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 299,
+      "instances": 1,
+      "params": "070000000000000000000132510ee5b9"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 273,
+      "instances": 1,
+      "params": "01000000000000000000010500000000"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 148,
+      "instances": 1,
+      "params": "07000000000000000000009903eaeda0"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 165,
+      "instances": 1,
+      "params": "0100000000000000000000a611c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 166,
+      "instances": 1,
+      "params": "0700000000000000000000a7db312242"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 305,
+      "instances": 1,
+      "params": "0100000000000000000000c821308515"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 80,
+      "instances": 1,
+      "params": "07000000000000000000004f11c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 79,
+      "instances": 1,
+      "params": "010000000000000000000057510ee5b9"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 21,
+      "instances": 1,
+      "params": "0100000000000000000000c311c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 195,
+      "instances": 1,
+      "params": "0100000000000000000000cc3e4d11dc"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 102,
+      "instances": 1,
+      "params": "0700000000000000000000d4db312242"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 95,
+      "instances": 1,
+      "params": "0100000000000000002000ec510ee5b9"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 133,
+      "instances": 1,
+      "params": "01000000000000000000008f510ee5b9"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 3,
+      "instances": 1,
+      "params": "07000000000000000000020011c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 512,
+      "instances": 1,
+      "params": "07000000000000000000001e11c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 30,
+      "instances": 1,
+      "params": "01010000000000000000020111c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 513,
+      "instances": 1,
+      "params": "01010000000000000000020211c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 514,
+      "instances": 1,
+      "params": "07000000000000000000004a11c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 74,
+      "instances": 1,
+      "params": "0100000000000000000000a811c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 168,
+      "instances": 1,
+      "params": "01000000000000000000020311c07909"
+    },
+    {
+      "mission": "stgF40",
+      "file": "stgF40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 515,
+      "instances": 1,
+      "params": "0100000000000000000000a3db312242"
+    },
+    {
+      "mission": "stgG10",
+      "file": "stgG10_obj_00.orc",
+      "type": "MultiBoostBox",
+      "object_id": 480,
+      "instances": 1,
+      "params": "0100000000000003db31224200000000"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 342,
+      "instances": 1,
+      "params": "00000000000000000000015711c07909"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 343,
+      "instances": 1,
+      "params": "0000000000000000000001587cc40477"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 329,
+      "instances": 1,
+      "params": "00000000000000000000014a11c07909"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 330,
+      "instances": 1,
+      "params": "00000000000000000000014b11c07909"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 331,
+      "instances": 1,
+      "params": "00000000000000000000015b7cc40477"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 352,
+      "instances": 1,
+      "params": "00000000000000000000016211c07909"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 354,
+      "instances": 1,
+      "params": "000000000000000000100163510ee5b9"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 211,
+      "instances": 1,
+      "params": "0000000000000000001000da510ee5b9"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 240,
+      "instances": 1,
+      "params": "0000000000000000000000f111c07909"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 241,
+      "instances": 1,
+      "params": "0000000000000000000001642144df1c"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 363,
+      "instances": 1,
+      "params": "00000000000000000000016c11c07909"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 364,
+      "instances": 1,
+      "params": "0000000000000000000000028bb1ed18"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 122,
+      "instances": 1,
+      "params": "00000000000000000000007c11c07909"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 124,
+      "instances": 1,
+      "params": "00000000000000000000007511c07909"
+    },
+    {
+      "mission": "stgG20",
+      "file": "stgG20_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 117,
+      "instances": 1,
+      "params": "00000000000000000000007b03eaeda0"
+    },
+    {
+      "mission": "stgG30",
+      "file": "stgG30_obj_00.orc",
+      "type": "MultiBoostBox",
+      "object_id": 289,
+      "instances": 1,
+      "params": "0100000000000123db31224200000000"
+    },
+    {
+      "mission": "stgG40",
+      "file": "stgG40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 111,
+      "instances": 6,
+      "params": "00000000000000000000009511c07909"
+    },
+    {
+      "mission": "stgG40",
+      "file": "stgG40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 149,
+      "instances": 6,
+      "params": "00000000000000000000002cfa092009"
+    },
+    {
+      "mission": "stgG40",
+      "file": "stgG40_obj_00.orc",
+      "type": "ReleaseBoxSmall",
+      "object_id": 274,
+      "instances": 6,
+      "params": "0000000000000000001000327cc40477"
+    }
+  ]
+}

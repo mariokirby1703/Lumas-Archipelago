@@ -80,7 +80,7 @@ def test_white_control_guard_exact_fields_and_new_permissions():
     result=capsule_refresh.configure(m,snap,inventory([ITEM_TABLE['White Boost Wisp']]),slot)
     assert result['white_allowed'] and m.read_u32(address+8)==1
     with pytest.raises(MemoryUnavailable):m.write_u32(address+12,0,expected=0,operation='capsule_controls')
-    b.write_bytes(address+8,(2).to_bytes(4,'big'))
+    b.write_bytes(address+8,(4).to_bytes(4,'big'))
     with pytest.raises(MemoryUnavailable,match='unknown_revision'):m.verify_revision()
 
 

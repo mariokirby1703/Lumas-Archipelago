@@ -19,8 +19,8 @@ The package contains no game binaries or patched game files.
    playback in Dolphin remains unverified.
 3. The direct PPC injector is **opt-in only**. It writes 10 unmodified Gecko
    payloads into `0x80001800..0x80003000`, a former codehandler area that was
-   all zero in specific captures with Gecko disabled. There are 2952 payload
-   bytes, leaving considerable space. Original DOL text starts `0x80004000`.
+   all zero in specific captures with Gecko disabled. The complete current Gecko
+   export occupies 3256 bytes of its table budget. Original DOL text starts `0x80004000`.
    But ZERO in captured memory DOES NOT prove this scratch region is permanently
    reserved or executable. Dolphin may overwrite it, and DME does not provide
    JIT/ICache invalidation. A successful readback does NOT prove execution.
@@ -72,10 +72,11 @@ strategy. No guaranteed Gecko-free full integration is claimed here.
 
 New seeds include the progression item `Random Capsules` (stable item offset 35).
 It independently gates question-mark ReleaseBoxSmall capsules with native
-colour -1, +148=0 and +14A nonzero. White Boost ownership does not unlock them.
+colour -1 and either native special marker +148 or +14A. White Boost ownership does not unlock them.
 The native alternate-content marker is preserved during ghost/content model
-replacement and collision re-registration. Other multi-Wisp capsules remain
-excluded. Update the APWorld and Gecko codes, restart both programs, and
+replacement and collision re-registration. The native question-mark multi-Wisp
+variant uses its original reward path. Fixed White capsules retain their separate
+White permission. Update the APWorld and Gecko codes, restart both programs, and
 regenerate the seed to include the new item in the pool. Old seeds have no
 Random Capsules item unless explicitly granted by the server.
 

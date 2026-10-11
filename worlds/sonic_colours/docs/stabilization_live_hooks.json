@@ -1,0 +1,36 @@
+{
+  "read_only": true,
+  "revision": "92aefe33b577493b492f8433ca68b90d25d29d2f6d9c85310a6829481281f8a9",
+  "scene": [
+    {
+      "context": 2427153600,
+      "vtable": 2155257232,
+      "application": 2156976896,
+      "map_mode": 2,
+      "scene": "global_map"
+    }
+  ],
+  "capsule": {
+    "installed": true,
+    "variant": "current_white_collision_refresh",
+    "hook": 2148354084,
+    "target": 2147492704,
+    "payload_length": 920,
+    "actual_header_length": 920,
+    "return_instruction": 1208820020,
+    "return_target": 2148354088,
+    "white_data_offset": 904
+  },
+  "medal": 2147495856,
+  "progression": 2147493944,
+  "controls": {
+    "boost": null,
+    "boost_use": 2147494168,
+    "boost_query": 2147494344,
+    "boost_add": 2147494520,
+    "speed_get": 2147494684,
+    "speed_set": 2147494840,
+    "speed_ui": 2147495016
+  },
+  "map_refresh": 2147495392
+}

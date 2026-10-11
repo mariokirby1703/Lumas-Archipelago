@@ -6,7 +6,7 @@ import pytest
 import yaml
 from BaseClasses import CollectionState
 from ..Items import EMERALDS,ITEM_TABLE,RING_VALUES,WISP_ITEMS,WORLD_ITEMS
-from ..Options import OPTION_NAMES,StartingAct,Goal,SonicColoursOptions
+from ..Options import OPTION_NAMES,Goal,SonicColoursOptions
 from ..world_constants import STARTING_STAGES,STAGES,BASE_ID,pack_rings
 from ..client.runtime import inventory,victory,validate_slot,Runtime
 from ..client.journal import Journal
@@ -27,7 +27,7 @@ def test_schema_and_stable_emerald_ids():
     assert [ITEM_TABLE[n] for n in EMERALDS] == list(range(BASE_ID+15,BASE_ID+22))
     assert not {'wisp_unlocks','world_unlocks','chaos_emerald_items','red_ring_bundle_strategy','wisp_capsule_sanity'} & set(OPTION_NAMES)
     assert set(Goal.options) == {'nega_wisp_armor','all_bosses','all_red_rings','all_game_land_stages','super_sonic'}
-    assert StartingAct.default == 'random' and len(StartingAct.options) == 42
+    assert 'starting_act' not in OPTION_NAMES
     assert len(STARTING_STAGES) == 42 and 'stg790' not in {s['mission_id'] for s in STARTING_STAGES}
     assert sum(s['kind']=='Boss' for s in STARTING_STAGES) == 6
 
@@ -102,7 +102,7 @@ def test_supplied_yaml_migrates_and_generates():
     assert m.can_beat_game() and m.worlds[1].ring_target==187
     old={'Sonic Colours (Wii)':{'goal':'all_story_clears','wisp_capsule_sanity':'story','wisp_unlocks':'vanilla','world_unlocks':'vanilla','chaos_emerald_items':False}}
     new,changes=migrate_yaml(old)
-    assert new['Sonic Colours (Wii)']=={'goal':'all_bosses','wisp_capsules':True} and changes
+    assert new['Sonic Colours (Wii)']=={'goal':'all_bosses','wisp_capsules':True,'world_progression':'sequential','music_randomization':True} and changes
     with pytest.raises(ValueError,match='schema migration'):
         validate_slot({**m.worlds[1].fill_slot_data(),'schema_version':2})
 

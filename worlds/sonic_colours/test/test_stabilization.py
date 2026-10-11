@@ -38,7 +38,7 @@ def test_normal_poll_configures_white_before_optional_failures_and_after_receipt
     native = replace(reader.snapshot(memory), save_identity='fixture')
     hooks.snapshot = lambda memory: native
     hooks.project_permissions = lambda *args: None
-    def unavailable(*args): raise MemoryUnavailable('optional fixture hook unavailable')
+    def unavailable(*args, **kwargs): raise MemoryUnavailable('optional fixture hook unavailable')
     if failed_hook == 'progression': monkeypatch.setattr(progression_hook, 'configure', unavailable)
     if failed_hook == 'gameplay': monkeypatch.setattr(gameplay_controls, 'configure', unavailable)
     slot = generate({'boost_lock': True}).worlds[1].fill_slot_data()
@@ -48,6 +48,7 @@ def test_normal_poll_configures_white_before_optional_failures_and_after_receipt
         runtime.poll(memory, [], False)
         assert memory.read_u32(address+8) == 0
         assert hooks.gameplay_controls_status['white_capsules'] == {'available': True, 'white_allowed': False,
+                                                                  'random_capsules_allowed': False,
                                                                   'collision_reenable_installed': True}
         runtime.poll(memory, white, True)
         assert memory.read_u32(address+8) == 1
