@@ -9,7 +9,7 @@ Guest code and Dolphin JIT state are never modified by this module.
 import hashlib
 import struct
 from .memory import MemoryUnavailable, valid_range
-from .music_bank import CATALOG, CUES, PROTECTED, WISP_CUES, plan, rewrite_bank, recover_bank
+from .music_bank import CATALOG, CUES, WISP_CUES, FINITE_CUES, PLAYBACK, plan, rewrite_bank, recover_bank
 from .cpk import UTF
 
 ORIGINAL_SHA256 = CATALOG['bank_sha256']
@@ -70,7 +70,7 @@ def apply(memory, slot, test_pair=None):
     mapping = plan(slot['seed_name'], 'anywhere' if on else 'off')
     if test_pair is not None:
         destination,donor=test_pair
-        if not on or destination in PROTECTED or donor in PROTECTED or destination not in CUES or donor not in CUES:
+        if not on or destination not in CUES or donor not in CUES:
             raise MemoryUnavailable('music test requires two eligible cues and Music Randomization On')
         owner=next(name for name,value in mapping.items() if value==donor)
         mapping[owner],mapping[destination]=mapping[destination],mapping[owner]
@@ -86,10 +86,13 @@ def apply(memory, slot, test_pair=None):
                        'verified PAL BGM bank already matches this seed',
             'bank_address':f'0x{base:08X}', 'scope':'one global pool / destination control graphs retained',
             'strategy':'destination_graph_audio_leaves_v1',
-            'protected_cues':sorted(PROTECTED),
+            'pool_size':len(CUES), 'excluded_cues':[],
             'transformation_cues':sorted(WISP_CUES),
-            'finite_audio_donors':['bgm_pha_rkt'],
-            'finite_audio_destinations':[n for n,d in mapping.items() if d == 'bgm_pha_rkt'],
+            'finite_audio_donors':sorted(FINITE_CUES),
+            'finite_audio_destinations':{n:d for n,d in mapping.items() if n != d and d in FINITE_CUES},
+            'duration_validation':('pending: finite donor repetition adaptation and timed destination cutoff are not verified'
+                                   if on else 'vanilla bank restored; no shuffled duration adaptation'),
+            'native_repeat_fields':{n:PLAYBACK['cues'][n]['native_repeat'] for n,d in mapping.items() if n != d and d in FINITE_CUES},
             'wisp_music_mapping':{n:mapping[n] for n in sorted(WISP_CUES)},
             'test_pair':test_pair,
             'randomized_cues':sum(name!=donor for name,donor in mapping.items()),

@@ -1,7 +1,7 @@
 """Global PAL audio-content shuffle retaining each destination's control graph.
 
 Change only leaf AAX references in the resident CSB. Cue identity, native filter,
-boost/sleep graphs, audio bytes and synchronized/critical music remain intact.
+boost/sleep graphs and audio bytes remain intact. Every catalog cue participates.
 """
 import hashlib
 import json
@@ -15,6 +15,13 @@ CATALOG = load_data('bgm_cues.json')
 CUES = {row['name']: row for row in CATALOG['cues']}
 AUDIO = load_data('bgm_audio_identity.json')
 GRAPHS = load_data('bgm_graphs.json')
+PLAYBACK = load_data('bgm_playback.json')
+if PLAYBACK['bank_sha256'] != CATALOG['bank_sha256'] or set(PLAYBACK['cues']) != set(CUES):
+    raise ValueError('PAL playback catalog mismatch')
+for name, evidence in PLAYBACK['cues'].items():
+    if evidence['leaf_audio'] != [l['audio'] for l in GRAPHS['graphs'][name]]:
+        raise ValueError('PAL playback audio graph mismatch')
+FINITE_CUES = frozenset(n for n,r in PLAYBACK['cues'].items() if not r['audio_has_loop'])
 if GRAPHS['bank_sha256'] != CATALOG['bank_sha256'] or set(GRAPHS['graphs']) != set(CUES):
     raise ValueError('PAL BGM graph catalog mismatch')
 if AUDIO['bank_sha256'] != CATALOG['bank_sha256'] or set(AUDIO['cues']) != set(CUES):
@@ -31,66 +38,44 @@ for name, evidence in TRANSFORMATIONS['cues'].items():
             any(evidence['sound'].get(k) != v for k, v in
                 {'fmt': 0, 'nch': 2, 'stmflg': 1, 'sfreq': 48000}.items())):
         raise ValueError('PAL transformation audio/graph evidence mismatch')
-PROTECTED = frozenset(name for name in CUES if name.startswith('bgm_jingle_')
-                      or name in ('bgm_sys_theme', 'bgm_sys_op', 'bgm_sys_end'))
-LEGACY_PROTECTED = PROTECTED | WISP_CUES
-
-
-def group(name):
-    if name in WISP_CUES: return 'transformations'
-    if name.startswith('bgm_stg'): return 'stage_' + name.rsplit('_', 1)[1]
-    if name.startswith('bgm_boss_'): return 'boss'
-    if name in {f'bgm_mlt_{letter}' for letter in 'abcdefg'}: return 'game_land'
-    if name == 'bgm_wmap' or name.startswith('bgm_zmap_'): return 'maps'
-    return 'menus'
+# Read-only migration whitelist for the retired CUE-root patch format. These
+# restrictions never apply to current audio-leaf planning, writing or recovery.
+LEGACY_PROTECTED = frozenset(n for n in CUES if n.startswith(('bgm_jingle_', 'bgm_pha_'))
+                             or n in ('bgm_sys_theme', 'bgm_sys_op', 'bgm_sys_end'))
 
 
 def plan(seed, mode):
-    if mode not in ('off', 'per_world', 'anywhere') or not isinstance(seed, str) or not seed:
+    if mode not in ('off', 'anywhere') or not isinstance(seed, str) or not seed:
         raise ValueError('BGM bank requires a seed and supported music mode')
     result = {name: name for name in CUES}
     if mode == 'off': return result
-    groups = {}
-    for name, row in CUES.items():
-        if name in PROTECTED: continue
-        key = group(name) if mode == 'per_world' else 'global'
-        groups.setdefault(key, []).append(name)
-    rng = random.Random(int.from_bytes(hashlib.sha256(f'{seed}:sonic-bgm-bank-v1'.encode()).digest(), 'big'))
-    for key in sorted(groups):
-        names = sorted(groups[key]); donors = names.copy(); rng.shuffle(donors)
-        # Eliminate self-maps without retry loops or a biased fallback seed.
-        fixed = [i for i, (name, donor) in enumerate(zip(names, donors)) if name == donor]
-        if len(names) > 1:
-            if len(fixed) == 1:
-                i = fixed[0]; j = (i + 1) % len(names)
-                donors[i], donors[j] = donors[j], donors[i]
-            elif fixed:
-                original_fixed = [donors[i] for i in fixed]
-                for i, donor in zip(fixed, original_fixed[1:] + original_fixed[:1]): donors[i] = donor
-        # Distinct cues can be aliases of the very same AAX music (Aquarium
-        # Acts 1/4, 2/5 and 3/6). Find a seeded perfect matching by audio identity.
-        choices = {n: [d for d in donors if AUDIO['cues'][n] != AUDIO['cues'][d]] for n in names}
-        assigned = {}
-        def assign(name, seen):
-            for donor in choices[name]:
-                if donor in seen: continue
-                seen.add(donor)
-                if donor not in assigned or assign(assigned[donor], seen):
-                    assigned[donor] = name
-                    return True
-            return False
-        if all(assign(n, set()) for n in names):
-            result.update({name: donor for donor, name in assigned.items()})
-        else:
-            result.update(zip(names, donors))
-    return result
+    rng = random.Random(int.from_bytes(hashlib.sha256(f'{seed}:sonic-bgm-all87-v1'.encode()).digest(), 'big'))
+    names = sorted(CUES); rng.shuffle(names)
+    donors = sorted(CUES); rng.shuffle(donors)
+    # One bipartite matching across ALL cues. Exclude only self/audio aliases,
+    # never categories, flags, formats, durations or gameplay contexts.
+    choices = {n: [d for d in donors if AUDIO['cues'][n] != AUDIO['cues'][d]] for n in names}
+    assigned = {}
+    def assign(name, seen):
+        for donor in choices[name]:
+            if donor in seen: continue
+            seen.add(donor)
+            if donor not in assigned or assign(assigned[donor], seen):
+                assigned[donor] = name
+                return True
+        return False
+    if all(assign(n, set()) for n in names):
+        return {name: donor for donor, name in assigned.items()}
+    # A seeded cycle is always a cue derangement if audio aliases prevent a
+    # perfect audio-identity matching. It still includes every original cue.
+    return dict(zip(names, names[1:] + names[:1]))
 
 
 def rewrite_bank(original, mapping):
     if hashlib.sha256(original).hexdigest() != CATALOG['bank_sha256']:
         raise ValueError('original PAL BGM bank SHA256 mismatch')
-    if set(mapping) != set(CUES) or any(donor not in CUES for donor in mapping.values()):
-        raise ValueError('BGM mapping must cover exactly the original cue catalog')
+    if set(mapping) != set(CUES) or set(mapping.values()) != set(CUES):
+        raise ValueError('BGM mapping must be a permutation of the complete original cue catalog')
     bank = UTF(original)
     offset, size = next(row['utf'] for row in bank.rows if row['name'] == 'CUE')
     base = bank.binary + offset; cue = UTF(original[base:base+size])
@@ -100,8 +85,6 @@ def rewrite_bank(original, mapping):
     output = bytearray(original)
     for name, donor in mapping.items():
         source, target = CUES[name], CUES[donor]
-        if ((name in PROTECTED and donor != name) or donor in PROTECTED and donor != name):
-            raise ValueError('incompatible or protected BGM redirect')
         i, j = indices[name], indices[donor]
         for key in ('id', 'flags', 'synth'):
             if cue.rows[i][key] != source[key]: raise ValueError('PAL cue identity mismatch')
@@ -127,7 +110,7 @@ def recover_bank(data):
 
     Reconstruct ALL allowed cells, hash every immutable byte, then prove that
     each destination's leaf vector comes from one eligible donor. Unknown refs,
-    damaged graphs, protected edits and mixed legacy/current layouts are rejected.
+    damaged graphs and mixed legacy/current layouts are rejected.
     """
     outer = UTF(data)
     offset, size = next(r['utf'] for r in outer.rows if r['name'] == 'CUE')
@@ -151,7 +134,7 @@ def recover_bank(data):
         observed=tuple(struct.unpack_from('>I',data,leaf['cell'])[0] for leaf in leaves)
         expected=tuple(leaf['original_ref'] for leaf in leaves)
         leaves_changed |= observed != expected
-        allowed = (name,) if name in PROTECTED else tuple(n for n in CUES if n not in PROTECTED)
+        allowed = tuple(CUES)
         if not any(observed == tuple(GRAPHS['graphs'][d][min(k,len(GRAPHS['graphs'][d])-1)]['original_ref']
                                      for k in range(len(leaves))) for d in allowed):
             raise ValueError('invalid or mixed donor audio leaves')
@@ -177,7 +160,7 @@ def patch(source, output, seed, mode):
                 'source_cpk_sha256': PAL_CPK_SHA256, 'resource_file': output.name,
                 'original_bank_sha256': CATALOG['bank_sha256'],
                 'patched_bank_sha256': hashlib.sha256(replacement).hexdigest(),
-                'music_mapping': mapping, 'protected_cues': sorted(PROTECTED),
+                'music_mapping': mapping, 'pool_size': len(CUES),
                 'runtime_cue_policy': 'original', 'audible_verified': False}
     manifest_path.write_text(json.dumps(manifest, indent=2)+'\n', encoding='utf-8')
     return manifest

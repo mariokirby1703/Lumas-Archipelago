@@ -1,7 +1,6 @@
 """Preserve vanilla mission aliases for the global resident audio-bank shuffle."""
 from .memory import MemoryUnavailable
 from .native_read import STAGE_TABLE_GLOBAL
-from .audio import plan_music
 from ..world_constants import NORMAL
 
 

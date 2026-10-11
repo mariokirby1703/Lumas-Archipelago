@@ -39,8 +39,10 @@ Ring counters cannot enter this grant set or be replayed through it.
 
 ## One global music pool
 
-Music On uses one eligible pool for Acts, world maps, Game Land, bosses and
-menus. Compatibility no longer splits that pool. The destination keeps its
+Music On uses one pool containing all 87 original music cues: Acts, world maps,
+Game Land, all bosses, menus, Wisps, results, musical jingles and opening/ending.
+There are no excluded cues or category pools. Compatibility no longer splits
+that pool. The destination keeps its
 original CUE, SYNTH graph, ISAAC controls, filters, gain/envelopes and routing.
 Only terminal SYNTH `lnkname` references change to existing donor AAX audio.
 No modified ISO, external music/CPK, new allocation or code hook is required.
@@ -56,15 +58,18 @@ gain and transitions still require listening in Dolphin.
 `bgm_graphs.json` records exact original field locations and reference values.
 Validation reconstructs every permitted field and hashes the entire original
 bank, then verifies that each destination's audio vector comes from one
-eligible donor. Mixed stems from unrelated donors, protected edits, unknown
+catalog donor. Mixed stems from unrelated donors, unauthorized field edits, unknown
 references, graph damage and combined legacy/current layouts are rejected.
 Exact previous compatible-CUE layouts can migrate. Music Off restores the
 complete byte-for-byte vanilla bank. Native mission aliases stay vanilla so
 the old Act-only permutation cannot compose with this bank shuffle.
 
-Excluded source and destination cues: `bgm_jingle_*`,
-`bgm_sys_theme`, `bgm_sys_op`, `bgm_sys_end`. These retain synchronized
-opening/ending, transformation and critical jingle behavior.
+All `bgm_jingle_*`, `bgm_sys_theme`, `bgm_sys_op` and `bgm_sys_end` participate
+as sources and destinations. The old protected/compatible CUE-root whitelist
+exists only to authenticate and recover historical patches; it cannot restrict
+the new audio-leaf permutation. Every supplied mapping must be a bijection of
+the entire 87-cue catalog. The optional old Act exporter now delegates to this
+same permutation; it no longer creates a separate Act shuffle.
 
 The seed mapping is deterministic and avoids self/identical-audio mappings
 where possible. `/sonicmusictest DESTINATION_CUE DONOR_CUE` provides a clearly
@@ -105,8 +110,9 @@ permissions. These are verified associations, not abbreviation guesses:
 | `bgm_pha_multi_united` | Native multi-Wisp mode 2, variant 1 |
 
 The multi-Wisp selector remains mode/variant based; it is not reassigned to a
-single colour. Actor+104's Super Sonic override still requests the protected
-`bgm_jingle_super_sonic`. Wisp-start requests go through `80126554`; Wisp-end
+single colour. Actor+104's Super Sonic override still requests
+`bgm_jingle_super_sonic`, whose audio now participates in the global shuffle.
+Wisp-start requests go through `80126554`; Wisp-end
 events retain native `80123730` handle release/fade. No player timer, stage cue
 identity, playback handle, activation callback or executable is patched by
 music randomization.
@@ -127,13 +133,22 @@ segments. Recovery retains the exact prior legacy CUE whitelist and validates
 the expanded current audio-leaf donor set against the canonical bank hash.
 Earlier resident global banks can migrate; Off restores the entire original.
 
-**Known remaining native duration issue:** Rocket's original AAX has only a
-non-looping segment, unlike the other nine cues. The client preserves this
-finite audio instead of inventing an unsupported CRI repeat value. Rocket is
-in the global pool, but continuous playback when it is assigned to a map or
-other single-leaf destination still needs a verified native loop adaptation.
+**Known remaining native duration issue:** Original AAX segment analysis finds
+nine finite donors: `bgm_sys_theme`, `bgm_sys_op`, `bgm_sys_end`,
+`bgm_stg720_elv`, the three clear jingles, `bgm_jingle_drown` and
+`bgm_pha_rkt`. All remain in the pool. Continuous playback of these donors in
+longer scenes still needs a verified native loop adaptation. Conversely, a
+looping donor in a short result/jingle/opening destination needs verification
+that native event handling cuts it off correctly. Retaining destination graph
+bytes proves control preservation, not equivalent playback duration.
 The Act complex synth's original repeat flag is preserved; actual restart
-behavior there also requires listening. This is not a completed looping claim.
+behavior there also requires listening. No unsupported repeat value or audio
+loop flag is written. This duration adaptation is outstanding implementation
+work, not merely a completed feature awaiting a listening test.
+`tools/analyze_music_playback.py` reproduces the all-87-cue playback evidence
+in `data/bgm_playback.json` from the original CPK. It records source segment
+loops, mono/stereo formats and native synth repeat values. Diagnostics list
+finite donors and their assigned destinations without excluding them.
 CRI distinguishes waveform loops from sequence repetition; current ADX
 [looping documentation](https://game.criware.jp/manual/native/adx2_en/latest/craftv2_tips_decide_loop.html)
 does not establish the semantics of this older PAL CSB's repeat field.
@@ -154,7 +169,9 @@ may retain cached audio. `/sonicmusictest off` clears the temporary test pair.
 All these audible/native timing checks are pending, explicitly deferred by the
 user until the next live session. Offline coverage includes all 60 reciprocal
 Wisp/category combinations, canonical recovery, destination-control identity,
-the resident write transaction, critical-jingle rejection and vanilla restore.
+the resident write transaction and vanilla restore. Additional coverage checks
+all 7,569 source/destination combinations against the original bank, including
+jingles, cutscenes and final-boss cues; these are offline resource tests.
 
 ## Act 6 return with a locked successor
 

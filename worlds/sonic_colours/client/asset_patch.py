@@ -1,12 +1,9 @@
 """Apply a seed's actual music redirects to a separate player-owned PAL CPK."""
 import argparse
-import hashlib
 import json
 from pathlib import Path
 import re
 
-from .audio import plan_music
-from .cpk import CPK, UTF
 from ..world_constants import NORMAL
 
 
@@ -43,37 +40,10 @@ def replace_music(script, mapping):
 
 
 def patch_music(source, output, seed, mode):
-    if mode not in ('per_world', 'anywhere') or not seed:
-        raise ValueError('music patch requires seed and per_world/anywhere mode')
-    if Path(str(output) + '.json').exists():
-        raise ValueError('output manifest already exists')
-    archive = CPK(source)
-    banks = [row for row in archive.toc.rows if row['FileName'] == 'bgm.strm.csb']
-    if len(banks) != 1:
-        raise ValueError('PAL BGM cue bank not unique')
-    bank = UTF(archive.read(banks[0]))
-    cue = next(row for row in bank.rows if row['name'] == 'CUE')
-    offset, size = cue['utf']
-    cues = UTF(bank.data[bank.binary + offset:bank.binary + offset + size])
-    # Lua BGM values are cue aliases, not necessarily AAX basenames. For
-    # example Act 4 reuses a waveform through its own named cue.
-    available = {row['name'] for row in cues.rows}
-    mapping = plan_music(seed, mode, available)
-    indices = [index for index, row in enumerate(archive.toc.rows)
-               if row['DirName'] == '' and row['FileName'] == 'actstgmission.lua']
-    if len(indices) != 1:
-        raise ValueError('original mission script not unique')
-    index = indices[0]
-    original = archive.read(archive.toc.rows[index])
-    replacement = replace_music(original, mapping)
-    archive.replace_member(output, index, replacement, PAL_CPK_SHA256)
-    manifest = {'seed': seed, 'mode': mode, 'source_cpk_sha256': PAL_CPK_SHA256,
-                'original_script_sha256': hashlib.sha256(original).hexdigest(),
-                'patched_script_sha256': hashlib.sha256(replacement).hexdigest(),
-                'music_mapping': mapping,
-                'validation': 'CPK decompression, PAL asset names, redirects and archive readback; audible playback unverified'}
-    Path(str(output) + '.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
-    return manifest
+    # Retired Act-only exporter now delegates to the same complete global bank
+    # permutation. Production uses live_music and never requires this copy.
+    from .music_bank import patch
+    return patch(source, output, seed, mode)
 
 
 def main():
@@ -81,11 +51,11 @@ def main():
     parser.add_argument('source', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--seed', required=True)
-    parser.add_argument('--mode', required=True, choices=('per_world', 'anywhere'))
+    parser.add_argument('--mode', required=True, choices=('anywhere',))
     args = parser.parse_args()
     result = patch_music(args.source, args.output, args.seed, args.mode)
     print(json.dumps({'output': str(args.output), 'manifest': str(args.output) + '.json',
-                      'validation': result['validation']}, indent=2))
+                      'audible_verified': result['audible_verified']}, indent=2))
 
 
 if __name__ == '__main__':

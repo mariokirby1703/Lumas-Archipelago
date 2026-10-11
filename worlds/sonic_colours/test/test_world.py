@@ -11,7 +11,7 @@ from .. import Items, Locations
 from ..Options import SonicColoursOptions, OPTION_NAMES
 from ..world_constants import STAGES, NORMAL, load_data, game_land_gates, pack_rings
 from ..client.staging import plan_stage_mapping
-from ..client.audio import plan_music
+from ..client.audio import canonical_act_cues
 from ..client.runtime import validate_slot, inventory
 from ..client.memory import MemoryUnavailable
 from . import generate
@@ -127,7 +127,7 @@ def test_plans_are_bijections_and_not_native_patches():
             elif mode == 'per_world':
                 assert next(t for t in STAGES if t['mission_id'] == mapping[s['stage_slot_id']])['zone_index'] == s['zone_index']
     with pytest.raises(MemoryUnavailable, match='asset_index'):
-        plan_music('seed', 'anywhere', set())
+        canonical_act_cues(set())
 
 
 def test_output_and_tamper_rejection():

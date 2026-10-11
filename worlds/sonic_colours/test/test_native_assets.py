@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from ..client.asset_patch import replace_music, NAME, BGM
-from ..client.audio import plan_music
+from ..client.audio import canonical_act_cues
 from ..client.cpk import CPK, UTF
 from ..client.runtime import validate_slot
 from ..world_constants import NORMAL
@@ -13,16 +13,15 @@ from . import generate
 SOURCE = Path(__file__).parents[1] / 'notes/memdumps_and_more/sonic2010_0.cpk'
 
 
-@pytest.mark.parametrize('mode', ['per_world', 'anywhere'])
 @pytest.mark.skipif(not SOURCE.exists(), reason='private original PAL CPK not installed')
-def test_original_archive_music_redirects(mode):
+def test_original_archive_canonical_cues_and_byte_restoration():
     archive = CPK(SOURCE)
     script = archive.read(next(row for row in archive.toc.rows if row['FileName'] == 'actstgmission.lua'))
     bank = UTF(archive.read(next(row for row in archive.toc.rows if row['FileName'] == 'bgm.strm.csb')))
     offset, size = next(row['utf'] for row in bank.rows if row['name'] == 'CUE')
     cues = UTF(bank.data[bank.binary + offset:bank.binary + offset + size])
     available = {row['name'] for row in cues.rows}
-    mapping = plan_music('native-regression', mode, available)
+    mapping = canonical_act_cues(available)
     patched = replace_music(script, mapping)
     entries = list(NAME.finditer(patched))
     for index, entry in enumerate(entries):

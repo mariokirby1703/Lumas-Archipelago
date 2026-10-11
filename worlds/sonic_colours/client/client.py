@@ -39,10 +39,10 @@ class SonicCommands(ClientCommandProcessor):
         if not self.ctx.runtime or not self.ctx.authenticated_identity:
             logger.info('Connect to your Sonic Colours slot first.')
             return
-        from .music_bank import CUES, PROTECTED
+        from .music_bank import CUES
         if destination=='off' and not donor:
             self.ctx.runtime.music_test_pair=None
-        elif (destination in CUES and donor in CUES and destination not in PROTECTED and donor not in PROTECTED
+        elif (destination in CUES and donor in CUES
               and self.ctx.runtime.slot_data['options']['music_randomization']):
             self.ctx.runtime.music_test_pair=(destination,donor)
         else:

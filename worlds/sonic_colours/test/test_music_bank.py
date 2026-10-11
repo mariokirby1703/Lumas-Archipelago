@@ -19,21 +19,19 @@ def bank():
 
 
 @pytest.mark.parametrize('seed',range(100))
-@pytest.mark.parametrize('mode',('per_world','anywhere'))
-def test_seed_music_bank_permutations_preserve_protected_cues_and_global_pool(seed,mode):
+@pytest.mark.parametrize('mode',('anywhere',))
+def test_seed_music_bank_permutations_cover_all_87_cues(seed,mode):
     m=music_bank.plan(str(seed),mode)
     assert m==music_bank.plan(str(seed),mode)
     assert set(m)==set(m.values())==set(music_bank.CUES)
-    assert all(m[n]==n for n in music_bank.PROTECTED)
+    assert len(m) == 87 and all(n != d for n, d in m.items())
     if mode=='anywhere':
         assert any(music_bank.CUES[n]['compatibility']!=music_bank.CUES[d]['compatibility'] for n,d in m.items())
-        assert any(music_bank.group(n)!=music_bank.group(d) for n,d in m.items())
-    if mode=='per_world': assert all(music_bank.group(n)==music_bank.group(d) for n,d in m.items())
-    assert any(n!=d for n,d in m.items() if n not in music_bank.PROTECTED)
+    assert all(music_bank.AUDIO['cues'][n] != music_bank.AUDIO['cues'][d] for n,d in m.items())
 
 
 @pytest.mark.skipif(not SOURCE.exists(),reason='original PAL CPK absent')
-@pytest.mark.parametrize('mode',('per_world','anywhere'))
+@pytest.mark.parametrize('mode',('anywhere',))
 def test_original_bgm_rewrite_changes_only_audio_leaves_preserving_control_graphs(mode):
     original=bank();m=music_bank.plan('native-music-regression',mode)
     patched=music_bank.rewrite_bank(original,m)
@@ -50,7 +48,7 @@ def test_original_bgm_rewrite_changes_only_audio_leaves_preserving_control_graph
     corrupted=bytearray(patched);corrupted[-1]^=1
     with pytest.raises(ValueError):music_bank.validate_resource_bank(bytes(corrupted),m)
     bad=m.copy();bad['bgm_sys_title']='bgm_jingle_drown'
-    with pytest.raises(ValueError,match='incompatible or protected'):music_bank.rewrite_bank(original,bad)
+    with pytest.raises(ValueError,match='permutation'):music_bank.rewrite_bank(original,bad)
 
 
 @pytest.mark.skipif(not SOURCE.exists(),reason='original PAL CPK absent')
@@ -93,7 +91,7 @@ def test_reported_aquarium_seed_changes_actual_audio_not_aliases():
     mapping = music_bank.plan('53608322755801233751', 'anywhere')
     for name in (*[f'bgm_stg5{i}0_qua' for i in range(1,7)], 'bgm_zmap_qua'):
         assert music_bank.AUDIO['cues'][name] != music_bank.AUDIO['cues'][mapping[name]]
-    assert any(music_bank.group(mapping[name]) != 'stage_qua' for name in mapping if name.startswith('bgm_stg5'))
+    assert any(not mapping[name].startswith('bgm_stg5') for name in mapping if name.startswith('bgm_stg5'))
 
 
 @pytest.mark.skipif(not SOURCE.exists(),reason='original PAL CPK absent')

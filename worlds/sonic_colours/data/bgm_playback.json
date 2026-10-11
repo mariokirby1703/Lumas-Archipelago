@@ -1,0 +1,2032 @@
+{
+  "bank_sha256": "48eef93bd2744820a95432e848c687c71bc166e3549889720402535ff7757842",
+  "cues": {
+    "bgm_sys_theme": {
+      "cue_flags": 0,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_sys_theme_wav.aax"
+      ],
+      "audio_has_loop": false
+    },
+    "bgm_sys_op": {
+      "cue_flags": 0,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_sys_op_wav.aax"
+      ],
+      "audio_has_loop": false
+    },
+    "bgm_sys_end": {
+      "cue_flags": 0,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_sys_end_wav.aax"
+      ],
+      "audio_has_loop": false
+    },
+    "bgm_stg110_rso": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg110_rso_wav.aax",
+        "Synth/bgm_stg110_rso_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg120_rso": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg120_rso_wav.aax",
+        "Synth/bgm_stg120_rso_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg130_rso": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg110_rso_wav.aax",
+        "Synth/bgm_stg110_rso_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg140_rso": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg130_rso_wav.aax",
+        "Synth/bgm_stg130_rso_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg150_rso": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg120_rso_wav.aax",
+        "Synth/bgm_stg120_rso_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg160_rso": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg130_rso_wav.aax",
+        "Synth/bgm_stg130_rso_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg210_fct": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg210_fct_wav.aax",
+        "Synth/bgm_stg210_fct_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg220_fct": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg220_fct_wav.aax",
+        "Synth/bgm_stg220_fct_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg230_fct": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg230_fct_wav.aax",
+        "Synth/bgm_stg230_fct_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg240_fct": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg210_fct_wav.aax",
+        "Synth/bgm_stg210_fct_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg250_fct": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg220_fct_wav.aax",
+        "Synth/bgm_stg220_fct_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg260_fct": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg230_fct_wav.aax",
+        "Synth/bgm_stg230_fct_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg310_shp": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg310_shp_nomal_wav.aax",
+        "Synth/bgm_stg310_shp_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg320_shp": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg320_shp_nomal_wav.aax",
+        "Synth/bgm_stg320_shp_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg330_shp": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg330_shp_nomal_wav.aax",
+        "Synth/bgm_stg330_shp_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg340_shp": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg320_shp_nomal_wav.aax",
+        "Synth/bgm_stg320_shp_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg350_shp": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg310_shp_nomal_wav.aax",
+        "Synth/bgm_stg310_shp_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg360_shp": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg320_shp_nomal_wav.aax",
+        "Synth/bgm_stg320_shp_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg410_pla": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg410_pla_wav.aax",
+        "Synth/bgm_stg410_pla_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg420_pla": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg420_pla_wav.aax",
+        "Synth/bgm_stg420_pla_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg430_pla": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg430_pla_wav.aax",
+        "Synth/bgm_stg430_pla_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg440_pla": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg410_pla_wav.aax",
+        "Synth/bgm_stg410_pla_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg450_pla": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg420_pla_wav.aax",
+        "Synth/bgm_stg420_pla_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg460_pla": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg430_pla_wav.aax",
+        "Synth/bgm_stg430_pla_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg510_qua": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg510_qua_nomal_wav.aax",
+        "Synth/bgm_stg510_qua_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg520_qua": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg520_qua_nomal_wav.aax",
+        "Synth/bgm_stg520_qua_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg530_qua": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg530_qua_nomal_wav.aax",
+        "Synth/bgm_stg530_qua_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg540_qua": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg510_qua_nomal_wav.aax",
+        "Synth/bgm_stg510_qua_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg550_qua": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg520_qua_nomal_wav.aax",
+        "Synth/bgm_stg520_qua_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg560_qua": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg530_qua_nomal_wav.aax",
+        "Synth/bgm_stg530_qua_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg610_ast": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg610_ast_normal_wav.aax",
+        "Synth/bgm_stg610_ast_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg620_ast": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg620_ast_normal_wav.aax",
+        "Synth/bgm_stg620_ast_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg630_ast": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg630_ast_normal_wav.aax",
+        "Synth/bgm_stg630_ast_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg640_ast": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg610_ast_normal_wav.aax",
+        "Synth/bgm_stg610_ast_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg650_ast": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg620_ast_normal_wav.aax",
+        "Synth/bgm_stg620_ast_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg660_ast": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg630_ast_normal_wav.aax",
+        "Synth/bgm_stg630_ast_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg710_elv": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg710_elv_wav.aax",
+        "Synth/bgm_stg710_elv_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg720_elv": {
+      "cue_flags": 0,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_stg720_elv_wav.aax",
+        "Synth/bgm_stg720_elv_fx_wav.aax"
+      ],
+      "audio_has_loop": false
+    },
+    "bgm_boss_coreboss": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_boss_coreboss_wav.aax",
+        "Synth/bgm_boss_coreboss_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_boss_Jellyboss": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_boss_Jellyboss_normal_wav.aax",
+        "Synth/bgm_boss_Jellyboss_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_boss_shipboss": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_boss_shipboss_wav.aax",
+        "Synth/bgm_boss_shipboss_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_boss_lastboss_1": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_boss_lastboss_1_wav.aax",
+        "Synth/bgm_boss_lastboss_1_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_boss_lastboss_2": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_boss_lastboss_2_wav.aax",
+        "Synth/bgm_boss_lastboss_2_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_mlt_a": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_mlt_a_nomal_wav.aax",
+        "Synth/bgm_mlt_a_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_mlt_b": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_mlt_b_nomal_wav.aax",
+        "Synth/bgm_mlt_b_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_mlt_c": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_mlt_c_nomal_wav.aax",
+        "Synth/bgm_mlt_c_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_mlt_d": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_mlt_d_nomal_wav.aax",
+        "Synth/bgm_mlt_d_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_mlt_e": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_mlt_e_nomal_wav.aax",
+        "Synth/bgm_mlt_e_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_mlt_f": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_mlt_f_nomal_wav.aax",
+        "Synth/bgm_mlt_f_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_mlt_g": {
+      "cue_flags": 1,
+      "root_type": 1,
+      "native_repeat": 1,
+      "leaf_audio": [
+        "Synth/bgm_mlt_g_nomal_wav.aax",
+        "Synth/bgm_mlt_g_fx_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_mlt_title": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_mlt_title_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_jingle_mlt_clear": {
+      "cue_flags": 0,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_jingle_mlt_clear_wav.aax"
+      ],
+      "audio_has_loop": false
+    },
+    "bgm_mlt_result": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_mlt_result_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_wmap": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_worldmap_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_zmap_rso": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_zmap_rso_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_zmap_fct": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_zmap_fct_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_zmap_shp": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_zmap_shp_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_zmap_pla": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_zmap_pla_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_zmap_qua": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_zmap_qua_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_zmap_ast": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_zmap_ast_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_zmap_elv": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_zmap_elv_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_sys_title": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_sys_title_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_sys_option": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_sys_option_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_sys_save": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_sys_save_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_sys_result": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_sys_result_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_jingle_stg_clear": {
+      "cue_flags": 0,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_jingle_stg_clear_wav.aax"
+      ],
+      "audio_has_loop": false
+    },
+    "bgm_jingle_boss_clear": {
+      "cue_flags": 0,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_jingle_boss_clear_wav.aax"
+      ],
+      "audio_has_loop": false
+    },
+    "bgm_jingle_drown": {
+      "cue_flags": 0,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_jingle_drown_wav.aax"
+      ],
+      "audio_has_loop": false
+    },
+    "bgm_jingle_gameover": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_jingle_gameover_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_jingle_super_sonic": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_jingle_super_sonic_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_pha_spn": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_spn_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_pha_spn_wtr": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_spn_wtr_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_pha_spk": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_spk_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_pha_ast": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_ast_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_pha_rod": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_rod_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_pha_lsr": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_lsr_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_pha_rkt": {
+      "cue_flags": 0,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_rkt_wav.aax"
+      ],
+      "audio_has_loop": false
+    },
+    "bgm_pha_pzl": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_pzl_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_pha_multi_common": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_multi_common_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_pha_multi_united": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_pha_multi_united_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_stg730_elv": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_stg730_elv_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_jingle_mlt_drown": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_jingle_mlt_drown_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_sys_challenge": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_sys_challenge_wav.aax"
+      ],
+      "audio_has_loop": true
+    },
+    "bgm_sys_challenge_result": {
+      "cue_flags": 1,
+      "root_type": 0,
+      "native_repeat": 0,
+      "leaf_audio": [
+        "Synth/bgm_sys_challenge_result_wav.aax"
+      ],
+      "audio_has_loop": true
+    }
+  },
+  "audio": {
+    "Synth/bgm_boss_Jellyboss_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "d13346f80ed94b642e2cb6afab2e5306554521e5d7058221057395cb61ecbd10",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7658236
+    },
+    "Synth/bgm_boss_Jellyboss_normal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "40765d75eed7962d31b9569802e77259e91ba886b370a1f6772728323860c18f",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7658236
+    },
+    "Synth/bgm_boss_coreboss_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "6c318b68508686a5abc260a8d6b5467d315f787e76f1fe05973a91d11be14481",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4800029
+    },
+    "Synth/bgm_boss_coreboss_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "d5fcac489f63fcf85a945badfd672a47da0bb4c83818e5e1e2440e0b92932c76",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4800029
+    },
+    "Synth/bgm_boss_lastboss_1_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "f4d4b3d673253511142d3dfa62f3250779a06bc5309acf04bff1fb4662fd377b",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 11582425
+    },
+    "Synth/bgm_boss_lastboss_1_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "bf1490f0b3807ee0163157aa24c6fad18abf1631beb8808c508db319aabf598d",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 11582425
+    },
+    "Synth/bgm_boss_lastboss_2_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "d8ec800a23a7ec3a72b8e362759dbd43366a5880043c0d37eeb084ef001643de",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 9539278
+    },
+    "Synth/bgm_boss_lastboss_2_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "5a49c3bb253d2b0c6b31a47d4d7aff1a132a9bca68b196a191709cdab438e033",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 9539278
+    },
+    "Synth/bgm_boss_shipboss_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "5ba4b23f9398aa89703a243220dc34e547db51f24cfdfe9f869da7dc16bc0181",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4720270
+    },
+    "Synth/bgm_boss_shipboss_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "c74776e1a88a52f5e62ac9126757b5f814764a3c8127e7a1fd96eb7ae836b1d1",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4720270
+    },
+    "Synth/bgm_jingle_boss_clear_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "d493a34059c93afcf14f364ab1aea8d33a9f63921577024433b58306f50b8b29",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 483535
+    },
+    "Synth/bgm_jingle_drown_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "2c18b391d2acfaa463e24393fa85ced48086479ae5466e5c66acb25abab6ee5b",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 688055
+    },
+    "Synth/bgm_jingle_gameover_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "e3307f5139e4a6c464455706c65ef2c0ea77abe7ef5ea61a9dfd14df71e844ca",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 925420
+    },
+    "Synth/bgm_jingle_mlt_clear_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "5c91974b82b4fa1f33ffc5475a0fa8d5704a98e67d4f58810e0d3a70cb04c24d",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 587291
+    },
+    "Synth/bgm_jingle_mlt_drown_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "1cba029ad8037042d37e94109e148c583e8c48e621f974f7c4a68894c2a008cd",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 635576
+    },
+    "Synth/bgm_jingle_stg_clear_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "bba93b8dce1d73c1df0742f84a9ec2054c47a67566cd4d499f0581a98830932e",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 473380
+    },
+    "Synth/bgm_jingle_super_sonic_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "453e7cf4feb9cc7309a191511c6de02f0ca276e173ea90546d6d21f5954d80a7",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 906960
+    },
+    "Synth/bgm_mlt_a_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "75a545d2bbe5fde8df5813d44238db3c5778087ead42ba172d415a50b775c082",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5928473
+    },
+    "Synth/bgm_mlt_a_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "87ae1800bd1c2c401d0aff58b5c7db298f39e7edaf1f459b6545b1a9bc301cf1",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5928473
+    },
+    "Synth/bgm_mlt_b_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "3a31272e94ccd854f078f2dab4386874a9d3577c6b08fbc23399c428c5284c1a",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5290532
+    },
+    "Synth/bgm_mlt_b_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "e830080e82718b38b8f6e632389e6e09625f1e54548231e3e4b31e434b1c8848",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5290532
+    },
+    "Synth/bgm_mlt_c_fx_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "d0cc9f8562f5e1312485362aecd9d10c4b715d34ddd1adfa00485daeaf2ba970",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5760014
+    },
+    "Synth/bgm_mlt_c_nomal_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "48be7a8a79cbb198d640ef3e86d4df4ea25066beb67d01b161e8f7a57306f486",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5760014
+    },
+    "Synth/bgm_mlt_d_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "d5739e5b18cf08abcd8e4e662c1ec5f16ad8b69949794792319952eacca7ea3b",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7630955
+    },
+    "Synth/bgm_mlt_d_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "87c50686565bc3f9dec4e8b6b2336216b7311eb57982753d93de7a645ddb10bf",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7630955
+    },
+    "Synth/bgm_mlt_e_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "9f0cfd0514edfd10401c9d99b7da44e74caf6206e5a6b47a6a7d69355e3543ea",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6319526
+    },
+    "Synth/bgm_mlt_e_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "ca7fddbc23a7dc15bbd251611d55a78c7988e998369a4a95f174f936611faeb4",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6319526
+    },
+    "Synth/bgm_mlt_f_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "a25004343c3a11c99b1c3b57a26affb5227fff56f103d80e57bd95fc73d0130e",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5811962
+    },
+    "Synth/bgm_mlt_f_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "01e7e0a5d2b07a9cf1dc24cdef5e1bddc00b79aff9b67ad70cae41eb121909fd",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5811962
+    },
+    "Synth/bgm_mlt_g_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "d2ed5688bebf6631877ec16e984c25bebc8d7db897aa9d2e626cbb556ea8476f",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6583562
+    },
+    "Synth/bgm_mlt_g_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "a0d942be97bc2853a5fe008f919f6c4c58aa4e8eb1436eb9931a7a5897232eb5",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6583562
+    },
+    "Synth/bgm_mlt_result_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "d5937d5644233c5ee467d55c9e6aa0a0898158434e9e4491bca6d68084819ee3",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 1741030
+    },
+    "Synth/bgm_mlt_title_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "05c5ccbd776d5e5433f4027db63eba19e537f488b4a895d1ce13fa833971bc59",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 1898361
+    },
+    "Synth/bgm_pha_ast_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "52effe35122634e9c13dc69935c2091f65a62431f4549dba6fc3d43800f95b0c",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 677684
+    },
+    "Synth/bgm_pha_lsr_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "ba050eb5774dec96a91d9a8ea8ac07e72ac26cccb0222fe3f4bf1051e5d63779",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 384010
+    },
+    "Synth/bgm_pha_multi_common_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "4479c78523b40ba418ccbb8e035de448458f905ac944feffc646b8bab9433d67",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 737276
+    },
+    "Synth/bgm_pha_multi_united_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "0e25bbe4ded0b5d1ddecd9039399d45ab949617457863cc20eff3a7a42c43336",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 737277
+    },
+    "Synth/bgm_pha_pzl_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "350f3936da3c4e351c942f43f1fd68f0231d546aca9e4ca8c7aad23e9575baa3",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 847077
+    },
+    "Synth/bgm_pha_rkt_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "f1539fcdacc5117cfda9cef3b49ba1d15e6431763950821452ce85cdb5bb1bb1",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 353534
+    },
+    "Synth/bgm_pha_rod_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "7cc4053e9b06dfe3f41d63ed47f9eaa0e2348f4ea1bd3d5c8073113acc492e3b",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 231141
+    },
+    "Synth/bgm_pha_spk_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "1e576494db42710dffb8fc68cadf0574b7712356c1015db246da0fb365a77fb7",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 581346
+    },
+    "Synth/bgm_pha_spn_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "dc1034d49feeb0dc483ae39521c516408ada13ec4a20d7e45e9ae09bc24967af",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 255709
+    },
+    "Synth/bgm_pha_spn_wtr_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "9625fbe02f185cb7077c2db947686fd89563a2214f0d660cac5349f8cd19556f",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 647998
+    },
+    "Synth/bgm_stg110_rso_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "cafbb00b58aa5bef5afac318f634b354de8bed3310d8474304b313a05eadaab3",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6572886
+    },
+    "Synth/bgm_stg110_rso_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "2e1173d56465a35dab533bf26b862d579a5e590fa3212ab7e022b50dbb68b62a",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6572886
+    },
+    "Synth/bgm_stg120_rso_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "bf7da9e857f2f8c2d6a4319a45415c657e494d25d1831acac5b22dac52803c7a",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6030794
+    },
+    "Synth/bgm_stg120_rso_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "a08d24b25607e4ba9e83562be76aad80ebe374a7cc7113cfedc4a562534cc36d",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6030794
+    },
+    "Synth/bgm_stg130_rso_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "da0b71be23a33ee6c9877977baf9a08025a23c534c12ecfd6066c5fe51b82156",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 3915291
+    },
+    "Synth/bgm_stg130_rso_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "975a695276e03024d570364df289c1bac95a65ece839f44a8706fa0f3ab070d8",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 3915291
+    },
+    "Synth/bgm_stg210_fct_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "2889ea00fa6ef0382932cb6dcb37e8cce2aec7e9f90a3cf4f53725d1c34f1b81",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5487618
+    },
+    "Synth/bgm_stg210_fct_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "b4a493d257fd2d836aac9de18a5899fedfa57381fa6c338f9b55ff2bda6ca66a",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5487618
+    },
+    "Synth/bgm_stg220_fct_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "7a496949302ec7cc682cb2b1b2e9587567933a754ba6eab1c3eb1f29a3e6214f",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4357486
+    },
+    "Synth/bgm_stg220_fct_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "0585427125251b922faa12d7f7d70a8a120600823bd0d5c0abcf8a68a16929fd",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4357486
+    },
+    "Synth/bgm_stg230_fct_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "da5e6de2c5a486838b6b88614cd5fb016e5053f612b7cf617546a28776fa763f",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 8974667
+    },
+    "Synth/bgm_stg230_fct_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "431cc2edf145a3eb319135131ad1d22cc1d1607784682e5843a0a330488fecc5",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 8974667
+    },
+    "Synth/bgm_stg310_shp_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "287993177ad8152d7c411d87357e4bf22585080e141d562a1aa0e9aa16b8d1dc",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5760737
+    },
+    "Synth/bgm_stg310_shp_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "8a3598d1e359fec96ba6f71cfd15d1e78584b0d62062ae4534f9daffc5cb860b",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5760737
+    },
+    "Synth/bgm_stg320_shp_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "183395ca513705547143bc4ea1fc204de086e4cc73d37465ff4d1b59109535c0",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4507821
+    },
+    "Synth/bgm_stg320_shp_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "7c7f89edbaa56252b21517c75da5fdae587fe1ade4bbc8f3e6fd7d79779770ea",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4507821
+    },
+    "Synth/bgm_stg330_shp_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "2966ab900c55eeb056bbb93271809307c9db0dc6d62d9090bf6878bae56cad46",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4736161
+    },
+    "Synth/bgm_stg330_shp_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "6505d0532c06b87b9e00f343ae9d6ca00416ccadaa8abc75bdf8c0d8476757db",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 4736161
+    },
+    "Synth/bgm_stg410_pla_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "723acef8f4e6847439a8f838312c925e062869cbed9f814d014a08e6cb714be1",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7629126
+    },
+    "Synth/bgm_stg410_pla_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "b98d6820c2dfa26f2b276f300d6d84ee4d863ebe578abe638b57103234ea96fb",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7629126
+    },
+    "Synth/bgm_stg420_pla_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "f3bdcc0ad74f55d479db3b758d458f43d3e77e94ca582b241a9c6e200e741096",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7245722
+    },
+    "Synth/bgm_stg420_pla_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "a9071155c2bb866b56fc567a4d5d9da068fffa122fed18557477f94b01267e60",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7245722
+    },
+    "Synth/bgm_stg430_pla_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "b4aa9df8a690579d64bab0d010c29957f9faa3ccfe6b9838dc24eab6da756916",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5680034
+    },
+    "Synth/bgm_stg430_pla_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "f50b3a62d3b2ca0d2c18ba1a2f90a1f14b4b544c536e4afb0ae3ff0d14364973",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5680034
+    },
+    "Synth/bgm_stg510_qua_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "256338686cb692fc8a2e4b2c2ab81293671c92a39b652ef7e2f2de07ccfad709",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6319528
+    },
+    "Synth/bgm_stg510_qua_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "6ea00ba83afdbc78a50309d01e3dafaf4e44cdbefce9f562b03b31b7da7701b5",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6319528
+    },
+    "Synth/bgm_stg520_qua_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "2d37df52dc3c5b98a80a1eb8eb3eb5fb76043e77df0d31b0c9f62d96b397320d",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6344393
+    },
+    "Synth/bgm_stg520_qua_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "f69a0357e676712e3fac17b13572e37b5b72a04d36b39c39dc72b18a3aa6eaf8",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6344393
+    },
+    "Synth/bgm_stg530_qua_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "9e0b88bc0feef1c0e42981071ef68354b5a26464275763a571f64dd825de0660",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5266313
+    },
+    "Synth/bgm_stg530_qua_nomal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "4a8dd30bab4292f47fe8df5f8ddf0a7a66d14c6d3cc4e19bcdb5280b9fce0a82",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5266313
+    },
+    "Synth/bgm_stg610_ast_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "0dd39fd458a009481070cc07e1e61befe5e9c4d17e436724fed8f9de8131217b",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5826935
+    },
+    "Synth/bgm_stg610_ast_normal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "e156e31ca74b121cb0376328e2566fa44fb0b6a435197ce3987fccf15dd1ff01",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5826935
+    },
+    "Synth/bgm_stg620_ast_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "5f1f4eb0a1b1556ca3bbb43893c834ea404c442f38b2253812214e868d20fa95",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6171196
+    },
+    "Synth/bgm_stg620_ast_normal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "ab39d218ee9709137ea1f626b419b80aca6980b3b9f4e63810e5e9cecb4cbc6e",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6171196
+    },
+    "Synth/bgm_stg630_ast_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "70c11c13b96920c85ce7ce7313822dd10ad7a97a0e3e453fde75d8af9843b077",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7449263
+    },
+    "Synth/bgm_stg630_ast_normal_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "b837061419b7b016a77204442b58eebb619e2f58b5675ea24ec2e9c881804c09",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7449263
+    },
+    "Synth/bgm_stg710_elv_fx_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "703100b8d67c6e2d1f70492df730b9b2b9ff3f992602396c7372881618b99942",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6320154
+    },
+    "Synth/bgm_stg710_elv_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "2df7d775caaaef33b39d900849db8f7181d29d8b5f8ad7b55f14ed5672efff6a",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6320154
+    },
+    "Synth/bgm_stg720_elv_fx_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "662e6f239f14e3748a8810d8222fb4e12069034ecce7361d53a17ed7f96094bf",
+      "fmt": 0,
+      "nch": 1,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 1548622
+    },
+    "Synth/bgm_stg720_elv_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "d43c520cae5462d7192190e5afe089368005fa22ee0f089e2589e46256de4cc0",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 1548622
+    },
+    "Synth/bgm_stg730_elv_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "69bf74b8912340d7e3ed18611c3be51b0a837c49b50b95792cb1ab4d78f18510",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 267119
+    },
+    "Synth/bgm_sys_challenge_result_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "9f780d139301cfb4b5f9564df38cc3c6a746b43adb2d3a16f112a8cd07499d9d",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 1662820
+    },
+    "Synth/bgm_sys_challenge_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "b78a6b04cd06a095e8bec60affe42058071651366926f3319d8f6d64be22c53a",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 2200522
+    },
+    "Synth/bgm_sys_end_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "925417768e42fcf37cb50cd371e2614d640e53e411924b016ae3d61f82c76227",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 14024789
+    },
+    "Synth/bgm_sys_op_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "7e3f722406223fa0f5ac537283e7852d3d59e0099616e50ba45d4843d0402a01",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 11690246
+    },
+    "Synth/bgm_sys_option_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "de9fb93f14a4aa31aaf3d5efc94021da709e70fc9ce3bc53002fce69869e8747",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 3357478
+    },
+    "Synth/bgm_sys_result_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "90396d735a07fedc1e33e010631c2cf23b35ed50b30e3f05c8ea6fcc2003383f",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 2223371
+    },
+    "Synth/bgm_sys_save_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "50ec942423ac640de99a4b4909466f4291f68283017721c1ee41619df34ea092",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 2413781
+    },
+    "Synth/bgm_sys_theme_wav.aax": {
+      "loop_segments": [
+        0
+      ],
+      "aax_sha256": "fcfb05cf3515f778f53542ea6189a002e8a6d9cfab00e6ee759770466e6512cf",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 13479390
+    },
+    "Synth/bgm_sys_title_wav.aax": {
+      "loop_segments": [
+        1
+      ],
+      "aax_sha256": "3fb3645859b82e62cb5b84e4502b24a9704c143fe91d40b3ca2fccdd7d8fd945",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7137457
+    },
+    "Synth/bgm_worldmap_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "957c71e7dd0a1ee3d033fdbf960cce941f9854b00a2377fbc2f371da153bd7a7",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 2417738
+    },
+    "Synth/bgm_zmap_ast_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "479f148b3ca171d5108f6297a00d61bfc5a3c96a5b79d1f8a4fb63f576878bfd",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6883604
+    },
+    "Synth/bgm_zmap_elv_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "eec3d0aa149e0f159e2c7126492fa162e74eddcd8e23827de7706caccbd1beb4",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 3920921
+    },
+    "Synth/bgm_zmap_fct_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "858891c82c42d2d9d3eeeca48bd5ab58f300fb117fdd885f17440134e68d2a8e",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6114820
+    },
+    "Synth/bgm_zmap_pla_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "a6197373bc82b5643ffdd1d2484ae17d29fc25599752a269a7f0341b0c01b5ae",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 7221385
+    },
+    "Synth/bgm_zmap_qua_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "5598c121bace1835d0d1e424e32c97694fc9b9e71229e6a2ecf6ed565385b7ec",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 6342480
+    },
+    "Synth/bgm_zmap_rso_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "005b6aabb8451405f09513aa00d7d8a7fe74a18b4d41deaf171273b63df48f88",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 5138882
+    },
+    "Synth/bgm_zmap_shp_wav.aax": {
+      "loop_segments": [
+        0,
+        1
+      ],
+      "aax_sha256": "d3544ef12ed688f26b913b5c0daac7215fbb5b29e91732f93223e20334d01451",
+      "fmt": 0,
+      "nch": 2,
+      "stmflg": 1,
+      "sfreq": 48000,
+      "nsmpl": 8113197
+    }
+  }
+}

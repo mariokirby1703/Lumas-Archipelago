@@ -47,10 +47,10 @@ def test_native_patch_plan_stays_within_disabled_gecko_scratch():
 
 def test_bgm_87_cues_seed_permutation_and_safe_recovery():
     assert len(music_bank.CUES)==87
-    # Use deterministic plan while preserving all synchronization-sensitive cues.
+    # Every genuine music cue participates, including musical jingles.
     perm=music_bank.plan('schema6-test','anywhere')
     assert set(perm)==set(music_bank.CUES)
-    assert all(perm[n]==n for n in music_bank.PROTECTED)
+    assert len(perm) == 87 and all(perm[n]!=n for n in perm)
     assert any(perm[n]!=n for n in ('bgm_wmap', 'bgm_mlt_a', 'bgm_sys_title'))
 
 

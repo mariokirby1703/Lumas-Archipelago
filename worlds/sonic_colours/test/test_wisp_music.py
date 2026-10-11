@@ -21,8 +21,7 @@ DESTINATIONS = ('bgm_stg120_rso', 'bgm_stg530_qua', 'bgm_zmap_rso',
 
 def test_every_original_transformation_is_in_the_global_source_destination_pool():
     assert set(WISPS) == mb.WISP_CUES
-    assert not mb.WISP_CUES & mb.PROTECTED
-    assert 'bgm_jingle_super_sonic' in mb.PROTECTED
+    assert 'bgm_jingle_super_sonic' in mb.CUES
     for seed in range(100):
         mapping = mb.plan(str(seed), 'anywhere')
         assert set(mapping.values()) == set(mapping)
@@ -81,15 +80,22 @@ def test_resident_writer_wisp_force_reload_off_and_integrity_guards():
     pair = ('bgm_stg120_rso', 'bgm_pha_pzl')
     result = live_music.apply(memory, slot, pair)
     assert result['audible_verified'] is False and set(result['transformation_cues']) == set(WISPS)
+    assert result['pool_size'] == 87 and result['excluded_cues'] == []
+    assert result['randomized_cues'] == 87
+    assert set(result['finite_audio_donors']) == mb.FINITE_CUES
+    assert all(n != d and d in mb.FINITE_CUES for n,d in result['finite_audio_destinations'].items())
     leaf = mb.GRAPHS['graphs'][pair[0]][0]; donor = mb.GRAPHS['graphs'][pair[1]][0]
     assert memory.read_u32(base+leaf['cell']) == donor['original_ref']
     assert live_music.recover_original(memory.read_bytes(base, len(original))) == original
-    live_music.apply(memory, {**slot, 'options': {'music_randomization': False}})
+    vanilla = live_music.apply(memory, {**slot, 'options': {'music_randomization': False}})
+    assert vanilla['randomized_cues'] == 0 and vanilla['finite_audio_destinations'] == {}
+    assert vanilla['duration_validation'].startswith('vanilla bank restored')
     assert memory.read_bytes(base, len(original)) == original
     assert len(backend.writes) == 2
     checked = len(writes)
-    with pytest.raises(MemoryUnavailable):
-        live_music.apply(memory, slot, ('bgm_pha_lsr', 'bgm_jingle_super_sonic'))
+    live_music.apply(memory, slot, ('bgm_pha_lsr', 'bgm_jingle_super_sonic'))
+    assert len(backend.writes) == 3
+    checked = len(writes)
     damaged = bytearray(original); damaged[-1] ^= 1; backend.put(base, damaged)
     with pytest.raises(MemoryUnavailable): live_music.apply(memory, slot, pair)
-    assert len(backend.writes) == 2 and len(writes) == checked
+    assert len(backend.writes) == 3 and len(writes) == checked
