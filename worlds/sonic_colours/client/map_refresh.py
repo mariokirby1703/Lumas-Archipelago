@@ -84,11 +84,17 @@ def configure(memory, snapshot, permissions):
         else: return {'available':True, 'pending_zone':memory.read_u32(data+4)}
     if memory.read_u32(actor+0x10f0) != 9:
         return {'available':True, 'reason':'waiting for interactive map state'}
+    requested=[]
     for zone in range(1, 7):
         if permissions.get(20+zone) and memory.read_u32(actor+0xb4+zone*8):
-            memory.write_u32(data+4, zone, expected=memory.read_u32(data+4), operation='global_map_refresh')
-            memory.write_u32(data+8, chain[1], expected=memory.read_u32(data+8), operation='global_map_refresh')
-            memory.write_u32(data+12, chain[2], expected=memory.read_u32(data+12), operation='global_map_refresh')
+            for offset,value in ((4,zone),(8,chain[1]),(12,chain[2])):
+                before=memory.read_u32(data+offset)
+                if before!=value:
+                    memory.write_u32(data+offset,value,expected=before,operation='global_map_refresh')
             memory.write_u32(data, actor, expected=0, operation='global_map_refresh')
-            return {'available': True, 'requested_zone': zone}
-    return {'available': True}
+            requested.append(zone)
+            # Never overwrite an outstanding native request. If the guest has
+            # already consumed it, publish the next owned world in this poll.
+            if memory.read_u32(data):
+                return {'available':True,'requested_zone':zone,'requested_zones':requested}
+    return {'available': True,'requested_zones':requested} if requested else {'available':True}

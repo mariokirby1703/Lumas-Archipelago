@@ -137,7 +137,7 @@ def test_supplied_sweet_mountain_first_waypoint_refresh(tmp_path):
         def check(self,state):return ('test-bound-save',state.session)
     memory.write_guard=WritePolicy(memory,BoundFixture(),hooks.snapshot)
     data=generate({}).worlds[1].fill_slot_data()
-    hooks.project_permissions(memory,state,inventory([ITEM_TABLE['Sweet Mountain Access']]),data)
+    hooks.project_permissions(memory,state,inventory([ITEM_TABLE['Sweet Mountain Shuttle']]),data)
     assert memory.read_u32(access['status_address'])==2
     flags=memory.resolve_flags_ptr()[-1]
     assert memory.read_progress_bit(flags,37)

@@ -19,12 +19,25 @@ class SaveBinding:
     def __init__(self, journal):
         self.journal = journal
         self.intro_session = None
+        self.intro_stage_epoch = None
         self.second_act_seen = False
         self.first_record = None
         self.last_attributed_mission = None
         self.replay_result = None
 
+    def observe_intro(self, snapshot):
+        # This is valid even while the native save index is unavailable. Never
+        # infer or create a persistent save ID from the heap or a menu label.
+        if snapshot.new_game_verified and snapshot.actual_mission == INTRO[0]:
+            if self.intro_stage_epoch != snapshot.stage_epoch or self.intro_session != snapshot.session:
+                self.second_act_seen = False
+                self.first_record = None
+                self.last_attributed_mission = self.replay_result = None
+                self.intro_stage_epoch = snapshot.stage_epoch
+            self.intro_session = snapshot.session
+
     def attribute(self, snapshot, saved):
+        self.observe_intro(snapshot)
         bootstrap = self.journal.data.get('bootstrap')
         binding = self.journal.data.get('native_binding')
         if not saved or not snapshot.progress_verified:
@@ -63,8 +76,6 @@ class SaveBinding:
                            visible_slot=index + 1,
                            evidence={**snapshot.evidence, 'save_binding_proof': binding['kind']},
                            status='seeded native save/profile/intro records attributed; live gameplay verification pending')
-        if snapshot.new_game_verified and snapshot.actual_mission == INTRO[0]:
-            self.intro_session = snapshot.session
         if not bootstrap or bootstrap['session'] != snapshot.session:
             return snapshot
         if self.intro_session != snapshot.session:
@@ -74,7 +85,25 @@ class SaveBinding:
             record = current[INTRO[0]]
             if INTRO[0] in snapshot.persisted_clears and 0 <= record['raw_rank'] <= 4 and record['time_raw'] > 0:
                 self.first_record = record
-        if (index <= 2 and self.second_act_seen and self.first_record == current[INTRO[0]]
+        # When New Game runs before a native save index exists, no rank-table
+        # read is possible during the intro. Instead match the two *durably*
+        # observed native UI result events against the subsequently saved rank
+        # and score records. This does not accept old save data by itself.
+        witnesses = [e for e in self.journal.data.get('pickup_events', ())
+                     if e.get('kind') == 'result' and e.get('mission') in INTRO
+                     and e.get('playthrough_epoch') == bootstrap['epoch']
+                     and e.get('session') == snapshot.session
+                     and e.get('provenance') == 'stage9C_native_UI_state7_grade124']
+        witnessed = {}
+        for e in witnesses:
+            witnessed.setdefault(e['mission'], e)
+        saved_matches_witnesses = (set(witnessed) == set(INTRO)
+            and all(type(witnessed[m].get('score')) is int
+                    and witnessed[m]['score'] == current[m]['score']
+                    and witnessed[m]['grade'] == current[m]['raw_rank']
+                    and current[m]['time_raw'] > 0 for m in INTRO))
+        old_verified_route = (self.second_act_seen and self.first_record == current[INTRO[0]])
+        if (index <= 2 and (old_verified_route or saved_matches_witnesses)
                 and snapshot.scene in ('global_map', 'world_map') and snapshot.scene_verified
                 and snapshot.persisted_clears == frozenset(INTRO)
                 and 0 <= current[INTRO[1]]['raw_rank'] <= 4 and current[INTRO[1]]['time_raw'] > 0):

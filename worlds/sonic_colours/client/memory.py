@@ -144,7 +144,26 @@ class SonicMemory:
             raise MemoryUnavailable('WRITE_BLOCKED: disabled progression events may only reset to zero')
         if operation == 'map_lock' and (data != (1).to_bytes(4,'big') or int.from_bytes(expected,'big') not in (2,3,4)):
             raise MemoryUnavailable('WRITE_BLOCKED: map lock only permits available/entered/cleared-to-locked cache')
+        if operation == 'intro_box_placement':
+            from .intro_box import PLACEMENTS
+            if data not in PLACEMENTS or expected not in PLACEMENTS or data == expected:
+                raise MemoryUnavailable('WRITE_BLOCKED: intro box permits only its bounded placement pair')
         token = self.write_guard(operation, address, len(data))
+        if operation == 'breath_timer':
+            tx=self._breath_transaction
+            new=struct.unpack('>f',data)[0];old=struct.unpack('>f',expected)[0]
+            if (len(tx)!=5 or expected!=tx[2] or data!=tx[3] or tx[4] not in (0,5,10,20,30,40,60)
+                    or not -30<=old<=120 or not -30<=new<=30.051):
+                raise MemoryUnavailable('WRITE_BLOCKED: oxygen only permits bounded progressive duration')
+        if operation == 'game_land_notice':
+            before,after=self._game_land_notice_transaction[3][address]
+            if expected!=before.to_bytes(4,'big') or data!=after.to_bytes(4,'big'):
+                raise MemoryUnavailable('WRITE_BLOCKED: Game Land notification value not in transaction')
+        if operation == 'physical_ring_collection':
+            mask = token[1]
+            old, new = int.from_bytes(expected,'big'), int.from_bytes(data,'big')
+            if new != old | mask:
+                raise MemoryUnavailable('WRITE_BLOCKED: physical rings only permit witnessed collection bits')
         if operation == 'global_map_refresh':
             _, request, actors, chain = token
             value = int.from_bytes(data, 'big')
@@ -159,10 +178,25 @@ class SonicMemory:
             if not valid:
                 raise MemoryUnavailable('WRITE_BLOCKED: invalid or unauthorized Grand World Map request')
         before = self.read_bytes(address, len(data))
-        if before != expected:
+        if operation == 'breath_timer':
+            # This is a frame-advancing native clock, not a static mailbox.
+            # Ownership is checked on both sides; compare by the bounded
+            # monotonic floor instead of demanding a stale float bit pattern.
+            elapsed=struct.unpack('>f',before)[0]
+            if not -30<=elapsed<=120:
+                raise MemoryUnavailable('WRITE_BLOCKED: oxygen clock invalid')
+            if abs(elapsed-struct.unpack('>f',expected)[0])>0.25:
+                raise MemoryUnavailable('WRITE_BLOCKED: oxygen reset during transaction')
+        elif before != expected:
             raise MemoryUnavailable('WRITE_BLOCKED: compare_failed')
         if self.write_guard(operation, address, len(data)) != token:
             raise MemoryUnavailable('WRITE_BLOCKED: context_changed')
+        if operation == 'breath_timer':
+            elapsed=self.read_f32(address)
+            if not -30<=elapsed<=120:
+                raise MemoryUnavailable('WRITE_BLOCKED: oxygen clock invalid')
+            if abs(elapsed-struct.unpack('>f',expected)[0])>0.25:
+                raise MemoryUnavailable('WRITE_BLOCKED: oxygen reset during transaction')
         if before == data:
             return
         try:
@@ -176,7 +210,9 @@ class SonicMemory:
         consumed = (operation == 'global_map_refresh' and offset == 0 and value
                     and readback == bytes(4)
                     and self.read_u32(actors[0]+0xb4+zone*8) == 0)
-        if readback != data and not consumed:
+        oxygen_advanced = (operation=='breath_timer' and len(readback)==4
+                           and struct.unpack('>f',data)[0]<=struct.unpack('>f',readback)[0]<=struct.unpack('>f',data)[0]+0.25)
+        if readback != data and not consumed and not oxygen_advanced:
             raise MemoryUnavailable('WRITE_UNCERTAIN: readback_mismatch')
         try:
             final_token = self.write_guard(operation, address, len(data))

@@ -1,3 +1,17 @@
+## V10 experimental update (2026-10-12)
+
+This source includes a **New Game Boost provider pointer fix** and a **native-request guarded movement rearm experiment**. Without White Boost Wisp and without an AP refill, enemy gains must be clamped to zero by the next client poll. The V10 replacement Gecko INI is **required** for the new movement experiment, and existing V8/V9 Gecko must not run alongside it. **Dolphin playback/live gate success is not yet verified.** See `docs/movement_boost_v10.md` for installation and test limitations. Swim and Breath native restrictions remain unimplemented.
+
+> **CURRENT EXPERIMENT: early movement-request gate V4, 2026-10-12.**
+> The preceding Fallback V3 was disproven by real Dolphin tests: native denial
+> telemetry incremented but Crouch and Ground Pound left Sonic stuck.
+> V4 intercepts earlier at 0x8003388C and replaces disallowed requested state
+> arguments with the existing state, BEFORE native state-change callbacks.
+> Dolphin playback of V4 remains UNVERIFIED. Use ONLY the replacement Movement
+> Request Gate V4 Gecko profile, never alongside the old V2/V3 Gecko groups.
+> [DOL disassembly, testing and caveats](docs/movement_request_gate_oct12.md).
+> Swim and Breath are separate items but native water gates are still absent.
+
 > **Experimental schema 7 movement research build (October 11, 2026).**
 > The new opt-in Movement Unlocks option creates Wall Jump, Homing Attack,
 > Mid-Air Boost (Jump Dash), Double Jump, Ground Pound, two Progressive
@@ -84,3 +98,14 @@ is still required. See [new abilities validation](docs/new_abilities_validation.
 
 Regenerate both APWorld and seed. Previous schema-5 seeds do not work in this
 schema-6 client; do not delete or repurpose your old journals.
+
+## Experimental Movement Gecko BETA (2026-10-11)
+
+For Dolphin-managed PPC movement testing, see [Movement Gecko BETA](docs/movement_gecko_beta.md). Its `data/SNCP8P_movement_gecko_beta.ini` REPLACES the original Gecko codes (do not combine). The verified source/Gecko installer tests are offline-only. **Swim and Breath remain separate AP items but native underwater/oxygen gates are not implemented yet.** The older `--experimental-direct-hooks` mode is not recommended after an invalid-read crash.
+
+## Movement Fallback TEST (2026-10-12)
+
+The old C2 deny branch skipped native state entry and could lock Sonic in Ball Form (`-1 -> 8`). The new **experimental native fallback** preserves the entire original state transition and exposes guest-only deny counters. Gecko profile **MUST replace**, not supplement, the older movement profile. See [dump analysis and installation](docs/movement_fallback_dump_oct12.md). Swim/Breath remain without native gates.
+
+
+**Movement Request Gate V5 (diagnostic only):** see [V5 lifecycle telemetry](docs/movement_request_gate_v5.md). The actual V4 request hook is retained but augmented with cumulative guest counters for all handler entries and Sonic-owned requests, to debug controller changes across stage reloads. This is not a certified movement fix.

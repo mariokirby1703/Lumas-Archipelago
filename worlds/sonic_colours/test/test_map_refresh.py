@@ -10,6 +10,34 @@ from ..client.memory import SonicMemory, MemoryUnavailable
 from .test_memory import FakeBackend
 
 
+@pytest.mark.parametrize('consume',[True,False])
+def test_reconnect_refresh_batches_only_acknowledged_requests(monkeypatch,consume):
+    from ..client import native_read
+    b=FakeBackend();m=SonicMemory(b)
+    data,actor=0x80002000,0x90010000
+    chain=(0x90020000,0x90030000,1,0x90040000,0x9004001c)
+    m.resolve_flags_ptr=lambda:chain
+    m.write_guard=lambda *args:('bound',data,(actor,),chain)
+    monkeypatch.setattr(map_refresh,'installed_data',lambda memory:data)
+    monkeypatch.setattr(native_read,'read_actors',lambda memory,context:[actor])
+    for address,value in ((actor,0x80777000),(actor+0x10f0,9),
+        (data+8,chain[1]),(data+12,chain[2]),(chain[-1]+0x10,(1<<21)|(1<<22))):
+        b.put(address,value.to_bytes(4,'big'))
+    for zone in (1,2):b.put(actor+0xb4+zone*8,(0x90060000).to_bytes(4,'big'))
+    original=b.write_bytes;published=[]
+    def guest(address,raw):
+        original(address,raw)
+        if address==data and int.from_bytes(raw,'big')==actor:
+            zone=m.read_u32(data+4);published.append(zone)
+            if consume:
+                b.put(data,bytes(4));b.put(actor+0xb4+zone*8,bytes(4))
+    b.write_bytes=guest
+    snapshot=SimpleNamespace(scene='global_map',evidence={'native_data':{'stage_objects':[{'context':0x90070000}]}})
+    map_refresh.configure(m,snapshot,{21:True,22:True})
+    assert published==([1,2] if consume else [1])
+    assert not any(address in (data+8,data+12) for address,*_ in b.writes)
+
+
 def execute(zone=1, phase=9, profile=1, actor_matches=True, lock=True):
     words, offset = map_refresh.payload()
     base, actor, owner = 0x80002000, 0x90010000, 0x90020000

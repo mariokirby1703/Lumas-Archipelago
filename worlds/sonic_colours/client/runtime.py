@@ -55,7 +55,8 @@ def validate_slot(data):
         if hasattr(option, 'range_start') and not option.range_start <= value <= option.range_end:
             raise ValueError(f'invalid range {name}')
         resolved[name] = option
-    if data.get('game_land_gates') != game_land_gates(options['game_land_requirement_reduction']):
+    from ..world_constants import legacy_game_land_gates
+    if data.get('game_land_gates') not in (game_land_gates(options['game_land_requirement_reduction']), legacy_game_land_gates(options['game_land_requirement_reduction'])):
         raise ValueError('slot Game Land gates mismatch')
     expected_speed = bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'] or options['eggman_heart_sanity'])
     if type(data.get('game_land_speed_items')) is not bool or data['game_land_speed_items'] != expected_speed:
@@ -65,6 +66,13 @@ def validate_slot(data):
         raise ValueError('unsupported native stage permutation')
     from types import SimpleNamespace
     expected_locations = {n: d.code for n, d in LOCATION_TABLE.items() if enabled(d, SimpleNamespace(**resolved))}
+    # Display-name migration only; stable IDs and enabled location set must
+    # still match exactly. Existing servers may retain the old Discovery label.
+    legacy_discoveries = {n.removesuffix(' Discovery')+' - First Discovery':n
+                          for n in expected_locations if n.endswith(' Discovery')}
+    if isinstance(data.get('locations'), dict):
+        data = {**data, 'locations':{legacy_discoveries.get(n,n):code
+                                    for n,code in data['locations'].items()}}
     if data.get('locations') != expected_locations:
         raise ValueError('slot locations do not match option-selected stable IDs')
     if options['wisp_capsules'] and not any(LOCATION_TABLE[n].kind == 'capsule' for n in expected_locations):
@@ -158,6 +166,8 @@ class Runtime:
                              'audible_verified':False}
         self.next_music_poll = 0.0
         self.experimental_direct_hooks = False
+        self.boost_gain_status = {'status': 'waiting for verified living Sonic'}
+        self.intro_box_status = {'status':'not observed','applied':False}
         self.movement_status = {'status': 'Movement Unlocks off or waiting for Dolphin',
                                 'native_gate_verified': False, 'swim_gate_verified': False,
                                 'breath_gate_verified': False}
@@ -209,9 +219,18 @@ class Runtime:
                   and (LOCATION_TABLE[name].kind == 'clear'
                        or LOCATION_TABLE[name].kind == 'rank' and result['grade'] <= LOCATION_TABLE[name].index)}
         checks -= set(self.journal.data['checks'])
-        if checks:
+        epoch = self.journal.data.get('bootstrap', {}).get('epoch')
+        new_intro_witness = (self.journal.data.get('save_identity') is None
+            and snapshot.actual_mission in ('stg110','stg130') and epoch is not None
+            and not any(e.get('kind') == 'result' and e.get('mission') == snapshot.actual_mission
+                        and e.get('playthrough_epoch') == epoch
+                        and e.get('session') == snapshot.session
+                        for e in self.journal.data.get('pickup_events', ())))
+        if checks or new_intro_witness:
             self.journal.record_pickups([{'kind': 'result', 'mission': snapshot.actual_mission,
-                'grade': result['grade'], 'stage_epoch': snapshot.stage_epoch,
+                'grade': result['grade'], 'score': result.get('score'),
+                'session': snapshot.session, 'playthrough_epoch': epoch,
+                'stage_epoch': snapshot.stage_epoch,
                 'provenance': result['provenance']}], {}, checks)
             logger.info('Result detected: %s grade %s; Location queued: %s',
                         snapshot.actual_mission, result['grade'], sorted(checks))
@@ -241,7 +260,9 @@ class Runtime:
         self.initial_pickup_exclusions[mission] = excluded
         mode = self.slot_data['options']['red_ring_checks']
         ever = self.journal.data['ever_collected_mask'].get(mission, 0)
-        added = mask & ~previous & ~ever & ~excluded
+        from .physical_rings import witnessed
+        physical_ever = witnessed(self.journal).get(mission, 0)
+        added = mask & ~previous & ~physical_ever & ~excluded
         if not added:
             return
         updated = ever | added
@@ -261,8 +282,28 @@ class Runtime:
     def poll(self, memory, item_ids, history_ready):
         self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
+        # Water entry and controller replacement must be handled before slow
+        # journal, resource-bank and progression operations in this poll.
+        if self.slot_data['options'].get('movement_unlocks'):
+            early_items=list(item_ids if history_ready else self.journal.data['receipts'])
+            early_items+=[item for item in self.journal.data.get('permission_receipts',()) if item not in early_items]
+            early_owned=inventory(early_items)
+            from .movement_gate import configure as configure_movement
+            from .water_native import configure as configure_breath
+            for name,action in (('movement_status',configure_movement),('breath_status',configure_breath)):
+                try:
+                    result=(action(memory,self.snapshot,early_owned,transport=('direct' if self.experimental_direct_hooks else 'gecko')) if name=='movement_status'
+                            else action(memory,self.snapshot,self.guard,early_owned,self.journal))
+                    setattr(self,name,result)
+                except MemoryUnavailable as error:
+                    setattr(self,name,{'status':str(error),'write_verified':False})
         self.observe_pickups()
         self.observe_results()
+        try:
+            from .physical_rings import apply as restore_physical_rings
+            self.physical_ring_status = restore_physical_rings(memory, self.snapshot, self.guard)
+        except MemoryUnavailable as error:
+            self.physical_ring_status = {'status':str(error), 'nand_flush_verified':False}
         if self.slot_data['options']['eggman_heart_sanity'] and self.guard.can_record(self.snapshot):
             try:
                 self.guard.check(self.snapshot)
@@ -271,11 +312,26 @@ class Runtime:
                 self.hooks.medal_status = configure(memory, self.snapshot, self.journal)
             except MemoryUnavailable as error:
                 self.hooks.medal_status = {'available': False, 'reason': str(error)}
+        try:
+            from .intro_box import apply as apply_intro_box
+            self.intro_box_status = apply_intro_box(memory,self.snapshot,self.guard,self.slot_data)
+        except MemoryUnavailable as error:
+            self.intro_box_status = {'status':str(error),'applied':False}
         self.settle_effects(memory)
         durable = list(item_ids if history_ready else self.journal.data['receipts'])
         durable += [item for item in self.journal.data.get('permission_receipts',()) if item not in durable]
         known = inventory(durable)
+        if self.snapshot.scene in ('global_map','world_map','game_land_select'):
+            try:
+                self.guard.check(self.snapshot)
+                self.project_permissions(memory,known)
+            except MemoryUnavailable as error:
+                self.hooks.progression_status={'available':False,'reason':str(error)}
         self.observe_capsules(frozenset(known['wisps']))
+        # Catch native enemy/script grants even if they bypass boost_add.
+        # Do this BEFORE new AP refill receipts are applied, so the refill
+        # is calculated from the genuinely AP-owned remaining balance.
+        self.enforce_white_boost_gain_lock(memory, known)
         # Install native interception even before ReceivedItems finishes. Zero
         # or durable authenticated permissions do not authorize unknown items.
         if not history_ready and self.guard.can_record(self.snapshot):
@@ -300,8 +356,12 @@ class Runtime:
         if history_ready:
             self.journal.record_history(item_ids)
         if self.guard.can_record(self.snapshot):
-            checks = detect_checks(self.slot_data, self.snapshot,
+            # Before a selected native save is bound, only witnessed pickups
+            # and final result events from the mandatory intro may grant AP
+            # checks. Never import persisted bits from an unidentified slot.
+            checks = (detect_checks(self.slot_data, self.snapshot,
                                    frozenset(owned['wisps']) if owned else frozenset())
+                      if self.journal.data['save_identity'] is not None else set())
             checks -= {code for name, code in self.slot_data['locations'].items()
                        if LOCATION_TABLE[name].kind in ('ring', 'rings', 'capsule')}
             observed = frozenset(e['mission'] for e in self.journal.data['pickup_events'] if e['kind'] == 'result')
@@ -324,6 +384,18 @@ class Runtime:
             if not self.journal.data.get('goal_observed'):
                 self.journal.data['goal_observed'] = True
                 self.journal.save()
+        # An opt-in, signature-verified Movement Gecko profile writes ONLY its
+        # transient controller/mask words. It may be tested on a freshly verified
+        # living player even while the vanilla new-game save is still being
+        # attributed. It never bypasses persistent AP world/save write guards.
+        if (owned and self.slot_data['options'].get('movement_unlocks')
+                and not self.experimental_direct_hooks):
+            try:
+                from .movement_gate import configure
+                self.movement_status = configure(memory, self.snapshot, owned, transport='gecko')
+            except MemoryUnavailable as error:
+                self.movement_status = {'status':str(error), 'native_gate_verified':False,
+                                        'swim_gate_verified':False, 'breath_gate_verified':False}
         if owned:
             # Native permissions and non-idempotent filler are independent. A
             # blocked query hook must not prevent separately verified stats writes.
@@ -339,8 +411,10 @@ class Runtime:
         elif not history_ready:
             self.last_error = 'Received history incomplete; independently verified reads remain active.'
         can_send = self.guard.can_send(self.snapshot)
-        return (set(self.journal.data['pickup_checks']) | (set(self.journal.data['checks']) if can_send else set()),
-                bool((can_send or self.slot_data['options']['goal'] == 4) and self.journal.data.get('goal_observed')))
+        # Never leak a saved journal event to another Dolphin session without
+        # fresh native attribution. Bootstrap checks travel before save select.
+        checks_out = set(self.journal.data['checks']) if can_send else set()
+        return (checks_out, bool(can_send and self.journal.data.get('goal_observed')))
 
     def select_resource_music(self, path):
         from .music_bank import load_manifest
@@ -377,18 +451,20 @@ class Runtime:
             controls = {'error': str(error), 'installed': {}}
         self.hooks.gameplay_controls_status = {**controls, 'white_capsules': capsules}
         if self.slot_data['options']['movement_unlocks']:
+            from .water_native import configure as configure_breath
+            try:
+                self.breath_status=configure_breath(memory,self.snapshot,self.guard,owned,self.journal)
+            except MemoryUnavailable as error:
+                self.breath_status={'status':str(error),'write_verified':False}
             from .movement_gate import configure
-            if self.experimental_direct_hooks:
-                try:
-                    self.movement_status = configure(memory, self.snapshot, owned)
-                except MemoryUnavailable as error:
-                    self.movement_status = {'status': str(error), 'native_gate_verified':False}
-            else:
-                self.movement_status = {'status':'Movement items enabled but native locks INACTIVE: standard Gecko lacks space; use an isolated --experimental-direct-hooks test with Gecko disabled',
-                                        'native_gate_verified':False,
-                                        'swim_gate_verified':False, 'breath_gate_verified':False}
+            try:
+                self.movement_status = configure(memory, self.snapshot, owned,
+                                                 transport=('direct' if self.experimental_direct_hooks else 'gecko'))
+            except MemoryUnavailable as error:
+                self.movement_status = {'status': str(error), 'native_gate_verified': False,
+                                        'swim_gate_verified': False, 'breath_gate_verified': False}
         else:
-            self.movement_status = {'status':'Movement Unlocks off; vanilla native movement'}
+            self.movement_status = {'status': 'Movement Unlocks off; vanilla native movement'}
 
     def project_permissions(self, memory, owned):
         try:
@@ -398,8 +474,16 @@ class Runtime:
             self.configure_native_hooks(memory, owned)
             self.hooks.project_live_permissions(memory, self.snapshot, owned, self.slot_data)
             return
-        self.configure_native_hooks(memory, owned)
+        on_map=self.snapshot.scene in ('global_map','world_map','game_land_select')
+        if not on_map:self.configure_native_hooks(memory, owned)
+        from .game_land_notice import prepare as prepare_notice, apply as apply_notice
+        prepare_notice(memory,self.snapshot,owned,self.slot_data,self.journal)
         self.hooks.project_permissions(memory, self.snapshot, owned, self.slot_data)
+        if on_map:self.configure_native_hooks(memory, owned)
+        try:
+            self.game_land_notice_status=apply_notice(memory,self.snapshot,self.guard,self.journal)
+        except MemoryUnavailable as error:
+            self.game_land_notice_status={'status':str(error),'visual_verified':False}
 
     def boost_grant_context(self, memory):
         context = self.effect_context(memory, 'boost')
@@ -425,11 +509,85 @@ class Runtime:
             gauge = memory.read_f32(self.snapshot.boost_address)
         except MemoryUnavailable:
             return False
-        if context != grant['context'] or gauge <= 0:
+        if (context != grant['context'] or gauge <= 0 or
+                not isinstance(grant.get('ceiling'), (int,float)) or grant['ceiling'] <= 0):
             grant['consumed'] = True
             self.journal.save()
             return False
         return math.isfinite(gauge) and gauge > 0
+
+    def enforce_white_boost_gain_lock(self, memory, owned):
+        """Correct native Boost grants that bypass the single boost_add C2 hook.
+
+        Native Boost state and the C2 hook stay authoritative for normal Boost
+        consumption. This guarded reconciliation is *only* a backup: with White
+        Boost missing, the meter cannot exceed the last AP-receipt-backed
+        balance. The balance is monotonically nonincreasing between AP refills.
+        Unlike a naive per-frame zeroing hook, a legitimate AP refill remains
+        usable and ordinary consumption still works. No persistent save writes.
+        """
+        if not self.slot_data['options'].get('boost_lock'):
+            self.boost_gain_status = {'status': 'off: Boost Lock option disabled'}
+            return
+        if owned['counts']['White Boost Wisp']:
+            self.boost_gain_status = {'status': 'white owned: vanilla Boost gains allowed'}
+            return
+        try:
+            self.guard.check_stats(self.snapshot)
+            address = self.snapshot.boost_address
+            maximum_addr = self.snapshot.boost_max_address
+            if address is None or maximum_addr != address + 12:
+                raise MemoryUnavailable('boost provider pointer unavailable')
+            if memory.read_u32(address - 8) != 0x80763A18:
+                raise MemoryUnavailable('boost provider vtable changed')
+            current = memory.read_f32(address)
+            maximum = memory.read_f32(maximum_addr)
+            if not (math.isfinite(current) and math.isfinite(maximum)
+                    and 0. < maximum <= 10000. and 0. <= current <= maximum):
+                raise MemoryUnavailable('native Boost meter out of range')
+            grant = self.journal.data.get('temporary_boost')
+            ceiling = 0.
+            receipt = None
+            if grant and not grant.get('consumed'):
+                # Never inherit an unverified old grant or accept vanilla
+                # enemy gains as its new baseline. New grants record ceiling
+                # at the instant the AP refill write passes readback.
+                if (self.boost_grant_context(memory) == grant.get('context')
+                        and type(grant.get('ceiling')) in (int, float)
+                        and math.isfinite(grant['ceiling'])
+                        and 0. <= grant['ceiling'] <= maximum):
+                    ceiling = float(grant['ceiling'])
+                    receipt = grant.get('receipt')
+                else:
+                    grant['consumed'] = True
+                    self.journal.save()
+            if current > ceiling + 0.0001:
+                # Restores only the exact current, attributed native gauge.
+                # compare/readback, scene/actor revalidation are performed by
+                # SonicMemory's existing boost_stats write policy.
+                memory.write_f32(address, ceiling, expected=current,
+                                 operation='boost_stats')
+                self.boost_gain_status = {
+                    'status':'vanilla gain clamped', 'before':current,
+                    'after':ceiling, 'ap_refill_receipt':receipt,
+                    'native_boost_add_hook_alone_sufficient':False}
+                current = ceiling
+            else:
+                self.boost_gain_status = {'status':'native gauge within AP-authorized ceiling',
+                                          'current':current, 'ceiling':ceiling,
+                                          'ap_refill_receipt':receipt}
+            if grant and receipt is not None:
+                # Reduce budget following ordinary Boost use. Persist the
+                # downward change, so client restarts cannot reauthorize an
+                # already consumed amount via enemy kills.
+                new_ceiling = min(ceiling, current)
+                if new_ceiling < ceiling:
+                    grant['ceiling'] = new_ceiling
+                    if new_ceiling <= 0:
+                        grant['consumed'] = True
+                    self.journal.save()
+        except MemoryUnavailable as error:
+            self.boost_gain_status = {'status': 'deferred: '+str(error)}
 
     def effect_context(self, memory, family):
         context = list(self.guard.check_stats(self.snapshot))
@@ -499,6 +657,11 @@ class Runtime:
                 del self.inflight[index]
 
     def apply_effects(self, memory, item_ids):
+        try:
+            from .intro_box import apply as apply_intro_box
+            self.intro_box_status = apply_intro_box(memory,self.snapshot,self.guard,self.slot_data)
+        except MemoryUnavailable as error:
+            self.intro_box_status = {'status':str(error),'applied':False}
         self.settle_effects(memory)
         occupied = {pending['family'] for pending in self.inflight.values()}
         for index, item in enumerate(item_ids):
@@ -610,7 +773,8 @@ class Runtime:
                 logger.warning('Item uncertain: receipt %s (%s): %s; later receipts remain eligible', index, name, error)
                 continue
             if family == 'boost':
-                self.journal.data['temporary_boost'] = {'context': grant_context, 'receipt': index, 'consumed': False}
+                self.journal.data['temporary_boost'] = {'context': grant_context, 'receipt': index,
+                                                        'consumed': False, 'ceiling': struct.unpack('>f', after.to_bytes(4, 'big'))[0]}
             self.journal.data['effects'][str(index)]['state'] = 'verifying'
             self.journal.save()
             self.inflight[index] = {'started': self.clock(), 'addresses': addresses,

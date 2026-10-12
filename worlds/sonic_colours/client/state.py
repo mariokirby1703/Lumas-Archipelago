@@ -72,9 +72,39 @@ class SaveGuard:
         self.operator_confirmed = True
         self.reason = 'New Game confirmed; waiting for native menu/freshness corroboration.'
 
+    def required_polls(self,snapshot):
+        # Resuming an already bound, independently verified save on a native
+        # map needs no extra scene debounce. WritePolicy re-resolves the save
+        # chain and map actor/address for every permission/refresh write.
+        if (snapshot.scene in ('global_map','world_map','game_land_select')
+                and snapshot.scene_verified and snapshot.save_identity_verified
+                and self.journal.data['save_identity'] is not None
+                and snapshot.save_identity==self.journal.data['save_identity']):
+            return 1
+        return 3
+
     def observe(self, snapshot):
         self.armed = False
         bound = self.journal.data['save_identity']
+        fresh_restart = (bound is not None and snapshot.new_game_verified
+            and snapshot.scene_verified and snapshot.scene == 'gameplay'
+            and snapshot.actual_mission == 'stg110' and snapshot.stable_polls >= 3
+            and snapshot.save_identity is None and not snapshot.save_identity_verified
+            and len(snapshot.fresh_fields) >= 2 and all(snapshot.fresh_fields))
+        if fresh_restart:
+            # Same authenticated seed journal, new native playthrough. Preserve
+            # AP checks/receipts and archive the old native binding, not the save.
+            keys = ('save_identity','native_binding','native_monotonic_clears',
+                    'bootstrap','native_event_baseline')
+            self.journal.data.setdefault('prior_playthroughs', []).append(
+                {key:self.journal.data[key] for key in keys if key in self.journal.data})
+            for key in keys:
+                self.journal.data.pop(key, None)
+            self.journal.data['save_identity'] = None
+            self.journal.save()
+            self.session = None
+            self.state = PlaythroughState.UNBOUND_BOOTSTRAP
+            bound = None
         if bound is not None:
             if not snapshot.save_identity_verified:
                 self.reason = 'save_identity_proof_missing: reads retained, writes deferred'
@@ -93,7 +123,7 @@ class SaveGuard:
                 self.journal.save()
             self.state = PlaythroughState.RESUME if self.session != snapshot.session else PlaythroughState.BOUND_PLAYTHROUGH
             self.session = snapshot.session
-            self.armed = snapshot.stable_polls >= 3 and snapshot.scene_verified
+            self.armed = snapshot.stable_polls >= self.required_polls(snapshot) and snapshot.scene_verified
             self.reason = 'bound seed/save resumed' if self.armed else 'waiting for stable scene'
             return
         bootstrap = self.journal.data.get('bootstrap')
@@ -104,7 +134,10 @@ class SaveGuard:
                 self.reason = 'new_game_indicator_unverified: waiting for native intro and freshness evidence'
                 return
             bootstrap = {'epoch': uuid.uuid4().hex, 'session': snapshot.session, 'checks': [],
-                         'observed_missions': [], 'goal': False}
+                         'observed_missions': [], 'goal': False,
+                         'intro_proof': ('native_unselected_intro_v1' if
+                                         snapshot.evidence.get('native_intro_without_selected_slot')
+                                         else 'native_factory_save_v1')}
             self.journal.data['bootstrap'] = bootstrap
             self.journal.save()
             self.state = PlaythroughState.MANDATORY_PROLOGUE
@@ -141,17 +174,32 @@ class SaveGuard:
             self.reason = 'prologue observed locally; awaiting verified vanilla save selection'
 
     def can_record(self, snapshot):
-        if not snapshot.progress_verified:
-            return False
         if self.journal.data['save_identity'] is not None:
+            if not snapshot.progress_verified:
+                return False
             return (self.state in (PlaythroughState.BOUND_PLAYTHROUGH, PlaythroughState.RESUME)
                     and snapshot.save_identity_verified and snapshot.save_identity == self.journal.data['save_identity'])
         bootstrap = self.journal.data.get('bootstrap')
-        return bool(bootstrap and bootstrap['session'] == snapshot.session and self.state in (
-            PlaythroughState.MANDATORY_PROLOGUE, PlaythroughState.VANILLA_SAVE_SELECTION))
+        if not (bootstrap and bootstrap['session'] == snapshot.session):
+            return False
+        if snapshot.progress_verified:
+            return (self.state in (PlaythroughState.MANDATORY_PROLOGUE, PlaythroughState.VANILLA_SAVE_SELECTION)
+                    and snapshot.candidate_clears <= frozenset({'stg110','stg130'}))
+        # Without an actual selected slot, only first-party scene-local result
+        # and pickup evidence from the two *mandatory* intro acts is recordable.
+        return (self.state == PlaythroughState.MANDATORY_PROLOGUE
+                and snapshot.scene_verified and snapshot.pickup_verified
+                and snapshot.stage_epoch is not None
+                and snapshot.actual_mission in ('stg110', 'stg130')
+                and not snapshot.candidate_clears)
 
     def can_send(self, snapshot):
-        return self.can_record(snapshot) and self.journal.data['save_identity'] is not None
+        # Server checks are AP-seed-scoped, not Wii-save-scoped. Allow ONLY the
+        # corroborated mandatory intro to send its own native results/pickups
+        # before slot selection. Persistent world writes still need check().
+        if self.journal.data['save_identity'] is None:
+            return self.can_record(snapshot)
+        return self.can_record(snapshot)
 
     def can_record_pickups(self, snapshot):
         if not snapshot.scene_verified or not snapshot.pickup_verified or not snapshot.stage_epoch:
@@ -193,7 +241,7 @@ class SaveGuard:
                 or snapshot.save_identity != self.journal.data['save_identity']):
             self.armed = False
             raise MemoryUnavailable('WRITE_BLOCKED: save_not_bound_or_session_changed')
-        if snapshot.stable_polls < 3 or not snapshot.scene_verified:
+        if snapshot.stable_polls < self.required_polls(snapshot) or not snapshot.scene_verified:
             raise MemoryUnavailable('WRITE_BLOCKED: unstable_context')
         return snapshot.session, snapshot.save_identity, snapshot.scene, snapshot.actual_mission
 
@@ -205,6 +253,37 @@ class SaveGuard:
     def suspend(self):
         """Stop writes for this observation without destroying attribution."""
         self.armed = False
+
+
+def live_control_profile(memory, snapshot, guard):
+    """Read-only Gecko owner/index pair for a proven seed-local New Game intro.
+
+    Never synthesize a selected save pointer when the native index is invalid.
+    Only the exact owner/index equality check in transient C2 controls may use
+    this pair; NOT progression, flags, stage records or actual save writes.
+    """
+    try:
+        return memory.resolve_flags_ptr(allow_working=True)
+    except MemoryUnavailable:
+        trace = snapshot.evidence.get('save_chain_trace', {})
+        failure = trace.get('first_failure', {})
+        if (failure.get('step') != 'selected_index' or failure.get('reason') != 'index_out_of_range'
+                or snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'
+                or not snapshot.scene_verified or snapshot.stable_polls < 3
+                or guard is None or not guard.can_record_pickups(snapshot)):
+            raise MemoryUnavailable('WRITE_BLOCKED: no verified live Gecko intro profile')
+        manager, container = memory.resolve_save_container()
+        index = memory.read_u8(container)
+        step = next((item for item in trace.get('steps', []) if item.get('step') == 'selected_index'), {})
+        # PAL can expose different out-of-range transient indices before the
+        # first save selection.  Preserve the *actual* native byte, never
+        # replace it with a guessed 0xFF and never interpret it as a save slot.
+        # A second read must agree with the independent snapshot's chain trace
+        # or this particular write is refused (scene/index transition).
+        if (not 4 <= index <= 0xFF or step.get('raw') != f'0x{index:02X}'
+                or trace.get('chain') is not None):
+            raise MemoryUnavailable('WRITE_BLOCKED: no-slot native index changed')
+        return (manager, container, index, None, None)
 
 
 class WritePolicy:
@@ -230,6 +309,29 @@ class WritePolicy:
             snapshot = owner._snapshot_after_revision(self.memory)
         else:
             snapshot = self.snapshot_reader(self.memory)
+        if operation == 'breath_timer':
+            from .water_native import target
+            player,clock=target(self.memory,snapshot,self.guard)
+            tx=getattr(self.memory,'_breath_transaction',None)
+            if tx is None or size!=4 or (player,clock['plugin'])!=tx[:2] or address!=clock['elapsed_address']:
+                raise MemoryUnavailable('WRITE_BLOCKED: oxygen plugin ownership changed')
+            return snapshot.session,snapshot.stage_epoch,player,clock['plugin']
+        if operation == 'game_land_notice':
+            from .game_land_notice import owner
+            self.guard.check(snapshot)
+            tx=getattr(self.memory,'_game_land_notice_transaction',None)
+            if tx is None or size!=4 or address not in tx[3]:
+                raise MemoryUnavailable('WRITE_BLOCKED: no bounded Game Land event transaction')
+            context,count=owner(self.memory,snapshot)
+            if context!=tx[0] or self.memory.resolve_flags_ptr()!=tx[1] or count not in (tx[2],tx[2]+1):
+                raise MemoryUnavailable('WRITE_BLOCKED: Game Land event owner changed')
+            return (context,tx[1],tx[2],tuple(tx[3].items()))
+        if operation == 'physical_ring_collection':
+            from .physical_rings import targets
+            allowed, context = targets(self.memory, snapshot, self.guard)
+            if address not in allowed or size != allowed[address][0]:
+                raise MemoryUnavailable('WRITE_BLOCKED: no witnessed physical ring at this address')
+            return context, allowed[address][1]
         if operation == 'experimental_code':
             # ONLY reachable through the explicit, dangerous --experimental-direct-hooks
             # launcher switch, with a complete exact-address write plan.
@@ -253,34 +355,38 @@ class WritePolicy:
             if observed_bank != bank or hashlib.sha256(raw).hexdigest() not in (current, expected):
                 raise MemoryUnavailable('WRITE_BLOCKED: native CSB bank changed during transaction')
             return 'verified_native_pal_music_bank', bank, current, expected
-        if operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls','movement_controls') and snapshot.save_identity is None:
-            token = self.guard.check_stats(snapshot)
-        else:
-            token = self.guard.check_stats(snapshot) if operation in ('stats', 'boost_stats', 'colour_permissions') else self.guard.check(snapshot)
-        if operation not in ('global_map_refresh', 'permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset', 'gameplay_controls', 'egg_medal_controls', 'capsule_controls', 'movement_controls') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
-            raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
+        if operation == 'intro_box_placement':
+            from .intro_box import locate
+            if (snapshot.stable_polls < 3 or not self.guard.can_record_pickups(snapshot)):
+                raise MemoryUnavailable('WRITE_BLOCKED: intro box playthrough not attributed')
+            base, target, actors = locate(self.memory, snapshot)
+            if size != 4 or address != target or actors:
+                raise MemoryUnavailable('WRITE_BLOCKED: intro box must precede native construction')
+            return snapshot.session, snapshot.stage_epoch, base, target
         if operation == 'movement_controls':
-            from .movement_gate import payload, observed
-            from .direct_hooks import plan, _branch
-            plans = [row for row in plan(include_movement=True) if row[4] == 'movement']
-            if len(plans) != 1:
-                raise MemoryUnavailable('WRITE_BLOCKED: missing movement plan')
-            hook, original, arena, code, label = plans[0]
-            words, _, off = payload()
-            base = arena+off
-            current = bytearray(self.memory.read_bytes(arena, len(code)))
-            current[off:off+8] = bytes(8)
-            if (self.memory.read_u32(hook) != _branch(hook,arena)
-                    or current != code or size != 4 or address not in (base,base+4)):
-                raise MemoryUnavailable('WRITE_BLOCKED: unverified movement trampoline/data address')
-            if snapshot.scene != 'gameplay' or snapshot.death_state != 'alive':
-                raise MemoryUnavailable('WRITE_BLOCKED: movement gate requires living player')
+            from .movement_gate import installed_data, observed
+            match = installed_data(self.memory)
+            if match is None:
+                raise MemoryUnavailable('WRITE_BLOCKED: movement hook missing')
+            base, transport = match
+            if size != 4 or address not in (base, base + 4, base + 16):
+                raise MemoryUnavailable('WRITE_BLOCKED: unverified movement data word')
+            if (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'
+                    or not snapshot.scene_verified or snapshot.stable_polls < 1
+                    or not (snapshot.progress_verified or self.guard.can_record_pickups(snapshot))):
+                raise MemoryUnavailable('WRITE_BLOCKED: movement gate requires attributed living player')
             stage = next(iter(snapshot.evidence.get('native_data',{}).get('stage_objects',[])),{})
             player = stage.get('player',{}).get('actor')
             if player is None:
                 raise MemoryUnavailable('WRITE_BLOCKED: movement actor unavailable')
-            ctrl = observed(self.memory, player)['controller']
-            return token, ctrl, base
+            ctrl = observed(self.memory, player)['request_machine']
+            return ('verified ephemeral PAL Sonic movement owner; no persistent save writes', ctrl, base)
+        if operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls') and snapshot.save_identity is None:
+            token = self.guard.check_stats(snapshot)
+        else:
+            token = self.guard.check_stats(snapshot) if operation in ('stats', 'boost_stats', 'colour_permissions') else self.guard.check(snapshot)
+        if operation not in ('global_map_refresh', 'permission_bits', 'map_availability', 'map_lock', 'music_cues', 'progression_data', 'progression_reset', 'gameplay_controls', 'egg_medal_controls', 'capsule_controls') and (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'):
+            raise MemoryUnavailable('WRITE_BLOCKED: unsafe_scene')
         if operation == 'global_map_refresh':
             from .map_refresh import installed_data
             from .native_read import read_actors
@@ -307,8 +413,9 @@ class WritePolicy:
         elif operation == 'capsule_controls':
             from .capsule_refresh import installed_data
             data = installed_data(self.memory)
-            chain = self.memory.resolve_flags_ptr(allow_working=True)
-            if tuple(snapshot.evidence.get('chain', ())) != chain or data is None:
+            chain = live_control_profile(self.memory, snapshot, self.guard)
+            if (snapshot.evidence.get('chain') is not None
+                    and tuple(snapshot.evidence['chain']) != chain) or data is None:
                 raise MemoryUnavailable('WRITE_BLOCKED: White capsule control profile changed')
             if size != 4 or address not in range(data, data+12, 4):
                 raise MemoryUnavailable('WRITE_BLOCKED: White capsule control address not allowed')
@@ -324,8 +431,9 @@ class WritePolicy:
             return token, chain, data
         elif operation == 'gameplay_controls':
             from .gameplay_controls import HOOKS, installed
-            chain = self.memory.resolve_flags_ptr(allow_working=True)
-            if tuple(snapshot.evidence.get('chain', ())) != chain:
+            chain = live_control_profile(self.memory, snapshot, self.guard)
+            if (snapshot.evidence.get('chain') is not None
+                    and tuple(snapshot.evidence['chain']) != chain):
                 raise MemoryUnavailable('WRITE_BLOCKED: gameplay control profile changed')
             data = [installed(self.memory, kind) for kind in HOOKS]
             if size != 4 or not any(d is not None and address in range(d, d+self.memory.gameplay_data_sizes.get(d,20), 4) for d in data):

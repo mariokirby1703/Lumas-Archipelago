@@ -36,12 +36,13 @@ def test_catalogs():
 @pytest.mark.parametrize('reduction', range(180))
 def test_thresholds(reduction):
     gates = game_land_gates(reduction)
-    ordered = [gates[f'{i}-{act}'] for act in (2, 3) for i in range(1, 8)]
+    ordered = [gates[f'{i}-{act}'] for act in (1, 2, 3) for i in range(1, 8)]
     assert ordered[0] >= 1 and ordered[-1] <= 180
     assert all(a < b for a, b in zip(ordered, ordered[1:]))
-    assert sum(v == 0 for v in gates.values()) == 7
+    assert sum(v == 0 for v in gates.values()) == 0
+    assert len(set(b-a for a,b in zip(ordered,ordered[1:])))==1
     if reduction == 40:
-        assert ordered == list(range(10, 141, 10))
+        assert ordered == list(range(1, 122, 6))
 
 
 def test_options_and_yaml():

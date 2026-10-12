@@ -143,6 +143,7 @@ def _read_stage_objects(memory, include_pickups=True):
                 if not coherent():
                     raise MemoryUnavailable('stage_context_changed')
                 row['player'] = player
+                classify_playable_entry(row)
             except MemoryUnavailable as error:
                 row['player_error'] = str(error)
             else:
@@ -170,6 +171,26 @@ def _read_stage_objects(memory, include_pickups=True):
         if not coherent():
             raise MemoryUnavailable('stage_context_changed')
     return [row]
+
+
+def classify_playable_entry(row):
+    """PAL gameplay callback can run while its prior descriptor is the initializer.
+
+    800200CC copies the original empty member-function descriptor; it is not
+    a results/death/menu handler. Require the already attributed native player
+    and known live movement states, not merely an allocated stage object.
+    """
+    player=row.get('player',{})
+    movement=player.get('movement',{})
+    if (row.get('scene')=='unclassified' and row.get('state_handler')==0x8001CDB4
+            and row.get('current_handler')==0x800200CC and player.get('mode')==0
+            and movement.get('controller_vtable')=='0x8075FA3C'
+            and movement.get('state_machine_vtable')=='0x8075A0F8'
+            and movement.get('current_id') in (2,7,8,9,13,97)
+            and movement.get('state_fields_plausible')):
+        row['scene']='gameplay'
+        row['scene_evidence']='native gameplay callback / initializer predecessor / owned living Sonic'
+    return row
 
 
 def read_mission_metadata(memory, name_address, mission):

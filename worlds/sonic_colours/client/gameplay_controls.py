@@ -6,7 +6,7 @@ No native calls or CTR changes; LR, CR and scratch GPRs are preserved.
 The ordinary-use hook replaces only the displaced instruction's f1 output.
 """
 import struct
-from .capsule_refresh import PPC
+from .capsule_refresh import PPC, valid_native_control_index
 from .gecko import inspect_c2
 from .memory import MemoryUnavailable, valid_range
 
@@ -141,7 +141,7 @@ def installed(memory, kind):
     owner, index, maximum, model, locked = (*values, 0, 0) if size == 12 else values
     if not hasattr(memory, 'gameplay_data_sizes'): memory.gameplay_data_sizes = {}
     memory.gameplay_data_sizes[address] = size
-    if (owner and not valid_range(owner, 1) or index > 3 or maximum > 4
+    if (owner and not valid_range(owner, 1) or not valid_native_control_index(memory, owner, index) or maximum > 4
             or model and not valid_range(model, 0x30) or locked > 2):
         raise MemoryUnavailable('unknown_revision: invalid native gameplay control data')
     return address
@@ -149,7 +149,8 @@ def installed(memory, kind):
 
 def configure(memory, snapshot, owned, slot, temporary_boost=False):
     from ..Items import GAME_LAND_SPEED
-    chain = memory.resolve_flags_ptr(allow_working=True)
+    from .state import live_control_profile
+    chain = live_control_profile(memory, snapshot, getattr(getattr(memory, 'write_guard', None), 'guard', None))
     maximum = min(4, owned['counts'][GAME_LAND_SPEED]) if slot.get('game_land_speed_items') else 4
     model = snapshot.boost_address - 8 if snapshot.boost_address is not None else 0
     locked = int(bool(slot['options'].get('boost_lock') and not owned['counts']['White Boost Wisp']))

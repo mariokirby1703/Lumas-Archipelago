@@ -83,7 +83,7 @@ class SonicColoursWorld(World):
         for location in self.multiworld.get_locations(self.player):
             data = Locations.LOCATION_TABLE.get(location.name)
             if data and any(s['mission_id'] == data.mission and s['zone_index'] >= 7
-                            and s['slot'] > 1 for s in STAGES):
+                            for s in STAGES):
                 add_item_rule(location, lambda item: item.player != self.player
                               or item.name not in Items.WISP_ITEMS + Items.WORLD_ITEMS)
         # With Singles, the ring pool can otherwise exhaust every Clear before

@@ -33,10 +33,10 @@ for stage_index, stage in enumerate(STAGES):
         land = stage['zone_index'] - 6
         LOCATION_TABLE[f'Game Land {land} - Chaos Emerald Obtained'] = LocationData(base + 16, mission, 'emerald', land)
 # Native discovery table at PAL 80720B98, queried by 80228B30.
-DISCOVERY_STAGES = {1:(0,3), 2:(1,1), 3:(2,1), 4:(3,1), 5:(1,3), 6:(2,5), 7:(5,1)}
+DISCOVERY_STAGES = {1:(0,3), 2:(1,1), 3:(1,3), 4:(2,1), 5:(2,5), 6:(3,1), 7:(5,1)}
 for i, wisp in enumerate(WISPS):
     mission = next((s['mission_id'] for s in STAGES if (s['zone_index'],s['slot']) == DISCOVERY_STAGES.get(i)), '')
-    LOCATION_TABLE[f'{wisp} - First Discovery'] = LocationData(BASE_ID + 4000 + i, mission, 'wisp', i)
+    LOCATION_TABLE[f'{wisp} Discovery'] = LocationData(BASE_ID + 4000 + i, mission, 'wisp', i)
 for capsule in CAPSULES.values():
     if capsule.name:
         if capsule.name in LOCATION_TABLE:

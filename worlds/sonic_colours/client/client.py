@@ -75,7 +75,7 @@ class SonicCommands(ClientCommandProcessor):
             for zone in range(1,6):
                 present=bool(self.ctx.memory.read_u32(actor+0xB4+zone*8))
                 allowed=bool(owned[WORLD_ITEMS[zone]])
-                rows.append({'world':WORLD_ITEMS[zone].removesuffix(' Access'),
+                rows.append({'world':WORLD_ITEMS[zone].removesuffix(' Shuttle'),
                              'ap_owned':allowed,'castle_cache_present':present,
                              'cached_ui_mismatch':present and not allowed})
             log_diagnostic({'mission':snap.actual_mission, 'scene':snap.scene,
@@ -100,6 +100,43 @@ class SonicCommands(ClientCommandProcessor):
                         'swim_item':bool(owned['counts']['Swim']),
                         'breath_item':bool(owned['counts']['Breath']),
                         'movement_status':self.ctx.runtime.movement_status})
+
+    def _cmd_sonicwater(self):
+        """Read-only PAL underwater stats; does NOT implement Swim/Breath gates."""
+        if not self.ctx.runtime or not self.ctx.memory or not self.ctx.runtime.snapshot:
+            logger.info('Connect to a Sonic Colours slot and Dolphin first.')
+            return
+        from .movement_gate import water_observed
+        snap=self.ctx.runtime.snapshot
+        stage=next(iter(snap.evidence.get('native_data',{}).get('stage_objects',[])),{})
+        player=stage.get('player',{}).get('actor')
+        if player is None:
+            logger.info('Enter a Sonic gameplay stage to inspect water state.')
+            return
+        try:
+            result=water_observed(self.ctx.memory,player)
+            log_diagnostic({'mission':snap.actual_mission,'water':result,
+                            'note':'Only read-only snapshot correlations: no trusted oxygen timer or bubble reset setter yet.'})
+        except MemoryUnavailable as error:
+            log_diagnostic({'error':str(error),'mission':snap.actual_mission})
+
+    def _cmd_sonicbinding(self):
+        """Explain why the current AP save has or has not been attributed."""
+        if not self.ctx.runtime:
+            logger.info('Connect to a Sonic slot first.')
+            return
+        runtime=self.ctx.runtime;snap=runtime.snapshot
+        journal=runtime.journal.data
+        log_diagnostic({'playthrough':runtime.guard.state.value, 'save_armed':runtime.guard.armed,
+                        'reason':runtime.guard.reason,
+                        'save_identity_verified':bool(snap and snap.save_identity_verified),
+                        'new_save_selected':bool(snap and snap.new_save_selected),
+                        'stable_polls':snap.stable_polls if snap else None,
+                        'scene':snap.scene if snap else None,
+                        'bootstrap_present':bool(journal.get('bootstrap')),
+                        'native_binding_present':bool(journal.get('native_binding')),
+                        'intro_record_witness_count':len(journal.get('native_binding',{}).get('intro_record_witnesses',[])),
+                        'note':'Diagnostic only. This command does not bypass the save binding guard.'})
 
     def _cmd_sonicmusictest(self, destination='', donor=''):
         """Audible test: DESTINATION_CUE DONOR_CUE, or off to restore the seed mapping."""
@@ -366,7 +403,10 @@ async def transmit_checks(ctx, checks=(), goal=False):
     if not ctx.server or ctx.slot is None:
         ctx.operation_status['ap_transport'] = 'offline; durable queue retained'
         return
-    earned = set(checks) | set(ctx.runtime.journal.data['checks'])
+    # Runtime authorizes checks for the current seeded/bound session. Do not
+    # bypass that gate by reimporting all journal entries while disconnected,
+    # unbound, or after a save/scene identity switch.
+    earned = set(checks)
     pending = earned - ctx.checked_locations
     if not pending and not (goal and not ctx.finished_game):
         ctx.operation_status['ap_transport'] = 'idle: no pending checks or goal'
@@ -436,8 +476,25 @@ async def dolphin_loop(ctx):
                 if ctx.experimental_direct_hooks and ctx.direct_hook_status.get('status', '').startswith('FAILED'):
                     raise MemoryUnavailable('EXPERIMENT BLOCKED: restart Dolphin and client after a partial experimental install')
                 if ctx.experimental_direct_hooks and not ctx.direct_hook_attempted:
-                    # Intentional once-per-session experiment. Never automatically
-                    # retry a partially installed native hook or hide a failed write.
+                    # A valid DME attachment alone does not prove the guest disc
+                    # header is ready. During Dolphin boot/reset, an all-zero
+                    # header must defer the experiment, not permanently mark a
+                    # never-attempted installation as partially failed.
+                    # No guest writes are permitted before a full verified PAL
+                    # revision check succeeds. Re-check on the next poll.
+                    try:
+                        memory.verify_revision()
+                    except MemoryUnavailable as error:
+                        ctx.direct_hook_status = {
+                            'status': 'WAITING: verified PAL executable required before experimental install',
+                            'preflight_error': str(error),
+                            'installed_in_guest_ram': False,
+                            'jit_execution_verified': False,
+                        }
+                        raise
+                    # Intentional once-per-session experiment AFTER preflight.
+                    # Only installation-phase errors require a full restart;
+                    # the installer refuses unsafe scratch RAM or mismatched code.
                     ctx.direct_hook_attempted = True
                     try:
                         from .direct_hooks import install, inspect
@@ -470,8 +527,12 @@ async def dolphin_loop(ctx):
                     pickup_detection={'verified': snap.pickup_verified, 'authorized': ctx.runtime.guard.can_record_pickups(snap)},
                     journal_persistence={'durable_events': len(ctx.runtime.journal.data['pickup_events']), 'earned_checks': len(ctx.runtime.journal.data['checks']), 'persistence_pending': ctx.runtime.journal.persistence_pending},
                     capsule_refresh=ctx.runtime.hooks.capsule_refresh_status,
+                    physical_red_rings=getattr(ctx.runtime,'physical_ring_status',{}),
+                    game_land_unlock_animation=getattr(ctx.runtime,'game_land_notice_status',{}),
+                    breath=getattr(ctx.runtime,'breath_status',{}),
                     native_progression=ctx.runtime.hooks.progression_status,
                     native_gameplay_controls=ctx.runtime.hooks.gameplay_controls_status,
+                    boost_gain_guard=ctx.runtime.boost_gain_status,
                     movement_unlocks=ctx.runtime.movement_status,
                     global_map_refresh=ctx.runtime.hooks.global_map_refresh_status,
                     native_egg_medals=ctx.runtime.hooks.medal_status,

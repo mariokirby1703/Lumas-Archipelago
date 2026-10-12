@@ -41,20 +41,32 @@ class PPC:
         return self.words
 
 
-def payload_words():
+def payload_words(compact_abi=False, epilogue_abi=False):
+    if epilogue_abi and not compact_abi:
+        raise ValueError('epilogue ABI requires the compact native-call profile')
+    # 800D4828 overwrites CR0; 800D4850..4860 restores the enclosing LR.
+    # The continuation uses only r31/r1 and the displaced r0. Our helper never
+    # alters r31; native callees preserve all nonvolatile registers/CR fields.
+    # Therefore its compact epilogue variant need not save volatile GPRs/LR/CR0.
     a=PPC()
     # Keep save slots above the native callee's outgoing-argument home area.
     a.d(37,1,1,-0x200)
-    a.emit(0x7C0802A6); a.d(36,0,1,0x40)
-    a.emit(0x7C000026); a.d(36,0,1,0x44)
-    a.emit(0x7C0902A6); a.d(36,0,1,0x48)
-    a.d(47,3,1,0x184)
-    a.emit(0x7C10E2A6); a.d(36,0,1,0x180)  # save GQR0
-    a.d(14,0,0,0); a.emit(0x7C10E3A6)
-    for r in range(14):
-        a.d(54,r,1,0x80+r*8)  # volatile FPR double component
-        a.d(60,r,1,0x100+r*8)  # both paired-single components, GQR0=float
-    a.emit(0xFC00048E); a.d(54,0,1,0xf0)  # mffs f0; save FPSCR
+    if not epilogue_abi:
+        a.emit(0x7C0802A6); a.d(36,0,1,0x40)
+        a.emit(0x7C000026); a.d(36,0,1,0x44)
+    if not compact_abi:
+        a.emit(0x7C0902A6); a.d(36,0,1,0x48)
+    if not epilogue_abi: a.d(47,3,1,0x184)
+    # At this hook the native void update has already called 800D4864;
+    # no volatile FPR/paired-single values are live in the continuation.
+    # The compact profile follows the original caller's native call ABI.
+    if not compact_abi:
+        a.emit(0x7C10E2A6); a.d(36,0,1,0x180)  # save GQR0
+        a.d(14,0,0,0); a.emit(0x7C10E3A6)
+        for r in range(14):
+            a.d(54,r,1,0x80+r*8)  # volatile FPR double component
+            a.d(60,r,1,0x100+r*8)  # both paired-single components, GQR0=float
+        a.emit(0xFC00048E); a.d(54,0,1,0xf0)  # mffs f0; save FPSCR
     a.emit(0x48000005); pic_base = len(a.words)*4
     a.emit(0x7D8802A6); pic_fix = len(a.words); a.d(14,12,12,0)
     a.d(32,6,12,0); a.d(11,0,6,0); a.branch('end',0x41820000)
@@ -127,16 +139,19 @@ def payload_words():
     a.mr(3,31); a.call(0x800D3DA4)  # native ghost model, refcount-replace +B0
     a.mr(3,31); a.d(15,4,0,0x8076); a.d(14,4,4,0x13d8); a.call(0x800D5490)
     a.label('end')
-    a.d(14,0,0,0); a.emit(0x7C10E3A6)
-    a.d(50,0,1,0xf0); a.emit(0xFDFE058E)  # restore FPSCR
-    for r in range(14):
-        a.d(56,r,1,0x100+r*8)
-        a.d(50,r,1,0x80+r*8)
-    a.d(32,0,1,0x180); a.emit(0x7C10E3A6)
-    a.d(46,3,1,0x184)
-    a.d(32,0,1,0x48); a.emit(0x7C0903A6)
-    a.d(32,0,1,0x44); a.emit(0x7C0FF120)
-    a.d(32,0,1,0x40); a.emit(0x7C0803A6)
+    if not compact_abi:
+        a.d(14,0,0,0); a.emit(0x7C10E3A6)
+        a.d(50,0,1,0xf0); a.emit(0xFDFE058E)  # restore FPSCR
+        for r in range(14):
+            a.d(56,r,1,0x100+r*8)
+            a.d(50,r,1,0x80+r*8)
+        a.d(32,0,1,0x180); a.emit(0x7C10E3A6)
+    if not epilogue_abi: a.d(46,3,1,0x184)
+    if not compact_abi:
+        a.d(32,0,1,0x48); a.emit(0x7C0903A6)
+    if not epilogue_abi:
+        a.d(32,0,1,0x44); a.emit(0x7C0FF120)
+        a.d(32,0,1,0x40); a.emit(0x7C0803A6)
     a.d(14,1,1,0x200); a.emit(ORIGINAL)
     a.branch('return')
     data = len(a.words)*4; a.words[pic_fix] |= (data-pic_base)&0xffff
@@ -148,8 +163,8 @@ def payload_words():
     return a.finish()
 
 
-def gecko_ini():
-    words=payload_words()
+def gecko_ini(compact_capsule=True):
+    words=payload_words(compact_abi=compact_capsule, epilogue_abi=compact_capsule)
     lines=['[Gecko]', '$AP PAL live coloured capsule refresh',
            '20000000 534E4350', '28000004 00003850', '28000006 00000000']
     # Keep one entry signature per directly called native callee. The payload
@@ -167,6 +182,8 @@ def gecko_ini():
     lines += medal_lines()
     from .map_transition import gecko_lines as transition_lines
     lines[-1:-1] = transition_lines()
+    from .map_ring_display import gecko_lines as ring_display_lines
+    lines[-1:-1] = ring_display_lines()
     lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Eggman Heart pickup capture']
     # Exact revision/full text is authenticated by DME before any owner word
     # is published. Every hook is inert before that; retain the full disc ID.
@@ -197,10 +214,47 @@ def gecko_ini():
     return '\n'.join(lines)+'\n'
 
 
+def valid_native_control_index(memory, owner, index):
+    """Validate a Gecko mailbox index, NOT a native save-slot pointer.
+
+    Only 0..3 refer to native selected/working records.  A no-slot intro may
+    expose *any* native out-of-range byte.  The C2 hook only compares this
+    mailbox byte with the index byte in the current, pointer-checked native
+    container, so an identical transient byte is safe for ephemeral control.
+    Never use such a byte with resolve_selected_slot() or flags writes.
+
+    A stale no-slot mailbox after a genuine save is selected is inert: the
+    native byte no longer matches.  Accept it for revision inspection so the
+    client can reconfigure the mailbox instead of permanently bricking itself.
+    An owner of zero is an intentionally disarmed mailbox during multiword
+    updates; it cannot enable the hook.
+    """
+    if 0 <= index <= 3:
+        return True
+    if not 4 <= index <= 0xFF:
+        return False
+    try:
+        _, container = memory.resolve_save_container()
+        native_index = memory.read_u8(container)
+    except MemoryUnavailable:
+        return False
+    if owner not in (0, container):
+        return False
+    if owner == 0:
+        return True
+    # A stale mailbox byte is harmless whether native index has switched to
+    # another pre-save marker or a real selected slot. The C2 hook itself only
+    # activates when the bytes match.  WritePolicy + live_control_profile
+    # separately demand exact native/snapshot agreement BEFORE writing.
+    return True
+
+
 def inspect_installed(memory):
     from .gecko import inspect_c2
     from ..world_constants import load_data
-    candidates = [('current_white_collision_refresh', payload_words()),
+    candidates = [('current_compact_white_collision_refresh', payload_words(compact_abi=True, epilogue_abi=True)),
+                  ('current_compact_white_collision_refresh', payload_words(compact_abi=True)),
+                  ('current_white_collision_refresh', payload_words()),
                   ('previous_random_capsule_refresh', load_data('capsule_random_previous.json')),
                   ('before_random_capsule_refresh', load_data('capsule_before_random.json')),
                   ('previous_white_collision_refresh', load_data('capsule_white_previous.json'))]
@@ -213,10 +267,11 @@ def inspect_installed(memory):
             continue
     else:
         result = inspect_c2(memory, HOOK, ORIGINAL, load_data('capsule_hook_legacy.json'))
-    if result['installed'] and result['variant'] in ('current_white_collision_refresh','previous_random_capsule_refresh','before_random_capsule_refresh','previous_white_collision_refresh'):
+    if result['installed'] and result['variant'] in ('current_compact_white_collision_refresh','current_white_collision_refresh','previous_random_capsule_refresh','before_random_capsule_refresh','previous_white_collision_refresh'):
         result['white_data_offset'] = offset
         owner, index, allowed = struct.unpack('>3I', memory.read_bytes(result['target']+offset,12))
-        if owner and not valid_range(owner,1) or index > 3 or allowed > (3 if result['variant'] in ('current_white_collision_refresh','previous_random_capsule_refresh') else 1):
+        if (owner and not valid_range(owner,1) or not valid_native_control_index(memory, owner, index)
+                or allowed > (3 if result['variant'] in ('current_compact_white_collision_refresh','current_white_collision_refresh','previous_random_capsule_refresh') else 1)):
             raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
     memory.capsule_hook_observation=result
     return result
@@ -240,7 +295,8 @@ def installed_data(memory):
     if not result['installed'] or 'white_data_offset' not in result: return None
     address = result['target'] + result['white_data_offset']
     owner, index, allowed = struct.unpack('>3I', memory.read_bytes(address,12))
-    if owner and not valid_range(owner,1) or index > 3 or allowed > (3 if result['variant'] in ('current_white_collision_refresh','previous_random_capsule_refresh') else 1):
+    if (owner and not valid_range(owner,1) or not valid_native_control_index(memory, owner, index)
+                or allowed > (3 if result['variant'] in ('current_compact_white_collision_refresh','current_white_collision_refresh','previous_random_capsule_refresh') else 1)):
         raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
     return address
 
@@ -248,10 +304,11 @@ def installed_data(memory):
 def configure(memory, snapshot, owned, slot):
     address = installed_data(memory)
     if address is None: return {'available':False, 'reason':'Update Gecko code for native White capsule projection'}
-    chain = memory.resolve_flags_ptr(allow_working=True)
+    from .state import live_control_profile
+    chain = live_control_profile(memory, snapshot, getattr(getattr(memory, 'write_guard', None), 'guard', None))
     white = int(not slot['options']['boost_lock'] or bool(owned['counts']['White Boost Wisp']))
     random_allowed = bool(owned['counts']['Random Capsules'])
-    current_hook = memory.capsule_hook_observation['variant'] == 'current_white_collision_refresh'
+    current_hook = memory.capsule_hook_observation['variant'] in ('current_compact_white_collision_refresh', 'current_white_collision_refresh')
     desired = (chain[1], chain[2], white | (2 if random_allowed and current_hook else 0))
     before = struct.unpack('>3I', memory.read_bytes(address,12))
     if before != desired:
@@ -261,4 +318,4 @@ def configure(memory, snapshot, owned, slot):
             if current != value: memory.write_u32(address+i*4,value,expected=current,operation='capsule_controls')
         memory.write_u32(address,desired[0],expected=0,operation='capsule_controls')
     return {'available':True, 'white_allowed':bool(white), 'random_capsules_allowed':random_allowed and current_hook,
-            'collision_reenable_installed': memory.capsule_hook_observation['variant'] == 'current_white_collision_refresh'}
+            'collision_reenable_installed': memory.capsule_hook_observation['variant'] in ('current_compact_white_collision_refresh', 'current_white_collision_refresh')}

@@ -58,11 +58,27 @@ def diagnostic(ctx, memory=None):
                        'item_receipts': runtime.item_details()})
         result.update({'playthrough_state': runtime.guard.state.value, 'identity_status': runtime.guard.reason,
                        'bootstrap_checks': len(runtime.journal.data.get('bootstrap', {}).get('checks', [])),
+                       'intro_proof': runtime.journal.data.get('bootstrap', {}).get('intro_proof'),
+                       'intro_checks_authorized': bool(runtime.snapshot and runtime.guard.can_send(runtime.snapshot)
+                                                       and runtime.journal.data.get('save_identity') is None),
+                       'persistent_save_bound': bool(runtime.journal.data.get('save_identity')),
                        'super_sonic_ap_permission': owned['super_sonic_allowed']})
         if runtime.snapshot:
+            # Expose the actual native byte for unsaved intro diagnosis.  This
+            # is read-only evidence from the snapshot; it is never a save ID.
+            trace = runtime.snapshot.evidence.get('save_chain_trace', {})
+            selected = next((step for step in trace.get('steps', ())
+                             if step.get('step') == 'selected_index'), None)
+            if selected is not None:
+                result['native_selected_index_observation'] = {
+                    'raw': selected.get('raw'),
+                    'reason': selected.get('reason'),
+                    'ephemeral_control_only': (selected.get('reason') == 'index_out_of_range'),
+                }
             stage = next(iter(runtime.snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
             player = stage.get('player', {})
-            result.update(movement=player.get('movement'), movement_unlocks=runtime.movement_status)
+            result.update(movement=player.get('movement'), movement_unlocks=runtime.movement_status,
+                          intro_box_assist=getattr(runtime,'intro_box_status',{}))
             result.update(rings=player.get('rings'), lives=stage.get('lives'), boost=player.get('boost'),
                           clicked_slot=runtime.snapshot.clicked_slot, real_stage_id=stage.get('real_stage_id'),
                           native_bgm_cue=stage.get('bgm_cue'),

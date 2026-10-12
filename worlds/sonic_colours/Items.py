@@ -1,7 +1,7 @@
 from BaseClasses import Item, ItemClassification
 from .world_constants import BASE_ID, GAME, WORLDS, WISPS
 
-WORLD_ITEMS = tuple(f'{w} Access' for w in WORLDS[:6])
+WORLD_ITEMS = tuple(f'{w} Shuttle' for w in WORLDS[:6])
 WISP_ITEMS = tuple(f'{w} Wisp' for w in WISPS)
 EMERALDS = tuple(f'{colour} Chaos Emerald' for colour in
                  ('Green', 'Red', 'Blue', 'Yellow', 'Purple', 'Cyan', 'White'))
@@ -11,10 +11,10 @@ FILLER_WEIGHTS = {'Rings': 40, '1-Up': 30, 'Half Boost Refill': 20, 'Full Boost 
 FILLER = tuple(FILLER_WEIGHTS)
 TRAPS = ('Ring Loss Trap', 'Swim Everywhere Trap')
 # Keep retired Terminal Velocity Access offset 6 out of the public item table.
-NAMES = tuple(f'{w} Access' for w in WORLDS) + WISP_ITEMS + EMERALDS + tuple(RING_VALUES) + LEGACY_FILLER + ('1-Up',) + TRAPS
+NAMES = tuple(f'{w} Shuttle' for w in WORLDS) + WISP_ITEMS + EMERALDS + tuple(RING_VALUES) + LEGACY_FILLER + ('1-Up',) + TRAPS
 # Offset 22 is retired. Existing counter/filler/trap IDs must not move.
 ITEM_TABLE = {name: BASE_ID + i + (1 if i >= 22 else 0) for i, name in enumerate(NAMES)}
-ITEM_TABLE.pop('Terminal Velocity Access')
+ITEM_TABLE.pop('Terminal Velocity Shuttle')
 ITEM_TABLE.update({'Rings': BASE_ID + 32, 'Half Boost Refill': BASE_ID + 33})
 GAME_LAND_SPEED = 'Progressive Game Land Speed'
 ITEM_TABLE[GAME_LAND_SPEED] = BASE_ID + 34
@@ -27,6 +27,9 @@ MOVEMENT_ITEMS = ('Wall Jump', 'Homing Attack', 'Mid-Air Boost', 'Double Jump',
 MOVEMENT_POOL = ('Wall Jump', 'Homing Attack', 'Mid-Air Boost', 'Double Jump',
                  'Ground Pound', 'Progressive Crouch', 'Progressive Crouch', 'Swim', 'Breath')
 ITEM_TABLE.update({name: BASE_ID + 37 + i for i, name in enumerate(MOVEMENT_ITEMS)})
+ITEM_TABLE['Progressive Breathing'] = BASE_ID + 45
+MOVEMENT_ITEMS = MOVEMENT_ITEMS[:-1] + ('Progressive Breathing',)
+MOVEMENT_POOL = MOVEMENT_POOL[:-1] + ('Progressive Breathing',)*5
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}
 
 

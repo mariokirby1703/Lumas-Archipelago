@@ -23,9 +23,14 @@ def implementation_info():
     from .runtime import rings_amount
     from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions, progression_hook, music
     from ..world_progression import progression_clears, verified_result_clear
-    functions = (progression_clears, verified_result_clear, NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
-                 NativeHooks.swim, Runtime.poll, Runtime.configure_native_hooks, Runtime.select_resource_music, Runtime.apply_effects, Runtime.effect_context, Runtime.boost_grant_context, Runtime.temporary_boost_allowed, rings_amount, detect_checks,
-                 SaveGuard.observe, SaveGuard.check, SaveGuard.check_stats, WritePolicy.__call__, NativeHooks._snapshot_after_revision,
+    from .water_native import read as read_native_oxygen, target as oxygen_target, configure as configure_oxygen, duration as breathing_duration, allocation_key as oxygen_allocation_key
+    from .game_land_notice import owner as notice_owner, prepare as prepare_notice, apply as apply_notice
+    from .map_ring_display import payload as ring_display_payload, installed as ring_display_installed
+    from .physical_rings import witnessed, targets, apply as restore_physical_rings
+    from .intro_box import eligible, locate, apply as apply_intro_box
+    functions = (oxygen_allocation_key, native_read.classify_playable_entry, breathing_duration, read_native_oxygen, oxygen_target, configure_oxygen, notice_owner, prepare_notice, apply_notice, ring_display_payload, ring_display_installed, witnessed, targets, restore_physical_rings, eligible, locate, apply_intro_box,progression_clears, verified_result_clear, NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
+                 NativeHooks.swim, Runtime.poll, Runtime.configure_native_hooks, Runtime.select_resource_music, Runtime.apply_effects, Runtime.effect_context, Runtime.boost_grant_context, Runtime.temporary_boost_allowed, Runtime.enforce_white_boost_gain_lock, rings_amount, detect_checks,
+                 SaveGuard.required_polls, SaveGuard.observe, SaveGuard.check, SaveGuard.check_stats, WritePolicy.__call__, NativeHooks._snapshot_after_revision,
                  Runtime.observe_pickups, Runtime.observe_capsules, binding.SaveBinding.attribute,
                  native_read.read_capsules, client.SonicContext.on_package, client.transmit_checks, journal.Journal.save, journal.Journal.record_pickups, Runtime.observe_results, Runtime.settle_effects,
                  native_read.read_result, native_read.read_stage_objects, native_read.read_player,
@@ -40,7 +45,7 @@ def implementation_info():
                  native_read.read_medals, medal_hook.payload, medal_hook.installed_data, medal_hook.configure, medal_hook.observe,
                  music_bank.plan, music_bank.rewrite_bank, music_bank.recover_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch, journal.Journal.record_permissions,
                  live_music.apply, live_music.probe_bank, live_music.recover_original,
-                 direct_hooks.plan, direct_hooks.install, direct_hooks.inspect, movement_gate.payload, movement_gate.permissions, movement_gate.observed, movement_gate.configure, client.log_diagnostic, gameplay_controls.gecko_lines,
+                 direct_hooks.plan, direct_hooks.install, direct_hooks.inspect, movement_gate.payload, movement_gate.permissions, movement_gate.observed, movement_gate.configure, movement_gate.installed_data, movement_gate.gecko_lines, movement_gate.water_observed, client.log_diagnostic, gameplay_controls.gecko_lines,
                  map_refresh.payload, map_refresh.installed_data, map_refresh.configure, map_transition.payload, map_transition.installed, map_transition.update_payload, map_transition.update_installed, capsule_refresh.gecko_ini)
     digest = hashlib.sha256()
     for function in functions:

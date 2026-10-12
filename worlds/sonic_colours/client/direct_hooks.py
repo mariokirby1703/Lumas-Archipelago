@@ -54,10 +54,6 @@ def plan(include_movement=False):
             raise MemoryUnavailable('experimental code arena too small')
         if words[-1] != 0:
             raise MemoryUnavailable('unexpected C2 return placeholder')
-        if label == 'movement':
-            from .movement_gate import payload, DENIED_CONTINUATION
-            _, deny_index, _ = payload()
-            words[deny_index] = _branch(cursor + deny_index*4, DENIED_CONTINUATION)
         words[-1] = _branch(cursor + size - 4, address + 4)
         code = struct.pack('>'+'I'*len(words),*words)
         patches.append((address, original, cursor, code, label))
@@ -118,7 +114,7 @@ def _mutable_span(label):
     """Exact data-word spans owned by existing guarded PPC thunks."""
     if label == 'movement':
         from .movement_gate import payload
-        return payload()[2], 8
+        return payload()[2], 16
     if label == 'capsule':
         from .capsule_refresh import payload_words, data_offset
         return data_offset(payload_words()), 12

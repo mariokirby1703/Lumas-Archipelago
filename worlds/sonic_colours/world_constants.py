@@ -31,11 +31,21 @@ RANKS = ('S', 'A', 'B', 'C')
 def game_land_gates(reduction):
     if type(reduction) is not int or not 0 <= reduction <= 179:
         raise ValueError('Game Land reduction must be an integer in 0..179')
+    # One integer step across all 21 gates; never flatten early thresholds.
+    # The highest requirement stays below the remaining 180-ring budget.
+    step = max(1, (180 - reduction - 1) // 20)
+    return {f'{world}-{act}': 1 + ((act-1)*7 + world-1)*step
+            for act in (1,2,3) for world in range(1,8)}
+
+
+def legacy_game_land_gates(reduction):
+    """Read-only compatibility for previously generated schema-7 servers."""
     adjusted = []
-    for vanilla in range(50, 181, 10):
-        adjusted.append(max(1, vanilla - reduction, adjusted[-1] + 1 if adjusted else 1))
-    return {f'{i + 1}-{act}': 0 if act == 1 else adjusted[i + (7 if act == 3 else 0)]
-            for i in range(7) for act in (1, 2, 3)}
+    for vanilla in range(50,181,10):
+        adjusted.append(max(1,vanilla-reduction,adjusted[-1]+1 if adjusted else 1))
+    return {f'{i+1}-{act}':0 if act==1 else adjusted[i+(7 if act==3 else 0)]
+            for i in range(7) for act in (1,2,3)}
+
 
 
 def pack_rings(target, capacity):

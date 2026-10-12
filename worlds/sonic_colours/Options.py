@@ -71,7 +71,7 @@ class WorldProgression(Choice):
 
 
 class GameLandChecks(DefaultOnToggle):
-    """Add a Clear check for each of the 21 Game Land stages. Every first stage is free; the second and third stages require AP Red Ring items."""
+    """Add a Clear check for each of the 21 Game Land stages. All 21 stages require AP Red Ring items."""
     display_name = 'Game Land Checks'
 
 
@@ -86,7 +86,7 @@ class WispDiscoveryChecks(Toggle):
 
 
 class GameLandRequirementReduction(Range):
-    """Reduce the AP Red Ring counts needed for Game Land stages 2 and 3. Thresholds remain positive and strictly increasing. Stage 1 in every Game Land world always requires zero."""
+    """All 21 Game Land stages use one evenly spaced AP Red Ring requirement sequence: all Stage 1 gates, then Stage 2, then Stage 3. First gate requires 1. Step is max(1, floor((179 - reduction) / 20)). Reduction 113 gives 1, 4, 7 ... 61; default 40 gives 1, 7, 13 ... 121."""
     display_name = 'Game Land Requirement Reduction'
     range_start = 0
     range_end = 179
@@ -126,10 +126,12 @@ class SonicDeathLink(DeathLink):
 
 class MovementUnlocks(Toggle):
     """EXPERIMENTAL: shuffle Wall Jump, Homing Attack, Mid-Air Boost (Jump Dash),
-    Double Jump, Ground Pound, 2 Progressive Crouch stages, Swim and Breath.
-    State-transition locks require opt-in experimental guest hooks and are NOT
-    active with the ordinary four Gecko groups. Native Swim/Breath gating is
-    still research-only; consult the movement diagnostics before playing a seed.
+    Double Jump, Ground Pound, 2 Progressive Crouch stages, Swim and five Progressive Breathing items.
+    State-transition locks require the replacement Dolphin Movement Gecko BETA
+    code profile and are NOT active with the ordinary four Gecko groups.
+    Swim controls repeated underwater jumps independently of Double Jump.
+    Air starts at zero; Progressive Breathing grants 5, 10, 20, 40, then 60 seconds.
+    These gates require the current complete Movement profile.
     """
     display_name = 'Movement Unlocks (Experimental)'
 

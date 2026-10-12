@@ -57,6 +57,8 @@ def migrate_yaml(document):
         colours=('Green','Red','Blue','Yellow','Purple','Cyan','White')
         names={f'Chaos Emerald {i+1}':f'{c} Chaos Emerald' for i,c in enumerate(colours)}
         names.update({'Red Ring (+1)':'Red Ring','Red Rings (+5)':'5 Red Rings','Red Rings (+10)':'10 Red Rings'})
+        from .world_constants import WORLDS
+        names.update({f'{world} Access':f'{world} Shuttle' for world in WORLDS[:6]})
         if isinstance(value,dict) and 'Terminal Velocity Access' in value:
             value={k:v for k,v in value.items() if k!='Terminal Velocity Access'}
             changes.append(f'Removed retired Terminal Velocity Access from {key}.')

@@ -102,15 +102,48 @@ class NativeHooks:
         trace = memory.trace_save_chain()
         chain = trace['chain']
         if chain is None:
+            # The New Game prologue runs BEFORE a vanilla save index exists.
+            # Previous versions reset stable_polls to zero on *every* such
+            # frame, so the intro could never become attributed or deliver
+            # checks, even when a fully validated Sonic actor was playable.
+            # This is scene-local evidence only, NEVER a writable save slot.
+            failed_index = (trace.get('first_failure', {}).get('step') == 'selected_index'
+                            and trace.get('first_failure', {}).get('reason') == 'index_out_of_range')
+            player = stage.get('player', {})
+            native_intro = (failed_index and stage.get('scene') == 'gameplay'
+                            and stage.get('mission') == 'stg110'
+                            and stage.get('clicked_slot') == '0:1'
+                            and stage.get('death_count') == 0
+                            and stage.get('current_red_ring_mask') == 0
+                            and player.get('rings') == 0
+                            and player.get('mode') == 0
+                            and stage.get('player_actor_id') is not None
+                            and player.get('actor') is not None)
+            no_save_key = (application, stage.get('context'), stage.get('mission'),
+                           stage.get('scene'), stage.get('player_actor_id'),
+                           'selected_index_unavailable')
+            if no_save_key != self.context_key:
+                self.context_key, self.stable_polls = no_save_key, 0
+            self.stable_polls += 1
             self.chain = None
-            self.context_key = None
-            self.stable_polls = 0
-            return Snapshot(session, None, None, stage.get('scene', 'unclassified'), stage.get('mission'),
+            snapshot = Snapshot(session, None, None, stage.get('scene', 'unclassified'), stage.get('mission'),
+                            stable_polls=self.stable_polls,
+                            new_game_verified=bool(native_intro and self.stable_polls >= 3),
+                            fresh_fields=(failed_index, bool(native_intro)),
                             clicked_slot=stage.get('clicked_slot'),
                             scene_verified=stage.get('scene', 'unclassified') != 'unclassified',
                             rings_address=stage.get('player', {}).get('rings_address'),
                             lives_address=stage.get('lives_address'),
-                        ring_mirror_address=stage.get('ring_mirror_address'), world_lives_address=(stage.get('world_lives_address') if stage.get('player', {}).get('mode') == 0 else None),
+                            # The mandatory New Game prologue has a real native
+                            # Sonic boost provider even before it has a selected
+                            # save index.  Do not drop its already-vtable-checked
+                            # addresses: Boost C2 authorization and the V9
+                            # enemy-gain clamp both need the exact live meter.
+                            boost_address=stage.get('player', {}).get('boost_address'),
+                            boost_max_address=stage.get('player', {}).get('boost_max_address'),
+                            ring_mirror_address=stage.get('ring_mirror_address'),
+                            world_lives_address=(stage.get('world_lives_address')
+                                                 if stage.get('player', {}).get('mode') == 0 else None),
                             active_rings=active_rings, current_result=stage.get('result', {}),
                             stage_epoch=stage_epoch, pickup_verified=pickup_verified,
                             opened_capsules=frozenset(capsule['key'] for capsule in stage.get('capsules', []) if capsule['opened']),
@@ -118,7 +151,11 @@ class NativeHooks:
                                         'alive' if stage.get('scene') == 'gameplay' and stage.get('player') else 'unknown',
                             status=f"save_container_unavailable: {trace['status']}; prologue/menu state needs native tracing",
                             evidence={'manager_global': 'code-derived: 0x808F3628', 'save_chain_trace': trace,
+                                      'native_intro_without_selected_slot': bool(native_intro),
                                       'native_data': native})
+            if self.binding:
+                self.binding.observe_intro(snapshot)
+            return snapshot
         save_key = (application, chain)
         if save_key != self.save_context_key:
             self.save_context_key, self.stable_save_polls = save_key, 0
@@ -275,8 +312,8 @@ class NativeHooks:
                         bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))
                         values[bit] = full_access
             values[20 + zone] = granted
-        # Act 1 gates remain native factory defaults. Acts 2/3 use AP Red Ring
-        # items, independently from physical collectibles (8016CB5C table).
+        # All 21 gates use the generated AP thresholds, independently from
+        # physical collectibles (8016CB5C table).
         values[8] = True  # Game Land entry; no physical 30-Ring prerequisite.
         for key, requirement in slot_data['game_land_gates'].items():
             zone, act = map(int, key.split('-'))

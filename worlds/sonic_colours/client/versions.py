@@ -38,6 +38,14 @@ def verify_revision(memory):
                     if word != original and recognize_branch(memory, site, original, (site, original, arena, code, label)):
                         data = data[:off] + original.to_bytes(4,'big') + data[off+4:]
 
+        # Optional Dolphin-Gecko movement test group, independently verified
+        # before normalizing its single patched instruction for the PAL hash.
+        from .movement_gate import HOOK as MOVE_HOOK, ORIGINAL as MOVE_ORIGINAL, installed_data as move_data
+        if section['address'] <= MOVE_HOOK < section['address'] + section['size']:
+            off = MOVE_HOOK - section['address']
+            word = int.from_bytes(data[off:off+4], 'big')
+            if word != MOVE_ORIGINAL and move_data(memory, transport='gecko') is not None:
+                data = data[:off] + MOVE_ORIGINAL.to_bytes(4,'big') + data[off+4:]
         from .capsule_refresh import HOOK, ORIGINAL, installed
         if section['address'] <= HOOK < section['address'] + section['size']:
             offset = HOOK - section['address']
@@ -82,6 +90,15 @@ def verify_revision(memory):
             word = int.from_bytes(data[offset:offset+4], 'big')
             if word != UPDATE_ORIGINAL and update_installed(memory):
                 data = data[:offset] + UPDATE_ORIGINAL.to_bytes(4, 'big') + data[offset+4:]
+        from .map_ring_display import HOOK as RING_HOOK, ORIGINAL as RING_ORIGINAL, installed as ring_installed, PREVIOUS_HOOK, PREVIOUS_ORIGINAL, previous_installed
+        if section['address'] <= RING_HOOK < section['address'] + section['size']:
+            offset = RING_HOOK-section['address']
+            if int.from_bytes(data[offset:offset+4],'big') != RING_ORIGINAL and ring_installed(memory):
+                data = data[:offset]+RING_ORIGINAL.to_bytes(4,'big')+data[offset+4:]
+        if section['address'] <= PREVIOUS_HOOK < section['address'] + section['size']:
+            offset = PREVIOUS_HOOK-section['address']
+            if int.from_bytes(data[offset:offset+4],'big') != PREVIOUS_ORIGINAL and previous_installed(memory):
+                data = data[:offset]+PREVIOUS_ORIGINAL.to_bytes(4,'big')+data[offset+4:]
         digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:
             raise memory.error(f'unknown_revision: text at 0x{section["address"]:08X}, '

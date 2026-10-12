@@ -1,0 +1,43 @@
+SONIC COLOURS PAL SNCP8P - MOVEMENT REQUEST GATE V4 (2026-10-12)
+=====================================================================
+Purpose: replace the FAILING Movement Fallback V3 build. The old hook
+reported Crouch(43)/Ground Pound(44) denied, yet froze Sonic. Do not use it.
+
+INSTALL:
+  1. Fully close Dolphin and the Sonic Client. Do not reuse a savestate created
+     with the earlier broken Movement C2 profiles.
+  2. Backup and replace C:\ProgramData\Archipelago\custom_worlds\sonic_colours.apworld
+     with Sonic_Colours_Movement_Request_Gate_V4.apworld. Avoid loading a second
+     copy from Archipelago/worlds/sonic_colours.
+  3. In Dolphin's SNCP8P game-specific Gecko configuration, REPLACE the previous
+     BETA Gecko [Gecko] and [Gecko_Enabled] sections using the supplied
+     SNCP8P_Movement_Request_Gate_V4.ini. Preserve other game settings. Do not
+     append these codes on top of the previous movement groups.
+  4. Enable cheats; cold-start the PAL SNCP8P Rev0 game. Launch the normal
+     Archipelago Sonic Colours Client WITHOUT --experimental-direct-hooks.
+  5. You may reuse an existing Schema 7 seed with movement_unlocks: true; no
+     changes were made to AP item IDs or slot schema. For complete clean-room
+     experimentation a fresh seed and disposable save are preferable.
+  6. /sonicmovement: confirm the EARLY request-gate status, controller, owned_mask
+     0 and the initial denied_transition_count. Test only Crouch first.
+  7. Expected if successful: native denied count increments, last_denied_state
+     43, and Sonic DOES NOT get stuck in crouch. Then Ground Pound (44),
+     Double Jump (8); test receiving each item separately.
+  8. If glitch or crash: STOP testing, capture /sonicmovement + error PC and
+     invalid address if possible, fully restart Dolphin before normal use.
+
+DOL evidence:
+  0x8003388C: lwz r0,32(r3) ; 0x80033890: cmpw r4,r0
+  0x80033894: beq 0x800338A8 (return without callbacks)
+  Denied target r4 <- previous r31+0x20; the vanilla beq handles denial.
+
+Offline validation ONLY:
+  8 denied state IDs x 3 existing states, 8 owned x 3 states, 8 foreign owner,
+  8 no-state initialization, native instruction site and C2 signatures.
+  Gecko footprint: 3128/3256 bytes, verified PAL-DOL hashes with C2 payload
+  and changing in-guest controls/counters. No Dolphin live proof yet.
+
+SWIM/BREATH:
+  Separate AP items retained. Their underwater jump/oxygen hooks are NOT
+  implemented. In particular the desired 10s / vanilla breath duration and
+  bubble reset behavior cannot be truthfully called working.
