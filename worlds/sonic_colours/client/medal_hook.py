@@ -110,8 +110,8 @@ def observe(memory, snapshot, journal, slot):
                                 'instance_key': f"{r['mission_id']}:{r['object_id']}:{r['instance_index']}",
                                 'provenance': 'PAL_802F27C4_native_pickup', 'stage_epoch': snapshot.stage_epoch}
                                for r in rows], {}, {selected[r['location_name']] for r in rows})
-        import logging
-        logging.getLogger('Client').info('Pickup detected: Eggman Hearts %s; Location queued: %s',
+        from . import quiet_logging
+        quiet_logging.record('pickup', 'Pickup detected: Eggman Hearts %s; Location queued: %s',
             [r['location_name'] for r in rows], [selected[r['location_name']] for r in rows])
 
 

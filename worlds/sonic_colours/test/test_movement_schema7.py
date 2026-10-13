@@ -8,9 +8,9 @@ from . import generate
 
 def test_movement_ids_are_append_only_and_progressive_crouch_has_two_copies():
     assert SCHEMA_VERSION == 7
-    assert tuple(ITEM_TABLE[x] for x in MOVEMENT_ITEMS) == tuple(range(BASE_ID+37,BASE_ID+44))+(BASE_ID+45,)
+    assert tuple(ITEM_TABLE[x] for x in MOVEMENT_ITEMS) == tuple(range(BASE_ID+37,BASE_ID+44))+(BASE_ID+45,BASE_ID+46,BASE_ID+47)
     assert MOVEMENT_POOL.count('Progressive Crouch') == 2
-    assert len(MOVEMENT_POOL) == 13
+    assert len(MOVEMENT_POOL) == 15
     w = generate({'movement_unlocks':True}).worlds[1]
     from collections import Counter
     c = Counter(item.name for item in w.multiworld.itempool)
@@ -29,7 +29,7 @@ def test_progressive_permissions_and_independent_jumpdash():
     assert mask(Counter({'Mid-Air Boost':1})) == 1<<1
     assert mask(Counter({'Wall Jump':1})) == 1<<3
     assert not mask(Counter({'White Boost Wisp':1}))
-    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,39,40,41,43,44}
+    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,38,39,40,41,43,44}
 
 
 def test_experimental_native_movement_hook_respects_memory_scratch_limit():
@@ -40,6 +40,11 @@ def test_experimental_native_movement_hook_respects_memory_scratch_limit():
     row=next(r for r in optional if r[4]=='movement')
     words,deny,offset=movement_gate.payload()
     assert row[0]==movement_gate.HOOK and row[1]==movement_gate.ORIGINAL
-    assert int.from_bytes(row[3][deny*4:deny*4+4],'big') == 0x816C0008 # lwz r11, denied counter
+    assert 0x809F0020 in words # retain native predecessor
     assert int.from_bytes(row[3][-4:],'big') == direct_hooks._branch(row[2]+len(row[3])-4,movement_gate.HOOK+4)
-    assert row[3][offset:offset+16] == bytes(16)
+    assert row[3][offset:offset+8] == bytes(8)
+
+
+def test_drift_and_swim_have_independent_permissions():
+    assert movement_gate.permissions(Counter({"Drift":1})) == 128
+    assert movement_gate.permissions(Counter({"Swim":1})) == 256

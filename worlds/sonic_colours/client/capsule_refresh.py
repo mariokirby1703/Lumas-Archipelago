@@ -41,7 +41,7 @@ class PPC:
         return self.words
 
 
-def payload_words(compact_abi=False, epilogue_abi=False):
+def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False):
     if epilogue_abi and not compact_abi:
         raise ValueError('epilogue ABI requires the compact native-call profile')
     # 800D4828 overwrites CR0; 800D4850..4860 restores the enclosing LR.
@@ -75,6 +75,8 @@ def payload_words(compact_abi=False, epilogue_abi=False):
     a.d(32,0,31,0); a.d(15,5,0,0x8076); a.d(14,5,5,0x1534)
     a.emit(0x7C002800); a.branch('end',0x40820000)
     a.d(34,0,31,0x110); a.d(11,0,0,0); a.branch('end',0x40820000)
+    if cache_permissions:
+        a.d(14,0,0,-1); a.d(36,0,1,0x74) # coloured sentinel; White writes 0/1 below
     # The native question-mark model is shared by multi/random capsules.
     # +149 changes native use eligibility, not the model's colour contract.
     # Both +148 multi-Wisp and +14A EggMask variants use Random Capsules;
@@ -103,9 +105,13 @@ def payload_words(compact_abi=False, epilogue_abi=False):
     a.d(32,3,31,0x34); a.d(11,0,3,0); a.branch('end',0x41820000)
     a.d(14,3,3,8); a.d(32,4,2,-0x7c48); a.call(0x800132D8)
     a.d(11,0,3,0); a.branch('end',0x41820000)
-    a.d(34,0,31,0x148); a.d(11,0,0,0); a.branch('white_permission',0x40820000)
-    a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('white_permission',0x40820000)
-    a.d(32,4,31,0x114); a.d(11,0,4,-1); a.branch('white_permission',0x41820000)
+    if cache_permissions:
+        a.d(32,0,1,0x74); a.d(11,0,0,-1); a.branch('white_permission',0x40820000)
+        a.d(32,4,31,0x114)
+    else:
+        a.d(34,0,31,0x148); a.d(11,0,0,0); a.branch('white_permission',0x40820000)
+        a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('white_permission',0x40820000)
+        a.d(32,4,31,0x114); a.d(11,0,4,-1); a.branch('white_permission',0x41820000)
     a.call(0x8003BAAC)  # native coloured permission query
     a.branch('permission_ready')
     a.label('white_permission'); a.d(32,3,1,0x74)
@@ -164,7 +170,7 @@ def payload_words(compact_abi=False, epilogue_abi=False):
 
 
 def gecko_ini(compact_capsule=True):
-    words=payload_words(compact_abi=compact_capsule, epilogue_abi=compact_capsule)
+    words=payload_words(compact_abi=compact_capsule, epilogue_abi=compact_capsule,cache_permissions=compact_capsule)
     lines=['[Gecko]', '$AP PAL live coloured capsule refresh',
            '20000000 534E4350', '28000004 00003850', '28000006 00000000']
     # Keep one entry signature per directly called native callee. The payload
@@ -184,6 +190,12 @@ def gecko_ini(compact_capsule=True):
     lines[-1:-1] = transition_lines()
     from .map_ring_display import gecko_lines as ring_display_lines
     lines[-1:-1] = ring_display_lines()
+    from .game_land_menu import gecko_lines as game_land_menu_lines
+    lines[-1:-1] = game_land_menu_lines()
+    from .player_switch import gecko_lines as player_switch_lines
+    lines[-1:-1] = player_switch_lines()
+    from .speed_initial import gecko_lines as initial_speed_lines
+    lines[-1:-1] = initial_speed_lines()
     lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Eggman Heart pickup capture']
     # Exact revision/full text is authenticated by DME before any owner word
     # is published. Every hook is inert before that; retain the full disc ID.
@@ -252,7 +264,8 @@ def valid_native_control_index(memory, owner, index):
 def inspect_installed(memory):
     from .gecko import inspect_c2
     from ..world_constants import load_data
-    candidates = [('current_compact_white_collision_refresh', payload_words(compact_abi=True, epilogue_abi=True)),
+    candidates = [('current_compact_white_collision_refresh', payload_words(compact_abi=True, epilogue_abi=True,cache_permissions=True)),
+                  ('current_compact_white_collision_refresh', payload_words(compact_abi=True, epilogue_abi=True)),
                   ('current_compact_white_collision_refresh', payload_words(compact_abi=True)),
                   ('current_white_collision_refresh', payload_words()),
                   ('previous_random_capsule_refresh', load_data('capsule_random_previous.json')),

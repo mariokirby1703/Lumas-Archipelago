@@ -23,13 +23,19 @@ ITEM_TABLE[RANDOM_CAPSULES] = BASE_ID + 35
 ITEM_TABLE['Full Boost Refill'] = BASE_ID + 36
 # Append-only IDs. Never renumber existing Archipelago inventory/locations.
 MOVEMENT_ITEMS = ('Wall Jump', 'Homing Attack', 'Mid-Air Boost', 'Double Jump',
-                  'Ground Pound', 'Progressive Crouch', 'Swim', 'Breath')
+                  'Stomp', 'Progressive Crouch', 'Swim', 'Breath')
 MOVEMENT_POOL = ('Wall Jump', 'Homing Attack', 'Mid-Air Boost', 'Double Jump',
-                 'Ground Pound', 'Progressive Crouch', 'Progressive Crouch', 'Swim', 'Breath')
+                 'Stomp', 'Progressive Crouch', 'Progressive Crouch', 'Swim', 'Breath')
 ITEM_TABLE.update({name: BASE_ID + 37 + i for i, name in enumerate(MOVEMENT_ITEMS)})
 ITEM_TABLE['Progressive Breathing'] = BASE_ID + 45
 MOVEMENT_ITEMS = MOVEMENT_ITEMS[:-1] + ('Progressive Breathing',)
 MOVEMENT_POOL = MOVEMENT_POOL[:-1] + ('Progressive Breathing',)*5
+ITEM_TABLE['Drift'] = BASE_ID + 46
+MOVEMENT_ITEMS += ('Drift',)
+MOVEMENT_POOL += ('Drift',)
+ITEM_TABLE['Assist Change'] = BASE_ID + 47
+MOVEMENT_ITEMS += ('Assist Change',)
+MOVEMENT_POOL += ('Assist Change',)
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}
 
 
@@ -39,7 +45,7 @@ class SonicColoursItem(Item):
 
 def classification(name):
     if name == GAME_LAND_SPEED:
-        return ItemClassification.useful
+        return ItemClassification.progression
     if name in TRAPS:
         return ItemClassification.trap
     if name in FILLER + LEGACY_FILLER:

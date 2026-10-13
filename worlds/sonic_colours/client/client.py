@@ -11,6 +11,8 @@ from NetUtils import ClientStatus
 from websockets.exceptions import ConnectionClosed
 from ..world_constants import GAME
 from ..Items import BY_ID
+from .test_inventory import (ABILITY_SET, ABILITY_GROUPS, TESTABLE, MAXIMUM,
+                             parse_item_request, resolve_ability_group)
 from .diagnostics import diagnostic
 from .hooks import NativeHooks
 from .journal import Journal
@@ -21,6 +23,7 @@ from .versions import VERSION
 from .deathlink import DeathLink
 from .build_info import implementation_info
 from .status import StatusReporter
+from . import quiet_logging
 
 
 def log_diagnostic(value):
@@ -34,6 +37,104 @@ def log_diagnostic(value):
 
 
 class SonicCommands(ClientCommandProcessor):
+    def _test_inventory_base(self):
+        """True server receipts, including uncommitted permission history."""
+        if not self.ctx.runtime or not self.ctx.authenticated_identity:
+            raise ValueError('Connect to an authenticated Sonic Colours AP slot first.')
+        item_ids = ([item.item for item in self.ctx.items_received] if self.ctx.history_ready
+                    else list(self.ctx.runtime.journal.data['receipts']))
+        item_ids += [item for item in self.ctx.runtime.journal.data.get('permission_receipts', ())
+                     if item not in item_ids]
+        return inventory(item_ids)
+
+    @mark_raw
+    def _cmd_give(self, raw=''):
+        """TEST ONLY: /give ITEM [LEVEL|all]. Numeric progressive items set a target level; no AP receipt."""
+        self._change_test_ability('give', raw)
+
+    @mark_raw
+    def _cmd_remove(self, raw=''):
+        """TEST ONLY: /remove ITEM [COUNT|all]. Temporarily mask a real AP ability; /testitems reset restores."""
+        self._change_test_ability('remove', raw)
+
+    @mark_raw
+    def _cmd_testitems(self, raw=''):
+        """List supported items or show/reset session-local /give and /remove overrides."""
+        action=raw.strip().lower()
+        if action in ('list', 'help'):
+            log_diagnostic({'supported_items':list(TESTABLE), 'all_targets':list(ABILITY_SET),
+                            'progressive_limits':MAXIMUM,
+                            'examples':['/give Double Jump','/remove Double Jump',
+                                        '/give White Boost Wisp','/remove Cyan Laser Wisp',
+                                        '/give Progressive Crouch 2',
+                                        '/give Progressive Breathing 5',
+                                        '/give breath 2  (level 2 = 10 seconds)',
+                                        '/give laser', '/remove drill',
+                                        '/give legacy breath  (retired 30-second item)',
+                                        '/remove Progressive Breathing all',
+                                        '/give wisps', '/remove wisps',
+                                        '/give movements', '/remove movements',
+                                        '/give sweet', '/remove sweet',
+                                        '/give asteroid', '/remove aquarium',
+                                        '/give worlds', '/remove worlds',
+                                        '/give all', '/remove all', '/testitems reset'],
+                            'ability_groups': {group: list(items) for group, items in ABILITY_GROUPS.items()},
+                            'note':('Only local test abilities. No AP item is sent/removed on the server. '
+                                    '/give progressively numbered items sets the exact target level; '
+                                    '/remove ITEM N subtracts N levels. /remove ITEM all sets 0.')})
+            return
+        try:
+            original=self._test_inventory_base()
+        except ValueError as error:
+            logger.warning('%s',error)
+            return
+        overlay=self.ctx.runtime.test_inventory
+        if action == 'reset':
+            overlay.reset()
+            logger.warning('All local ability overrides cleared. Real AP receipts restored; changes apply on next Dolphin poll.')
+        elif action:
+            logger.info('Usage: /testitems [list|reset].')
+            return
+        log_diagnostic(overlay.describe(original))
+
+    def _change_test_ability(self, action, raw):
+        """One short result line; detailed ownership remains in /testitems."""
+        try:
+            original = self._test_inventory_base()
+            overlay = self.ctx.runtime.test_inventory
+            if raw.strip().lower() == 'all':
+                results = overlay.change_all_abilities(action, original)
+                if any(result['before'] != result['effective'] for result in results):
+                    logger.info('%s: all abilities.', 'Given' if action == 'give' else 'Removed')
+                else:
+                    logger.info('No change: all abilities already %s.',
+                                'unlocked' if action == 'give' else 'removed')
+                return
+            group = resolve_ability_group(raw)
+            if group is not None:
+                results = overlay.change_ability_group(action, group, original)
+                label = ('all Wisps' if group == 'wisps' else
+                         'all World Shuttles' if group == 'worlds' else
+                         'all Movement abilities (max level)' if action == 'give'
+                         else 'all Movement abilities')
+                if any(result['before'] != result['effective'] for result in results):
+                    logger.info('%s: %s.', 'Given' if action == 'give' else 'Removed', label)
+                else:
+                    logger.info('No change: %s already %s.', label,
+                                'unlocked' if action == 'give' else 'removed')
+                return
+            name, quantity = parse_item_request(raw)
+            result = overlay.change(action, name, quantity, original)
+            if result['before'] == result['effective']:
+                logger.info('No change: %s already %s.', name,
+                            'at the requested level' if action == 'give' and name in MAXIMUM
+                            else 'unlocked' if action == 'give' else 'removed')
+                return
+            level = (f" (level {result['effective']})" if name in MAXIMUM else '')
+            logger.info('%s: %s%s.', 'Given' if action == 'give' else 'Removed', name, level)
+        except ValueError as error:
+            logger.warning('%s failed: %s', 'Give' if action == 'give' else 'Remove', error)
+
     def _cmd_soniccapsules(self):
         """Read-only capsule/ghost-spawn evidence, including missing models."""
         snap = self.ctx.runtime.snapshot if self.ctx.runtime else None
@@ -70,7 +171,7 @@ class SonicCommands(ClientCommandProcessor):
             if len(actors) != 1:
                 raise MemoryUnavailable('Grand World Map actor not unique')
             actor=actors[0]
-            owned=inventory([i.item for i in self.ctx.items_received])['counts']
+            owned=self.ctx.runtime.test_inventory.apply(self._test_inventory_base())['counts']
             rows=[]
             for zone in range(1,6):
                 present=bool(self.ctx.memory.read_u32(actor+0xB4+zone*8))
@@ -93,12 +194,15 @@ class SonicCommands(ClientCommandProcessor):
         snap = self.ctx.runtime.snapshot
         stage = next(iter(snap.evidence.get('native_data',{}).get('stage_objects',[])),{}) if snap else {}
         player = stage.get('player',{})
-        owned = inventory([i.item for i in self.ctx.items_received])
+        base = self._test_inventory_base()
+        owned = self.ctx.runtime.test_inventory.apply(base)
         log_diagnostic({'mission':snap.actual_mission if snap else None,
                         'movement':player.get('movement'),
                         'owned_mask':permissions(owned['counts']),
                         'swim_item':bool(owned['counts']['Swim']),
                         'breath_item':bool(owned['counts']['Breath']),
+                        'progressive_breathing':owned['counts']['Progressive Breathing'],
+                        'test_inventory':self.ctx.runtime.test_inventory.describe(base),
                         'movement_status':self.ctx.runtime.movement_status})
 
     def _cmd_sonicwater(self):
@@ -205,6 +309,25 @@ class SonicCommands(ClientCommandProcessor):
     def _cmd_sonicdebug(self):
         """Inspect the small candidate pointer chain; never dumps whole RAM."""
         log_diagnostic(diagnostic(self.ctx, self.ctx.memory))
+
+    @mark_raw
+    def _cmd_soniclogs(self, raw=''):
+        """Show suppressed routine client logs: /soniclogs [NUMBER|all|clear]."""
+        argument = raw.strip().lower()
+        if argument == 'clear':
+            cleared = quiet_logging.clear()
+            logger.info('Cleared %s stored Sonic diagnostic log entries.', cleared)
+            return
+        if argument in ('', 'last'):
+            limit = 25
+        elif argument == 'all':
+            limit = None
+        elif argument.isascii() and argument.isdecimal() and 1 <= int(argument) <= 500:
+            limit = int(argument)
+        else:
+            logger.info('Usage: /soniclogs [1-500|all|clear]. Also: /sonicstatus, /sonicdebug, /sonicmovement, /sonicitems.')
+            return
+        log_diagnostic(quiet_logging.history(limit))
 
     def _cmd_sonicitems(self):
         """Show durable per-receipt delivery and reconciliation details."""
@@ -323,9 +446,7 @@ class SonicContext(CommonContext):
                 # handles AP's omitted empty ReceivedItems without a timeout guess.
                 self.barrier = f'_sonic_history_{time.monotonic_ns()}'
                 asyncio.create_task(self.send_msgs([{'cmd': 'Get', 'keys': [self.barrier]}]))
-                logger.warning('Sonic Colours (Wii) slot connected. For a new seed choose New Game; '
-                               'the client detects the mandatory intro automatically. Intro evidence is retained until a verified save binding; '
-                               '/sonicdebug shows individual native proof gaps.')
+                quiet_logging.record('connection', 'Sonic Colours (Wii) slot connected. New Game intro is detected automatically; /sonicdebug shows native proof gaps.')
             except (ValueError, KeyError, OSError) as error:
                 self.authenticated_identity = None
                 self.release_runtime()
@@ -352,7 +473,7 @@ class SonicContext(CommonContext):
                     previous = len(self.runtime.journal.data['receipts'])
                     self.runtime.journal.record_history([i.item for i in self.items_received])
                     for index in range(previous, len(self.items_received)):
-                        logger.info('Item received / queued: receipt %s, %s', index, BY_ID[self.items_received[index].item])
+                        quiet_logging.record('received_item', 'Item received / queued: receipt %s, %s', index, BY_ID[self.items_received[index].item])
                 except (ValueError, OSError) as error:
                     self.history_ready = False
                     self.history_desynced = True
@@ -367,7 +488,7 @@ class SonicContext(CommonContext):
                 self.latest_acknowledged_location = {
                     'time_utc': datetime.now(timezone.utc).isoformat(),
                     'locations': sorted(newly_checked), 'packet': cmd}
-                logger.info('Location acknowledged: %s', sorted(newly_checked))
+                quiet_logging.record('location', 'Location acknowledged: %s', sorted(newly_checked))
             if self.runtime:
                 self.runtime.journal.acknowledge(self.checked_locations)
             self.last_observed_checked = set(self.checked_locations)
@@ -422,7 +543,7 @@ async def transmit_checks(ctx, checks=(), goal=False):
         raise MemoryUnavailable(message)
     if pending and (pending != ctx.last_pending or time.monotonic() - ctx.last_send >= 5):
         await ctx.send_msgs([{'cmd': 'LocationChecks', 'locations': sorted(pending)}])
-        logger.info('LocationChecks sent: %s', sorted(pending))
+        quiet_logging.record('transport', 'LocationChecks sent: %s', sorted(pending))
         ctx.last_pending, ctx.last_send = pending.copy(), time.monotonic()
         ctx.operation_status['ap_transport'] = 'sent; awaiting server acknowledgement'
     if goal and not ctx.finished_game:
@@ -444,7 +565,7 @@ async def dolphin_loop(ctx):
             await asyncio.sleep(1)
         return
     backend = DMEBackend(dolphin)
-    logger.info('Sonic implementation: %s', json.dumps(ctx.implementation, sort_keys=True))
+    quiet_logging.record('implementation', 'Sonic implementation: %s', json.dumps(ctx.implementation, sort_keys=True))
     ctx.memory = memory = SonicMemory(backend)
     verified = False
     status_reporter = StatusReporter()
@@ -572,7 +693,7 @@ async def dolphin_loop(ctx):
                 ctx.operation_status['ap_transport'] = f'Location transmission pending: {error}'
             if status_reporter.ready(ctx.dolphin_status, time.monotonic()):
                 ctx.status_time_utc = datetime.now(timezone.utc).isoformat()
-                logger.info('Current Dolphin status [%s, instance=%s]: %s', ctx.status_time_utc,
+                quiet_logging.record('dolphin_status', 'Current Dolphin status [%s, instance=%s]: %s', ctx.status_time_utc,
                             json.dumps(ctx.dolphin_instance, sort_keys=True), ctx.dolphin_status)
             # Five-bit masks persist through normal gameplay, so bulk bit changes
             # capture multiple rings. Sample promptly; capsule pulses will need a

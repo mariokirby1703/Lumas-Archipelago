@@ -363,13 +363,29 @@ class WritePolicy:
             if size != 4 or address != target or actors:
                 raise MemoryUnavailable('WRITE_BLOCKED: intro box must precede native construction')
             return snapshot.session, snapshot.stage_epoch, base, target
+        if operation == 'emerald_ui':
+            from .emerald_ui import targets
+            if snapshot.scene!='game_land_select' or not snapshot.scene_verified:
+                raise MemoryUnavailable('WRITE_BLOCKED: Emerald UI requires verified Game Land menu')
+            token=self.guard.check(snapshot)
+            fields=targets(self.memory)
+            if size!=4 or address not in fields:
+                raise MemoryUnavailable('WRITE_BLOCKED: unowned Emerald UI field')
+            return token,address,fields[address]
+        if operation == 'assist_change':
+            from .player_switch import installed_data
+            base=installed_data(self.memory)
+            if base is None or size!=4 or address!=base:
+                raise MemoryUnavailable('WRITE_BLOCKED: unverified Assist Change data')
+            token=self.guard.check(snapshot)
+            return token,base
         if operation == 'movement_controls':
             from .movement_gate import installed_data, observed
             match = installed_data(self.memory)
             if match is None:
                 raise MemoryUnavailable('WRITE_BLOCKED: movement hook missing')
             base, transport = match
-            if size != 4 or address not in (base, base + 4, base + 16):
+            if size != 4 or address not in (base, base + 4):
                 raise MemoryUnavailable('WRITE_BLOCKED: unverified movement data word')
             if (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'
                     or not snapshot.scene_verified or snapshot.stable_polls < 1

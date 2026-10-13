@@ -27,6 +27,17 @@ def verify_revision(memory):
     direct_plans = [direct_plan(include_movement=False), direct_plan(include_movement=True)]
     for section in VERSION['text_sections']:
         data = memory.read_bytes(section['address'], section['size'])
+        from .game_land_menu import normalize as normalize_game_land_menu
+        data = normalize_game_land_menu(memory,data,section['address'])
+        from .player_switch import normalize as normalize_player_switch
+        data = normalize_player_switch(data,section['address'])
+        from .speed_initial import normalize as normalize_initial_speed
+        data = normalize_initial_speed(data,section['address'])
+        from .player_switch import HOOK as ASSIST_HOOK, HOOK_ORIGINAL as ASSIST_ORIGINAL, installed_data as assist_data
+        if section['address']<=ASSIST_HOOK<section['address']+section['size']:
+            off=ASSIST_HOOK-section['address']
+            if int.from_bytes(data[off:off+4],'big')!=ASSIST_ORIGINAL and assist_data(memory) is not None:
+                data=data[:off]+ASSIST_ORIGINAL.to_bytes(4,'big')+data[off+4:]
         # Only touch candidate sites not normalized as exact supported Gecko
         # hooks above. Partially installed experiments may contain a mix of
         # original and exact trampoline words; unknown branches still fail.

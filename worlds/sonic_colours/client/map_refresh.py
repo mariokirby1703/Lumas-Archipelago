@@ -38,12 +38,19 @@ def payload():
     a.d(32, 12, 3, 8); a.d(32, 12, 12, 0xc0)
     a.emit(0x7D8903A6); a.emit(0x4E800421)
     a.d(36, 3, 1, 0x30)
-    for address, hidden in ((0x80722ACE, 0), (0x80722ADB, 1)):
-        a.d(14, 3, 1, 0x34); a.d(15, 4, 0, address >> 16); a.d(24, 4, 4, address & 0xffff)
-        a.d(14, 5, 30, 1); a.emit(0x4CC63182)  # crclr 6 for sprintf varargs
-        a.call(0x80379820)
-        a.d(14, 3, 1, 0x30); a.d(14, 4, 1, 0x34); a.d(14, 5, 0, hidden)
-        a.call(0x8026399C)
+    # Outer PAL epilogue restores r28, as it does r29..r31. Share the two
+    # native formatting/hide calls without changing their order or arguments.
+    a.d(14, 28, 0, 0)
+    a.label('chains')
+    a.d(14, 3, 1, 0x34)
+    a.d(7, 4, 28, 13)  # mulli: native format strings are 13 bytes apart
+    a.d(15, 4, 4, 0x8072); a.d(14, 4, 4, 0x2ace)
+    a.d(14, 5, 30, 1); a.emit(0x4CC63182)
+    a.call(0x80379820)
+    a.d(14, 3, 1, 0x30); a.d(14, 4, 1, 0x34); a.mr(5,28)
+    a.call(0x8026399C)
+    a.d(14, 28, 28, 1); a.d(11, 0, 28, 2)
+    a.branch('chains',0x41800000)
     a.label('done'); a.d(14, 0, 0, 0); a.d(36, 0, 29, 0)
     a.label('end'); a.d(14, 1, 1, 0x60); a.emit(ORIGINAL); a.branch('return')
     offset = len(a.words)*4; a.words[fix] |= (offset-base)&0xffff
@@ -56,7 +63,12 @@ def payload():
 
 def installed_data(memory):
     words, offset = payload()
-    result = inspect_c2(memory, HOOK, ORIGINAL, {'grand_map_refresh': words}, ((offset, 16),), label='Grand World Map refresh')
+    try:
+        result = inspect_c2(memory, HOOK, ORIGINAL, {'grand_map_refresh': words}, ((offset, 16),), label='Grand World Map refresh')
+    except MemoryUnavailable:
+        from ..world_constants import load_data
+        old=load_data('map_refresh_unrolled_previous.json'); offset=old['offset']
+        result=inspect_c2(memory,HOOK,ORIGINAL,{'grand_map_refresh_previous':old['words']},((offset,16),),label='previous Grand World Map refresh')
     if not result['installed']: return None
     data = result['target'] + offset
     actor, zone, owner, index = (memory.read_u32(data+i*4) for i in range(4))

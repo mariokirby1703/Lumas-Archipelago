@@ -7,6 +7,16 @@ import pytest
 from ..client.capsule_refresh import payload_words, ORIGINAL
 
 
+@pytest.mark.parametrize('colour,special',[(0,0),(6,0),(0xffffffff,0),(0,1)])
+@pytest.mark.parametrize('owned',[False,True])
+@pytest.mark.parametrize('mode',[0,1])
+def test_cached_type_preserves_native_capsule_calls(monkeypatch,colour,special,owned,mode):
+    original=run(mode,owned,colour=colour,special=special,white_control=True,random_owned=owned)
+    monkeypatch.setitem(globals(),'payload_words',lambda:__import__(
+        'worlds.sonic_colours.client.capsule_refresh',fromlist=['payload_words']).payload_words(cache_permissions=True))
+    assert run(mode,owned,colour=colour,special=special,white_control=True,random_owned=owned)==original
+
+
 def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,white_control=None,profile=1,random_capsule=False,random_owned=False):
     if white_control is None: white_control = colour not in (-1, 0xffffffff)
     actor,model,manager,state=0x90010000,0x90020000,0x90030000,0x90040000

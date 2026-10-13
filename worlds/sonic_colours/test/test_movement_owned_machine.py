@@ -22,9 +22,9 @@ def test_actor_owned_machine_ignores_allocation_adjacency(separation):
 
 
 @pytest.mark.parametrize('requested', list(g.STATE_PERMISSION)+[2,3,60,128,0xffffffff])
-@pytest.mark.parametrize('mask', [0,1,127,128,255])
+@pytest.mark.parametrize('mask', [0,1,127,128,256,511])
 @pytest.mark.parametrize('underwater', [True,False])
-@pytest.mark.parametrize('previous', [2,0xffffffff,0x90010000])
+@pytest.mark.parametrize('previous', [2,38,41,0xffffffff,0x90010000])
 @pytest.mark.parametrize('same_owner', [True,False])
 @pytest.mark.parametrize('host_machine_matches',[True,False])
 def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,same_owner,underwater,host_machine_matches):
@@ -36,7 +36,7 @@ def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,sa
     def load(a):return int.from_bytes(bytes(mem.get(a+i,0) for i in range(4)),'big')
     for i,w in enumerate(words):store(base+i*4,w)
     for a,v in ((machine,g.STATE_MACHINE_VTABLE),(machine+0x28,player if same_owner else player+4),
-                (machine+0x20,previous),(base+off,machine if host_machine_matches else machine+0x1000),(base+off+4,mask),(base+off+16,player)):
+                (machine+0x20,previous),(base+off,machine if host_machine_matches else machine+0x1000),(base+off+4,mask)):
         store(a,v)
     store(player+0x8c,player+0x100);store(player+0x110,0x800 if underwater else 0)
     store(player,g.PLAYER_VTABLE);store(player+0x70,player+0x200);store(player+0x208,machine)
@@ -83,12 +83,12 @@ def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,sa
         elif w==0x60000000:pass
         else:raise AssertionError(hex(w))
     else:raise AssertionError('instruction loop')
-    bit=7 if requested==8 and underwater else g.STATE_PERMISSION.get(requested,0)
+    bit=8 if requested==8 and underwater else g.STATE_PERMISSION.get(requested,0)
     deny= same_owner and previous<=127 and requested in g.STATE_PERMISSION and not (mask & (1<<bit))
-    assert regs[4]==(previous if deny else requested)
+    assert regs[4]==((3 if requested in (38,41) else previous) if deny else requested)
     assert regs[0]==previous  # displaced native instruction still runs
     assert load(machine+0x20)==previous  # never mutate native state records
-    assert load(base+off+8)==int(deny)
+    # Compact profile retains gameplay gates without optional guest telemetry.
     assert lr==0x80012340 and cr==0x12345678
     assert all(regs[i]==saved[i] for i in range(32) if i not in (0,4))
 
@@ -152,7 +152,7 @@ def test_same_controller_new_machine_rearms_per_stage(monkeypatch):
         evidence={'native_data':{'stage_objects':[{'player':{'actor':player}}]}})
     setup(0x90040000)
     for _ in range(3):g.configure(m,scene('act1'),{'counts':Counter()})
-    assert m.read_u32(data)==0x90040000 and m.read_u32(data+16)==player
+    assert m.read_u32(data)==0x90040000
     setup(0x90050000)
     g.configure(m,scene('act2'),{'counts':Counter()})
     assert m.read_u32(data)==0x90050000  # exact newly verified owner armed on first poll

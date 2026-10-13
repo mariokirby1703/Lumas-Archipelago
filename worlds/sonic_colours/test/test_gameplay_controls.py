@@ -108,12 +108,12 @@ def test_all_real_pal_control_sites_normalize_only_exact_known_thunks():
     with pytest.raises(MemoryUnavailable,match='unknown_revision'):m.verify_revision()
 
 
-def test_progressive_speed_pool_has_four_useful_items_without_new_option():
+def test_progressive_speed_pool_has_four_progression_items_without_new_option():
     for value in ({},{'game_land_checks':False,'chaos_emerald_checks':False}):
         m=generate(value,fill=True);w=m.worlds[1]
         speeds=[i for i in m.itempool if i.name==GAME_LAND_SPEED]
         assert len(speeds)==(4 if w.game_land_speed_items else 0)
-        assert all(i.useful and not i.advancement for i in speeds)
+        assert all(i.advancement and not i.useful for i in speeds)
         assert m.can_beat_game()
 
 

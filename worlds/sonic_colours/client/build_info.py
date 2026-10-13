@@ -23,12 +23,16 @@ def implementation_info():
     from .runtime import rings_amount
     from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions, progression_hook, music
     from ..world_progression import progression_clears, verified_result_clear
+    from .player_switch import normalize as player_switch_normalize, gecko_lines as player_switch_lines, payload as assist_payload, installed_data as assist_installed, configure as assist_configure
+    from .game_land_menu import normalize as game_land_menu_normalize, gecko_lines as game_land_menu_lines
     from .water_native import read as read_native_oxygen, target as oxygen_target, configure as configure_oxygen, duration as breathing_duration, allocation_key as oxygen_allocation_key
     from .game_land_notice import owner as notice_owner, prepare as prepare_notice, apply as apply_notice
     from .map_ring_display import payload as ring_display_payload, installed as ring_display_installed
     from .physical_rings import witnessed, targets, apply as restore_physical_rings
     from .intro_box import eligible, locate, apply as apply_intro_box
-    functions = (oxygen_allocation_key, native_read.classify_playable_entry, breathing_duration, read_native_oxygen, oxygen_target, configure_oxygen, notice_owner, prepare_notice, apply_notice, ring_display_payload, ring_display_installed, witnessed, targets, restore_physical_rings, eligible, locate, apply_intro_box,progression_clears, verified_result_clear, NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
+    from .emerald_ui import targets as emerald_ui_targets, apply as emerald_ui_apply
+    from .speed_initial import normalize as initial_speed_normalize, gecko_lines as initial_speed_lines
+    functions = (initial_speed_normalize, initial_speed_lines,emerald_ui_targets, emerald_ui_apply,assist_payload, assist_installed, assist_configure, player_switch_normalize, player_switch_lines, game_land_menu_normalize, game_land_menu_lines, oxygen_allocation_key, native_read.classify_playable_entry, breathing_duration, read_native_oxygen, oxygen_target, configure_oxygen, notice_owner, prepare_notice, apply_notice, ring_display_payload, ring_display_installed, witnessed, targets, restore_physical_rings, eligible, locate, apply_intro_box,progression_clears, verified_result_clear, NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
                  NativeHooks.swim, Runtime.poll, Runtime.configure_native_hooks, Runtime.select_resource_music, Runtime.apply_effects, Runtime.effect_context, Runtime.boost_grant_context, Runtime.temporary_boost_allowed, Runtime.enforce_white_boost_gain_lock, rings_amount, detect_checks,
                  SaveGuard.required_polls, SaveGuard.observe, SaveGuard.check, SaveGuard.check_stats, WritePolicy.__call__, NativeHooks._snapshot_after_revision,
                  Runtime.observe_pickups, Runtime.observe_capsules, binding.SaveBinding.attribute,

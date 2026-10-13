@@ -12,6 +12,7 @@ from ..world_constants import GAME, SCHEMA_VERSION, STAGES, BY_MISSION, game_lan
 from .memory import MemoryUnavailable
 
 logger = logging.getLogger('Client')
+from . import quiet_logging
 DELIVERY_ITEMS = FILLER + LEGACY_FILLER + TRAPS
 
 
@@ -151,6 +152,8 @@ class Runtime:
         self.slot_data = validate_slot(slot_data)
         self.journal, self.guard, self.hooks = journal, guard, hooks
         self.snapshot = None
+        from .test_inventory import LocalInventoryOverrides
+        self.test_inventory = LocalInventoryOverrides()
         self.last_error = None
         self.pickup_masks = {}
         self.pickup_started = False
@@ -204,7 +207,7 @@ class Runtime:
                            'sequence': len(self.journal.data['pickup_events']) + len(events)})
         if events:
             self.journal.record_pickups(events, {}, checks)
-            logger.info('Pickup detected: opened capsules %s; Location queued: %s',
+            quiet_logging.record('pickup', 'Pickup detected: opened capsules %s; Location queued: %s',
                         [event['instance_key'] for event in events], sorted(checks))
 
     def observe_results(self):
@@ -232,7 +235,7 @@ class Runtime:
                 'session': snapshot.session, 'playthrough_epoch': epoch,
                 'stage_epoch': snapshot.stage_epoch,
                 'provenance': result['provenance']}], {}, checks)
-            logger.info('Result detected: %s grade %s; Location queued: %s',
+            quiet_logging.record('result', 'Result detected: %s grade %s; Location queued: %s',
                         snapshot.actual_mission, result['grade'], sorted(checks))
 
     def observe_pickups(self):
@@ -276,7 +279,7 @@ class Runtime:
                        added & (1 << (LOCATION_TABLE[name].index - 1)) or
                        mode == 2 and LOCATION_TABLE[name].kind == 'rings' and updated == 31))}
         self.journal.record_pickups(events, {mission: updated}, checks)
-        logger.info('Pickup detected: %s rings %s; Location queued: %s',
+        quiet_logging.record('pickup', 'Pickup detected: %s rings %s; Location queued: %s',
                     mission, [event['ring'] for event in events], sorted(checks))
 
     def poll(self, memory, item_ids, history_ready):
@@ -287,7 +290,7 @@ class Runtime:
         if self.slot_data['options'].get('movement_unlocks'):
             early_items=list(item_ids if history_ready else self.journal.data['receipts'])
             early_items+=[item for item in self.journal.data.get('permission_receipts',()) if item not in early_items]
-            early_owned=inventory(early_items)
+            early_owned=self.test_inventory.apply(inventory(early_items))
             from .movement_gate import configure as configure_movement
             from .water_native import configure as configure_breath
             for name,action in (('movement_status',configure_movement),('breath_status',configure_breath)):
@@ -320,7 +323,7 @@ class Runtime:
         self.settle_effects(memory)
         durable = list(item_ids if history_ready else self.journal.data['receipts'])
         durable += [item for item in self.journal.data.get('permission_receipts',()) if item not in durable]
-        known = inventory(durable)
+        known = self.test_inventory.apply(inventory(durable))
         if self.snapshot.scene in ('global_map','world_map','game_land_select'):
             try:
                 self.guard.check(self.snapshot)
@@ -365,7 +368,8 @@ class Runtime:
             checks -= {code for name, code in self.slot_data['locations'].items()
                        if LOCATION_TABLE[name].kind in ('ring', 'rings', 'capsule')}
             observed = frozenset(e['mission'] for e in self.journal.data['pickup_events'] if e['kind'] == 'result')
-            goal = victory(self.slot_data, self.snapshot, self.journal.data['ever_collected_mask'], owned, observed)
+            goal = victory(self.slot_data, self.snapshot, self.journal.data['ever_collected_mask'],
+                           inventory(durable) if self.slot_data['options']['goal'] == 4 else owned, observed)
             if self.guard.can_send(self.snapshot):
                 self.journal.add_checks(checks)
                 if goal and not self.journal.data.get('goal_observed'):
@@ -380,7 +384,7 @@ class Runtime:
                         or updated_goal != bootstrap.get('goal', False)):
                     bootstrap.update(checks=updated_checks, observed_missions=updated_missions, goal=updated_goal)
                     self.journal.save()
-        if owned and self.slot_data['options']['goal'] == 4 and owned['super_sonic_allowed']:
+        if owned and self.slot_data['options']['goal'] == 4 and inventory(durable)['super_sonic_allowed']:
             if not self.journal.data.get('goal_observed'):
                 self.journal.data['goal_observed'] = True
                 self.journal.save()
@@ -424,7 +428,7 @@ class Runtime:
             self.resource_music = {'status': f'Music resource rejected: {error}',
                                    'resource_verified': False, 'audible_verified': False}
         self.music_status = self.resource_music
-        logger.info(self.music_status['status'])
+        quiet_logging.record('music', '%s', self.music_status['status'])
 
     def configure_native_hooks(self, memory, owned):
         """Project authenticated ownership into independent native controls.
@@ -450,6 +454,16 @@ class Runtime:
         except MemoryUnavailable as error:
             controls = {'error': str(error), 'installed': {}}
         self.hooks.gameplay_controls_status = {**controls, 'white_capsules': capsules}
+        from .emerald_ui import apply as apply_emerald_ui
+        try:
+            self.hooks.gameplay_controls_status['emerald_ui']=apply_emerald_ui(memory,self.snapshot,self.guard,owned)
+        except MemoryUnavailable as error:
+            self.hooks.gameplay_controls_status['emerald_ui']={'status':str(error)}
+        from .player_switch import configure as configure_assist
+        try:
+            self.hooks.gameplay_controls_status['assist_change']=configure_assist(memory,self.snapshot,owned)
+        except MemoryUnavailable as error:
+            self.hooks.gameplay_controls_status['assist_change']={'status':str(error)}
         if self.slot_data['options']['movement_unlocks']:
             from .water_native import configure as configure_breath
             try:
@@ -642,14 +656,14 @@ class Runtime:
                 if coherent and pending.get('later_frame') and pending.get('half_second'):
                     self.journal.confirm(index)
                     if effect.get('rolled_amount'):
-                        logger.info('Rings applied: receipt %s, rolled +%s, counter gain +%s', index,
+                        quiet_logging.record('item_effect', 'Rings applied: receipt %s, rolled +%s, counter gain +%s', index,
                                     effect['rolled_amount'], effect['after'] - effect['before'])
                     if pending['family'] == 'boost':
                         before_float, after_float = (struct.unpack('>f', effect[k].to_bytes(4, 'big'))[0]
                                                      for k in ('before','after'))
-                        logger.info('%s applied: receipt %s, %.2f -> %.2f (maximum %.2f)',
+                        quiet_logging.record('item_effect', '%s applied: receipt %s, %.2f -> %.2f (maximum %.2f)',
                                     BY_ID[effect['item']], index, before_float, after_float, effect['maximum'])
-                    logger.info('Counter delivery observed: receipt %s, counters %s after %.2fs; HUD verification separate', index, values, elapsed)
+                    quiet_logging.record('item_effect', 'Counter delivery observed: receipt %s, counters %s after %.2fs; HUD verification separate', index, values, elapsed)
                 else:
                     effect.update(state='uncertain', reason='no later-frame effect witness or counter sources disagree')
                     self.journal.save()
@@ -714,7 +728,7 @@ class Runtime:
             if name == 'Ring Loss Trap' and (before == 0 or not BY_MISSION.get(snapshot.actual_mission, {}).get('normal', False)):
                 if index not in self.deferred:
                     self.deferred[index] = 'trap context'
-                    logger.info('Item deferred: receipt %s Ring Loss awaits normal act with positive Rings', index)
+                    quiet_logging.record('item_effect', 'Item deferred: receipt %s Ring Loss awaits normal act with positive Rings', index)
                 self.journal.defer(index, item, 'normal act with positive rings required')
                 continue  # Keep receipt queued, allow later positive filler.
             limit = 99 if family == 'lives' else 9999
@@ -743,7 +757,7 @@ class Runtime:
                 continue
             grant_context = self.boost_grant_context(memory) if family == 'boost' else None
             self.journal.prepare(index, item, context, before, after)
-            logger.info('Native write attempted: receipt %s, %s, %s -> %s', index, name, before, after)
+            quiet_logging.record('item_effect', 'Native write attempted: receipt %s, %s, %s -> %s', index, name, before, after)
             self.journal.data['effects'][str(index)].update(addresses=addresses, family=family, stage_epoch=snapshot.stage_epoch, reason=None)
             if family == 'boost':
                 self.journal.data['effects'][str(index)]['maximum'] = maximum
@@ -766,7 +780,7 @@ class Runtime:
                     self.journal.data['effects'][str(index)].update(state='deferred', reason=str(error))
                     self.journal.save()
                     self.retry_after[index] = self.clock() + .25
-                    logger.info('Item deferred before any native write: receipt %s (%s): %s', index, name, error)
+                    quiet_logging.record('item_effect', 'Item deferred before any native write: receipt %s (%s): %s', index, name, error)
                     continue
                 self.journal.data['effects'][str(index)].update(state='uncertain', reason=str(error))
                 self.journal.save()
@@ -780,7 +794,7 @@ class Runtime:
             self.inflight[index] = {'started': self.clock(), 'addresses': addresses,
                                     'family': family, 'positive': name != 'Ring Loss Trap'}
             occupied.add(family)
-            logger.info('Immediate readback verified: receipt %s; queued for 0.5s/2s settlement', index)
+            quiet_logging.record('item_effect', 'Immediate readback verified: receipt %s; queued for 0.5s/2s settlement', index)
 
     def pending_effects(self):
         return [i for i, item in enumerate(self.journal.data['receipts'])

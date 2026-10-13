@@ -22,10 +22,10 @@ STATE_MACHINE_VTABLE = 0x8075A0F8
 PLAYER_VTABLE = 0x8075AEF8
 # Permission bit 1 = owned/unlocked. State 43 is crouch (first copy),
 # state 41 is Slide (second copy). 9 = Jump Dash (user's Mid-Air Boost).
-STATE_PERMISSION = {8: 0, 9: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
+STATE_PERMISSION = {38: 7, 8: 0, 9: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
 CAPABILITY_NAMES = ('Double Jump', 'Mid-Air Boost', 'Homing Attack',
-                    'Wall Jump', 'Slide', 'Crouch', 'Ground Pound')
-DATA_WORDS = 5                 # C2 control + native telemetry; read-only table follows
+                    'Wall Jump', 'Slide', 'Crouch', 'Stomp', 'Drift')
+DATA_WORDS = 2                 # C2 control + native telemetry; read-only table follows
 
 
 def permissions(counts):
@@ -37,7 +37,8 @@ def permissions(counts):
         counts['Wall Jump'] > 0,
         counts['Progressive Crouch'] >= 2,
         counts['Progressive Crouch'] >= 1,
-        counts['Ground Pound'] > 0,
+        counts['Stomp'] > 0,
+        counts.get('Drift', 0) > 0,
         counts.get('Swim', 0) > 0,
     )) if present)
 
@@ -47,12 +48,13 @@ def payload(gecko=False):
 
     Control data lives in the same direct-hook allocation. The host writes
     only the exact two-word controller/mask range with compare/readback validation.
-    The guest C2 code increments denial_count and records denied_state. The hook
+    The guest C2 preserves register state while rejecting denied transitions. The hook
     is inert until the host supplies a verified living player's controller.
     """
     a = PPC()
     a.d(37, 1, 1, -0x80)       # stwu r1,-64(r1)
     a.d(47, 9, 1, 8)
+    a.emit(ORIGINAL)  # capture native predecessor before scratch work
     a.emit(0x7D600026)        # mfcr r11
     a.d(36, 11, 1, 104)
     a.emit(0x7D6802A6)        # mflr r11
@@ -91,17 +93,16 @@ def payload(gecko=False):
     # Native original at 0x8003388C reads r3+0x20, not the host's
     # guessed controller-state offsets. A valid predecessor is [0,127].
     # -1 and any pointer/float garbage fail open before cancellation.
-    a.d(32, 0, 31, 0x20)     # previous pending state, NO-OP fallback
     a.d(10, 0, 0, 127)       # cmplwi r0,127
     a.branch('allow', 0x41810000)
-    # Compact state->permission lookup. Exactly 45 bytes (0..44), padded
+    # Compact state->permission lookup. Thirteen state entries, padded
     # to a word boundary. Zero denotes an unrestricted native state.
     # Unlike a long chain of comparisons this also restores the Game Land
     # speed-UI C2 in the tightly constrained Gecko codehandler allocation.
     a.d(14, 9, 4, -8)
     a.d(10, 0, 9, 5); a.branch('lookup', 0x40810000)
-    a.d(14, 9, 4, -39)
-    a.d(10, 0, 9, 5); a.branch('allow', 0x41810000)
+    a.d(14, 9, 4, -38)
+    a.d(10, 0, 9, 6); a.branch('allow', 0x41810000)
     a.d(14, 9, 9, 6)
     a.label('lookup')
     table_fix = len(a.words)
@@ -116,10 +117,10 @@ def payload(gecko=False):
     a.d(32, 10, 10, 0x10)
     a.d(28, 10, 10, 0x800)  # native water-entry flag, set by 801F0408
     a.branch('permission', 0x41820000)
-    a.d(14, 9, 0, 128)       # Swim permission, independent of Double Jump
+    a.d(14, 9, 0, 256)       # Swim permission, independent of Double Jump
     a.label('permission')
     a.d(32, 10, 12, 4)         # permissions bitmask
-    a.emit(31<<26 | 10<<21 | 9<<16 | 9<<11 | 28<<1 | 1)  # and. r9,r10,r9
+    a.emit(31<<26 | 10<<21 | 10<<16 | 9<<11 | 28<<1 | 1)  # and. r9,r10,r9
     a.branch('allow', 0x40820000)  # permission bit present: skip denial
     def restore():
         a.d(32, 11, 1, 104); a.emit(0x7D6FF120) # mtcrf 0xff,r11
@@ -128,30 +129,28 @@ def payload(gecko=False):
         a.d(14, 1, 1, 0x80)
     a.label('deny')
     deny_index = len(a.words)
-    # Guest-only telemetry, last denied ID = ORIGINAL target r4.
-    a.d(32, 11, 12, 8)            # lwz r11, denied_count
-    a.d(14, 11, 11, 1)            # addi r11,r11,1
-    a.d(36, 11, 12, 8)            # stw r11, denied_count
-    a.d(36, 4, 12, 12)            # stw r4, last_denied_state
     # EARLY CANCELLATION: convert target to exactly previous request.
     # The vanilla compare at 0x80033890 sees equality and returns without
     # invoking transition callbacks. Never write current or requested fields.
-    a.d(32, 4, 31, 0x20)          # lwz r4,32(r31)
+    # Drift/Sliding have native exits requesting state 3 (801505C0,
+    # 80159A70). Retaining an already forbidden predecessor is ineffective.
+    # Route denied attempts through that same native transition/cleanup.
+    # r9 retains the lookup permission byte: only Drift/Slide use 0x90.
+    a.d(28, 9, 9, 0x90)
+    a.d(14, 4, 0, 3)
+    a.branch('allow',0x40820000)
+    a.d(32, 4, 31, 0x20)          # other gates retain native predecessor
     a.label('allow')
     restore()
-    a.emit(ORIGINAL)          # preserve vanilla lwz r0,0x20(r3)
     a.branch('return')        # over data cells
     data_offset = len(a.words)*4
     a.emit(0)                 # controller address, armed LAST
     a.emit(0)                 # independent movement permission mask
-    a.emit(0)                 # denied-transition hit counter (guest writes)
-    a.emit(0)                 # last denied state ID (guest writes)
-    a.emit(0)                 # exact host player owner
     table_offset = len(a.words)*4
     mapping = [1 << STATE_PERMISSION[state] if state in STATE_PERMISSION else 0
-               for state in (*range(8,14), *range(39,45))]
-    for j in range(0,12,4):
-        a.emit(int.from_bytes(bytes(mapping[j:j+4]),'big'))
+               for state in (*range(8,14), *range(38,45))]
+    for j in range(0,len(mapping),4):
+        a.emit(int.from_bytes(bytes(mapping[j:j+4]).ljust(4,b'\0'),'big'))
     a.label('return')
     if gecko and len(a.words) % 2 == 0:
         a.emit(0x60000000)   # C2 must contain an even number of words
@@ -214,10 +213,34 @@ def _gecko_install(memory):
         memory.movement_legacy_profile = False
     except MemoryUnavailable:
         from ..world_constants import load_data
+        previous=load_data('movement_v11_no_eject_previous.json')
+        try:
+            info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_v11_no_eject':previous['words']},
+                            ((previous['offset'],8),),label='previous movement without ejection')
+            memory.movement_legacy_profile=True
+            return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
+        except MemoryUnavailable:
+            pass
+        previous=load_data('movement_v11_no_drift_previous.json')
+        try:
+            info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_v11_no_drift':previous['words']},
+                            ((previous['offset'],8),),label='previous movement without Drift')
+            memory.movement_legacy_profile=True
+            return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
+        except MemoryUnavailable:
+            pass
+        previous=load_data('movement_v11_follow_previous.json')
+        try:
+            info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_v11_follow':previous['words']},
+                            ((previous['offset'],20),),label='previous follow movement')
+            memory.movement_legacy_profile=True
+            return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
+        except MemoryUnavailable:
+            pass
         previous=load_data('movement_v11_swim_previous.json')
         try:
             info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_v11_polled_owner':previous['words']},
-                            ((previous['offset'],DATA_WORDS*4),),label='polled movement owner')
+                            ((previous['offset'],20),),label='polled movement owner')
             memory.movement_legacy_profile=True
             return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
         except MemoryUnavailable:
@@ -225,7 +248,7 @@ def _gecko_install(memory):
         previous = load_data('movement_v11_dry_previous.json')
         try:
             info = inspect_c2(memory, HOOK, ORIGINAL, {'movement_v11_dry':previous['words']},
-                              ((previous['offset'], DATA_WORDS*4),), label='dry-only movement transition')
+                              ((previous['offset'], 20),), label='dry-only movement transition')
             memory.movement_legacy_profile = True
             return info['target']+previous['offset'], 'Dolphin Gecko C2 (update required)'
         except MemoryUnavailable:
@@ -233,7 +256,7 @@ def _gecko_install(memory):
         previous = load_data('movement_v11_previous.json'); off = previous['offset']
         try:
             info = inspect_c2(memory, HOOK, ORIGINAL, {'movement_request_gate_v11_owned_machine':previous['words']},
-                              ((off, DATA_WORDS*4),), label='previous movement transition')
+                              ((off, 20),), label='previous movement transition')
             memory.movement_legacy_profile = True
         except MemoryUnavailable:
             previous = load_data('movement_v10_previous.json'); off = previous['offset']
@@ -283,7 +306,7 @@ def configure(memory, snapshot, owned, transport=None):
                 'swim_gate_verified': False, 'breath_gate_verified': False}
     data, method = match
     if getattr(memory, 'movement_legacy_profile', False):
-        return {'status':'Update complete Gecko profile: installed payload lacks independent native Swim support', 'native_gate_verified':False}
+        return {'status':'Update complete Gecko profile: installed payload lacks current Drift/Slide exit behavior', 'native_gate_verified':False}
     stage = next(iter(snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
     player = stage.get('player', {}).get('actor')
     ctrl = 0
@@ -339,19 +362,16 @@ def configure(memory, snapshot, owned, transport=None):
             _STAGE_ARM_OBSERVATIONS.pop(data, None)
     mask = permissions(owned['counts'])
     before_ctrl, before_mask = prior_ctrl, memory.read_u32(data+4)
-    owner = player if ctrl else 0
-    if (before_ctrl, before_mask, memory.read_u32(data+16)) != (ctrl, mask, owner):
+    if (before_ctrl, before_mask) != (ctrl, mask):
         if before_ctrl:
             memory.write_u32(data, 0, expected=before_ctrl, operation='movement_controls')
         if before_mask != mask:
             memory.write_u32(data+4, mask, expected=before_mask, operation='movement_controls')
-        if memory.read_u32(data+16) != owner:
-            memory.write_u32(data+16, owner, expected=memory.read_u32(data+16), operation='movement_controls')
         if ctrl:
             memory.write_u32(data, ctrl, expected=0, operation='movement_controls')
     # Runtime telemetry from the guest hook, never a substitute for a live
     # end-to-end ability/animation test. Only read after exact payload verification.
-    denied_count, last_denied = memory.read_u32(data+8), memory.read_u32(data+12)
+    denied_count, last_denied = 0, 0
     return {'status': 'armed native movement request-gate V11 native state-machine guarded via '+method if ctrl else 'movement hook fail-open: '+controller_reason,
             'native_gate_verified': False, 'installed_signature_verified': True, 'transport': method,
             'request_machine':f'0x{ctrl:08X}' if ctrl else None,

@@ -56,6 +56,8 @@
     "intro_box_placement": true,
     "physical_ring_collection": true,
     "game_land_notice": true,
-    "breath_timer": true
+    "breath_timer": true,
+    "assist_change": true,
+    "emerald_ui": true
   }
 }

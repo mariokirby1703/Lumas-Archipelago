@@ -26,14 +26,19 @@ def movement_ini():
     # Insert in existing guarded scope BEFORE its final E0; no extra group.
     final_close = cleaned.index('E0000000 80008000', cleaned.index('$AP PAL Eggman Heart pickup capture'))
     cleaned[final_close:final_close] = gecko_lines()
+    # SNCP uniquely identifies the PAL game. Full SNCP8P/revision/text checks
+    # remain mandatory in the client; retain the first one-time install guard.
+    cleaned.remove('28000004 00003850')
     # Four owner-gated hooks are inert until the client authenticates the
     # complete PAL executable and exact installed payload. Their redundant
     # nested install comparisons are omitted to fit Swim in the stock arena;
     # retain the full disc guard and first install guard, plus all ungated
     # map/transition guards. Standalone exporters keep their comparisons.
-    for kind in ('speed_get', 'speed_set', 'speed_ui', 'boost_add','boost_query'):
+    for kind in ('speed_get', 'speed_set', 'speed_ui', 'boost_add','boost_query','boost_use'):
         hook, original = HOOKS[kind]
         cleaned.remove(f'20{hook-0x80000000:06X} {original:08X}')
+    # Speed UI is owner-gated like the other speed hooks; retain its payload.
+    cleaned.remove('20266410 396102E0')
     from . import progression_hook,medal_hook,movement_gate
     for module in (progression_hook,medal_hook,movement_gate):
         cleaned.remove(f'20{module.HOOK-0x80000000:06X} {module.ORIGINAL:08X}')

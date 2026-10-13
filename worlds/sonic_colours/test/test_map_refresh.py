@@ -75,6 +75,7 @@ def execute(zone=1, phase=9, profile=1, actor_matches=True, lock=True):
         op = w>>26; rt = w>>21&31; ra=w>>16&31; rb=w>>11&31
         imm=w&0xffff; imm=imm if imm<0x8000 else imm-0x10000
         if op in (14,15): r[rt] = ((r[ra] if ra else 0)+(imm if op==14 else imm<<16))&0xffffffff
+        elif op == 7: r[rt]=(r[ra]*imm)&0xffffffff
         elif op == 24: r[ra] = r[rt]|(w&0xffff)
         elif op in (32,34): r[rt]=mem.get((r[ra]+imm)&0xffffffff,0)
         elif op in (36,37):

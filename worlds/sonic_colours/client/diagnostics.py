@@ -51,6 +51,15 @@ def diagnostic(ctx, memory=None):
     if ctx.runtime:
         runtime = ctx.runtime
         owned = inventory([i.item for i in ctx.items_received])
+        baseline = [i.item for i in ctx.items_received] if ctx.history_ready else list(runtime.journal.data['receipts'])
+        baseline += [item for item in runtime.journal.data.get('permission_receipts', ()) if item not in baseline]
+        real_for_permissions = inventory(baseline)
+        effective = runtime.test_inventory.apply(real_for_permissions)
+        result['local_test_items'] = runtime.test_inventory.describe(real_for_permissions)
+        result['effective_wisps'] = effective['wisps']
+        result['effective_movement_items'] = {name:effective['counts'][name] for name in
+            ('Wall Jump','Homing Attack','Mid-Air Boost','Double Jump','Stomp',
+             'Progressive Crouch','Swim','Breath','Progressive Breathing')}
         result.update({'save_armed': runtime.guard.armed, 'ap_red_rings': owned['red_rings'],
                        'emerald_count': len(owned['emeralds']), 'wisps': owned['wisps'],
                        'white_boost': 'White Boost Wisp' in owned['wisps'],

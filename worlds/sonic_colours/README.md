@@ -109,3 +109,22 @@ The old C2 deny branch skipped native state entry and could lock Sonic in Ball F
 
 
 **Movement Request Gate V5 (diagnostic only):** see [V5 lifecycle telemetry](docs/movement_request_gate_v5.md). The actual V4 request hook is retained but augmented with cumulative guest counters for all handler entries and Sonic-owned requests, to debug controller changes across stage reloads. This is not a certified movement fix.
+
+### Quiet client console and on-demand diagnostics
+
+The Sonic client no longer automatically prints routine Dolphin state changes,
+pickup/result detection, internal item-effect bookkeeping, native hook build
+identity, or outgoing check transport. Those events are kept **in memory**
+(up to 500 entries) until the client exits. Read them only when needed:
+
+- `/soniclogs` shows the last 25 routine events.
+- `/soniclogs 50` shows the last 50 (1 to 500 supported).
+- `/soniclogs all` shows the entire in-memory history.
+- `/soniclogs clear` clears that history without touching AP progress.
+- `/sonicstatus`, `/sonicdebug`, `/sonicmovement`, `/sonicwater`,
+  `/sonicitems`, `/soniccapsules` still provide their existing live reports.
+
+Archipelago's own connection/chat/item notifications and **important errors or
+uncertain item-delivery warnings** remain visible. No game state, seed logic,
+Gecko code, item receipts, journal, or outgoing checks are modified by quiet
+logging. This is diagnostic presentation only.
