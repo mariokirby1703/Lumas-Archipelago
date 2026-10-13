@@ -183,3 +183,11 @@ Such receipts remain confirmed without replay; HUD appearance is still separate.
 Historical settlement-only errors may be reconciled when every recorded write
 completed. Partial writes, missing completion evidence and interrupted native
 attempts remain uncertain and are never automatically replayed.
+
+Progressive Skydiving has two copies: the first permits normal gliding, the second additionally permits fast diving (native Diving 109 to DivingFast 110). Without either copy the existing Diving callback selects native Fall. `/give skydiving` adds one tier; `/remove skydiving all` removes both. Install the updated combined movement Gecko profile for the fast-dive transition gate.
+
+Progressive Yellow Drill Wisp is now progressive without changing its item name or numeric ID: one copy unlocks Drill, two unlock its held-button turbo. New seeds contain two copies. `/give drill` adds one copy, `/remove drill all` removes both, and `/give wisps` grants maximum tiers. The native Drill predicate hook changes only manual turbo input; native forced acceleration and effect cleanup remain intact.
+
+Progressive Green Hover Wisp now has two copies: one unlocks normal Hover, two additionally unlock Ring Dash. The gate masks native LightDash action 13 before ring search/activation, rather than blocking Hover state 94. `/give hover` adds one tier; `/remove hover all` removes both.
+
+Progressive Pink Spikes Wisp has two copies: one enables Spikes, two additionally enable Spin Dash. The gate rejects native state 82 before entry, so charging itself is locked. `/give spikes` adds one tier; `/remove spikes all` removes both. These Wisp tiers apply independently of the Movement Unlocks option.

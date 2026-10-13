@@ -10,7 +10,7 @@ from .memory import MemoryUnavailable
 from .versions import VERSION
 from .state import Snapshot
 from .native_read import read_saved_progress, read_stage_objects
-from ..world_constants import load_data, STAGES, STARTING_STAGES, NATIVE_COLOURS, WISPS
+from ..world_constants import load_data, STAGES, STARTING_STAGES, NATIVE_COLOURS, WISPS, wisp_item
 from .binding import SaveBinding
 
 
@@ -300,7 +300,7 @@ class NativeHooks:
         from ..world_constants import NATIVE_COLOURS
         colours = NATIVE_COLOURS
         for bit, colour in enumerate(colours):
-            values[bit] = inventory['counts'][colour + ' Wisp'] > 0
+            values[bit] = inventory['counts'][wisp_item(colour)] > 0
         for zone in range(7):
             granted = zone == 0 or (zone < 6 and inventory['counts'][WORLD_ITEMS[zone]] > 0)
             if zone == 6:
@@ -354,7 +354,7 @@ class NativeHooks:
             from ..world_constants import NATIVE_COLOURS
             colours = NATIVE_COLOURS
             mask = sum(1 << bit for bit, colour in enumerate(colours)
-                       if inventory['counts'][colour + ' Wisp'])
+                       if inventory['counts'][wisp_item(colour)])
             for address in (stage['stage'] + 0x61, stage['actor_state'] + 0x90):
                 before = memory.read_u8(address)
                 if before != mask:

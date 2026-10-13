@@ -24,13 +24,13 @@ AP item IDs and names are unchanged. PAL colour/permission indices are:
 
 | Index | AP item |
 |---|---|
-| 0 | Yellow Drill Wisp |
+| 0 | Progressive Yellow Drill Wisp |
 | 1 | Cyan Laser Wisp |
-| 2 | Pink Spikes Wisp |
+| 2 | Progressive Pink Spikes Wisp |
 | 3 | Orange Rocket Wisp |
 | 4 | Purple Frenzy Wisp |
 | 5 | Blue Cube Wisp |
-| 6 | Green Hover Wisp |
+| 6 | Progressive Green Hover Wisp |
 
 The original executable's indexed sound table at `0x80765390` identifies
 Laser, Spike, Rocket, Rodeo, Puzzle and Astronautes at indices 1..6.

@@ -138,7 +138,8 @@ def configure(memory, snapshot, inventory, slot, journal=None):
         world=1<<20  # only the original mandatory introduction until first save
     from ..world_constants import NATIVE_COLOURS
     colours=NATIVE_COLOURS
-    mask=sum(1<<i for i,name in enumerate(colours) if inventory['counts'][name+' Wisp'])
+    from ..world_constants import wisp_item
+    mask=sum(1<<i for i,name in enumerate(colours) if inventory['counts'][wisp_item(name)])
     mask |= 0x80 if inventory['super_sonic_allowed'] else 0
     # Disable interception before resetting seed-owned event data. The seed tag
     # also prevents a snapshot from crediting another seed using the same buffer.

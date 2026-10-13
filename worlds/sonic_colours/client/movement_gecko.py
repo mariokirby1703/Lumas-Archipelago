@@ -30,6 +30,9 @@ def movement_ini():
     # SNCP uniquely identifies the PAL game. Full SNCP8P/revision/text checks
     # remain mandatory in the client; retain the first one-time install guard.
     cleaned.remove('28000004 00003850')
+    # Capsule C2 is inert until its authenticated mailbox is published.
+    # The client verifies the complete PAL text and exact payload before use.
+    cleaned.remove('200D4824 801F0128')
     # Four owner-gated hooks are inert until the client authenticates the
     # complete PAL executable and exact installed payload. Their redundant
     # nested install comparisons are omitted to fit Swim in the stock arena;

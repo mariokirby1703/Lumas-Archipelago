@@ -4,7 +4,7 @@ The dated report below is historical where the current report supersedes it.
 
 # Repeated items and live coloured capsules
 
-Wisp item names are now `Cyan Laser Wisp`, `Yellow Drill Wisp`, etc. Numeric
+Wisp item names are now `Cyan Laser Wisp`, `Progressive Yellow Drill Wisp`, etc. Numeric
 item IDs are unchanged, so existing server histories and journals remain valid.
 Update explicit item names in future YAML start inventories/plando.
 

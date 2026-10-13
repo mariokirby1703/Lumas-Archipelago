@@ -1,3 +1,4 @@
+from ..world_constants import wisp_item
 """PAL native enum evidence, separate from the stable AP item ordering."""
 import struct
 from pathlib import Path
@@ -10,7 +11,7 @@ def test_capsule_requirements_match_native_colour_indices():
     names=('White Boost',)+NATIVE_COLOURS
     for capsule in CAPSULES.values():
         if capsule.eligible:
-            assert capsule.wisp_item==names[capsule.raw_wisp]+' Wisp'
+            assert capsule.wisp_item==wisp_item(names[capsule.raw_wisp])
     assert NATIVE_COLOURS.index('Orange Rocket')==3
     assert NATIVE_COLOURS.index('Blue Cube')==5
     assert NATIVE_COLOURS.index('Green Hover')==6
@@ -42,5 +43,5 @@ def test_each_item_projects_only_its_native_live_permission(index,name):
         def write_u8(self,a,v,**kwargs):self.writes.append((a,v))
     memory=Memory(); memory.writes=[]
     snapshot=SimpleNamespace(scene='gameplay',evidence={'native_data':{'stage_objects':[{'stage':0x90001000,'actor_state':0x90002000}]}})
-    NativeHooks().project_live_permissions(memory,snapshot,{'counts':Counter({name+' Wisp':1})},{})
+    NativeHooks().project_live_permissions(memory,snapshot,{'counts':Counter({wisp_item(name):1})},{})
     assert memory.writes==[(0x90001061,1<<index),(0x90002090,1<<index)]

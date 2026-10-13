@@ -21,9 +21,14 @@ HOOKS = {
 }
 
 
-def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_abi=True):
+def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_abi=True, pic_base=True, volatile_return=True):
     if not compact: temporary = False
     a = PPC(); hook, original = HOOKS[kind]
+    short = compact and lean and register_abi and pic_base
+    # Only volatile CR0 is changed. Boost-use/speed-UI overwrite it before
+    # branching; the query/get/set hooks finish their native functions, whose
+    # PPC call ABI does not preserve CR0. CR2..4 remain untouched.
+    preserve_cr = not (short and (kind in ('boost_use','speed_ui') or volatile_return and kind in ('boost_query','speed_get','speed_set')))
     output = 3 if kind in ('boost', 'speed_get') else 0 if kind == 'speed_ui' else None
     frame = 0xa0 if compact else 0x40
     saved = (3, 4, 6, 7, 12)
@@ -32,7 +37,7 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_
         a.d(47, 0, 1, 16)
         if register_abi:
             a.emit(0x7FE802A6)  # saved r31 holds LR across inline, call-free gate
-            a.emit(0x7F800026)  # saved r28 holds CR; restored by lmw
+            if preserve_cr:a.emit(0x7F800026)  # saved r28 holds CR; restored by lmw
         else:
             a.emit(0x7C0802A6); a.d(36, 0, 1, 144)
             a.emit(0x7C000026); a.d(36, 0, 1, 148)
@@ -44,7 +49,8 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_
     # older exact layouts available to the verifier during client updates.
     if lean and compact and kind == 'speed_get': a.emit(original)
     a.emit(0x48000005); base = len(a.words)*4
-    a.emit(0x7D8802A6); fix = len(a.words); a.d(14, 12, 12, 0)
+    a.emit(0x7D8802A6); fix = len(a.words)
+    if not short:a.d(14, 12, 12, 0)
     if lean and compact and kind == 'speed_ui': a.d(32, 0, 1, 16)
     a.d(32, 6, 12, 0); a.d(11, 0, 6, 0); a.branch('vanilla', 0x41820000)
     a.d(34, 6, 6, 0); a.d(32, 7, 12, 4)
@@ -99,7 +105,8 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_
     if compact:
         if output is not None: a.d(36, output, 1, 16+output*4)
         if register_abi:
-            a.emit(0x7F8FF120); a.emit(0x7FE803A6)
+            if preserve_cr:a.emit(0x7F8FF120)
+            a.emit(0x7FE803A6)
         else:
             a.d(32, 0, 1, 148); a.emit(0x7C0FF120)
             a.d(32, 0, 1, 144); a.emit(0x7C0803A6)
@@ -114,7 +121,12 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_
         a.d(32, 6, 1, 28)
         if output != 0: a.d(32, 0, 1, 16)
     a.d(14, 1, 1, frame); a.branch('return')
-    data = len(a.words)*4; a.words[fix] |= (data-base)&0xffff
+    data = len(a.words)*4
+    if short:
+        for i,w in enumerate(a.words):
+            if w>>26 in (32,48) and (w>>16)&31==12:
+                a.words[i]=(w&0xffff0000)|(((w&0xffff)+data-base)&0xffff)
+    else:a.words[fix] |= (data-base)&0xffff
     for _ in range(3 if compact and temporary and kind.startswith('speed') else 6 if not compact or kind in ('boost_use','boost_query') and not lean else 5): a.emit(0)
     a.label('return')
     if len(a.words)%2 == 0: a.emit(0x60000000)
@@ -132,10 +144,14 @@ def installed(memory, kind):
     before_lean, before_lean_offset = payload(kind, lean=False,register_abi=False)
     stack_lr,stack_lr_offset=payload(kind,register_abi=False)
     layouts = [(kind, words, offset), ('stack_lr',stack_lr,stack_lr_offset), ('before_lean', before_lean, before_lean_offset), ('before_drain', no_drain, no_drain_offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
+    before_hover, before_hover_offset=payload(kind,volatile_return=False)
+    layouts.append(('before_hover',before_hover,before_hover_offset))
+    before_drill=load_data('gameplay_before_drill.json').get(kind)
+    if before_drill:layouts.append(('before_drill',before_drill['words'],before_drill['offset']))
     if legacy: layouts.append(('legacy', legacy['words'], legacy['offset']))
     for name, candidate, candidate_offset in layouts:
         try:
-            size = 12 if name in (kind, 'stack_lr', 'before_lean') and kind.startswith('speed') else 20
+            size = 12 if name in (kind, 'before_hover', 'before_drill', 'stack_lr', 'before_lean') and kind.startswith('speed') else 20
             result = inspect_c2(memory, hook, original, {name:candidate}, ((candidate_offset,size),), label=kind)
             offset = candidate_offset
             break
@@ -143,7 +159,7 @@ def installed(memory, kind):
             failure = error
     else: raise failure
     if not result['installed']: return None
-    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'stack_lr', 'before_lean')
+    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'before_hover', 'before_drill', 'stack_lr', 'before_lean')
     address = result['target'] + offset
     values = struct.unpack('>'+'I'*(size//4), memory.read_bytes(address,size))
     owner, index, maximum, model, locked = (*values, 0, 0) if size == 12 else values

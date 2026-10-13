@@ -16,7 +16,7 @@ def payload():
     a.d(37, 1, 1, -0x60)
     a.emit(0x48000005); base = len(a.words)*4
     a.emit(0x7FA802A6)  # mflr r29 (outer PAL epilogue restores r29/LR)
-    fix = len(a.words); a.d(14, 29, 29, 0)
+    fix = len(a.words)
     a.d(32, 3, 29, 0); a.emit(0x7C03D800); a.branch('end', 0x40820000)
     a.d(32, 3, 29, 8); a.d(34, 3, 3, 0); a.d(32, 0, 29, 12)
     a.emit(0x7C030000); a.branch('end', 0x40820000)
@@ -53,7 +53,10 @@ def payload():
     a.branch('chains',0x41800000)
     a.label('done'); a.d(14, 0, 0, 0); a.d(36, 0, 29, 0)
     a.label('end'); a.d(14, 1, 1, 0x60); a.emit(ORIGINAL); a.branch('return')
-    offset = len(a.words)*4; a.words[fix] |= (offset-base)&0xffff
+    offset = len(a.words)*4
+    for i,w in enumerate(a.words):
+        if w>>26 in (32,36) and (w>>16)&31==29:
+            a.words[i]=(w&0xffff0000)|(((w&0xffff)+offset-base)&0xffff)
     for _ in range(4): a.emit(0)
     a.label('return')
     if len(a.words)%2 == 0: a.emit(0x60000000)
@@ -67,8 +70,12 @@ def installed_data(memory):
         result = inspect_c2(memory, HOOK, ORIGINAL, {'grand_map_refresh': words}, ((offset, 16),), label='Grand World Map refresh')
     except MemoryUnavailable:
         from ..world_constants import load_data
-        old=load_data('map_refresh_unrolled_previous.json'); offset=old['offset']
-        result=inspect_c2(memory,HOOK,ORIGINAL,{'grand_map_refresh_previous':old['words']},((offset,16),),label='previous Grand World Map refresh')
+        old=load_data('map_refresh_before_drill.json'); offset=old['offset']
+        try:
+            result=inspect_c2(memory,HOOK,ORIGINAL,{'grand_map_before_drill':old['words']},((offset,16),),label='previous Grand World Map refresh')
+        except MemoryUnavailable:
+            old=load_data('map_refresh_unrolled_previous.json'); offset=old['offset']
+            result=inspect_c2(memory,HOOK,ORIGINAL,{'grand_map_refresh_previous':old['words']},((offset,16),),label='previous Grand World Map refresh')
     if not result['installed']: return None
     data = result['target'] + offset
     actor, zone, owner, index = (memory.read_u32(data+i*4) for i in range(4))

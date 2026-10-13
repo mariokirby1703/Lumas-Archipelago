@@ -1,7 +1,7 @@
 """Canonical instance catalog; an ORC placement alone is not a playable check."""
 from dataclasses import dataclass
 import json
-from .world_constants import BASE_ID, BY_MISSION, WISPS, load_data
+from .world_constants import BASE_ID, BY_MISSION, WISPS, load_data, wisp_item
 
 
 def instance_key(row):
@@ -40,7 +40,7 @@ def build_catalog(rows, validation):
         evidence = validation.get(key, {})
         eligible = evidence.get('validated', False)
         item = evidence.get('wisp_item')
-        if eligible and (not stage or item not in {w + ' Wisp' for w in WISPS}
+        if eligible and (not stage or item not in {wisp_item(w) for w in WISPS}
                          or not evidence.get('native_identity_proof') or not evidence.get('accessibility_proof')):
             raise ValueError('capsule validation lacks mapping, confirmed subtype or proof: ' + key)
         code = BASE_ID + 10000 + index

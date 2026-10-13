@@ -447,6 +447,14 @@ class Runtime:
         self.music_status = self.resource_music
         quiet_logging.record('music', '%s', self.music_status['status'])
 
+    def movement_policy(self, owned):
+        if self.slot_data['options'].get('movement_unlocks'):return owned
+        from ..Items import MOVEMENT_ITEMS
+        from .test_inventory import MAXIMUM
+        counts=owned['counts'].copy()
+        for item in MOVEMENT_ITEMS:counts[item]=MAXIMUM.get(item,1)
+        return {**owned,'counts':counts}  # Wisp tiers retain genuine ownership
+
     def refresh_movement_permissions(self,memory,owned):
         """Apply idempotent ability permissions on receipt/override events.
 
@@ -456,6 +464,8 @@ class Runtime:
         if self.snapshot is None:return
         from .stunts import configure as stunts
         from .player_switch import configure as assist
+        from .drill_turbo import configure as drill
+        from .hover_ring_dash import configure as hover_dash
         if self.slot_data['options'].get('movement_unlocks'):
             from .movement_gate import configure as movement
             from .water_native import configure as breath
@@ -464,8 +474,14 @@ class Runtime:
                 ('breath_status',lambda:breath(memory,self.snapshot,self.guard,owned,self.journal))):
                 try:setattr(self,attribute,action())
                 except MemoryUnavailable as error:setattr(self,attribute,{'status':str(error)})
+        if not self.slot_data['options'].get('movement_unlocks'):
+            from .movement_gate import configure as movement
+            try:self.movement_status=movement(memory,self.snapshot,self.movement_policy(owned),transport='direct' if self.experimental_direct_hooks else 'gecko')
+            except MemoryUnavailable as error:self.movement_status={'status':str(error)}
         for name,action in (('stunts',lambda:stunts(memory,self.snapshot,owned,self.slot_data)),
-                            ('assist_change',lambda:assist(memory,self.snapshot,owned))):
+                            ('assist_change',lambda:assist(memory,self.snapshot,owned)),
+                            ('drill_turbo',lambda:drill(memory,self.snapshot,owned)),
+                            ('hover_ring_dash',lambda:hover_dash(memory,self.snapshot,owned))):
             try:result=action()
             except MemoryUnavailable as error:result={'status':str(error)}
             self.hooks.gameplay_controls_status[name]=result
@@ -509,6 +525,16 @@ class Runtime:
             self.hooks.gameplay_controls_status['assist_change']=configure_assist(memory,self.snapshot,owned)
         except MemoryUnavailable as error:
             self.hooks.gameplay_controls_status['assist_change']={'status':str(error)}
+        from .drill_turbo import configure as configure_drill
+        try:
+            self.hooks.gameplay_controls_status['drill_turbo']=configure_drill(memory,self.snapshot,owned)
+        except MemoryUnavailable as error:
+            self.hooks.gameplay_controls_status['drill_turbo']={'status':str(error)}
+        from .hover_ring_dash import configure as configure_hover_dash
+        try:
+            self.hooks.gameplay_controls_status['hover_ring_dash']=configure_hover_dash(memory,self.snapshot,owned)
+        except MemoryUnavailable as error:
+            self.hooks.gameplay_controls_status['hover_ring_dash']={'status':str(error)}
         if self.slot_data['options']['movement_unlocks']:
             from .water_native import configure as configure_breath
             try:
@@ -523,7 +549,9 @@ class Runtime:
                 self.movement_status = {'status': str(error), 'native_gate_verified': False,
                                         'swim_gate_verified': False, 'breath_gate_verified': False}
         else:
-            self.movement_status = {'status': 'Movement Unlocks off; vanilla native movement'}
+            from .movement_gate import configure
+            try:self.movement_status=configure(memory,self.snapshot,self.movement_policy(owned),transport='direct' if self.experimental_direct_hooks else 'gecko')
+            except MemoryUnavailable as error:self.movement_status={'status':str(error)}
 
     def project_permissions(self, memory, owned):
         try:
@@ -748,7 +776,9 @@ class Runtime:
             if (recorded and recorded.get('state')=='uncertain' and self.delivery_readback_verified(recorded)
                     and recorded.get('reason') in ('left living gameplay before verification completed',
                         'actor/context changed before verification',
-                        'no later-frame effect witness or counter sources disagree')):
+                        'no later-frame effect witness or counter sources disagree')
+                    and (recorded.get('reason')!='no later-frame effect witness or counter sources disagree'
+                        or recorded.get('last_observed')==[recorded.get('after')]*len(recorded['addresses']))):
                 recorded['confirmation_source']='historical complete native write/readback; no replay'
                 self.journal.confirm(index,verified_delivery=True)
                 continue

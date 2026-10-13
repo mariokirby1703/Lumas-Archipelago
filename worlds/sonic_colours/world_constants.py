@@ -25,6 +25,11 @@ WISPS = ('White Boost', 'Cyan Laser', 'Yellow Drill', 'Orange Rocket',
 # 5 puzzle, 6 astronautes; capsule ORC colour is native index + 1.
 NATIVE_COLOURS = ('Yellow Drill', 'Cyan Laser', 'Pink Spikes', 'Orange Rocket',
                   'Purple Frenzy', 'Blue Cube', 'Green Hover')
+def wisp_item(colour):
+    prefix = 'Progressive ' if colour in ('Yellow Drill','Green Hover','Pink Spikes') else ''
+    return prefix + colour + ' Wisp'
+
+
 RANKS = ('S', 'A', 'B', 'C')
 
 

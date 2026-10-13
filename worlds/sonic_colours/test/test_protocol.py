@@ -22,7 +22,7 @@ def test_authenticated_singleton_permission_survives_truncated_consumable_histor
         journal=ctx.runtime.journal
         original=[ITEM_TABLE['Rings']]*40
         journal.record_history(original)
-        green=ITEM_TABLE['Green Hover Wisp']
+        green=ITEM_TABLE['Progressive Green Hover Wisp']
         ctx.items_received=[NetworkItem(green,0,1)]
         ctx.on_package('ReceivedItems',{'index':0,'items':[[green,0,1]]})
         assert ctx.history_desynced and not ctx.history_ready

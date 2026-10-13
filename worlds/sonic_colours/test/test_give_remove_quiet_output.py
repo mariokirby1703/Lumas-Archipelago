@@ -23,9 +23,9 @@ def environment(monkeypatch):
     items.MOVEMENT_ITEMS = ('Wall Jump', 'Homing Attack', 'Mid-Air Boost',
                             'Double Jump', 'Stomp', 'Progressive Crouch',
                             'Swim', 'Progressive Breathing')
-    items.WISP_ITEMS = ('White Boost Wisp', 'Cyan Laser Wisp', 'Yellow Drill Wisp',
-                        'Orange Rocket Wisp', 'Blue Cube Wisp', 'Green Hover Wisp',
-                        'Pink Spikes Wisp', 'Purple Frenzy Wisp')
+    items.WISP_ITEMS = ('White Boost Wisp', 'Cyan Laser Wisp', 'Progressive Yellow Drill Wisp',
+                        'Orange Rocket Wisp', 'Blue Cube Wisp', 'Progressive Green Hover Wisp',
+                        'Progressive Pink Spikes Wisp', 'Purple Frenzy Wisp')
     items.WORLD_ITEMS = ('Tropical Resort Shuttle', 'Sweet Mountain Shuttle',
                          'Starlight Carnival Shuttle', 'Planet Wisp Shuttle',
                          'Aquarium Park Shuttle', 'Asteroid Coaster Shuttle')
@@ -68,7 +68,7 @@ def environment(monkeypatch):
     genuine = {'counts': counts, 'red_rings': 0, 'emeralds': [], 'wisps': []}
     overlay = inv.LocalInventoryOverrides()
     dummy = types.SimpleNamespace(ctx=types.SimpleNamespace(
-        runtime=types.SimpleNamespace(test_inventory=overlay)),
+        runtime=types.SimpleNamespace(test_inventory=overlay),refresh_movement_permissions=lambda:None),
         _test_inventory_base=lambda: genuine)
 
     def run(action, raw):

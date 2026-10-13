@@ -50,6 +50,11 @@ def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,sa
         if op==14:regs[rt]=((regs[ra] if ra else 0)+imm)&0xffffffff
         elif op==15:regs[rt]=((regs[ra] if ra else 0)+(imm<<16))&0xffffffff
         elif op==24:regs[ra]=regs[rt]|u
+        elif op==27:regs[ra]=regs[rt]^(u<<16)
+        elif op==21:
+            shift=(w>>11)&31;mb=(w>>6)&31;me=(w>>1)&31
+            mask_bits=sum(1<<(31-i) for i in range(32) if (mb<=i<=me if mb<=me else i>=mb or i<=me))
+            regs[ra]=((regs[rt]<<shift)|(regs[rt]>>(32-shift)))&mask_bits&0xffffffff
         elif op==28:
             regs[ra]=regs[rt]&u;cmp=int(regs[ra]>0)
         elif op==32:regs[rt]=load((regs[ra]+imm)&0xffffffff)
@@ -132,7 +137,7 @@ def test_map_preloads_new_items_without_a_living_actor(monkeypatch):
     m.write_guard=lambda *args:'bound fixture save'
     m.backend.write_bytes(sky,(1).to_bytes(4,'big'))  # previous stage locked
     snap=Snapshot('session','save',1,'world_map',None,scene_verified=True,stable_polls=1)
-    owned={'counts':Counter({'Skydiving':1,'Double Jump':1})}
+    owned={'counts':Counter({'Progressive Skydiving':1,'Double Jump':1})}
     result=g.configure(m,snap,owned)
     assert result['menu_policy_preloaded'] and result['request_machine'] is None
     assert m.read_u32(sky)==0  # item takes effect before entering Aquarium Park
@@ -252,3 +257,13 @@ def test_confirmed_gate_survives_transient_reads_without_new_write_authority(mon
     m.backend.write_bytes(machine+0x28,(player+4).to_bytes(4,'big'))
     with pytest.raises(MemoryUnavailable,match='ownership'):
         g.configure(m,replace(s,stage_epoch='wrong-owner',stable_polls=1),owned)
+
+
+@pytest.mark.parametrize('mask',[0,4096])
+def test_fast_dive_native_request(mask):
+    test_encoded_gate_preserves_original_request_flow(110,mask,109,True,False,None,False)
+
+
+@pytest.mark.parametrize('mask',[0,8192])
+def test_spikes_charge_cancelled_before_state_entry(mask):
+    test_encoded_gate_preserves_original_request_flow(82,mask,79,True,False,None,False)

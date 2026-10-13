@@ -389,8 +389,13 @@ class WritePolicy:
             if size!=4 or address not in fields:
                 raise MemoryUnavailable('WRITE_BLOCKED: unowned Emerald UI field')
             return token,address,fields[address]
-        if operation == 'stunts':
-            from .stunts import installed_data
+        if operation in ('stunts','drill_turbo','hover_ring_dash'):
+            if operation=='hover_ring_dash':
+                from .hover_ring_dash import installed_data
+            elif operation=='drill_turbo':
+                from .drill_turbo import installed_data
+            else:
+                from .stunts import installed_data
             base=installed_data(self.memory)
             if base is None or size!=4 or address!=base:
                 raise MemoryUnavailable('WRITE_BLOCKED: unverified Stunts permission data')

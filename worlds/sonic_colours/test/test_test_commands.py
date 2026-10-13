@@ -99,11 +99,11 @@ def test_parser(raw,expected,qty):
 
 @pytest.mark.parametrize('raw,expected', [
     ('laser', 'Cyan Laser Wisp'),
-    ('drill', 'Yellow Drill Wisp'),
+    ('drill', 'Progressive Yellow Drill Wisp'),
     ('rocket', 'Orange Rocket Wisp'),
     ('cube', 'Blue Cube Wisp'),
-    ('hover', 'Green Hover Wisp'),
-    ('spikes', 'Pink Spikes Wisp'),
+    ('hover', 'Progressive Green Hover Wisp'),
+    ('spikes', 'Progressive Pink Spikes Wisp'),
     ('frenzy', 'Purple Frenzy Wisp'),
     ('boost', 'White Boost Wisp'),
 ])

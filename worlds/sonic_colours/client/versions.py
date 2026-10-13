@@ -35,6 +35,10 @@ def verify_revision(memory):
         data = normalize_initial_speed(data,section['address'])
         from .stunts import normalize as normalize_stunts
         data = normalize_stunts(memory,data,section['address'])
+        from .hover_ring_dash import normalize as normalize_hover_dash
+        data = normalize_hover_dash(memory,data,section['address'])
+        from .drill_turbo import normalize as normalize_drill
+        data = normalize_drill(memory,data,section['address'])
         from .skydiving import normalize as normalize_skydiving
         data = normalize_skydiving(memory,data,section['address'])
         from .player_switch import HOOK as ASSIST_HOOK, HOOK_ORIGINAL as ASSIST_ORIGINAL, installed_data as assist_data

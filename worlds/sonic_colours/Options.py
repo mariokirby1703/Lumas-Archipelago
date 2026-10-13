@@ -126,7 +126,7 @@ class SonicDeathLink(DeathLink):
 
 class MovementUnlocks(Toggle):
     """EXPERIMENTAL: shuffle Wall Jump, Homing Attack, Mid-Air Boost (Jump Dash),
-    Double Jump, Stomp, Drift, Rail Jump, Rail Switch, Assist Change, five Progressive Stunts, 2 Progressive Crouch stages, Swim and five Progressive Breathing items.
+    Double Jump, Stomp, Drifting, two Progressive Rail stages (Rail Jump then Rail Switch), two Progressive Skydiving stages (gliding then fast diving), Assist Change, five Progressive Stunts, 2 Progressive Crouch stages, Swim and five Progressive Breathing items.
     State-transition locks require the replacement Dolphin Movement Gecko BETA
     code profile and are NOT active with the ordinary four Gecko groups.
     Swim controls repeated underwater jumps independently of Double Jump.

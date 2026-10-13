@@ -42,7 +42,7 @@ def resolve_ability_group(raw):
               'worldaccess': 'worlds', 'allworldaccess': 'worlds',
               'shuttles': 'worlds', 'allshuttles': 'worlds'}
     return groups.get(key)
-MAXIMUM = {'Progressive Stunts':5, 'Progressive Crouch': 2, 'Progressive Breathing': 5,
+MAXIMUM = {'Progressive Pink Spikes Wisp':2, 'Progressive Green Hover Wisp':2, 'Progressive Yellow Drill Wisp':2, 'Progressive Skydiving':2, 'Progressive Rail':2, 'Progressive Stunts':5, 'Progressive Crouch': 2, 'Progressive Breathing': 5,
            GAME_LAND_SPEED: 4}
 
 
@@ -53,7 +53,7 @@ def _key(text):
 # Short capability names are more useful for logic testing than the colour.
 # `breath` means the progressive item. The retired one-off `Breath` item
 # remains available explicitly as `legacy breath` for old seed research.
-_ALIAS = {'stunts':'Progressive Stunts', 'stunt':'Progressive Stunts', 'crouch': 'Progressive Crouch', 'slide': 'Progressive Crouch',
+_ALIAS = {'skydiving':'Progressive Skydiving', 'dive':'Progressive Skydiving', 'rail':'Progressive Rail', 'drift':'Drifting', 'stunts':'Progressive Stunts', 'stunt':'Progressive Stunts', 'crouch': 'Progressive Crouch', 'slide': 'Progressive Crouch',
           'breath': 'Progressive Breathing',
           'breathing': 'Progressive Breathing', 'oxygen': 'Progressive Breathing',
           'air': 'Progressive Breathing', 'legacy breath': 'Breath',
@@ -71,8 +71,9 @@ for item in WORLD_UNLOCK_ITEMS:
 
 for item in TESTABLE:
     if item.endswith(' Wisp'):
-        short = item[:-5]
+        short = item[:-5].removeprefix('Progressive ')
         _ALIAS.setdefault(_key(short), item)
+        _ALIAS.setdefault(_key(short+' Wisp'),item)
         parts = short.split()
         if len(parts) > 1:
             # Both /give cyan and /give laser should work.

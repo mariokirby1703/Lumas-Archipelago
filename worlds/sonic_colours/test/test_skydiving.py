@@ -49,7 +49,7 @@ def test_item_permission_updates_existing_menu_independent_lock(monkeypatch,coun
     class Memory:
         def read_u32(self,a):return 1
         def write_u32(self,a,v,**kw):writes.append((a,v,kw))
-    result=s.configure(Memory(),None,{'counts':Counter({'Skydiving':count})})
+    result=s.configure(Memory(),None,{'counts':Counter({'Progressive Skydiving':count})})
     assert result['locked']==(count==0)
     assert len(writes)==int(count>0)
     if writes:assert writes[0]==(0x80002800,0,{'expected':1,'operation':'skydiving'})
@@ -59,9 +59,9 @@ def test_item_and_native_callback_evidence():
     from ..Items import ITEM_TABLE,MOVEMENT_POOL,classification
     from ..world_constants import BASE_ID
     from BaseClasses import ItemClassification
-    assert ITEM_TABLE['Skydiving']==BASE_ID+51
-    assert MOVEMENT_POOL.count('Skydiving')==1
-    assert classification('Skydiving')==ItemClassification.progression
+    assert ITEM_TABLE['Progressive Skydiving']==BASE_ID+51
+    assert MOVEMENT_POOL.count('Progressive Skydiving')==2
+    assert classification('Progressive Skydiving')==ItemClassification.progression
     from ..tools.ppc import Executable
     path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('original executable absent')

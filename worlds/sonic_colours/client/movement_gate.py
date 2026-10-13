@@ -22,9 +22,9 @@ STATE_MACHINE_VTABLE = 0x8075A0F8
 PLAYER_VTABLE = 0x8075AEF8
 # Permission bit 1 = owned/unlocked. State 43 is crouch (first copy),
 # state 41 is Slide (second copy). 9 = Jump Dash (user's Mid-Air Boost).
-STATE_PERMISSION = {48:11,29: 9, 30: 10, 38: 7, 8: 0, 9: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
+STATE_PERMISSION = {82:13,110:12,48:11,29: 9, 30: 10, 38: 7, 8: 0, 9: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
 CAPABILITY_NAMES = ('Double Jump', 'Mid-Air Boost', 'Homing Attack',
-                    'Wall Jump', 'Slide', 'Crouch', 'Stomp', 'Drift', 'Swim', 'Rail Jump', 'Rail Switch', 'Quick Step')
+                    'Wall Jump', 'Slide', 'Crouch', 'Stomp', 'Drifting', 'Swim', 'Rail Jump', 'Rail Switch', 'Quick Step', 'Fast Dive', 'Spikes Spin Dash')
 DATA_WORDS = 2                 # C2 control + native telemetry; read-only table follows
 MENU_POLICY_ARMED = 1  # activation only; current guest owner is resolved natively
 MENU_SCENES = ('world_map','global_map','game_land_select')
@@ -40,11 +40,13 @@ def permissions(counts):
         counts['Progressive Crouch'] >= 2,
         counts['Progressive Crouch'] >= 1,
         counts['Stomp'] > 0,
-        counts.get('Drift', 0) > 0,
+        counts.get('Drifting', 0) > 0,
         counts.get('Swim', 0) > 0,
-        counts.get('Rail Jump',0)>0,
-        counts.get('Rail Switch',0)>0,
+        counts.get('Progressive Rail',0)>=1,
+        counts.get('Progressive Rail',0)>=2 or counts.get('Rail Switch',0)>0,
         counts.get('Quick Step',0)>0,
+        counts.get('Progressive Skydiving',0)>=2,
+        counts.get('Progressive Pink Spikes Wisp',0)>=2,
     )) if present)
 
 
@@ -75,15 +77,13 @@ def payload(gecko=False):
     # The nonzero mailbox enables the authenticated AP policy. Resolve each
     # newly constructed native Sonic machine in the guest, before host polling.
     a.d(32, 10, 31, 0)         # verify current guest machine vtable
-    a.d(15, 11, 0, STATE_MACHINE_VTABLE >> 16)
-    a.d(24, 11, 11, STATE_MACHINE_VTABLE & 0xffff)
-    a.emit(0x7C0A5800); a.branch('allow', 0x40820000)
+    a.d(27,10,10,STATE_MACHINE_VTABLE >> 16)
+    a.d(10,0,10,STATE_MACHINE_VTABLE & 0xffff); a.branch('allow', 0x40820000)
     a.d(32, 11, 31, 0x28)  # actual native machine owner
     a.d(11, 0, 11, 0); a.branch('allow', 0x41820000)
     a.d(32, 10, 11, 0)
-    a.d(15, 9, 0, PLAYER_VTABLE >> 16)
-    a.d(24, 9, 9, PLAYER_VTABLE & 0xffff)
-    a.emit(0x7C0A4800); a.branch('allow', 0x40820000)
+    a.d(27,10,10,PLAYER_VTABLE >> 16)
+    a.d(10,0,10,PLAYER_VTABLE & 0xffff); a.branch('allow', 0x40820000)
     a.d(32, 10, 11, 0x70)
     a.d(11, 0, 10, 0); a.branch('allow', 0x41820000)
     a.d(32, 10, 10, 8)
@@ -101,14 +101,15 @@ def payload(gecko=False):
     # to a word boundary. Zero denotes an unrestricted native state.
     # Unlike a long chain of comparisons this also restores the Game Land
     # speed-UI C2 in the tightly constrained Gecko codehandler allocation.
-    a.d(11,0,4,48);a.branch('rail_lookup',0x40820000)
-    a.d(14,9,0,2048);a.branch('permission')
+    a.d(11,0,4,82);a.branch('spikes_permission',0x41820000)
+    a.d(11,0,4,110);a.branch('fast_permission',0x41820000)
+    a.d(11,0,4,48);a.branch('quick_permission',0x41820000)
     a.label('rail_lookup')
     # Two independent wide permissions: GrindJumpShort 29, GrindJumpSide 30.
     a.d(14,9,4,-29)
     a.d(10,0,9,1);a.branch('table_lookup',0x41810000)
-    a.d(14,10,0,512)
-    a.emit(31<<26 | 10<<21 | 9<<16 | 9<<11 | 24<<1) # slw r9,r10,r9
+    a.emit(21<<26 | 9<<21 | 9<<16 | 9<<11 | 22<<6 | 31<<1)  # slwi r9,r9,9
+    a.d(14,9,9,512)
     # Held actions 2/3, native input getter 80056CA0: +48 bit 2/3.
     # Adding Switch to an explicit Switch request is idempotent; adding it
     # to a directional Jump requires BOTH permissions, not either one.
@@ -136,6 +137,10 @@ def payload(gecko=False):
     a.d(28, 10, 10, 0x800)  # native water-entry flag, set by 801F0408
     a.branch('permission', 0x41820000)
     a.d(14, 9, 0, 256)       # Swim permission, independent of Double Jump
+    a.branch('permission')
+    a.label('spikes_permission');a.d(14,9,0,8192);a.branch('permission')
+    a.label('quick_permission');a.d(14,9,0,2048);a.branch('permission')
+    a.label('fast_permission');a.d(14,9,0,4096)
     a.label('permission')
     a.d(32, 10, 12, 4)         # permissions bitmask
     a.emit(31<<26 | 10<<21 | 10<<16 | 9<<11 | 28<<1 | 1)  # and. r9,r10,r9
@@ -233,6 +238,22 @@ def _gecko_install(memory):
         memory.movement_legacy_profile = False
     except MemoryUnavailable:
         from ..world_constants import load_data
+        previous=load_data('movement_v11_before_spikes_dash.json')
+        try:
+            info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_before_spikes_dash':previous['words']},
+                            ((previous['offset'],8),),label='previous movement without Spikes Spin Dash')
+            memory.movement_legacy_profile=True
+            return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
+        except MemoryUnavailable:
+            pass
+        previous=load_data('movement_v11_no_fast_dive_previous.json')
+        try:
+            info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_before_fast_dive':previous['words']},
+                            ((previous['offset'],8),),label='previous movement without Fast Dive')
+            memory.movement_legacy_profile=True
+            return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
+        except MemoryUnavailable:
+            pass
         previous=load_data('movement_v11_no_quick_step_previous.json')
         try:
             info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_before_quick_step':previous['words']},

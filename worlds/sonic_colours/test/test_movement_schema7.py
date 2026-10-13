@@ -8,13 +8,13 @@ from . import generate
 
 def test_movement_ids_are_append_only_and_progressive_crouch_has_two_copies():
     assert SCHEMA_VERSION == 7
-    assert tuple(ITEM_TABLE[x] for x in MOVEMENT_ITEMS) == tuple(range(BASE_ID+37,BASE_ID+44))+(BASE_ID+45,BASE_ID+46,BASE_ID+47,BASE_ID+48,BASE_ID+49,BASE_ID+50)
+    assert tuple(ITEM_TABLE[x] for x in MOVEMENT_ITEMS) == tuple(range(BASE_ID+37,BASE_ID+44))+(BASE_ID+45,BASE_ID+46,BASE_ID+47,BASE_ID+48,BASE_ID+49,BASE_ID+51,BASE_ID+52)
     assert MOVEMENT_POOL.count('Progressive Crouch') == 2
-    assert len(MOVEMENT_POOL) == 22
+    assert len(MOVEMENT_POOL) == 25
     w = generate({'movement_unlocks':True}).worlds[1]
     from collections import Counter
     c = Counter(item.name for item in w.multiworld.itempool)
-    assert all(c[name] == (2 if name=='Progressive Crouch' else 5 if name in ('Progressive Breathing','Progressive Stunts') else 1) for name in MOVEMENT_ITEMS)
+    assert all(c[name] == (2 if name in ('Progressive Crouch','Progressive Rail','Progressive Skydiving') else 5 if name in ('Progressive Breathing','Progressive Stunts') else 1) for name in MOVEMENT_ITEMS)
     assert w.fill_slot_data()['options']['movement_unlocks'] == 1
     default = generate().worlds[1]
     assert not any(i.name in MOVEMENT_ITEMS for i in default.multiworld.itempool)
@@ -29,7 +29,7 @@ def test_progressive_permissions_and_independent_jumpdash():
     assert mask(Counter({'Mid-Air Boost':1})) == 1<<1
     assert mask(Counter({'Wall Jump':1})) == 1<<3
     assert not mask(Counter({'White Boost Wisp':1}))
-    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,29,30,38,39,40,41,43,44}
+    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,29,30,38,39,40,41,43,44,48,82,110}
 
 
 def test_experimental_native_movement_hook_respects_memory_scratch_limit():
@@ -46,15 +46,15 @@ def test_experimental_native_movement_hook_respects_memory_scratch_limit():
 
 
 def test_drift_and_swim_have_independent_permissions():
-    assert movement_gate.permissions(Counter({"Drift":1})) == 128
+    assert movement_gate.permissions(Counter({"Drifting":1})) == 128
     assert movement_gate.permissions(Counter({"Swim":1})) == 256
 
 
 def test_rail_jump_and_switch_have_independent_wide_permissions():
-    assert movement_gate.permissions(Counter({'Rail Jump':1}))==512
+    assert movement_gate.permissions(Counter({'Progressive Rail':1}))==512
     assert movement_gate.STATE_PERMISSION[29]==9
     assert movement_gate.STATE_PERMISSION[30]==10
-    assert movement_gate.permissions(Counter({"Rail Switch":1}))==1024
+    assert movement_gate.permissions(Counter({"Progressive Rail":2}))==1536
     from pathlib import Path
     from ..tools.ppc import Executable
     path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
@@ -63,3 +63,24 @@ def test_rail_jump_and_switch_have_independent_wide_permissions():
         getter=int.from_bytes(e.read(0x807610F8+0xc,4),'big')
         assert getter==0x800D2330
         assert b'CStateGrindJumpShort\0'==e.read(0x80761200,21)
+
+
+def test_progressive_rail_test_commands_and_retired_id():
+    from ..Items import BY_ID
+    from ..client.test_inventory import resolve_item, MAXIMUM
+    assert resolve_item('rail') == 'Progressive Rail'
+    assert resolve_item('drift') == 'Drifting'
+    assert MAXIMUM['Progressive Rail'] == 2
+    assert 'Rail Switch' not in ITEM_TABLE
+    assert BY_ID[BASE_ID+50] == 'Rail Switch'
+    assert movement_gate.permissions(Counter({'Rail Switch':1})) == 1024
+
+
+def test_fast_dive_requires_second_skydiving_copy():
+    assert not movement_gate.permissions(Counter({'Progressive Skydiving':1})) & 4096
+    assert movement_gate.permissions(Counter({'Progressive Skydiving':2})) & 4096
+
+
+def test_spikes_spin_dash_second_tier_permission():
+    assert not movement_gate.permissions(Counter({'Progressive Pink Spikes Wisp':1})) & 8192
+    assert movement_gate.permissions(Counter({'Progressive Pink Spikes Wisp':2})) & 8192

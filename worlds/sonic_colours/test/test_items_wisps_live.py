@@ -169,7 +169,7 @@ def test_only_exact_gecko_thunk_can_pass_native_revision_hash():
 
 
 def test_wisp_names_keep_numeric_ids_and_exported_gecko_is_packaged():
-    assert 'Cyan Laser Wisp' in WISP_ITEMS and 'Yellow Drill Wisp' in WISP_ITEMS
+    assert 'Cyan Laser Wisp' in WISP_ITEMS and 'Progressive Yellow Drill Wisp' in WISP_ITEMS
     assert not any('Unlock' in n for n in ITEM_TABLE)
     from ..world_constants import BASE_ID
     assert ITEM_TABLE['Cyan Laser Wisp']==BASE_ID+8

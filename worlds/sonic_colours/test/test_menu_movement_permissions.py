@@ -35,9 +35,9 @@ def test_local_give_and_remove_refresh_permissions_without_waiting_for_poll():
     overlay=LocalInventoryOverrides();refreshed=[]
     runtime=SimpleNamespace(test_inventory=overlay,journal=SimpleNamespace(data={'receipts':[]}))
     context=SimpleNamespace(runtime=runtime,authenticated_identity=(0,1,'seed'),history_ready=True,items_received=[],
-        refresh_movement_permissions=lambda:refreshed.append(overlay.apply(inventory([]))['counts']['Skydiving']))
+        refresh_movement_permissions=lambda:refreshed.append(overlay.apply(inventory([]))['counts']['Progressive Skydiving']))
     commands=object.__new__(SonicCommands);commands.ctx=context
-    commands._change_test_ability('give','Skydiving')
+    commands._change_test_ability('give','Progressive Skydiving')
     commands._change_test_ability('remove','Skydiving all')
     assert refreshed==[1,0]
 
@@ -51,16 +51,16 @@ def test_receipt_refresh_uses_authenticated_inventory(identity):
     runtime=SimpleNamespace(snapshot=object(),journal=SimpleNamespace(
         identity={'team':0,'slot':1,'seed':'seed'},data={'receipts':[]}),
         test_inventory=LocalInventoryOverrides(),
-        refresh_movement_permissions=lambda memory,owned:refreshed.append(owned['counts']['Skydiving']))
+        refresh_movement_permissions=lambda memory,owned:refreshed.append(owned['counts']['Progressive Skydiving']))
     context=SimpleNamespace(runtime=runtime,memory=object(),authenticated_identity=identity,
-        history_ready=True,items_received=[SimpleNamespace(item=ITEM_TABLE['Skydiving'])])
+        history_ready=True,items_received=[SimpleNamespace(item=ITEM_TABLE['Progressive Skydiving'])])
     SonicContext.refresh_movement_permissions(context)
     assert refreshed==([1] if identity[2]=='seed' else [])
 
 
 def test_optional_movement_failure_does_not_block_other_permissions(monkeypatch):
     from ..client.runtime import Runtime
-    from ..client import stunts,player_switch,water_native
+    from ..client import stunts,player_switch,water_native,drill_turbo,hover_ring_dash
     runtime=object.__new__(Runtime)
     runtime.snapshot=object();runtime.slot_data={'options':{'movement_unlocks':True}}
     runtime.guard=None;runtime.journal=None;runtime.experimental_direct_hooks=False
@@ -70,6 +70,8 @@ def test_optional_movement_failure_does_not_block_other_permissions(monkeypatch)
     monkeypatch.setattr(water_native,'configure',lambda *args:{'status':'not underwater'})
     monkeypatch.setattr(stunts,'configure',lambda *args:{'level':3})
     monkeypatch.setattr(player_switch,'configure',lambda *args:{'allowed':True})
+    monkeypatch.setattr(drill_turbo,'configure',lambda *args:{'level':2})
+    monkeypatch.setattr(hover_ring_dash,'configure',lambda *args:{'level':1})
     runtime.refresh_movement_permissions(object(),{'counts':{}})
     assert runtime.movement_status['status']=='missing movement hook'
-    assert runtime.hooks.gameplay_controls_status=={'stunts':{'level':3},'assist_change':{'allowed':True}}
+    assert runtime.hooks.gameplay_controls_status=={'stunts':{'level':3},'assist_change':{'allowed':True},'drill_turbo':{'level':2},'hover_ring_dash':{'level':1}}

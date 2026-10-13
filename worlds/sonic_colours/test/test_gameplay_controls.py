@@ -223,3 +223,16 @@ def test_pal_boost_delta_and_zero_lower_bound_evidence():
     assert e.read(0x801014F8,4) == bytes.fromhex('C0429A80')
     assert e.read(0x80101508,16) == bytes.fromhex('C0030008C0630014EC20082AD0230008')
     assert run('boost_add', selected=25, locked=0) == 30
+
+
+@pytest.mark.parametrize('kind',['speed_get','speed_set','speed_ui'])
+def test_before_drill_speed_layout_uses_only_three_mutable_words(kind):
+    from ..world_constants import load_data
+    old=load_data('gameplay_before_drill.json')[kind]
+    words=old['words'][:];target=0x80002000;hook,_=HOOKS[kind]
+    words[-1]=0x48000000 | ((hook+4-(target+len(words)*4-4))&0x3fffffc)
+    b=FakeBackend();m=SonicMemory(b)
+    b.put(target,struct.pack('>'+'I'*len(words),*words))
+    b.put(hook,(0x48000000 | ((target-hook)&0x3fffffc)).to_bytes(4,'big'))
+    assert installed(m,kind)==target+old['offset']
+    assert m.gameplay_data_sizes[target+old['offset']]==12

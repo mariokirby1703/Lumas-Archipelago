@@ -16,7 +16,7 @@ def test_give_and_remove_every_wisp(alias, monkeypatch):
     assert len(WISP_ITEMS) == 8
     assert run('give', alias) == 'Given: all Wisps.'
     derived = overlay.apply(base)['counts']
-    assert all(derived[name] == 1 for name in WISP_ITEMS)
+    assert all(derived[name] == (2 if name in ('Progressive Yellow Drill Wisp','Progressive Green Hover Wisp','Progressive Pink Spikes Wisp') else 1) for name in WISP_ITEMS)
     assert all(derived[name] == 0 for name in MOVEMENT_ITEMS)
     assert run('give', 'wisps') == 'No change: all Wisps already unlocked.'
     assert run('remove', alias) == 'Removed: all Wisps.'

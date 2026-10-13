@@ -1,8 +1,8 @@
 from BaseClasses import Item, ItemClassification
-from .world_constants import BASE_ID, GAME, WORLDS, WISPS
+from .world_constants import BASE_ID, GAME, WORLDS, WISPS, wisp_item
 
 WORLD_ITEMS = tuple(f'{w} Shuttle' for w in WORLDS[:6])
-WISP_ITEMS = tuple(f'{w} Wisp' for w in WISPS)
+WISP_ITEMS = tuple(wisp_item(w) for w in WISPS)
 EMERALDS = tuple(f'{colour} Chaos Emerald' for colour in
                  ('Green', 'Red', 'Blue', 'Yellow', 'Purple', 'Cyan', 'White'))
 RING_VALUES = {'Red Ring': 1, '5 Red Rings': 5, '10 Red Rings': 10}
@@ -30,28 +30,27 @@ ITEM_TABLE.update({name: BASE_ID + 37 + i for i, name in enumerate(MOVEMENT_ITEM
 ITEM_TABLE['Progressive Breathing'] = BASE_ID + 45
 MOVEMENT_ITEMS = MOVEMENT_ITEMS[:-1] + ('Progressive Breathing',)
 MOVEMENT_POOL = MOVEMENT_POOL[:-1] + ('Progressive Breathing',)*5
-ITEM_TABLE['Drift'] = BASE_ID + 46
-MOVEMENT_ITEMS += ('Drift',)
-MOVEMENT_POOL += ('Drift',)
+ITEM_TABLE['Drifting'] = BASE_ID + 46
+MOVEMENT_ITEMS += ('Drifting',)
+MOVEMENT_POOL += ('Drifting',)
 ITEM_TABLE['Assist Change'] = BASE_ID + 47
 MOVEMENT_ITEMS += ('Assist Change',)
 MOVEMENT_POOL += ('Assist Change',)
 ITEM_TABLE['Progressive Stunts'] = BASE_ID + 48
 MOVEMENT_ITEMS += ('Progressive Stunts',)
 MOVEMENT_POOL += ('Progressive Stunts',)*5
-ITEM_TABLE['Rail Jump'] = BASE_ID + 49
-MOVEMENT_ITEMS += ('Rail Jump',)
-MOVEMENT_POOL += ('Rail Jump',)
-ITEM_TABLE['Rail Switch'] = BASE_ID + 50
-MOVEMENT_ITEMS += ('Rail Switch',)
-MOVEMENT_POOL += ('Rail Switch',)
-ITEM_TABLE['Skydiving'] = BASE_ID + 51
-MOVEMENT_ITEMS += ('Skydiving',)
-MOVEMENT_POOL += ('Skydiving',)
+ITEM_TABLE['Progressive Rail'] = BASE_ID + 49
+MOVEMENT_ITEMS += ('Progressive Rail',)
+MOVEMENT_POOL += ('Progressive Rail',)*2
+# Offset 50 is retired; decode old Rail Switch receipts without generating them.
+ITEM_TABLE['Progressive Skydiving'] = BASE_ID + 51
+MOVEMENT_ITEMS += ('Progressive Skydiving',)
+MOVEMENT_POOL += ('Progressive Skydiving',)*2
 ITEM_TABLE['Quick Step'] = BASE_ID + 52
 MOVEMENT_ITEMS += ('Quick Step',)
 MOVEMENT_POOL += ('Quick Step',)
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}
+BY_ID[BASE_ID + 50] = 'Rail Switch'
 
 
 class SonicColoursItem(Item):

@@ -135,7 +135,9 @@ class Journal:
                     and effect.get('family') in ('rings','lives','boost')
                     and effect.get('reason') in ('left living gameplay before verification completed',
                         'actor/context changed before verification',
-                        'no later-frame effect witness or counter sources disagree')):
+                        'no later-frame effect witness or counter sources disagree')
+                    and (effect.get('reason')!='no later-frame effect witness or counter sources disagree'
+                        or effect.get('last_observed')==[effect.get('after')]*len(effect['addresses']))):
                 raise ValueError('effect_not_prepared')
             effect['previous_settlement_reason']=effect.get('reason')
             effect['reason']=None

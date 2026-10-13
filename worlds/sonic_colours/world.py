@@ -55,7 +55,7 @@ class SonicColoursWorld(World):
     def create_items(self):
         names = []
         names += [n for i, n in enumerate(Items.WORLD_ITEMS) if i != self.starting_world]
-        names += list(Items.WISP_ITEMS) + list(Items.EMERALDS) + [Items.RANDOM_CAPSULES]
+        names += list(Items.WISP_ITEMS) + ['Progressive Yellow Drill Wisp','Progressive Green Hover Wisp','Progressive Pink Spikes Wisp'] + list(Items.EMERALDS) + [Items.RANDOM_CAPSULES]
         if self.options.movement_unlocks.value:
             names += list(Items.MOVEMENT_POOL)
         precollected = self.multiworld.precollected_items[self.player]

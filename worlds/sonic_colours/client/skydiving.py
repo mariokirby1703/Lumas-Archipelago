@@ -42,7 +42,7 @@ def installed_data(memory):
 def configure(memory,snapshot,owned):
     address=installed_data(memory)
     if address is None:return {'status':'Update Gecko profile for Skydiving','installed':False}
-    locked=int(owned['counts']['Skydiving']==0)
+    locked=int(owned['counts']['Progressive Skydiving']==0)
     before=memory.read_u32(address)
     if before!=locked:memory.write_u32(address,locked,expected=before,operation='skydiving')
     return {'status':'Skydiving locked: native Fall on each Diving update' if locked else 'Skydiving unlocked',
