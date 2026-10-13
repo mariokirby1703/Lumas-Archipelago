@@ -94,7 +94,7 @@ def test_game_land_clear_event_is_monotonic_and_does_not_modify_clear(bit):
     assert execute(bit,1,clears=0x1fffff)[2]==0x1fffff
 
 
-@pytest.mark.parametrize('bit',[8,19,27,72,90,150,251,273,400])
+@pytest.mark.parametrize('bit',[8,19,27,75,90,150,251,273,400])
 def test_unrelated_flags_keep_vanilla_value(bit):
     assert execute(bit,1)==(1,0,0)
     assert execute(bit,0)==(0,0,0)
@@ -113,3 +113,9 @@ def test_compact_permission_matches_previous_native_logic(bit):
     for enabled in (False, True):
         args = dict(worlds=(1 << bit) if enabled else 0, colours=(1 << bit) if enabled else 0, story=(1 << bit) if enabled else 0)
         assert execute(bit, 1, **args) == execute(bit, 1, compact_permission=False, **args)
+
+
+@pytest.mark.parametrize('bit',[72,73,74])
+def test_terminal_setters_obey_sequential_story_mask(bit):
+    assert execute(bit,1,story=0)[0]==0
+    assert execute(bit,1,story=1<<(bit-30))[0]==1

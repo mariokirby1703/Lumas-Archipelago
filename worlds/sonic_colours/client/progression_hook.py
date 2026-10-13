@@ -14,7 +14,8 @@ HOOK = 0x8015ECC0
 ORIGINAL = 0x2C050000  # cmpwi r5,0
 
 
-def payload(compact_permission=True, compact_cr=True, register_lr=True):
+def payload(compact_permission=True, compact_cr=True, register_lr=True, lean=True, terminal=True):
+    short=lean and register_lr and compact_cr and compact_permission
     a=PPC()
     a.d(37,1,1,-0x90)
     if not register_lr:a.emit(0x7C0802A6); a.d(36,0,1,8)
@@ -25,12 +26,16 @@ def payload(compact_permission=True, compact_cr=True, register_lr=True):
     a.emit(0x48000005)  # bl .+4, position-independent data base
     base=len(a.words)*4
     a.emit(0x7D8802A6)  # mflr r12
-    fix=len(a.words); a.d(14,12,12,0)
+    fix=len(a.words)
+    if not short:a.d(14,12,12,0)
     a.d(32,6,3,0); a.d(32,7,12,0)
     a.emit(0x7C063800); a.branch('end',0x40820000)  # cmpw r6,r7
     a.d(10,0,4,7); a.branch('colour',0x40810000)  # ble unsigned
-    a.d(10,0,4,20); a.branch('clears',0x41800000)
-    a.d(10,0,4,26); a.branch('clears',0x41810000)
+    if short:
+        a.d(14,8,4,-20);a.d(10,0,8,6);a.branch('clears',0x41810000)
+    else:
+        a.d(10,0,4,20);a.branch('clears',0x41800000)
+        a.d(10,0,4,26);a.branch('clears',0x41810000)
     a.d(32,7,12,4); a.branch('permission')
     a.label('colour')
     a.d(11,0,5,0); a.branch('colour_mask',0x41820000)
@@ -52,10 +57,14 @@ def payload(compact_permission=True, compact_cr=True, register_lr=True):
     a.branch('end')
     a.label('clears')
     # Intercept story availability at the setter, before native map animations.
-    # Completion/rank banks are deliberately outside 30..71 and immutable here.
-    a.d(10,0,4,30); a.branch('clear_events',0x41800000)
-    a.d(10,0,4,71); a.branch('clear_events',0x41810000)
-    a.d(14,8,4,-30); a.d(32,7,12,24)
+    # Completion/rank banks are deliberately outside 30..74 and immutable here.
+    if short:
+        a.d(14,8,4,-30);a.d(10,0,8,44 if terminal else 41);a.branch('clear_events',0x41810000)
+    else:
+        a.d(10,0,4,30);a.branch('clear_events',0x41800000)
+        a.d(10,0,4,74 if terminal else 71);a.branch('clear_events',0x41810000)
+        a.d(14,8,4,-30)
+    a.d(32,7,12,24)
     a.d(10,0,8,32); a.branch('story_mask',0x41800000)
     a.d(14,8,8,-32); a.d(32,7,12,28)
     a.label('story_mask')
@@ -63,9 +72,13 @@ def payload(compact_permission=True, compact_cr=True, register_lr=True):
     a.branch('permission_test')
     a.label('clear_events')
     a.d(11,0,5,0); a.branch('end',0x41820000)
-    a.d(10,0,4,252); a.branch('end',0x41800000)
-    a.d(10,0,4,272); a.branch('end',0x41810000)
-    a.d(14,8,4,-252); a.d(14,7,0,1); a.emit(0x7CE74030)  # slw r7,r7,r8
+    if short:
+        a.d(14,8,4,-252);a.d(10,0,8,20);a.branch('end',0x41810000)
+    else:
+        a.d(10,0,4,252);a.branch('end',0x41800000)
+        a.d(10,0,4,272);a.branch('end',0x41810000)
+        a.d(14,8,4,-252)
+    a.d(14,7,0,1); a.emit(0x7CE74030)  # slw r7,r7,r8
     a.d(32,6,12,16); a.emit(0x7CC63B78); a.d(36,6,12,16)
     a.label('end')
     if register_lr:a.emit(0x7FE803A6)
@@ -75,7 +88,11 @@ def payload(compact_permission=True, compact_cr=True, register_lr=True):
     a.d(14,1,1,0x90); a.emit(ORIGINAL)
     a.branch('return')
     data=len(a.words)*4
-    a.words[fix] |= (data-base)&0xffff
+    if short:
+        for i,w in enumerate(a.words):
+            if w>>26 in (32,36) and (w>>16)&31==12:
+                a.words[i]=(w&0xffff0000)|(((w&0xffff)+data-base)&0xffff)
+    else:a.words[fix] |= (data-base)&0xffff
     for _ in range(8):a.emit(0)  # owner, world mask, colours/super, two event masks, seed tag
     a.label('return')
     if len(a.words)%2==0:a.emit(0x60000000)
@@ -85,32 +102,26 @@ def payload(compact_permission=True, compact_cr=True, register_lr=True):
 
 def installed_data(memory):
     from .gecko import inspect_c2
-    words, offset = payload()
-    try:
-        result = inspect_c2(memory, HOOK, ORIGINAL, {'story_permissions':words}, ((offset,32),))
-    except MemoryUnavailable:
-        from ..world_constants import load_data
-        old_words, offset = payload(True,True,False)
+    from ..world_constants import load_data
+    candidates=[('story_permissions',*payload()),('story_permissions',*payload(terminal=False)),('story_permissions',*payload(lean=False,terminal=False)),
+                ('story_permissions',*payload(True,True,False,terminal=False)),
+                ('story_permissions',*payload(True,False,False,terminal=False)),
+                ('before_compact_permission',*payload(False,False,False,terminal=False))]
+    old=load_data('progression_hook_previous.json')
+    candidates.append(('previous',old['words'],old['offset']))
+    for variant,words,offset in candidates:
         try:
-            result = inspect_c2(memory, HOOK, ORIGINAL, {'story_permissions':old_words}, ((offset,32),))
-        except MemoryUnavailable:
-            old_words, offset = payload(True,False,False)
-            try:
-                result = inspect_c2(memory, HOOK, ORIGINAL, {'story_permissions':old_words}, ((offset,32),))
-            except MemoryUnavailable:
-                old_words,offset=payload(False,False,False)
-                try:
-                    result=inspect_c2(memory,HOOK,ORIGINAL,{'before_compact_permission':old_words},((offset,32),))
-                except MemoryUnavailable:
-                    old = load_data('progression_hook_previous.json'); offset = old['offset']
-                    result = inspect_c2(memory, HOOK, ORIGINAL, {'previous':old['words']}, ((offset,24),))
+            result=inspect_c2(memory,HOOK,ORIGINAL,{variant:words},((offset,24 if variant=='previous' else 32),))
+            break
+        except MemoryUnavailable as error:failure=error
+    else:raise failure
     memory.story_permissions_installed = result.get('variant') in ('story_permissions', 'before_compact_permission')
     if not result['installed']: return None
     address = result['target'] + offset
     owner,world,colours,discoveries,clears,seed_tag = struct.unpack('>6I',memory.read_bytes(address,24))
     low, high = struct.unpack('>2I',memory.read_bytes(address+24,8)) if memory.story_permissions_installed else (0,0)
     if (owner and not valid_range(owner,0x50) or world & ~0x07f00000 or colours & ~0xff
-            or discoveries & ~0x7f or clears & ~0x1fffff or high & ~0x3ff):
+            or discoveries & ~0x7f or clears & ~0x1fffff or high & ~0x1fff):
         raise MemoryUnavailable('unknown_revision: progression hook data is invalid')
     return address
 
@@ -162,7 +173,7 @@ def configure(memory, snapshot, inventory, slot, journal=None):
     from ..world_progression import available_story_stages, progression_clears
     rows = load_data('progress_bits.json')
     story = 0
-    for zone in range(6):
+    for zone in range(7):
         if not world & (1 << (20+zone)): continue
         available = available_story_stages(zone, progression_clears(snapshot), slot['options']['world_progression'])
         if snapshot.save_identity is None and zone == 0: available = {'stg110','stg130'}

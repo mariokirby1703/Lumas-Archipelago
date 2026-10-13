@@ -65,7 +65,9 @@ def set_rules(world):
             elif world.options.world_progression.value == 0:
                 set_rule(region.entrances[0], lambda state, mission=previous: can_complete(world, state, mission))
         if stage['zone_index'] == 6:
-            set_rule(region.entrances[0], lambda state: state.has_all(WISP_ITEMS, player))
+            previous={'stg790':'stg710','stg720':'stg790'}.get(stage['mission_id'])
+            set_rule(region.entrances[0], lambda state, previous=previous: state.has_all(WISP_ITEMS, player)
+                     and (previous is None or can_complete(world,state,previous)))
         if stage['zone_index'] >= 7:
             gate = world.gates[f'{stage["zone_index"] - 6}-{stage["slot"]}']
             set_rule(region.entrances[0], lambda state, count=gate: sum(

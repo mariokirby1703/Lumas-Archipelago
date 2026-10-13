@@ -37,12 +37,12 @@ def test_catalogs():
 def test_thresholds(reduction):
     gates = game_land_gates(reduction)
     ordered = [gates[f'{i}-{act}'] for act in (1, 2, 3) for i in range(1, 8)]
-    assert ordered[0] >= 1 and ordered[-1] <= 180
+    assert ordered[0] == 0 and ordered[-1] <= 180
     assert all(a < b for a, b in zip(ordered, ordered[1:]))
-    assert sum(v == 0 for v in gates.values()) == 0
-    assert len(set(b-a for a,b in zip(ordered,ordered[1:])))==1
+    assert sum(v == 0 for v in gates.values()) == 1
+    assert len(set(b-a for a,b in zip(ordered[1:],ordered[2:])))==1
     if reduction == 40:
-        assert ordered == list(range(1, 122, 6))
+        assert ordered == [0]+list(range(7,122,6))
 
 
 def test_options_and_yaml():

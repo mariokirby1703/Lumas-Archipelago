@@ -57,8 +57,11 @@ def validate_slot(data):
             raise ValueError(f'invalid range {name}')
         resolved[name] = option
     from ..world_constants import legacy_game_land_gates
-    if data.get('game_land_gates') not in (game_land_gates(options['game_land_requirement_reduction']), legacy_game_land_gates(options['game_land_requirement_reduction'])):
+    current_gates=game_land_gates(options['game_land_requirement_reduction'])
+    previous_gates={**current_gates,'1-1':1}
+    if data.get('game_land_gates') not in (current_gates,previous_gates,legacy_game_land_gates(options['game_land_requirement_reduction'])):
         raise ValueError('slot Game Land gates mismatch')
+    data={**data,'game_land_gates':{**data['game_land_gates'],'1-1':0}}
     expected_speed = bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'] or options['eggman_heart_sanity'])
     if type(data.get('game_land_speed_items')) is not bool or data['game_land_speed_items'] != expected_speed:
         raise ValueError('slot Game Land speed pool contract mismatch')
@@ -270,7 +273,8 @@ class Runtime:
             return
         updated = ever | added
         events = [{'kind': 'red_ring', 'mission': mission, 'ring': ring,
-                   'stage_epoch': epoch, 'playthrough_epoch': self.journal.data.get('bootstrap', {}).get('epoch'),
+                   'stage_epoch': epoch, 'playthrough_epoch': (self.journal.data.get('bootstrap', {}).get('epoch')
+                       or (self.journal.data.get('native_binding') or {}).get('bootstrap_epoch')),
                    'sequence': len(self.journal.data['pickup_events']) + index}
                   for index, ring in enumerate(ring for ring in range(1, 6) if added & (1 << (ring - 1)))]
         checks = {code for name, code in self.slot_data['locations'].items()
@@ -478,7 +482,8 @@ class Runtime:
             from .movement_gate import configure as movement
             try:self.movement_status=movement(memory,self.snapshot,self.movement_policy(owned),transport='direct' if self.experimental_direct_hooks else 'gecko')
             except MemoryUnavailable as error:self.movement_status={'status':str(error)}
-        for name,action in (('stunts',lambda:stunts(memory,self.snapshot,owned,self.slot_data)),
+        from .quick_step import configure as quick_step
+        for name,action in (('quick_step',lambda:quick_step(memory,self.snapshot,owned,self.slot_data['options'].get('movement_unlocks',False))),('stunts',lambda:stunts(memory,self.snapshot,owned,self.slot_data)),
                             ('assist_change',lambda:assist(memory,self.snapshot,owned)),
                             ('drill_turbo',lambda:drill(memory,self.snapshot,owned)),
                             ('hover_ring_dash',lambda:hover_dash(memory,self.snapshot,owned))):
@@ -515,6 +520,11 @@ class Runtime:
             self.hooks.gameplay_controls_status['emerald_ui']=apply_emerald_ui(memory,self.snapshot,self.guard,owned)
         except MemoryUnavailable as error:
             self.hooks.gameplay_controls_status['emerald_ui']={'status':str(error)}
+        from .game_land_ui import apply as apply_game_land_ui
+        try:
+            self.hooks.gameplay_controls_status['game_land_ui']=apply_game_land_ui(memory,self.snapshot,self.guard,owned)
+        except MemoryUnavailable as error:
+            self.hooks.gameplay_controls_status['game_land_ui']={'status':str(error)}
         from .stunts import configure as configure_stunts
         try:
             self.hooks.gameplay_controls_status['stunts']=configure_stunts(memory,self.snapshot,owned,self.slot_data)
@@ -525,6 +535,11 @@ class Runtime:
             self.hooks.gameplay_controls_status['assist_change']=configure_assist(memory,self.snapshot,owned)
         except MemoryUnavailable as error:
             self.hooks.gameplay_controls_status['assist_change']={'status':str(error)}
+        from .quick_step import configure as configure_quick
+        try:
+            self.hooks.gameplay_controls_status['quick_step']=configure_quick(memory,self.snapshot,owned,self.slot_data['options'].get('movement_unlocks',False))
+        except MemoryUnavailable as error:
+            self.hooks.gameplay_controls_status['quick_step']={'status':str(error)}
         from .drill_turbo import configure as configure_drill
         try:
             self.hooks.gameplay_controls_status['drill_turbo']=configure_drill(memory,self.snapshot,owned)

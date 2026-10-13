@@ -8,8 +8,11 @@ def available_story_stages(zone: int, cleared: set[str], mode: int) -> frozenset
     The two forced Tropical Resort intro Acts are handled by native bootstrap,
     independent of this post-save policy.
     """
-    if not 0 <= zone < 6 or mode not in (0, 1):
+    if not 0 <= zone <= 6 or mode not in (0, 1):
         raise ValueError('invalid story zone or world progression mode')
+    if zone==6:
+        chain=('stg710','stg790','stg720')
+        return frozenset(mission for i,mission in enumerate(chain) if all(m in cleared for m in chain[:i]))
     acts = [s for s in STAGES if s['zone_index'] == zone and 1 <= s['slot'] <= 6]
     if len(acts) != 6:
         raise ValueError('incomplete original PAL world act catalog')

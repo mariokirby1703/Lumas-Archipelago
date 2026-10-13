@@ -30,7 +30,7 @@ def test_actor_owned_machine_ignores_allocation_adjacency(separation):
 @pytest.mark.parametrize('host_machine_matches',[True,False])
 def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,same_owner,underwater,host_machine_matches,rail_side):
     words,_,off=g.payload(gecko=True); base=0x80002000; machine=0x90010000; player=0x90020000
-    regs=list(range(32));regs[1]=0x90030000;regs[3]=regs[31]=machine;regs[4]=requested
+    regs=list(range(32));regs[1]=0x90030000;regs[3]=machine+0x14;regs[31]=0x90040000;regs[4]=requested
     saved=regs[:]; lr=0x80012340;cr=0x12345678;pc=0;cmp=0;mem={}
     def store(a,v):
         for i,b in enumerate((v&0xffffffff).to_bytes(4,'big')):mem[a+i]=b
@@ -40,7 +40,7 @@ def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,sa
                 (machine+0x20,previous),(base+off,machine if host_machine_matches else machine+0x1000),(base+off+4,mask)):
         store(a,v)
     if host_machine_matches is None:store(base+off,g.MENU_POLICY_ARMED)
-    store(player+0x88,player+0x300);store(player+0x348,8 if rail_side else 0)
+    store(player+0x88,player+0x300);store(player+0x34c,8 if rail_side else 0)
     store(player+0x8c,player+0x100);store(player+0x110,0x800 if underwater else 0)
     store(player,g.PLAYER_VTABLE);store(player+0x70,player+0x200);store(player+0x208,machine)
     for _ in range(300):
@@ -91,18 +91,22 @@ def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,sa
         elif op==31 and ((w>>1)&1023)==87:regs[rt]=mem.get(regs[ra]+regs[rb],0)
         elif op==31 and ((w>>1)&1023)==28:
             regs[ra]=regs[rt]&regs[rb];cmp=(regs[ra]>0)-(regs[ra]<0)
+        elif w==0x4c421182:cmp=1
+        elif w==0x4d820020:
+            if cmp==0:break
         elif w==0x60000000:pass
         else:raise AssertionError(hex(w))
     else:raise AssertionError('instruction loop')
     bit=8 if requested==8 and underwater else g.STATE_PERMISSION.get(requested,0)
     required=1536 if requested==29 and rail_side else 1<<bit
-    deny= same_owner and previous<=127 and requested in g.STATE_PERMISSION and (mask & required)!=required
-    assert regs[4]==((3 if requested in (38,41,48) else previous) if deny else requested)
-    assert regs[0]==previous  # displaced native instruction still runs
-    assert load(machine+0x20)==previous  # never mutate native state records
-    # Compact profile retains gameplay gates without optional guest telemetry.
+    deny=same_owner and requested in g.STATE_PERMISSION and (mask & required)!=required
+    native_entry=not deny or requested in (38,41,48)
+    assert regs[1]==saved[1]-(0xc0 if native_entry else 0)
+    assert regs[4]==(3 if deny else requested)
+    assert load(machine+0x20)==previous  # no direct state-field edits
     assert lr==0x80012340 and cr==0x12345678
-    assert all(regs[i]==saved[i] for i in range(32) if i not in (0,4))
+    assert all(regs[i]==saved[i] for i in range(32) if i not in (1,4))
+
 
 
 @pytest.mark.parametrize('mask',[0,1,512,1024])
@@ -267,3 +271,14 @@ def test_fast_dive_native_request(mask):
 @pytest.mark.parametrize('mask',[0,8192])
 def test_spikes_charge_cancelled_before_state_entry(mask):
     test_encoded_gate_preserves_original_request_flow(82,mask,79,True,False,None,False)
+
+
+@pytest.mark.parametrize('requested',[29,30,48])
+@pytest.mark.parametrize('previous',[0xffffffff,29,30,48])
+def test_spammed_requests_cannot_use_pending_minus_one_as_a_bypass(requested,previous):
+    test_encoded_gate_preserves_original_request_flow(requested,0,previous,True,False,None,False)
+
+
+def test_direction_held_without_press_still_needs_rail_switch():
+    test_encoded_gate_preserves_original_request_flow(29,512,28,True,False,None,True)
+    test_encoded_gate_preserves_original_request_flow(29,1536,28,True,False,None,True)

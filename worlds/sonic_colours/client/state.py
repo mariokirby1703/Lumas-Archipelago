@@ -380,12 +380,12 @@ class WritePolicy:
             if size != 4 or address != target or actors:
                 raise MemoryUnavailable('WRITE_BLOCKED: intro box must precede native construction')
             return snapshot.session, snapshot.stage_epoch, base, target
-        if operation == 'emerald_ui':
+        if operation in ('emerald_ui','game_land_ui'):
             from .emerald_ui import targets
             if snapshot.scene!='game_land_select' or not snapshot.scene_verified:
                 raise MemoryUnavailable('WRITE_BLOCKED: Emerald UI requires verified Game Land menu')
             token=self.guard.check(snapshot)
-            fields=targets(self.memory)
+            fields=targets(self.memory,stages=True) if operation=='game_land_ui' else targets(self.memory)
             if size!=4 or address not in fields:
                 raise MemoryUnavailable('WRITE_BLOCKED: unowned Emerald UI field')
             return token,address,fields[address]
@@ -418,9 +418,13 @@ class WritePolicy:
                 raise MemoryUnavailable('WRITE_BLOCKED: unverified Assist Change data')
             token=self.guard.check(snapshot)
             return token,base
-        if operation in ('movement_controls','skydiving'):
+        if operation in ('movement_controls','skydiving','quick_step'):
             from .movement_gate import installed_data, observed
-            if operation == 'skydiving':
+            if operation == 'quick_step':
+                from .quick_step import installed_data as quick_data
+                address_base=quick_data(self.memory)
+                match=(address_base,'Gecko') if address_base is not None else None
+            elif operation == 'skydiving':
                 from .skydiving import installed_data as sky_data
                 address_base=sky_data(self.memory)
                 match=(address_base,'Gecko') if address_base is not None else None
@@ -429,7 +433,7 @@ class WritePolicy:
             if match is None:
                 raise MemoryUnavailable('WRITE_BLOCKED: movement hook missing')
             base, transport = match
-            if size != 4 or address not in ((base,) if operation=='skydiving' else (base, base + 4)):
+            if size != 4 or address not in ((base,) if operation in ('skydiving','quick_step') else (base, base + 4)):
                 raise MemoryUnavailable('WRITE_BLOCKED: unverified movement data word')
             if (snapshot.scene in ('world_map','global_map','game_land_select')
                     and snapshot.scene_verified and snapshot.stable_polls>=1):

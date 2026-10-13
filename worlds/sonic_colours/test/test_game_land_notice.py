@@ -22,7 +22,7 @@ def test_actual_queue_layout_and_flag_notification_without_fake_physical_rings(t
     j,m,b,s,g,chain,owner=fixture(tmp_path)
     with j:
         state=prepare(m,s,{'red_rings':4},{'game_land_gates':game_land_gates(113)},j)
-        assert state['pending']==['1-1','2-1']
+        assert state['pending']==['2-1']
         before_physical=m.read_u32(chain[-1]+0x10+40)
         result=apply(m,s,g,j)
         assert m.read_u32(owner+0x68)==1 and m.read_u32(owner+0x70)==2
@@ -37,7 +37,7 @@ def test_actual_queue_layout_and_flag_notification_without_fake_physical_rings(t
 def test_rejects_changed_native_owner_and_overflow(tmp_path,field,value):
     j,m,b,s,g,chain,owner=fixture(tmp_path)
     with j:
-        prepare(m,s,{'red_rings':1},{'game_land_gates':game_land_gates(113)},j)
+        prepare(m,s,{'red_rings':4},{'game_land_gates':game_land_gates(113)},j)
         b.put(owner+field,value.to_bytes(4,'big'))
         with pytest.raises(MemoryUnavailable):apply(m,s,g,j)
         assert not b.writes
@@ -46,18 +46,18 @@ def test_rejects_changed_native_owner_and_overflow(tmp_path,field,value):
 def test_full_queue_and_menu_defer_durably(tmp_path):
     j,m,b,s,g,chain,owner=fixture(tmp_path)
     with j:
-        state=prepare(m,s,{'red_rings':1},{'game_land_gates':game_land_gates(113)},j)
+        state=prepare(m,s,{'red_rings':4},{'game_land_gates':game_land_gates(113)},j)
         b.put(owner+0x68,(5).to_bytes(4,'big'))
         with pytest.raises(MemoryUnavailable,match='full'):apply(m,s,g,j)
         with pytest.raises(MemoryUnavailable,match='deferred'):
             apply(m,replace(s,scene='world_map'),g,j)
-        assert state['pending']==['1-1'] and not b.writes
+        assert state['pending']==['2-1'] and not b.writes
 
 
 def test_uncertain_native_publish_does_not_automatically_duplicate_animation(tmp_path):
     j,m,b,s,g,chain,owner=fixture(tmp_path)
     with j:
-        prepare(m,s,{'red_rings':1},{'game_land_gates':game_land_gates(113)},j)
+        prepare(m,s,{'red_rings':4},{'game_land_gates':game_land_gates(113)},j)
         original_write=b.write_bytes
         def corrupt_count(address,data):
             original_write(address,b'\xff'*4 if address==owner+0x68 else data)
@@ -70,7 +70,7 @@ def test_uncertain_native_publish_does_not_automatically_duplicate_animation(tmp
 def test_inactive_slot_failure_remains_retryable_and_records_actual_error(tmp_path):
     j,m,b,s,g,chain,owner=fixture(tmp_path)
     with j:
-        prepare(m,s,{'red_rings':1},{'game_land_gates':game_land_gates(113)},j)
+        prepare(m,s,{'red_rings':4},{'game_land_gates':game_land_gates(113)},j)
         b.corrupt=True
         with pytest.raises(MemoryUnavailable):apply(m,s,g,j)
         state=j.data['game_land_notice']
@@ -84,7 +84,7 @@ def test_inactive_slot_failure_remains_retryable_and_records_actual_error(tmp_pa
 def test_legacy_cosmetic_uncertainty_recovers_once_only_when_inactive(tmp_path):
     j,m,b,s,g,chain,owner=fixture(tmp_path)
     with j:
-        state=prepare(m,s,{'red_rings':1},{'game_land_gates':game_land_gates(113)},j)
+        state=prepare(m,s,{'red_rings':4},{'game_land_gates':game_land_gates(113)},j)
         state['state']='uncertain'
         apply(m,s,g,j)
         assert state['legacy_retry_used'] and state['state']=='idle'

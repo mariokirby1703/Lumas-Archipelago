@@ -47,7 +47,9 @@ def test_shared_guard_installs_all_real_controls_once_and_rejects_wrong_disc():
     from ..client.player_switch import HOOK as ASSIST
     from ..client.stunts import HOOK as STUNTS
     expected={CAPSULE,PROGRESSION,MEDAL,MAP,TRANSITION,UPDATE_HOOK}|{a for name,(a,_) in HOOKS.items() if name!='boost'}
-    expected|={ASSIST,STUNTS}
+    from ..client.drill_turbo import HOOK as DRILL
+    from ..client.hover_ring_dash import HOOK as HOVER
+    expected|={ASSIST,STUNTS,DRILL,HOVER}
     from ..client.map_ring_display import HOOK as RINGS
     expected.add(RINGS)
     wrong={**memory,0x80000000:0}
@@ -55,3 +57,13 @@ def test_shared_guard_installs_all_real_controls_once_and_rejects_wrong_disc():
     assert set(run(memory))==expected
     assert run(memory)==[]
     assert HOOKS['boost'][0] not in expected
+
+
+def test_combined_export_contains_each_progressive_wisp_gate():
+    from ..client.movement_gecko import movement_ini,pairs as movement_pairs,CAPACITY_BYTES
+    from ..client.drill_turbo import HOOK as DRILL
+    from ..client.hover_ring_dash import HOOK as HOVER
+    table=movement_pairs(movement_ini())
+    assert len(table)*8<=CAPACITY_BYTES
+    for hook in (DRILL,HOVER):
+        assert sum(first==0xC2000000|(hook-0x80000000) for first,_ in table)==1

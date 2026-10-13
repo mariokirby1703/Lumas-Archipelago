@@ -9,7 +9,10 @@ from .memory import MemoryUnavailable
 
 
 def witnessed(journal):
-    epoch = journal.data.get('bootstrap', {}).get('epoch')
+    binding=journal.data.get('native_binding') or {}
+    epoch = journal.data.get('bootstrap', {}).get('epoch') or binding.get('bootstrap_epoch')
+    recovered=(journal.data.get('binding_recovery')=='exact native witness from prior slot-data digest'
+               and journal.data.get('save_identity')==binding.get('id') and epoch is not None)
     # Only epochs explicitly recorded by this authenticated seed's journal.
     # A fresh New Game changes native playthrough identity, not earned AP pickups.
     epochs={epoch} if epoch is not None else set()
@@ -20,7 +23,11 @@ def witnessed(journal):
     if not epochs:
         return masks
     for event in journal.data.get('pickup_events', ()):
-        if event.get('kind') != 'red_ring' or event.get('playthrough_epoch') not in epochs:
+        event_epoch=event.get('playthrough_epoch')
+        # The initial recovery build recorded witnessed pickups without the
+        # restored bootstrap epoch. Only that exact bound recovery can repair them.
+        if event_epoch is None and recovered:event_epoch=epoch
+        if event.get('kind') != 'red_ring' or event_epoch not in epochs:
             continue
         mission, ring = event.get('mission'), event.get('ring')
         stage = BY_MISSION.get(mission, {})

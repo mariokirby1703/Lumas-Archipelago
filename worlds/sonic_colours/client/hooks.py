@@ -310,7 +310,7 @@ class NativeHooks:
                 for stage in STAGES:
                     if stage['zone_index'] == 6:
                         bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))
-                        values[bit] = full_access
+                        values[bit] = full_access and stage['mission_id'] in available_story_stages(6,clears,0)
             values[20 + zone] = granted
         # All 21 gates use the generated AP thresholds, independently from
         # physical collectibles (8016CB5C table).

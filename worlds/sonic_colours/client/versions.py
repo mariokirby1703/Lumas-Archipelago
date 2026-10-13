@@ -37,6 +37,8 @@ def verify_revision(memory):
         data = normalize_stunts(memory,data,section['address'])
         from .hover_ring_dash import normalize as normalize_hover_dash
         data = normalize_hover_dash(memory,data,section['address'])
+        from .quick_step import normalize as normalize_quick
+        data = normalize_quick(memory,data,section['address'])
         from .drill_turbo import normalize as normalize_drill
         data = normalize_drill(memory,data,section['address'])
         from .skydiving import normalize as normalize_skydiving
@@ -59,12 +61,14 @@ def verify_revision(memory):
 
         # Optional Dolphin-Gecko movement test group, independently verified
         # before normalizing its single patched instruction for the PAL hash.
-        from .movement_gate import HOOK as MOVE_HOOK, ORIGINAL as MOVE_ORIGINAL, installed_data as move_data
-        if section['address'] <= MOVE_HOOK < section['address'] + section['size']:
-            off = MOVE_HOOK - section['address']
-            word = int.from_bytes(data[off:off+4], 'big')
-            if word != MOVE_ORIGINAL and move_data(memory, transport='gecko') is not None:
-                data = data[:off] + MOVE_ORIGINAL.to_bytes(4,'big') + data[off+4:]
+        from .movement_gate import HOOK as MOVE_HOOK, ORIGINAL as MOVE_ORIGINAL, LEGACY_HOOK, LEGACY_ORIGINAL, installed_data as move_data, _legacy_gecko_install
+        for move_hook,move_original in ((MOVE_HOOK,MOVE_ORIGINAL),(LEGACY_HOOK,LEGACY_ORIGINAL)):
+            if section['address']<=move_hook<section['address']+section['size']:
+                off=move_hook-section['address']
+                word=int.from_bytes(data[off:off+4],'big')
+                if word!=move_original:
+                    verified=(_legacy_gecko_install(memory) if move_hook==LEGACY_HOOK else move_data(memory,transport='gecko'))
+                    if verified is not None:data=data[:off]+move_original.to_bytes(4,'big')+data[off+4:]
         from .capsule_refresh import HOOK, ORIGINAL, installed
         if section['address'] <= HOOK < section['address'] + section['size']:
             offset = HOOK - section['address']

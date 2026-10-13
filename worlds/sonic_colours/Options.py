@@ -63,7 +63,7 @@ class MusicRandomization(DefaultOnToggle):
 
 
 class WorldProgression(Choice):
-    """Sequential unlocks the next Act after clearing the previous one; Open Acts allows all six Acts and opens the boss only after all six are cleared."""
+    """Sequential unlocks the next Act after clearing the previous one; Open Acts allows all six Acts and opens the boss only after all six are cleared. Terminal Velocity always follows Act 1, Final Boss, Act 2."""
     display_name = 'World Progression'
     option_sequential = 0
     option_open_acts = 1
@@ -71,7 +71,7 @@ class WorldProgression(Choice):
 
 
 class GameLandChecks(DefaultOnToggle):
-    """Add a Clear check for each of the 21 Game Land stages. All 21 stages require AP Red Ring items."""
+    """Add a Clear check for each of the 21 Game Land stages. Game Land 1-1 is always available; the other 20 stages require AP Red Ring items."""
     display_name = 'Game Land Checks'
 
 
@@ -86,7 +86,7 @@ class WispDiscoveryChecks(Toggle):
 
 
 class GameLandRequirementReduction(Range):
-    """All 21 Game Land stages use one evenly spaced AP Red Ring requirement sequence: all Stage 1 gates, then Stage 2, then Stage 3. First gate requires 1. Step is max(1, floor((179 - reduction) / 20)). Reduction 113 gives 1, 4, 7 ... 61; default 40 gives 1, 7, 13 ... 121."""
+    """All 21 Game Land stages use one evenly spaced AP Red Ring requirement sequence: all Stage 1 gates, then Stage 2, then Stage 3. 1-1 is always available; other gates retain their evenly spaced requirements. Step is max(1, floor((179 - reduction) / 20)). Reduction 113 gives 0, 4, 7 ... 61; default 40 gives 0, 7, 13 ... 121."""
     display_name = 'Game Land Requirement Reduction'
     range_start = 0
     range_end = 179

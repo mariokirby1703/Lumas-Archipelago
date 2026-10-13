@@ -2,8 +2,8 @@
 
 800B033C constructs a 0x38-byte ability controller; controller+0x40 is an
 unrelated allocation. Resolve the request machine through player+70 -> +8,
-with original 80032C9C's vtable and owner at +28. The hook at 8003388C
-cancels denied requests before callbacks by retaining the native predecessor.
+with original 80032C9C's vtable and owner at +28. The common dispatcher at
+800395B0 gates normal and forced requests before any exit/entry callbacks.
 Underwater request 8 uses Swim instead of Double Jump; live validation required.
 """
 from .capsule_refresh import PPC
@@ -15,14 +15,15 @@ from .memory import MemoryUnavailable, valid_range
 _STABLE_ARM_EPOCH = {}
 _STAGE_ARM_OBSERVATIONS = {}  # (stage_epoch, actor, ctrl) -> stable samples
 
-HOOK = 0x8003388C
-ORIGINAL = 0x80030020                 # lwz r0,0x20(r3) at early request dispatch
+LEGACY_HOOK, LEGACY_ORIGINAL = 0x8003388C, 0x80030020
+HOOK = 0x800395B0
+ORIGINAL = 0x9421FF40  # stwu r1,-0xC0(r1), common transition dispatcher
 CONTROLLER_VTABLE = 0x8075FA3C
 STATE_MACHINE_VTABLE = 0x8075A0F8
 PLAYER_VTABLE = 0x8075AEF8
 # Permission bit 1 = owned/unlocked. State 43 is crouch (first copy),
 # state 41 is Slide (second copy). 9 = Jump Dash (user's Mid-Air Boost).
-STATE_PERMISSION = {82:13,110:12,48:11,29: 9, 30: 10, 38: 7, 8: 0, 9: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
+STATE_PERMISSION = {82:13,110:12,29: 9, 30: 10, 38: 7, 8: 0, 9: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
 CAPABILITY_NAMES = ('Double Jump', 'Mid-Air Boost', 'Homing Attack',
                     'Wall Jump', 'Slide', 'Crouch', 'Stomp', 'Drifting', 'Swim', 'Rail Jump', 'Rail Switch', 'Quick Step', 'Fast Dive', 'Spikes Spin Dash')
 DATA_WORDS = 2                 # C2 control + native telemetry; read-only table follows
@@ -61,7 +62,7 @@ def payload(gecko=False):
     a = PPC()
     a.d(37, 1, 1, -0x80)       # stwu r1,-64(r1)
     a.d(47, 9, 1, 8)
-    a.emit(ORIGINAL)  # capture native predecessor before scratch work
+    a.d(14,31,3,-0x14)  # common queue receiver -> canonical machine
     # Native 80033890 immediately replaces CR0 with cmpw. All gate
     # comparisons affect only CR0; CR1..7 are untouched. Saved r29 holds LR.
     a.emit(0x7FA802A6)        # mflr r29, restored by lmw at exit
@@ -88,32 +89,24 @@ def payload(gecko=False):
     a.d(11, 0, 10, 0); a.branch('allow', 0x41820000)
     a.d(32, 10, 10, 8)
     a.emit(0x7C0AF800); a.branch('allow', 0x40820000)
-    # Do NOT infer a native request from controller+0x5C/+0x60: those
-    # exploratory fields turn into pointer-sized data in Act2/Game Land.
-    # The canonical request is loaded from r31+0x20 below, as the displaced
-    # original PAL instruction shows. This keeps invalid IDs fail-open.
-    # Native original at 0x8003388C reads r3+0x20, not the host's
-    # guessed controller-state offsets. A valid predecessor is [0,127].
-    # -1 and any pointer/float garbage fail open before cancellation.
-    a.d(10, 0, 0, 127)       # cmplwi r0,127
-    a.branch('allow', 0x41810000)
+    # Both 80033878 and forced/repeated 800338E8 reach this call before
+    # exit/entry callbacks. Pending -1 is legitimate and never permits bypass.
     # Compact state->permission lookup. Thirteen state entries, padded
     # to a word boundary. Zero denotes an unrestricted native state.
     # Unlike a long chain of comparisons this also restores the Game Land
     # speed-UI C2 in the tightly constrained Gecko codehandler allocation.
     a.d(11,0,4,82);a.branch('spikes_permission',0x41820000)
     a.d(11,0,4,110);a.branch('fast_permission',0x41820000)
-    a.d(11,0,4,48);a.branch('quick_permission',0x41820000)
     a.label('rail_lookup')
     # Two independent wide permissions: GrindJumpShort 29, GrindJumpSide 30.
     a.d(14,9,4,-29)
     a.d(10,0,9,1);a.branch('table_lookup',0x41810000)
     a.emit(21<<26 | 9<<21 | 9<<16 | 9<<11 | 22<<6 | 31<<1)  # slwi r9,r9,9
     a.d(14,9,9,512)
-    # Held actions 2/3, native input getter 80056CA0: +48 bit 2/3.
+    # Held actions 2/3, native getter 80056CA0: type 2 -> +4C, bit 2/3.
     # Adding Switch to an explicit Switch request is idempotent; adding it
     # to a directional Jump requires BOTH permissions, not either one.
-    a.d(32,10,11,0x88);a.d(32,10,10,0x48)
+    a.d(32,10,11,0x88);a.d(32,10,10,0x4c)
     a.d(28,10,10,0xc);a.branch('permission',0x41820000)
     a.d(24,9,9,1024)
     a.branch('permission')
@@ -127,8 +120,6 @@ def payload(gecko=False):
     table_fix = len(a.words)
     a.d(14, 10, 12, 0)
     a.emit(31<<26 | 9<<21 | 10<<16 | 9<<11 | 87<<1)  # lbzx r9,r10,r9
-    a.d(11, 0, 9, 0)
-    a.branch('allow', 0x41820000)
     # Resolve the water bit at request time, never from a stale host poll.
     # r11 still holds the exact authenticated player owner above.
     a.d(11, 0, 4, 8); a.branch('permission', 0x40820000)
@@ -139,7 +130,6 @@ def payload(gecko=False):
     a.d(14, 9, 0, 256)       # Swim permission, independent of Double Jump
     a.branch('permission')
     a.label('spikes_permission');a.d(14,9,0,8192);a.branch('permission')
-    a.label('quick_permission');a.d(14,9,0,2048);a.branch('permission')
     a.label('fast_permission');a.d(14,9,0,4096)
     a.label('permission')
     a.d(32, 10, 12, 4)         # permissions bitmask
@@ -152,20 +142,18 @@ def payload(gecko=False):
         a.d(14, 1, 1, 0x80)
     a.label('deny')
     deny_index = len(a.words)
-    # EARLY CANCELLATION: convert target to exactly previous request.
-    # The vanilla compare at 0x80033890 sees equality and returns without
-    # invoking transition callbacks. Never write current or requested fields.
-    # Drift/Sliding have native exits requesting state 3 (801505C0,
-    # 80159A70). Retaining an already forbidden predecessor is ineffective.
-    # Route denied attempts through that same native transition/cleanup.
-    # r9 retains the lookup permission byte: only Drift/Slide use 0x90.
-    a.d(28, 9, 9, 0x890)  # native Run exit also ends QuickStep (80194070)
-    a.d(14, 4, 0, 3)
-    a.branch('allow',0x40820000)
-    a.d(32, 4, 31, 0x20)          # other gates retain native predecessor
+    # Drift/Slide/QuickStep use native Run cleanup; other denied requests
+    # return before the common queue creates any exit/entry side effects.
+    a.d(28,9,9,0x890)
+    a.d(14,4,0,3)
+    a.branch('restore',0x41820000)
     a.label('allow')
+    a.emit(0x4C421182)  # crclr cr0eq: approved -> native prologue
+    a.label('restore')
     restore()
-    a.branch('return')        # over data cells
+    a.emit(0x4D820020)  # beqlr: denied request, caller's frame untouched
+    a.emit(ORIGINAL)
+    a.branch('return')
     data_offset = len(a.words)*4
     a.emit(0)                 # controller address, armed LAST
     a.emit(0)                 # independent movement permission mask
@@ -229,13 +217,32 @@ def _direct_install(memory):
 
 
 def _gecko_install(memory):
+    from .gecko import inspect_c2
+    words,_,off=payload(gecko=True)
+    try:
+        info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_common_dispatch':words},((off,8),),label='movement common dispatch')
+    except MemoryUnavailable:
+        from ..world_constants import load_data
+        previous=load_data('movement_before_quick_predicate.json')
+        info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_before_quick_predicate':previous['words']},((previous['offset'],8),),label='previous movement dispatcher')
+        memory.movement_legacy_profile=True
+        return info['target']+previous['offset'],'Dolphin Gecko C2'
+    if not info['installed']:return _legacy_gecko_install(memory)
+    memory.movement_legacy_profile=False
+    return info['target']+off,'Dolphin Gecko C2'
+
+
+
+def _legacy_gecko_install(memory):
     """Accept ONLY the exact Dolphin C2 payload with authenticated mutable words."""
     from .gecko import inspect_c2
-    words, _, off = payload(gecko=True)
+    from ..world_constants import load_data
+    previous=load_data('movement_before_common_dispatch.json')
+    words,off=previous['words'],previous['offset']
     try:
-        info = inspect_c2(memory, HOOK, ORIGINAL, {'movement_request_gate_v11_owned_machine':words},
+        info = inspect_c2(memory, LEGACY_HOOK, LEGACY_ORIGINAL, {'movement_request_gate_v11_owned_machine':words},
                           ((off, DATA_WORDS*4),), label='movement transition')
-        memory.movement_legacy_profile = False
+        memory.movement_legacy_profile = True
     except MemoryUnavailable:
         from ..world_constants import load_data
         previous=load_data('movement_v11_before_spikes_dash.json')
@@ -320,7 +327,7 @@ def _gecko_install(memory):
             pass
         previous = load_data('movement_v11_dry_previous.json')
         try:
-            info = inspect_c2(memory, HOOK, ORIGINAL, {'movement_v11_dry':previous['words']},
+            info = inspect_c2(memory, LEGACY_HOOK, LEGACY_ORIGINAL, {'movement_v11_dry':previous['words']},
                               ((previous['offset'], 20),), label='dry-only movement transition')
             memory.movement_legacy_profile = True
             return info['target']+previous['offset'], 'Dolphin Gecko C2 (update required)'
@@ -328,12 +335,12 @@ def _gecko_install(memory):
             pass
         previous = load_data('movement_v11_previous.json'); off = previous['offset']
         try:
-            info = inspect_c2(memory, HOOK, ORIGINAL, {'movement_request_gate_v11_owned_machine':previous['words']},
+            info = inspect_c2(memory, LEGACY_HOOK, LEGACY_ORIGINAL, {'movement_request_gate_v11_owned_machine':previous['words']},
                               ((off, 20),), label='previous movement transition')
             memory.movement_legacy_profile = True
         except MemoryUnavailable:
             previous = load_data('movement_v10_previous.json'); off = previous['offset']
-            info = inspect_c2(memory, HOOK, ORIGINAL, {'movement_v10_legacy':previous['words']},
+            info = inspect_c2(memory, LEGACY_HOOK, LEGACY_ORIGINAL, {'movement_v10_legacy':previous['words']},
                               ((off, previous['data_words']*4),), label='legacy movement transition')
             memory.movement_legacy_profile = True
     if not info['installed']:
@@ -472,7 +479,7 @@ def configure(memory, snapshot, owned, transport=None):
             'transient_minus_one_grace_active': transient_grace,
             'controller_arm_reason':controller_reason,
             'stage_controller_consecutive_samples': _STAGE_ARM_OBSERVATIONS.get(data, (None,0))[1],
-            'native_request_source': 'original PAL r3+0x20; reject predecessor outside 0..127',
+            'native_request_source': 'common PAL queue r3-0x14; normal and forced requests gated before callbacks',
             'same_stage_authorization_retained':bool(prior_epoch and ctrl and prior_epoch == (stage_epoch, player, ctrl)),
             'host_controller_state_fields_reliable': bool(player is not None and stage.get('player',{}).get('movement',{}).get('state_fields_plausible')),
             'swim_gate_verified': False, 'breath_gate_verified': False,

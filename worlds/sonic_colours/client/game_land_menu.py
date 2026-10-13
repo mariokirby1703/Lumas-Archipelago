@@ -1,4 +1,4 @@
-"""PAL menu counts all 21 availability flags and tints unavailable Act nodes.
+"""PAL menu counts all 21 availability flags; native clears retain their tint.
 
 Stage columns are a contiguous prefix, matching the generated linear gates
 and legacy vanilla thresholds. No clears, scores, ranks or medals are written.
@@ -24,14 +24,17 @@ def normalize(memory,data,base):
                 raise MemoryUnavailable(f'unknown_revision: Game Land menu at {address:#x}')
             observed.append(word==patched)
             data=data[:offset]+original.to_bytes(4,'big')+data[offset+4:]
-    if observed and any(observed) and not all(observed) and observed not in ([True]*4+[False]*2,[True]*5+[False]):
+    if observed and any(observed) and not all(observed) and observed not in ([True]*4+[False]*2,[True]*5+[False],[True]*3+[False,True,False]):
         raise MemoryUnavailable('unknown_revision: partially installed Game Land menu patches')
     return data
 
 
 def gecko_lines():
-    # The selection view remains transparent. The secondary records view
+    # Restore the native clear query: availability must not imply completion.
+    # The client recolours available uncleared selection labels after the
+    # native tint pass initializes their colour storage. Locked labels stay
+    # transparent. The secondary records view
     # retains its original grey tint; it cannot launch a locked Act. Retain
     # recognition of the earlier transparent records patch above.
-    return [f'04{address-0x80000000:06X} {patched:08X}' for address,(_,patched) in PATCHES.items()
+    return [f'04{address-0x80000000:06X} {(original if address==0x802F0D98 else patched):08X}' for address,(original,patched) in PATCHES.items()
             if address!=0x802F0E00]

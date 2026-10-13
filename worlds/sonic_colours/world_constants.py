@@ -39,7 +39,7 @@ def game_land_gates(reduction):
     # One integer step across all 21 gates; never flatten early thresholds.
     # The highest requirement stays below the remaining 180-ring budget.
     step = max(1, (180 - reduction - 1) // 20)
-    return {f'{world}-{act}': 1 + ((act-1)*7 + world-1)*step
+    return {f'{world}-{act}': 0 if (world,act)==(1,1) else 1 + ((act-1)*7 + world-1)*step
             for act in (1,2,3) for world in range(1,8)}
 
 

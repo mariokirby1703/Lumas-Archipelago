@@ -92,6 +92,8 @@ def execute_pickup(b, actor, target=0x80002000):
             for r in range(rt,32):
                 if op==47:b.write_bytes(addr+(r-rt)*4,regs[r].to_bytes(4,'big'))
                 else:regs[r]=int.from_bytes(b.read_bytes(addr+(r-rt)*4,4),'big')
+        elif op==27:regs[ra]=regs[rt]^(u<<16)
+        elif op==10:cmp=(regs[ra]>u)-(regs[ra]<u)
         elif op==11:cmp=(regs[ra]>imm)-(regs[ra]<imm)
         elif op==16:
             if {0x41820000:cmp==0,0x40820000:cmp!=0}[w&0xffff0000]:pc=pc-1+imm//4

@@ -36,6 +36,7 @@ def prepare(memory,snapshot,owned,slot,journal):
         journal.data['game_land_notice']=state
     new=[]
     for key,needed in slot['game_land_gates'].items():
+        if needed==0:continue  # starter stage needs no unlock notification
         world,act=map(int,key.split('-'));bit=210+(world-1)*3+act-1
         if (owned['red_rings']>=needed and key not in state['announced'] and key not in state['pending']
                 and not memory.read_u32(flags+0x10+bit//32*4)&(1<<(bit%32))):new.append(key)

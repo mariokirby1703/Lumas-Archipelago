@@ -26,7 +26,11 @@ def movement_ini():
     # Insert in existing guarded scope BEFORE its final E0; no extra group.
     final_close = cleaned.index('E0000000 80008000', cleaned.index('$AP PAL Eggman Heart pickup capture'))
     from .skydiving import gecko_lines as skydiving_lines
-    cleaned[final_close:final_close] = gecko_lines()+skydiving_lines()
+    from .quick_step import gecko_lines as quick_lines
+    cleaned[final_close:final_close] = gecko_lines()+skydiving_lines()+quick_lines()
+    # These PAL-only null/UI fixes are covered by the outer disc guard.
+    for guard in ('2026C938 806407EC','2026CA18 80C407EC','202697A8 40820198'):
+        cleaned.remove(guard)
     # SNCP uniquely identifies the PAL game. Full SNCP8P/revision/text checks
     # remain mandatory in the client; retain the first one-time install guard.
     cleaned.remove('28000004 00003850')

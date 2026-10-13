@@ -28,7 +28,7 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_
     # Only volatile CR0 is changed. Boost-use/speed-UI overwrite it before
     # branching; the query/get/set hooks finish their native functions, whose
     # PPC call ABI does not preserve CR0. CR2..4 remain untouched.
-    preserve_cr = not (short and (kind in ('boost_use','speed_ui') or volatile_return and kind in ('boost_query','speed_get','speed_set')))
+    preserve_cr = not (short and (kind in ('boost_use','speed_ui') or volatile_return and kind in ('boost_query','boost_add','speed_get','speed_set')))
     output = 3 if kind in ('boost', 'speed_get') else 0 if kind == 'speed_ui' else None
     frame = 0xa0 if compact else 0x40
     saved = (3, 4, 6, 7, 12)

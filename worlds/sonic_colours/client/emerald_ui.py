@@ -14,14 +14,14 @@ _PENDING_REFRESH = set()
 _COMPLETED_REFRESH = set()
 
 
-def targets(memory):
+def targets(memory, stages=False):
     rows=read_stage_objects(memory,include_pickups=False)
     if len(rows)!=1 or rows[0].get('scene')!='game_land_select':return {}
     context=rows[0]['context']
     actors=[a for a in read_actors(memory,context) if memory.read_u32(a)==ACTOR_VTABLE]
     if len(actors)!=1:raise MemoryUnavailable('Emerald UI owner unavailable')
     actor=actors[0];result={}
-    for offset in (0x84,0x94):
+    for offset in ((0x84,) if stages else (0x84,0x94)):
         ref=memory.read_ptr_checked(actor+offset+4,4)
         layer=memory.read_ptr_checked(ref,0xe0)
         layout=memory.read_ptr_checked(layer+0xc,0x34)
@@ -32,12 +32,46 @@ def targets(memory):
             entry=table+i*12
             nameptr=memory.read_ptr_checked(entry,16)
             name=memory.read_bytes(nameptr,16).split(b'\0')[0]
-            for index,colour in enumerate(UI_COLOURS):
-                if name in (f'em_img_{index}'.encode(),f'em_bli_{index}'.encode()):
-                    key=(memory.read_u32(entry+4),memory.read_u32(entry+8))
-                    if key in wanted:raise MemoryUnavailable('Duplicate Emerald pane')
-                    wanted[key]=colour
-        if len(wanted)!=14:raise MemoryUnavailable('Emerald UI named panes missing')
+            if stages:
+                if len(name)!=7 or not name.startswith(b'act_') or name[5:6]!=b'_':continue
+                zone=name[4]-48;act=name[6]-48
+                if not (0<=zone<7 and 0<=act<3):continue
+                key=(memory.read_u32(entry+4),memory.read_u32(entry+8))
+                if key in wanted:raise MemoryUnavailable('Duplicate Game Land stage pane')
+                wanted[key]=zone*3+act
+            else:
+                for index,colour in enumerate(UI_COLOURS):
+                    if name in (f'em_img_{index}'.encode(),f'em_bli_{index}'.encode()):
+                        key=(memory.read_u32(entry+4),memory.read_u32(entry+8))
+                        if key in wanted:raise MemoryUnavailable('Duplicate Emerald pane')
+                        wanted[key]=colour
+        if len(wanted)!=(21 if stages else 14):raise MemoryUnavailable('Game Land UI named panes missing')
+        if stages:
+            # 805E4AC0 resolves the already allocated native pane directly;
+            # available/cleared labels need not have lazy wrapper-cache entries.
+            flags=memory.resolve_flags_ptr(allow_working=True)[-1]
+            graph=memory.read_ptr_checked(layer+0x8c,0x10)
+            groups=memory.read_ptr_checked(memory.read_ptr_checked(graph+0xc,8)+4,16)
+            for (group,index),stage in wanted.items():
+                if memory.read_progress_bit(flags,252+stage):continue  # vanilla completed-label styling
+                if not 0<=group<512 or not 0<=index<512:raise MemoryUnavailable('Invalid Game Land pane index')
+                array=memory.read_ptr_checked(groups+group*16+4,(index+1)*0x144)
+                pane=array+index*0x144
+                if not memory.read_u32(pane+0x74)&0x80:
+                    raise MemoryUnavailable('Game Land stage colour not initialized; reload menu with current Gecko profile')
+                data=memory.read_ptr_checked(pane+0x78,0x20)
+                result[data+0x1c]=('stage_colour',stage)
+                ancestors=set()
+                while True:
+                    if pane in ancestors or len(ancestors)>=64:raise MemoryUnavailable('Game Land pane parent cycle')
+                    ancestors.add(pane)
+                    result[pane+0x7c]=('dirty_colour' if len(ancestors)==1 else 'dirty',None)
+                    if not memory.read_u32(pane+0x80):break
+                    pane=memory.read_ptr_checked(pane+0x80,0x88)
+                root=memory.read_ptr_checked(pane+0x84,0x10)
+                owner=memory.read_ptr_checked(root+0xc,0x3c)
+                result[root+8]=('zero',None);result[owner+8]=('zero',None);result[owner+0x38]=('one',None)
+            continue
         todo=[memory.read_u32(layer+0xd8)];seen=set();found=set()
         while todo:
             node=todo.pop()
@@ -54,7 +88,7 @@ def targets(memory):
             pane=memory.read_ptr_checked(component+0xc,0x88)
             if not memory.read_u32(pane+0x74)&0x80:raise MemoryUnavailable('Emerald colour not initialized')
             data=memory.read_ptr_checked(pane+0x78,0x20)
-            colour=wanted[key];result[data+0x1c]=('colour',colour)
+            colour=wanted[key];result[data+0x1c]=('stage_colour' if stages else 'colour',colour)
             result[pane+0x7c]=('dirty_colour',None)
             ancestors=set()
             while True:

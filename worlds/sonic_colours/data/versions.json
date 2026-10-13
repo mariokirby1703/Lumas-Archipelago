@@ -60,7 +60,9 @@
     "assist_change": true,
     "drill_turbo": true,
     "hover_ring_dash": true,
+    "quick_step": true,
     "emerald_ui": true,
+    "game_land_ui": true,
       "stunts": true,
       "skydiving": true
   }

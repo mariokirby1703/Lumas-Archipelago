@@ -5,6 +5,8 @@ the selected native slot, profile and exact previously witnessed intro records.
 No guest padding, NAND file or unrelated save is modified to make a marker.
 """
 from dataclasses import replace
+import json
+from copy import deepcopy
 
 
 INTRO = ('stg110', 'stg130')
@@ -25,6 +27,45 @@ class SaveBinding:
         self.last_attributed_mission = None
         self.replay_result = None
 
+    def recover_prior_binding(self, snapshot, saved):
+        """Recover an exact native witness after client slot-data normalization changes."""
+        if self.journal.data.get('native_binding') or not snapshot.progress_verified:
+            return
+        path=getattr(self.journal,'path',None)
+        if path is None:return
+        identity=self.journal.identity
+        matches=[]
+        for candidate in path.parent.glob('*.json'):
+            if candidate==path:continue
+            try:
+                old=json.loads(candidate.read_text(encoding='utf-8'))
+                other=old.get('identity',{})
+                if any(other.get(k)!=identity.get(k) for k in ('seed','team','slot','revision','game')):continue
+                binding=old.get('native_binding')
+                if not binding or old.get('save_identity')!=binding['id']:continue
+                if (binding['profile_hex']!=saved['profile_hex']
+                    or binding['selected_index']!=saved['chain'][2]
+                    or anchors(saved) not in binding['intro_record_witnesses']
+                    or not set(old.get('native_monotonic_clears',[]))<=snapshot.persisted_clears):continue
+                matches.append(old)
+            except (OSError,ValueError,KeyError,TypeError):continue
+        if len({old['native_binding']['id'] for old in matches})!=1:return
+        old=matches[0]
+        if old.get('bootstrap'):
+            self.journal.data['bootstrap']=deepcopy(old['bootstrap'])
+        self.journal.data['native_binding']=deepcopy(old['native_binding'])
+        self.journal.data['save_identity']=old['save_identity']
+        self.journal.data['native_monotonic_clears']=old.get('native_monotonic_clears',[])
+        self.journal.data['binding_recovery']='exact native witness from prior slot-data digest'
+        # Previously delivered effects must not become eligible a second time.
+        for index,effect in old.get('effects',{}).items():
+            i=int(index)
+            receipts=self.journal.data.get('receipts',[])
+            previous=old.get('receipts',[])
+            if i<len(receipts) and i<len(previous) and receipts[i]==previous[i]:
+                self.journal.data.setdefault('effects',{}).setdefault(index,deepcopy(effect))
+        self.journal.save()
+
     def observe_intro(self, snapshot):
         # This is valid even while the native save index is unavailable. Never
         # infer or create a persistent save ID from the heap or a menu label.
@@ -42,6 +83,8 @@ class SaveBinding:
         binding = self.journal.data.get('native_binding')
         if not saved or not snapshot.progress_verified:
             return snapshot
+        self.recover_prior_binding(snapshot,saved)
+        binding = self.journal.data.get('native_binding')
         current = anchors(saved)
         profile, index = saved['profile_hex'], saved['chain'][2]
         if binding:

@@ -14,7 +14,7 @@ HOOK, ORIGINAL = 0x802F27C4, 0x7F83E378  # mr r3,r28; next calls hide and remove
 VTABLE = 0x8077E714
 
 
-def payload(compact=True):
+def payload(compact=True, lean=True):
     a = PPC()
     # Next instruction calls 80072B18 with only r3; volatile registers,
     # CR0 and LR are dead here. Enclosing epilogue restores its saved LR.
@@ -26,25 +26,38 @@ def payload(compact=True):
     registers = (3, 4, 5, 6, 7, 12)
     if not compact: a.d(47, 3, 1, 20)
     a.emit(0x48000005); base = len(a.words)*4
-    a.emit(0x7D8802A6); fix = len(a.words); a.d(14, 12, 12, 0)
+    a.emit(0x7D8802A6); fix = len(a.words)
+    if not (compact and lean):a.d(14,12,12,0)
     def equal(ra, rb):
         a.emit(0x7C000000 | ra << 16 | rb << 11); a.branch('end', 0x40820000)
     a.d(32, 6, 12, 0); a.d(11, 0, 6, 0); a.branch('end', 0x41820000)
     a.d(34, 6, 6, 0); a.d(32, 7, 12, 4); equal(6, 7)
     # Authenticate the currently picked actor, not a host-observed actor pointer.
     a.d(32, 5, 12, 8); a.d(11, 0, 5, 0); a.branch('end', 0x41820000)
-    a.d(32, 6, 5, 0); a.d(15, 7, 0, 0x8076); a.d(14, 7, 7, -0x6bc8); equal(6, 7)
+    a.d(32, 6, 5, 0)
+    if compact and lean:
+        a.d(27,6,6,32885);a.d(10,0,6,37944);a.branch('end',0x40820000)
+    else:
+        a.d(15, 7, 0, 0x8076); a.d(14, 7, 7, -0x6bc8); equal(6, 7)
     a.d(32, 6, 5, 0x18); a.d(32, 7, 12, 20); equal(6, 7)
     a.d(32, 5, 5, 0x4c)
     for field, offset in ((0, 48), (4, 52)):
         a.d(32, 6, 5, field); a.d(32, 7, 12, offset); equal(6, 7)
-    a.d(32, 6, 28, 0); a.d(15, 7, 0, 0x8078); a.d(14, 7, 7, -0x18ec); equal(6, 7)
+    a.d(32, 6, 28, 0)
+    if compact and lean:
+        a.d(27,6,6,32887);a.d(10,0,6,59156);a.branch('end',0x40820000)
+    else:
+        a.d(15, 7, 0, 0x8078); a.d(14, 7, 7, -0x18ec); equal(6, 7)
     a.d(32, 6, 28, 0x34); a.d(32, 7, 12, 20); equal(6, 7)
     a.d(32, 5, 28, 0x64)
     a.d(32, 6, 5, 4); equal(6, 28)
     a.d(32, 4, 5, 8)
     a.d(32, 3, 5, 12)
-    a.d(32, 6, 3, 0); a.d(15, 7, 0, 0x8077); a.d(14, 7, 7, 0x0fa0); equal(6, 7)
+    a.d(32, 6, 3, 0)
+    if compact and lean:
+        a.d(27,6,6,32887);a.d(10,0,6,4000);a.branch('end',0x40820000)
+    else:
+        a.d(15, 7, 0, 0x8077); a.d(14, 7, 7, 0x0fa0); equal(6, 7)
     a.d(32, 6, 3, 0x10); equal(6, 4)
     a.d(32, 6, 3, 0x1c); equal(6, 5)
     a.d(32, 6, 3, 0x14); a.d(32, 7, 12, 16); equal(6, 7)
@@ -65,7 +78,12 @@ def payload(compact=True):
         a.d(32, 0, 1, 16); a.d(14, 1, 1, 0xa0)
     a.emit(ORIGINAL)
     a.branch('return')
-    offset = len(a.words)*4; a.words[fix] |= (offset-base)&0xffff
+    offset = len(a.words)*4
+    if compact and lean:
+        for i,w in enumerate(a.words):
+            if w>>26 in (32,36) and (w>>16)&31==12:
+                a.words[i]=(w&0xffff0000)|(((w&0xffff)+offset-base)&0xffff)
+    else:a.words[fix] |= (offset-base)&0xffff
     for _ in range(14): a.emit(0)
     a.label('return')
     if len(a.words)%2 == 0: a.emit(0x60000000)
@@ -78,6 +96,11 @@ def installed_data(memory):
     try:
         result = inspect_c2(memory, HOOK, ORIGINAL, {'egg_medal': words}, ((offset, 56),), 'Eggman Heart')
     except MemoryUnavailable:
+        words,offset=payload(True,False)
+        try:
+            result=inspect_c2(memory,HOOK,ORIGINAL,{'egg_medal_before_lean':words},((offset,56),),'Eggman Heart previous compact')
+            return _validated_data(memory,result,offset)
+        except MemoryUnavailable:pass
         words, offset = payload(False)
         try:
             result = inspect_c2(memory, HOOK, ORIGINAL, {'egg_medal':words}, ((offset,56),), 'Eggman Heart previous ABI')

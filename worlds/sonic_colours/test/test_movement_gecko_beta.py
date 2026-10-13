@@ -26,13 +26,13 @@ def test_both_injected_hook_variants_are_byte_encoded_correctly():
         raw=b''.join(word.to_bytes(4,'big') for word in table)
         assert len(raw)==16
         for state, bit in movement_gate.STATE_PERMISSION.items():
-            if state in (29,30):continue # explicit wide mask, not byte lookup
+            if bit>=8:continue # explicit wide mask, not byte lookup
             index=state-8 if state<14 else state-38+6
             assert raw[index] == 1 << bit
         states=(*range(8,14),*range(38,45))
         assert all(raw[i]==0 for i,state in enumerate(states) if state not in movement_gate.STATE_PERMISSION)
-        assert words[deny]==0x71290090
-        assert 0x809F0020 in words  # lwz r4,0x20(r31) makes denied target match prior request
+        assert words[deny]==0x71290890
+        assert 0x4D820020 in words  # denied queue returns before native callbacks
         assert 0x4E800420 not in words  # never branch via CTR into a post-entry block
         if gecko:
             assert len(words)%2==0

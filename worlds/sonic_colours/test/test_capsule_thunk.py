@@ -42,6 +42,7 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,whit
         op=w>>26;rt=w>>21&31;ra=w>>16&31;u=w&0xffff;imm=u if u<0x8000 else u-0x10000
         if op in (14,15):regs[rt]=((regs[ra] if ra else 0)+(imm<<(16 if op==15 else 0)))&0xffffffff
         elif op==24:regs[ra]=regs[rt]|u
+        elif op==27:regs[ra]=regs[rt]^(u<<16)
         elif op==28:regs[ra]=regs[rt]&u
         elif w==0x5463f87e:regs[3] >>= 1
         elif op in (32,34):regs[rt]=mem.get((regs[ra]+imm)&0xffffffff,0)

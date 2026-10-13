@@ -41,7 +41,7 @@ class PPC:
         return self.words
 
 
-def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False, spawn_refresh=True):
+def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False, spawn_refresh=True, lean=True):
     if epilogue_abi and not compact_abi:
         raise ValueError('epilogue ABI requires the compact native-call profile')
     # 800D4828 overwrites CR0; 800D4850..4860 restores the enclosing LR.
@@ -79,8 +79,12 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
     a.d(32,6,12,0); a.d(11,0,6,0); a.branch('end',0x41820000)
     a.d(34,6,6,0); a.d(32,7,12,4)
     a.emit(0x7C063800); a.branch('end',0x40820000)
-    a.d(32,0,31,0); a.d(15,5,0,0x8076); a.d(14,5,5,0x1534)
-    a.emit(0x7C002800); a.branch('end',0x40820000)
+    a.d(32,0,31,0)
+    if lean and epilogue_abi:
+        a.d(27,0,0,0x8076);a.d(10,0,0,0x1534)
+    else:
+        a.d(15,5,0,0x8076);a.d(14,5,5,0x1534);a.emit(0x7C002800)
+    a.branch('end',0x40820000)
     a.d(34,0,31,0x110); a.d(11,0,0,0); a.branch('end',0x40820000)
     if cache_permissions:
         a.d(14,0,0,-1); a.d(36,0,1,0x74) # coloured sentinel; White writes 0/1 below
@@ -106,8 +110,12 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
     a.label('permission_saved'); a.d(36,3,1,0x74)
     a.label('model')
     a.d(32,3,31,0xb0); a.d(11,0,3,0); a.branch('missing_model' if spawn_refresh else 'end',0x41820000)
-    a.d(32,0,3,0); a.d(15,5,0,0x8078); a.d(14,5,5,-0x2ed4)
-    a.emit(0x7C002800); a.branch('end',0x40820000)  # cmpw r0,r5 model VT
+    a.d(32,0,3,0)
+    if lean and epilogue_abi:
+        a.d(27,0,0,0x8077);a.d(10,0,0,0xd12c)
+    else:
+        a.d(15,5,0,0x8078);a.d(14,5,5,-0x2ed4);a.emit(0x7C002800)
+    a.branch('end',0x40820000)  # cmpw r0,r5 model VT
     a.d(32,0,3,8); a.emit(0x7C00F800); a.branch('end',0x40820000)  # owner == r31
     a.d(32,3,31,0x34); a.d(11,0,3,0); a.branch('end',0x41820000)
     a.d(14,3,3,8); a.d(32,4,2,-0x7c48); call(0x800132D8)
@@ -216,6 +224,10 @@ def gecko_ini(compact_capsule=True):
     lines[-1:-1] = initial_speed_lines()
     from .stunts import gecko_lines as stunt_lines
     lines[-1:-1] = stunt_lines()
+    from .drill_turbo import gecko_lines as drill_lines
+    lines[-1:-1] = drill_lines()
+    from .hover_ring_dash import gecko_lines as hover_lines
+    lines[-1:-1] = hover_lines()
     lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Eggman Heart pickup capture']
     # Exact revision/full text is authenticated by DME before any owner word
     # is published. Every hook is inert before that; retain the full disc ID.
@@ -295,6 +307,7 @@ def inspect_installed(memory):
                   ('previous_random_capsule_refresh', load_data('capsule_random_previous.json')),
                   ('before_random_capsule_refresh', load_data('capsule_before_random.json')),
                   ('previous_white_collision_refresh', load_data('capsule_white_previous.json'))]
+    candidates.insert(1,('current_compact_white_collision_refresh',payload_words(compact_abi=True,epilogue_abi=True,cache_permissions=True,lean=False)))
     for variant, words in candidates:
         offset = data_offset(words)
         try:

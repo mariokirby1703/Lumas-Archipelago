@@ -29,7 +29,7 @@ def test_progressive_permissions_and_independent_jumpdash():
     assert mask(Counter({'Mid-Air Boost':1})) == 1<<1
     assert mask(Counter({'Wall Jump':1})) == 1<<3
     assert not mask(Counter({'White Boost Wisp':1}))
-    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,29,30,38,39,40,41,43,44,48,82,110}
+    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,29,30,38,39,40,41,43,44,82,110}
 
 
 def test_experimental_native_movement_hook_respects_memory_scratch_limit():
@@ -40,7 +40,8 @@ def test_experimental_native_movement_hook_respects_memory_scratch_limit():
     row=next(r for r in optional if r[4]=='movement')
     words,deny,offset=movement_gate.payload()
     assert row[0]==movement_gate.HOOK and row[1]==movement_gate.ORIGINAL
-    assert 0x809F0020 in words # retain native predecessor
+    assert 0x3BE3FFEC in words # resolve machine from common queue receiver
+    assert 0x4D820020 in words # denied request returns before native callbacks
     assert int.from_bytes(row[3][-4:],'big') == direct_hooks._branch(row[2]+len(row[3])-4,movement_gate.HOOK+4)
     assert row[3][offset:offset+8] == bytes(8)
 
