@@ -21,13 +21,14 @@ def test_actor_owned_machine_ignores_allocation_adjacency(separation):
     with pytest.raises(MemoryUnavailable,match='state-machine ownership'):g.observed(m,player)
 
 
-@pytest.mark.parametrize('requested', list(g.STATE_PERMISSION)+[2,3,60,128,0xffffffff])
-@pytest.mark.parametrize('mask', [0,1,127,128,256,511])
+@pytest.mark.parametrize('requested', list(g.STATE_PERMISSION)+[2,3,31,60,128,0xffffffff])
+@pytest.mark.parametrize('mask', [0,1,127,128,256,511,512,1023,1024,2047])
+@pytest.mark.parametrize('rail_side',[True,False])
 @pytest.mark.parametrize('underwater', [True,False])
 @pytest.mark.parametrize('previous', [2,38,41,0xffffffff,0x90010000])
 @pytest.mark.parametrize('same_owner', [True,False])
 @pytest.mark.parametrize('host_machine_matches',[True,False])
-def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,same_owner,underwater,host_machine_matches):
+def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,same_owner,underwater,host_machine_matches,rail_side):
     words,_,off=g.payload(gecko=True); base=0x80002000; machine=0x90010000; player=0x90020000
     regs=list(range(32));regs[1]=0x90030000;regs[3]=regs[31]=machine;regs[4]=requested
     saved=regs[:]; lr=0x80012340;cr=0x12345678;pc=0;cmp=0;mem={}
@@ -38,6 +39,8 @@ def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,sa
     for a,v in ((machine,g.STATE_MACHINE_VTABLE),(machine+0x28,player if same_owner else player+4),
                 (machine+0x20,previous),(base+off,machine if host_machine_matches else machine+0x1000),(base+off+4,mask)):
         store(a,v)
+    if host_machine_matches is None:store(base+off,g.MENU_POLICY_ARMED)
+    store(player+0x88,player+0x300);store(player+0x348,8 if rail_side else 0)
     store(player+0x8c,player+0x100);store(player+0x110,0x800 if underwater else 0)
     store(player,g.PLAYER_VTABLE);store(player+0x70,player+0x200);store(player+0x208,machine)
     for _ in range(300):
@@ -70,11 +73,14 @@ def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,sa
             if delta&0x2000000:delta-=0x4000000
             if w&1:lr=base+pc*4
             pc=pc-1+delta//4
+        elif w==0x7fa802a6:regs[29]=lr
+        elif w==0x7fa803a6:lr=regs[29]
         elif w==0x7d600026:regs[11]=cr
         elif w==0x7d6802a6:regs[11]=lr
         elif w==0x7d8802a6:regs[12]=lr
         elif w==0x7d6ff120:cr=regs[11]
         elif w==0x7d6803a6:lr=regs[11]
+        elif op==31 and w&0x7ff==48:regs[ra]=(regs[rt] << (regs[rb]&31))&0xffffffff
         elif op==31 and ((w>>1)&1023)==0:cmp=(regs[ra]>regs[rb])-(regs[ra]<regs[rb])
         elif op==31 and ((w>>1)&1023)==444:regs[ra]=regs[rt]|regs[rb]
         elif op==31 and ((w>>1)&1023)==87:regs[rt]=mem.get(regs[ra]+regs[rb],0)
@@ -84,13 +90,56 @@ def test_encoded_gate_preserves_original_request_flow(requested,mask,previous,sa
         else:raise AssertionError(hex(w))
     else:raise AssertionError('instruction loop')
     bit=8 if requested==8 and underwater else g.STATE_PERMISSION.get(requested,0)
-    deny= same_owner and previous<=127 and requested in g.STATE_PERMISSION and not (mask & (1<<bit))
-    assert regs[4]==((3 if requested in (38,41) else previous) if deny else requested)
+    required=1536 if requested==29 and rail_side else 1<<bit
+    deny= same_owner and previous<=127 and requested in g.STATE_PERMISSION and (mask & required)!=required
+    assert regs[4]==((3 if requested in (38,41,48) else previous) if deny else requested)
     assert regs[0]==previous  # displaced native instruction still runs
     assert load(machine+0x20)==previous  # never mutate native state records
     # Compact profile retains gameplay gates without optional guest telemetry.
     assert lr==0x80012340 and cr==0x12345678
     assert all(regs[i]==saved[i] for i in range(32) if i not in (0,4))
+
+
+@pytest.mark.parametrize('mask',[0,1,512,1024])
+def test_menu_activation_applies_on_first_native_request(mask):
+    test_encoded_gate_preserves_original_request_flow(8,mask,2,True,False,None,False)
+
+
+@pytest.mark.parametrize('mask',[0,2048,4095])
+@pytest.mark.parametrize('previous',[3,48])
+def test_quick_step_permission_and_native_run_exit(mask,previous):
+    test_encoded_gate_preserves_original_request_flow(48,mask,previous,True,False,None,False)
+
+
+def test_quick_step_append_only_progression_item():
+    from ..Items import ITEM_TABLE,MOVEMENT_POOL,classification
+    from ..world_constants import BASE_ID
+    from BaseClasses import ItemClassification
+    from collections import Counter
+    assert ITEM_TABLE['Quick Step']==BASE_ID+52
+    assert MOVEMENT_POOL.count('Quick Step')==1
+    assert classification('Quick Step')==ItemClassification.progression
+    assert g.permissions(Counter({'Quick Step':1}))==2048
+
+
+def test_map_preloads_new_items_without_a_living_actor(monkeypatch):
+    from collections import Counter
+    from ..client.state import Snapshot
+    from ..client import skydiving
+    m=SonicMemory(FakeBackend());data=0x80002000;sky=0x80002800
+    monkeypatch.setattr(g,'installed_data',lambda *args:(data,'fixture C2'))
+    monkeypatch.setattr(skydiving,'installed_data',lambda *args:sky)
+    m.write_guard=lambda *args:'bound fixture save'
+    m.backend.write_bytes(sky,(1).to_bytes(4,'big'))  # previous stage locked
+    snap=Snapshot('session','save',1,'world_map',None,scene_verified=True,stable_polls=1)
+    owned={'counts':Counter({'Skydiving':1,'Double Jump':1})}
+    result=g.configure(m,snap,owned)
+    assert result['menu_policy_preloaded'] and result['request_machine'] is None
+    assert m.read_u32(sky)==0  # item takes effect before entering Aquarium Park
+    assert m.read_u32(data)==g.MENU_POLICY_ARMED and m.read_u32(data+4)==1
+    owned['counts']['Double Jump']=0
+    g.configure(m,snap,owned)
+    assert m.read_u32(data+4)==0 and m.read_u32(data)==g.MENU_POLICY_ARMED
 
 
 def test_complete_v11_profile_recovers_exact_pal_text_and_rejects_corruption():
@@ -147,6 +196,8 @@ def test_same_controller_new_machine_rearms_per_stage(monkeypatch):
             backend.write_bytes(a,v.to_bytes(4,'big'))
     monkeypatch.setattr(g,'installed_data',lambda *args:(data,'fixture C2'))
     m.write_guard=lambda *args:True
+    from ..client.skydiving import HOOK,ORIGINAL
+    m.backend.write_bytes(HOOK,ORIGINAL.to_bytes(4,'big'))
     def scene(epoch):return Snapshot('session','save',1,'gameplay','stg110',
         stage_epoch=epoch,scene_verified=True,stable_polls=3,death_state='alive',
         evidence={'native_data':{'stage_objects':[{'player':{'actor':player}}]}})
@@ -174,6 +225,8 @@ def test_confirmed_gate_survives_transient_reads_without_new_write_authority(mon
         m.backend.write_bytes(a,v.to_bytes(4,'big'))
     monkeypatch.setattr(g,'installed_data',lambda *args:(data,'fixture C2'))
     writes=[]
+    from ..client.skydiving import HOOK,ORIGINAL
+    m.backend.write_bytes(HOOK,ORIGINAL.to_bytes(4,'big'))
     def check(*args):writes.append(args);return True
     m.write_guard=check
     s=Snapshot('session','save',1,'gameplay','stg130',stage_epoch='same-stage',

@@ -10,11 +10,17 @@ from .memory import MemoryUnavailable
 
 def witnessed(journal):
     epoch = journal.data.get('bootstrap', {}).get('epoch')
+    # Only epochs explicitly recorded by this authenticated seed's journal.
+    # A fresh New Game changes native playthrough identity, not earned AP pickups.
+    epochs={epoch} if epoch is not None else set()
+    epochs.update(p.get('epoch') for p in journal.data.get('prior_prologues',()) if p.get('epoch'))
+    epochs.update(p.get('bootstrap',{}).get('epoch') for p in journal.data.get('prior_playthroughs',())
+                  if p.get('bootstrap',{}).get('epoch'))
     masks = {}
-    if epoch is None:
+    if not epochs:
         return masks
     for event in journal.data.get('pickup_events', ()):
-        if event.get('kind') != 'red_ring' or event.get('playthrough_epoch') != epoch:
+        if event.get('kind') != 'red_ring' or event.get('playthrough_epoch') not in epochs:
             continue
         mission, ring = event.get('mission'), event.get('ring')
         stage = BY_MISSION.get(mission, {})

@@ -98,13 +98,13 @@ route-by-route validation.
 
 ## Other current native issues
 
-- Starlight Carnival Act 5: the Green Hover capsule triggered by defeating an
-  enemy group is reportedly present as a native actor but has no model in the
-  AP-locked state. The actor must process its *native spawn trigger* while
-  locked, select the ghost model and disable interaction. Ordinary installed
-  capsule-refresh hooks are insufficient; no verified replacement exists yet.
-  Do not spawn an AP-owned real Hover capsule. Reproduce and capture stage
-  before/after the enemy wave with /sonicdebug and RAM snapshots.
+- Starlight Carnival Act 5: live locked Hover actors 229/308 had no model and
+  no published ORC appearance channel. The current capsule helper restores
+  native `WaitAppear` using 800D4298; 600F then publishes appearance channel 0.
+  Only after that event does a model-less capsule receive its native ghost
+  model and locked lifecycle. PPC tests cover waiting, publication, opened
+  actors and register preservation. The enemy-wave reproduction with the new
+  Gecko profile still needs visual/collision validation in Dolphin.
 - Boss unlock on Act 6 first clear: latest source projects authenticated final
   result into pending boss permission before map construction. Needs live test.
 - Grand World Map: clearing a boss can temporarily reveal an unowned world

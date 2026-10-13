@@ -126,10 +126,19 @@ class Journal:
             self.data['effects'][key] = updated
             self.save()
 
-    def confirm(self, index):
+    def confirm(self, index, *, verified_delivery=False):
         effect = self.data['effects'][str(index)]
         if effect['state'] not in ('prepared', 'verifying'):
-            raise ValueError('effect_not_prepared')
+            if not (verified_delivery and effect['state']=='uncertain'
+                    and effect.get('addresses')
+                    and effect.get('completed_writes')==len(effect['addresses'])
+                    and effect.get('family') in ('rings','lives','boost')
+                    and effect.get('reason') in ('left living gameplay before verification completed',
+                        'actor/context changed before verification',
+                        'no later-frame effect witness or counter sources disagree')):
+                raise ValueError('effect_not_prepared')
+            effect['previous_settlement_reason']=effect.get('reason')
+            effect['reason']=None
         effect['state'] = 'confirmed'
         self.save()
 

@@ -45,6 +45,8 @@ def execute(bit, value, worlds=1<<20, colours=0, bound=True, discoveries=0, clea
             if w&1:lr=origin+pc*4
             pc=pc-1+delta//4
         elif w==0x7c0802a6:regs[0]=lr
+        elif w==0x7fe802a6:regs[31]=lr
+        elif w==0x7fe803a6:lr=regs[31]
         elif w==0x7c000026:regs[0]=cr
         elif w==0x7d8802a6:regs[12]=lr
         elif w==0x7c0ff120:cr=regs[0]

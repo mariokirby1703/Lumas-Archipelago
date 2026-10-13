@@ -5,6 +5,7 @@ operation; multi-write transactions cannot guarantee rollback across scene exits
 """
 import os
 import struct
+import time
 from datetime import datetime, timezone
 from typing import Protocol
 
@@ -28,6 +29,8 @@ class DMEBackend:
     def __init__(self, engine):
         self.engine = engine
         self.fallback = None
+        self._empty_text_polls = 0
+        self._last_read_rehook = float("-inf")
 
     def active(self):
         return self.engine.is_hooked() and getattr(self.engine.get_status(), 'name', None) == 'hooked'
@@ -44,6 +47,31 @@ class DMEBackend:
             except OSError as error:
                 result['process_enumeration_error'] = str(error)
         return result
+
+    def recover_empty_text_mapping(self,error):
+        """Reattach only for repeated PAL/header boot reads with empty text.
+
+        This never accepts an altered executable. The next poll must verify
+        the complete PAL text and every installed hook again before writing.
+        """
+        if not str(error).startswith(('unknown_revision','wrong_game')) or not self.active():
+            self._empty_text_polls=0
+            return False
+        self.assert_instance()
+        header=bytes(self.engine.read_bytes(0x80000000,6))
+        empty=all(bytes(self.engine.read_bytes(a,4))==bytes(4) for a in (0x8003388C,0x802ED70C))
+        if header not in (b'SNCP8P',bytes(6)) or not empty:
+            self._empty_text_polls=0
+            return False
+        self._empty_text_polls+=1
+        now=time.monotonic()
+        if self._empty_text_polls<3 or now-self._last_read_rehook<10:
+            return False
+        self.close()
+        self.engine.un_hook()
+        self._empty_text_polls=0
+        self._last_read_rehook=now
+        return True
 
     def _check(self):
         if not self.active():
@@ -148,7 +176,12 @@ class SonicMemory:
             from .intro_box import PLACEMENTS
             if data not in PLACEMENTS or expected not in PLACEMENTS or data == expected:
                 raise MemoryUnavailable('WRITE_BLOCKED: intro box permits only its bounded placement pair')
-        token = self.write_guard(operation, address, len(data))
+        try:
+            token = self.write_guard(operation, address, len(data))
+        except MemoryUnavailable as error:
+            # This boundary is strictly before backend mutation. A native
+            # stage-read failure here proves no write was attempted.
+            raise MemoryUnavailable(f'WRITE_BLOCKED: prewrite_context: {error}') from error
         if operation == 'breath_timer':
             tx=self._breath_transaction
             new=struct.unpack('>f',data)[0];old=struct.unpack('>f',expected)[0]
@@ -189,7 +222,11 @@ class SonicMemory:
                 raise MemoryUnavailable('WRITE_BLOCKED: oxygen reset during transaction')
         elif before != expected:
             raise MemoryUnavailable('WRITE_BLOCKED: compare_failed')
-        if self.write_guard(operation, address, len(data)) != token:
+        try:
+            prewrite_token=self.write_guard(operation,address,len(data))
+        except MemoryUnavailable as error:
+            raise MemoryUnavailable(f'WRITE_BLOCKED: prewrite_context: {error}') from error
+        if prewrite_token != token:
             raise MemoryUnavailable('WRITE_BLOCKED: context_changed')
         if operation == 'breath_timer':
             elapsed=self.read_f32(address)

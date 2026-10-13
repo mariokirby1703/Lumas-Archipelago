@@ -8,13 +8,13 @@ from . import generate
 
 def test_movement_ids_are_append_only_and_progressive_crouch_has_two_copies():
     assert SCHEMA_VERSION == 7
-    assert tuple(ITEM_TABLE[x] for x in MOVEMENT_ITEMS) == tuple(range(BASE_ID+37,BASE_ID+44))+(BASE_ID+45,BASE_ID+46,BASE_ID+47)
+    assert tuple(ITEM_TABLE[x] for x in MOVEMENT_ITEMS) == tuple(range(BASE_ID+37,BASE_ID+44))+(BASE_ID+45,BASE_ID+46,BASE_ID+47,BASE_ID+48,BASE_ID+49,BASE_ID+50)
     assert MOVEMENT_POOL.count('Progressive Crouch') == 2
-    assert len(MOVEMENT_POOL) == 15
+    assert len(MOVEMENT_POOL) == 22
     w = generate({'movement_unlocks':True}).worlds[1]
     from collections import Counter
     c = Counter(item.name for item in w.multiworld.itempool)
-    assert all(c[name] == (2 if name=='Progressive Crouch' else 5 if name=='Progressive Breathing' else 1) for name in MOVEMENT_ITEMS)
+    assert all(c[name] == (2 if name=='Progressive Crouch' else 5 if name in ('Progressive Breathing','Progressive Stunts') else 1) for name in MOVEMENT_ITEMS)
     assert w.fill_slot_data()['options']['movement_unlocks'] == 1
     default = generate().worlds[1]
     assert not any(i.name in MOVEMENT_ITEMS for i in default.multiworld.itempool)
@@ -29,7 +29,7 @@ def test_progressive_permissions_and_independent_jumpdash():
     assert mask(Counter({'Mid-Air Boost':1})) == 1<<1
     assert mask(Counter({'Wall Jump':1})) == 1<<3
     assert not mask(Counter({'White Boost Wisp':1}))
-    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,38,39,40,41,43,44}
+    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,29,30,38,39,40,41,43,44}
 
 
 def test_experimental_native_movement_hook_respects_memory_scratch_limit():
@@ -48,3 +48,18 @@ def test_experimental_native_movement_hook_respects_memory_scratch_limit():
 def test_drift_and_swim_have_independent_permissions():
     assert movement_gate.permissions(Counter({"Drift":1})) == 128
     assert movement_gate.permissions(Counter({"Swim":1})) == 256
+
+
+def test_rail_jump_and_switch_have_independent_wide_permissions():
+    assert movement_gate.permissions(Counter({'Rail Jump':1}))==512
+    assert movement_gate.STATE_PERMISSION[29]==9
+    assert movement_gate.STATE_PERMISSION[30]==10
+    assert movement_gate.permissions(Counter({"Rail Switch":1}))==1024
+    from pathlib import Path
+    from ..tools.ppc import Executable
+    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    if path.exists():
+        e=Executable(path)
+        getter=int.from_bytes(e.read(0x807610F8+0xc,4),'big')
+        assert getter==0x800D2330
+        assert b'CStateGrindJumpShort\0'==e.read(0x80761200,21)

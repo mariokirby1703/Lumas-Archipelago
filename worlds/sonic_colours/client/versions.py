@@ -33,6 +33,10 @@ def verify_revision(memory):
         data = normalize_player_switch(data,section['address'])
         from .speed_initial import normalize as normalize_initial_speed
         data = normalize_initial_speed(data,section['address'])
+        from .stunts import normalize as normalize_stunts
+        data = normalize_stunts(memory,data,section['address'])
+        from .skydiving import normalize as normalize_skydiving
+        data = normalize_skydiving(memory,data,section['address'])
         from .player_switch import HOOK as ASSIST_HOOK, HOOK_ORIGINAL as ASSIST_ORIGINAL, installed_data as assist_data
         if section['address']<=ASSIST_HOOK<section['address']+section['size']:
             off=ASSIST_HOOK-section['address']

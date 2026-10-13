@@ -102,3 +102,20 @@ def test_display_names_and_discovery_stage_assignment():
               'Blue Cube':'Starlight Carnival Act 1','Green Hover':'Starlight Carnival Act 5','Pink Spikes':'Planet Wisp Act 1','Purple Frenzy':'Asteroid Coaster Act 1'}
     for wisp,mission in expected.items():
         assert BY_MISSION[LOCATION_TABLE[wisp+' Discovery'].mission]['name']==mission
+
+
+@pytest.mark.parametrize('archive', ['prior_prologues','prior_playthroughs'])
+def test_same_seed_archived_collections_restore_in_new_game(tmp_path,archive):
+    j,m,b,s,g,chain,actor=setup(tmp_path)
+    with j:
+        old=dict(j.data['bootstrap'])
+        j.data[archive]=[old if archive=='prior_prologues' else {'bootstrap':old}]
+        j.data['bootstrap']['epoch']='new-epoch'
+        j.data['receipts']=[ITEM_TABLE['10 Red Rings']]
+        assert witnessed(j)=={'stg110':1}
+        apply(m,s,g)
+        assert m.read_u8(actor+0x91)==0x81
+        assert m.read_u32(chain[-1]+0x10+40)==1
+        # Unattributed event epochs do not become physical progress.
+        j.data['pickup_events'].append({'kind':'red_ring','mission':'stg110','ring':2,'playthrough_epoch':'foreign'})
+        assert witnessed(j)=={'stg110':1}

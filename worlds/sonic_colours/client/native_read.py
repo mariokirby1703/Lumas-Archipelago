@@ -462,7 +462,12 @@ def read_result(memory, stage, mission):
     time = memory.read_f32(ui + 0xf8)
     final = (state == 7 and grade <= 4 and memory.read_u32(ui + 0x114) == score
              and math.isfinite(time) and time > 0)
-    if memory.read_u32(stage + 0x9c) != ui or memory.read_bytes(ui + 0xdc, 0x50) != fields:
+    # Animation/fade fields in this block continue changing on the final UI.
+    # Revalidate only the authoritative result tuple, not unrelated animation.
+    observed=memory.read_bytes(ui+0xdc,0x50)
+    stable_offsets=(0,0x1c,0x38,0x44,0x48)  # state, time, displayed score, score, grade
+    if (memory.read_u32(stage+0x9c)!=ui or memory.read_u32(ui)!=0x8076CAE4
+            or any(observed[o:o+4]!=fields[o:o+4] for o in stable_offsets)):
         raise MemoryUnavailable('result_context_changed')
     return {'mission': mission, 'grade': grade, 'final': final, 'ui': ui,
             'score': score, 'time': time, 'provenance': 'stage9C_native_UI_state7_grade124'}

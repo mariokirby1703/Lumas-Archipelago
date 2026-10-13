@@ -17,6 +17,16 @@ The client must be connected to a verified Sonic Colours AP slot. Commands:
 /remove White Boost Wisp
 /give Cyan Laser Wisp
 /give Stomp
+/give Rail Switch
+/remove Rail Switch
+/give Rail Jump
+/remove Rail Jump
+/give stunts 1              # Good
+/give stunts 2              # Great
+/give stunts 3              # Awesome
+/give stunts 4              # Outstanding
+/give stunts 5              # Amazing
+/remove stunts all
 /give Assist Change
 /remove Assist Change
 /give Drift
@@ -125,3 +135,51 @@ Wisps. Use `/give wisps` and `/remove wisps` to test that gate.
 Drift is an independent progression item (ID 847000046), included when movement unlocks are enabled. PAL native request 38 is denied without it. Restart the Act before testing; an already active drift is not forcibly interrupted. Old seeds can test with `/give Drift`. Both the APWorld and complete Movement Gecko profile must be updated together because the compact native permission layout changed.
 
 Denied Drift (38) and Slide (41) requests now route to native exit 3 instead of retaining a forbidden predecessor. This uses the native transition callbacks (original exits at 801505C0 and 80159A70), without host edits to player state or animation fields. Requires the updated complete Movement Gecko profile; live validation pending.
+
+Progressive Stunts (847000048, five pool copies) gates only TrickJump stunt performance/animation/reward routine 80148454. Ramp launch, State 46 flight and normal landing remain native. Included in Movement Unlocks; Off grants the native routine. Update complete Gecko profile and APWorld together. Live validation pending.
+
+Progressive Stunts grants a maximum of 0/1/2/3/4/5 stunt performances per ramp flight. Quality order: Good, Great, Awesome, Outstanding, Amazing. The original ramp-specific native maximum still applies. Existing seed item ID 847000048 now grants one progressive tier.
+
+A fresh verified Act-1 prologue can rebase an unbound journal after reconnecting or abandoning an unfinished intro in the same authenticated AP seed. Prior prologue evidence is archived and AP receipts/checks preserved. Loaded foreign saves and incomplete freshness evidence remain blocked.
+
+Rail Jump (847000049) gates native GrindJumpShort state 29. Rail Switch (847000050) independently gates GrindJumpSide state 30. Same-seed fresh games restore physical Red Rings from explicitly archived seed playthrough/prologue epochs as well as the current epoch. AP Red Ring counter receipts never manufacture physical collections.
+
+Directional Rail Jump requests (29) additionally require Rail Switch when native held input actions 2/3 are set. The native mask is read from the current actor at request time. Straight jumps require only Rail Jump; explicit GrindJumpSide (30) requires only Rail Switch. CR0 is recomputed by the immediately following native cmpw at 80033890; the gate modifies no other CR field and restores LR/GPRs.
+
+# Skydiving
+
+`/give Skydiving` enables the native Diving glide. `/remove Skydiving all`
+restores the lock. Without the item, every PAL `CStateDiving` update requests
+native `CStateFall` (15), including a glide already in progress. The native
+dispatcher performs state cleanup; no host writes alter velocity or state IDs.
+Install the current complete movement Gecko profile and APWorld, then restart
+client and emulation. Existing seeds can test the item locally; new seeds
+include one progression item when Movement Unlocks is enabled.
+
+Movement masks and Skydiving permission now preload on verified bound world
+maps and Game Land selection, without requiring a live Sonic actor. The guest
+gate validates the next native actor/machine/reverse link on its first request.
+ReceivedItems and local give/remove/reset also publish idempotent movement
+permissions immediately when the current scene permits verified writes.
+Unavailable/loading or unbound saves defer to the regular poll; no filler is
+replayed by this event path.
+
+`/give Quick Step` enables QuickStep (native state 48); `/remove Quick Step all`
+locks it. Item ID 847000052, permission bit 11, one progression copy in new
+Movement Unlocks seeds. Denied requests use native Run (3), the same exit
+requested at 80194070. Normal section travel does not require the item. The
+current full Gecko profile is required; older masks are recognized for PAL
+verification but are not overwritten with unsupported new permission bits.
+
+Check scanning now captures pickup/result evidence and exposes a transport
+checkpoint before slow permission projection. The async client sends the
+durable queue and processes server acknowledgements at that checkpoint.
+Result coherence compares authoritative state/score/grade/time fields while
+ignoring unrelated live UI animation values.
+
+Consumable settlement accepts a late observation after a slow poll. An exit
+does not undo already completed, individually guarded native writes/readbacks.
+Such receipts remain confirmed without replay; HUD appearance is still separate.
+Historical settlement-only errors may be reconciled when every recorded write
+completed. Partial writes, missing completion evidence and interrupted native
+attempts remain uncertain and are never automatically replayed.

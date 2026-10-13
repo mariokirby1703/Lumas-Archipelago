@@ -48,6 +48,10 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
             if w&1:lr=base+pc*4
             pc=pc-1+delta//4
         elif w==0x7c0802a6:regs[0]=lr
+        elif w==0x7fe802a6:regs[31]=lr
+        elif w==0x7f800026:regs[28]=cr
+        elif w==0x7f8ff120:cr=regs[28]
+        elif w==0x7fe803a6:lr=regs[31]
         elif w==0x7c000026:regs[0]=cr
         elif w==0x7d8802a6:regs[12]=lr
         elif w==0x7ccff120:cr=regs[6]
@@ -197,7 +201,7 @@ def test_boost_consumption_is_never_blocked_by_white_ownership(locked, delta):
 
 def test_previous_refill_hook_is_identifiable_but_marked_drain_unsafe():
     b = FakeBackend(); m = SonicMemory(b); target = 0x80002000
-    hook, _ = HOOKS['boost_add']; words, offset = payload('boost_add', drain=False)
+    hook, _ = HOOKS['boost_add']; words, offset = payload('boost_add', drain=False,lean=False,register_abi=False)
     words[-1] = 0x48000000 | ((hook+4-(target+len(words)*4-4)) & 0x3fffffc)
     b.put(target, struct.pack('>'+'I'*len(words), *words))
     b.put(hook, (0x48000000 | ((target-hook) & 0x3fffffc)).to_bytes(4,'big'))

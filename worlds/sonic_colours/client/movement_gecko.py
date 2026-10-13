@@ -25,7 +25,8 @@ def movement_ini():
         raise ValueError('unexpected Gecko section layout')
     # Insert in existing guarded scope BEFORE its final E0; no extra group.
     final_close = cleaned.index('E0000000 80008000', cleaned.index('$AP PAL Eggman Heart pickup capture'))
-    cleaned[final_close:final_close] = gecko_lines()
+    from .skydiving import gecko_lines as skydiving_lines
+    cleaned[final_close:final_close] = gecko_lines()+skydiving_lines()
     # SNCP uniquely identifies the PAL game. Full SNCP8P/revision/text checks
     # remain mandatory in the client; retain the first one-time install guard.
     cleaned.remove('28000004 00003850')

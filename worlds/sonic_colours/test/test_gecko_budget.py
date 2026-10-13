@@ -35,6 +35,8 @@ def test_shared_guard_installs_all_real_controls_once_and_rejects_wrong_disc():
                 i+=second  # payload words are not interpreted as Gecko codes
             elif kind==0xe0:
                 enabled=True
+            elif kind==0x04:
+                if enabled:memory[address]=second
             else:raise AssertionError(hex(first))
         return installed
     memory={0x80000000:0x534e4350,0x80000004:0x3850,0x80000006:0}
@@ -42,7 +44,12 @@ def test_shared_guard_installs_all_real_controls_once_and_rejects_wrong_disc():
         if first>>24==0x20:memory[0x80000000+(first&0xffffff)]=second
     from ..client.map_refresh import HOOK as MAP
     from ..client.map_transition import HOOK as TRANSITION, UPDATE_HOOK
+    from ..client.player_switch import HOOK as ASSIST
+    from ..client.stunts import HOOK as STUNTS
     expected={CAPSULE,PROGRESSION,MEDAL,MAP,TRANSITION,UPDATE_HOOK}|{a for name,(a,_) in HOOKS.items() if name!='boost'}
+    expected|={ASSIST,STUNTS}
+    from ..client.map_ring_display import HOOK as RINGS
+    expected.add(RINGS)
     wrong={**memory,0x80000000:0}
     assert run(wrong)==[]
     assert set(run(memory))==expected

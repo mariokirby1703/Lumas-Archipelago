@@ -26,6 +26,7 @@ def test_both_injected_hook_variants_are_byte_encoded_correctly():
         raw=b''.join(word.to_bytes(4,'big') for word in table)
         assert len(raw)==16
         for state, bit in movement_gate.STATE_PERMISSION.items():
+            if state in (29,30):continue # explicit wide mask, not byte lookup
             index=state-8 if state<14 else state-38+6
             assert raw[index] == 1 << bit
         states=(*range(8,14),*range(38,45))

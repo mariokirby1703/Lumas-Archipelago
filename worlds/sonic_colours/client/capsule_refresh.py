@@ -41,7 +41,7 @@ class PPC:
         return self.words
 
 
-def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False):
+def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False, spawn_refresh=True):
     if epilogue_abi and not compact_abi:
         raise ValueError('epilogue ABI requires the compact native-call profile')
     # 800D4828 overwrites CR0; 800D4850..4860 restores the enclosing LR.
@@ -51,6 +51,13 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
     a=PPC()
     # Keep save slots above the native callee's outgoing-argument home area.
     a.d(37,1,1,-0x200)
+    shared_callees=epilogue_abi and spawn_refresh
+    if shared_callees:
+        a.d(36,30,1,0x78); a.d(15,30,0,0x800d)
+    def call(address):
+        if shared_callees and address>>16==0x800d:
+            a.d(24,30,12,address&0xffff); a.emit(0x7D8903A6); a.emit(0x4E800421)
+        else:a.call(address)
     if not epilogue_abi:
         a.emit(0x7C0802A6); a.d(36,0,1,0x40)
         a.emit(0x7C000026); a.d(36,0,1,0x44)
@@ -98,12 +105,12 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
     a.label('ordinary_white'); a.d(28,3,3,1)
     a.label('permission_saved'); a.d(36,3,1,0x74)
     a.label('model')
-    a.d(32,3,31,0xb0); a.d(11,0,3,0); a.branch('end',0x41820000)
+    a.d(32,3,31,0xb0); a.d(11,0,3,0); a.branch('missing_model' if spawn_refresh else 'end',0x41820000)
     a.d(32,0,3,0); a.d(15,5,0,0x8078); a.d(14,5,5,-0x2ed4)
     a.emit(0x7C002800); a.branch('end',0x40820000)  # cmpw r0,r5 model VT
     a.d(32,0,3,8); a.emit(0x7C00F800); a.branch('end',0x40820000)  # owner == r31
     a.d(32,3,31,0x34); a.d(11,0,3,0); a.branch('end',0x41820000)
-    a.d(14,3,3,8); a.d(32,4,2,-0x7c48); a.call(0x800132D8)
+    a.d(14,3,3,8); a.d(32,4,2,-0x7c48); call(0x800132D8)
     a.d(11,0,3,0); a.branch('end',0x41820000)
     if cache_permissions:
         a.d(32,0,1,0x74); a.d(11,0,0,-1); a.branch('white_permission',0x40820000)
@@ -112,7 +119,7 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
         a.d(34,0,31,0x148); a.d(11,0,0,0); a.branch('white_permission',0x40820000)
         a.d(34,0,31,0x14a); a.d(11,0,0,0); a.branch('white_permission',0x40820000)
         a.d(32,4,31,0x114); a.d(11,0,4,-1); a.branch('white_permission',0x41820000)
-    a.call(0x8003BAAC)  # native coloured permission query
+    call(0x8003BAAC)  # native coloured permission query
     a.branch('permission_ready')
     a.label('white_permission'); a.d(32,3,1,0x74)
     a.label('permission_ready')
@@ -120,7 +127,7 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
     a.emit(0x7C001800); a.branch('matched',0x41820000)
     a.d(10,0,0,1); a.branch('end',0x41810000)
     a.d(11,0,3,0); a.branch('lock',0x41820000)
-    a.mr(3,31); a.d(32,4,31,0x34); a.d(14,5,0,1); a.call(0x800D3EB4)
+    a.mr(3,31); a.d(32,4,31,0x34); a.d(14,5,0,1); call(0x800D3EB4)
     a.branch('interaction')
     a.label('matched')
     a.d(11,0,3,0); a.branch('end',0x41820000)
@@ -129,21 +136,31 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
     # Ghosts never traverse 800D3CF8..3D08's native collision initialization.
     # Repair a previous model-only refresh too; do not duplicate body handles.
     a.d(32,0,31,0xb4); a.d(11,0,0,0); a.branch('state',0x40820000)
-    a.mr(3,31); a.d(32,4,31,0x34); a.call(0x800D3FF8)
+    a.mr(3,31); a.d(32,4,31,0x34); call(0x800D3FF8)
     a.label('state')
     # Ghost entry disables EXISTING bodies through 800D517C(actor, 0).
     # Creating a body only when absent does not restore those registrations.
     # Use the native wrapper/physics registration routine, then allow native
     # lifecycle selection to apply any specialized visibility/movement gates.
-    a.mr(3,31); a.d(14,4,0,1); a.call(0x800D517C)
+    a.mr(3,31); a.d(14,4,0,1); call(0x800D517C)
     # Constructor's default state, via the real transition function (exit/entry
     # callbacks), before native visibility/movement picks any specialized state.
-    a.mr(3,31); a.d(15,4,0,0x8076); a.d(14,4,4,0x13c0); a.call(0x800D5490)
-    a.mr(3,31); a.call(0x800D4298)  # select native available lifecycle state
+    a.mr(3,31); a.d(15,4,0,0x8076); a.d(14,4,4,0x13c0); call(0x800D5490)
+    a.label('availability')
+    a.mr(3,31); call(0x800D4298)  # select native available lifecycle state
     a.branch('end')
+    if spawn_refresh:
+        a.label('missing_model')
+        # Native 80072BC0 / 8008DAF8 channel 0 is wrapper+10 bits 16..23.
+        # Do not create a model until the true 600F spawn event publishes it.
+        a.d(32,3,31,0x64); a.d(34,0,3,0x11)
+        a.d(11,0,0,0); a.branch('lock',0x40820000)
+        # Locked constructors skipped 800D4298. Restore native WaitAppear,
+        # which handles 600F and publishes the wrapper byte, without a model.
+        a.branch('availability')
     a.label('lock')
-    a.mr(3,31); a.call(0x800D3DA4)  # native ghost model, refcount-replace +B0
-    a.mr(3,31); a.d(15,4,0,0x8076); a.d(14,4,4,0x13d8); a.call(0x800D5490)
+    a.mr(3,31); call(0x800D3DA4)  # native ghost model, refcount-replace +B0
+    a.mr(3,31); a.d(15,4,0,0x8076); a.d(14,4,4,0x13d8); call(0x800D5490)
     a.label('end')
     if not compact_abi:
         a.d(14,0,0,0); a.emit(0x7C10E3A6)
@@ -158,6 +175,7 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
     if not epilogue_abi:
         a.d(32,0,1,0x44); a.emit(0x7C0FF120)
         a.d(32,0,1,0x40); a.emit(0x7C0803A6)
+    if shared_callees:a.d(32,30,1,0x78)
     a.d(14,1,1,0x200); a.emit(ORIGINAL)
     a.branch('return')
     data = len(a.words)*4; a.words[pic_fix] |= (data-pic_base)&0xffff
@@ -196,6 +214,8 @@ def gecko_ini(compact_capsule=True):
     lines[-1:-1] = player_switch_lines()
     from .speed_initial import gecko_lines as initial_speed_lines
     lines[-1:-1] = initial_speed_lines()
+    from .stunts import gecko_lines as stunt_lines
+    lines[-1:-1] = stunt_lines()
     lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Eggman Heart pickup capture']
     # Exact revision/full text is authenticated by DME before any owner word
     # is published. Every hook is inert before that; retain the full disc ID.
@@ -268,6 +288,10 @@ def inspect_installed(memory):
                   ('current_compact_white_collision_refresh', payload_words(compact_abi=True, epilogue_abi=True)),
                   ('current_compact_white_collision_refresh', payload_words(compact_abi=True)),
                   ('current_white_collision_refresh', payload_words()),
+                  ('current_compact_white_collision_refresh', payload_words(compact_abi=True, epilogue_abi=True,cache_permissions=True,spawn_refresh=False)),
+                  ('current_compact_white_collision_refresh', payload_words(compact_abi=True, epilogue_abi=True,spawn_refresh=False)),
+                  ('current_compact_white_collision_refresh', payload_words(compact_abi=True,spawn_refresh=False)),
+                  ('current_white_collision_refresh', payload_words(spawn_refresh=False)),
                   ('previous_random_capsule_refresh', load_data('capsule_random_previous.json')),
                   ('before_random_capsule_refresh', load_data('capsule_before_random.json')),
                   ('previous_white_collision_refresh', load_data('capsule_white_previous.json'))]
@@ -287,6 +311,9 @@ def inspect_installed(memory):
                 or allowed > (3 if result['variant'] in ('current_compact_white_collision_refresh','current_white_collision_refresh','previous_random_capsule_refresh') else 1)):
             raise MemoryUnavailable('unknown_revision: invalid White capsule control data')
     memory.capsule_hook_observation=result
+    result['spawn_refresh_installed']=bool(result['installed'] and words in (
+        payload_words(compact_abi=True,epilogue_abi=True,cache_permissions=True),
+        payload_words(compact_abi=True,epilogue_abi=True),payload_words(compact_abi=True),payload_words()))
     return result
 
 
@@ -331,4 +358,5 @@ def configure(memory, snapshot, owned, slot):
             if current != value: memory.write_u32(address+i*4,value,expected=current,operation='capsule_controls')
         memory.write_u32(address,desired[0],expected=0,operation='capsule_controls')
     return {'available':True, 'white_allowed':bool(white), 'random_capsules_allowed':random_allowed and current_hook,
+            'spawn_refresh_installed':memory.capsule_hook_observation.get('spawn_refresh_installed',False),
             'collision_reenable_installed': memory.capsule_hook_observation['variant'] in ('current_compact_white_collision_refresh', 'current_white_collision_refresh')}

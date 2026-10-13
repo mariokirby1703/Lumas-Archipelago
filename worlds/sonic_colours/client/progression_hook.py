@@ -14,12 +14,14 @@ HOOK = 0x8015ECC0
 ORIGINAL = 0x2C050000  # cmpwi r5,0
 
 
-def payload(compact_permission=True):
+def payload(compact_permission=True, compact_cr=True, register_lr=True):
     a=PPC()
     a.d(37,1,1,-0x90)
-    a.emit(0x7C0802A6); a.d(36,0,1,8)
-    a.emit(0x7C000026); a.d(36,0,1,12)
+    if not register_lr:a.emit(0x7C0802A6); a.d(36,0,1,8)
+    # Only CR0 is used; displaced cmpwi overwrites it before continuation.
+    if not compact_cr: a.emit(0x7C000026); a.d(36,0,1,12)
     a.d(47,6,1,16)
+    if register_lr:a.emit(0x7FE802A6) # save LR in already stacked nonvolatile r31
     a.emit(0x48000005)  # bl .+4, position-independent data base
     base=len(a.words)*4
     a.emit(0x7D8802A6)  # mflr r12
@@ -66,9 +68,10 @@ def payload(compact_permission=True):
     a.d(14,8,4,-252); a.d(14,7,0,1); a.emit(0x7CE74030)  # slw r7,r7,r8
     a.d(32,6,12,16); a.emit(0x7CC63B78); a.d(36,6,12,16)
     a.label('end')
+    if register_lr:a.emit(0x7FE803A6)
     a.d(46,6,1,16)
-    a.d(32,0,1,12); a.emit(0x7C0FF120)
-    a.d(32,0,1,8); a.emit(0x7C0803A6)
+    if not compact_cr: a.d(32,0,1,12); a.emit(0x7C0FF120)
+    if not register_lr:a.d(32,0,1,8); a.emit(0x7C0803A6)
     a.d(14,1,1,0x90); a.emit(ORIGINAL)
     a.branch('return')
     data=len(a.words)*4
@@ -87,13 +90,20 @@ def installed_data(memory):
         result = inspect_c2(memory, HOOK, ORIGINAL, {'story_permissions':words}, ((offset,32),))
     except MemoryUnavailable:
         from ..world_constants import load_data
-        old_words, offset = payload(False)
+        old_words, offset = payload(True,True,False)
         try:
-            result = inspect_c2(memory, HOOK, ORIGINAL, {'before_compact_permission':old_words}, ((offset,32),))
+            result = inspect_c2(memory, HOOK, ORIGINAL, {'story_permissions':old_words}, ((offset,32),))
         except MemoryUnavailable:
-            old = load_data('progression_hook_previous.json'); offset = old['offset']
-            result = inspect_c2(memory, HOOK, ORIGINAL, {'previous':old['words']}, ((offset,24),))
-    if result.get('variant') == 'before_compact_permission': offset = payload(False)[1]
+            old_words, offset = payload(True,False,False)
+            try:
+                result = inspect_c2(memory, HOOK, ORIGINAL, {'story_permissions':old_words}, ((offset,32),))
+            except MemoryUnavailable:
+                old_words,offset=payload(False,False,False)
+                try:
+                    result=inspect_c2(memory,HOOK,ORIGINAL,{'before_compact_permission':old_words},((offset,32),))
+                except MemoryUnavailable:
+                    old = load_data('progression_hook_previous.json'); offset = old['offset']
+                    result = inspect_c2(memory, HOOK, ORIGINAL, {'previous':old['words']}, ((offset,24),))
     memory.story_permissions_installed = result.get('variant') in ('story_permissions', 'before_compact_permission')
     if not result['installed']: return None
     address = result['target'] + offset

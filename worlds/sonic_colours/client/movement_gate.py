@@ -22,10 +22,12 @@ STATE_MACHINE_VTABLE = 0x8075A0F8
 PLAYER_VTABLE = 0x8075AEF8
 # Permission bit 1 = owned/unlocked. State 43 is crouch (first copy),
 # state 41 is Slide (second copy). 9 = Jump Dash (user's Mid-Air Boost).
-STATE_PERMISSION = {38: 7, 8: 0, 9: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
+STATE_PERMISSION = {48:11,29: 9, 30: 10, 38: 7, 8: 0, 9: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
 CAPABILITY_NAMES = ('Double Jump', 'Mid-Air Boost', 'Homing Attack',
-                    'Wall Jump', 'Slide', 'Crouch', 'Stomp', 'Drift')
+                    'Wall Jump', 'Slide', 'Crouch', 'Stomp', 'Drift', 'Swim', 'Rail Jump', 'Rail Switch', 'Quick Step')
 DATA_WORDS = 2                 # C2 control + native telemetry; read-only table follows
+MENU_POLICY_ARMED = 1  # activation only; current guest owner is resolved natively
+MENU_SCENES = ('world_map','global_map','game_land_select')
 
 
 def permissions(counts):
@@ -40,6 +42,9 @@ def permissions(counts):
         counts['Stomp'] > 0,
         counts.get('Drift', 0) > 0,
         counts.get('Swim', 0) > 0,
+        counts.get('Rail Jump',0)>0,
+        counts.get('Rail Switch',0)>0,
+        counts.get('Quick Step',0)>0,
     )) if present)
 
 
@@ -55,15 +60,13 @@ def payload(gecko=False):
     a.d(37, 1, 1, -0x80)       # stwu r1,-64(r1)
     a.d(47, 9, 1, 8)
     a.emit(ORIGINAL)  # capture native predecessor before scratch work
-    a.emit(0x7D600026)        # mfcr r11
-    a.d(36, 11, 1, 104)
-    a.emit(0x7D6802A6)        # mflr r11
-    a.d(36, 11, 1, 108)
+    # Native 80033890 immediately replaces CR0 with cmpw. All gate
+    # comparisons affect only CR0; CR1..7 are untouched. Saved r29 holds LR.
+    a.emit(0x7FA802A6)        # mflr r29, restored by lmw at exit
     a.emit(0x48000005)        # bl +4 for PC-relative data, LR restored on exit
     pic_base = len(a.words)*4
     a.emit(0x7D8802A6)        # mflr r12
-    fix_index = len(a.words)
-    a.d(14, 12, 12, 0)         # addi r12,r12, data-pc
+    # Use PIC base directly; mailbox/table displacements are fixed below.
     a.d(32, 9, 12, 0)          # lwz r9, controller
     a.d(11, 0, 9, 0); a.branch('allow', 0x41820000)
     # Initial activation still requires a host-attributed living Sonic and
@@ -71,12 +74,11 @@ def payload(gecko=False):
     # the reverse player+70 -> +8 link follow replacements without a host gap.
     # The nonzero mailbox enables the authenticated AP policy. Resolve each
     # newly constructed native Sonic machine in the guest, before host polling.
-    a.emit(0x7FE9FB78)        # mr r9,r31
-    a.d(32, 10, 9, 0)         # verify controller vtable remains canonical
+    a.d(32, 10, 31, 0)         # verify current guest machine vtable
     a.d(15, 11, 0, STATE_MACHINE_VTABLE >> 16)
     a.d(24, 11, 11, STATE_MACHINE_VTABLE & 0xffff)
     a.emit(0x7C0A5800); a.branch('allow', 0x40820000)
-    a.d(32, 11, 9, 0x28)  # actual native machine owner
+    a.d(32, 11, 31, 0x28)  # actual native machine owner
     a.d(11, 0, 11, 0); a.branch('allow', 0x41820000)
     a.d(32, 10, 11, 0)
     a.d(15, 9, 0, PLAYER_VTABLE >> 16)
@@ -99,6 +101,22 @@ def payload(gecko=False):
     # to a word boundary. Zero denotes an unrestricted native state.
     # Unlike a long chain of comparisons this also restores the Game Land
     # speed-UI C2 in the tightly constrained Gecko codehandler allocation.
+    a.d(11,0,4,48);a.branch('rail_lookup',0x40820000)
+    a.d(14,9,0,2048);a.branch('permission')
+    a.label('rail_lookup')
+    # Two independent wide permissions: GrindJumpShort 29, GrindJumpSide 30.
+    a.d(14,9,4,-29)
+    a.d(10,0,9,1);a.branch('table_lookup',0x41810000)
+    a.d(14,10,0,512)
+    a.emit(31<<26 | 10<<21 | 9<<16 | 9<<11 | 24<<1) # slw r9,r10,r9
+    # Held actions 2/3, native input getter 80056CA0: +48 bit 2/3.
+    # Adding Switch to an explicit Switch request is idempotent; adding it
+    # to a directional Jump requires BOTH permissions, not either one.
+    a.d(32,10,11,0x88);a.d(32,10,10,0x48)
+    a.d(28,10,10,0xc);a.branch('permission',0x41820000)
+    a.d(24,9,9,1024)
+    a.branch('permission')
+    a.label('table_lookup')
     a.d(14, 9, 4, -8)
     a.d(10, 0, 9, 5); a.branch('lookup', 0x40810000)
     a.d(14, 9, 4, -38)
@@ -121,10 +139,10 @@ def payload(gecko=False):
     a.label('permission')
     a.d(32, 10, 12, 4)         # permissions bitmask
     a.emit(31<<26 | 10<<21 | 10<<16 | 9<<11 | 28<<1 | 1)  # and. r9,r10,r9
-    a.branch('allow', 0x40820000)  # permission bit present: skip denial
+    a.emit(0x7C0A4800) # cmpw r10,r9: all requested permission bits required
+    a.branch('allow', 0x41820000)
     def restore():
-        a.d(32, 11, 1, 104); a.emit(0x7D6FF120) # mtcrf 0xff,r11
-        a.d(32, 11, 1, 108); a.emit(0x7D6803A6) # mtlr r11
+        a.emit(0x7FA803A6) # mtlr r29; lmw restores its original value
         a.d(46, 9, 1, 8)
         a.d(14, 1, 1, 0x80)
     a.label('deny')
@@ -136,7 +154,7 @@ def payload(gecko=False):
     # 80159A70). Retaining an already forbidden predecessor is ineffective.
     # Route denied attempts through that same native transition/cleanup.
     # r9 retains the lookup permission byte: only Drift/Slide use 0x90.
-    a.d(28, 9, 9, 0x90)
+    a.d(28, 9, 9, 0x890)  # native Run exit also ends QuickStep (80194070)
     a.d(14, 4, 0, 3)
     a.branch('allow',0x40820000)
     a.d(32, 4, 31, 0x20)          # other gates retain native predecessor
@@ -156,8 +174,10 @@ def payload(gecko=False):
         a.emit(0x60000000)   # C2 must contain an even number of words
     a.emit(0)                 # filled by Gecko or direct plan (HOOK + 4)
     words = a.finish()
-    words[fix_index] |= (data_offset - pic_base) & 0xffff
-    words[table_fix] |= (table_offset - data_offset) & 0xffff
+    for i,word in enumerate(words):
+        if word>>26 in (32,36) and (word>>16)&31==12:
+            words[i]=(word&0xffff0000)|(((word&0xffff)+data_offset-pic_base)&0xffff)
+    words[table_fix] |= (table_offset - pic_base) & 0xffff
     return words, deny_index, data_offset
 
 
@@ -213,6 +233,38 @@ def _gecko_install(memory):
         memory.movement_legacy_profile = False
     except MemoryUnavailable:
         from ..world_constants import load_data
+        previous=load_data('movement_v11_no_quick_step_previous.json')
+        try:
+            info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_before_quick_step':previous['words']},
+                            ((previous['offset'],8),),label='previous movement without Quick Step')
+            memory.movement_legacy_profile=True
+            return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
+        except MemoryUnavailable:
+            pass
+        previous=load_data('movement_v11_rail_direction_previous.json')
+        try:
+            info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_rail_direction_previous':previous['words']},
+                            ((previous['offset'],8),),label='previous rail gate without directional check')
+            memory.movement_legacy_profile=True
+            return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
+        except MemoryUnavailable:
+            pass
+        previous=load_data('movement_v11_no_rail_switch_previous.json')
+        try:
+            info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_v11_no_rail_switch':previous['words']},
+                            ((previous['offset'],8),),label='previous movement without Rail Switch')
+            memory.movement_legacy_profile=True
+            return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
+        except MemoryUnavailable:
+            pass
+        previous=load_data('movement_v11_no_rail_previous.json')
+        try:
+            info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_v11_no_rail':previous['words']},
+                            ((previous['offset'],8),),label='previous movement without Rail Jump')
+            memory.movement_legacy_profile=True
+            return info['target']+previous['offset'],'Dolphin Gecko C2 (update required)'
+        except MemoryUnavailable:
+            pass
         previous=load_data('movement_v11_no_eject_previous.json')
         try:
             info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_v11_no_eject':previous['words']},
@@ -297,7 +349,11 @@ def gecko_lines():
 def configure(memory, snapshot, owned, transport=None):
     """Arm an exact recognized guest hook for a verified living PAL Sonic actor.
 
-    The owner is cleared BEFORE any mask changes and armed LAST. No effect is
+    Bound map scenes can preload policy before the next actor is constructed.
+    The guest treats the mailbox as activation and independently verifies its
+    current machine/player/reverse link on every request. No stale host pointer
+    is dereferenced. The owner is cleared BEFORE mask changes and armed LAST.
+    No effect is
     claimed if the native gate has not demonstrably run in Dolphin gameplay.
     """
     match = installed_data(memory, transport)
@@ -306,7 +362,7 @@ def configure(memory, snapshot, owned, transport=None):
                 'swim_gate_verified': False, 'breath_gate_verified': False}
     data, method = match
     if getattr(memory, 'movement_legacy_profile', False):
-        return {'status':'Update complete Gecko profile: installed payload lacks current Drift/Slide exit behavior', 'native_gate_verified':False}
+        return {'status':'Update complete Gecko profile: installed payload lacks current movement permissions (Quick Step/Rail)', 'native_gate_verified':False}
     stage = next(iter(snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
     player = stage.get('player', {}).get('actor')
     ctrl = 0
@@ -315,6 +371,8 @@ def configure(memory, snapshot, owned, transport=None):
     prior_epoch = _STABLE_ARM_EPOCH.get(data)
     transient_grace = False
     stage_epoch = snapshot.stage_epoch
+    menu_preload = (snapshot.scene in MENU_SCENES and snapshot.scene_verified
+                    and snapshot.stable_polls >= 1)
     same_stage = bool(prior_epoch and prior_epoch[0] == stage_epoch)
     if (same_stage and snapshot.scene_verified and snapshot.scene == 'gameplay'
             and player is None):
@@ -354,13 +412,21 @@ def configure(memory, snapshot, owned, transport=None):
                                  else 'actor/backreference stable; native guest request guard active (host state IDs unreliable)')
         else:
             controller_reason = f'awaiting native controller stage rearm ({seen}/{required_samples})'
-    if not ctrl:
+    if menu_preload:
+        ctrl = MENU_POLICY_ARMED
+        controller_reason = 'bound map policy preloaded; guest resolves next living owner'
+    if not ctrl or menu_preload:
         # Only transient -1 samples from the SAME previously stable stage may
         # retain grace; otherwise stale epoch trust must be forgotten.
         if not controller_reason.startswith('awaiting native controller stage rearm'):
             _STABLE_ARM_EPOCH.pop(data, None)
             _STAGE_ARM_OBSERVATIONS.pop(data, None)
     mask = permissions(owned['counts'])
+    from .skydiving import configure as configure_skydiving
+    try:
+        skydiving = configure_skydiving(memory,snapshot,owned) if ctrl else {'status':'awaiting living movement owner'}
+    except MemoryUnavailable as error:
+        skydiving = {'status':str(error),'installed':False}
     before_ctrl, before_mask = prior_ctrl, memory.read_u32(data+4)
     if (before_ctrl, before_mask) != (ctrl, mask):
         if before_ctrl:
@@ -373,9 +439,11 @@ def configure(memory, snapshot, owned, transport=None):
     # end-to-end ability/animation test. Only read after exact payload verification.
     denied_count, last_denied = 0, 0
     return {'status': 'armed native movement request-gate V11 native state-machine guarded via '+method if ctrl else 'movement hook fail-open: '+controller_reason,
+            'skydiving':skydiving,
             'native_gate_verified': False, 'installed_signature_verified': True, 'transport': method,
-            'request_machine':f'0x{ctrl:08X}' if ctrl else None,
-            'controller':f'0x{stage.get("player",{}).get("movement",{}).get("controller",0):08X}' if ctrl else None, 'owned_mask':mask,
+            'request_machine':f'0x{ctrl:08X}' if ctrl and not menu_preload else None,
+            'controller':f'0x{stage.get("player",{}).get("movement",{}).get("controller",0):08X}' if ctrl and not menu_preload else None, 'owned_mask':mask,
+            'menu_policy_preloaded':menu_preload,
             'denied_transition_count':denied_count,
             'last_denied_state':last_denied if denied_count else None,
             'guest_denial_counter_nonzero':bool(denied_count),

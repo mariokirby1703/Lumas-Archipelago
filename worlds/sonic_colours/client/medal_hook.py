@@ -14,13 +14,17 @@ HOOK, ORIGINAL = 0x802F27C4, 0x7F83E378  # mr r3,r28; next calls hide and remove
 VTABLE = 0x8077E714
 
 
-def payload():
+def payload(compact=True):
     a = PPC()
-    a.d(37, 1, 1, -0xa0)
-    a.d(36, 0, 1, 16); a.emit(0x7C0802A6); a.d(36, 0, 1, 8)
-    a.emit(0x7C000026); a.d(36, 0, 1, 12)
+    # Next instruction calls 80072B18 with only r3; volatile registers,
+    # CR0 and LR are dead here. Enclosing epilogue restores its saved LR.
+    # This call-free probe changes no nonvolatile registers or CR fields.
+    if not compact:
+        a.d(37, 1, 1, -0xa0)
+        a.d(36, 0, 1, 16); a.emit(0x7C0802A6); a.d(36, 0, 1, 8)
+        a.emit(0x7C000026); a.d(36, 0, 1, 12)
     registers = (3, 4, 5, 6, 7, 12)
-    a.d(47, 3, 1, 20)
+    if not compact: a.d(47, 3, 1, 20)
     a.emit(0x48000005); base = len(a.words)*4
     a.emit(0x7D8802A6); fix = len(a.words); a.d(14, 12, 12, 0)
     def equal(ra, rb):
@@ -54,10 +58,12 @@ def payload():
     a.d(32, 6, 12, 40); a.d(32, 7, 12, 44)
     a.emit(0x7CC63B78); a.d(36, 6, 12, 40)
     a.label('end')
-    a.d(46, 3, 1, 20)
-    a.d(32, 0, 1, 12); a.emit(0x7C0FF120)
-    a.d(32, 0, 1, 8); a.emit(0x7C0803A6)
-    a.d(32, 0, 1, 16); a.d(14, 1, 1, 0xa0); a.emit(ORIGINAL)
+    if not compact:
+        a.d(46, 3, 1, 20)
+        a.d(32, 0, 1, 12); a.emit(0x7C0FF120)
+        a.d(32, 0, 1, 8); a.emit(0x7C0803A6)
+        a.d(32, 0, 1, 16); a.d(14, 1, 1, 0xa0)
+    a.emit(ORIGINAL)
     a.branch('return')
     offset = len(a.words)*4; a.words[fix] |= (offset-base)&0xffff
     for _ in range(14): a.emit(0)
@@ -72,9 +78,22 @@ def installed_data(memory):
     try:
         result = inspect_c2(memory, HOOK, ORIGINAL, {'egg_medal': words}, ((offset, 56),), 'Eggman Heart')
     except MemoryUnavailable:
-        from ..world_constants import load_data
-        old = load_data('medal_hook_previous.json'); offset = old['offset']
-        result = inspect_c2(memory, HOOK, ORIGINAL, {'previous':old['words']}, ((offset,44),), 'Eggman Heart')
+        words, offset = payload(False)
+        try:
+            result = inspect_c2(memory, HOOK, ORIGINAL, {'egg_medal':words}, ((offset,56),), 'Eggman Heart previous ABI')
+        except MemoryUnavailable:
+            return _previous_data(memory)
+    return _validated_data(memory,result,offset)
+
+
+def _previous_data(memory):
+    from ..world_constants import load_data
+    old = load_data('medal_hook_previous.json'); offset = old['offset']
+    result = inspect_c2(memory, HOOK, ORIGINAL, {'previous':old['words']}, ((offset,44),), 'Eggman Heart')
+    return _validated_data(memory,result,offset)
+
+
+def _validated_data(memory,result,offset):
     memory.medal_stage_capture = result.get('variant') == 'egg_medal'
     if not result['installed']: return None
     memory.medal_data_size = 56 if memory.medal_stage_capture else 44

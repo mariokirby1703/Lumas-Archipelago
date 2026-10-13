@@ -114,3 +114,20 @@ def test_wrong_game_reports_observed_disc_and_never_claims_verification():
     assert memory.revision_observation['revision'] == 2
     assert not memory.revision_observation['verified']
     assert memory.latest_read['time_utc']
+
+
+@pytest.mark.parametrize('failed_check',[1,2,3])
+def test_stage_transition_distinguishes_prewrite_from_postwrite(failed_check):
+    backend=FakeBackend();memory=SonicMemory(backend);address=0x90001000
+    backend.put(address,(10).to_bytes(4,'big'))
+    calls=0
+    def guard(*args):
+        nonlocal calls
+        calls+=1
+        if calls==failed_check:raise MemoryUnavailable('stage_context_changed')
+        return 'stable-native-owner'
+    memory.write_guard=guard
+    expected='WRITE_BLOCKED: prewrite_context' if failed_check<3 else 'WRITE_UNCERTAIN: context_revalidation_after_write'
+    with pytest.raises(MemoryUnavailable,match=expected):
+        memory.write_u32(address,25,expected=10,operation='stats')
+    assert memory.read_u32(address)==(10 if failed_check<3 else 25)

@@ -36,6 +36,21 @@ MOVEMENT_POOL += ('Drift',)
 ITEM_TABLE['Assist Change'] = BASE_ID + 47
 MOVEMENT_ITEMS += ('Assist Change',)
 MOVEMENT_POOL += ('Assist Change',)
+ITEM_TABLE['Progressive Stunts'] = BASE_ID + 48
+MOVEMENT_ITEMS += ('Progressive Stunts',)
+MOVEMENT_POOL += ('Progressive Stunts',)*5
+ITEM_TABLE['Rail Jump'] = BASE_ID + 49
+MOVEMENT_ITEMS += ('Rail Jump',)
+MOVEMENT_POOL += ('Rail Jump',)
+ITEM_TABLE['Rail Switch'] = BASE_ID + 50
+MOVEMENT_ITEMS += ('Rail Switch',)
+MOVEMENT_POOL += ('Rail Switch',)
+ITEM_TABLE['Skydiving'] = BASE_ID + 51
+MOVEMENT_ITEMS += ('Skydiving',)
+MOVEMENT_POOL += ('Skydiving',)
+ITEM_TABLE['Quick Step'] = BASE_ID + 52
+MOVEMENT_ITEMS += ('Quick Step',)
+MOVEMENT_POOL += ('Quick Step',)
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}
 
 

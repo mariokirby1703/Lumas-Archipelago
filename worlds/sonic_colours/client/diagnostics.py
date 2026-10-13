@@ -59,7 +59,7 @@ def diagnostic(ctx, memory=None):
         result['effective_wisps'] = effective['wisps']
         result['effective_movement_items'] = {name:effective['counts'][name] for name in
             ('Wall Jump','Homing Attack','Mid-Air Boost','Double Jump','Stomp',
-             'Progressive Crouch','Swim','Breath','Progressive Breathing')}
+             'Progressive Crouch','Swim','Breath','Progressive Breathing','Drift','Assist Change','Progressive Stunts','Rail Jump','Rail Switch')}
         result.update({'save_armed': runtime.guard.armed, 'ap_red_rings': owned['red_rings'],
                        'emerald_count': len(owned['emeralds']), 'wisps': owned['wisps'],
                        'white_boost': 'White Boost Wisp' in owned['wisps'],

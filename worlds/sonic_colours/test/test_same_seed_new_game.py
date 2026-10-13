@@ -66,3 +66,31 @@ def test_repeat_intro_results_produce_new_binding_witness_even_when_checked(tmp_
         assert len(events)==1 and events[0]['score']==123
         assert events[0]['playthrough_epoch']==j.data['bootstrap']['epoch']
         assert j.data['checks']==list(slot['locations'].values())
+
+
+@pytest.mark.parametrize('same_session',[False,True])
+def test_aborted_unbound_prologue_can_restart_on_fresh_native_intro(tmp_path,same_session):
+    with Journal(tmp_path,IDENTITY) as j:
+        j.data['bootstrap']={'epoch':'old','session':fresh().session if same_session else 'old-session',
+                             'intro_stage_epoch':'old-stage','checks':[847001003],
+                             'observed_missions':['stg110'],'goal':False}
+        j.data['receipts']=[847000048]
+        g=SaveGuard(j);g.observe(fresh())
+        assert g.state==PlaythroughState.MANDATORY_PROLOGUE
+        assert g.can_record_pickups(fresh())
+        assert j.data['bootstrap']['session']==fresh().session
+        assert j.data['bootstrap']['epoch']!='old'
+        assert j.data['checks']==[847001003] and j.data['receipts']==[847000048]
+        assert len(j.data['prior_prologues'])==1
+        g.observe(fresh());assert len(j.data['prior_prologues'])==1
+
+
+@pytest.mark.parametrize('change',[{'new_game_verified':False},{'fresh_fields':(True,False)},
+    {'actual_mission':'stg130'},{'stable_polls':1},{'save_identity':'foreign','save_identity_verified':True}])
+def test_unbound_session_recovery_still_requires_freshness(tmp_path,change):
+    with Journal(tmp_path,IDENTITY) as j:
+        old={'epoch':'old','session':'old-session','checks':[],'observed_missions':[],'goal':False}
+        j.data['bootstrap']=dict(old)
+        g=SaveGuard(j);g.observe(replace(fresh(),**change))
+        assert j.data['bootstrap']==old
+        assert 'prior_prologues' not in j.data

@@ -283,8 +283,27 @@ class Runtime:
                     mission, [event['ring'] for event in events], sorted(checks))
 
     def poll(self, memory, item_ids, history_ready):
+        steps=self.poll_steps(memory,item_ids,history_ready)
+        while True:
+            try:next(steps)
+            except StopIteration as done:return done.value
+
+    def poll_steps(self, memory, item_ids, history_ready):
         self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
+        # Capture irreversible pickup/result evidence before slow permission
+        # writes. Network clients can transmit this checkpoint and receive
+        # acknowledgements before continuing the same synchronous poll.
+        self.observe_pickups()
+        self.observe_results()
+        can_send=self.guard.can_send(self.snapshot)
+        if can_send and self.journal.data.get('save_identity') is not None:
+            saved_checks=detect_checks(self.slot_data,self.snapshot)
+            saved_checks-={code for name,code in self.slot_data['locations'].items()
+                           if LOCATION_TABLE[name].kind in ('ring','rings','capsule')}
+            self.journal.add_checks(saved_checks)
+        yield (set(self.journal.data['checks']) if can_send else set(),
+               bool(can_send and self.journal.data.get('goal_observed')))
         # Water entry and controller replacement must be handled before slow
         # journal, resource-bank and progression operations in this poll.
         if self.slot_data['options'].get('movement_unlocks'):
@@ -300,8 +319,6 @@ class Runtime:
                     setattr(self,name,result)
                 except MemoryUnavailable as error:
                     setattr(self,name,{'status':str(error),'write_verified':False})
-        self.observe_pickups()
-        self.observe_results()
         try:
             from .physical_rings import apply as restore_physical_rings
             self.physical_ring_status = restore_physical_rings(memory, self.snapshot, self.guard)
@@ -430,6 +447,29 @@ class Runtime:
         self.music_status = self.resource_music
         quiet_logging.record('music', '%s', self.music_status['status'])
 
+    def refresh_movement_permissions(self,memory,owned):
+        """Apply idempotent ability permissions on receipt/override events.
+
+        Uses existing per-operation write guards. No resource scans, filler
+        replay or persistent progression writes; unavailable scenes defer.
+        """
+        if self.snapshot is None:return
+        from .stunts import configure as stunts
+        from .player_switch import configure as assist
+        if self.slot_data['options'].get('movement_unlocks'):
+            from .movement_gate import configure as movement
+            from .water_native import configure as breath
+            for attribute,action in (
+                ('movement_status',lambda:movement(memory,self.snapshot,owned,transport='direct' if self.experimental_direct_hooks else 'gecko')),
+                ('breath_status',lambda:breath(memory,self.snapshot,self.guard,owned,self.journal))):
+                try:setattr(self,attribute,action())
+                except MemoryUnavailable as error:setattr(self,attribute,{'status':str(error)})
+        for name,action in (('stunts',lambda:stunts(memory,self.snapshot,owned,self.slot_data)),
+                            ('assist_change',lambda:assist(memory,self.snapshot,owned))):
+            try:result=action()
+            except MemoryUnavailable as error:result={'status':str(error)}
+            self.hooks.gameplay_controls_status[name]=result
+
     def configure_native_hooks(self, memory, owned):
         """Project authenticated ownership into independent native controls.
 
@@ -459,6 +499,11 @@ class Runtime:
             self.hooks.gameplay_controls_status['emerald_ui']=apply_emerald_ui(memory,self.snapshot,self.guard,owned)
         except MemoryUnavailable as error:
             self.hooks.gameplay_controls_status['emerald_ui']={'status':str(error)}
+        from .stunts import configure as configure_stunts
+        try:
+            self.hooks.gameplay_controls_status['stunts']=configure_stunts(memory,self.snapshot,owned,self.slot_data)
+        except MemoryUnavailable as error:
+            self.hooks.gameplay_controls_status['stunts']={'status':str(error)}
         from .player_switch import configure as configure_assist
         try:
             self.hooks.gameplay_controls_status['assist_change']=configure_assist(memory,self.snapshot,owned)
@@ -612,10 +657,22 @@ class Runtime:
                             memory.read_u32(self.snapshot.boost_max_address)))
         return context
 
+    @staticmethod
+    def delivery_readback_verified(effect):
+        addresses=effect.get('addresses',())
+        return (bool(addresses) and effect.get('completed_writes')==len(addresses)
+                and effect.get('state') in ('verifying','uncertain')
+                and effect.get('family') in ('rings','lives','boost'))
+
     def settle_effects(self, memory):
         for index, pending in list(self.inflight.items()):
             effect = self.journal.data['effects'][str(index)]
             if self.snapshot.scene not in ('gameplay', 'paused'):
+                if self.delivery_readback_verified(effect):
+                    effect['confirmation_source']='all native writes/readbacks verified before scene exit'
+                    self.journal.confirm(index)
+                    del self.inflight[index]
+                    continue
                 effect.update(state='uncertain', reason='left living gameplay before verification completed')
                 self.journal.save()
                 del self.inflight[index]
@@ -627,6 +684,11 @@ class Runtime:
                 continue
             elapsed = self.clock() - pending['started']
             if context != effect['context']:
+                if self.delivery_readback_verified(effect):
+                    effect['confirmation_source']='all native writes/readbacks verified before actor change'
+                    self.journal.confirm(index)
+                    del self.inflight[index]
+                    continue
                 effect.update(state='uncertain', reason='actor/context changed before verification')
                 self.journal.save()
                 del self.inflight[index]
@@ -648,9 +710,9 @@ class Runtime:
                 coherent = len(set(values)) == 1 and all(0 <= value <= (99 if pending['family'] == 'lives' else 9999) for value in values)
             effect['last_observed'] = values
             effect['elapsed'] = elapsed
-            if elapsed >= .02 and correct:
+            if elapsed >= .02 and coherent and (correct or self.delivery_readback_verified(effect)):
                 pending['later_frame'] = True
-            if .5 <= elapsed < 2:
+            if elapsed >= .5:
                 pending['half_second'] = pending.get('half_second', False) or (coherent and pending.get('later_frame'))
             if elapsed >= 2:
                 if coherent and pending.get('later_frame') and pending.get('half_second'):
@@ -683,6 +745,13 @@ class Runtime:
             if name not in DELIVERY_ITEMS:
                 continue
             recorded = self.journal.data['effects'].get(str(index))
+            if (recorded and recorded.get('state')=='uncertain' and self.delivery_readback_verified(recorded)
+                    and recorded.get('reason') in ('left living gameplay before verification completed',
+                        'actor/context changed before verification',
+                        'no later-frame effect witness or counter sources disagree')):
+                recorded['confirmation_source']='historical complete native write/readback; no replay'
+                self.journal.confirm(index,verified_delivery=True)
+                continue
             family = 'lives' if name == '1-Up' else 'boost' if name in ('Half Boost Refill', 'Full Boost Refill') else 'rings'
             amount = rings_amount(self.journal, index) if name == 'Rings' else None
             recorded = self.journal.data['effects'].get(str(index))
@@ -758,7 +827,7 @@ class Runtime:
             grant_context = self.boost_grant_context(memory) if family == 'boost' else None
             self.journal.prepare(index, item, context, before, after)
             quiet_logging.record('item_effect', 'Native write attempted: receipt %s, %s, %s -> %s', index, name, before, after)
-            self.journal.data['effects'][str(index)].update(addresses=addresses, family=family, stage_epoch=snapshot.stage_epoch, reason=None)
+            self.journal.data['effects'][str(index)].update(addresses=addresses, family=family, stage_epoch=snapshot.stage_epoch, reason=None, completed_writes=0)
             if family == 'boost':
                 self.journal.data['effects'][str(index)]['maximum'] = maximum
             self.journal.save()
@@ -773,6 +842,8 @@ class Runtime:
                     memory.write_u32(target, after, expected=before if target == address else current,
                                      operation='boost_stats' if family == 'boost' else 'stats')
                     completed_writes += 1
+                    self.journal.data['effects'][str(index)]['completed_writes']=completed_writes
+                    self.journal.save()
             except MemoryUnavailable as error:
                 if completed_writes == 0 and str(error).startswith('WRITE_BLOCKED:'):
                     # SonicMemory emits WRITE_BLOCKED only before backend mutation.
@@ -794,7 +865,7 @@ class Runtime:
             self.inflight[index] = {'started': self.clock(), 'addresses': addresses,
                                     'family': family, 'positive': name != 'Ring Loss Trap'}
             occupied.add(family)
-            quiet_logging.record('item_effect', 'Immediate readback verified: receipt %s; queued for 0.5s/2s settlement', index)
+            quiet_logging.record('item_effect', 'Immediate readback verified: receipt %s; settlement follows on a later observation', index)
 
     def pending_effects(self):
         return [i for i, item in enumerate(self.journal.data['receipts'])

@@ -17,14 +17,15 @@ def test_cached_type_preserves_native_capsule_calls(monkeypatch,colour,special,o
     assert run(mode,owned,colour=colour,special=special,white_control=True,random_owned=owned)==original
 
 
-def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,white_control=None,profile=1,random_capsule=False,random_owned=False):
+def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,white_control=None,profile=1,random_capsule=False,random_owned=False,model_present=True,spawned=False,compact=False):
     if white_control is None: white_control = colour not in (-1, 0xffffffff)
     actor,model,manager,state=0x90010000,0x90020000,0x90030000,0x90040000
     mem={actor:0x80761534,actor+0x110:opened,actor+0x148:special,actor+0x114:colour,
-         actor+0xb0:model,actor+0x34:manager,model:0x8077d12c,
+         actor+0xb0:model if model_present else 0,actor+0x34:manager,model:0x8077d12c,
          model+8:actor,model+0x88:mode,actor+0x128:0,
          actor+0xb4: 0x90060000 if (mode if interaction is None else interaction) else 0,
          actor+0x149:alternate,actor+0x14a:int(random_capsule)}
+    mem[actor+0x64]=0x90080000;mem[0x90080011]=int(spawned)
     regs=list(range(32));regs[1]=0x90050000;regs[2]=0x808f0000;regs[31]=actor
     mem[regs[2]-0x7c48]=0x80720000
     original=regs[:];lr,ctr,cr=0x80012345,0x80045678,0x12345678
@@ -102,7 +103,7 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,whit
                 assert regs[3]==actor and regs[4]==manager and regs[5]==1
                 mem[model+0x88]=1
             elif ctr==0x800d3da4:
-                assert regs[3]==actor;mem[model+0x88]=0
+                assert regs[3]==actor;mem[actor+0xb0]=model;mem[model+0x88]=0
             elif ctr==0x800d3ff8:
                 assert regs[3]==actor and regs[4]==manager and not mem[actor+0xb4]
                 mem[actor+0xb4]=0x90060000
@@ -116,13 +117,57 @@ def run(mode,owned,opened=0,colour=1,special=0,interaction=None,alternate=0,whit
         elif w==0x60000000:pass
         else:raise AssertionError(hex(w))
     else:raise AssertionError('PPC loop')
-    assert regs[1:]==original[1:] and (lr,ctr,cr)==initial
-    assert (fpr,paired,fpscr,gqr0)==floating
+    if compact:
+        assert all(regs[i]==original[i] for i in (1,2,*range(13,32)))
+    else:
+        assert regs[1:]==original[1:] and (lr,ctr,cr)==initial
+        assert (fpr,paired,fpscr,gqr0)==floating
     assert regs[0]==0 # displaced original lwz r0,128(r31)
     assert mem[actor+0x110]==opened
     if 0x800d517c in [c[0] for c in calls]:
         assert mem[mem[actor+0xb4]+0x54] == 1
     return [c[0] for c in calls],mem[model+0x88]
+
+
+@pytest.mark.parametrize('spawned',[False,True])
+@pytest.mark.parametrize('compact',[False,True])
+def test_locked_scripted_capsule_waits_for_native_spawn_then_creates_only_ghost(monkeypatch,spawned,compact):
+    from ..client import capsule_refresh as capsule
+    if compact:
+        monkeypatch.setitem(globals(),'payload_words',lambda:capsule.payload_words(
+            compact_abi=True,epilogue_abi=True,cache_permissions=True))
+    calls,mode=run(0,False,colour=6,white_control=True,model_present=False,
+                   spawned=spawned,compact=compact)
+    assert calls==([0x800D3DA4,0x800D5490] if spawned else [0x800D4298])
+    assert mode==0
+    assert 0x800D3FF8 not in calls and 0x800D517C not in calls
+
+
+def test_opened_scripted_capsule_is_never_recreated():
+    assert run(0,False,colour=6,white_control=True,model_present=False,spawned=True,opened=1)[0]==[]
+
+
+@pytest.mark.parametrize('mode',[0,1])
+@pytest.mark.parametrize('owned',[False,True])
+def test_compact_shared_callees_preserve_nonvolatile_registers(monkeypatch,mode,owned):
+    from ..client import capsule_refresh as capsule
+    expected=run(mode,owned,colour=6,white_control=True)
+    monkeypatch.setitem(globals(),'payload_words',lambda:capsule.payload_words(
+        compact_abi=True,epilogue_abi=True,cache_permissions=True))
+    assert run(mode,owned,colour=6,white_control=True,compact=True)==expected
+
+
+def test_spawn_wait_uses_original_native_visibility_event():
+    from pathlib import Path
+    from ..tools.ppc import Executable
+    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    if not path.exists():pytest.skip('original executable absent')
+    e=Executable(path)
+    # WaitAppear handles message 600F, writes channel 0 = 1 through 72BD8.
+    assert e.read(0x800D6194,4)==bytes.fromhex('2800600F')
+    assert e.read(0x800D619C,12)==bytes.fromhex('7FA3EB78 38800000 38A00001')
+    # Native getter masks exactly bits 16..23 (big-endian wrapper+11).
+    assert e.read(0x8008DAFC,4)==bytes.fromhex('80630010')
 
 
 @pytest.mark.parametrize('colour',range(7))

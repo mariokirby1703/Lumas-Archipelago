@@ -91,7 +91,8 @@ class SonicCommands(ClientCommandProcessor):
         overlay=self.ctx.runtime.test_inventory
         if action == 'reset':
             overlay.reset()
-            logger.warning('All local ability overrides cleared. Real AP receipts restored; changes apply on next Dolphin poll.')
+            self.ctx.refresh_movement_permissions()
+            logger.warning('All local ability overrides cleared. Real AP receipts restored.')
         elif action:
             logger.info('Usage: /testitems [list|reset].')
             return
@@ -99,11 +100,13 @@ class SonicCommands(ClientCommandProcessor):
 
     def _change_test_ability(self, action, raw):
         """One short result line; detailed ownership remains in /testitems."""
+        refresh=False
         try:
             original = self._test_inventory_base()
             overlay = self.ctx.runtime.test_inventory
             if raw.strip().lower() == 'all':
                 results = overlay.change_all_abilities(action, original)
+                refresh=True
                 if any(result['before'] != result['effective'] for result in results):
                     logger.info('%s: all abilities.', 'Given' if action == 'give' else 'Removed')
                 else:
@@ -113,6 +116,7 @@ class SonicCommands(ClientCommandProcessor):
             group = resolve_ability_group(raw)
             if group is not None:
                 results = overlay.change_ability_group(action, group, original)
+                refresh=True
                 label = ('all Wisps' if group == 'wisps' else
                          'all World Shuttles' if group == 'worlds' else
                          'all Movement abilities (max level)' if action == 'give'
@@ -125,6 +129,7 @@ class SonicCommands(ClientCommandProcessor):
                 return
             name, quantity = parse_item_request(raw)
             result = overlay.change(action, name, quantity, original)
+            refresh=True
             if result['before'] == result['effective']:
                 logger.info('No change: %s already %s.', name,
                             'at the requested level' if action == 'give' and name in MAXIMUM
@@ -134,6 +139,8 @@ class SonicCommands(ClientCommandProcessor):
             logger.info('%s: %s%s.', 'Given' if action == 'give' else 'Removed', name, level)
         except ValueError as error:
             logger.warning('%s failed: %s', 'Give' if action == 'give' else 'Remove', error)
+        finally:
+            if refresh:self.ctx.refresh_movement_permissions()
 
     def _cmd_soniccapsules(self):
         """Read-only capsule/ghost-spawn evidence, including missing models."""
@@ -395,6 +402,16 @@ class SonicContext(CommonContext):
             await self.get_username()
         await self.send_connect(game=GAME)
 
+    def refresh_movement_permissions(self):
+        runtime=self.runtime
+        if runtime is None or self.memory is None or runtime.snapshot is None:return
+        identity=runtime.journal.identity
+        if self.authenticated_identity!=(identity['team'],identity['slot'],identity['seed']):return
+        ids=([item.item for item in self.items_received] if self.history_ready
+             else list(runtime.journal.data['receipts']))
+        ids += [item for item in runtime.journal.data.get('permission_receipts',()) if item not in ids]
+        runtime.refresh_movement_permissions(self.memory,runtime.test_inventory.apply(inventory(ids)))
+
     def release_runtime(self):
         if self.runtime:
             self.runtime.guard.disarm()
@@ -478,6 +495,7 @@ class SonicContext(CommonContext):
                     self.history_ready = False
                     self.history_desynced = True
                     logger.error('Receipt synchronization blocked: %s', error)
+            self.refresh_movement_permissions()
         elif cmd == 'Retrieved' and self.barrier in args.get('keys', {}) and not self.history_desynced:
             self.history_ready = True
         if cmd in ('Connected', 'RoomUpdate'):
@@ -549,6 +567,28 @@ async def transmit_checks(ctx, checks=(), goal=False):
     if goal and not ctx.finished_game:
         await ctx.send_msgs([{'cmd': 'StatusUpdate', 'status': ClientStatus.CLIENT_GOAL}])
         ctx.finished_game = True
+
+
+async def poll_runtime(ctx,memory):
+    runtime=ctx.runtime
+    identity=runtime.journal.identity
+    expected=(identity['team'],identity['slot'],identity['seed'])
+    items=[item.item for item in ctx.items_received]
+    steps=runtime.poll_steps(memory,items,ctx.history_ready)
+    try:
+        while True:
+            try:checks,goal=next(steps)
+            except StopIteration as done:return done.value
+            try:await transmit_checks(ctx,checks,goal)
+            except (MemoryUnavailable,ConnectionClosed,OSError) as error:
+                ctx.operation_status['ap_transport']='Location transmission pending: '+str(error)
+            # Let socket acknowledgements and inventory messages run before
+            # expensive data projection; no concurrent native-memory worker.
+            await asyncio.sleep(.001)
+            if ctx.runtime is not runtime or ctx.authenticated_identity!=expected:
+                return set(),False
+            items[:]=[item.item for item in ctx.items_received]
+    finally:steps.close()
 
 
 async def dolphin_loop(ctx):
@@ -629,7 +669,7 @@ async def dolphin_loop(ctx):
                         logger.error('EXPERIMENTAL hook installation failed, restart Dolphin: %s', error)
                         # A partial installation cannot safely continue writing.
                         raise MemoryUnavailable('EXPERIMENT BLOCKED: '+str(error))
-                checks, goal = ctx.runtime.poll(memory, [i.item for i in ctx.items_received], ctx.history_ready)
+                checks, goal = await poll_runtime(ctx,memory)
                 verified = bool((memory.revision_observation or {}).get('verified'))
                 if ctx.deathlink:
                     snap = ctx.runtime.snapshot
@@ -675,6 +715,12 @@ async def dolphin_loop(ctx):
                         ctx.runtime.guard.suspend()
                 if str(error).startswith(('wrong_game', 'unknown_revision')):
                     verified = False
+                    try:
+                        if backend.recover_empty_text_mapping(error):
+                            ctx.dolphin_status='Reattaching Dolphin after repeated empty native text reads; PAL verification pending'
+                            if ctx.runtime:ctx.runtime.hooks.invalidate_session()
+                    except (MemoryUnavailable,RuntimeError,OSError):
+                        pass
             except ConnectionClosed:
                 ctx.dolphin_status = 'AP disconnected; synchronization stopped.'
                 if ctx.runtime:

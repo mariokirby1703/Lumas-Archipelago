@@ -42,7 +42,7 @@ def resolve_ability_group(raw):
               'worldaccess': 'worlds', 'allworldaccess': 'worlds',
               'shuttles': 'worlds', 'allshuttles': 'worlds'}
     return groups.get(key)
-MAXIMUM = {'Progressive Crouch': 2, 'Progressive Breathing': 5,
+MAXIMUM = {'Progressive Stunts':5, 'Progressive Crouch': 2, 'Progressive Breathing': 5,
            GAME_LAND_SPEED: 4}
 
 
@@ -53,7 +53,7 @@ def _key(text):
 # Short capability names are more useful for logic testing than the colour.
 # `breath` means the progressive item. The retired one-off `Breath` item
 # remains available explicitly as `legacy breath` for old seed research.
-_ALIAS = {'crouch': 'Progressive Crouch', 'slide': 'Progressive Crouch',
+_ALIAS = {'stunts':'Progressive Stunts', 'stunt':'Progressive Stunts', 'crouch': 'Progressive Crouch', 'slide': 'Progressive Crouch',
           'breath': 'Progressive Breathing',
           'breathing': 'Progressive Breathing', 'oxygen': 'Progressive Breathing',
           'air': 'Progressive Breathing', 'legacy breath': 'Breath',

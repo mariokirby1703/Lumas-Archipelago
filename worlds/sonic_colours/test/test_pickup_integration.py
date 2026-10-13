@@ -314,7 +314,9 @@ def test_original_bound_colour_permission_fields_and_no_physical_ring_mutation(t
         backend=Overlay(pair);memory=SonicMemory(backend)
         memory.write_guard=WritePolicy(memory,guard,hooks.snapshot)
         for _ in range(3):runtime.poll(memory,[],False)
-        before=runtime.snapshot.persisted_rings
+        # poll may already project witnessed physical pickups after taking its
+        # snapshot. Compare fresh native reads around the permission-only write.
+        before=NativeHooks().snapshot(memory).persisted_rings
         owned=inventory([ITEM_TABLE['Cyan Laser Wisp']])
         hooks.project_permissions(memory,runtime.snapshot,owned,data)
         assert not hooks.capsule_refresh_status['available']

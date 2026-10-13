@@ -32,7 +32,10 @@ def implementation_info():
     from .intro_box import eligible, locate, apply as apply_intro_box
     from .emerald_ui import targets as emerald_ui_targets, apply as emerald_ui_apply
     from .speed_initial import normalize as initial_speed_normalize, gecko_lines as initial_speed_lines
-    functions = (initial_speed_normalize, initial_speed_lines,emerald_ui_targets, emerald_ui_apply,assist_payload, assist_installed, assist_configure, player_switch_normalize, player_switch_lines, game_land_menu_normalize, game_land_menu_lines, oxygen_allocation_key, native_read.classify_playable_entry, breathing_duration, read_native_oxygen, oxygen_target, configure_oxygen, notice_owner, prepare_notice, apply_notice, ring_display_payload, ring_display_installed, witnessed, targets, restore_physical_rings, eligible, locate, apply_intro_box,progression_clears, verified_result_clear, NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
+    from .stunts import payload as stunt_payload, configure as stunt_configure, normalize as stunt_normalize
+    from .memory import DMEBackend
+    from .skydiving import payload as sky_payload, configure as sky_configure, normalize as sky_normalize, installed_data as sky_installed
+    functions = (DMEBackend.recover_empty_text_mapping,stunt_payload, stunt_configure, stunt_normalize,initial_speed_normalize, initial_speed_lines,emerald_ui_targets, emerald_ui_apply,assist_payload, assist_installed, assist_configure, player_switch_normalize, player_switch_lines, game_land_menu_normalize, game_land_menu_lines, oxygen_allocation_key, native_read.classify_playable_entry, breathing_duration, read_native_oxygen, oxygen_target, configure_oxygen, notice_owner, prepare_notice, apply_notice, ring_display_payload, ring_display_installed, witnessed, targets, restore_physical_rings, eligible, locate, apply_intro_box,progression_clears, verified_result_clear, NativeHooks.snapshot, NativeHooks.project_permissions, NativeHooks.project_live_permissions, NativeHooks.kill,
                  NativeHooks.swim, Runtime.poll, Runtime.configure_native_hooks, Runtime.select_resource_music, Runtime.apply_effects, Runtime.effect_context, Runtime.boost_grant_context, Runtime.temporary_boost_allowed, Runtime.enforce_white_boost_gain_lock, rings_amount, detect_checks,
                  SaveGuard.required_polls, SaveGuard.observe, SaveGuard.check, SaveGuard.check_stats, WritePolicy.__call__, NativeHooks._snapshot_after_revision,
                  Runtime.observe_pickups, Runtime.observe_capsules, binding.SaveBinding.attribute,
@@ -52,6 +55,12 @@ def implementation_info():
                  direct_hooks.plan, direct_hooks.install, direct_hooks.inspect, movement_gate.payload, movement_gate.permissions, movement_gate.observed, movement_gate.configure, movement_gate.installed_data, movement_gate.gecko_lines, movement_gate.water_observed, client.log_diagnostic, gameplay_controls.gecko_lines,
                  map_refresh.payload, map_refresh.installed_data, map_refresh.configure, map_transition.payload, map_transition.installed, map_transition.update_payload, map_transition.update_installed, capsule_refresh.gecko_ini)
     digest = hashlib.sha256()
+    for function in (sky_payload,sky_configure,sky_normalize,sky_installed,medal_hook._validated_data,medal_hook._previous_data,
+                     Runtime.refresh_movement_permissions,client.SonicContext.refresh_movement_permissions,
+                     client.SonicCommands._change_test_ability,Runtime.poll_steps,
+                     Runtime.delivery_readback_verified,client.poll_runtime,journal.Journal.confirm):
+        digest.update(function.__qualname__.encode())
+        digest.update(marshal.dumps(function.__code__))
     for function in functions:
         digest.update(function.__qualname__.encode())
         digest.update(marshal.dumps(function.__code__))

@@ -21,7 +21,7 @@ HOOKS = {
 }
 
 
-def payload(kind, compact=True, temporary=True, drain=True, lean=True):
+def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_abi=True):
     if not compact: temporary = False
     a = PPC(); hook, original = HOOKS[kind]
     output = 3 if kind in ('boost', 'speed_get') else 0 if kind == 'speed_ui' else None
@@ -30,8 +30,12 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True):
     a.d(37, 1, 1, -frame)
     if compact:
         a.d(47, 0, 1, 16)
-        a.emit(0x7C0802A6); a.d(36, 0, 1, 144)
-        a.emit(0x7C000026); a.d(36, 0, 1, 148)
+        if register_abi:
+            a.emit(0x7FE802A6)  # saved r31 holds LR across inline, call-free gate
+            a.emit(0x7F800026)  # saved r28 holds CR; restored by lmw
+        else:
+            a.emit(0x7C0802A6); a.d(36, 0, 1, 144)
+            a.emit(0x7C000026); a.d(36, 0, 1, 148)
     else:
         a.d(36, 0, 1, 16); a.emit(0x7C0802A6); a.d(36, 0, 1, 8)
         a.emit(0x7C000026); a.d(36, 0, 1, 12)
@@ -94,8 +98,11 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True):
     a.label('restore')
     if compact:
         if output is not None: a.d(36, output, 1, 16+output*4)
-        a.d(32, 0, 1, 148); a.emit(0x7C0FF120)
-        a.d(32, 0, 1, 144); a.emit(0x7C0803A6)
+        if register_abi:
+            a.emit(0x7F8FF120); a.emit(0x7FE803A6)
+        else:
+            a.d(32, 0, 1, 148); a.emit(0x7C0FF120)
+            a.d(32, 0, 1, 144); a.emit(0x7C0803A6)
         a.d(46, 0, 1, 16)
     else:
         for r in saved:
@@ -118,16 +125,17 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True):
 def installed(memory, kind):
     hook, original = HOOKS[kind]; words, offset = payload(kind)
     from ..world_constants import load_data
-    previous_words, previous_offset = payload(kind, compact=False, temporary=False, lean=False)
+    previous_words, previous_offset = payload(kind, compact=False, temporary=False, lean=False,register_abi=False)
     legacy = load_data('gameplay_hook_legacy.json').get(kind)
-    old_compact, old_offset = payload(kind, temporary=False, lean=False)
-    no_drain, no_drain_offset = payload(kind, drain=False, lean=False)
-    before_lean, before_lean_offset = payload(kind, lean=False)
-    layouts = [(kind, words, offset), ('before_lean', before_lean, before_lean_offset), ('before_drain', no_drain, no_drain_offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
+    old_compact, old_offset = payload(kind, temporary=False, lean=False,register_abi=False)
+    no_drain, no_drain_offset = payload(kind, drain=False, lean=False,register_abi=False)
+    before_lean, before_lean_offset = payload(kind, lean=False,register_abi=False)
+    stack_lr,stack_lr_offset=payload(kind,register_abi=False)
+    layouts = [(kind, words, offset), ('stack_lr',stack_lr,stack_lr_offset), ('before_lean', before_lean, before_lean_offset), ('before_drain', no_drain, no_drain_offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
     if legacy: layouts.append(('legacy', legacy['words'], legacy['offset']))
     for name, candidate, candidate_offset in layouts:
         try:
-            size = 12 if name in (kind, 'before_lean') and kind.startswith('speed') else 20
+            size = 12 if name in (kind, 'stack_lr', 'before_lean') and kind.startswith('speed') else 20
             result = inspect_c2(memory, hook, original, {name:candidate}, ((candidate_offset,size),), label=kind)
             offset = candidate_offset
             break
@@ -135,7 +143,7 @@ def installed(memory, kind):
             failure = error
     else: raise failure
     if not result['installed']: return None
-    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'before_lean')
+    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'stack_lr', 'before_lean')
     address = result['target'] + offset
     values = struct.unpack('>'+'I'*(size//4), memory.read_bytes(address,size))
     owner, index, maximum, model, locked = (*values, 0, 0) if size == 12 else values

@@ -17,6 +17,6 @@ def test_denied_request_becomes_noop_before_callbacks():
 
 
 def test_gated_native_states_and_capacity():
-    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,38,39,40,41,43,44}
+    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,29,30,38,39,40,41,43,44}
     text=movement_gecko.movement_ini()
     assert len(movement_gecko.pairs(text))*8 <= movement_gecko.CAPACITY_BYTES

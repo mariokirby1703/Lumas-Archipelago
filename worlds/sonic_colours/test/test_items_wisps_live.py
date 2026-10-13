@@ -116,16 +116,45 @@ def test_normal_gameplay_counter_changes_do_not_replay_observed_effect(tmp_path,
         assert len(b.writes)==2
 
 
-def test_fast_exit_is_uncertain_and_later_receipts_still_apply(tmp_path):
+def test_verified_delivery_remains_confirmed_after_fast_exit(tmp_path):
     with Journal(tmp_path,IDENTITY) as j:
         r,b,m,tick=runtime_fixture(j);items=[ITEM_TABLE['Rings (+10)']];j.record_history(items)
         r.apply_effects(m,items)
         r.snapshot=replace(r.snapshot,stage_epoch='next')
         items.append(ITEM_TABLE['Rings (+25)']);j.record_history(items)
         r.apply_effects(m,items);settle(r,m,items,tick)
-        assert j.data['effects']['0']['state']=='uncertain'
+        assert j.data['effects']['0']['state']=='confirmed'
         assert j.data['effects']['1']['state']=='confirmed'
         assert m.read_u32(r.snapshot.rings_address)==35
+
+
+@pytest.mark.parametrize('boost',[False,True])
+def test_slow_poll_confirms_verified_delivery_without_mid_window_sample(tmp_path,boost):
+    with Journal(tmp_path,IDENTITY) as j:
+        r,b,m,tick=runtime_fixture(j)
+        if boost:
+            r.snapshot=replace(r.snapshot,boost_address=0x90002008,boost_max_address=0x90002014)
+            b.put(r.snapshot.boost_address,struct.pack('>f',0.))
+            b.put(r.snapshot.boost_max_address,struct.pack('>f',100.))
+        items=[ITEM_TABLE['Full Boost Refill' if boost else 'Rings (+10)']]
+        j.record_history(items);r.apply_effects(m,items)
+        writes=len(b.writes)
+        tick[0]=3.2;r.apply_effects(m,items)
+        assert j.data['effects']['0']['state']=='confirmed'
+        assert len(b.writes)==writes
+
+
+@pytest.mark.parametrize('completed',[1,2])
+def test_old_settlement_error_reconciles_only_complete_verified_writes(tmp_path,completed):
+    with Journal(tmp_path,IDENTITY) as j:
+        r,b,m,tick=runtime_fixture(j);items=[ITEM_TABLE['Rings (+10)']]
+        j.record_history(items);j.prepare(0,items[0],['old actor'],0,10)
+        j.data['effects']['0'].update(state='uncertain',family='rings',
+            addresses=[r.snapshot.rings_address,r.snapshot.ring_mirror_address],
+            completed_writes=completed,reason='left living gameplay before verification completed')
+        r.apply_effects(m,items)
+        assert j.data['effects']['0']['state']==('confirmed' if completed==2 else 'uncertain')
+        assert not b.writes  # reconciliation never duplicates old items
 
 
 @pytest.mark.skipif(not PAIRS[1][0].exists(),reason='private capture absent')
@@ -154,6 +183,7 @@ def test_repeated_original_native_counter_writes_across_act_initialization(tmp_p
     # fixture input; address resolution, PAL hashing and writer gates are real.
     class AttributedFixture(Guard):
         def check(self,s):return self.check_stats(s)
+        def can_record_pickups(self,s):return False
     with Journal(tmp_path,IDENTITY) as j:
         hooks=NativeHooks();guard=AttributedFixture()
         r=Runtime(generate().worlds[1].fill_slot_data(),j,guard,hooks)

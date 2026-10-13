@@ -58,6 +58,8 @@
     "game_land_notice": true,
     "breath_timer": true,
     "assist_change": true,
-    "emerald_ui": true
+    "emerald_ui": true,
+      "stunts": true,
+      "skydiving": true
   }
 }

@@ -127,6 +127,23 @@ class SaveGuard:
             self.reason = 'bound seed/save resumed' if self.armed else 'waiting for stable scene'
             return
         bootstrap = self.journal.data.get('bootstrap')
+        # An unbound journal may outlive a client/Dolphin session or an aborted
+        # intro. Only fresh, independently native-verified Act 1 can rebase it.
+        fresh_intro=(snapshot.new_game_verified and snapshot.scene_verified
+            and snapshot.scene=='gameplay' and snapshot.actual_mission=='stg110'
+            and snapshot.stable_polls>=3 and snapshot.save_identity is None
+            and not snapshot.save_identity_verified
+            and len(snapshot.fresh_fields)>=2 and all(snapshot.fresh_fields))
+        if (bootstrap is not None and fresh_intro and
+                (bootstrap['session']!=snapshot.session or
+                 bootstrap.get('intro_stage_epoch',snapshot.stage_epoch)!=snapshot.stage_epoch)):
+            self.journal.data.setdefault('prior_prologues',[]).append(dict(bootstrap))
+            self.journal.data['checks']=sorted(set(self.journal.data['checks'])|set(bootstrap.get('checks',[])))
+            self.journal.data.pop('bootstrap',None)
+            self.journal.data.pop('native_event_baseline',None)
+            bootstrap=None
+            self.session=None
+            self.state=PlaythroughState.UNBOUND_BOOTSTRAP
         if bootstrap is None:
             if not (snapshot.new_game_verified and snapshot.scene_verified
                     and snapshot.actual_mission == 'stg110'
@@ -134,7 +151,7 @@ class SaveGuard:
                 self.reason = 'new_game_indicator_unverified: waiting for native intro and freshness evidence'
                 return
             bootstrap = {'epoch': uuid.uuid4().hex, 'session': snapshot.session, 'checks': [],
-                         'observed_missions': [], 'goal': False,
+                         'observed_missions': [], 'goal': False, 'intro_stage_epoch':snapshot.stage_epoch,
                          'intro_proof': ('native_unselected_intro_v1' if
                                          snapshot.evidence.get('native_intro_without_selected_slot')
                                          else 'native_factory_save_v1')}
@@ -372,6 +389,23 @@ class WritePolicy:
             if size!=4 or address not in fields:
                 raise MemoryUnavailable('WRITE_BLOCKED: unowned Emerald UI field')
             return token,address,fields[address]
+        if operation == 'stunts':
+            from .stunts import installed_data
+            base=installed_data(self.memory)
+            if base is None or size!=4 or address!=base:
+                raise MemoryUnavailable('WRITE_BLOCKED: unverified Stunts permission data')
+            # Same ephemeral gameplay authority as Movement: the mandatory
+            # prologue has a verified living Sonic before persistent save bind.
+            if (snapshot.scene=='gameplay' and snapshot.scene_verified
+                    and snapshot.death_state=='alive' and snapshot.stable_polls>=1
+                    and self.guard.can_record_pickups(snapshot)):
+                from .movement_gate import observed
+                stage=next(iter(snapshot.evidence.get('native_data',{}).get('stage_objects',[])),{})
+                player=stage.get('player',{}).get('actor')
+                if player is None:raise MemoryUnavailable('WRITE_BLOCKED: Stunts actor unavailable')
+                machine=observed(self.memory,player)['request_machine']
+                return ('verified ephemeral Stunts owner; no persistent save writes',snapshot.session,snapshot.stage_epoch,machine,base)
+            return self.guard.check(snapshot),base
         if operation == 'assist_change':
             from .player_switch import installed_data
             base=installed_data(self.memory)
@@ -379,14 +413,25 @@ class WritePolicy:
                 raise MemoryUnavailable('WRITE_BLOCKED: unverified Assist Change data')
             token=self.guard.check(snapshot)
             return token,base
-        if operation == 'movement_controls':
+        if operation in ('movement_controls','skydiving'):
             from .movement_gate import installed_data, observed
-            match = installed_data(self.memory)
+            if operation == 'skydiving':
+                from .skydiving import installed_data as sky_data
+                address_base=sky_data(self.memory)
+                match=(address_base,'Gecko') if address_base is not None else None
+            else:
+                match = installed_data(self.memory)
             if match is None:
                 raise MemoryUnavailable('WRITE_BLOCKED: movement hook missing')
             base, transport = match
-            if size != 4 or address not in (base, base + 4):
+            if size != 4 or address not in ((base,) if operation=='skydiving' else (base, base + 4)):
                 raise MemoryUnavailable('WRITE_BLOCKED: unverified movement data word')
+            if (snapshot.scene in ('world_map','global_map','game_land_select')
+                    and snapshot.scene_verified and snapshot.stable_polls>=1):
+                # Actor-free permission words only. Persistent binding must
+                # match this snapshot; a cached save or unknown scene cannot
+                # authorize menu preloading. Guest verifies the next owner.
+                return self.guard.check(snapshot), snapshot.session, base
             if (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'
                     or not snapshot.scene_verified or snapshot.stable_polls < 1
                     or not (snapshot.progress_verified or self.guard.can_record_pickups(snapshot))):
