@@ -1,5 +1,7 @@
 """Game Land labels: hidden when locked, faded until genuinely cleared."""
 from .emerald_ui import targets
+from .memory import MemoryUnavailable
+from contextlib import contextmanager
 _PENDING_REFRESH=set()
 _COMPLETED_REFRESH=set()
 
@@ -7,6 +9,35 @@ _COMPLETED_REFRESH=set()
 def stage_colour(memory,flags,index):
     if not memory.read_progress_bit(flags,210+index):return 0
     return 0xffffffff if memory.read_progress_bit(flags,252+index) else 0x606060ff
+
+
+@contextmanager
+def verified_batch(memory,fields):
+    """One full code proof; recheck live owner/topology for every field write."""
+    if not hasattr(memory,'verify_revision'):
+        yield;return  # lightweight offline fixtures retain their own policy
+    memory.verify_revision()
+    from .native_read import read_stage_objects,read_actors
+    row=read_stage_objects(memory,False)[0]
+    actors=[a for a in read_actors(memory,row['context']) if memory.read_u32(a)==0x8077e59c]
+    if len(actors)!=1:raise MemoryUnavailable('Game Land UI owner not unique')
+    actor=actors[0];ref=memory.read_ptr_checked(actor+0x88,4);layer=memory.read_ptr_checked(ref,0xe0)
+    # Retain owner, dictionary, graph, and each allocated colour-data link.
+    pointers=[(actor,4),(actor+12,4),(actor+0x88,4),(ref,4),(layer,4),(layer+12,4),(layer+0x8c,4)]
+    for address,(kind,_) in fields.items():
+        if kind in ('dirty_colour','dirty'):pointers.extend(((address+4,4),(address+8,4)))
+        if kind=='dirty_colour':pointers.append((address-4,4))
+    anchors=tuple((a,memory.read_bytes(a,n)) for a,n in pointers)
+    code=tuple((a,memory.read_bytes(a,n)) for a,n in ((0x80000000,8),(0x802f0d98,4),(0x802f0dd4,4)))
+    if getattr(memory,'_game_land_ui_batch',None) is not None:raise MemoryUnavailable('nested UI batch')
+    memory._game_land_ui_batch={'fields':fields,'anchors':anchors,'code':code}
+    try:yield
+    finally:memory._game_land_ui_batch=None
+
+def validate_batch(memory,batch):
+    if any(memory.read_bytes(a,len(value))!=value for a,value in (*batch['code'],*batch['anchors'])):
+        raise MemoryUnavailable('WRITE_BLOCKED: Game Land UI owner/topology changed')
+    return batch['fields']
 
 
 def apply(memory,snapshot,guard,owned):
@@ -25,15 +56,16 @@ def apply(memory,snapshot,guard,owned):
     # All pane/ancestor dirtiness precedes root cache reset. Publish both
     # native redraw markers LAST: the emulation can run between host writes.
     order={'stage_colour':0,'dirty_colour':1,'dirty':1,'zero':2,'one':3}
-    for address,(kind,colour) in sorted(fields.items(),key=lambda row:order[row[1][0]]):
-        before=memory.read_u32(address)
-        if kind=='stage_colour':after=stage_colour(memory,flags,colour)
-        elif not refresh:continue
-        elif kind=='dirty_colour':after=before & ~0x00180080
-        elif kind=='dirty':after=before & ~0x00100000
-        else:after=int(kind=='one')
-        if before!=after:
-            memory.write_u32(address,after,expected=before,operation='game_land_ui');changed+=1
+    with verified_batch(memory,fields):
+        for address,(kind,colour) in sorted(fields.items(),key=lambda row:order[row[1][0]]):
+            before=memory.read_u32(address)
+            if kind=='stage_colour':after=stage_colour(memory,flags,colour)
+            elif not refresh:continue
+            elif kind=='dirty_colour':after=before & ~0x00180080
+            elif kind=='dirty':after=before & ~0x00100000
+            else:after=int(kind=='one')
+            if before!=after:
+                memory.write_u32(address,after,expected=before,operation='game_land_ui');changed+=1
     _PENDING_REFRESH.discard(identity)
     _COMPLETED_REFRESH.add(identity)
     return {'status':'Game Land availability and clears displayed separately','changed_fields':changed,'visual_verified':False}

@@ -67,3 +67,25 @@ def test_existing_linear_seed_gets_free_starter_without_changing_other_gates():
     assert current['game_land_gates']['1-1']==0
     assert all(current['game_land_gates'][k]==v for k,v in old['game_land_gates'].items() if k!='1-1')
     assert old['game_land_gates']['1-1']==1
+
+
+def test_batch_reuses_full_revision_but_rejects_owner_change(monkeypatch):
+    from ..client import native_read
+    monkeypatch.setattr(native_read,'read_stage_objects',lambda m,*a:[{'context':0x9000}])
+    monkeypatch.setattr(native_read,'read_actors',lambda m,c:[0x9100])
+    class Memory:
+        _game_land_ui_batch=None
+        proofs=0
+        values={0x9100:0x8077e59c,0x9188:0x9200,0x9200:0x9300}
+        def verify_revision(self):self.proofs+=1
+        def read_u32(self,a):return self.values.get(a,0)
+        def read_ptr_checked(self,a,n):return self.read_u32(a)
+        def read_bytes(self,a,n):return self.read_u32(a).to_bytes(4,'big')[:n].ljust(n,b'\0')
+    m=Memory();fields={0x9500:('stage_colour',0)}
+    with ui.verified_batch(m,fields):
+        assert m.proofs==1
+        for _ in range(20):assert ui.validate_batch(m,m._game_land_ui_batch)==fields
+        assert m.proofs==1
+        m.values[0x9200]=0x9400
+        with pytest.raises(MemoryUnavailable):ui.validate_batch(m,m._game_land_ui_batch)
+    assert m._game_land_ui_batch is None

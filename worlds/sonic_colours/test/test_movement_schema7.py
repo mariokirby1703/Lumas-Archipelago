@@ -29,7 +29,7 @@ def test_progressive_permissions_and_independent_jumpdash():
     assert mask(Counter({'Mid-Air Boost':1})) == 1<<1
     assert mask(Counter({'Wall Jump':1})) == 1<<3
     assert not mask(Counter({'White Boost Wisp':1}))
-    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,29,30,38,39,40,41,43,44,82,110}
+    assert set(movement_gate.STATE_PERMISSION) == {8,9,10,13,29,30,38,39,40,41,43,44,82,110}
 
 
 def test_experimental_native_movement_hook_respects_memory_scratch_limit():

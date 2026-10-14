@@ -231,6 +231,19 @@ class SonicCommands(ClientCommandProcessor):
         except MemoryUnavailable as error:
             log_diagnostic({'error':str(error),'mission':snap.actual_mission})
 
+    def _cmd_sonichud(self):
+        """Report AP ticker events and native renderer proof gaps."""
+        if not self.ctx.runtime:
+            logger.info('Connect to a Sonic Colours slot first.');return
+        runtime=self.ctx.runtime
+        result=runtime.hud_ticker.diagnostics(bool(runtime.slot_data['options'].get('ap_item_hud')))
+        if self.ctx.memory:
+            try:
+                from .ap_hud_native import probe
+                result.update(probe(self.ctx.memory))
+            except MemoryUnavailable as error:result['native_probe_reason']=str(error)
+        log_diagnostic(result)
+
     def _cmd_sonicbinding(self):
         """Explain why the current AP save has or has not been attributed."""
         if not self.ctx.runtime:
@@ -424,6 +437,13 @@ class SonicContext(CommonContext):
         if self.deathlink:
             self.deathlink.receive(data, time.monotonic())
 
+    def hud_item_name(self,item,slot):
+        try:return self.item_names.lookup_in_slot(item,slot)
+        except (KeyError,ValueError,AttributeError):return f'Item {item}'
+
+    def hud_player_name(self,slot):
+        return str(self.player_names.get(slot,f'Player {slot}'))
+
     def on_package(self, cmd, args):
         if cmd == 'RoomInfo':
             self.authenticated_identity = None
@@ -469,6 +489,9 @@ class SonicContext(CommonContext):
                 self.release_runtime()
                 self.dolphin_status = f'Slot rejected: {error}'
                 logger.error(self.dolphin_status)
+        elif cmd == 'PrintJSON':
+            if self.runtime and self.authenticated_identity==(self.team,self.slot,self.server_seed):
+                self.runtime.hud_ticker.sent(args,self.team,self.slot,self.hud_item_name,self.hud_player_name)
         elif cmd == 'ReceivedItems':
             if self.runtime and self.authenticated_identity == (
                     self.runtime.journal.identity['team'],self.runtime.journal.identity['slot'],
@@ -495,6 +518,10 @@ class SonicContext(CommonContext):
                     self.history_ready = False
                     self.history_desynced = True
                     logger.error('Receipt synchronization blocked: %s', error)
+            if self.runtime and self.history_ready and self.authenticated_identity==(self.team,self.slot,self.server_seed):
+                index=args.get('index')
+                if type(index) is int and 0<=index<=len(self.items_received):
+                    self.runtime.hud_ticker.received(self.items_received[index:],index,lambda item:self.hud_item_name(item,self.slot),self.hud_player_name)
             self.refresh_movement_permissions()
         elif cmd == 'Retrieved' and self.barrier in args.get('keys', {}) and not self.history_desynced:
             self.history_ready = True

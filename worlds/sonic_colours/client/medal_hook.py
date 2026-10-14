@@ -14,7 +14,7 @@ HOOK, ORIGINAL = 0x802F27C4, 0x7F83E378  # mr r3,r28; next calls hide and remove
 VTABLE = 0x8077E714
 
 
-def payload(compact=True, lean=True):
+def payload(compact=True, lean=True, capture_compact=True):
     a = PPC()
     # Next instruction calls 80072B18 with only r3; volatile registers,
     # CR0 and LR are dead here. Enclosing epilogue restores its saved LR.
@@ -53,21 +53,23 @@ def payload(compact=True, lean=True):
     a.d(32, 6, 5, 4); equal(6, 28)
     a.d(32, 4, 5, 8)
     a.d(32, 3, 5, 12)
-    a.d(32, 6, 3, 0)
-    if compact and lean:
-        a.d(27,6,6,32887);a.d(10,0,6,4000);a.branch('end',0x40820000)
-    else:
-        a.d(15, 7, 0, 0x8077); a.d(14, 7, 7, 0x0fa0); equal(6, 7)
-    a.d(32, 6, 3, 0x10); equal(6, 4)
-    a.d(32, 6, 3, 0x1c); equal(6, 5)
+    if not (compact and lean and capture_compact):
+        a.d(32, 6, 3, 0)
+        if compact and lean:
+            a.d(27,6,6,32887);a.d(10,0,6,4000);a.branch('end',0x40820000)
+        else:
+            a.d(15, 7, 0, 0x8077); a.d(14, 7, 7, 0x0fa0); equal(6, 7)
+        a.d(32, 6, 3, 0x10); equal(6, 4)
+        a.d(32, 6, 3, 0x1c); equal(6, 5)
     a.d(32, 6, 3, 0x14); a.d(32, 7, 12, 16); equal(6, 7)
     a.d(32, 6, 4, 0); a.emit(0x54C6033E)  # rlwinm r6,r6,0,12,31: native ORC ID
     a.d(32, 7, 12, 12); equal(6, 7)
-    a.d(32, 5, 4, 0x18)
-    # All 21 PAL Heart records have exactly one placement, instance zero.
-    a.d(32, 6, 4, 0x1c); a.d(11, 0, 6, 1); a.branch('end', 0x40820000)
-    for field, offset in ((0, 24), (4, 28), (8, 32)):
-        a.d(32, 6, 5, field); a.d(32, 7, 12, offset); equal(6, 7)
+    if not (compact and lean and capture_compact):
+        a.d(32, 5, 4, 0x18)
+        # All 21 PAL Heart records have exactly one placement, instance zero.
+        a.d(32, 6, 4, 0x1c); a.d(11, 0, 6, 1); a.branch('end', 0x40820000)
+        for field, offset in ((0, 24), (4, 28), (8, 32)):
+            a.d(32, 6, 5, field); a.d(32, 7, 12, offset); equal(6, 7)
     a.d(32, 6, 12, 40); a.d(32, 7, 12, 44)
     a.emit(0x7CC63B78); a.d(36, 6, 12, 40)
     a.label('end')
@@ -88,7 +90,8 @@ def payload(compact=True, lean=True):
     a.label('return')
     if len(a.words)%2 == 0: a.emit(0x60000000)
     a.emit(0)
-    return a.finish(), offset
+    words=a.finish()
+    return words, offset
 
 
 def installed_data(memory):
@@ -96,6 +99,11 @@ def installed_data(memory):
     try:
         result = inspect_c2(memory, HOOK, ORIGINAL, {'egg_medal': words}, ((offset, 56),), 'Eggman Heart')
     except MemoryUnavailable:
+        words,offset=payload(True,True,False)
+        try:
+            result=inspect_c2(memory,HOOK,ORIGINAL,{'egg_medal':words},((offset,56),),'previous Heart capture')
+            return _validated_data(memory,result,offset)
+        except MemoryUnavailable:pass
         words,offset=payload(True,False)
         try:
             result=inspect_c2(memory,HOOK,ORIGINAL,{'egg_medal_before_lean':words},((offset,56),),'Eggman Heart previous compact')

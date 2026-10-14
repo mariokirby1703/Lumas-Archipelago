@@ -84,6 +84,14 @@ def set_rules(world):
                     set_rule(location, lambda state: True)
                 else:
                     set_rule(location, lambda state, item=item: state.has(item, player))
+            elif data.kind == 'one_up':
+                # Coordinates prove object identity, not traversal requirements.
+                # Keep unverified routes conservative until live route checks.
+                from .Items import MOVEMENT_ITEMS
+                from .client.test_inventory import MAXIMUM
+                set_rule(location, lambda state: state.has_all(WISP_ITEMS, player)
+                         and (not world.options.movement_unlocks or all(
+                             state.has(item,player,MAXIMUM.get(item,1)) for item in MOVEMENT_ITEMS)))
             elif data.kind == 'medal':
                 # The placement catalog proves identity, not an ability-free route.
                 # Until individual routes are verified, require every Wisp in

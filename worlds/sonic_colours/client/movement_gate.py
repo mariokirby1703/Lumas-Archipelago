@@ -23,7 +23,7 @@ STATE_MACHINE_VTABLE = 0x8075A0F8
 PLAYER_VTABLE = 0x8075AEF8
 # Permission bit 1 = owned/unlocked. State 43 is crouch (first copy),
 # state 41 is Slide (second copy). 9 = Jump Dash (user's Mid-Air Boost).
-STATE_PERMISSION = {82:13,110:12,29: 9, 30: 10, 38: 7, 8: 0, 9: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
+STATE_PERMISSION = {82:13,110:12,29: 9, 30: 10, 38: 7, 8: 0, 9: 1, 10: 1, 13: 2, 39: 3, 40: 3, 41: 4, 43: 5, 44: 6}
 CAPABILITY_NAMES = ('Double Jump', 'Mid-Air Boost', 'Homing Attack',
                     'Wall Jump', 'Slide', 'Crouch', 'Stomp', 'Drifting', 'Swim', 'Rail Jump', 'Rail Switch', 'Quick Step', 'Fast Dive', 'Spikes Spin Dash')
 DATA_WORDS = 2                 # C2 control + native telemetry; read-only table follows
@@ -219,8 +219,10 @@ def _direct_install(memory):
 def _gecko_install(memory):
     from .gecko import inspect_c2
     words,_,off=payload(gecko=True)
+    from ..world_constants import load_data
+    previous_air=load_data('movement_before_air_boost.json')
     try:
-        info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_common_dispatch':words},((off,8),),label='movement common dispatch')
+        info=inspect_c2(memory,HOOK,ORIGINAL,{'movement_common_dispatch':words,'movement_before_air_boost':previous_air['words']},((off,8),),label='movement common dispatch')
     except MemoryUnavailable:
         from ..world_constants import load_data
         previous=load_data('movement_before_quick_predicate.json')
@@ -228,7 +230,7 @@ def _gecko_install(memory):
         memory.movement_legacy_profile=True
         return info['target']+previous['offset'],'Dolphin Gecko C2'
     if not info['installed']:return _legacy_gecko_install(memory)
-    memory.movement_legacy_profile=False
+    memory.movement_legacy_profile=info.get('variant')=='movement_before_air_boost'
     return info['target']+off,'Dolphin Gecko C2'
 
 

@@ -282,3 +282,16 @@ def test_spammed_requests_cannot_use_pending_minus_one_as_a_bypass(requested,pre
 def test_direction_held_without_press_still_needs_rail_switch():
     test_encoded_gate_preserves_original_request_flow(29,512,28,True,False,None,True)
     test_encoded_gate_preserves_original_request_flow(29,1536,28,True,False,None,True)
+
+
+def test_funded_air_boost_uses_same_permission_as_jump_dash():
+    from pathlib import Path
+    from ..tools.ppc import Executable
+    assert g.STATE_PERMISSION[9]==g.STATE_PERMISSION[10]==1
+    e=Executable(Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
+    # Native constructor installs CStateAirBoost and registers it as ID 10.
+    assert int.from_bytes(e.read(0x80033ff8,4),'big')==0x3863C960
+    assert int.from_bytes(e.read(0x80034018,4),'big')==0x3880000A
+    for request in (9,10):
+        for owned in (0,2):
+            test_encoded_gate_preserves_original_request_flow(request,owned,3,True,False,True,False)

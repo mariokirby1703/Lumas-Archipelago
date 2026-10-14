@@ -42,6 +42,14 @@ def validate_slot(data):
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
     options = data.get('options')
+    # Old seeds have no physical 1-Up locations; adding the optional toggle
+    # must not force regeneration or change their selected location set.
+    if isinstance(options,dict) and 'one_up_sanity' not in options:
+        options={**options,'one_up_sanity':0}
+        data={**data,'options':options}
+    if isinstance(options,dict) and 'ap_item_hud' not in options:
+        options={**options,'ap_item_hud':0}
+        data={**data,'options':options}
     if not isinstance(options, dict) or set(options) != set(OPTION_NAMES):
         raise ValueError('slot options missing or unexpected')
     resolved = {}
@@ -157,6 +165,8 @@ class Runtime:
         self.snapshot = None
         from .test_inventory import LocalInventoryOverrides
         self.test_inventory = LocalInventoryOverrides()
+        from .ap_hud_ticker import Ticker
+        self.hud_ticker=Ticker(journal)
         self.last_error = None
         self.pickup_masks = {}
         self.pickup_started = False
@@ -498,6 +508,11 @@ class Runtime:
         missing optional speed/query control cannot strand its capsule data.
         Each writer retains its own executable/profile/scene checks.
         """
+        from .game_land_ui import apply as apply_game_land_ui
+        try:
+            game_land_display=apply_game_land_ui(memory,self.snapshot,self.guard,owned)
+        except MemoryUnavailable as error:
+            game_land_display={'status':str(error)}
         from .capsule_refresh import configure as configure_capsules
         from .progression_hook import configure as configure_progression
         from .gameplay_controls import configure as configure_controls
@@ -514,17 +529,12 @@ class Runtime:
             controls = configure_controls(memory, self.snapshot, owned, self.slot_data, temporary_boost=self.temporary_boost_allowed(memory))
         except MemoryUnavailable as error:
             controls = {'error': str(error), 'installed': {}}
-        self.hooks.gameplay_controls_status = {**controls, 'white_capsules': capsules}
+        self.hooks.gameplay_controls_status = {**controls, 'white_capsules': capsules,'game_land_ui':game_land_display}
         from .emerald_ui import apply as apply_emerald_ui
         try:
             self.hooks.gameplay_controls_status['emerald_ui']=apply_emerald_ui(memory,self.snapshot,self.guard,owned)
         except MemoryUnavailable as error:
             self.hooks.gameplay_controls_status['emerald_ui']={'status':str(error)}
-        from .game_land_ui import apply as apply_game_land_ui
-        try:
-            self.hooks.gameplay_controls_status['game_land_ui']=apply_game_land_ui(memory,self.snapshot,self.guard,owned)
-        except MemoryUnavailable as error:
-            self.hooks.gameplay_controls_status['game_land_ui']={'status':str(error)}
         from .stunts import configure as configure_stunts
         try:
             self.hooks.gameplay_controls_status['stunts']=configure_stunts(memory,self.snapshot,owned,self.slot_data)
@@ -535,6 +545,11 @@ class Runtime:
             self.hooks.gameplay_controls_status['assist_change']=configure_assist(memory,self.snapshot,owned)
         except MemoryUnavailable as error:
             self.hooks.gameplay_controls_status['assist_change']={'status':str(error)}
+        from .oneup_hook import configure as configure_oneup
+        try:
+            self.hooks.gameplay_controls_status['one_up_sanity']=configure_oneup(memory,self.snapshot,self.guard,self.slot_data)
+        except MemoryUnavailable as error:
+            self.hooks.gameplay_controls_status['one_up_sanity']={'status':str(error)}
         from .quick_step import configure as configure_quick
         try:
             self.hooks.gameplay_controls_status['quick_step']=configure_quick(memory,self.snapshot,owned,self.slot_data['options'].get('movement_unlocks',False))

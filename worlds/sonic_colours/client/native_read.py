@@ -346,6 +346,45 @@ def read_medals(memory, stage, mission, actors):
     return result
 
 
+def read_oneups(memory, stage, mission, actors):
+    """Validate the immutable ORC identity before arming a native pickup hook."""
+    from ..oneups import ONEUPS
+    BY_NATIVE_ID={(r['mission_id'],r['object_id'],r['instance']):r for r in ONEUPS.values()}
+    import struct
+    from .oneup_hook import VTABLE
+    import math
+    result = []
+    manager = memory.read_ptr_checked(stage + 0x18, 0x20)
+    for actor in actors:
+        if memory.read_u32(actor) != VTABLE:
+            continue
+        wrapper = memory.read_ptr_checked(actor + 0x64, 0x18)
+        record = memory.read_ptr_checked(wrapper + 8, 0x24)
+        descriptor = memory.read_ptr_checked(wrapper + 12, 0x20)
+        if (memory.read_u32(actor+0x34) != manager or memory.read_u32(wrapper+4) != actor
+                or memory.read_u32(descriptor) != 0x80770FA0
+                or memory.read_u32(descriptor+0x10) != record or memory.read_u32(descriptor+0x1c) != wrapper):
+            raise MemoryUnavailable('oneup_native_owner_mismatch')
+        object_id, instance = memory.read_u32(record) & 0xfffff, memory.read_u32(descriptor+0x14)
+        row = BY_NATIVE_ID.get((mission, object_id, instance))
+        count = memory.read_u32(record+0x1c)
+        if row is None or not 0 <= instance < count <= 4096:
+            continue
+        vector = memory.read_ptr_checked(record+0x18, count*24)
+        xyz = struct.unpack('>3f', memory.read_bytes(vector+instance*24, 12))
+        if any(not math.isfinite(v) or abs(v-e) > max(.002, abs(e)*1e-6)
+               for v, e in zip(xyz, (row['x'],row['y'],row['z']))):
+            continue
+        if (memory.read_u32(actor+0x64) != wrapper or memory.read_u32(wrapper+8) != record
+                or memory.read_u32(descriptor+0x14) != instance):
+            raise MemoryUnavailable('oneup_native_context_changed')
+        result.append(dict(row, actor=actor, actor_id=memory.read_u32(actor+12),
+                           wrapper=wrapper, record=record, manager=manager, instance=instance))
+    if len(result) > 1:
+        raise MemoryUnavailable('oneup_native_identity_not_unique')
+    return result
+
+
 def read_player(memory, stage, actor_id, actors=None):
     """Resolve the player ID through the native actor list, not RAM patterns."""
     manager = memory.read_ptr_checked(stage + 0x18, 0x20)

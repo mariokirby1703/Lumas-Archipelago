@@ -114,6 +114,16 @@ class WispCapsules(Toggle):
     display_name = 'Wisp Capsule Sanity'
 
 
+class APItemHUD(Toggle):
+    """Experimental native AP item ticker. Rendering remains unavailable until the PAL alphabetic HUD resource is verified."""
+    display_name = 'AP Item HUD (Experimental)'
+
+
+class OneUpSanity(Toggle):
+    """Add checks for the 31 physical story-Act 1-Up objects. Vanilla lives remain unchanged."""
+    display_name = '1-Up Sanity'
+
+
 class EggmanHeartSanity(Toggle):
     """Add one immediate native Eggman Heart pickup check in each of the 21 Game Land stages. Requires the PAL Eggman Heart native pickup code; stage Ring gates and traversal requirements still apply."""
     display_name = 'Eggman Heart Sanity'
@@ -161,14 +171,16 @@ class SonicColoursOptions(PerGameCommonOptions):
     movement_unlocks: MovementUnlocks
     wisp_capsules: WispCapsules
     eggman_heart_sanity: EggmanHeartSanity
+    one_up_sanity: OneUpSanity
+    ap_item_hud: APItemHUD
 
 OPTION_NAMES = tuple(SonicColoursOptions.__annotations__)
 
 OPTION_GROUPS = [
     OptionGroup('Progression', [Goal, WorldProgression, BoostLock, MovementUnlocks]),
-    OptionGroup('Checks', [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks, WispCapsules, EggmanHeartSanity]),
+    OptionGroup('Checks', [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks, WispCapsules, EggmanHeartSanity, OneUpSanity]),
     OptionGroup('Game Land', [GameLandRequirementReduction]),
-    OptionGroup('Presentation', [MusicRandomization]),
+    OptionGroup('Presentation', [MusicRandomization, APItemHUD]),
     OptionGroup('Gameplay', [SonicDeathLink]),
     OptionGroup('Traps', [TrapPercentage, RingLossTrapWeight, SwimTrapWeight, SwimTrapDuration]),
 ]

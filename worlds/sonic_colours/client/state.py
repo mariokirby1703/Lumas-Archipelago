@@ -315,7 +315,11 @@ class WritePolicy:
     def __call__(self, operation, address, size):
         if not VERSION['capabilities'].get(operation, False):
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
-        self.memory.verify_revision()
+        ui_batch=getattr(self.memory,'_game_land_ui_batch',None) if operation=='game_land_ui' else None
+        if ui_batch is None:self.memory.verify_revision()
+        else:
+            from .game_land_ui import validate_batch
+            validate_batch(self.memory,ui_batch)
         # The production reader normally verifies the whole executable itself.
         # This policy has JUST done that; use its lean scene/profile snapshot
         # without hashing the same 7 MB twice or rescanning collectible actors.
@@ -326,6 +330,14 @@ class WritePolicy:
             snapshot = owner._snapshot_after_revision(self.memory)
         else:
             snapshot = self.snapshot_reader(self.memory)
+        if operation == 'one_up_controls':
+            from .oneup_hook import installed_data
+            base=installed_data(self.memory)
+            if base is None or base!=getattr(self.memory,'_oneup_allowed',None) or size!=4 or address not in range(base,base+24,4):
+                raise MemoryUnavailable('WRITE_BLOCKED: unverified 1-Up control field')
+            if self.guard.can_record_pickups(snapshot):
+                return snapshot.session,snapshot.stage_epoch,base
+            return self.guard.check(snapshot),base
         if operation == 'breath_timer':
             from .water_native import target
             player,clock=target(self.memory,snapshot,self.guard)
@@ -385,7 +397,7 @@ class WritePolicy:
             if snapshot.scene!='game_land_select' or not snapshot.scene_verified:
                 raise MemoryUnavailable('WRITE_BLOCKED: Emerald UI requires verified Game Land menu')
             token=self.guard.check(snapshot)
-            fields=targets(self.memory,stages=True) if operation=='game_land_ui' else targets(self.memory)
+            fields=ui_batch['fields'] if ui_batch is not None else (targets(self.memory,stages=True) if operation=='game_land_ui' else targets(self.memory))
             if size!=4 or address not in fields:
                 raise MemoryUnavailable('WRITE_BLOCKED: unowned Emerald UI field')
             return token,address,fields[address]

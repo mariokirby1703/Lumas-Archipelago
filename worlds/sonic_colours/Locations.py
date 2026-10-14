@@ -48,7 +48,14 @@ for medal in MEDALS:
     LOCATION_TABLE[medal['location_name']] = LocationData(medal['code'], medal['mission_id'], 'medal', medal['index'])
 
 
+from .oneups import ONEUPS
+for oneup in ONEUPS.values():
+    LOCATION_TABLE[oneup['location_name']] = LocationData(oneup['code'], oneup['mission_id'], 'one_up', instance_key=oneup['key'])
+
+
 def enabled(data, options):
+    if data.kind == 'one_up':
+        return bool(getattr(options,'one_up_sanity',False))
     if data.kind == 'medal':
         return bool(options.eggman_heart_sanity)
     if data.kind == 'clear':

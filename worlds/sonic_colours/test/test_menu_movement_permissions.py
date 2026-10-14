@@ -60,7 +60,7 @@ def test_receipt_refresh_uses_authenticated_inventory(identity):
 
 def test_optional_movement_failure_does_not_block_other_permissions(monkeypatch):
     from ..client.runtime import Runtime
-    from ..client import stunts,player_switch,water_native,drill_turbo,hover_ring_dash
+    from ..client import stunts,player_switch,water_native,drill_turbo,hover_ring_dash,quick_step
     runtime=object.__new__(Runtime)
     runtime.snapshot=object();runtime.slot_data={'options':{'movement_unlocks':True}}
     runtime.guard=None;runtime.journal=None;runtime.experimental_direct_hooks=False
@@ -72,6 +72,7 @@ def test_optional_movement_failure_does_not_block_other_permissions(monkeypatch)
     monkeypatch.setattr(player_switch,'configure',lambda *args:{'allowed':True})
     monkeypatch.setattr(drill_turbo,'configure',lambda *args:{'level':2})
     monkeypatch.setattr(hover_ring_dash,'configure',lambda *args:{'level':1})
+    monkeypatch.setattr(quick_step,'configure',lambda *args:{'allowed':True})
     runtime.refresh_movement_permissions(object(),{'counts':{}})
     assert runtime.movement_status['status']=='missing movement hook'
-    assert runtime.hooks.gameplay_controls_status=={'stunts':{'level':3},'assist_change':{'allowed':True},'drill_turbo':{'level':2},'hover_ring_dash':{'level':1}}
+    assert runtime.hooks.gameplay_controls_status=={'quick_step':{'allowed':True},'stunts':{'level':3},'assist_change':{'allowed':True},'drill_turbo':{'level':2},'hover_ring_dash':{'level':1}}

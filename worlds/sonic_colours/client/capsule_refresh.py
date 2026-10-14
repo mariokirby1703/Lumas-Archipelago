@@ -228,6 +228,8 @@ def gecko_ini(compact_capsule=True):
     lines[-1:-1] = drill_lines()
     from .hover_ring_dash import gecko_lines as hover_lines
     lines[-1:-1] = hover_lines()
+    from .oneup_hook import gecko_lines as oneup_lines
+    lines[-1:-1] = oneup_lines()
     lines += ['[Gecko_Enabled]', '$AP PAL live coloured capsule refresh', '$AP PAL authoritative progression', '$AP PAL speed and White Boost gates', '$AP PAL Eggman Heart pickup capture']
     # Exact revision/full text is authenticated by DME before any owner word
     # is published. Every hook is inert before that; retain the full disc ID.

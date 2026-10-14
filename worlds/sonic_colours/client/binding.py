@@ -51,6 +51,8 @@ class SaveBinding:
             except (OSError,ValueError,KeyError,TypeError):continue
         if len({old['native_binding']['id'] for old in matches})!=1:return
         old=matches[0]
+        if old.get('ap_hud') and not self.journal.data.get('ap_hud',{}).get('events_received'):
+            self.journal.data['ap_hud']=deepcopy(old['ap_hud'])
         if old.get('bootstrap'):
             self.journal.data['bootstrap']=deepcopy(old['bootstrap'])
         self.journal.data['native_binding']=deepcopy(old['native_binding'])

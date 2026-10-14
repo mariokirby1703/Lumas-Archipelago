@@ -37,6 +37,8 @@ def verify_revision(memory):
         data = normalize_stunts(memory,data,section['address'])
         from .hover_ring_dash import normalize as normalize_hover_dash
         data = normalize_hover_dash(memory,data,section['address'])
+        from .oneup_hook import normalize as normalize_oneup
+        data = normalize_oneup(memory,data,section['address'])
         from .quick_step import normalize as normalize_quick
         data = normalize_quick(memory,data,section['address'])
         from .drill_turbo import normalize as normalize_drill
