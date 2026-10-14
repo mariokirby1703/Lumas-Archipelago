@@ -115,8 +115,9 @@ class WispCapsules(Toggle):
 
 
 class APItemHUD(Toggle):
-    """Experimental native AP item ticker. Rendering remains unavailable until the PAL alphabetic HUD resource is verified."""
+    """Experimental native HUD for the five most recent AP items, each visible for up to 120 seconds. Requires the matching PAL English UI Riivolution resource/publisher patch."""
     display_name = 'AP Item HUD (Experimental)'
+    default = 1
 
 
 class OneUpSanity(Toggle):

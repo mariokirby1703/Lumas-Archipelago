@@ -27,6 +27,12 @@ def verify_revision(memory):
     direct_plans = [direct_plan(include_movement=False), direct_plan(include_movement=True)]
     for section in VERSION['text_sections']:
         data = memory.read_bytes(section['address'], section['size'])
+        from .ap_hud_publisher import normalize as normalize_hud_publisher
+        data=normalize_hud_publisher(memory,data,section['address'])
+        from .hud_renderer_batch import normalize as normalize_hud_batch
+        data=normalize_hud_batch(memory,data,section['address'])
+        from .game_land_native_tint import normalize as normalize_initial_tint
+        data=normalize_initial_tint(memory,data,section['address'])
         from .game_land_menu import normalize as normalize_game_land_menu
         data = normalize_game_land_menu(memory,data,section['address'])
         from .player_switch import normalize as normalize_player_switch
@@ -45,6 +51,8 @@ def verify_revision(memory):
         data = normalize_drill(memory,data,section['address'])
         from .skydiving import normalize as normalize_skydiving
         data = normalize_skydiving(memory,data,section['address'])
+        from .rocket_skydiving import normalize as normalize_rocket_skydiving
+        data = normalize_rocket_skydiving(memory,data,section['address'])
         from .player_switch import HOOK as ASSIST_HOOK, HOOK_ORIGINAL as ASSIST_ORIGINAL, installed_data as assist_data
         if section['address']<=ASSIST_HOOK<section['address']+section['size']:
             off=ASSIST_HOOK-section['address']

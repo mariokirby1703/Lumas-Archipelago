@@ -218,6 +218,8 @@ def gecko_ini(compact_capsule=True):
     lines[-1:-1] = ring_display_lines()
     from .game_land_menu import gecko_lines as game_land_menu_lines
     lines[-1:-1] = game_land_menu_lines()
+    from .game_land_native_tint import gecko_lines as initial_tint_lines
+    lines[-1:-1] = initial_tint_lines()
     from .player_switch import gecko_lines as player_switch_lines
     lines[-1:-1] = player_switch_lines()
     from .speed_initial import gecko_lines as initial_speed_lines

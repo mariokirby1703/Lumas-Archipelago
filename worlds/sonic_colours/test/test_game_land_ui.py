@@ -45,7 +45,7 @@ def test_unattributed_save_cannot_write_ui(monkeypatch):
 def test_export_restores_native_clear_tint_and_keeps_lock_visibility():
     lines=game_land_menu.gecko_lines()
     assert '042F0D98 4BE6E235' in lines
-    assert '042F0DD4 3882EB58' in lines
+    assert '042F0DD4 7F64DB78' in lines
     base=min(game_land_menu.PATCHES)
     raw=bytearray(max(game_land_menu.PATCHES)-base+4)
     for address,(old,new) in game_land_menu.PATCHES.items():

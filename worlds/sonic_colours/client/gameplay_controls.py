@@ -21,13 +21,14 @@ HOOKS = {
 }
 
 
-def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_abi=True, pic_base=True, volatile_return=True):
+def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_abi=True, pic_base=True, volatile_return=True, caller_lr_dead=True):
     if not compact: temporary = False
     a = PPC(); hook, original = HOOKS[kind]
     short = compact and lean and register_abi and pic_base
     # Only volatile CR0 is changed. Boost-use/speed-UI overwrite it before
     # branching; the query/get/set hooks finish their native functions, whose
     # PPC call ABI does not preserve CR0. CR2..4 remain untouched.
+    dead_lr=short and caller_lr_dead and kind in ('boost_use','boost_query')
     preserve_cr = not (short and (kind in ('boost_use','speed_ui') or volatile_return and kind in ('boost_query','boost_add','speed_get','speed_set')))
     output = 3 if kind in ('boost', 'speed_get') else 0 if kind == 'speed_ui' else None
     frame = 0xa0 if compact else 0x40
@@ -36,7 +37,7 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_
     if compact:
         a.d(47, 0, 1, 16)
         if register_abi:
-            a.emit(0x7FE802A6)  # saved r31 holds LR across inline, call-free gate
+            if not dead_lr:a.emit(0x7FE802A6)  # saved r31 holds LR across inline, call-free gate
             if preserve_cr:a.emit(0x7F800026)  # saved r28 holds CR; restored by lmw
         else:
             a.emit(0x7C0802A6); a.d(36, 0, 1, 144)
@@ -106,7 +107,7 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_
         if output is not None: a.d(36, output, 1, 16+output*4)
         if register_abi:
             if preserve_cr:a.emit(0x7F8FF120)
-            a.emit(0x7FE803A6)
+            if not dead_lr:a.emit(0x7FE803A6)
         else:
             a.d(32, 0, 1, 148); a.emit(0x7C0FF120)
             a.d(32, 0, 1, 144); a.emit(0x7C0803A6)
@@ -144,14 +145,16 @@ def installed(memory, kind):
     before_lean, before_lean_offset = payload(kind, lean=False,register_abi=False)
     stack_lr,stack_lr_offset=payload(kind,register_abi=False)
     layouts = [(kind, words, offset), ('stack_lr',stack_lr,stack_lr_offset), ('before_lean', before_lean, before_lean_offset), ('before_drain', no_drain, no_drain_offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
-    before_hover, before_hover_offset=payload(kind,volatile_return=False)
+    old_lr,old_lr_offset=payload(kind,caller_lr_dead=False)
+    layouts.append(('before_dead_lr',old_lr,old_lr_offset))
+    before_hover, before_hover_offset=payload(kind,volatile_return=False,caller_lr_dead=False)
     layouts.append(('before_hover',before_hover,before_hover_offset))
     before_drill=load_data('gameplay_before_drill.json').get(kind)
     if before_drill:layouts.append(('before_drill',before_drill['words'],before_drill['offset']))
     if legacy: layouts.append(('legacy', legacy['words'], legacy['offset']))
     for name, candidate, candidate_offset in layouts:
         try:
-            size = 12 if name in (kind, 'before_hover', 'before_drill', 'stack_lr', 'before_lean') and kind.startswith('speed') else 20
+            size = 12 if name in (kind, 'before_dead_lr', 'before_hover', 'before_drill', 'stack_lr', 'before_lean') and kind.startswith('speed') else 20
             result = inspect_c2(memory, hook, original, {name:candidate}, ((candidate_offset,size),), label=kind)
             offset = candidate_offset
             break
@@ -159,7 +162,7 @@ def installed(memory, kind):
             failure = error
     else: raise failure
     if not result['installed']: return None
-    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'before_hover', 'before_drill', 'stack_lr', 'before_lean')
+    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'before_dead_lr', 'before_hover', 'before_drill', 'stack_lr', 'before_lean')
     address = result['target'] + offset
     values = struct.unpack('>'+'I'*(size//4), memory.read_bytes(address,size))
     owner, index, maximum, model, locked = (*values, 0, 0) if size == 12 else values

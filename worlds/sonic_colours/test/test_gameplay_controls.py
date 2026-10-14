@@ -65,7 +65,9 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
         else:raise AssertionError(hex(w))
     else:raise AssertionError('thunk loop')
     outputs={3} if kind in ('boost','speed_get') else {0} if kind=='speed_ui' else set()
-    assert (lr,cr)==original
+    if kind not in ('boost_use','boost_query'):
+        assert lr==original[0]
+    assert cr==original[1]
     assert all(regs[i]==before[i] for i in range(32) if i not in outputs)
     return f1 if kind in ('boost_use','boost_query','boost_add') else regs[3] if kind in ('boost','speed_get') else mem[before[3]+4] if kind=='speed_set' else mem[before[27]+0x118]
 

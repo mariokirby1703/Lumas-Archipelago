@@ -315,6 +315,16 @@ class WritePolicy:
     def __call__(self, operation, address, size):
         if not VERSION['capabilities'].get(operation, False):
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
+        if operation=='hud_mailbox':
+            from .ap_hud_connected import validate
+            from .ap_hud_publisher import HOOK
+            tx=getattr(self.memory,'_hud_transaction',None)
+            if not isinstance(tx,dict) or tx['allowed'].get(address)!=size:
+                raise MemoryUnavailable('WRITE_BLOCKED: no authenticated HUD transaction')
+            validate(self.memory,tx['owner'])
+            if self.memory.read_bytes(HOOK,4)!=tx['hook']:
+                raise MemoryUnavailable('WRITE_BLOCKED: HUD publisher changed')
+            return (*tx['identity'],tx['owner']['layer'],tx['owner']['handle'],tx['owner']['control'])
         ui_batch=getattr(self.memory,'_game_land_ui_batch',None) if operation=='game_land_ui' else None
         if ui_batch is None:self.memory.verify_revision()
         else:

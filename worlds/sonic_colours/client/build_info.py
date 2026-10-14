@@ -57,7 +57,12 @@ def implementation_info():
                  live_music.apply, live_music.probe_bank, live_music.recover_original,
                  direct_hooks.plan, direct_hooks.install, direct_hooks.inspect, movement_gate.payload, movement_gate.permissions, movement_gate.observed, movement_gate.configure, movement_gate.installed_data, movement_gate.gecko_lines, movement_gate.water_observed, client.log_diagnostic, gameplay_controls.gecko_lines,
                  map_refresh.payload, map_refresh.installed_data, map_refresh.configure, map_transition.payload, map_transition.installed, map_transition.update_payload, map_transition.update_installed, capsule_refresh.gecko_ini)
+    from .ap_hud_publisher import patches as hud_patches,normalize as hud_normalize
+    from .ap_hud_connected import discover as hud_discover,render as hud_render,payloads as hud_payloads
+    from .ap_hud_ticker import Ticker
     digest = hashlib.sha256()
+    for function in (hud_patches.__wrapped__,hud_normalize,hud_discover,hud_render,hud_payloads,Ticker.received,Ticker.sent,Ticker.published,Ticker.panel_events,client.SonicCommands._cmd_sonichud):
+        digest.update(function.__qualname__.encode());digest.update(marshal.dumps(function.__code__))
     for function in (sky_payload,sky_configure,sky_normalize,sky_installed,medal_hook._validated_data,medal_hook._previous_data,
                      movement_gate._gecko_install,movement_gate._legacy_gecko_install,Runtime.movement_policy,Runtime.refresh_movement_permissions,client.SonicContext.refresh_movement_permissions,
                      client.SonicCommands._change_test_ability,Runtime.poll_steps,

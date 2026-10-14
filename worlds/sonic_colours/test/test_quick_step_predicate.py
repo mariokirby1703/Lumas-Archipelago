@@ -26,7 +26,7 @@ def test_gate_precedes_flags_and_forced_entry():
     assert list(e.disassemble(q.HOOK-4,4))[0].op_str=='0x8020d554'
     assert int.from_bytes(e.read(q.HOOK+4,4),'big')==0x41820038
     assert q.HOOK<0x80091c84<0x80091c90
-    assert movement_ini().count('C2091C60 00000005')==1
+    assert movement_ini().count('C2091C60 00000004')==1
 
 
 def test_quick_step_write_capability_is_enabled():

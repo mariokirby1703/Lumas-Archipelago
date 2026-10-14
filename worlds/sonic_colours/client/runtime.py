@@ -305,6 +305,12 @@ class Runtime:
     def poll_steps(self, memory, item_ids, history_ready):
         self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
+        try:
+            from .ap_hud_connected import render as render_ap_hud
+            self.hud_status=render_ap_hud(self,memory)
+        except MemoryUnavailable as error:
+            self.hud_status={'hud_ready':False,'status':str(error)}
+            self.hud_ticker.elapsed_visible(False)
         # Capture irreversible pickup/result evidence before slow permission
         # writes. Network clients can transmit this checkpoint and receive
         # acknowledgements before continuing the same synchronous poll.
@@ -854,11 +860,13 @@ class Runtime:
             except MemoryUnavailable as error:
                 self.journal.defer(index, item, str(error))
                 continue
-            if name == 'Ring Loss Trap' and (before == 0 or not BY_MISSION.get(snapshot.actual_mission, {}).get('normal', False)):
+            stage=BY_MISSION.get(snapshot.actual_mission,{})
+            ring_trap_stage=stage.get('normal',False) or stage.get('zone_index',-1)>=7
+            if name == 'Ring Loss Trap' and (before == 0 or not ring_trap_stage):
                 if index not in self.deferred:
                     self.deferred[index] = 'trap context'
-                    quiet_logging.record('item_effect', 'Item deferred: receipt %s Ring Loss awaits normal act with positive Rings', index)
-                self.journal.defer(index, item, 'normal act with positive rings required')
+                    quiet_logging.record('item_effect', 'Item deferred: receipt %s Ring Loss awaits story or Game Land act with positive Rings', index)
+                self.journal.defer(index, item, 'story or Game Land act with positive rings required')
                 continue  # Keep receipt queued, allow later positive filler.
             limit = 99 if family == 'lives' else 9999
             if family != 'boost' and before > limit:

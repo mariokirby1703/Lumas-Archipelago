@@ -64,7 +64,8 @@
     "one_up_controls": true,
     "emerald_ui": true,
     "game_land_ui": true,
-      "stunts": true,
-      "skydiving": true
+    "stunts": true,
+    "skydiving": true,
+    "hud_mailbox": true
   }
 }

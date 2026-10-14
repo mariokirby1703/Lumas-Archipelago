@@ -64,6 +64,28 @@ def settle(r,m,items,tick):
     start=tick[0];tick[0]=start+.6;r.apply_effects(m,items)
     tick[0]=start+2.1;r.apply_effects(m,items)
 
+@pytest.mark.parametrize('name,address,before,after',[
+    ('Ring Loss Trap',0x90001000,47,0),
+    ('Rings (+10)',0x90001000,47,57),
+    ('1-Up',0x90001008,2,3),
+    ('Half Boost Refill',0x90001010,0,50),
+    ('Full Boost Refill',0x90001010,0,100),
+])
+def test_game_land_item_effects_use_resolved_counters(tmp_path,name,address,before,after):
+    with Journal(tmp_path,IDENTITY) as journal:
+        r,b,m,tick=runtime_fixture(journal)
+        r.snapshot=replace(r.snapshot,actual_mission='stgD30',world_lives_address=None,
+                           boost_address=0x90001010,boost_max_address=0x90001014)
+        is_boost='Boost' in name
+        pack=lambda value:struct.pack('>f',value) if is_boost else int(value).to_bytes(4,'big')
+        b.put(address,pack(before))
+        b.put(0x90001014,struct.pack('>f',100))
+        if address==r.snapshot.rings_address:b.put(r.snapshot.ring_mirror_address,pack(before))
+        items=[ITEM_TABLE[name]];journal.record_history(items)
+        r.apply_effects(m,items);settle(r,m,items,tick)
+        assert m.read_bytes(address,4)==pack(after)
+        assert journal.data['effects']['0']['state']=='confirmed'
+
 
 def test_repeated_lives_results_deferral_restart_uncertain_and_next_act(tmp_path):
     items=[ITEM_TABLE[n] for n in ('1-Up','1-Up','Rings (+10)','Ring Loss Trap')]

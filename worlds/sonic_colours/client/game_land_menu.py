@@ -20,6 +20,7 @@ def normalize(memory,data,base):
     for address,(original,patched) in PATCHES.items():
         if base<=address<base+len(data):
             offset=address-base;word=int.from_bytes(data[offset:offset+4],'big')
+            if address==0x802F0DD4 and word==0x7F64DB78:word=patched
             if word not in (original,patched):
                 raise MemoryUnavailable(f'unknown_revision: Game Land menu at {address:#x}')
             observed.append(word==patched)
@@ -36,5 +37,5 @@ def gecko_lines():
     # transparent. The secondary records view
     # retains its original grey tint; it cannot launch a locked Act. Retain
     # recognition of the earlier transparent records patch above.
-    return [f'04{address-0x80000000:06X} {(original if address==0x802F0D98 else patched):08X}' for address,(original,patched) in PATCHES.items()
+    return [f'04{address-0x80000000:06X} {(original if address==0x802F0D98 else 0x7F64DB78 if address==0x802F0DD4 else patched):08X}' for address,(original,patched) in PATCHES.items()
             if address!=0x802F0E00]

@@ -21,7 +21,7 @@ def test_native_predicate_and_displaced_instruction():
     from ..tools.ppc import Executable
     words,offset=d.payload()
     assert (words,offset)==assist_payload()  # already verified boolean mask ABI
-    assert offset==32 and words[7]==0x48000008
+    assert offset==24 and words[5]==0x48000008
     path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('private executable absent')
     e=Executable(path)

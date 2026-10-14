@@ -50,7 +50,8 @@ def test_shared_guard_installs_all_real_controls_once_and_rejects_wrong_disc():
     from ..client.drill_turbo import HOOK as DRILL
     from ..client.hover_ring_dash import HOOK as HOVER
     from ..client.oneup_hook import HOOK as ONEUP
-    expected|={ASSIST,STUNTS,DRILL,HOVER,ONEUP}
+    from ..client.game_land_native_tint import HOOK as TINT
+    expected|={ASSIST,STUNTS,DRILL,HOVER,ONEUP,TINT}
     from ..client.map_ring_display import HOOK as RINGS
     expected.add(RINGS)
     wrong={**memory,0x80000000:0}

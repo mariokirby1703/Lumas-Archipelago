@@ -26,18 +26,26 @@ HOOK=0x802F1634
 HOOK_ORIGINAL=0x2C030000
 
 
-def payload():
+def payload(preserve_lr=False):
     # The original action predicate call clobbers volatile r0/r12. At its
     # following cmpwi neither is live. Preserve LR and gate its boolean r3
     # before the original branch, hence before any transfer side effects.
-    return [0x7C0802A6,0x48000005,0x7D8802A6,0x818C0018,
-            0x7C636038,0x7C0803A6,HOOK_ORIGINAL,0x48000008,0,0],32
+    if preserve_lr:
+        return [0x7C0802A6,0x48000005,0x7D8802A6,0x818C0018,
+                0x7C636038,0x7C0803A6,HOOK_ORIGINAL,0x48000008,0,0],32
+    # All enclosing native routines restore their saved LR in the epilogue.
+    return [0x48000005,0x7D8802A6,0x818C0014,0x7C636038,
+            HOOK_ORIGINAL,0x48000008,0,0],24
 
 
 def installed_data(memory):
     from .gecko import inspect_c2
     words,offset=payload()
-    info=inspect_c2(memory,HOOK,HOOK_ORIGINAL,{'assist_change':words},((offset,4),),label='Assist Change')
+    try:
+        info=inspect_c2(memory,HOOK,HOOK_ORIGINAL,{'assist_change':words},((offset,4),),label='Assist Change')
+    except MemoryUnavailable:
+        words,offset=payload(True)
+        info=inspect_c2(memory,HOOK,HOOK_ORIGINAL,{'assist_change':words},((offset,4),),label='Assist Change')
     return info['target']+offset if info['installed'] else None
 
 

@@ -231,13 +231,25 @@ class SonicCommands(ClientCommandProcessor):
         except MemoryUnavailable as error:
             log_diagnostic({'error':str(error),'mission':snap.actual_mission})
 
-    def _cmd_sonichud(self):
+    def _cmd_sonichud(self,action=''):
         """Report AP ticker events and native renderer proof gaps."""
         if not self.ctx.runtime:
             logger.info('Connect to a Sonic Colours slot first.');return
         runtime=self.ctx.runtime
-        result=runtime.hud_ticker.diagnostics(bool(runtime.slot_data['options'].get('ap_item_hud')))
-        if self.ctx.memory:
+        action=action.strip().lower()
+        if action in ('on','off'):
+            logger.info('AP HUD is always enabled when the native patch is installed.')
+        elif action=='test':
+            if not getattr(runtime,'hud_status',{}).get('font_ready'):
+                logger.info('Enable /sonichud on and wait for a verified native HUD first.');return
+            runtime.hud_ticker.enqueue({'kind':'Received','item':'HUD TEST Item','player':'Local preview',
+                                       'flags':1,'local_test':True})
+        elif action:
+            logger.info('Usage: /sonichud [on|off|test]');return
+        result=runtime.hud_ticker.diagnostics(True)
+        result.update(getattr(runtime,'hud_status',{}))
+        if result.get('hud_ready'):result['blocked_reason']=None
+        if self.ctx.memory and not result.get('owner_verified'):
             try:
                 from .ap_hud_native import probe
                 result.update(probe(self.ctx.memory))
@@ -521,10 +533,12 @@ class SonicContext(CommonContext):
             if self.runtime and self.history_ready and self.authenticated_identity==(self.team,self.slot,self.server_seed):
                 index=args.get('index')
                 if type(index) is int and 0<=index<=len(self.items_received):
-                    self.runtime.hud_ticker.received(self.items_received[index:],index,lambda item:self.hud_item_name(item,self.slot),self.hud_player_name)
+                    self.runtime.hud_ticker.received(self.items_received[index:],index,lambda item:self.hud_item_name(item,self.slot),self.hud_player_name,self.slot)
             self.refresh_movement_permissions()
         elif cmd == 'Retrieved' and self.barrier in args.get('keys', {}) and not self.history_desynced:
             self.history_ready = True
+            if self.runtime and self.authenticated_identity==(self.team,self.slot,self.server_seed):
+                self.runtime.hud_ticker.history_ready(self.items_received)
         if cmd in ('Connected', 'RoomUpdate'):
             # CommonContext has already applied missing_locations before invoking
             # this callback. Only server-confirmed locations are acknowledgements.

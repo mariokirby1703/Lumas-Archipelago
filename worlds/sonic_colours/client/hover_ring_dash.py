@@ -11,16 +11,24 @@ ORIGINAL=0x2C030000
 ITEM='Progressive Green Hover Wisp'
 
 
-def payload():
+def payload(preserve_lr=False):
     # r0/r12 are caller-clobbered by the preceding native input query.
-    # Preserve LR; displaced cmpwi supplies CR0 for the native branch.
-    return [0x7C0802A6,0x48000005,0x7D8802A6,0x818C0018,
-            0x7C636038,0x7C0803A6,ORIGINAL,0x48000008,0,0],32
+    # Displaced cmpwi supplies CR0; the enclosing native epilogue restores LR.
+    if preserve_lr:
+        return [0x7C0802A6,0x48000005,0x7D8802A6,0x818C0018,
+                0x7C636038,0x7C0803A6,ORIGINAL,0x48000008,0,0],32
+    # All enclosing native routines restore their saved LR in the epilogue.
+    return [0x48000005,0x7D8802A6,0x818C0014,0x7C636038,
+            ORIGINAL,0x48000008,0,0],24
 
 
 def installed_data(memory):
     words,offset=payload()
-    info=inspect_c2(memory,HOOK,ORIGINAL,{'hover_ring_dash':words},((offset,4),),label='Hover Ring Dash')
+    try:
+        info=inspect_c2(memory,HOOK,ORIGINAL,{'hover_ring_dash':words},((offset,4),),label='Hover Ring Dash')
+    except MemoryUnavailable:
+        words,offset=payload(True)
+        info=inspect_c2(memory,HOOK,ORIGINAL,{'hover_ring_dash':words},((offset,4),),label='Hover Ring Dash')
     if not info['installed']:return None
     address=info['target']+offset
     if memory.read_u32(address)>1:raise MemoryUnavailable('unknown_revision: Hover Ring Dash permission')
