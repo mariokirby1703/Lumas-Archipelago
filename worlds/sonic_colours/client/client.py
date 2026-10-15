@@ -362,6 +362,18 @@ class SonicCommands(ClientCommandProcessor):
         self.ctx.deathlink.receive({'source':'LOCAL TEST ONLY','time':time.time()},time.monotonic())
         logger.info('Synthetic incoming DeathLink queued locally. This command sends no DeathLink packet.')
 
+    def _cmd_sonicmusicpreview(self):
+        """Preview the currently captured native music cue for HUD placement."""
+        runtime=self.ctx.runtime
+        if not runtime or not getattr(runtime,'native_event_status',{}).get('cue_name'):
+            logger.info('No captured native music cue is available.');return
+        popup=getattr(runtime,'music_popup',None)
+        if popup:
+            popup.sequence=None;popup.cue=None
+        panel=getattr(runtime,'_hud_connected',None)
+        if panel:panel['music']=None
+        logger.info('Music HUD preview requested for the current native cue; playback is unchanged.')
+
     @mark_raw
     def _cmd_sonictraptest(self,raw=''):
         """Explicit local Dead Weight test: /sonictraptest dead weight. No AP receipt or broadcast."""

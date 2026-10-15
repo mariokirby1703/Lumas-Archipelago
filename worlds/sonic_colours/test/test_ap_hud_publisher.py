@@ -37,10 +37,11 @@ def test_padding_is_ordinary_function_alignment_and_not_an_existing_branch_targe
                 target=(offset if word&2 else section[3]+i+offset)&0xffffffff
                 assert target not in occupied
 
+@pytest.mark.parametrize('moved', [False,True])
 @pytest.mark.parametrize('same_text', [False,True])
 @pytest.mark.parametrize('target_alpha', [128,255])
 @pytest.mark.parametrize('generation,ack,layer_class,expected',[(2,0,0x807abc40,True),(3,0,0x807abc40,False),(2,2,0x807abc40,True),(2,0,0,False)])
-def test_guest_native_setter_ack_and_register_preservation(generation,ack,layer_class,expected,same_text,target_alpha):
+def test_guest_native_setter_ack_and_register_preservation(generation,ack,layer_class,expected,same_text,target_alpha,moved):
     instructions={a+i*4:w for a,old,new in patches() for i,w in enumerate(struct.unpack('>'+'I'*(len(new)//4),new))}
     r=[0x11000000+i for i in range(32)];r[1]=0x900f0000;r[26]=0x90002000;r[27]=0x90001000
     before=list(r);f=[100.+i for i in range(32)];fb=list(f);lr=0x80054320;ctr=0x1234;xer=0x5678
@@ -53,6 +54,9 @@ def test_guest_native_setter_ack_and_register_preservation(generation,ack,layer_
          0x90009040:0x9000b000,0x9000b00c:0x9000c000,0x90003094:0x42500000,0x90003098:0x41504d42}
     mem.update({0x90001068:0x42500000,0x90002078:0x9000f000,
                 0x9000f01c:0xaf70ffff,0x90003090:0xaf70ff00|target_alpha})
+    desired_x=0x44160000 if moved else 0x42500000
+    mem[0x90003094]=desired_x
+    refreshed=not same_text or moved
     calls=[];saved_f={};pc=HOOK
     for _ in range(1000):
         if pc in (HOOK+4,0x805e0f50):break
@@ -111,10 +115,13 @@ def test_guest_native_setter_ack_and_register_preservation(generation,ack,layer_
                     mem[args[0]+4]=0x9000e000;mem[0x9000e000]=0x90009000;ret=args[0]
                 elif target==0x805e9ce8:ret=0x90009000
                 elif target==0x8037b194:ret=0 if same_text else 1
-                elif target==0x805e6888:assert args[:2]==(0x90009000,0x90003010);ret=0
+                elif target==0x805e6888:
+                    assert args[:2]==(0x90009000,0x90003010)
+                    assert mem[0x90001068]==desired_x # Position precedes native geometry allocation.
+                    ret=0
                 elif target==0x805e6734:
                     assert args[:2]==(0x90009000,before[1]-0x160+0x128)
-                    assert mem[args[1]]==(0xaf70fffe if same_text else 0xaf70ff00|target_alpha)
+                    assert mem[args[1]]==(0xaf70fffe if not refreshed else 0xaf70ff00|target_alpha)
                     ret=0
                 elif target==0x805e3198:assert args==(0x90002000,0x90001000,0x9000c000);ret=0
                 elif target==0x805e9c68:assert args[1]==0;ret=0
@@ -125,10 +132,10 @@ def test_guest_native_setter_ack_and_register_preservation(generation,ack,layer_
             else:pc=target
         else:raise AssertionError(hex(w))
     else:raise AssertionError('publisher did not return')
-    assert (0x805e6888 in calls)==(expected and not same_text)
-    assert (0x805e3198 in calls)==(expected and not same_text)
+    assert (0x805e6888 in calls)==(expected and refreshed)
+    assert (0x805e3198 in calls)==(expected and refreshed)
     assert (0x805e6734 in calls)==(expected and target_alpha!=255)
-    assert pc==(0x805e0f50 if expected and not same_text else HOOK+4)
+    assert pc==(0x805e0f50 if expected and refreshed else HOOK+4)
     assert mem[0x90003000]==(generation if expected else ack)
     assert r[:3]==before[:3] and r[4:]==before[4:] and r[3]==before[27]
     assert f==fb and lr==0x80054320 and ctr==0x1234 and xer==0x5678 and cr==0x12345678

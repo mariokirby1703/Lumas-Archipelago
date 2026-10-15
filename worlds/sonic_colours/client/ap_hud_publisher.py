@@ -18,6 +18,8 @@ def patches():
         from ..world_constants import load_data
         sites=load_data('hud_publisher_sites.json')
     else:sites=json.loads((Path(__file__).parents[1]/'data'/'hud_publisher_sites.json').read_text())
+    # Slots 120..149 belong to the two Rocket guards. Keep their fixed ABI.
+    sites=sites[:120]+sites[150:]
     slots=[row['address']+off for row in sites for off in (0,4)]
     code=[];labels={};fix=[]
     def emit(w):code.append(w)
@@ -62,10 +64,18 @@ def patches():
     d(36,3,1,0x130);d(32,4,3,12);emit(0x7c04d800);branch('release',0x40820000)
     d(32,4,3,0x34);d(32,4,4,12);emit(0x7c04d000);branch('release',0x40820000)
     d(14,0,0,0);d(36,0,1,0x134)
+    # The native text setter builds glyph geometry from the resource's pixel
+    # position. Publish X before invoking it, including unchanged headings.
+    d(32,0,30,148);d(32,3,27,104);emit(0x7c001800)
+    branch('initial_position_same',0x41820000)
+    d(36,0,27,104);d(14,0,0,1);d(36,0,1,0x134)
+    label('initial_position_same')
     d(32,4,26,0x64);cmp(4,0);branch('have_text',0x40820000)
     d(32,4,27,0x44)
     label('have_text');d(14,3,30,16);call(0x8037b194)
-    cmp(3,0);branch('text_same',0x41820000)
+    cmp(3,0);branch('replace_text',0x40820000)
+    d(32,3,1,0x134);cmp(3,0);branch('text_same',0x41820000)
+    label('replace_text')
     d(14,0,0,1);d(36,0,1,0x134)
     d(32,3,1,0x130);d(14,4,30,16);call(0x805e6888)
     label('text_same')

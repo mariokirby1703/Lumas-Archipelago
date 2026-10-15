@@ -123,9 +123,9 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
         metrics[ch]=(uv[2]-uv[0])*312*0.45
     for message,(title,subtitle) in enumerate(tuple(messages)+(('BGM Now Playing','Track'),)):
         if message==len(messages):
-            parts=(('ap_music_icon',' ',605.,365.,0xffffffff),
-                   ('ap_music_heading','NOW PLAYING:',620.,365.,0xffffffff),
-                   ('ap_music_title','Track',590.,382.,0xffffffff))
+            parts=(('ap_music_icon',' ',775.,365.,0xffffffff),
+                   ('ap_music_heading','NOW PLAYING:',790.,365.,0xffffffff),
+                   ('ap_music_title','Track',760.,382.,0xffffffff))
             for name,label,x,y,colour in parts:
                 for shadow,(dx,dy) in enumerate(((-0.8,0.),(0.8,0.),(0.,-0.8),(0.,0.8))):
                     specs.append((name+'_outline'+str(shadow),label,x+dx,y+dy,0x000000ff))

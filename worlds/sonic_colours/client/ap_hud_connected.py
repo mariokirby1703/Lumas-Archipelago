@@ -81,8 +81,8 @@ def payloads(owner,events,metrics,music=None):
             # Align the panel to the native right HUD edge. The icon sits just
             # before the heading; the title has its own right-aligned baseline.
             heading_width=sum(metrics[c] for c in 'NOW PLAYING:')
-            x=630.-width
-            if base=='ap_music_icon':x=630.-heading_width-6.-width
+            x=800.-width
+            if base=='ap_music_icon':x=800.-heading_width-6.-width
             if shadow:x+=(-0.8,0.8,0.,0.)[int(name[-1])]
             raw=(fitted or ' ').encode('ascii').ljust(128,b'\0')
             result[box+8]=struct.pack('>I',owner['handle']);result[box+16]=raw
