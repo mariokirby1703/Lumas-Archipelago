@@ -86,7 +86,18 @@ def plan():
     hooks.append({'hook':area_map_refresh.HOOK,'target':cursor,'size':len(blob),'return':area_map_refresh.HOOK+4})
     payload.extend(blob);cursor+=len(blob)
     patches.extend(hud());patches.extend(rocket())
-    from . import native_events
+    from . import native_events,oxygen_native
+    # Oxygen code and its data precede the event mailbox, keeping that ABI's
+    # end-relative address stable and within the reserved executable section.
+    oxygen_start=cursor
+    probe,_=oxygen_native.payload(oxygen_start,0x80002000)
+    oxygen_control=cursor+len(probe)
+    oxygen_code,reset_entry=oxygen_native.payload(oxygen_start,oxygen_control)
+    for hook,old,target in ((oxygen_native.UPDATE,oxygen_native.ORIGINAL_UPDATE,oxygen_start),
+                            (oxygen_native.RESET,oxygen_native.ORIGINAL_RESET,reset_entry)):
+        patches.append((hook,old.to_bytes(4,'big'),branch(hook,target).to_bytes(4,'big')))
+    payload.extend(oxygen_code);cursor+=len(oxygen_code)
+    payload.extend(struct.pack('>I',oxygen_native.MAGIC)+bytes(oxygen_native.SIZE-4));cursor+=oxygen_native.SIZE
     patches.extend(native_events.patches(cursor))
     mailbox=bytearray(native_events.SIZE);struct.pack_into('>I',mailbox,0,native_events.MAGIC)
     for state in native_events.JUMP_STATES:

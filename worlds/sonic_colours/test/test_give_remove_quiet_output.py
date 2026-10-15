@@ -26,6 +26,7 @@ def environment(monkeypatch):
     items.WISP_ITEMS = ('White Boost Wisp', 'Cyan Laser Wisp', 'Progressive Yellow Drill Wisp',
                         'Orange Rocket Wisp', 'Blue Cube Wisp', 'Progressive Green Hover Wisp',
                         'Progressive Pink Spikes Wisp', 'Purple Frenzy Wisp')
+    items.ALL_WISP_ITEMS = items.WISP_ITEMS + ('Yellow Drill Wisp','Green Hover Wisp','Pink Spikes Wisp')
     items.WORLD_ITEMS = ('Tropical Resort Shuttle', 'Sweet Mountain Shuttle',
                          'Starlight Carnival Shuttle', 'Planet Wisp Shuttle',
                          'Aquarium Park Shuttle', 'Asteroid Coaster Shuttle')

@@ -25,14 +25,14 @@ def test_native_charge_transition_precedes_dash_entry():
     assert int.from_bytes(e.read(0x80771e08+0x28,4),'big')==0x801fdd90
 
 
-def test_spikes_tier_is_enforced_when_movement_randomization_is_off():
+def test_owned_spikes_has_complete_abilities_when_movement_randomization_is_off():
     from collections import Counter
     from ..client.runtime import Runtime
     from ..client.movement_gate import permissions
     r=object.__new__(Runtime);r.slot_data={'options':{'movement_unlocks':False}}
     owned={'counts':Counter({'Progressive Pink Spikes Wisp':1})}
     mask=permissions(r.movement_policy(owned)['counts'])
-    assert mask & 8192 == 0 and mask & 4095 == 4095
+    assert mask & 8192 and mask & 4095 == 4095
     assert owned['counts']['Double Jump']==0
     owned['counts']['Progressive Pink Spikes Wisp']=2
     assert permissions(r.movement_policy(owned)['counts']) & 8192

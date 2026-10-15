@@ -74,7 +74,7 @@ def test_random_capsules_item_is_generated_once_with_stable_id():
     from BaseClasses import ItemClassification
     world = generate()
     assert ITEM_TABLE[RANDOM_CAPSULES] == BASE_ID + 35
-    assert classification(RANDOM_CAPSULES) == ItemClassification.progression
+    assert classification(RANDOM_CAPSULES) == ItemClassification.useful
     assert sum(item.name == RANDOM_CAPSULES for item in world.itempool) == 1
 
 

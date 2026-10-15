@@ -52,6 +52,7 @@ class Machine:
             elif op==28:
                 self.r[ra]=self.r[rt]&u;self.cmp=(self.r[ra]>0)
             elif op==32:self.r[rt]=self.get((self.r[ra]+imm)&0xffffffff)
+            elif op==34:self.r[rt]=self.read((self.r[ra]+imm)&0xffffffff,1)[0]
             elif op in (36,37,38):
                 a=(self.r[ra]+imm)&0xffffffff;size=1 if op==38 else 4
                 self.b.write_bytes(a,(self.r[rt]&((1<<(8*size))-1)).to_bytes(size,'big'))
@@ -91,6 +92,8 @@ class Machine:
                 self.ctr=0xcccccccc
             elif w==0x4e800020:next_pc=self.lr
             elif w==0xec000828:self.f[0]-=self.f[1]
+            elif w==0xec210028:self.f[1]-=self.f[0]
+            elif w==0xec21002a:self.f[1]+=self.f[0]
             elif w==0xfc001040:self.cmp=(self.f[0]>self.f[2])-(self.f[0]<self.f[2])
             elif w==0xfc001090:self.f[0]=self.f[2]
             elif w==0x5484103a:self.r[4]=(self.r[4]<<2)&0xffffffff
@@ -173,3 +176,32 @@ def test_non_jump_requests_and_native_death_are_not_trapped(state):
     m=Machine('jump_state');m.r[4]=state;m.put(m.control+n.REMAINING,0x41f00000)
     m.run()
     assert m.r[1]==m.before[1] and m.r[0]==0x80001234
+
+
+@pytest.mark.parametrize('pause_flags',[0x400,0x800,0xc00])
+def test_paused_gameplay_neither_consumes_trap_time_nor_acknowledges_death(pause_flags):
+    m=Machine('frame');m.put(m.stage+0xa4,pause_flags)
+    m.put(m.control+n.REMAINING,0x41f00000);m.put(m.control+n.REQUEST,1)
+    m.run()
+    assert m.get(m.control+n.REMAINING)==0x41f00000
+    assert not m.calls and m.get(m.control+n.ACK)==0
+
+
+def test_dead_weight_and_remote_death_overlap_without_repeating_death_request():
+    m=Machine('frame');m.put(m.control+n.REMAINING,0x41f00000)
+    m.put(m.control+n.TRAP_REQUEST,9);m.put(m.control+n.REQUEST,7)
+    m.run();m.run()
+    assert len(m.calls)==1 and m.get(m.control+n.ACK)==7
+    assert m.get(m.control+n.TRAP_ACK)==9
+    assert struct.unpack('>f',m.read(m.control+n.REMAINING,4))[0]==29.
+
+
+@pytest.mark.parametrize('field,value',[('serial',456),('stage',0x90010100),('player_vtable',0x8075a000)])
+def test_stale_actor_context_cannot_consume_a_native_effect(field,value):
+    m=Machine('frame');m.put(m.control+n.REMAINING,0x41f00000);m.put(m.control+n.REQUEST,7)
+    if field=='serial':m.put(m.player+12,value)
+    if field=='stage':m.put(m.control+n.STAGE,value)
+    if field=='player_vtable':m.put(m.player,value)
+    m.run()
+    assert not m.calls and m.get(m.control+n.ACK)==0
+    assert m.get(m.control+n.REMAINING)==0x41f00000

@@ -23,25 +23,27 @@ class SonicColoursWorld(World):
     required_client_version = (0, 6, 7)
     item_name_to_id = Items.ITEM_TABLE
     location_name_to_id = {n: d.code for n, d in Locations.LOCATION_TABLE.items()}
-    item_name_groups = {'Wisps': set(Items.WISP_ITEMS), 'World Access': set(Items.WORLD_ITEMS),
+    item_name_groups = {'Wisps': set(Items.ALL_WISP_ITEMS), 'World Access': set(Items.WORLD_ITEMS),
                         'Chaos Emeralds': set(Items.EMERALDS), 'Red Rings': set(Items.RING_VALUES),
                         'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS)}
 
     def generate_early(self):
         validation=load_data('versions.json').get('live_validation',{})
         for option, capability in [('death_link', 'deathlink'),('dead_weight_trap_weight','dead_weight')]:
-            if getattr(self.options, option).value and not validation.get(capability):
+            if getattr(self.options, option).value and not validation.get(capability) and not self.options.native_feature_tests:
                 raise ValueError(f'Sonic Colours: {option} requires_verified_hook: {capability}. '
                                  'Native implementation awaits the PAL live test matrix; use off until verified.')
+        if self.options.native_feature_tests:
+            logger.warning('Sonic Colours: unverified native feature TEST opt-in; PAL live matrix incomplete.')
         self.starting_stage = next(s for s in STAGES if s['mission_id'] == 'stg110')
         self.starting_world = 0
         self.gates = game_land_gates(self.options.game_land_requirement_reduction.value)
         self.active_locations = tuple(n for n, d in Locations.LOCATION_TABLE.items() if Locations.enabled(d, self.options))
-        self.logic = load_data('logic_requirements.json')
-        Rules.validate_logic(self.logic)
-        self.unknown_logic = tuple(k for k, v in self.logic.items() if v['logic_status'] == 'unknown')
-        logger.warning('Sonic Colours: provisional clear accessibility; %d unknown logic entries; '
-                       'eight Wisps remain shuffled progression; native feature evidence is separate.',
+        self.logic = load_data('logic_from_sheet_v2.json')
+        from .logic_v2 import validate_manifest
+        validate_manifest(self.logic)
+        self.unknown_logic = tuple(k for k,v in self.logic['locations'].items() if v['normal']['status']=='not_documented')
+        logger.info('Sonic Colours: Sheet Logic V2; %d undocumented Normal routes use conservative fallback.',
                        len(self.unknown_logic))
         if self.options.wisp_capsules.value and not any(
                 Locations.LOCATION_TABLE[n].kind == 'capsule' for n in self.active_locations):
@@ -58,7 +60,11 @@ class SonicColoursWorld(World):
     def create_items(self):
         names = []
         names += [n for i, n in enumerate(Items.WORLD_ITEMS) if i != self.starting_world]
-        names += list(Items.WISP_ITEMS) + ['Progressive Yellow Drill Wisp','Progressive Green Hover Wisp','Progressive Pink Spikes Wisp'] + [Items.RANDOM_CAPSULES]
+        from .wisps import required_wisp_items
+        names += list(required_wisp_items(self.options))
+        if self.options.movement_unlocks:
+            names += ['Progressive Yellow Drill Wisp','Progressive Green Hover Wisp','Progressive Pink Spikes Wisp']
+        if self.options.game_land_checks:names += [Items.RANDOM_CAPSULES]
         if self.options.super_sonic.value:
             names += list(Items.EMERALDS)
         if self.options.movement_unlocks.value:
@@ -73,6 +79,11 @@ class SonicColoursWorld(World):
             # One ordinary world expands the initial check pool. The remaining
             # access items and every Wisp use ordinary randomized fill.
             early = self.multiworld.local_early_items[self.player]
+            from BaseClasses import CollectionState
+            initial=CollectionState(self.multiworld)
+            opening=[item for item in access if Rules.requirements(self,initial,next(
+                stage['mission_id'] for stage in STAGES if stage['zone_index']==Items.WORLD_ITEMS.index(item) and stage['slot']==1))]
+            if opening:access=opening
             early.setdefault(self.random.choice(access), 1)
         needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks
                           or self.options.goal.value == 3 or self.options.wisp_capsules or self.options.eggman_heart_sanity)
@@ -83,29 +94,19 @@ class SonicColoursWorld(World):
         remaining = max(0, self.ring_target - sum(Items.RING_VALUES.get(i.name, 0) for i in precollected))
         capacity = len(self.active_locations) - len(self.options.exclude_locations.value & set(self.active_locations)) - len(names)
         capacity = min(capacity, len(self.active_locations) - len(names) - speed_count)
+        # In small check sets, mostly-single currency can occupy almost every
+        # ordinary route and leave the abilities needed by Game Land stranded.
+        # Bundle currency while retaining the exact target value and reserve
+        # ordinary check capacity for the mandatory non-currency progression.
+        ordinary=sum(next(s for s in STAGES if s['mission_id']==Locations.LOCATION_TABLE[n].mission)['zone_index']<7
+                     for n in self.active_locations if n not in self.options.exclude_locations.value)
+        minimum_currency_items=remaining//10+(remaining%10)//5+remaining%5
+        capacity=min(capacity,max(minimum_currency_items,ordinary-len(names)-speed_count))
         ring_items = [Items.ring_name(n) for n in pack_rings(remaining, capacity)]
         names += ring_items
-        from worlds.generic.Rules import add_item_rule
-        for location in self.multiworld.get_locations(self.player):
-            data = Locations.LOCATION_TABLE.get(location.name)
-            if data and any(s['mission_id'] == data.mission and s['zone_index'] >= 7
-                            for s in STAGES):
-                add_item_rule(location, lambda item: item.player != self.player
-                              or item.name not in Items.WISP_ITEMS + Items.WORLD_ITEMS)
-        # With Singles, the ring pool can otherwise exhaust every Clear before
-        # access items can be placed. Reserve completion routes only when the
-        # remaining check capacity can hold the entire AP Ring pool. No early
-        # item, world, sphere or location is forced by this constraint.
-        nonclear_capacity = sum(Locations.LOCATION_TABLE[n].kind != 'clear'
-                                and n not in self.options.exclude_locations.value
-                                for n in self.active_locations)
-        if len(ring_items) > 100 and nonclear_capacity >= len(ring_items):
-            from worlds.generic.Rules import add_item_rule
-            for location in self.multiworld.get_locations(self.player):
-                data = Locations.LOCATION_TABLE.get(location.name)
-                if data and data.kind == 'clear':
-                    add_item_rule(location, lambda item: item.player != self.player
-                                  or item.name not in Items.RING_VALUES)
+        # The restrictive filler already prevents item self-locks. Blanket
+        # Wisp/world bans in Game Land and Red Ring bans on Clears exhaust
+        # reachable slots with Sheet V2's individual movement requirements.
         names += [Items.GAME_LAND_SPEED] * speed_count
         filler_count = len(self.active_locations) - len(names)
         if filler_count < 0:
@@ -121,18 +122,28 @@ class SonicColoursWorld(World):
         names += [self.get_filler_item_name() for _ in range(filler_count - trap_count)]
         self.multiworld.itempool += [self.create_item(n) for n in names]
 
+    def fill_hook(self, progitempool, usefulitempool, filleritempool, fill_locations):
+        # Reverse restrictive fill must place the many interchangeable rings
+        # while access/ability items are still in its maximum exploration state.
+        # Otherwise removing one ability can strand hundreds of ring receipts.
+        progitempool.sort(key=lambda item: item.player == self.player and item.name in Items.RING_VALUES)
+
     def create_item(self, name):
-        return Items.SonicColoursItem(name, Items.classification(name), Items.ITEM_TABLE[name], self.player)
+        from BaseClasses import ItemClassification
+        kind=Items.classification(name)
+        if name==Items.RANDOM_CAPSULES:
+            kind=ItemClassification.progression if self.options.wisp_capsules else ItemClassification.useful
+        return Items.SonicColoursItem(name,kind,Items.ITEM_TABLE[name],self.player)
 
     def get_filler_item_name(self):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'options_revision':4, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':5, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),
-                'logic_policy': 'provisional_clears_conservative_pickups',
+                'logic_policy': 'sheet_v2',
                 'mandatory_prologue': ['stg110', 'stg130'],
                 'locations': {n: Locations.LOCATION_TABLE[n].code for n in self.active_locations},
                 'options': self.options.as_dict(*OPTION_NAMES)}
@@ -148,4 +159,4 @@ class SonicColoursWorld(World):
         spoiler_handle.write(f'\nSonic Colours (Wii) PAL\n'
                              'Starting world: Tropical Resort (vanilla intro)\n'
                              f'Unknown logic entries: {len(self.unknown_logic)}\n'
-                             'Wisps: shuffled; unknown clear routes provisional, optional pickups conservative.\n')
+                             'Logic: Sheet V2; undocumented Normal routes require all selected Wisps.\n')

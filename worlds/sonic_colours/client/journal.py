@@ -93,8 +93,8 @@ class Journal:
         progressive items, filler or traps here; a truncated history cannot
         replay them or erase a previously witnessed permanent permission.
         """
-        from ..Items import ITEM_TABLE, WORLD_ITEMS, WISP_ITEMS, EMERALDS, RANDOM_CAPSULES
-        allowed={ITEM_TABLE[n] for n in WORLD_ITEMS+WISP_ITEMS+EMERALDS+(RANDOM_CAPSULES,)}
+        from ..Items import ITEM_TABLE, WORLD_ITEMS, ALL_WISP_ITEMS, EMERALDS, RANDOM_CAPSULES
+        allowed={ITEM_TABLE[n] for n in WORLD_ITEMS+ALL_WISP_ITEMS+EMERALDS+(RANDOM_CAPSULES,)}
         old=set(self.data.get('permission_receipts',()))
         new=old | (set(item_ids)&allowed)
         if new!=old:

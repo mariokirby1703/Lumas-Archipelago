@@ -8,6 +8,7 @@ Underwater request 8 uses Swim instead of Double Jump; live validation required.
 """
 from .capsule_refresh import PPC
 from .memory import MemoryUnavailable, valid_range
+from ..wisps import wisp_level
 
 # Transient trust is scoped to a verified native C2 data address and a single
 # stage epoch. It is not persistent save authority or a substitute for a live
@@ -47,7 +48,7 @@ def permissions(counts):
         counts.get('Progressive Rail',0)>=2 or counts.get('Rail Switch',0)>0,
         counts.get('Quick Step',0)>0,
         counts.get('Progressive Skydiving',0)>=2,
-        counts.get('Progressive Pink Spikes Wisp',0)>=2,
+        wisp_level(counts,'Pink Spikes')>=2,
     )) if present)
 
 

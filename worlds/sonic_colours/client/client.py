@@ -422,6 +422,8 @@ class SonicCommands(ClientCommandProcessor):
 
 def slot_identity_digest(data):
     """Keep old seed journals stable when adding a disabled optional trap."""
+    if data.get('options_revision',0)<5 and data['options'].get('native_feature_tests')==0:
+        data={**data,'options':{k:v for k,v in data['options'].items() if k!='native_feature_tests'}}
     if data.get('options_revision', 0) < 4:
         options = dict(data['options'])
         if options.get('dead_weight_trap_weight') == 0:
@@ -485,7 +487,7 @@ class SonicContext(CommonContext):
         ids=([item.item for item in self.items_received] if self.history_ready
              else list(runtime.journal.data['receipts']))
         ids += [item for item in runtime.journal.data.get('permission_receipts',()) if item not in ids]
-        runtime.refresh_movement_permissions(self.memory,runtime.test_inventory.apply(inventory(ids)))
+        runtime.refresh_movement_permissions(self.memory,runtime.effective_inventory(inventory(ids)))
 
     def release_runtime(self):
         if self.runtime:
@@ -496,7 +498,7 @@ class SonicContext(CommonContext):
 
     def on_deathlink(self, data):
         super().on_deathlink(data)
-        if self.deathlink:
+        if self.deathlink and self.runtime and self.runtime.slot_data["options"].get("death_link", False):
             self.deathlink.receive(data, time.monotonic())
 
     def hud_item_name(self,item,slot):
@@ -533,6 +535,13 @@ class SonicContext(CommonContext):
                 identity = {'seed': self.server_seed, 'team': self.team, 'slot': self.slot,
                             'revision': VERSION['dol_sha256'], 'game': GAME,
                             'slot_digest': slot_identity_digest(data)}
+                # Freshly generated slots distinguish rooms hosting the same
+                # generated seed. Legacy slots keep their existing journal key.
+                if data.get('options_revision',0)>=5 and self.server_address:
+                    from urllib.parse import urlsplit
+                    endpoint=urlsplit(self.server_address if '://' in self.server_address else 'ws://'+self.server_address)
+                    room=f'{(endpoint.hostname or "").lower()}:{endpoint.port or 38281}{endpoint.path.rstrip("/")}'
+                    identity['room_endpoint']=hashlib.sha256(room.encode()).hexdigest()
                 if not self.runtime or self.runtime.journal.identity != identity:
                     self.release_runtime()
                     journal = Journal(self.journal_directory, identity)
@@ -635,10 +644,12 @@ async def transmit_checks(ctx, checks=(), goal=False):
     if not ctx.server or ctx.slot is None:
         ctx.operation_status['ap_transport'] = 'offline; durable queue retained'
         return
-    # Runtime authorizes checks for the current seeded/bound session. Do not
-    # bypass that gate by reimporting all journal entries while disconnected,
-    # unbound, or after a save/scene identity switch.
-    earned = set(checks)
+    # Runtime already attributed these durable checks before journalling them.
+    # Reconnect/DME loss must not strand that queue. This creates no new checks
+    # from the currently loaded save; the AP room/team/slot identity below must
+    # still match before any network send.
+    earned = set(checks) | set(ctx.runtime.journal.data['checks'])
+    goal = goal or bool(ctx.runtime.journal.data.get('goal_observed'))
     pending = earned - ctx.checked_locations
     if not pending and not (goal and not ctx.finished_game):
         ctx.operation_status['ap_transport'] = 'idle: no pending checks or goal'

@@ -5,7 +5,7 @@ import hashlib
 import json
 import math
 import struct
-from ..Items import BY_ID, ITEM_TABLE, RING_VALUES, EMERALDS, WISP_ITEMS, FILLER, LEGACY_FILLER, TRAPS
+from ..Items import BY_ID, ITEM_TABLE, RING_VALUES, EMERALDS, WISP_ITEMS, ALL_WISP_ITEMS, FILLER, LEGACY_FILLER, TRAPS
 from ..Locations import LOCATION_TABLE, enabled
 from ..Options import SonicColoursOptions, OPTION_NAMES
 from ..world_constants import GAME, SCHEMA_VERSION, STAGES, BY_MISSION, game_land_gates
@@ -41,6 +41,8 @@ def validate_slot(data):
         raise ValueError('Sonic Colours schema 7 required: movement/Swim/Breath item IDs and options. Regenerate seed and .apsonic; do not reuse old seed journals.')
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
+    revision=data.get('options_revision',0)
+    if type(revision) is not int or not 0<=revision<=5:raise ValueError('unsupported slot options revision')
     options = data.get('options')
     # Old seeds have no physical 1-Up locations; adding the optional toggle
     # must not force regeneration or change their selected location set.
@@ -52,6 +54,7 @@ def validate_slot(data):
         options={k:v for k,v in options.items() if k not in ('ap_item_hud','swim_trap_weight','swim_trap_duration')}
         options.setdefault('score_reset_trap_weight',0)
         options.setdefault('dead_weight_trap_weight',0)
+        if data.get('options_revision',0)<5:options.setdefault('native_feature_tests',0)
         if data.get('options_revision',0)<3:
             options.setdefault('super_sonic',1)
         data={**data,'options':options}
@@ -100,7 +103,7 @@ def validate_slot(data):
         raise ValueError('slot locations do not match option-selected stable IDs')
     if options['wisp_capsules'] and not any(LOCATION_TABLE[n].kind == 'capsule' for n in expected_locations):
         raise ValueError('wisp_capsules: no validated accessible capsule instances')
-    if data.get('logic_policy') != 'provisional_clears_conservative_pickups':
+    if data.get('logic_policy') != ('sheet_v2' if data.get('options_revision',0)>=5 else 'provisional_clears_conservative_pickups'):
         raise ValueError('slot logic policy mismatch; regenerate with matching world/client')
     if data.get('mandatory_prologue') != ['stg110', 'stg130']:
         raise ValueError('unsupported native prologue contract')
@@ -108,7 +111,7 @@ def validate_slot(data):
         raise ValueError('expected fixed Tropical Resort starting world and vanilla intro')
     for name in ('death_link',):
         from .versions import VERSION
-        if options[name] and not VERSION.get('live_validation',{}).get('deathlink'):
+        if options[name] and not options.get('native_feature_tests') and not VERSION.get('live_validation',{}).get('deathlink'):
             raise ValueError(f'{name}: requires_verified_hook')
     return data
 
@@ -119,7 +122,7 @@ def inventory(item_ids):
         raise ValueError(f'unknown item IDs: {sorted(unknown)}')
     counts = Counter(BY_ID[item] for item in item_ids)
     return {'counts': counts, 'red_rings': sum(counts[n] * v for n, v in RING_VALUES.items()),
-            'emeralds': [n for n in EMERALDS if counts[n]], 'wisps': [n for n in WISP_ITEMS if counts[n]],
+            'emeralds': [n for n in EMERALDS if counts[n]], 'wisps': [n for n in ALL_WISP_ITEMS if counts[n]],
             'super_sonic_allowed': all(counts[n] for n in EMERALDS)}
 
 
@@ -215,14 +218,17 @@ class Runtime:
             locations={LOCATION_TABLE[n].instance_key:code for n,code in self.slot_data['locations'].items()
                        if LOCATION_TABLE[n].kind=='capsule'}
             events=[];checks=set()
+            from .state import live_control_profile
+            profile=live_control_profile(memory,snapshot,self.guard) if entries else None
             for entry in entries:
+                if (entry['container'],entry['save_index'])!=(profile[1],profile[2]):continue
                 capsule=CAPSULES_BY_NATIVE_ID.get((entry['mission'],entry['object_id'],entry['instance']))
                 if not capsule or not capsule.eligible or capsule.raw_wisp!=entry['raw_wisp']:continue
                 code=locations.get(capsule.key)
                 if code is None or code in self.journal.data['pickup_checks'] or code in checks:continue
                 checks.add(code);events.append({'kind':'capsule','mission':capsule.mission,
                     'instance_key':capsule.key,'actor_id':entry['actor_id'],
-                    'provenance':'PAL_800D4FA8_native_success','native_sequence':entry['sequence']})
+                    'provenance':'PAL_800D4CF0_committed_opening','native_sequence':entry['sequence']})
             if events:self.journal.record_pickups(events,{},checks)
             self._capsule_event_cursor=head
             self.capsule_capture_status={'installed':True,'native_head':head,'overflow':overflow,
@@ -341,6 +347,23 @@ class Runtime:
         self._capsule_memory=memory
         self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
+        # Capture irreversible pickup/result evidence before slow permission
+        # writes. Network clients can transmit this checkpoint and receive
+        # acknowledgements before continuing the same synchronous poll.
+        self.observe_pickups()
+        self.observe_results()
+        if getattr(memory,'native_patch',None):
+            try:self.observe_capsules(frozenset())
+            except MemoryUnavailable as error:
+                self.capsule_capture_status={'installed':True,'status':'deferred: '+str(error)}
+        can_send=self.guard.can_send(self.snapshot)
+        if can_send and self.journal.data.get('save_identity') is not None:
+            saved_checks=detect_checks(self.slot_data,self.snapshot)
+            saved_checks-={code for name,code in self.slot_data['locations'].items()
+                           if LOCATION_TABLE[name].kind in ('ring','rings','capsule')}
+            self.journal.add_checks(saved_checks)
+        yield (set(self.journal.data['checks']) if can_send else set(),
+               bool(can_send and self.journal.data.get('goal_observed')))
         # Publish the HUD before owner configuration performs its guarded
         # writes. A new scene's music must not wait behind those transactions.
         try:
@@ -365,25 +388,12 @@ class Runtime:
                 self._death_allowed_stages.add(self._event_owner[2])
         except MemoryUnavailable as error:
             self.native_event_status={'installed':False,'status':str(error)}
-        # Capture irreversible pickup/result evidence before slow permission
-        # writes. Network clients can transmit this checkpoint and receive
-        # acknowledgements before continuing the same synchronous poll.
-        self.observe_pickups()
-        self.observe_results()
-        can_send=self.guard.can_send(self.snapshot)
-        if can_send and self.journal.data.get('save_identity') is not None:
-            saved_checks=detect_checks(self.slot_data,self.snapshot)
-            saved_checks-={code for name,code in self.slot_data['locations'].items()
-                           if LOCATION_TABLE[name].kind in ('ring','rings','capsule')}
-            self.journal.add_checks(saved_checks)
-        yield (set(self.journal.data['checks']) if can_send else set(),
-               bool(can_send and self.journal.data.get('goal_observed')))
         # Water entry and controller replacement must be handled before slow
         # journal, resource-bank and progression operations in this poll.
         if self.slot_data['options'].get('movement_unlocks'):
             early_items=list(item_ids if history_ready else self.journal.data['receipts'])
             early_items+=[item for item in self.journal.data.get('permission_receipts',()) if item not in early_items]
-            early_owned=self.test_inventory.apply(inventory(early_items))
+            early_owned=self.effective_inventory(inventory(early_items))
             from .movement_gate import configure as configure_movement
             from .water_native import configure as configure_breath
             for name,action in (('movement_status',configure_movement),('breath_status',configure_breath)):
@@ -414,14 +424,14 @@ class Runtime:
         self.settle_effects(memory)
         durable = list(item_ids if history_ready else self.journal.data['receipts'])
         durable += [item for item in self.journal.data.get('permission_receipts',()) if item not in durable]
-        known = self.test_inventory.apply(inventory(durable))
+        known = self.effective_inventory(inventory(durable))
         if self.snapshot.scene in ('global_map','world_map','game_land_select'):
             try:
                 self.guard.check(self.snapshot)
                 self.project_permissions(memory,known)
             except MemoryUnavailable as error:
                 self.hooks.progression_status={'available':False,'reason':str(error)}
-        self.observe_capsules(frozenset(known['wisps']))
+        if not getattr(memory,'native_patch',None):self.observe_capsules(frozenset(known['wisps']))
         # Catch native enemy/script grants even if they bypass boost_add.
         # Do this BEFORE new AP refill receipts are applied, so the refill
         # is calculated from the genuinely AP-owned remaining balance.
@@ -521,7 +531,13 @@ class Runtime:
         self.music_status = self.resource_music
         quiet_logging.record('music', '%s', self.music_status['status'])
 
+    def effective_inventory(self,owned):
+        from ..wisps import project_inventory
+        return project_inventory(self.test_inventory.apply(owned),self.slot_data['options'])
+
     def movement_policy(self, owned):
+        from ..wisps import project_inventory
+        owned=project_inventory(owned,self.slot_data['options'])
         if self.slot_data['options'].get('movement_unlocks'):return owned
         from ..Items import MOVEMENT_ITEMS
         from .test_inventory import MAXIMUM
@@ -536,6 +552,7 @@ class Runtime:
         replay or persistent progression writes; unavailable scenes defer.
         """
         if self.snapshot is None:return
+        owned=self.movement_policy(owned)
         from .stunts import configure as stunts
         from .player_switch import configure as assist
         from .drill_turbo import configure as drill
@@ -568,6 +585,7 @@ class Runtime:
         missing optional speed/query control cannot strand its capsule data.
         Each writer retains its own executable/profile/scene checks.
         """
+        owned=self.movement_policy(owned)
         from .game_land_ui import apply as apply_game_land_ui
         try:
             game_land_display=apply_game_land_ui(memory,self.snapshot,self.guard,owned)

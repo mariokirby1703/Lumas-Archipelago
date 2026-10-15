@@ -9,7 +9,7 @@ from collections import Counter
 import re
 import shlex
 
-from ..Items import (MOVEMENT_ITEMS, WISP_ITEMS,
+from ..Items import (MOVEMENT_ITEMS, ALL_WISP_ITEMS as WISP_ITEMS,
                      WORLD_ITEMS, EMERALDS, GAME_LAND_SPEED, RANDOM_CAPSULES,
                      RING_VALUES)
 

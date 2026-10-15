@@ -39,7 +39,8 @@ def installed_data(memory):
 def configure(memory,snapshot,owned):
     address=installed_data(memory)
     if address is None:return {'status':'Update Gecko profile for Drill turbo','installed':False}
-    level=min(2,max(0,owned['counts'].get(ITEM,0)))
+    from ..wisps import wisp_level
+    level=wisp_level(owned['counts'],'Yellow Drill')
     value=int(level>=2)
     before=memory.read_u32(address)
     if before!=value:memory.write_u32(address,value,expected=before,operation='drill_turbo')

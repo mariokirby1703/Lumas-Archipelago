@@ -166,11 +166,14 @@ def test_medal_thunk_only_exact_normalization_and_mutable_words():
 
 
 def test_disabled_option_and_conservative_traversal_rule():
-    off=generate();on=generate({'eggman_heart_sanity':True})
+    off=generate({'eggman_heart_sanity':False});on=generate({'eggman_heart_sanity':True})
     assert not any(l.name.endswith(' - Eggman Heart') for l in off.get_locations())
     locations=[l for l in on.get_locations() if l.name.endswith(' - Eggman Heart')]
     assert len(locations)==21 and len({l.address for l in locations})==21
-    state=CollectionState(on);assert not any(l.access_rule(state) for l in locations)
+    from ..Locations import LOCATION_TABLE
+    state=CollectionState(on)
+    assert next(l for l in locations if l.name=='Game Land 1-1 - Eggman Heart').access_rule(state)
+    assert not next(l for l in locations if LOCATION_TABLE[l.name].mission=='stgE50').access_rule(state)
     for name in WISP_ITEMS:state.collect(on.worlds[1].create_item(name),prevent_sweep=True)
     assert all(l.access_rule(state) for l in locations)
     assert not any(l.parent_region.can_reach(state) for l in locations if l.name.startswith('Game Land 1-2'))
@@ -178,13 +181,13 @@ def test_disabled_option_and_conservative_traversal_rule():
 
 @pytest.mark.parametrize('seed',range(100))
 def test_medals_white_lock_and_goals_fill_without_tv_item(seed):
-    m=generate({'eggman_heart_sanity':True,'boost_lock':seed%2,'goal':seed%5,
+    m=generate({'eggman_heart_sanity':True,'boost_lock':seed%2,'goal':seed%4,
                 'red_ring_checks':('off','singles','per_level')[seed%3],
                 'rank_checks':('off','c','all')[seed%3]},seed,fill=True)
     assert m.can_beat_game() and not m.get_unfilled_locations()
     assert 'Terminal Velocity Access' not in ITEM_TABLE
     assert all(i.name!='Terminal Velocity Access' for i in m.itempool)
-    assert sum(i.name=='White Boost Wisp' for i in m.itempool)==1
+    assert sum(i.name=='White Boost Wisp' for i in m.itempool)==seed%2
 
 
 def test_native_medal_capture_reaches_real_websocket_ack_without_item_history(tmp_path,monkeypatch):

@@ -381,6 +381,18 @@ class WritePolicy:
             if not tx or tx[0]!=context or tx[1].get(address)!=size or address not in fields or len(fields[address])!=size:
                 raise MemoryUnavailable('WRITE_BLOCKED: unverified current-stage score transaction')
             return context
+        if operation == 'oxygen_controls':
+            from .oxygen_native import address as oxygen_address,context as oxygen_context
+            tx=getattr(self.memory,'_oxygen_transaction',None)
+            if not tx or tx[0]!=oxygen_address(self.memory):raise MemoryUnavailable('WRITE_BLOCKED: oxygen mailbox unavailable')
+            base,token,fields=tx
+            off=address-base
+            if off not in fields or len(fields[off])!=size:raise MemoryUnavailable('WRITE_BLOCKED: oxygen policy field')
+            if token is None:
+                if off!=4 or fields[off]!=bytes(4):raise MemoryUnavailable('WRITE_BLOCKED: oxygen disable only')
+                return base,None
+            if token!=oxygen_context(self.memory,snapshot,self.guard):raise MemoryUnavailable('WRITE_BLOCKED: oxygen save changed')
+            return base,token
         if operation == 'breath_timer':
             from .water_native import target
             player,clock=target(self.memory,snapshot,self.guard)

@@ -160,6 +160,13 @@ class BoostLock(DefaultOnToggle):
     display_name = 'White Boost Wisp Lock'
 
 
+class NativeFeatureTests(Toggle):
+    """Developer opt-in for the incomplete PAL DeathLink/Dead Weight live matrix.
+    Never implies production verification. Use only with a disposable test seed."""
+    display_name = 'Unverified Native Feature Tests'
+    visibility = Visibility.none
+
+
 @dataclass
 class SonicColoursOptions(PerGameCommonOptions):
     goal: Goal
@@ -182,6 +189,7 @@ class SonicColoursOptions(PerGameCommonOptions):
     music_randomization: MusicRandomization
     death_link: SonicDeathLink
     wisp_capsules: WispCapsules
+    native_feature_tests: NativeFeatureTests
 
 OPTION_NAMES = tuple(SonicColoursOptions.__annotations__)
 

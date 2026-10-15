@@ -300,12 +300,13 @@ class NativeHooks:
         from ..world_constants import NATIVE_COLOURS
         colours = NATIVE_COLOURS
         for bit, colour in enumerate(colours):
-            values[bit] = inventory['counts'][wisp_item(colour)] > 0
+            from ..wisps import wisp_level
+            values[bit] = wisp_level(inventory['counts'],colour,slot_data.get('options',{})) > 0
         for zone in range(7):
             granted = zone == 0 or (zone < 6 and inventory['counts'][WORLD_ITEMS[zone]] > 0)
             if zone == 6:
-                from ..Items import WISP_ITEMS
-                full_access = all(inventory['counts'][w] for w in WISP_ITEMS)
+                from ..wisps import all_wisps_owned
+                full_access = all_wisps_owned(inventory['counts'],slot_data.get('options',{}))
                 granted = full_access
                 for stage in STAGES:
                     if stage['zone_index'] == 6:
@@ -353,8 +354,9 @@ class NativeHooks:
             stage = snapshot.evidence['native_data']['stage_objects'][0]
             from ..world_constants import NATIVE_COLOURS
             colours = NATIVE_COLOURS
+            from ..wisps import wisp_level
             mask = sum(1 << bit for bit, colour in enumerate(colours)
-                       if inventory['counts'][wisp_item(colour)])
+                       if wisp_level(inventory['counts'],colour,slot_data.get('options',{})))
             for address in (stage['stage'] + 0x61, stage['actor_state'] + 0x90):
                 before = memory.read_u8(address)
                 if before != mask:

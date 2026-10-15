@@ -50,6 +50,9 @@ ITEM_TABLE['Quick Step'] = BASE_ID + 52
 ITEM_TABLE.pop('Swim Everywhere Trap')
 ITEM_TABLE['Score Reset Trap'] = BASE_ID + 53
 ITEM_TABLE['Dead Weight Trap'] = BASE_ID + 54
+NORMAL_WISP_ITEMS = ('Yellow Drill Wisp','Green Hover Wisp','Pink Spikes Wisp')
+ITEM_TABLE.update({name:BASE_ID+55+i for i,name in enumerate(NORMAL_WISP_ITEMS)})
+ALL_WISP_ITEMS = WISP_ITEMS + NORMAL_WISP_ITEMS
 MOVEMENT_ITEMS += ('Quick Step',)
 MOVEMENT_POOL += ('Quick Step',)
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}
@@ -62,6 +65,8 @@ class SonicColoursItem(Item):
 
 
 def classification(name):
+    if name == RANDOM_CAPSULES:
+        return ItemClassification.useful  # Capsule Sanity promotes it per world.
     if name == GAME_LAND_SPEED:
         return ItemClassification.progression
     if name in TRAPS:

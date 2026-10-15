@@ -46,61 +46,31 @@ def targets(memory, stages=False):
                         if key in wanted:raise MemoryUnavailable('Duplicate Emerald pane')
                         wanted[key]=colour
         if len(wanted)!=(21 if stages else 14):raise MemoryUnavailable('Game Land UI named panes missing')
-        if stages:
-            # 805E4AC0 resolves the already allocated native pane directly;
-            # available/cleared labels need not have lazy wrapper-cache entries.
-            flags=memory.resolve_flags_ptr(allow_working=True)[-1]
-            graph=memory.read_ptr_checked(layer+0x8c,0x10)
-            groups=memory.read_ptr_checked(memory.read_ptr_checked(graph+0xc,8)+4,16)
-            for (group,index),stage in wanted.items():
-                if memory.read_progress_bit(flags,252+stage):continue  # vanilla completed-label styling
-                if not 0<=group<512 or not 0<=index<512:raise MemoryUnavailable('Invalid Game Land pane index')
-                array=memory.read_ptr_checked(groups+group*16+4,(index+1)*0x144)
-                pane=array+index*0x144
-                if not memory.read_u32(pane+0x74)&0x80:
-                    raise MemoryUnavailable('Game Land stage colour not initialized; reload menu with current Gecko profile')
-                data=memory.read_ptr_checked(pane+0x78,0x20)
-                result[data+0x1c]=('stage_colour',stage)
-                ancestors=set()
-                while True:
-                    if pane in ancestors or len(ancestors)>=64:raise MemoryUnavailable('Game Land pane parent cycle')
-                    ancestors.add(pane)
-                    result[pane+0x7c]=('dirty_colour' if len(ancestors)==1 else 'dirty',None)
-                    if not memory.read_u32(pane+0x80):break
-                    pane=memory.read_ptr_checked(pane+0x80,0x88)
-                root=memory.read_ptr_checked(pane+0x84,0x10)
-                owner=memory.read_ptr_checked(root+0xc,0x3c)
-                result[root+8]=('zero',None);result[owner+8]=('zero',None);result[owner+0x38]=('one',None)
-            continue
-        todo=[memory.read_u32(layer+0xd8)];seen=set();found=set()
-        while todo:
-            node=todo.pop()
-            if not node:continue
-            if node in seen or len(seen)>=512:raise MemoryUnavailable('Emerald pane cache cycle')
-            seen.add(node)
-            todo.extend((memory.read_u32(node),memory.read_u32(node+4)))
-            key=(memory.read_u32(node+0xc),memory.read_u32(node+0x10))
-            if key not in wanted:continue
-            found.add(key)
-            wrapper=memory.read_ptr_checked(memory.read_ptr_checked(node+0x18,4),0x38)
-            if memory.read_u32(wrapper)!=PANE_WRAPPER_VTABLE:raise MemoryUnavailable('Emerald pane wrapper class mismatch')
-            component=memory.read_ptr_checked(wrapper+0x34,0x10)
-            pane=memory.read_ptr_checked(component+0xc,0x88)
-            if not memory.read_u32(pane+0x74)&0x80:raise MemoryUnavailable('Emerald colour not initialized')
+        # Resolve allocated panes directly, as 805E4AC0 does. The native
+        # dictionary is complete before the lazy named-wrapper cache; waiting
+        # for every em_img/em_bli wrapper misses the first menu presentation.
+        flags=memory.resolve_flags_ptr(allow_working=True)[-1] if stages else None
+        graph=memory.read_ptr_checked(layer+0x8c,0x10)
+        groups=memory.read_ptr_checked(memory.read_ptr_checked(graph+0xc,8)+4,16)
+        for (group,index),value in wanted.items():
+            if stages and memory.read_progress_bit(flags,252+value):continue
+            if not 0<=group<512 or not 0<=index<512:raise MemoryUnavailable('Invalid Game Land pane index')
+            array=memory.read_ptr_checked(groups+group*16+4,(index+1)*0x144)
+            pane=array+index*0x144
+            if not memory.read_u32(pane+0x74)&0x80:
+                raise MemoryUnavailable('Game Land pane colour not initialized')
             data=memory.read_ptr_checked(pane+0x78,0x20)
-            colour=wanted[key];result[data+0x1c]=('stage_colour' if stages else 'colour',colour)
-            result[pane+0x7c]=('dirty_colour',None)
+            result[data+0x1c]=('stage_colour' if stages else 'colour',value)
             ancestors=set()
             while True:
-                if pane in ancestors or len(ancestors)>=64:raise MemoryUnavailable('Emerald pane parent cycle')
-                ancestors.add(pane);result[pane+0x7c]=('dirty_colour' if len(ancestors)==1 else 'dirty',None)
-                parent=memory.read_u32(pane+0x80)
-                if not parent:break
+                if pane in ancestors or len(ancestors)>=64:raise MemoryUnavailable('Game Land pane parent cycle')
+                ancestors.add(pane)
+                result[pane+0x7c]=('dirty_colour' if len(ancestors)==1 else 'dirty',None)
+                if not memory.read_u32(pane+0x80):break
                 pane=memory.read_ptr_checked(pane+0x80,0x88)
             root=memory.read_ptr_checked(pane+0x84,0x10)
             owner=memory.read_ptr_checked(root+0xc,0x3c)
             result[root+8]=('zero',None);result[owner+8]=('zero',None);result[owner+0x38]=('one',None)
-        if found!=set(wanted):raise MemoryUnavailable('Emerald pane cache incomplete')
     if read_stage_objects(memory,include_pickups=False)[0]['context']!=context:
         raise MemoryUnavailable('Emerald UI changed during read')
     return result

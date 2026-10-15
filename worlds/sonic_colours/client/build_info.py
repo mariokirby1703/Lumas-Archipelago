@@ -60,7 +60,14 @@ def implementation_info():
     from .ap_hud_publisher import patches as hud_patches,normalize as hud_normalize
     from .ap_hud_connected import discover as hud_discover,render as hud_render,payloads as hud_payloads
     from .ap_hud_ticker import Ticker
+    from . import oxygen_native,capsule_capture,native_events
+    from .. import wisps,logic_v2
     digest = hashlib.sha256()
+    for function in (oxygen_native.payload,oxygen_native.address,oxygen_native.context,oxygen_native.configure,
+                     capsule_capture.payload,capsule_capture.read_events,native_events.program,
+                     wisps.wisp_level,wisps.project_inventory,wisps.all_wisps_owned,
+                     logic_v2.check,logic_v2.entry_match,logic_v2.available):
+        digest.update(function.__qualname__.encode());digest.update(marshal.dumps(function.__code__))
     for function in (hud_patches.__wrapped__,hud_normalize,hud_discover,hud_render,hud_payloads,Ticker.received,Ticker.sent,Ticker.published,Ticker.panel_events,client.SonicCommands._cmd_sonichud):
         digest.update(function.__qualname__.encode());digest.update(marshal.dumps(function.__code__))
     for function in (sky_payload,sky_configure,sky_normalize,sky_installed,medal_hook._validated_data,medal_hook._previous_data,

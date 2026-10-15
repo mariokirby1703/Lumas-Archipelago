@@ -65,16 +65,16 @@ def test_options_and_yaml():
                 cls.from_any(value)
 
 
-@pytest.mark.parametrize('mode,count', [('off', 73), ('singles', 253), ('per_level', 109)])
+@pytest.mark.parametrize('mode,count', [('off', 94), ('singles', 274), ('per_level', 130)])
 def test_counts(mode, count):
     world = generate({'red_ring_checks': mode}, fill=True).worlds[1]
     assert len(world.active_locations) == count
     assert len(world.multiworld.itempool) == count
     assert world.multiworld.can_beat_game()
-    assert sum(item.name in Items.EMERALDS for item in world.multiworld.itempool) == 7
+    assert sum(item.name in Items.EMERALDS for item in world.multiworld.itempool) == 0
     assert all(item.classification & ItemClassification.progression for item in world.multiworld.itempool
                if item.name in Items.RING_VALUES)
-    assert sum(Items.RING_VALUES.get(item.name, 0) for item in world.multiworld.itempool) == 187
+    assert sum(Items.RING_VALUES.get(item.name, 0) for item in world.multiworld.itempool) == 162
     assert len(world.multiworld.precollected_items[1]) == 0
 
 
@@ -91,7 +91,7 @@ def test_exact_packing(target):
 @pytest.mark.parametrize('settings', [
     {'red_ring_checks': 'off', 'game_land_checks': 0, 'chaos_emerald_checks': 0},
     {'red_ring_checks': 'per_level'}, {'trap_percentage': 100}, {'trap_percentage': 0},
-    {'goal': 'super_sonic'}, {'world_progression': 'open_acts'},
+    {'goal': 'all_game_land_stages'}, {'world_progression': 'open_acts'},
 ])
 def test_fill_100_seeds(settings):
     for seed in range(100):

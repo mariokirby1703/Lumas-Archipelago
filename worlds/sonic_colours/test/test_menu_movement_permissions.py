@@ -47,10 +47,12 @@ def test_receipt_refresh_uses_authenticated_inventory(identity):
     from ..client.client import SonicContext
     from ..client.test_inventory import LocalInventoryOverrides
     from ..Items import ITEM_TABLE
+    from ..client.runtime import Runtime
     refreshed=[]
     runtime=SimpleNamespace(snapshot=object(),journal=SimpleNamespace(
         identity={'team':0,'slot':1,'seed':'seed'},data={'receipts':[]}),
-        test_inventory=LocalInventoryOverrides(),
+        test_inventory=LocalInventoryOverrides(),slot_data={'options':{'movement_unlocks':True,'boost_lock':True}},
+        effective_inventory=lambda owned:Runtime.effective_inventory(runtime,owned),
         refresh_movement_permissions=lambda memory,owned:refreshed.append(owned['counts']['Progressive Skydiving']))
     context=SimpleNamespace(runtime=runtime,memory=object(),authenticated_identity=identity,
         history_ready=True,items_received=[SimpleNamespace(item=ITEM_TABLE['Progressive Skydiving'])])

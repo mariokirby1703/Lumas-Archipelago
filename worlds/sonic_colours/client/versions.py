@@ -119,6 +119,13 @@ def verify_revision(memory):
             if capture_data(memory) is None:raise MemoryUnavailable('native capsule capture missing')
             offset=CAP_HOOK-section['address']
             data=data[:offset]+CAP_ORIGINAL.to_bytes(4,'big')+data[offset+4:]
+        if getattr(memory,'native_patch',None):
+            from .oxygen_native import UPDATE,RESET,ORIGINAL_UPDATE,ORIGINAL_RESET,address as oxygen_address
+            for hook,original in ((UPDATE,ORIGINAL_UPDATE),(RESET,ORIGINAL_RESET)):
+                if section['address']<=hook<section['address']+section['size']:
+                    oxygen_address(memory)  # exact initialized code, not only its branch
+                    offset=hook-section['address']
+                    data=data[:offset]+original.to_bytes(4,'big')+data[offset+4:]
         from .area_map_refresh import HOOK as AREA_HOOK, ORIGINAL as AREA_ORIGINAL
         if getattr(memory,'native_patch',None) and section['address']<=AREA_HOOK<section['address']+section['size']:
             offset=AREA_HOOK-section['address']

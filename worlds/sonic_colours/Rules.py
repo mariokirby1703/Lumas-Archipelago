@@ -24,19 +24,15 @@ def validate_logic(logic):
         raise ValueError('Missing logic entries: ' + ', '.join(sorted(expected - logic.keys())))
 
 
-def requirements(world, state, key):
-    entry = world.logic[key]
-    # At minimum, avoid claiming Aquarium Park's water-dependent stage checks
-    # are obtainable with locked underwater traversal or reduced breath.
-    # This is deliberately a coarse conservative prerequisite, not detailed
-    # ring-by-ring routing. The native Swim/Breath gate remains unverified.
-    if (world.options.movement_unlocks.value and key.startswith('stg5')
-            and not state.has_all(('Swim', 'Breath'), world.player)):
-        return False
-    if entry['logic_status'] == 'unknown':
-        return state.has_all(WISP_ITEMS, world.player)
-    return (state.has_all(entry['requires_all'], world.player)
-            and (not entry['requires_any'] or state.has_any(entry['requires_any'], world.player)))
+def requirements(world,state,key,rank=None):
+    from .logic_v2 import check
+    return check(world,state,world.logic,key,rank)
+
+
+def all_wisps(world,state):
+    from .wisps import all_wisps_owned
+    from .Items import ALL_WISP_ITEMS
+    return all_wisps_owned({n:state.count(n,world.player) for n in ALL_WISP_ITEMS},world.options)
 
 
 def can_complete(world, state, mission):
@@ -50,24 +46,34 @@ def set_rules(world):
     for i, name in enumerate(WORLDS):
         entrance = world.get_region(name).entrances[0]
         if i == 6:
-            set_rule(entrance, lambda state: state.has_all(WISP_ITEMS, player))
+            set_rule(entrance, lambda state: all_wisps(world,state))
         elif i != world.starting_world:
             set_rule(entrance, lambda state, item=WORLD_ITEMS[i]: state.has(item, player))
     for stage in STAGES:
         region = world.get_region('Map Slot ' + stage['stage_slot_id'])
+        dependencies=()
         if stage['zone_index'] < 6 and stage['slot'] > 1:
             zone, slot = stage['zone_index'], stage['slot']
             previous = next(s['mission_id'] for s in STAGES if s['zone_index'] == zone and s['slot'] == slot - 1)
             all_acts = tuple(s['mission_id'] for s in STAGES if s['zone_index'] == zone and 1 <= s['slot'] <= 6)
             if slot == 7 and world.options.world_progression.value == 1:
+                dependencies=all_acts
                 set_rule(region.entrances[0], lambda state, missions=all_acts: all(
                     can_complete(world, state, m) for m in missions))
             elif world.options.world_progression.value == 0:
+                dependencies=(previous,)
                 set_rule(region.entrances[0], lambda state, mission=previous: can_complete(world, state, mission))
         if stage['zone_index'] == 6:
             previous={'stg790':'stg710','stg720':'stg790'}.get(stage['mission_id'])
-            set_rule(region.entrances[0], lambda state, previous=previous: state.has_all(WISP_ITEMS, player)
+            dependencies=(previous,) if previous else ()
+            set_rule(region.entrances[0], lambda state, previous=previous: all_wisps(world,state)
                      and (previous is None or can_complete(world,state,previous)))
+        # Entrance rules inspect other regions through can_complete(). Tell
+        # CollectionState to revisit them when those regions become reachable;
+        # otherwise traversal order can strand a valid sequential route.
+        for mission in dependencies:
+            predecessor=world.get_region('Map Slot '+BY_MISSION[mission]['stage_slot_id'])
+            world.multiworld.register_indirect_condition(predecessor,region.entrances[0])
         if stage['zone_index'] >= 7:
             gate = world.gates[f'{stage["zone_index"] - 6}-{stage["slot"]}']
             set_rule(region.entrances[0], lambda state, count=gate: sum(
@@ -80,23 +86,18 @@ def set_rules(world):
                     [f'{data.mission}:ring:{i}' for i in range(1, 6)] if data.kind == 'rings' else [data.mission])
             if data.kind == 'capsule':
                 item = CAPSULES[data.instance_key].wisp_item
-                if item == 'White Boost Wisp' and not world.options.boost_lock:
-                    set_rule(location, lambda state: True)
-                else:
-                    set_rule(location, lambda state, item=item: state.has(item, player))
-            elif data.kind == 'one_up':
-                # Coordinates prove object identity, not traversal requirements.
-                # Keep unverified routes conservative until live route checks.
-                from .Items import MOVEMENT_ITEMS
-                from .client.test_inventory import MAXIMUM
-                set_rule(location, lambda state: state.has_all(WISP_ITEMS, player)
-                         and (not world.options.movement_unlocks or all(
-                             state.has(item,player,MAXIMUM.get(item,1)) for item in MOVEMENT_ITEMS)))
-            elif data.kind == 'medal':
-                # The placement catalog proves identity, not an ability-free route.
-                # Until individual routes are verified, require every Wisp in
-                # addition to the physical Game Land stage's AP Ring gate.
-                set_rule(location, lambda state: state.has_all(WISP_ITEMS, player))
+                from .logic_v2 import available
+                colour=item.removesuffix(' Wisp').removeprefix('Progressive ')
+                set_rule(location,lambda state,colour=colour,story=CAPSULES[data.instance_key].story:
+                         available(world,state,{'ability':colour}) and
+                         (not world.options.game_land_checks or story or state.has('Random Capsules',player)))
+            elif data.kind in ('one_up','medal'):
+                from .logic_v2 import key_for_location
+                set_rule(location,lambda state,key=key_for_location(data):requirements(world,state,key))
+            elif data.kind=='rank':
+                from .world_constants import RANKS
+                set_rule(location,lambda state,mission=data.mission,rank=RANKS[data.index]:
+                         can_complete(world,state,mission) and requirements(world,state,mission,rank))
             elif data.kind == 'emerald':
                 missions = tuple(s['mission_id'] for s in STAGES if s['zone_index'] == stage['zone_index'])
                 set_rule(location, lambda state, missions=missions: all(can_complete(world, state, m) for m in missions))

@@ -21,7 +21,11 @@
     "address": 2147500692,
     "hex": "3da0808f61ad9520"
   },
-  "live_validation": {"deathlink": false, "dead_weight": false, "music_popup": false},
+  "live_validation": {
+    "deathlink": false,
+    "dead_weight": false,
+    "music_popup": false
+  },
   "capabilities": {
     "save_identity": true,
     "progress_c": false,
@@ -69,6 +73,7 @@
     "skydiving": true,
     "hud_mailbox": true,
     "score_reset": true,
-    "native_event_controls": true
+    "native_event_controls": true,
+    "oxygen_controls": true
   }
 }

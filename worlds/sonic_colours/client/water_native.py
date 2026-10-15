@@ -95,6 +95,9 @@ def allocation_key(memory,snapshot,player,plugin):
 
 
 def configure(memory,snapshot,guard,owned,journal=None):
+    from .oxygen_native import configure as native_configure
+    native=native_configure(memory,snapshot,guard,owned)
+    if native is not None:return native
     seconds=duration(owned['counts'])
     records=getattr(memory,'_oxygen_records',None)
     if records is None:records=dict(journal.data.get('oxygen_live',{})) if journal else {}

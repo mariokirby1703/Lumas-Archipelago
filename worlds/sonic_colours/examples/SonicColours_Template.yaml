@@ -29,6 +29,4 @@ Sonic Colours (Wii):
   music_randomization: true
   trap_percentage: 10
   ring_loss_trap_weight: medium
-  swim_trap_weight: 'off'
-  swim_trap_duration: 15
   death_link: false

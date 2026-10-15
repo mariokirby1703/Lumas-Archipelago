@@ -10,7 +10,7 @@ Sonic Colours (Wii):
   chaos_emerald_checks: false
   wisp_discovery_checks: true
   one_up_sanity: false
-  eggman_heart_sanity: false
+  eggman_heart_sanity: true
   boost_lock: true
   movement_unlocks: true
   game_land_requirement_reduction: 40
@@ -19,3 +19,8 @@ Sonic Colours (Wii):
   score_reset_trap_weight: low
   trap_percentage: 10
   death_link: false
+  dead_weight_trap_weight: off
+  wisp_capsules: false
+
+  # Developer testing only; incomplete native PAL live matrix. Hidden from web/template.
+  native_feature_tests: false

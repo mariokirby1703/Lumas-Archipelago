@@ -4,8 +4,8 @@ from .capsule_refresh import PPC
 from .gecko import inspect_c2
 from .memory import MemoryUnavailable
 
-HOOK=0x800D4FA8
-ORIGINAL=0x981C0110
+HOOK=0x800D4CF0
+ORIGINAL=0xC3FC0104
 CAPACITY=32
 ENTRY_SIZE=32
 DATA_SIZE=16+CAPACITY*ENTRY_SIZE
@@ -21,7 +21,9 @@ def payload():
     data_fix=len(a.words);a.d(14,12,12,0)
     a.d(32,3,28,0);a.d(15,4,0,0x8076);a.d(24,4,4,0x1534)
     a.emit(0x7C032000);a.branch('end',0x40820000)
-    # The contact-success hook is reached after native item spawning. Retain
+    # The native committed-opening path follows all rejection branches and
+    # unconditionally reaches the opened write. Capture BEFORE item spawning
+    # can synchronously retire its ORC wrapper. Retain
     # the exact ORC instance while the wrapper and actor still exist.
     a.d(32,5,28,0x64);a.d(11,0,5,0);a.branch('end',0x41820000)
     a.d(32,3,5,4);a.emit(0x7C03E000);a.branch('end',0x40820000)
@@ -43,12 +45,22 @@ def payload():
     a.d(32,3,12,0);a.d(14,3,3,1)
     a.d(28,3,4,CAPACITY-1);a.d(7,4,4,ENTRY_SIZE)
     a.emit(0x7C8C2214);a.d(14,4,4,16)  # add r4,r12,r4
-    a.d(36,8,4,4)
+    a.d(14,10,0,0);a.d(36,10,4,0)  # invalidate a reused slot before changing payload
+    # Attribute queued pickups to the exact native save container/index.
+    # The low byte of the subtype word remains the raw colour (1..8).
+    from .versions import VERSION
+    manager=VERSION['manager_global_candidate']
+    a.d(15,10,0,manager>>16);a.d(24,10,10,manager&65535)
+    a.d(32,10,10,0);a.d(32,10,10,0x30);a.d(36,10,4,4)
+    a.d(34,11,10,0)
     a.d(32,10,9,0);a.d(36,10,4,8)
     a.d(40,10,9,4);a.d(36,10,4,12)
     a.d(32,10,6,0);a.emit(0x554A033E);a.d(36,10,4,16)  # low 20 bits
     a.d(32,10,7,0x14);a.d(36,10,4,20)
-    a.d(32,10,28,0x114);a.d(14,10,10,1);a.d(36,10,4,24)
+    a.d(32,10,28,0x114);a.d(14,10,10,1)
+    a.emit(21<<26|11<<21|11<<16|8<<11|23<<1)  # slwi r11,r11,8
+    a.emit(31<<26|10<<21|10<<16|11<<11|444<<1)  # or r10,r10,r11
+    a.d(36,10,4,24)
     a.d(32,10,28,12);a.d(36,10,4,28)
     a.emit(0x7C0004AC)  # sync: payload precedes sequence publication
     a.d(36,3,4,0);a.d(36,3,12,0)
@@ -86,6 +98,6 @@ def read_events(memory,after=0):
         words=struct.unpack_from('>8I',raw,(sequence&(CAPACITY-1))*ENTRY_SIZE)
         if words[0]!=sequence:raise MemoryUnavailable('capsule event publication incomplete')
         mission=(words[2].to_bytes(4,'big')+words[3].to_bytes(2,'big')).decode('ascii')
-        events.append(dict(sequence=sequence,context=words[1],mission=mission,
-                           object_id=words[4],instance=words[5],raw_wisp=words[6],actor_id=words[7]))
+        events.append(dict(sequence=sequence,container=words[1],save_index=words[6]>>8,mission=mission,
+                           object_id=words[4],instance=words[5],raw_wisp=words[6]&255,actor_id=words[7]))
     return head,events,max(0,head-after-CAPACITY)

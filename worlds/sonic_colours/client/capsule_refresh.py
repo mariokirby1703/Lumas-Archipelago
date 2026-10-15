@@ -364,7 +364,7 @@ def configure(memory, snapshot, owned, slot):
     from .state import live_control_profile
     chain = live_control_profile(memory, snapshot, getattr(getattr(memory, 'write_guard', None), 'guard', None))
     white = int(not slot['options']['boost_lock'] or bool(owned['counts']['White Boost Wisp']))
-    random_allowed = bool(owned['counts']['Random Capsules'])
+    random_allowed = not slot['options'].get('game_land_checks',True) or bool(owned['counts']['Random Capsules'])
     current_hook = memory.capsule_hook_observation['variant'] in ('current_compact_white_collision_refresh', 'current_white_collision_refresh')
     desired = (chain[1], chain[2], white | (2 if random_allowed and current_hook else 0))
     before = struct.unpack('>3I', memory.read_bytes(address,12))

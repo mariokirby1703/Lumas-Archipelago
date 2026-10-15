@@ -67,3 +67,30 @@ def test_redraw_published_after_every_dirty_pane_and_retries_interruption(monkey
     ui.apply(m,snap,guard,owned)
     assert m.writes[-2:]==[400,401]
     assert not ui._PENDING_REFRESH
+
+
+def test_initial_emerald_projection_does_not_require_lazy_wrapper_cache(monkeypatch):
+    from .test_memory import FakeBackend
+    from ..client.memory import SonicMemory
+    b=FakeBackend();m=SonicMemory(b);actor=0x90001000
+    def put(a,v):b.put(a,v.to_bytes(4,'big'))
+    put(actor,ui.ACTOR_VTABLE)
+    monkeypatch.setattr(ui,'read_stage_objects',lambda memory,**kw:[{'scene':'game_land_select','context':0x90002000}])
+    monkeypatch.setattr(ui,'read_actors',lambda memory,context:[actor])
+    for layer_index,offset in enumerate((0x84,0x94)):
+        base=0x90100000+layer_index*0x100000;ref=base;layer=base+0x100;layout=base+0x300;table=base+0x400
+        graph=base+0x800;group_ref=base+0x900;groups=base+0xa00;panes=base+0x1000
+        put(actor+offset+4,ref);put(ref,layer);put(layer+0xc,layout)
+        put(layout+0x2c,14);put(layout+0x30,table);put(layer+0x8c,graph)
+        put(graph+0xc,group_ref);put(group_ref+4,groups);put(groups+4,panes)
+        put(layer+0xd8,0) # no cached wrappers at all, as on first presentation
+        for index in range(14):
+            name=(f'em_img_{index//2}' if index%2==0 else f'em_bli_{index//2}').encode()
+            nameptr=base+0x4000+index*16;b.put(nameptr,name.ljust(16,b'\0'))
+            put(table+index*12,nameptr);put(table+index*12+4,0);put(table+index*12+8,index)
+            pane=panes+index*0x144;data=base+0x5000+index*0x20;root=base+0x6000;owner=base+0x6100
+            put(pane+0x74,0x80);put(pane+0x78,data);put(pane+0x84,root);put(root+0xc,owner)
+    fields=ui.targets(m)
+    colours=[c for k,c in fields.values() if k=='colour']
+    assert len(colours)==28 and colours.count('Yellow')==4
+    assert not b.writes

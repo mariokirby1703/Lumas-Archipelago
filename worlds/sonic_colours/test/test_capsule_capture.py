@@ -42,15 +42,16 @@ def test_native_game_restart_restarts_sequence(monkeypatch):
     assert c.read_events(memory,10)[1][0]['object_id']==149
 
 
-def test_hook_original_is_the_native_opened_write_and_payload_fits():
+def test_hook_original_precedes_native_spawning_on_committed_open_path():
     words,offset=c.payload()
-    assert c.ORIGINAL==0x981C0110 and c.HOOK==0x800D4FA8
+    assert c.ORIGINAL==0xC3FC0104 and c.HOOK==0x800D4CF0
     assert words[offset//4+1]==c.MAGIC
     assert words[-1]==0
     assert len(words)*4<1600
 
 
-def test_emitted_hook_publishes_identity_and_preserves_native_registers():
+@pytest.mark.parametrize("save_index",[0,1,2,3,255])
+def test_emitted_hook_publishes_identity_and_preserves_native_registers(save_index):
     from .test_memory import FakeBackend
     b=FakeBackend();target=0x80002000;actor=0x90010000
     wrapper,record,descriptor=0x90020000,0x90021000,0x90022000
@@ -61,17 +62,23 @@ def test_emitted_hook_publishes_identity_and_preserves_native_registers():
         descriptor:0x80770fa0,descriptor+0x10:record,descriptor+0x1c:wrapper,
         descriptor+0x14:0,record:0xff000095,0x808f336c:app,app+4:doc,
         doc+0x1c:module,module+0x34:stage,stage:0x80759438,stage+0x4c:name}
+    from ..client.versions import VERSION
+    fields.update({VERSION['manager_global_candidate']:0x90035000,0x90035030:0x90036000})
     for a,v in fields.items():b.put(a,v.to_bytes(4,'big'))
+    b.put(0x90036000,bytes([save_index]))
     b.put(name,b'stg110\0\0');regs=list(range(32));regs[0]=1;regs[1]=0x900f0000;regs[28]=actor
-    original=regs[:];lr=0x80001234;cr=0x12345678;pc=0;cmp=0
+    original=regs[:];f31=None;lr=0x80001234;cr=0x12345678;pc=0;cmp=0
     for _ in range(250):
         w=words[pc];pc+=1
         if not w:break
         op=w>>26;rt=w>>21&31;ra=w>>16&31;u=w&65535;imm=u-65536 if u&32768 else u
         if op==14:regs[rt]=((regs[ra] if ra else 0)+imm)&0xffffffff
         elif op==15:regs[rt]=(imm<<16)&0xffffffff
+        elif op==48:
+            assert rt==31 and ra==28 and imm==0x104
+            f31=b.read_bytes(regs[ra]+imm,4)
         elif op==7:regs[rt]=(regs[ra]*imm)&0xffffffff
-        elif op in (32,40):regs[rt]=int.from_bytes(b.read_bytes(regs[ra]+imm,4 if op==32 else 2),'big')
+        elif op in (32,34,40):regs[rt]=int.from_bytes(b.read_bytes(regs[ra]+imm,{32:4,34:1,40:2}[op]),'big')
         elif op in (36,37,38):
             size=1 if op==38 else 4;addr=regs[ra]+imm;b.write_bytes(addr,(regs[rt]&((1<<(size*8))-1)).to_bytes(size,'big'))
             if op==37:regs[ra]=addr
@@ -91,17 +98,20 @@ def test_emitted_hook_publishes_identity_and_preserves_native_registers():
         elif w==0x7c0ff120:cr=regs[0]
         elif w==0x7c0803a6:lr=regs[0]
         elif w==0x554a033e:regs[10]&=0xfffff
+        elif op==21 and rt==ra==11:regs[11]=(regs[11]<<8)&0xffffff00
+        elif op==31 and w&0x7ff==0x378:regs[ra]=regs[rt]|regs[w>>11&31]
         elif w==0x7c0004ac:pass
         elif op==31 and w&0x7ff==0:
             rhs=regs[w>>11&31];cmp=(regs[ra]>rhs)-(regs[ra]<rhs)
         elif op==31 and w&0x7ff==0x214:regs[rt]=(regs[ra]+regs[w>>11&31])&0xffffffff
         else:raise AssertionError(hex(w))
     else:raise AssertionError('capture did not terminate')
+    assert f31 is not None
     assert regs==original and lr==0x80001234 and cr==0x12345678
-    assert b.read_bytes(actor+0x110,1)==b'\x01'
+    assert b.read_bytes(actor+0x110,1)==b'\0'
     assert int.from_bytes(b.read_bytes(target+offset,4),'big')==1
     event=struct.unpack('>8I',b.read_bytes(target+offset+16+32,32))
-    assert event==(1,stage,int.from_bytes(b'stg1','big'),int.from_bytes(b'10','big'),149,0,1,123)
+    assert event==(1,0x90036000,int.from_bytes(b'stg1','big'),int.from_bytes(b'10','big'),149,0,(save_index<<8)|1,123)
 
 
 def test_runtime_deduplicates_native_event_after_actor_and_stage_are_gone(monkeypatch):
@@ -111,16 +121,31 @@ def test_runtime_deduplicates_native_event_after_actor_and_stage_are_gone(monkey
     runtime=Runtime.__new__(Runtime)
     runtime.snapshot=SimpleNamespace(actual_mission='stg130')
     runtime.guard=SimpleNamespace(can_record_pickups=lambda s:True)
-    runtime._capsule_memory=SimpleNamespace(native_patch={'abi':1})
+    runtime._capsule_memory=SimpleNamespace(native_patch={'abi':2},resolve_flags_ptr=lambda **kw:(0,0x90010000,0,0))
     runtime.slot_data={'locations':{capsule.name:capsule.code}}
     data={'pickup_checks':[],'pickup_events':[]}
     def record(events,masks,checks):
         data['pickup_checks'].extend(checks);data['pickup_events'].extend(events)
     runtime.journal=SimpleNamespace(data=data,record_pickups=record)
-    event=dict(sequence=1,context=0x90010000,mission='stg110',object_id=149,instance=0,raw_wisp=capsule.raw_wisp,actor_id=123)
+    event=dict(sequence=1,container=0x90010000,save_index=0,mission='stg110',object_id=149,instance=0,raw_wisp=capsule.raw_wisp,actor_id=123)
     monkeypatch.setattr(c,'read_events',lambda memory,after:(1,[event],0))
     runtime.observe_capsules(set());runtime.observe_capsules(set())
     assert data['pickup_checks']==[capsule.code]
     assert len(data['pickup_events'])==1
-    assert data['pickup_events'][0]['provenance']=='PAL_800D4FA8_native_success'
+    assert data['pickup_events'][0]['provenance']=='PAL_800D4CF0_committed_opening'
+    assert runtime._capsule_event_cursor==1
+
+
+def test_pickup_from_another_save_is_never_credited(monkeypatch):
+    from ..client.runtime import Runtime
+    from ..capsules import CAPSULES_BY_NATIVE_ID
+    capsule=CAPSULES_BY_NATIVE_ID['stg110',149,0]
+    runtime=Runtime.__new__(Runtime);runtime.snapshot=SimpleNamespace()
+    runtime.guard=SimpleNamespace(can_record_pickups=lambda s:True)
+    runtime._capsule_memory=SimpleNamespace(native_patch={'abi':2},resolve_flags_ptr=lambda **kw:(0,0x90010000,1,0))
+    runtime.slot_data={'locations':{capsule.name:capsule.code}}
+    runtime.journal=SimpleNamespace(data={'pickup_checks':[]},record_pickups=lambda *a:pytest.fail('wrong save'))
+    event=dict(sequence=1,container=0x90010000,save_index=0,mission='stg110',object_id=149,instance=0,raw_wisp=capsule.raw_wisp,actor_id=123)
+    monkeypatch.setattr(c,'read_events',lambda memory,after:(1,[event],0))
+    runtime.observe_capsules(set())
     assert runtime._capsule_event_cursor==1

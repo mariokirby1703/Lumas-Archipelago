@@ -205,3 +205,41 @@ def test_score_reset_network_receipt_delivers_once_and_reconnect_does_not_replay
         assert ctx.runtime.pending_effects()==[]
         ctx.release_runtime();await ctx.shutdown()
     asyncio.run(scenario())
+
+
+def test_deathlink_off_drops_incoming_event_even_if_a_developer_model_exists(tmp_path):
+    from types import SimpleNamespace
+    async def scenario():
+        ctx=SonicContext(journal_directory=tmp_path)
+        received=[];ctx.deathlink=SimpleNamespace(receive=lambda *a:received.append(a))
+        ctx.runtime=SimpleNamespace(slot_data={'options':{'death_link':0}})
+        ctx.on_deathlink({'time':1,'source':'peer','cause':'test'})
+        assert not received
+        ctx.runtime.slot_data['options']['death_link']=1
+        ctx.on_deathlink({'time':2,'source':'peer','cause':'test'})
+        assert len(received)==1
+        ctx.runtime=None;ctx.deathlink=None;await ctx.shutdown()
+    asyncio.run(scenario())
+
+
+def test_new_slot_same_seed_room_change_isolated_but_reconnect_preserves_receipts(tmp_path):
+    async def scenario():
+        data=generate().worlds[1].fill_slot_data()
+        ctx=SonicContext(journal_directory=tmp_path);ctx.team,ctx.slot=0,1
+        async def send(messages):pass
+        ctx.send_msgs=send
+        ctx.server_address='ws://test.invalid:38283/'
+        ctx.on_package('RoomInfo',{'seed_name':data['seed_name']})
+        ctx.on_package('Connected',{'slot_data':data});await asyncio.sleep(0)
+        identity=dict(ctx.runtime.journal.identity)
+        ctx.runtime.journal.record_history([ITEM_TABLE['Rings']])
+        ctx.release_runtime()
+        ctx.on_package('RoomInfo',{'seed_name':data['seed_name']})
+        ctx.on_package('Connected',{'slot_data':data});await asyncio.sleep(0)
+        assert ctx.runtime.journal.identity==identity and ctx.runtime.journal.data['receipts']==[ITEM_TABLE['Rings']]
+        ctx.server_address='ws://test.invalid:38284'
+        ctx.on_package('RoomInfo',{'seed_name':data['seed_name']})
+        ctx.on_package('Connected',{'slot_data':data});await asyncio.sleep(0)
+        assert ctx.runtime.journal.identity!=identity and not ctx.runtime.journal.data['receipts']
+        ctx.release_runtime();await ctx.shutdown()
+    asyncio.run(scenario())

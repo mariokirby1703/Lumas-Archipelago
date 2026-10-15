@@ -23,7 +23,7 @@ def test_default_wisps_shuffle_in_reachable_spheres_for_100_seeds():
     for seed in range(100):
         multiworld = generate(seed=seed, fill=True)
         assert not multiworld.precollected_items[1]
-        assert Counter(i.name for i in multiworld.itempool if i.name in Items.WISP_ITEMS) == Counter(Items.WISP_ITEMS)
+        assert Counter(i.name for i in multiworld.itempool if i.name in Items.WISP_ITEMS) == Counter(Items.WISP_ITEMS+tuple(n for n in Items.WISP_ITEMS if n.startswith("Progressive ")))
         spheres = list(multiworld.get_spheres())
         obtained = {location.item.name for sphere in spheres for location in sphere if location.item}
         early = multiworld.local_early_items[1]
@@ -47,7 +47,7 @@ def test_default_wisps_shuffle_in_reachable_spheres_for_100_seeds():
 def test_removed_features_leave_holes_in_ids_and_options():
     from ..Options import SonicColoursOptions, RankChecks, Goal
     assert 'super_sonic_item' not in SonicColoursOptions.type_hints
-    assert 'd' not in RankChecks.options and 'super_sonic' in Goal.options
+    assert 'd' not in RankChecks.options and 'super_sonic' not in Goal.options
     assert BASE_ID + 22 not in Items.BY_ID
     assert Items.ITEM_TABLE['Red Ring'] == BASE_ID + 23
     assert not any(name.endswith(' - D Rank') for name in Locations.LOCATION_TABLE)
