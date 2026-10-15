@@ -3,523 +3,523 @@
   "tracks": {
     "bgm_sys_theme": {
       "cue_id": 0,
-      "title": "bgm_sys_theme",
+      "title": "Title Theme",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_sys_op": {
       "cue_id": 10,
-      "title": "bgm_sys_op",
+      "title": "Reach for the Stars (Opening)",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_sys_end": {
       "cue_id": 20,
-      "title": "bgm_sys_end",
+      "title": "Speak with your Heart (Credits)",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg110_rso": {
       "cue_id": 1000,
-      "title": "bgm_stg110_rso",
+      "title": "Tropical Resort - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg120_rso": {
       "cue_id": 1001,
-      "title": "bgm_stg120_rso",
+      "title": "Tropical Resort - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg130_rso": {
       "cue_id": 1002,
-      "title": "bgm_stg130_rso",
+      "title": "Tropical Resort - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg140_rso": {
       "cue_id": 1003,
-      "title": "bgm_stg140_rso",
+      "title": "Tropical Resort - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg150_rso": {
       "cue_id": 1004,
-      "title": "bgm_stg150_rso",
+      "title": "Tropical Resort - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg160_rso": {
       "cue_id": 1005,
-      "title": "bgm_stg160_rso",
+      "title": "Tropical Resort - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg210_fct": {
       "cue_id": 1010,
-      "title": "bgm_stg210_fct",
+      "title": "Sweet Mountain - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg220_fct": {
       "cue_id": 1011,
-      "title": "bgm_stg220_fct",
+      "title": "Sweet Mountain - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg230_fct": {
       "cue_id": 1012,
-      "title": "bgm_stg230_fct",
+      "title": "Sweet Mountain - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg240_fct": {
       "cue_id": 1013,
-      "title": "bgm_stg240_fct",
+      "title": "Sweet Mountain - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg250_fct": {
       "cue_id": 1014,
-      "title": "bgm_stg250_fct",
+      "title": "Sweet Mountain - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg260_fct": {
       "cue_id": 1015,
-      "title": "bgm_stg260_fct",
+      "title": "Sweet Mountain - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg310_shp": {
       "cue_id": 1020,
-      "title": "bgm_stg310_shp",
+      "title": "Starlight Carnival - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg320_shp": {
       "cue_id": 1021,
-      "title": "bgm_stg320_shp",
+      "title": "Starlight Carnival - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg330_shp": {
       "cue_id": 1022,
-      "title": "bgm_stg330_shp",
+      "title": "Starlight Carnival - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg340_shp": {
       "cue_id": 1023,
-      "title": "bgm_stg340_shp",
+      "title": "Starlight Carnival - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg350_shp": {
       "cue_id": 1024,
-      "title": "bgm_stg350_shp",
+      "title": "Starlight Carnival - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg360_shp": {
       "cue_id": 1025,
-      "title": "bgm_stg360_shp",
+      "title": "Starlight Carnival - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg410_pla": {
       "cue_id": 1030,
-      "title": "bgm_stg410_pla",
+      "title": "Planet Wisp - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg420_pla": {
       "cue_id": 1031,
-      "title": "bgm_stg420_pla",
+      "title": "Planet Wisp - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg430_pla": {
       "cue_id": 1032,
-      "title": "bgm_stg430_pla",
+      "title": "Planet Wisp - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg440_pla": {
       "cue_id": 1033,
-      "title": "bgm_stg440_pla",
+      "title": "Planet Wisp - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg450_pla": {
       "cue_id": 1034,
-      "title": "bgm_stg450_pla",
+      "title": "Planet Wisp - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg460_pla": {
       "cue_id": 1035,
-      "title": "bgm_stg460_pla",
+      "title": "Planet Wisp - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg510_qua": {
       "cue_id": 1040,
-      "title": "bgm_stg510_qua",
+      "title": "Aquarium Park - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg520_qua": {
       "cue_id": 1041,
-      "title": "bgm_stg520_qua",
+      "title": "Aquarium Park - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg530_qua": {
       "cue_id": 1042,
-      "title": "bgm_stg530_qua",
+      "title": "Aquarium Park - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg540_qua": {
       "cue_id": 1043,
-      "title": "bgm_stg540_qua",
+      "title": "Aquarium Park - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg550_qua": {
       "cue_id": 1044,
-      "title": "bgm_stg550_qua",
+      "title": "Aquarium Park - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg560_qua": {
       "cue_id": 1045,
-      "title": "bgm_stg560_qua",
+      "title": "Aquarium Park - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg610_ast": {
       "cue_id": 1050,
-      "title": "bgm_stg610_ast",
+      "title": "Asteroid Coaster - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg620_ast": {
       "cue_id": 1051,
-      "title": "bgm_stg620_ast",
+      "title": "Asteroid Coaster - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg630_ast": {
       "cue_id": 1052,
-      "title": "bgm_stg630_ast",
+      "title": "Asteroid Coaster - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg640_ast": {
       "cue_id": 1053,
-      "title": "bgm_stg640_ast",
+      "title": "Asteroid Coaster - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg650_ast": {
       "cue_id": 1054,
-      "title": "bgm_stg650_ast",
+      "title": "Asteroid Coaster - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg660_ast": {
       "cue_id": 1055,
-      "title": "bgm_stg660_ast",
+      "title": "Asteroid Coaster - Act 3",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg710_elv": {
       "cue_id": 1060,
-      "title": "bgm_stg710_elv",
+      "title": "Terminal Velocity - Act 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg720_elv": {
       "cue_id": 1061,
-      "title": "bgm_stg720_elv",
+      "title": "Terminal Velocity - Act 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_boss_coreboss": {
       "cue_id": 2000,
-      "title": "bgm_boss_coreboss",
+      "title": "Rotatatron & Refreshinator",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_boss_Jellyboss": {
       "cue_id": 2010,
-      "title": "bgm_boss_Jellyboss",
+      "title": "Captain Jelly & Admiral Jelly",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_boss_shipboss": {
       "cue_id": 2020,
-      "title": "bgm_boss_shipboss",
+      "title": "Frigate Orcan & Skullian",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_boss_lastboss_1": {
       "cue_id": 2030,
-      "title": "bgm_boss_lastboss_1",
+      "title": "Nega-Wisp Armor - Phase 1",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_boss_lastboss_2": {
       "cue_id": 2040,
-      "title": "bgm_boss_lastboss_2",
+      "title": "Nega-Wisp Armor - Phase 2",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_mlt_a": {
       "cue_id": 3000,
-      "title": "bgm_mlt_a",
+      "title": "Tropical Resort - Game Land Ver.",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_mlt_b": {
       "cue_id": 3010,
-      "title": "bgm_mlt_b",
+      "title": "Sweet Mountain - Game Land Ver.",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_mlt_c": {
       "cue_id": 3020,
-      "title": "bgm_mlt_c",
+      "title": "Starlight Carnival - Game Land Ver.",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_mlt_d": {
       "cue_id": 3030,
-      "title": "bgm_mlt_d",
+      "title": "Planet Wisp - Game Land Ver.",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_mlt_e": {
       "cue_id": 3040,
-      "title": "bgm_mlt_e",
+      "title": "Aquarium Park - Game Land Ver.",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_mlt_f": {
       "cue_id": 3050,
-      "title": "bgm_mlt_f",
+      "title": "Asteroid Coaster - Game Land Ver.",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_mlt_g": {
       "cue_id": 3060,
-      "title": "bgm_mlt_g",
+      "title": "Terminal Velocity - Game Land Ver.",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_mlt_title": {
       "cue_id": 3100,
-      "title": "bgm_mlt_title",
+      "title": "Game Land",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_jingle_mlt_clear": {
       "cue_id": 3110,
-      "title": "bgm_jingle_mlt_clear",
+      "title": "Game Land Result Jingle",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_mlt_result": {
       "cue_id": 3120,
-      "title": "bgm_mlt_result",
+      "title": "Game Land Results",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_wmap": {
       "cue_id": 4000,
-      "title": "bgm_wmap",
+      "title": "World Map",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_zmap_rso": {
       "cue_id": 4010,
-      "title": "bgm_zmap_rso",
+      "title": "Tropical Resort - Area Map",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_zmap_fct": {
       "cue_id": 4020,
-      "title": "bgm_zmap_fct",
+      "title": "Sweet Mountain - Area Map",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_zmap_shp": {
       "cue_id": 4030,
-      "title": "bgm_zmap_shp",
+      "title": "Starlight Carnival - Area Map",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_zmap_pla": {
       "cue_id": 4040,
-      "title": "bgm_zmap_pla",
+      "title": "Planet Wisp - Area Map",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_zmap_qua": {
       "cue_id": 4050,
-      "title": "bgm_zmap_qua",
+      "title": "Aquarium Park - Area Map",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_zmap_ast": {
       "cue_id": 4060,
-      "title": "bgm_zmap_ast",
+      "title": "Asteroid Coaster - Area Map",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_zmap_elv": {
       "cue_id": 4070,
-      "title": "bgm_zmap_elv",
+      "title": "Terminal Velocity - Area Map",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_sys_title": {
       "cue_id": 5000,
-      "title": "bgm_sys_title",
+      "title": "Title Screen",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_sys_option": {
       "cue_id": 5010,
-      "title": "bgm_sys_option",
+      "title": "Option Satellite",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_sys_save": {
       "cue_id": 5011,
-      "title": "bgm_sys_save",
+      "title": "Save File Select",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_sys_result": {
       "cue_id": 5020,
-      "title": "bgm_sys_result",
+      "title": "Stage Results",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_jingle_stg_clear": {
       "cue_id": 6000,
-      "title": "bgm_jingle_stg_clear",
+      "title": "Stage Clear Jingle",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_jingle_boss_clear": {
       "cue_id": 6010,
-      "title": "bgm_jingle_boss_clear",
+      "title": "Boss Clear Jingle",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_jingle_drown": {
       "cue_id": 6200,
-      "title": "bgm_jingle_drown",
+      "title": "Drowning",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_jingle_gameover": {
       "cue_id": 6300,
-      "title": "bgm_jingle_gameover",
+      "title": "Game Over",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_jingle_super_sonic": {
       "cue_id": 6500,
-      "title": "bgm_jingle_super_sonic",
+      "title": "Super Sonic",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_spn": {
       "cue_id": 6100,
-      "title": "bgm_pha_spn",
+      "title": "Yellow Drill",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_spn_wtr": {
       "cue_id": 6101,
-      "title": "bgm_pha_spn_wtr",
+      "title": "Yellow Drill (Underwater)",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_spk": {
       "cue_id": 6110,
-      "title": "bgm_pha_spk",
+      "title": "Pink Spikes",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_ast": {
       "cue_id": 6120,
-      "title": "bgm_pha_ast",
+      "title": "Green Hover",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_rod": {
       "cue_id": 6130,
-      "title": "bgm_pha_rod",
+      "title": "Purple Frenzy",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_lsr": {
       "cue_id": 6140,
-      "title": "bgm_pha_lsr",
+      "title": "Cyan Laser",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_rkt": {
       "cue_id": 6150,
-      "title": "bgm_pha_rkt",
+      "title": "Orange Rocket",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_pzl": {
       "cue_id": 6160,
-      "title": "bgm_pha_pzl",
+      "title": "Blue Cube",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_multi_common": {
       "cue_id": 6460,
-      "title": "bgm_pha_multi_common",
+      "title": "Wisp Power - Game Land Ver.",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_pha_multi_united": {
       "cue_id": 6470,
-      "title": "bgm_pha_multi_united",
+      "title": "Multi Wisp (United)",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_stg730_elv": {
       "cue_id": 1062,
-      "title": "bgm_stg730_elv",
+      "title": "Caught in the Supernova",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_jingle_mlt_drown": {
       "cue_id": 3200,
-      "title": "bgm_jingle_mlt_drown",
+      "title": "Drowning - Game Land Ver.",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_sys_challenge": {
       "cue_id": 6600,
-      "title": "bgm_sys_challenge",
+      "title": "Challenge Mode",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_sys_challenge_result": {
       "cue_id": 6601,
-      "title": "bgm_sys_challenge_result",
+      "title": "Challenge Mode - Results",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     }
