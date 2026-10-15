@@ -72,3 +72,11 @@ Production DeathLink and Dead Weight generation remain gated by versions.json li
 V3 user feedback showed that the 640-pixel right edge was insufficient for widescreen and the title vanished abruptly. V4 live feedback showed 830 was outside the viewport. The corrected client uses the 630-pixel right edge, places the two lines above the Red Rings, and preserves the title while alpha reaches zero. Music publication runs before slow guarded owner reconfiguration. Game Land selection (`ui_title_multi`, `multi_bg`) and results (`ui_result`, `result`) have dedicated appended resources, with exact original-record preservation and all original animations retained. Discovery accepts the verified dictionary sizes 93 and 95 respectively. Tests verify both original resource animations and casts remain unchanged. The initial production-layout live test is still pending.
 
 Final complete suite after the behavior/fixture corrections: **17956 passed, 117 failed**. Properly decoded failure identifiers introduce none relative to the copied HEAD baseline; five baseline failures concern code/asset packaging differences in that isolated copy. Known repository failures remain and are not presented as a green suite. Subsequent changes only adjust the right-anchor constant and its focused assertion.
+
+
+## Subsequent implementation audit
+
+See [the 2026-10-15 Sheet V2/native reliability report](implementation_2026_10_15.md)
+for new automated tests, the explicit hidden native-test opt-in and remaining
+live cases. The historical multiplayer evidence above is preserved; it is not
+relabelled as a live pass for the newer native component.

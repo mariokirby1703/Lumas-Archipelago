@@ -42,17 +42,21 @@ def payload():
     a.d(32,3,8,0);a.d(15,4,0,0x8075);a.d(24,4,4,0x9438)
     a.emit(0x7C032000);a.branch('end',0x40820000)
     a.d(32,9,8,0x4c)
-    a.d(32,3,12,0);a.d(14,3,3,1)
-    a.d(28,3,4,CAPACITY-1);a.d(7,4,4,ENTRY_SIZE)
-    a.emit(0x7C8C2214);a.d(14,4,4,16)  # add r4,r12,r4
-    a.d(14,10,0,0);a.d(36,10,4,0)  # invalidate a reused slot before changing payload
-    # Attribute queued pickups to the exact native save container/index.
-    # The low byte of the subtype word remains the raw colour (1..8).
+    # The client arms a profile and AP-session tag only after attribution.
+    # Check them before touching a queue entry, including on ring wraparound.
     from .versions import VERSION
     manager=VERSION['manager_global_candidate']
     a.d(15,10,0,manager>>16);a.d(24,10,10,manager&65535)
-    a.d(32,10,10,0);a.d(32,10,10,0x30);a.d(36,10,4,4)
+    a.d(32,10,10,0);a.d(32,10,10,0x30)
+    a.d(32,5,12,12) # read tag before owner: disarm/tag/arm cannot relabel an old event
+    a.d(32,11,12,8);a.emit(0x7C0A5800);a.branch('end',0x40820000)
+    a.d(11,0,5,0);a.branch('end',0x41820000)
     a.d(34,11,10,0)
+    a.d(32,3,12,0);a.d(14,3,3,1)
+    a.d(28,3,4,CAPACITY-1);a.d(7,4,4,ENTRY_SIZE)
+    a.emit(0x7C8C2214);a.d(14,4,4,16)
+    a.d(14,0,0,0);a.d(36,0,4,0) # invalidate only an authorized publication
+    a.d(36,10,4,4)
     a.d(32,10,9,0);a.d(36,10,4,8)
     a.d(40,10,9,4);a.d(36,10,4,12)
     a.d(32,10,6,0);a.emit(0x554A033E);a.d(36,10,4,16)  # low 20 bits
@@ -61,7 +65,7 @@ def payload():
     a.emit(21<<26|11<<21|11<<16|8<<11|23<<1)  # slwi r11,r11,8
     a.emit(31<<26|10<<21|10<<16|11<<11|444<<1)  # or r10,r10,r11
     a.d(36,10,4,24)
-    a.d(32,10,28,12);a.d(36,10,4,28)
+    a.d(36,5,4,28) # AP session tag, not a recycled actor allocation
     a.emit(0x7C0004AC)  # sync: payload precedes sequence publication
     a.d(36,3,4,0);a.d(36,3,12,0)
     a.label('end')
@@ -99,5 +103,38 @@ def read_events(memory,after=0):
         if words[0]!=sequence:raise MemoryUnavailable('capsule event publication incomplete')
         mission=(words[2].to_bytes(4,'big')+words[3].to_bytes(2,'big')).decode('ascii')
         events.append(dict(sequence=sequence,container=words[1],save_index=words[6]>>8,mission=mission,
-                           object_id=words[4],instance=words[5],raw_wisp=words[6]&255,actor_id=words[7]))
+                           object_id=words[4],instance=words[5],raw_wisp=words[6]&255,session_tag=words[7]))
     return head,events,max(0,head-after-CAPACITY)
+
+
+
+def control_context(memory,snapshot,guard):
+    from .state import live_control_profile
+    if not snapshot.scene_verified or snapshot.scene not in ('gameplay','world_map','global_map','game_land_select','results','dying','respawning'):
+        raise MemoryUnavailable('Capsule capture awaits an attributed scene')
+    if not guard.can_record_pickups(snapshot):guard.check(snapshot)
+    profile=live_control_profile(memory,snapshot,guard)
+    observed=snapshot.evidence.get('chain') or snapshot.evidence.get('save_chain_trace',{}).get('chain')
+    if observed and tuple(profile[:3])!=tuple(observed[:3]):
+        raise MemoryUnavailable('Capsule capture profile changed after snapshot')
+    return snapshot.session,profile[1],profile[2]
+
+
+def configure(memory,snapshot,guard,journal):
+    base=installed_data(memory)
+    if base is None:return
+    from .progression_hook import identity_tag
+    try:token=control_context(memory,snapshot,guard)
+    except MemoryUnavailable:token=None
+    tag=identity_tag(journal.identity)
+    if token and memory.read_bytes(base+8,8)==struct.pack('>II',token[1],tag):return
+    fields={8:bytes(4)} if token is None else {8:bytes(4),12:struct.pack('>I',tag)}
+    memory._capsule_event_transaction=(base,token,fields)
+    try:
+        for off,raw in fields.items():
+            before=memory.read_bytes(base+off,4)
+            if before!=raw:memory.write_bytes_verified(base+off,raw,expected=before,operation='capsule_event_controls')
+        if token:
+            fields[8]=struct.pack('>I',token[1])
+            memory.write_bytes_verified(base+8,fields[8],expected=bytes(4),operation='capsule_event_controls')
+    finally:memory._capsule_event_transaction=None

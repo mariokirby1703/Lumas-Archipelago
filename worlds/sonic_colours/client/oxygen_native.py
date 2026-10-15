@@ -89,10 +89,13 @@ def address(memory):
 
 
 def context(memory,snapshot,guard):
-    if snapshot.scene not in ('gameplay','world_map','global_map','game_land_select') or not snapshot.scene_verified:
+    if snapshot.scene not in ('gameplay','world_map','global_map','game_land_select','results','dying','respawning') or not snapshot.scene_verified:
         raise MemoryUnavailable('Oxygen policy awaits attributed gameplay or map')
     if not guard.can_record_pickups(snapshot):guard.check(snapshot)
     chain=memory.resolve_selected_slot(allow_working=True)
+    observed=snapshot.evidence.get('chain') or snapshot.evidence.get('save_chain_trace',{}).get('chain')
+    if observed and tuple(chain[:3])!=tuple(observed[:3]):
+        raise MemoryUnavailable('Oxygen profile changed after snapshot')
     return snapshot.session,chain[1],chain[2]
 
 

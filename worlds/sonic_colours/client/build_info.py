@@ -64,7 +64,7 @@ def implementation_info():
     from .. import wisps,logic_v2
     digest = hashlib.sha256()
     for function in (oxygen_native.payload,oxygen_native.address,oxygen_native.context,oxygen_native.configure,
-                     capsule_capture.payload,capsule_capture.read_events,native_events.program,
+                     capsule_capture.payload,capsule_capture.read_events,capsule_capture.control_context,capsule_capture.configure,native_events.program,
                      wisps.wisp_level,wisps.project_inventory,wisps.all_wisps_owned,
                      logic_v2.check,logic_v2.entry_match,logic_v2.available):
         digest.update(function.__qualname__.encode());digest.update(marshal.dumps(function.__code__))

@@ -80,6 +80,13 @@ def test_host_publication_is_authenticated_bounded_and_not_repeated(tmp_path,mon
         writes=len(b.writes)
         o.configure(m,runtime.snapshot,runtime.guard,owned)
         assert len(b.writes)==writes
+        # A bound result/respawn keeps the policy preloaded for the next act;
+        # it never writes an elapsed clock while outside gameplay.
+        from dataclasses import replace
+        for scene in ('results','dying','respawning'):
+            snap=replace(runtime.snapshot,scene=scene)
+            o.configure(m,snap,runtime.guard,owned)
+            assert len(b.writes)==writes and m.read_u32(base+4)==1
         # Arbitrary elapsed clocks or unrelated words cannot be published under
         # the policy operation, even inside an otherwise valid transaction.
         m._oxygen_transaction=(base,o.context(m,runtime.snapshot,runtime.guard),{16:struct.pack('>f',25.)})

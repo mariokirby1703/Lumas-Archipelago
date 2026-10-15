@@ -74,6 +74,7 @@
     "hud_mailbox": true,
     "score_reset": true,
     "native_event_controls": true,
-    "oxygen_controls": true
+    "oxygen_controls": true,
+    "capsule_event_controls": true
   }
 }

@@ -8,7 +8,7 @@ def test_check_checkpoint_sends_and_receives_ack_before_projection():
     async def test():
         phases=[]
         identity={'team':0,'slot':1,'seed':'seed'}
-        runtime=SimpleNamespace(journal=SimpleNamespace(identity=identity,persistence_pending=False))
+        runtime=SimpleNamespace(journal=SimpleNamespace(identity=identity,data={"checks":[]},persistence_pending=False))
         context=SimpleNamespace(runtime=runtime,items_received=[],history_ready=True,
             authenticated_identity=(0,1,'seed'),team=0,slot=1,server_seed='seed',server=object(),
             checked_locations=set(),last_pending=set(),last_send=0.,finished_game=False,operation_status={})
@@ -32,7 +32,7 @@ def test_check_checkpoint_sends_and_receives_ack_before_projection():
 def test_seed_switch_at_checkpoint_cancels_old_runtime_writes():
     async def test():
         phases=[]
-        runtime=SimpleNamespace(journal=SimpleNamespace(identity={'team':0,'slot':1,'seed':'old'},persistence_pending=False))
+        runtime=SimpleNamespace(journal=SimpleNamespace(identity={'team':0,'slot':1,'seed':'old'},data={'checks':[]},persistence_pending=False))
         context=SimpleNamespace(runtime=runtime,items_received=[],history_ready=True,
             authenticated_identity=(0,1,'old'),server=None,slot=1,operation_status={})
         def steps(*args):

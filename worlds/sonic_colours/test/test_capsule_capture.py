@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import pytest
 from ..client import capsule_capture as c
 from ..client.memory import MemoryUnavailable
+from ..client.progression_hook import identity_tag
 
 
 def queue(monkeypatch,head,events):
@@ -51,13 +52,15 @@ def test_hook_original_precedes_native_spawning_on_committed_open_path():
 
 
 @pytest.mark.parametrize("save_index",[0,1,2,3,255])
-def test_emitted_hook_publishes_identity_and_preserves_native_registers(save_index):
+@pytest.mark.parametrize("raw_wisp",range(8))
+@pytest.mark.parametrize("authorization",["valid","wrong_owner","zero_tag"])
+def test_emitted_hook_publishes_identity_and_preserves_native_registers(save_index,raw_wisp,authorization):
     from .test_memory import FakeBackend
     b=FakeBackend();target=0x80002000;actor=0x90010000
     wrapper,record,descriptor=0x90020000,0x90021000,0x90022000
     app,doc,module,stage,name=0x90030000,0x90031000,0x90032000,0x90033000,0x90034000
     words,offset=c.payload();b.put(target,struct.pack('>'+'I'*len(words),*words))
-    fields={actor:0x80761534,actor+0x64:wrapper,actor+0x114:0,actor+12:123,
+    fields={actor:0x80761534,actor+0x64:wrapper,actor+0x114:(raw_wisp-1)&0xffffffff,actor+12:123,
         wrapper+4:actor,wrapper+8:record,wrapper+12:descriptor,
         descriptor:0x80770fa0,descriptor+0x10:record,descriptor+0x1c:wrapper,
         descriptor+0x14:0,record:0xff000095,0x808f336c:app,app+4:doc,
@@ -66,6 +69,9 @@ def test_emitted_hook_publishes_identity_and_preserves_native_registers(save_ind
     fields.update({VERSION['manager_global_candidate']:0x90035000,0x90035030:0x90036000})
     for a,v in fields.items():b.put(a,v.to_bytes(4,'big'))
     b.put(0x90036000,bytes([save_index]))
+    b.put(target+offset+8,(0x90036000 if authorization!='wrong_owner' else 0x90037000).to_bytes(4,'big'))
+    b.put(target+offset+12,(0x12345678 if authorization!='zero_tag' else 0).to_bytes(4,'big'))
+    b.put(target+offset+16+32,b'\xa5'*32)
     b.put(name,b'stg110\0\0');regs=list(range(32));regs[0]=1;regs[1]=0x900f0000;regs[28]=actor
     original=regs[:];f31=None;lr=0x80001234;cr=0x12345678;pc=0;cmp=0
     for _ in range(250):
@@ -109,9 +115,13 @@ def test_emitted_hook_publishes_identity_and_preserves_native_registers(save_ind
     assert f31 is not None
     assert regs==original and lr==0x80001234 and cr==0x12345678
     assert b.read_bytes(actor+0x110,1)==b'\0'
+    if authorization!='valid':
+        assert int.from_bytes(b.read_bytes(target+offset,4),'big')==0
+        assert b.read_bytes(target+offset+16+32,32)==b'\xa5'*32
+        return
     assert int.from_bytes(b.read_bytes(target+offset,4),'big')==1
     event=struct.unpack('>8I',b.read_bytes(target+offset+16+32,32))
-    assert event==(1,0x90036000,int.from_bytes(b'stg1','big'),int.from_bytes(b'10','big'),149,0,(save_index<<8)|1,123)
+    assert event==(1,0x90036000,int.from_bytes(b'stg1','big'),int.from_bytes(b'10','big'),149,0,(save_index<<8)|raw_wisp,0x12345678)
 
 
 def test_runtime_deduplicates_native_event_after_actor_and_stage_are_gone(monkeypatch):
@@ -119,15 +129,15 @@ def test_runtime_deduplicates_native_event_after_actor_and_stage_are_gone(monkey
     from ..capsules import CAPSULES_BY_NATIVE_ID
     capsule=CAPSULES_BY_NATIVE_ID['stg110',149,0]
     runtime=Runtime.__new__(Runtime)
-    runtime.snapshot=SimpleNamespace(actual_mission='stg130')
+    runtime.snapshot=SimpleNamespace(actual_mission='stg130',scene='gameplay',scene_verified=True,session='S',evidence={})
     runtime.guard=SimpleNamespace(can_record_pickups=lambda s:True)
     runtime._capsule_memory=SimpleNamespace(native_patch={'abi':2},resolve_flags_ptr=lambda **kw:(0,0x90010000,0,0))
     runtime.slot_data={'locations':{capsule.name:capsule.code}}
     data={'pickup_checks':[],'pickup_events':[]}
     def record(events,masks,checks):
         data['pickup_checks'].extend(checks);data['pickup_events'].extend(events)
-    runtime.journal=SimpleNamespace(data=data,record_pickups=record)
-    event=dict(sequence=1,container=0x90010000,save_index=0,mission='stg110',object_id=149,instance=0,raw_wisp=capsule.raw_wisp,actor_id=123)
+    runtime.journal=SimpleNamespace(identity={'seed':'Test','team':0,'slot':1},data=data,record_pickups=record)
+    event=dict(sequence=1,container=0x90010000,save_index=0,mission='stg110',object_id=149,instance=0,raw_wisp=capsule.raw_wisp,session_tag=identity_tag(runtime.journal.identity))
     monkeypatch.setattr(c,'read_events',lambda memory,after:(1,[event],0))
     runtime.observe_capsules(set());runtime.observe_capsules(set())
     assert data['pickup_checks']==[capsule.code]
@@ -140,12 +150,68 @@ def test_pickup_from_another_save_is_never_credited(monkeypatch):
     from ..client.runtime import Runtime
     from ..capsules import CAPSULES_BY_NATIVE_ID
     capsule=CAPSULES_BY_NATIVE_ID['stg110',149,0]
-    runtime=Runtime.__new__(Runtime);runtime.snapshot=SimpleNamespace()
+    runtime=Runtime.__new__(Runtime);runtime.snapshot=SimpleNamespace(scene="gameplay",scene_verified=True,session="S",evidence={})
     runtime.guard=SimpleNamespace(can_record_pickups=lambda s:True)
     runtime._capsule_memory=SimpleNamespace(native_patch={'abi':2},resolve_flags_ptr=lambda **kw:(0,0x90010000,1,0))
     runtime.slot_data={'locations':{capsule.name:capsule.code}}
-    runtime.journal=SimpleNamespace(data={'pickup_checks':[]},record_pickups=lambda *a:pytest.fail('wrong save'))
-    event=dict(sequence=1,container=0x90010000,save_index=0,mission='stg110',object_id=149,instance=0,raw_wisp=capsule.raw_wisp,actor_id=123)
+    runtime.journal=SimpleNamespace(identity={'seed':'Test','team':0,'slot':1},data={'pickup_checks':[]},record_pickups=lambda *a:pytest.fail('wrong save'))
+    event=dict(sequence=1,container=0x90010000,save_index=0,mission='stg110',object_id=149,instance=0,raw_wisp=capsule.raw_wisp,session_tag=identity_tag(runtime.journal.identity))
     monkeypatch.setattr(c,'read_events',lambda memory,after:(1,[event],0))
     runtime.observe_capsules(set())
     assert runtime._capsule_event_cursor==1
+
+
+def test_previous_ap_session_tag_never_credits_a_pickup(monkeypatch):
+    from ..client.runtime import Runtime
+    from ..capsules import CAPSULES_BY_NATIVE_ID
+    from ..client.progression_hook import identity_tag
+    capsule=CAPSULES_BY_NATIVE_ID['stg110',149,0]
+    runtime=Runtime.__new__(Runtime);runtime.snapshot=SimpleNamespace(scene="gameplay",scene_verified=True,session="S",evidence={})
+    runtime.guard=SimpleNamespace(can_record_pickups=lambda s:True)
+    runtime._capsule_memory=SimpleNamespace(native_patch={'abi':2},resolve_flags_ptr=lambda **kw:(0,0x90010000,0,0))
+    runtime.slot_data={'locations':{capsule.name:capsule.code}}
+    runtime.journal=SimpleNamespace(identity={'seed':'Test','team':0,'slot':1,'room_endpoint':'new-room'},data={'pickup_checks':[]},record_pickups=lambda *a:pytest.fail('previous room event'))
+    old={'seed':'Test','team':0,'slot':1,'room_endpoint':'old-room'}
+    event=dict(sequence=1,container=0x90010000,save_index=0,mission='stg110',object_id=149,instance=0,raw_wisp=capsule.raw_wisp,session_tag=identity_tag(old))
+    monkeypatch.setattr(c,'read_events',lambda memory,after:(1,[event],0))
+    runtime.observe_capsules(set())
+    assert runtime._capsule_event_cursor==1
+
+
+
+def test_capture_control_publication_is_bounded_authenticated_and_idempotent(tmp_path,monkeypatch):
+    from .test_dead_weight import setup
+    from dataclasses import replace
+    runtime,m,b,_=setup(tmp_path,monkeypatch);base=0x80002d00
+    monkeypatch.setattr(c,'installed_data',lambda memory:base)
+    monkeypatch.setattr(m,'resolve_flags_ptr',lambda **kw:(0x90050000,0x90060000,0,0,0))
+    b.put(base,struct.pack('>II',0,c.MAGIC)+bytes(c.DATA_SIZE-8))
+    try:
+        c.configure(m,runtime.snapshot,runtime.guard,runtime.journal)
+        assert m.read_u32(base+8)==0x90060000
+        assert m.read_u32(base+12)==identity_tag(runtime.journal.identity)
+        writes=len(b.writes);c.configure(m,runtime.snapshot,runtime.guard,runtime.journal)
+        assert len(b.writes)==writes
+        with pytest.raises(MemoryUnavailable,match='transaction'):
+            m.write_u32(base,999,expected=0,operation='capsule_event_controls')
+        wrong=replace(runtime.snapshot,save_identity='foreign')
+        c.configure(m,wrong,runtime.guard,runtime.journal)
+        assert m.read_u32(base+8)==0 and m.read_u32(base)==0
+    finally:runtime.journal.close()
+
+
+def test_bound_map_consumes_native_event_without_a_live_capsule_or_pickup_scan(monkeypatch):
+    from ..client.runtime import Runtime
+    from ..capsules import CAPSULES_BY_NATIVE_ID
+    capsule=CAPSULES_BY_NATIVE_ID['stg110',149,0]
+    runtime=Runtime.__new__(Runtime)
+    runtime.snapshot=SimpleNamespace(scene='global_map',scene_verified=True,session='S',evidence={})
+    runtime.guard=SimpleNamespace(can_record_pickups=lambda s:False,check=lambda s:None)
+    runtime._capsule_memory=SimpleNamespace(native_patch={'abi':2},resolve_flags_ptr=lambda **kw:(0,0x90010000,0,0))
+    runtime.slot_data={'locations':{capsule.name:capsule.code}}
+    events=[]
+    runtime.journal=SimpleNamespace(identity={'seed':'Test','slot':1,'team':0},data={'pickup_checks':[]},record_pickups=lambda e,m,k:events.extend(e))
+    event=dict(sequence=1,container=0x90010000,save_index=0,mission='stg110',object_id=149,instance=0,raw_wisp=capsule.raw_wisp,session_tag=identity_tag(runtime.journal.identity))
+    monkeypatch.setattr(c,'read_events',lambda memory,after:(1,[event],0))
+    runtime.observe_capsules(set())
+    assert len(events)==1 and events[0]['object_id']==149

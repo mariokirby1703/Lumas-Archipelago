@@ -127,3 +127,16 @@ def test_sequential_region_dependencies_are_independent_of_traversal_order(progr
         state=CollectionState(m)
         for name in list(ALL_WISP_ITEMS)*2+list(MOVEMENT_POOL)+list(WORLD_ITEMS):state.collect(m.worlds[1].create_item(name),True)
         assert state.can_reach('Map Slot '+next(s['stage_slot_id'] for s in STAGES if s['mission_id']=='stg720'),'Region',1)
+
+
+def test_legacy_slot_normalization_preserves_the_previous_journal_digest():
+    import hashlib,json
+    from ..client.client import slot_identity_digest
+    data=generate({'movement_unlocks':0,'boost_lock':0}).worlds[1].fill_slot_data()
+    legacy={**data,'options_revision':4,'logic_policy':'provisional_clears_conservative_pickups',
+            'options':{k:v for k,v in data['options'].items() if k!='native_feature_tests'}}
+    expected=hashlib.sha256(json.dumps(legacy,sort_keys=True).encode()).hexdigest()
+    normalized=validate_slot(legacy)
+    assert normalized['options']['native_feature_tests']==0
+    assert slot_identity_digest(normalized)==expected
+    assert wisp_level({'Progressive Yellow Drill Wisp':1},'Yellow Drill',normalized['options'])==2

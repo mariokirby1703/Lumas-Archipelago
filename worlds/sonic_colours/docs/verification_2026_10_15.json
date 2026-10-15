@@ -1,0 +1,68 @@
+{
+  "implementation_commit": "cd64ce55d31edeba0c9ecdc42af35ecd37112c69",
+  "baseline_commit": "86742827203c82edbac7559c45047542d4c2980d",
+  "full_suite": {
+    "passed": 18127,
+    "failed": 25,
+    "skipped": 0,
+    "seconds": 489.24
+  },
+  "baseline_suite": {
+    "passed": 17824,
+    "failed": 118,
+    "skipped": 137,
+    "fixture_caveat": "Private capture discovery differed during initial baseline collection."
+  },
+  "new_failure_ids_vs_baseline": [
+    "worlds.sonic_colours.test.test_poll_checkpoint::test_check_checkpoint_sends_and_receives_ack_before_projection"
+  ],
+  "remaining_failures": {
+    "worlds.sonic_colours.test.test_movement_fallback_static::test_gated_native_states_and_capacity": "assert {8, 9, 10, 13, 29, 30, ...} == {8, 9, 13, 29, 30, 38, ...}\n  \n  Extra items in the left set:\n  10\n  Extra items in the right set:\n  48\n  Use -v to get more diff",
+    "worlds.sonic_colours.test.test_movement_schema7::test_movement_ids_are_append_only_and_progressive_crouch_has_two_copies": "assert not True\n +  where True = any(<generator object test_movement_ids_are_append_only_and_progressive_crouch_has_two_copies.<locals>.<genexpr> at 0x000002029C7E75E0>)",
+    "worlds.sonic_colours.test.test_overhaul::test_schema_and_stable_emerald_ids": "AssertionError: assert {'all_bosses'...a_wisp_armor'} == {'all_bosses'...'super_sonic'}\n  \n  Extra items in the right set:\n  'super_sonic'\n  Use -v to get more diff",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[nega_wisp_armor-singles]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x00000202A0DEF4C0>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[nega_wisp_armor-per_level]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x00000202A0DEFA00>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[nega_wisp_armor-off]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x000002029B01A7A0>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[all_bosses-singles]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x00000202A0DEFA00>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[all_bosses-per_level]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x000002029BB784A0>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[all_bosses-off]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x000002029C827140>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[all_red_rings-singles]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x0000020291AC7BC0>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[all_red_rings-per_level]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x0000020291AC7BC0>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[all_red_rings-off]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x0000020291AC7BC0>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[all_game_land_stages-singles]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x00000202A28CE5E0>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[all_game_land_stages-per_level]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x00000202A04FB760>)",
+    "worlds.sonic_colours.test.test_overhaul::test_goals_and_ring_pool_reachability[all_game_land_stages-off]": "assert False\n +  where False = all(<generator object test_goals_and_ring_pool_reachability.<locals>.<genexpr> at 0x00000202A04F9380>)",
+    "worlds.sonic_colours.test.test_overhaul::test_supplied_yaml_migrates_and_generates": "assert (True and 162 == 187)\n +  where True = can_beat_game()\n +    where can_beat_game = <BaseClasses.MultiWorld object at 0x000002029C149E50>.can_beat_game\n +  and   162 = <worlds.sonic_colours.world.SonicColoursWorld object at 0x00000202A20A9150>.ring_target",
+    "worlds.sonic_colours.test.test_overhaul::test_capsule_and_rank_checks_fill_with_every_goal[4]": "KeyError: 'Could not find option \"4\" for \"Goal\", known options are nega_wisp_armor, all_bosses, all_red_rings, all_game_land_stages'",
+    "worlds.sonic_colours.test.test_player_switch::test_native_assist_predicate_before_transfer[0-0]": "AssertionError: assert ['bl', 'mflr'... 'cmpwi', 'b'] == ['mflr', 'bl'..., 'mtlr', ...]\n  \n  At index 0 diff: 'bl' != 'mflr'\n  Right contains 2 more items, first extra item: 'cmpwi'\n  Use -v to get more diff",
+    "worlds.sonic_colours.test.test_player_switch::test_native_assist_predicate_before_transfer[0-1]": "AssertionError: assert ['bl', 'mflr'... 'cmpwi', 'b'] == ['mflr', 'bl'..., 'mtlr', ...]\n  \n  At index 0 diff: 'bl' != 'mflr'\n  Right contains 2 more items, first extra item: 'cmpwi'\n  Use -v to get more diff",
+    "worlds.sonic_colours.test.test_player_switch::test_native_assist_predicate_before_transfer[1-0]": "AssertionError: assert ['bl', 'mflr'... 'cmpwi', 'b'] == ['mflr', 'bl'..., 'mtlr', ...]\n  \n  At index 0 diff: 'bl' != 'mflr'\n  Right contains 2 more items, first extra item: 'cmpwi'\n  Use -v to get more diff",
+    "worlds.sonic_colours.test.test_player_switch::test_native_assist_predicate_before_transfer[1-1]": "AssertionError: assert ['bl', 'mflr'... 'cmpwi', 'b'] == ['mflr', 'bl'..., 'mtlr', ...]\n  \n  At index 0 diff: 'bl' != 'mflr'\n  Right contains 2 more items, first extra item: 'cmpwi'\n  Use -v to get more diff",
+    "worlds.sonic_colours.test.test_rework::test_new_game_prologue_any_slot_binding_resume_and_switch": "assert [] == [847001000]\n  \n  Right contains one more item: 847001000\n  Use -v to get more diff",
+    "worlds.sonic_colours.test.test_rework::test_emerald_rewards_need_native_clears_and_logical_route_requirements": "AssertionError: assert 847002520 in set()\n +  where set() = detect_checks({'schema_version': 7, 'options_revision': 5, 'game': 'Sonic Colours (Wii)', 'seed_name': 'SonicTest0', ...}, Snapshot(session='session', save_identity='save', visible_slot=1, scene='gameplay', actual_mission='stg120', clicked_s...), evidence={'native_data': {'progression_events': {'game_land_clears': 4}}}, status='native scene/save proof pending'))",
+    "worlds.sonic_colours.test.test_schema6::test_new_public_options_and_unchanged_medal_ids": "assert 7 == 6"
+  },
+  "live_validation": {
+    "deathlink": false,
+    "dead_weight": false,
+    "music_popup": false
+  },
+  "dolphin_observation": {
+    "dme_status": "notRunning",
+    "process_candidates": []
+  },
+  "music_display_names_sha256": "6aafc7d6b6f894dad16389001d8ce8cb78db731c6c902fede0ba96f5debdbaef",
+  "followup_fixed_failure_ids": [
+    "worlds.sonic_colours.test.test_poll_checkpoint::test_check_checkpoint_sends_and_receives_ack_before_projection"
+  ],
+  "new_failure_ids_vs_baseline_after_followup": [],
+  "focused_selection": {
+    "passed": 415,
+    "failed": 0
+  },
+  "followup_selection": {
+    "passed": 123,
+    "failed": 0,
+    "covers": "all eight capsule colours and five profile bytes, results/respawn oxygen preloading, legacy journal digest and checkpoint ACK ordering"
+  }
+}

@@ -2,7 +2,8 @@
 
 Supported source: an uncompressed original **PAL SNCP8P Revision 0 ISO**.
 Use Archipelago 0.6.7+ and 64-bit Dolphin with Dolphin Memory Engine support.
-See [the migration verification report](native_patch_migration.md) for tests
+See [the latest implementation/verification report](implementation_2026_10_15.md)
+and [the migration verification report](native_patch_migration.md) for tests
 actually performed and outstanding gameplay verification.
 
 ## Install and generate
@@ -111,3 +112,17 @@ save may defer writes; /sonicbinding, /sonicstatus and /sonicitems explain why.
 The always-on HUD shows five recent messages, coloured items, black outlines,
 own finds in two lines and a 60-second lifetime with a final ten-second fade.
 /sonichud test is a local renderer preview, not a received AP item.
+
+
+## Sheet V2 upgrade
+
+Use a newly generated seed for the corrected Wisp pools and Sheet V2 placements.
+Ability Locks Off now gives single, complete Drill/Hover/Spikes unlocks; White
+Boost Wisp is absent when its lock is Off. Capsule Sanity remains a hidden YAML
+option. Random Capsules only exists with Game Land Checks.
+
+Existing schema-7 seed containers/receipts remain supported. Rebuild their ISO
+with the new APWorld for native oxygen/capsule fixes; rebuilding cannot change
+the old server's item placements or logic. Output upgrades preserve existing ISO
+files. DeathLink/Dead Weight still require the explicit developer test opt-in
+shown in the verification report until their remaining live matrix is completed.

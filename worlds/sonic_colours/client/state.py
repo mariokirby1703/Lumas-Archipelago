@@ -381,6 +381,18 @@ class WritePolicy:
             if not tx or tx[0]!=context or tx[1].get(address)!=size or address not in fields or len(fields[address])!=size:
                 raise MemoryUnavailable('WRITE_BLOCKED: unverified current-stage score transaction')
             return context
+        if operation == 'capsule_event_controls':
+            from .capsule_capture import installed_data as capture_data,control_context
+            tx=getattr(self.memory,'_capsule_event_transaction',None)
+            if not tx:raise MemoryUnavailable('WRITE_BLOCKED: no capsule control transaction')
+            if tx[0]!=capture_data(self.memory):raise MemoryUnavailable('WRITE_BLOCKED: capsule queue unavailable')
+            base,token,fields=tx
+            if size!=4 or address-base not in fields:raise MemoryUnavailable('WRITE_BLOCKED: capsule control range')
+            if token is None:
+                if address!=base+8 or fields[8]!=bytes(4):raise MemoryUnavailable('WRITE_BLOCKED: capsule disarm only')
+                return base,None
+            if token!=control_context(self.memory,snapshot,self.guard):raise MemoryUnavailable('WRITE_BLOCKED: capsule profile changed')
+            return base,token
         if operation == 'oxygen_controls':
             from .oxygen_native import address as oxygen_address,context as oxygen_context
             tx=getattr(self.memory,'_oxygen_transaction',None)

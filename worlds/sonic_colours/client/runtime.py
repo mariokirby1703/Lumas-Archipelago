@@ -206,28 +206,35 @@ class Runtime:
     def observe_capsules(self, owned_wisps):
         from ..capsules import CAPSULES
         snapshot = self.snapshot
-        if not self.guard.can_record_pickups(snapshot):
-            return
-        from .capsule_capture import read_events
+        from .capsule_capture import read_events,control_context
         memory=getattr(self,'_capsule_memory',None)
-        captured=(read_events(memory,getattr(self,'_capsule_event_cursor',0))
-                  if memory and getattr(memory,'native_patch',None) else None)
+        native=bool(memory and getattr(memory,'native_patch',None))
+        if native:
+            # The guest event is the pickup witness. A bound map/result can
+            # consume it after the actor/stage has disappeared from host scans.
+            try:context=control_context(memory,snapshot,self.guard)
+            except MemoryUnavailable:return
+        elif not self.guard.can_record_pickups(snapshot):return
+        captured=read_events(memory,getattr(self,'_capsule_event_cursor',0)) if native else None
         if captured is not None:
             from ..capsules import CAPSULES_BY_NATIVE_ID
             head,entries,overflow=captured
             locations={LOCATION_TABLE[n].instance_key:code for n,code in self.slot_data['locations'].items()
                        if LOCATION_TABLE[n].kind=='capsule'}
             events=[];checks=set()
-            from .state import live_control_profile
-            profile=live_control_profile(memory,snapshot,self.guard) if entries else None
+            if context!=control_context(memory,snapshot,self.guard):
+                raise MemoryUnavailable('capsule capture context changed during consume')
+            from .progression_hook import identity_tag
+            tag=identity_tag(self.journal.identity)
             for entry in entries:
-                if (entry['container'],entry['save_index'])!=(profile[1],profile[2]):continue
+                if entry['session_tag']!=tag:continue
+                if (entry['container'],entry['save_index'])!=(context[1],context[2]):continue
                 capsule=CAPSULES_BY_NATIVE_ID.get((entry['mission'],entry['object_id'],entry['instance']))
                 if not capsule or not capsule.eligible or capsule.raw_wisp!=entry['raw_wisp']:continue
                 code=locations.get(capsule.key)
                 if code is None or code in self.journal.data['pickup_checks'] or code in checks:continue
                 checks.add(code);events.append({'kind':'capsule','mission':capsule.mission,
-                    'instance_key':capsule.key,'actor_id':entry['actor_id'],
+                    'instance_key':capsule.key,'object_id':entry['object_id'],'native_session_tag':tag,
                     'provenance':'PAL_800D4CF0_committed_opening','native_sequence':entry['sequence']})
             if events:self.journal.record_pickups(events,{},checks)
             self._capsule_event_cursor=head
@@ -353,7 +360,10 @@ class Runtime:
         self.observe_pickups()
         self.observe_results()
         if getattr(memory,'native_patch',None):
-            try:self.observe_capsules(frozenset())
+            try:
+                from .capsule_capture import configure as arm_capture
+                arm_capture(memory,self.snapshot,self.guard,self.journal)
+                self.observe_capsules(frozenset())
             except MemoryUnavailable as error:
                 self.capsule_capture_status={'installed':True,'status':'deferred: '+str(error)}
         can_send=self.guard.can_send(self.snapshot)

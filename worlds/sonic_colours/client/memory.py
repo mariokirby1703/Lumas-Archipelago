@@ -182,6 +182,10 @@ class SonicMemory:
             # This boundary is strictly before backend mutation. A native
             # stage-read failure here proves no write was attempted.
             raise MemoryUnavailable(f'WRITE_BLOCKED: prewrite_context: {error}') from error
+        if operation == 'capsule_event_controls':
+            tx=getattr(self,'_capsule_event_transaction',None)
+            if not tx or tx[2].get(address-tx[0])!=data:
+                raise MemoryUnavailable('WRITE_BLOCKED: capsule control value outside transaction')
         if operation == 'oxygen_controls':
             tx=getattr(self,'_oxygen_transaction',None)
             if not tx or tx[2].get(address-tx[0])!=data:

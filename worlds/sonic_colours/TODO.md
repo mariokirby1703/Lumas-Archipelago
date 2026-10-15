@@ -1,13 +1,45 @@
-# Outstanding live-test findings
+# Outstanding verification and implementation
 
-- Score Reset Trap: guarded local Dolphin test in Tropical Resort Act 1 reset 600 to 0; user confirmed the visible HUD updated to 00000000 (2026-10-15). Network receipt delivery for the new trap still needs testing with a newly generated seed; the existing live server predates its item definition.
+Current implementation/evidence: [2026-10-15 report](docs/implementation_2026_10_15.md).
+Historical observations below remain useful; a code fix is not a live pass.
 
-- Progressive Breathing must enforce entry/reset limits in the native Game Thread, including air bubbles. Live level-1 status showed 28 seconds of native air instead of 5. Host reset detection now accepts sampled backward resets and elapsed values below the effective floor, but host polling still causes entry/reset latency; a native per-frame/reset hook remains necessary. Include level 0 immediate drowning and durations above vanilla 30 seconds in live regression tests.
-
-- Area Map: newly AP-unlocked Acts remain visually black although navigable and their path is visible. User deferred this fix until after the current Act-5 completion test (2026-10-15). Refresh the native waypoint appearance as well as adjacency and path vertices; preserve cleared/locked distinctions.
-- Measure and reduce AP notification latency. The controlled live test observed approximately 2.7 seconds between server check handling and client message processing.
-- Capsule Sanity: Aquarium Park Act 1 white checkpoint capsule 1770 was missed on the first reported pickup, then successfully checked for Rings during a controlled before/after retry. Before: eligible native actor `0x90CADD60`, unopened. After: actor absent from capsule list. Investigate capturing the opening event before despawn rather than relying solely on polling; the exact first-miss cause is not yet proven.
-  Tropical Resort Act 1 Capsule 149 also passed a controlled before/after pickup test (2026-10-15), while the user still reports unreliable ordinary pickups. Controlled successes do not establish that rapid unpaused collection is reliable.
-- Verify white capsule pickup and enemy Boost gains with White Boost Wisp absent. The current live test already owns it; the user's earlier observation remains unconfirmed.
-- Game Land selection: user reported missing empty Yellow Emerald while the other empty Emeralds are visible. AP inventory owns none; all four Yellow UI colour fields read `0x606060ff`, matching other unowned colours. Inspect native visibility/animation separately; colour reads alone do not verify appearance.
-  After the requested selection/Record menu round trip, the user confirmed the empty Yellow Emerald appeared. Reproduce first-entry initialization and ensure it is visible without needing that round trip; no ownership change occurred.
+- **Unresolved:** AP-unlocked Area Map Acts can still use a black locked model.
+  Adjacency/path rendering works. Safely replace/refresh the status-selected
+  scene-owned model without leaking references or changing clear/locked styling.
+- **Progressive Breathing:** native update/reset hooks are implemented, with PPC
+  tests for 0/5/10/20/30/40/60 seconds. Verify immediate water entry, bubbles,
+  surfacing, loading/results/respawn, pause and level changes in Dolphin. The old
+  Gecko-only host fallback still has polling latency. Historical level-1 air was
+  about 28 seconds instead of five; do not mark that observation fixed live yet.
+- **Capsule Sanity:** committed-opening capture now precedes spawning callbacks,
+  survives actor removal, identifies the selected save and checkpoints checks
+  before slow UI work. Test rapid White/Cyan collections, TR Acts 1/2/3 and
+  Aquarium Park Act 1 checkpoint 1770 without stopping before each capsule.
+  Controlled earlier pickups passed, ordinary fast pickups were unreliable.
+  Native backlog is 32 entries; an overflow is explicitly reported.
+- **Game Land Emeralds:** direct allocated-pane resolution replaces the lazy
+  wrapper-cache prerequisite. Verify initially empty Yellow visibility without a
+  Record/menu round trip. Colours alone do not prove native visibility/animation.
+- **DeathLink:** retain successful historical two-client enemy/pit/incoming
+  tests. Complete drowning, Game Land, Assist, transformed/Super Sonic deferral,
+  reconnect, save/scene switches, expiration, duplicates and no-loop recovery.
+- **Dead Weight:** retain the confirmed native 30-gameplay-second Jump lock and
+  release. Complete rails, held jump, stunts, Wisps, transitions, respawn,
+  reconnect, repeated traps, DeathLink overlap and scripted softlock safety.
+- **Fillers/traps:** repeat Rings/1-Up/Half/Full Boost/Ring Loss/Score Reset across
+  Acts, prologue, deaths and Game Land in this build. Normal-Sonic targeting while
+  Assist is active is intentional and user-confirmed. Score Reset was actually
+  delivered through the server at 33,400 ? 0 with a red HUD entry; this is not an
+  unimplemented trap. Earlier guarded 600 ? 0 also passed visibly.
+- **White Boost Lock:** verify white capsules and enemy gains before ownership;
+  AP Boost Refills must remain usable. Earlier user observation was inconclusive.
+- **Latency:** earned native checks are checkpointed earlier and durable queues
+  retry after reconnect without a Dolphin poll. Measure actual AP-to-HUD latency
+  again; historical controlled observation was about 2.7 seconds.
+- **Music:** preserve the user's current layout, fonts, anchor 800, names and
+  timing. Complete audible donor/normal-FX, scene/result/Game Land, fades,
+  reconnect and long-session resource-lifetime tests. No visual changes made.
+- **Release gate:** DeathLink/Dead Weight/music live-validation flags remain
+  false. Hidden `native_feature_tests` is an explicit disposable-seed test opt-in,
+  not production verification. Full-suite historical fixture failures remain
+  listed in the verification report.
