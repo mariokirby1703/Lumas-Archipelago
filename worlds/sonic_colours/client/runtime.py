@@ -47,8 +47,12 @@ def validate_slot(data):
     if isinstance(options,dict) and 'one_up_sanity' not in options:
         options={**options,'one_up_sanity':0}
         data={**data,'options':options}
-    if isinstance(options,dict) and 'ap_item_hud' not in options:
-        options={**options,'ap_item_hud':0}
+    legacy_options=data.get('options_revision',0)<2
+    if isinstance(options,dict):
+        options={k:v for k,v in options.items() if k not in ('ap_item_hud','swim_trap_weight','swim_trap_duration')}
+        options.setdefault('score_reset_trap_weight',0)
+        if data.get('options_revision',0)<3:
+            options.setdefault('super_sonic',1)
         data={**data,'options':options}
     if not isinstance(options, dict) or set(options) != set(OPTION_NAMES):
         raise ValueError('slot options missing or unexpected')
@@ -58,6 +62,11 @@ def validate_slot(data):
         if type(value) is not int:
             raise ValueError(f'slot option {name} must be resolved integer')
         cls = SonicColoursOptions.type_hints[name]
+        # Previously generated Super Sonic goal seeds remain playable.
+        # New generators no longer offer this goal.
+        if name=='goal' and value==4 and data.get('options_revision',0)<3:
+            resolved[name]=cls(value)
+            continue
         option = cls.from_any(value)
         if getattr(option, 'options', None) and value not in option.options.values():
             raise ValueError(f'invalid choice {name}')
@@ -70,7 +79,8 @@ def validate_slot(data):
     if data.get('game_land_gates') not in (current_gates,previous_gates,legacy_game_land_gates(options['game_land_requirement_reduction'])):
         raise ValueError('slot Game Land gates mismatch')
     data={**data,'game_land_gates':{**data['game_land_gates'],'1-1':0}}
-    expected_speed = bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'] or options['eggman_heart_sanity'])
+    expected_speed = (bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'] or options['eggman_heart_sanity'])
+                      if legacy_options else bool(options['game_land_checks']))
     if type(data.get('game_land_speed_items')) is not bool or data['game_land_speed_items'] != expected_speed:
         raise ValueError('slot Game Land speed pool contract mismatch')
     expected_mapping = {s['stage_slot_id']: s['mission_id'] for s in STAGES}
@@ -95,7 +105,7 @@ def validate_slot(data):
         raise ValueError('unsupported native prologue contract')
     if data.get('starting_world') != 0 or 'starting_slot' in data:
         raise ValueError('expected fixed Tropical Resort starting world and vanilla intro')
-    for name in ('death_link', 'swim_trap_weight'):
+    for name in ('death_link',):
         if options[name]:
             raise ValueError(f'{name}: requires_verified_hook')
     return data
@@ -192,6 +202,29 @@ class Runtime:
         from ..capsules import CAPSULES
         snapshot = self.snapshot
         if not self.guard.can_record_pickups(snapshot):
+            return
+        from .capsule_capture import read_events
+        memory=getattr(self,'_capsule_memory',None)
+        captured=(read_events(memory,getattr(self,'_capsule_event_cursor',0))
+                  if memory and getattr(memory,'native_patch',None) else None)
+        if captured is not None:
+            from ..capsules import CAPSULES_BY_NATIVE_ID
+            head,entries,overflow=captured
+            locations={LOCATION_TABLE[n].instance_key:code for n,code in self.slot_data['locations'].items()
+                       if LOCATION_TABLE[n].kind=='capsule'}
+            events=[];checks=set()
+            for entry in entries:
+                capsule=CAPSULES_BY_NATIVE_ID.get((entry['mission'],entry['object_id'],entry['instance']))
+                if not capsule or not capsule.eligible or capsule.raw_wisp!=entry['raw_wisp']:continue
+                code=locations.get(capsule.key)
+                if code is None or code in self.journal.data['pickup_checks'] or code in checks:continue
+                checks.add(code);events.append({'kind':'capsule','mission':capsule.mission,
+                    'instance_key':capsule.key,'actor_id':entry['actor_id'],
+                    'provenance':'PAL_800D4FA8_native_success','native_sequence':entry['sequence']})
+            if events:self.journal.record_pickups(events,{},checks)
+            self._capsule_event_cursor=head
+            self.capsule_capture_status={'installed':True,'native_head':head,'overflow':overflow,
+                                        'status':'native successful-opening events consumed'}
             return
         stage = next(iter(snapshot.evidence.get('native_data', {}).get('stage_objects', [])), {})
         if 'capsules' not in stage:
@@ -303,6 +336,7 @@ class Runtime:
             except StopIteration as done:return done.value
 
     def poll_steps(self, memory, item_ids, history_ready):
+        self._capsule_memory=memory
         self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
         try:
@@ -818,6 +852,13 @@ class Runtime:
                 recorded['confirmation_source']='historical complete native write/readback; no replay'
                 self.journal.confirm(index,verified_delivery=True)
                 continue
+            if name=='Score Reset Trap':
+                effect=self.journal.data['effects'].get(str(index),{})
+                if effect.get('state') in ('confirmed','uncertain','prepared','verifying','skipped_by_operator'):continue
+                from .score_reset import deliver
+                try:deliver(memory,self.snapshot,self.guard,self.journal,index,item)
+                except MemoryUnavailable as error:self.journal.defer(index,item,str(error))
+                continue
             family = 'lives' if name == '1-Up' else 'boost' if name in ('Half Boost Refill', 'Full Boost Refill') else 'rings'
             amount = rings_amount(self.journal, index) if name == 'Rings' else None
             recorded = self.journal.data['effects'].get(str(index))
@@ -846,9 +887,6 @@ class Runtime:
             if family in occupied:
                 self.journal.defer(index, item, 'earlier receipt is actively verifying')
                 continue
-            if name == 'Swim Everywhere Trap':
-                self.journal.defer(index, item, 'unsupported native swimming operation')
-                continue  # Unsupported trap cannot starve independently safe filler.
             address = snapshot.lives_address if family == 'lives' else snapshot.boost_address if family == 'boost' else snapshot.rings_address
             mirror = snapshot.world_lives_address if family == 'lives' else None if family == 'boost' else snapshot.ring_mirror_address
             addresses = list(dict.fromkeys(a for a in (address, mirror) if a is not None))
@@ -947,7 +985,7 @@ class Runtime:
             if name in DELIVERY_ITEMS:
                 effect = self.journal.data['effects'].get(str(index), {})
                 rows.append({**effect, 'index': index, 'name': name,
-                             'family': 'lives' if name == '1-Up' else 'boost' if name in ('Half Boost Refill', 'Full Boost Refill') else 'rings',
+                             'family': 'score' if name=='Score Reset Trap' else 'lives' if name == '1-Up' else 'boost' if name in ('Half Boost Refill', 'Full Boost Refill') else 'rings',
                              'state': 'applying' if effect.get('state') == 'prepared' else effect.get('state', 'queued'),
                              'journal_state': effect.get('state', 'queued'),
                              'hud_verified': False})

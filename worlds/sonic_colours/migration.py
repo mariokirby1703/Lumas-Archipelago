@@ -2,7 +2,8 @@
 from copy import deepcopy
 
 
-REMOVED = ('wisp_unlocks','world_unlocks','chaos_emerald_items','red_ring_bundle_strategy')
+REMOVED = ('wisp_unlocks','world_unlocks','chaos_emerald_items','red_ring_bundle_strategy',
+           'swim_trap_weight','swim_trap_duration','ap_item_hud')
 GOALS = {'final_boss':'nega_wisp_armor','all_story_clears':'all_bosses','all_game_land':'all_game_land_stages','all_game_land_clears':'all_game_land_stages'}
 
 
@@ -13,7 +14,7 @@ def migrate_yaml(document):
     changes=[]
     for name in REMOVED:
         if name in options:
-            options.pop(name);changes.append(f'Removed {name}; progression is automatic and always enabled.')
+            options.pop(name);changes.append(f'Removed retired option {name}.')
     if 'wisp_capsule_sanity' in options:
         value=options.pop('wisp_capsule_sanity')
         if isinstance(value,dict):

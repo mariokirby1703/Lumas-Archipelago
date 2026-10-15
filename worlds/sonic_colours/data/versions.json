@@ -66,6 +66,7 @@
     "game_land_ui": true,
     "stunts": true,
     "skydiving": true,
-    "hud_mailbox": true
+    "hud_mailbox": true,
+    "score_reset": true
   }
 }

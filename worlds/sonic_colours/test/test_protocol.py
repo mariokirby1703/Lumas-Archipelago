@@ -77,7 +77,7 @@ def test_seed_file_mismatch_and_launcher_registration():
     async def scenario(directory):
         world = generate().worlds[1]
         world.generate_output(directory)
-        path = next(Path(directory).glob('*.apsonic'))
+        path = next(Path(directory).glob('*.apsoniccolours'))
         ctx = SonicContext(patch_file=path, journal_directory=directory)
         assert ctx.auth == 'SonicPlayer'
         data = world.fill_slot_data()

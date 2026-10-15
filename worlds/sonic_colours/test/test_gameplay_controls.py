@@ -18,7 +18,10 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
     regs[30]=0x90006000; regs[2]=0x808FC5C0
     mem={0x90005000:profile,regs[3]+4:selected,regs[3]+0x2c:1,regs[29]+0x114:0}
     mem[0x808F6040]=0.
-    mem.update({regs[3]+8:float(selected),regs[30]+0x8c:0x90007000,0x90007024:mode})
+    # Native r30 is a wrapper, not the player. Poison the former mistaken
+    # wrapper+8c path so executing the old hook fails this regression.
+    mem.update({regs[3]+8:float(selected),regs[30]+0x28:0x90008000,
+                regs[30]+0x8c:0x1d,0x9000808c:0x90007000,0x90007024:mode})
     for i,v in enumerate((0x90005000,expected_profile,maximum,regs[3],locked,0.)):mem[base+data+i*4]=v
     before=regs[:];lr,cr=0x80010000,0x12345678;original=(lr,cr);cmp=0;pc=0;f1=delta
     for _ in range(300):
@@ -26,7 +29,10 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
         if not w:break
         op=w>>26;rt=w>>21&31;ra=w>>16&31;u=w&0xffff;imm=u if u<0x8000 else u-0x10000
         if op==14:regs[rt]=((regs[ra] if ra else 0)+imm)&0xffffffff
-        elif op in (32,34):regs[rt]=mem.get((regs[ra]+imm)&0xffffffff,0)
+        elif op in (32,34):
+            addr=(regs[ra]+imm)&0xffffffff
+            assert addr>=0x80000000, f'invalid PPC read at {addr:#x}'
+            regs[rt]=mem.get(addr,0)
         elif op==48:f1=mem[regs[ra]+imm]
         elif w==0xec20082a:f1=float(selected)+f1
         elif w==0xfc011040:cmp=(f1>0)-(f1<0)  # native f2 lower clamp is zero
@@ -124,10 +130,11 @@ def test_progressive_speed_pool_has_four_progression_items_without_new_option():
 
 
 @pytest.mark.parametrize('kind', ['boost_use', 'boost_query'])
-def test_white_lock_gates_ordinary_queries_only(kind):
-    assert run(kind, selected=42, locked=1) == 0.
-    assert run(kind, selected=42, locked=0) == 42.
-    assert run(kind, selected=42, locked=1, profile=2) == 42.
+@pytest.mark.parametrize('gauge', [0,42])
+def test_white_lock_gates_ordinary_queries_only(kind,gauge):
+    assert run(kind, selected=gauge, locked=1) == 0.
+    assert run(kind, selected=gauge, locked=0) == float(gauge)
+    assert run(kind, selected=gauge, locked=1, profile=2) == float(gauge)
 
 
 def test_white_pickup_and_script_grants_preserve_existing_gauge_when_locked():

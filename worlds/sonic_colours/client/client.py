@@ -400,6 +400,7 @@ class SonicContext(CommonContext):
         self.operation_status = {}
         self.expected_seed = None
         self.expected_slot_data = None
+        self.expected_player = None
         self.music_resource_manifest = music_resource_manifest
         self.experimental_direct_hooks = False
         self.direct_hook_status = {'status':'disabled; existing Gecko hooks still supported'}
@@ -413,12 +414,12 @@ class SonicContext(CommonContext):
         self.last_observed_checked = set()
         self.journal_directory = Path(journal_directory or Utils.user_path('sonic_colours_journals'))
         if patch_file:
-            patch = json.loads(Path(patch_file).read_text(encoding='utf-8'))
-            if patch.get('game') != GAME:
-                raise ValueError('Expected a Sonic Colours (Wii) v2 .apsonic file; regenerate old seeds/files.')
-            self.expected_slot_data = validate_slot(patch['slot_data'])
+            from ..patch import load_patch
+            patch=load_patch(patch_file)
+            self.expected_slot_data = patch.slot_data
             self.expected_seed = self.expected_slot_data['seed_name']
-            self.auth = patch.get('player_name')
+            self.auth = patch.player_name
+            self.expected_player = patch.player
 
     async def server_auth(self, password_requested=False):
         if password_requested and not self.password:
@@ -471,8 +472,10 @@ class SonicContext(CommonContext):
             self.latest_acknowledged_location = None
             try:
                 data = validate_slot(args['slot_data'])
+                if self.expected_player is not None and self.slot!=self.expected_player:
+                    raise ValueError('server player slot differs from the player patch')
                 if self.expected_slot_data and data != self.expected_slot_data:
-                    raise ValueError('server slot data differs from loaded .apsonic file')
+                    raise ValueError('server slot data differs from loaded Sonic Colours player patch')
                 if not self.server_seed:
                     raise ValueError('Connected requires a valid preceding RoomInfo server seed')
                 if data['seed_name'] != self.server_seed:
@@ -662,6 +665,9 @@ async def dolphin_loop(ctx):
                         ctx.runtime.hooks.invalidate_session()
                     dolphin.hook()
                 ctx.dolphin_instance = backend.instance_info()
+                memory.required_native_seed=(ctx.expected_seed or ctx.server_seed if getattr(ctx,'generated_iso',None) else None)
+                if getattr(memory,'native_patch',None) and ctx.server_seed:
+                    memory.required_native_seed=ctx.server_seed
                 backend.assert_instance(ctx.dolphin_instance)
                 if not backend.active():
                     verified = False
@@ -726,7 +732,8 @@ async def dolphin_loop(ctx):
                 snap = ctx.runtime.snapshot
                 ctx.operation_status.update(
                     gameplay_detection={'scene': snap.scene, 'mission': snap.actual_mission, 'verified': snap.scene_verified},
-                    pickup_detection={'verified': snap.pickup_verified, 'authorized': ctx.runtime.guard.can_record_pickups(snap)},
+                    pickup_detection={'verified': snap.pickup_verified, 'authorized': ctx.runtime.guard.can_record_pickups(snap),
+                                      'capsule_capture':getattr(ctx.runtime,'capsule_capture_status',{})},
                     journal_persistence={'durable_events': len(ctx.runtime.journal.data['pickup_events']), 'earned_checks': len(ctx.runtime.journal.data['checks']), 'persistence_pending': ctx.runtime.journal.persistence_pending},
                     capsule_refresh=ctx.runtime.hooks.capsule_refresh_status,
                     physical_red_rings=getattr(ctx.runtime,'physical_ring_status',{}),
@@ -797,10 +804,14 @@ async def main(args):
     ctx = SonicContext(args.connect, args.password, args.patch_file,
                        music_resource_manifest=getattr(args, 'music_resource_manifest', None))
     ctx.auth = args.name or ctx.auth
+    ctx.generated_iso=getattr(args,'generated_iso',None)
     ctx.experimental_direct_hooks = bool(getattr(args, 'experimental_direct_hooks', False))
     ctx.server_task = asyncio.create_task(server_loop(ctx), name='ServerLoop')
     if gui_enabled and not getattr(args, 'nogui', False):
         ctx.run_gui()
+    dolphin_launch_status=getattr(args,'dolphin_launch_status',None)
+    if dolphin_launch_status and dolphin_launch_status.get('restarted'):
+        logger.info('Dolphin was restarted with the patched ISO: %s',ctx.generated_iso)
     ctx.run_cli()
     watcher = asyncio.create_task(dolphin_loop(ctx), name='SonicDolphin')
     try:

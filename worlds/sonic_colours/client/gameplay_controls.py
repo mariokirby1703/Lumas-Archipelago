@@ -62,9 +62,10 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_
             # Keep this compatibility hook inert; never deny native Drill.
             a.branch('vanilla')
         elif kind == 'boost_use':
-            # 800CD708's receiver r30 is the native player; mode 1 uses
-            # the separate native Boost provider (800381E0/8020E1CC).
-            a.d(32, 6, 30, 0x8c); a.d(32, 6, 6, 0x24)
+            # 800CD720 keeps the wrapper argument in r30. The original
+            # 80033A44 resolves wrapper+28 -> player+8C -> provider;
+            # 800381E0 reads provider+24 for Super's separate Boost mode.
+            a.d(32, 6, 30, 0x28); a.d(32, 6, 6, 0x8c); a.d(32, 6, 6, 0x24)
             a.d(11, 0, 6, 1); a.branch('vanilla', 0x41820000)
         a.d(32, 7, 12, 12); a.emit(0x7C033800); a.branch('vanilla', 0x40820000)
         a.d(32, 7, 12, 16); a.d(11, 0, 7, 0 if kind == 'boost_add' and temporary else 1); a.branch('vanilla', 0x41820000 if kind == 'boost_add' and temporary else 0x40820000)

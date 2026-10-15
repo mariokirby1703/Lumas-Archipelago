@@ -10,8 +10,12 @@ import json
 import struct
 import sys
 from pathlib import Path
-from hud_cpk import CPK
-from hud_original_assets import find_asset,scene_by_name,cast_by_name,fonts,u32,pointer,text,EXPECTED_CPK
+try:
+    from .hud_cpk import CPK
+    from .hud_original_assets import find_asset,scene_by_name,cast_by_name,fonts,u32,pointer,text,EXPECTED_CPK
+except ImportError:
+    from hud_cpk import CPK
+    from hud_original_assets import find_asset,scene_by_name,cast_by_name,fonts,u32,pointer,text,EXPECTED_CPK
 
 def scene_font_maps(blob,name):
     scene=scene_by_name(blob,name)

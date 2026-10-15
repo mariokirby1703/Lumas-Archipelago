@@ -121,8 +121,6 @@ def set_rules(world):
     elif goal == 3:
         set_rule(event, lambda state: all(can_complete(world, state, s['mission_id'])
                 for s in STAGES if s['zone_index'] >= 7))
-    elif goal == 4:
-        set_rule(event, lambda state: state.has_all(EMERALDS, player))
     else:
         set_rule(event, lambda state: all(can_complete(world, state, mission) for mission in names))
     world.multiworld.completion_condition[player] = lambda state: state.has('Sonic Colours Victory', player)

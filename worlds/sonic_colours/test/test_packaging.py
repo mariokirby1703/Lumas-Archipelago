@@ -60,6 +60,10 @@ import importlib, importlib.abc, sys, zipimport
 import worlds
 from worlds.AutoWorld import AutoWorldRegister
 AutoWorldRegister.world_types.pop('Sonic Colours (Wii)')
+from worlds.Files import AutoPatchRegister
+for extension in ('.apsoniccolours','.apsonic'):
+    AutoPatchRegister.file_endings.pop(extension,None)
+AutoPatchRegister.patch_types.pop('Sonic Colours (Wii)',None)
 for name in list(sys.modules):
     if name == 'worlds.sonic_colours' or name.startswith('worlds.sonic_colours.'):
         del sys.modules[name]
@@ -70,9 +74,15 @@ class Finder(importlib.abc.MetaPathFinder):
         return spec if fullname == 'worlds.sonic_colours' else None
 sys.meta_path.insert(0, Finder())
 from worlds.sonic_colours.client import binding, native_read, runtime
+from worlds.sonic_colours.client import dolphin_launch
 from worlds.sonic_colours.client.build_info import implementation_info
 from worlds.sonic_colours.capsules import CAPSULES
 from worlds.sonic_colours.medals import MEDALS
+from worlds.sonic_colours.tools import build_hud_overlay,hud_gncp,hud_tpl
+from worlds.sonic_colours.client.native_dol import plan
+from worlds.sonic_colours.patch import resource_component_id
+assert len(resource_component_id())==64 and plan()[1]
+assert '.apworld' in build_hud_overlay.__file__
 for module in (binding, native_read, runtime):
     assert '.apworld' in module.__file__, module.__file__
 assert sum(c.eligible for c in CAPSULES.values()) == 680

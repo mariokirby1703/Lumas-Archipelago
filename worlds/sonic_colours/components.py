@@ -11,5 +11,5 @@ def run_client(*args):
 
 
 components.append(Component('Sonic Colours (Wii) Client', func=run_client, game_name=GAME,
-                            component_type=Type.CLIENT, file_identifier=SuffixIdentifier('.apsonic'),
+                            component_type=Type.CLIENT, file_identifier=SuffixIdentifier('.apsoniccolours','.apsonic'),
                             supports_uri=True, icon=ICON))

@@ -86,6 +86,10 @@ Type: filesandordirs; Name: "{app}\SNI\lua*"
 
 [Registry]
 
+Root: HKCR; Subkey: ".apsoniccolours"; ValueData: "{#MyAppName}soniccolourspatch"; Flags: uninsdeletevalue; ValueType: string; ValueName: "";
+Root: HKCR; Subkey: "{#MyAppName}soniccolourspatch"; ValueData: "Sonic Colours Archipelago Player Patch"; Flags: uninsdeletekey; ValueType: string; ValueName: "";
+Root: HKCR; Subkey: "{#MyAppName}soniccolourspatch\shell\open\command"; ValueData: """{app}\ArchipelagoLauncher.exe"" ""%1"""; ValueType: string; ValueName: "";
+
 Root: HKCR; Subkey: ".aplttp";                                   ValueData: "{#MyAppName}patch";        Flags: uninsdeletevalue; ValueType: string;  ValueName: "";
 Root: HKCR; Subkey: "{#MyAppName}patch";                         ValueData: "Archipelago Binary Patch"; Flags: uninsdeletekey;   ValueType: string;  ValueName: "";
 Root: HKCR; Subkey: "{#MyAppName}patch\DefaultIcon";             ValueData: "{app}\ArchipelagoSNIClient.exe,0";                  ValueType: string;  ValueName: "";

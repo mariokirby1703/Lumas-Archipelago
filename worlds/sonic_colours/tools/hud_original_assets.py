@@ -9,7 +9,8 @@ import hashlib
 import json
 import struct
 from pathlib import Path
-from hud_cpk import CPK
+try:from .hud_cpk import CPK
+except ImportError:from hud_cpk import CPK
 
 BASE = 0x20
 EXPECTED_CPK = '58bbf2be97a2f08effb5752bd40eea8a1ba76a18349937a32351624d855651bf'

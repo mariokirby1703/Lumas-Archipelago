@@ -8,6 +8,15 @@ def launch_client(*args):
     from .client import main
     parser = get_base_parser(description='Sonic Colours PAL Archipelago Client')
     parser.add_argument('--name', help='Archipelago slot name')
+    parser.add_argument('--original-iso',help='Original PAL SNCP8P Rev0 ISO (saved path/file selection otherwise)')
+    parser.add_argument('--output-iso',help='Separate output ISO; existing mismatching files are never overwritten')
+    parser.add_argument('--wit',help='Wiimms ISO Tools executable; Windows download is verified automatically')
+    parser.add_argument('--patch-only',action='store_true',help='Build/verify the ISO, then exit')
+    parser.add_argument('--dolphin',help='Dolphin executable for optional automatic start')
+    parser.add_argument('--start-dolphin',action='store_true',help='Start the generated ISO in Dolphin')
+    parser.add_argument('--no-start-dolphin',action='store_true',help='Open the AP client without starting Dolphin')
+    parser.add_argument('--migrate-seed-patch',nargs=2,metavar=('OLD_APSONIC','NEW_APSONICCOLOURS'))
+    parser.add_argument('--player-slot',type=int,help='Explicit AP slot number for legacy patch migration')
     parser.add_argument('--experimental-direct-hooks', action='store_true',
                         help='DANGEROUS: no Gecko allowed; inject PAL PPC hooks plus optional movement gate; may crash, JIT unverified')
     parser.add_argument('--export-movement-gecko', metavar='OUTPUT_INI',
@@ -25,11 +34,19 @@ def launch_client(*args):
     parser.add_argument('url', nargs='?', help='archipelago:// URI or .apsonic file')
     parsed = parser.parse_args(args)
     parsed.patch_file = None
-    if parsed.url and parsed.url.lower().endswith('.apsonic'):
+    if parsed.url and parsed.url.lower().endswith(('.apsonic','.apsoniccolours')):
         parsed.patch_file, parsed.url = parsed.url, None
     else:
         parsed = handle_url_arg(parsed, parser=parser)
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(message)s')
+    try:
+        from .file_association import register_windows_patch
+        register_windows_patch()
+    except OSError as error:logging.info('Windows file association unavailable; Open Patch still works: %s',error)
+    if parsed.migrate_seed_patch:
+        from ..patch import migrate_legacy
+        migrate_legacy(*parsed.migrate_seed_patch,parsed.player_slot)
+        logging.info('Legacy metadata migrated without modifying its source.');return
     if parsed.migrate_yaml:
         import yaml
         from pathlib import Path
@@ -61,7 +78,8 @@ def launch_client(*args):
         from pathlib import Path
         from .runtime import validate_slot
         from .asset_patch import patch_music
-        slot = validate_slot(json.loads(Path(parsed.patch_file).read_text(encoding='utf-8'))['slot_data'])
+        from ..patch import load_patch
+        slot = load_patch(parsed.patch_file).slot_data
         mode = 'anywhere' if slot['options']['music_randomization'] else None
         if mode is None:
             parser.error('music_randomization is off in this seed')
@@ -72,6 +90,47 @@ def launch_client(*args):
             patch_music(*parsed.patch_music, slot['seed_name'], mode)
         logging.info('Separate seed music CPK and manifest verified. Install into a separate disc copy and restart emulation; file creation does not verify Dolphin playback.')
         return
+    parsed.generated_iso=None
+    parsed.dolphin_launch_status=None
+    if parsed.patch_file:
+        from ..patch import load_patch
+        from .iso_patch import install,install_with_progress,settings_group
+        patch=load_patch(parsed.patch_file)
+        group=settings_group()
+        automatic=(not parsed.no_start_dolphin and (parsed.start_dolphin or
+                   not parsed.patch_only and (bool(group.auto_start) or
+                   not vars(group).get('dolphin_path'))))
+        executable=None
+        if automatic:
+            from .dolphin_launch import select_executable
+            try:executable=select_executable(group,parsed.dolphin,not getattr(parsed,'nogui',False))
+            except (OSError,ValueError) as error:
+                logging.error('Dolphin selection failed: %s',error)
+                if not getattr(parsed,'nogui',False):
+                    import Utils
+                    Utils.messagebox('Dolphin selection',str(error),error=True)
+                return
+        installer=install if getattr(parsed,'nogui',False) else install_with_progress
+        try:
+            parsed.generated_iso=str(installer(patch,source=parsed.original_iso,target=parsed.output_iso,wit=parsed.wit))
+        except Exception as error:
+            logging.error('ISO installation failed: %s',error)
+            if not getattr(parsed,'nogui',False):
+                import Utils
+                Utils.messagebox('Sonic Colours ISO patch failed',str(error),error=True)
+            return
+        if not parsed.connect and patch.server:parsed.connect=patch.server
+        if automatic and executable:
+            from .dolphin_launch import start_or_reuse
+            try:
+                parsed.dolphin_launch_status=start_or_reuse(executable,parsed.generated_iso)
+            except (OSError,ValueError) as error:
+                logging.error('Dolphin startup: %s',error)
+                if not getattr(parsed,'nogui',False):
+                    import Utils
+                    Utils.messagebox('Dolphin startup',str(error),error=True)
+        if parsed.patch_only:return
+    elif parsed.patch_only:parser.error('--patch-only requires a player patch')
     asyncio.run(main(parsed))
 
 

@@ -18,8 +18,10 @@ def build(destination):
         with zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for path in sorted(root.rglob('*')):
                 relative = path.relative_to(root)
-                if (not path.is_file() or any(p in {'notes', 'test', 'tools', '__pycache__', '.pytest_cache'}
+                patch_tools={'__init__.py','build_hud_overlay.py','hud_cpk.py','hud_gncp.py','hud_original_assets.py','hud_preflight.py','hud_tpl.py'}
+                if (not path.is_file() or any(p in {'notes', 'test', '__pycache__', '.pytest_cache'}
                                              for p in relative.parts)
+                        or 'tools' in relative.parts and relative.name not in patch_tools
                         or relative.name == 'build_apworld.py'
                         or relative.name.startswith('live_pal_') and path.suffix == '.json'
                         or path.suffix not in {'.py', '.json', '.md', '.yaml', '.txt', '.ini', '.csv', '.png'}):

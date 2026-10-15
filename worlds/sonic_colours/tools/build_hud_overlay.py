@@ -9,8 +9,18 @@ import os
 import shutil
 import tempfile
 import xml.etree.ElementTree as ET
-from hud_tpl import append_texture,textures
-from hud_gncp import overlay,SAMPLE_MESSAGES
+try:
+    from .hud_tpl import append_texture,textures
+    from .hud_gncp import overlay,SAMPLE_MESSAGES
+    from .hud_cpk import CPK
+    from .hud_original_assets import find_asset,EXPECTED_CPK,u8_members
+    from .hud_preflight import audit
+except ImportError:
+    from hud_tpl import append_texture,textures
+    from hud_gncp import overlay,SAMPLE_MESSAGES
+    from hud_cpk import CPK
+    from hud_original_assets import find_asset,EXPECTED_CPK,u8_members
+    from hud_preflight import audit
 
 
 def riivolution_xml(archive_name,ap_connected=False):
@@ -103,10 +113,7 @@ def replace_u8(arc,replacements):
     return bytes(out)
 
 
-def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,ap_connected=False):
-    from hud_cpk import CPK
-    from hud_original_assets import find_asset,EXPECTED_CPK,u8_members
-    from hud_preflight import audit
+def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,ap_connected=False,music_mapping=None,write_xml=True):
     report=audit(source);cpk=CPK(source)
     resources={n:find_asset(cpk,arc,n) for arc,n in
         [('ui_cockpit_e.arc','ui_gameplay.gncp'),('ui_cockpit_e.arc','ui_gameplay.tls'),
@@ -157,6 +164,12 @@ def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,a
         if before_map.keys()!=after_map.keys():raise ValueError('map U8 members differ')
         if any(after_map[n]!=replacements_map.get(n,b) for n,b in before_map.items()):raise ValueError('map U8 roundtrip differs')
         changes.update({i:map_patch for i in map_indices})
+    if music_mapping is not None:
+        from ..client.music_bank import rewrite_bank
+        music_indices=[i for i,r in enumerate(cpk.toc.rows) if r.get('DirName')=='sound' and r.get('FileName')=='bgm.strm.csb']
+        if len(music_indices)!=1:raise ValueError('BGM bank not unique')
+        index=music_indices[0]
+        changes[index]=rewrite_bank(cpk.read(cpk.toc.rows[index]),music_mapping)
     publish_aliases(cpk,output,list(changes),changes,EXPECTED_CPK)
     rebuilt=CPK(output)
     if any(rebuilt.read(rebuilt.toc.rows[i])!=blob for i,blob in changes.items()):raise ValueError('CPK roundtrip differs')
@@ -165,7 +178,7 @@ def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,a
                   new_texture_count=len(textures(replacements['ui_gameplay.tls'])),patched_aliases=len(changes),
                   output=str(output),resources={n:hashlib.sha256(b).hexdigest() for n,b in replacements.items()})
     Path(str(output)+'.hud.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
-    Path(output).with_suffix('.xml').write_text(riivolution_xml(Path(output).name,ap_connected),encoding='utf-8')
+    if write_xml:Path(output).with_suffix('.xml').write_text(riivolution_xml(Path(output).name,ap_connected),encoding='utf-8')
     return report
 
 

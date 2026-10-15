@@ -1,14 +1,13 @@
 from dataclasses import dataclass
-from Options import Choice, DefaultOnToggle, Toggle, Range, DeathLink, PerGameCommonOptions, OptionGroup
+from Options import Choice, DefaultOnToggle, Toggle, Range, DeathLink, PerGameCommonOptions, OptionGroup, Visibility
 
 class Goal(Choice):
-    """Nega-Wisp Armor (Final Boss) requires the final boss and the subsequent Terminal Velocity Act 2 escape. Other goals require all seven bosses, all 180 physical Red Rings, all 21 Game Land stages, or all seven AP Chaos Emeralds."""
+    """Choose what you must complete to finish your run. Final Boss includes the escape in Terminal Velocity Act 2."""
     display_name = 'Goal'
     option_nega_wisp_armor = 0
     option_all_bosses = 1
     option_all_red_rings = 2
     option_all_game_land_stages = 3
-    option_super_sonic = 4
     default = 0
 
     @classmethod
@@ -17,7 +16,8 @@ class Goal(Choice):
 
 
 class RedRingChecks(Choice):
-    """Add a check for each physical Red Ring, or one check per Act for collecting all five. These pickups are separate from the AP Red Ring items used to open Game Land stages."""
+    """Add a check for each physical Red Ring, or one check per Act for collecting all five.
+    These pickups are separate from the AP Red Ring items used to open Game Land stages."""
     display_name = 'Red Ring Checks'
     option_off = 0
     option_singles = 1
@@ -26,7 +26,9 @@ class RedRingChecks(Choice):
 
 
 class RankChecks(Choice):
-    """Add minimum-grade checks for S, A, B or C. A better rank also completes every lower enabled threshold. All adds all four checks to each ranked stage."""
+    """Choose the lowest rank that gives a check.
+    Better ranks also complete lower enabled ranks.
+    All adds S, A, B and C checks."""
     display_name = 'Rank Checks'
     option_off = 0
     option_s = 1
@@ -38,7 +40,7 @@ class RankChecks(Choice):
 
 
 class RingLossTrapWeight(Choice):
-    """How often Ring Loss Traps appear among trap items. The trap removes Sonic's current rings when safely delivered during an Act."""
+    """How often Ring Loss Traps appear compared with other traps."""
     display_name = 'Ring Loss Trap Weight'
     option_off = 0
     option_low = 1
@@ -47,46 +49,59 @@ class RingLossTrapWeight(Choice):
     default = 2
 
 
-class SwimTrapWeight(Choice):
-    """How often swimming traps appear. This client currently requires Off; swimming traps are not supported."""
-    display_name = 'Swim Trap Weight'
+class ScoreResetTrapWeight(Choice):
+    """How often Score Reset Traps appear compared with other traps."""
+    display_name = 'Score Reset Trap Weight'
     option_off = 0
     option_low = 1
     option_medium = 2
     option_high = 3
-    default = 0
+    default = 1
 
 
 class MusicRandomization(DefaultOnToggle):
-    """Shuffle all 78 looping BGM cues in one global pool, including Acts, maps, bosses, menus, Game Land and Wisps. The nine finite tracks stay vanilla as sources and destinations. Destination audio controls are retained. Default On. Existing tracks may require a scene change."""
+    """Shuffle music across everywhere."""
     display_name = 'Music Randomization'
 
 
 class WorldProgression(Choice):
-    """Sequential unlocks the next Act after clearing the previous one; Open Acts allows all six Acts and opens the boss only after all six are cleared. Terminal Velocity always follows Act 1, Final Boss, Act 2."""
+    """Unlock Acts in Order: each clear opens the next Act like in Vanilla.
+    All Acts then Boss: unlocking a world opens all six Acts independently; clear all six to open its boss."""
     display_name = 'World Progression'
-    option_sequential = 0
-    option_open_acts = 1
+    option_unlock_acts_in_order = 0
+    option_all_acts_then_boss = 1
+    alias_sequential = 0
+    alias_open_acts = 1
     default = 0
 
 
 class GameLandChecks(DefaultOnToggle):
-    """Add a Clear check for each of the 21 Game Land stages. Game Land 1-1 is always available; the other 20 stages require AP Red Ring items."""
+    """Add a Clear check for each of the 21 Game Land stages.
+    Stages require AP Red Ring items to unlock."""
     display_name = 'Game Land Checks'
 
 
-class ChaosEmeraldChecks(DefaultOnToggle):
-    """Adds seven location checks for obtaining the Chaos Emerald rewards in Game Land. Each reward is earned by completing all three stages in one of the seven Game Land worlds. The checks are separate from the seven Chaos Emerald progression items placed by Archipelago."""
+class SuperSonic(Toggle):
+    """Add the seven Chaos Emerald items to the pool to unlock Super Sonic.
+    When Off, Chaos Emerald items are not added to the pool."""
+    display_name = 'Super Sonic'
+
+
+class ChaosEmeraldChecks(Toggle):
+    """Add a check for clearing all three stages in each Game Land group, for seven checks total.
+    This does not grant the matching AP Chaos Emerald item."""
     display_name = 'Chaos Emerald Checks'
 
 
-class WispDiscoveryChecks(Toggle):
-    """Add a check when the game first introduces each of the seven coloured Wisps through its vanilla discovery event. Opening ordinary capsules does not count, and discovery does not grant the corresponding AP Wisp item."""
+class WispDiscoveryChecks(DefaultOnToggle):
+    """Add a check when you first discover each coloured Wisp.
+    Discovery does not unlock its AP ability."""
     display_name = 'Wisp Discovery Checks'
 
 
 class GameLandRequirementReduction(Range):
-    """All 21 Game Land stages use one evenly spaced AP Red Ring requirement sequence: all Stage 1 gates, then Stage 2, then Stage 3. 1-1 is always available; other gates retain their evenly spaced requirements. Step is max(1, floor((179 - reduction) / 20)). Reduction 113 gives 0, 4, 7 ... 61; default 40 gives 0, 7, 13 ... 121."""
+    """Lower the number of AP Red Rings needed to open Game Land stages.
+    Higher values make stages cheaper."""
     display_name = 'Game Land Requirement Reduction'
     range_start = 0
     range_end = 179
@@ -94,94 +109,75 @@ class GameLandRequirementReduction(Range):
 
 
 class TrapPercentage(Range):
-    """Percentage of remaining filler slots replaced with traps. Progression items are never replaced."""
+    """Percentage of remaining filler slots replaced with traps."""
     display_name = 'Trap Percentage'
     range_start = 0
     range_end = 100
     default = 10
 
 
-class SwimTrapDuration(Range):
-    """Duration in seconds for swimming traps, when supported."""
-    display_name = 'Swim Trap Duration'
-    range_start = 5
-    range_end = 60
-    default = 15
-
-
 class WispCapsules(Toggle):
-    """Add an immediate check for every eligible collectible Wisp Capsule in story Acts and Game Land. Coloured capsules require their matching AP Wisp item."""
+    """Add checks for collectible Wisp Capsules.
+    Available through YAML while hidden from the standard options UI."""
     display_name = 'Wisp Capsule Sanity'
-
-
-class APItemHUD(Toggle):
-    """Experimental native HUD for the five most recent AP items, each visible for up to 120 seconds. Requires the matching PAL English UI Riivolution resource/publisher patch."""
-    display_name = 'AP Item HUD (Experimental)'
-    default = 1
+    visibility = Visibility.none
 
 
 class OneUpSanity(Toggle):
-    """Add checks for the 31 physical story-Act 1-Up objects. Vanilla lives remain unchanged."""
+    """Add checks for the 31 1-Up objects spread across the 36 Acts."""
     display_name = '1-Up Sanity'
 
 
-class EggmanHeartSanity(Toggle):
-    """Add one immediate native Eggman Heart pickup check in each of the 21 Game Land stages. Requires the PAL Eggman Heart native pickup code; stage Ring gates and traversal requirements still apply."""
+class EggmanHeartSanity(DefaultOnToggle):
+    """Add a check for collecting the Eggman Heart in each Game Land stage."""
     display_name = 'Eggman Heart Sanity'
 
 
 class SonicDeathLink(DeathLink):
-    """Share deaths with other players. This client currently requires Off; native death delivery is not supported."""
+    """Share deaths with other players. Keep Off until native death delivery has been verified."""
     display_name = 'Death Link'
 
 
-class MovementUnlocks(Toggle):
-    """EXPERIMENTAL: shuffle Wall Jump, Homing Attack, Mid-Air Boost (Jump Dash),
-    Double Jump, Stomp, Drifting, two Progressive Rail stages (Rail Jump then Rail Switch), two Progressive Skydiving stages (gliding then fast diving), Assist Change, five Progressive Stunts, 2 Progressive Crouch stages, Swim and five Progressive Breathing items.
-    State-transition locks require the replacement Dolphin Movement Gecko BETA
-    code profile and are NOT active with the ordinary four Gecko groups.
-    Swim controls repeated underwater jumps independently of Double Jump.
-    Air starts at zero; Progressive Breathing grants 5, 10, 20, 40, then 60 seconds.
-    These gates require the current complete Movement profile.
-    """
-    display_name = 'Movement Unlocks (Experimental)'
+class MovementUnlocks(DefaultOnToggle):
+    """Lock all kinds of movement abilities.
+    Includes abilities like double jump, wall jump etc."""
+    display_name = 'Ability Locks'
 
 
-class BoostLock(Toggle):
-    """Require the White Boost Wisp item for ordinary Boost use. Off preserves vanilla Boost from the start. Super Sonic's native infinite Boost remains separate."""
-    display_name = 'Boost Lock'
+class BoostLock(DefaultOnToggle):
+    """Require White Boost Wisp to gain Boost from white capsules and enemies.
+    AP Boost Refills remain usable."""
+    display_name = 'White Boost Wisp Lock'
 
 
 @dataclass
 class SonicColoursOptions(PerGameCommonOptions):
     goal: Goal
-    red_ring_checks: RedRingChecks
     world_progression: WorldProgression
-    rank_checks: RankChecks
-    ring_loss_trap_weight: RingLossTrapWeight
-    swim_trap_weight: SwimTrapWeight
-    music_randomization: MusicRandomization
-    game_land_checks: GameLandChecks
-    chaos_emerald_checks: ChaosEmeraldChecks
-    wisp_discovery_checks: WispDiscoveryChecks
-    game_land_requirement_reduction: GameLandRequirementReduction
-    trap_percentage: TrapPercentage
-    swim_trap_duration: SwimTrapDuration
-    death_link: SonicDeathLink
     boost_lock: BoostLock
     movement_unlocks: MovementUnlocks
-    wisp_capsules: WispCapsules
-    eggman_heart_sanity: EggmanHeartSanity
+    super_sonic: SuperSonic
+    red_ring_checks: RedRingChecks
+    rank_checks: RankChecks
     one_up_sanity: OneUpSanity
-    ap_item_hud: APItemHUD
+    wisp_discovery_checks: WispDiscoveryChecks
+    game_land_checks: GameLandChecks
+    chaos_emerald_checks: ChaosEmeraldChecks
+    eggman_heart_sanity: EggmanHeartSanity
+    game_land_requirement_reduction: GameLandRequirementReduction
+    trap_percentage: TrapPercentage
+    ring_loss_trap_weight: RingLossTrapWeight
+    score_reset_trap_weight: ScoreResetTrapWeight
+    music_randomization: MusicRandomization
+    death_link: SonicDeathLink
+    wisp_capsules: WispCapsules
 
 OPTION_NAMES = tuple(SonicColoursOptions.__annotations__)
 
 OPTION_GROUPS = [
-    OptionGroup('Progression', [Goal, WorldProgression, BoostLock, MovementUnlocks]),
-    OptionGroup('Checks', [RedRingChecks, RankChecks, GameLandChecks, ChaosEmeraldChecks, WispDiscoveryChecks, WispCapsules, EggmanHeartSanity, OneUpSanity]),
-    OptionGroup('Game Land', [GameLandRequirementReduction]),
-    OptionGroup('Presentation', [MusicRandomization, APItemHUD]),
-    OptionGroup('Gameplay', [SonicDeathLink]),
-    OptionGroup('Traps', [TrapPercentage, RingLossTrapWeight, SwimTrapWeight, SwimTrapDuration]),
+    OptionGroup('Progression', [Goal, WorldProgression, BoostLock, MovementUnlocks, SuperSonic]),
+    OptionGroup('Checks', [RedRingChecks, RankChecks, OneUpSanity, WispDiscoveryChecks]),
+    OptionGroup('Game Land', [GameLandChecks, ChaosEmeraldChecks, EggmanHeartSanity, GameLandRequirementReduction]),
+    OptionGroup('Traps', [TrapPercentage, RingLossTrapWeight, ScoreResetTrapWeight]),
+    OptionGroup('Miscellaneous', [MusicRandomization, SonicDeathLink]),
 ]

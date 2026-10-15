@@ -21,6 +21,15 @@ def verify_revision(memory):
         raise memory.error(f'wrong_game: observed {disc!r} (hex={disc.hex()}), expected PAL SNCP8P')
     if revision != VERSION['revision']:
         raise memory.error(f'unknown_revision: observed disc revision {revision}, expected {VERSION["revision"]}')
+    from .native_dol import handshake
+    native=handshake(memory)
+    memory.native_patch=native
+    expected=getattr(memory,'required_native_seed',None)
+    if expected is not None:
+        if native is None:raise memory.error('Load the generated AP ISO; native patch handshake missing')
+        if native['seed_digest']!=hashlib.sha256(expected.encode()).digest()[:16].hex():
+            raise memory.error('Native patched ISO belongs to another seed')
+    memory.revision_observation['native_patch']=native
     # Direct guest PPC experiments are NOT ordinary Gecko codes. Only
     # recognized, byte-authenticated trampoline plans may be normalized.
     from .direct_hooks import plan as direct_plan, recognize_branch
@@ -105,6 +114,15 @@ def verify_revision(memory):
             word = int.from_bytes(data[offset:offset+4], 'big')
             if word != MEDAL_ORIGINAL and medal_data(memory) is not None:
                 data = data[:offset] + MEDAL_ORIGINAL.to_bytes(4, 'big') + data[offset+4:]
+        from .capsule_capture import HOOK as CAP_HOOK, ORIGINAL as CAP_ORIGINAL, installed_data as capture_data
+        if getattr(memory,'native_patch',None) and section['address']<=CAP_HOOK<section['address']+section['size']:
+            if capture_data(memory) is None:raise MemoryUnavailable('native capsule capture missing')
+            offset=CAP_HOOK-section['address']
+            data=data[:offset]+CAP_ORIGINAL.to_bytes(4,'big')+data[offset+4:]
+        from .area_map_refresh import HOOK as AREA_HOOK, ORIGINAL as AREA_ORIGINAL
+        if getattr(memory,'native_patch',None) and section['address']<=AREA_HOOK<section['address']+section['size']:
+            offset=AREA_HOOK-section['address']
+            data=data[:offset]+AREA_ORIGINAL.to_bytes(4,'big')+data[offset+4:]
         from .map_refresh import HOOK as MAP_HOOK, ORIGINAL as MAP_ORIGINAL, installed_data as map_data
         if section['address'] <= MAP_HOOK < section['address'] + section['size']:
             offset = MAP_HOOK - section['address']

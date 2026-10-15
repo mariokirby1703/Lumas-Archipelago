@@ -100,7 +100,7 @@ def test_fill_100_seeds(settings):
         assert not multiworld.get_unfilled_locations()
 
 
-@pytest.mark.parametrize('option,value', [('death_link', 1), ('swim_trap_weight', 'low')])
+@pytest.mark.parametrize('option,value', [('death_link', 1)])
 def test_unverified_options_fail_precisely(option, value):
     for seed in range(100):
         with pytest.raises(ValueError, match='requires_verified_hook'):
@@ -110,7 +110,7 @@ def test_unverified_options_fail_precisely(option, value):
 def test_low_capacity_error_and_trap_classification():
     with pytest.raises(ValueError, match='Too few'):
         pack_rings(187, 1)
-    world = generate({'trap_percentage': 100, 'ring_loss_trap_weight': 'off'}).worlds[1]
+    world = generate({'trap_percentage': 100, 'ring_loss_trap_weight': 'off', 'score_reset_trap_weight': 'off'}).worlds[1]
     assert not any(i.trap for i in world.multiworld.itempool)
     world = generate({'trap_percentage': 100}).worlds[1]
     assert all(i.advancement or i.trap or i.useful for i in world.multiworld.itempool)
@@ -140,5 +140,6 @@ def test_output_and_tamper_rejection():
             validate_slot({**data, **mutation})
     with tempfile.TemporaryDirectory() as directory:
         world.generate_output(directory)
-        output = json.loads(next(Path(directory).glob('*.apsonic')).read_text())
-        assert output['slot_data'] == data
+        from ..patch import load_patch
+        output=load_patch(next(Path(directory).glob('*.apsoniccolours')))
+        assert output.slot_data==data

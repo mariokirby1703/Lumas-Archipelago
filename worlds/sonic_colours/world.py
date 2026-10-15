@@ -1,6 +1,8 @@
 import json
 import logging
 from pathlib import Path
+from typing import ClassVar
+from .settings import SonicColoursSettings
 
 from worlds.AutoWorld import World
 from . import Items, Locations, Regions, Rules
@@ -17,6 +19,7 @@ class SonicColoursWorld(World):
     web = SonicColoursWeb()
     options_dataclass = SonicColoursOptions
     options: SonicColoursOptions
+    settings: ClassVar[SonicColoursSettings]
     required_client_version = (0, 6, 7)
     item_name_to_id = Items.ITEM_TABLE
     location_name_to_id = {n: d.code for n, d in Locations.LOCATION_TABLE.items()}
@@ -25,8 +28,7 @@ class SonicColoursWorld(World):
                         'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS)}
 
     def generate_early(self):
-        for option, capability in [('death_link', 'native_death'),
-                                   ('swim_trap_weight', 'swimming')]:
+        for option, capability in [('death_link', 'native_death')]:
             if getattr(self.options, option).value:
                 raise ValueError(f'Sonic Colours: {option} requires_verified_hook: {capability}. '
                                  'Use off until PAL live validation; see docs/development.md.')
@@ -55,9 +57,12 @@ class SonicColoursWorld(World):
     def create_items(self):
         names = []
         names += [n for i, n in enumerate(Items.WORLD_ITEMS) if i != self.starting_world]
-        names += list(Items.WISP_ITEMS) + ['Progressive Yellow Drill Wisp','Progressive Green Hover Wisp','Progressive Pink Spikes Wisp'] + list(Items.EMERALDS) + [Items.RANDOM_CAPSULES]
+        names += list(Items.WISP_ITEMS) + ['Progressive Yellow Drill Wisp','Progressive Green Hover Wisp','Progressive Pink Spikes Wisp'] + [Items.RANDOM_CAPSULES]
+        if self.options.super_sonic.value:
+            names += list(Items.EMERALDS)
         if self.options.movement_unlocks.value:
-            names += list(Items.MOVEMENT_POOL)
+            names += [name for name in Items.MOVEMENT_POOL
+                      if name!='Assist Change' or self.options.game_land_checks.value]
         precollected = self.multiworld.precollected_items[self.player]
         for item in precollected:
             if item.name in names:
@@ -70,8 +75,8 @@ class SonicColoursWorld(World):
             early.setdefault(self.random.choice(access), 1)
         needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks
                           or self.options.goal.value == 3 or self.options.wisp_capsules or self.options.eggman_heart_sanity)
-        self.game_land_speed_items = needs_land
-        speed_count = max(0, 4 - sum(i.name == Items.GAME_LAND_SPEED for i in precollected)) if needs_land else 0
+        self.game_land_speed_items = bool(self.options.game_land_checks.value)
+        speed_count = max(0, 4 - sum(i.name == Items.GAME_LAND_SPEED for i in precollected)) if self.game_land_speed_items else 0
         self.ring_required = max(self.gates.values()) if needs_land else 0
         self.ring_target = (4 * self.ring_required + 2) // 3
         remaining = max(0, self.ring_target - sum(Items.RING_VALUES.get(i.name, 0) for i in precollected))
@@ -105,7 +110,7 @@ class SonicColoursWorld(World):
         if filler_count < 0:
             raise ValueError('Sonic Colours: enable more checks for mandatory progression.')
         weights = (0, 1, 3, 6)
-        trap_weights = [weights[self.options.ring_loss_trap_weight.value], weights[self.options.swim_trap_weight.value]]
+        trap_weights = [weights[self.options.ring_loss_trap_weight.value], weights[self.options.score_reset_trap_weight.value]]
         if self.options.trap_percentage.value and not any(trap_weights):
             logger.warning('Sonic Colours: all trap weights off; keeping ordinary filler.')
         trap_count = (filler_count * self.options.trap_percentage.value + 50) // 100 if any(trap_weights) else 0
@@ -121,7 +126,7 @@ class SonicColoursWorld(World):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':3, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),
@@ -131,9 +136,11 @@ class SonicColoursWorld(World):
                 'options': self.options.as_dict(*OPTION_NAMES)}
 
     def generate_output(self, output_directory):
-        path = Path(output_directory) / f'{self.multiworld.get_out_file_name_base(self.player)}.apsonic'
-        path.write_text(json.dumps({'game': GAME, 'player_name': self.multiworld.get_player_name(self.player),
-                                    'slot_data': self.fill_slot_data()}, indent=2), encoding='utf-8')
+        from .patch import SonicColoursPatch
+        path=Path(output_directory)/f'{self.multiworld.get_out_file_name_base(self.player)}.apsoniccolours'
+        patch=SonicColoursPatch(str(path),self.player,self.multiworld.get_player_name(self.player),
+                               slot_data=self.fill_slot_data())
+        patch.write()
 
     def write_spoiler_header(self, spoiler_handle):
         spoiler_handle.write(f'\nSonic Colours (Wii) PAL\n'

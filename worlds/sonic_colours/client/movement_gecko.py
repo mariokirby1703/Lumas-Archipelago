@@ -18,7 +18,7 @@ def pairs(text):
             if re.fullmatch(r'[0-9A-F]{8} [0-9A-F]{8}', line)]
 
 
-def movement_ini():
+def movement_ini(enforce_budget=True):
     cleaned = original_export(compact_capsule=True).splitlines()
     marker = '[Gecko_Enabled]'
     if cleaned.count(marker) != 1:
@@ -52,7 +52,7 @@ def movement_ini():
         cleaned.remove(f'20{module.HOOK-0x80000000:06X} {module.ORIGINAL:08X}')
     result = '\n'.join(cleaned)+'\n'
     raw = pairs(result)
-    if len(raw)*8 > CAPACITY_BYTES:
+    if enforce_budget and len(raw)*8 > CAPACITY_BYTES:
         raise ValueError(f'movement Gecko profile too large: {len(raw)*8} > {CAPACITY_BYTES}')
     starts=[x for x,_ in raw if (x>>24)==0xc2]
     if starts.count(0xc2000000 | (MOVEMENT_HOOK-0x80000000)) != 1:

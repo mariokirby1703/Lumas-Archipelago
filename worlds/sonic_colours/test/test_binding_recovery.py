@@ -28,3 +28,23 @@ def test_recovered_pickup_without_epoch_is_restored_only_with_bound_recovery(rec
         binding_recovery='exact native witness from prior slot-data digest' if recovered else None,
         pickup_events=[dict(kind='red_ring',mission='stg160',ring=1,playthrough_epoch=None)]))
     assert witnessed(journal)==({'stg160':1} if recovered else {})
+
+
+@pytest.mark.parametrize('change',['score_up','score_down','time','rank','profile','rollback'])
+def test_bound_resume_accepts_only_score_improvement_with_stable_witnesses(change):
+    from copy import deepcopy
+    from .test_runtime import snapshot
+    records={m:dict(raw_rank=2,score=100,time_raw=120) for m in ('stg110','stg130')}
+    binding=dict(id='bound',kind='native_intro_record_witness_v1',profile_hex='profile',selected_index=0,intro_record_witnesses=[deepcopy(records)])
+    data=dict(native_binding=binding,save_identity='bound',native_monotonic_clears=['stg110','stg130'])
+    journal=SimpleNamespace(data=data,save=lambda:None)
+    saved=dict(profile_hex='profile',chain=[0,0,0],rank_records=deepcopy(records))
+    if change=='score_up':saved['rank_records']['stg130']['score']=101
+    if change=='score_down':saved['rank_records']['stg130']['score']=99
+    if change=='time':saved['rank_records']['stg130']['time_raw']=121
+    if change=='rank':saved['rank_records']['stg130']['raw_rank']=1
+    if change=='profile':saved['profile_hex']='other'
+    if change=='rollback':saved['rank_records']['stg130']['score']=101
+    snap=snapshot(progress_verified=True,persisted_clears=frozenset(['stg110'] if change=='rollback' else ['stg110','stg130']))
+    result=SaveBinding(journal).attribute(snap,saved)
+    assert result.save_identity_verified==(change=='score_up')

@@ -52,7 +52,13 @@ class Ticker:
             receipt=index+offset
             if receipt<high:continue
             if receipt!=self.data['highwater']:break
-            event={'kind':'Received','item':name(item.item),'player':player(item.player),'receipt':receipt,'flags':item.flags}
+            flags=item.flags
+            if item.location == -1 and item.player == slot and flags == 0:
+                # MultiServer !getitem omits flags. Only infer classification
+                # for our own known game items; real location flags stay exact.
+                from ..Items import BY_ID,classification
+                if item.item in BY_ID:flags=int(classification(BY_ID[item.item]))
+            event={'kind':'Received','item':name(item.item),'player':player(item.player),'receipt':receipt,'flags':flags}
             if item.player==slot and item.location>=0:event['own']=True
             self.data['highwater']=receipt+1;self.enqueue(event)
     def sent(self,args,team,slot,name,player):

@@ -146,6 +146,19 @@ def test_breath_upgrade_preserves_time_already_spent_underwater(monkeypatch):
     assert m.read_f32(plugin+0x20)==22 # ten-second supply minus two spent
 
 
+def test_bubble_reset_detected_after_near_zero_window_was_missed(monkeypatch):
+    m,b,plugin,snapshot,guard=writable_fixture(monkeypatch)
+    owned={'counts':{'Progressive Breathing':1}}
+    w.configure(m,snapshot,guard,owned)
+    b.put(plugin+0x20,struct.pack('>f',1.966666))
+    result=w.configure(m,snapshot,guard,owned)
+    assert result['write_verified']
+    assert m.read_f32(plugin+0x20)==pytest.approx(26.966666,abs=0.001)
+    writes=len(b.writes)
+    w.configure(m,snapshot,guard,owned)
+    assert len(b.writes)==writes
+
+
 def test_client_restart_does_not_grant_sixty_seconds_again(monkeypatch):
     from types import SimpleNamespace
     m,b,plugin,snapshot,guard=writable_fixture(monkeypatch)

@@ -100,7 +100,13 @@ class SaveBinding:
                 # unrelated loaded save may establish a new witness by itself.
                 old = binding['intro_record_witnesses'][-1]
                 changed = {mission for mission in INTRO if old[mission] != current[mission]}
-                legitimate_replay = (self.last_attributed_mission in changed and len(changed) == 1
+                score_only_improvement = (
+                    snapshot.scene in ('gameplay','results','world_map','global_map')
+                    and all(current[m]['raw_rank']==old[m]['raw_rank']
+                            and current[m]['time_raw']==old[m]['time_raw']>0
+                            and current[m]['score']>=old[m]['score'] for m in INTRO)
+                    and set(self.journal.data.get('native_monotonic_clears',[]))<=snapshot.persisted_clears)
+                legitimate_replay = score_only_improvement or (self.last_attributed_mission in changed and len(changed) == 1
                                      and (snapshot.scene == 'results' and snapshot.actual_mission == self.last_attributed_mission
                                           or snapshot.scene in ('world_map', 'global_map')
                                           and self.replay_result == self.last_attributed_mission)

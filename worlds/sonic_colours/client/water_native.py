@@ -107,8 +107,12 @@ def configure(memory,snapshot,guard,owned,journal=None):
         return {'status':str(error),'write_verified':False,'air_seconds':seconds}
     key=allocation_key(memory,snapshot,player,clock['plugin'])
     elapsed=clock['elapsed_seconds'];previous=records.get(key)
-    reset=(previous is not None and abs(elapsed)<0.1
-           and abs(elapsed-previous['elapsed'])>0.5)
+    # A bubble may reset to zero and advance several frames before the next
+    # host sample. Do not require witnessing the short near-zero window.
+    reset=(previous is not None and (
+        elapsed < previous['elapsed']-0.001
+        or abs(elapsed)<0.1 and abs(elapsed-previous['elapsed'])>0.5
+        or seconds<30 and elapsed < 30-seconds-0.001))
     fresh=previous is None or reset
     if fresh:
         desired=30.05 if seconds==0 else 30-seconds+elapsed

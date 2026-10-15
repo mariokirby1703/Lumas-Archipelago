@@ -348,6 +348,15 @@ class WritePolicy:
             if self.guard.can_record_pickups(snapshot):
                 return snapshot.session,snapshot.stage_epoch,base
             return self.guard.check(snapshot),base
+        if operation == 'score_reset':
+            from .score_reset import sources
+            self.guard.check_stats(snapshot)
+            actor,fields,total=sources(self.memory,snapshot)
+            tx=getattr(self.memory,'_score_reset_transaction',None)
+            context=(snapshot.session,snapshot.stage_epoch,actor)
+            if not tx or tx[0]!=context or tx[1].get(address)!=size or address not in fields or len(fields[address])!=size:
+                raise MemoryUnavailable('WRITE_BLOCKED: unverified current-stage score transaction')
+            return context
         if operation == 'breath_timer':
             from .water_native import target
             player,clock=target(self.memory,snapshot,self.guard)

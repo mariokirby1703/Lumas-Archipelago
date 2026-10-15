@@ -231,7 +231,7 @@ def _gecko_install(memory):
         return info['target']+previous['offset'],'Dolphin Gecko C2'
     if not info['installed']:return _legacy_gecko_install(memory)
     memory.movement_legacy_profile=info.get('variant')=='movement_before_air_boost'
-    return info['target']+off,'Dolphin Gecko C2'
+    return info['target']+off,('DOL native hooks' if getattr(memory,'native_patch',None) else 'Dolphin Gecko C2')
 
 
 

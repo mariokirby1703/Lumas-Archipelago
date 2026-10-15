@@ -13,6 +13,18 @@ def test_received_history_and_reconnect():
     Ticker(t.journal).received(items+[NetworkItem(2,11,3,0)],0,str,str)
     assert len(t.data['queue'])==1
 
+
+def test_cheat_trap_colour_fallback_preserves_real_server_flags():
+    from ..Items import ITEM_TABLE
+    from ..client.ap_hud_ticker import item_colour
+    t=ticker();t.history_ready([])
+    trap=ITEM_TABLE['Ring Loss Trap']
+    t.received([NetworkItem(trap,-1,1,0),NetworkItem(trap,123,1,0)],0,str,str,slot=1)
+    assert item_colour(t.data['queue'][0]['flags'])=='#F05252'
+    assert t.data['queue'][1]['flags']==0
+    t.received([NetworkItem(trap,-1,2,0)],2,str,str,slot=1)
+    assert t.data['queue'][2]['flags']==0
+
 def test_empty_history_barrier_does_not_swallow_first_self_item():
     t=ticker();t.history_ready([])
     item=NetworkItem(77,123,1,1)

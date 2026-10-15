@@ -1,0 +1,13 @@
+# Outstanding live-test findings
+
+- Score Reset Trap: guarded local Dolphin test in Tropical Resort Act 1 reset 600 to 0; user confirmed the visible HUD updated to 00000000 (2026-10-15). Network receipt delivery for the new trap still needs testing with a newly generated seed; the existing live server predates its item definition.
+
+- Progressive Breathing must enforce entry/reset limits in the native Game Thread, including air bubbles. Live level-1 status showed 28 seconds of native air instead of 5. Host reset detection now accepts sampled backward resets and elapsed values below the effective floor, but host polling still causes entry/reset latency; a native per-frame/reset hook remains necessary. Include level 0 immediate drowning and durations above vanilla 30 seconds in live regression tests.
+
+- Area Map: newly AP-unlocked Acts remain visually black although navigable and their path is visible. User deferred this fix until after the current Act-5 completion test (2026-10-15). Refresh the native waypoint appearance as well as adjacency and path vertices; preserve cleared/locked distinctions.
+- Measure and reduce AP notification latency. The controlled live test observed approximately 2.7 seconds between server check handling and client message processing.
+- Capsule Sanity: Aquarium Park Act 1 white checkpoint capsule 1770 was missed on the first reported pickup, then successfully checked for Rings during a controlled before/after retry. Before: eligible native actor `0x90CADD60`, unopened. After: actor absent from capsule list. Investigate capturing the opening event before despawn rather than relying solely on polling; the exact first-miss cause is not yet proven.
+  Tropical Resort Act 1 Capsule 149 also passed a controlled before/after pickup test (2026-10-15), while the user still reports unreliable ordinary pickups. Controlled successes do not establish that rapid unpaused collection is reliable.
+- Verify white capsule pickup and enemy Boost gains with White Boost Wisp absent. The current live test already owns it; the user's earlier observation remains unconfirmed.
+- Game Land selection: user reported missing empty Yellow Emerald while the other empty Emeralds are visible. AP inventory owns none; all four Yellow UI colour fields read `0x606060ff`, matching other unowned colours. Inspect native visibility/animation separately; colour reads alone do not verify appearance.
+  After the requested selection/Record menu round trip, the user confirmed the empty Yellow Emerald appeared. Reproduce first-entry initialization and ensure it is visible without needing that round trip; no ownership change occurred.
