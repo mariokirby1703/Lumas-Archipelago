@@ -35,7 +35,7 @@ def test_game_land_overlay_preserves_other_native_scenes(monkeypatch):
     tls=assets.find_asset(cpk,'ui_name_entry_e.arc','ui_soft_keyboard.tls')
     new=m.overlay(original,keyboard,texture_index=13,keyboard_tls=tls,scene_name='info_1',ap_connected=True)
     scene=m.scene(new,'info_1')
-    assert m.u(new,scene+44)==81 and m.u(new,scene+36)==6
+    assert m.u(new,scene+44)==96 and m.u(new,scene+36)==7
     for name in ('info_2','info_bonus','info_1_2p'):
         old=m.scene(original,name)
         assert new[old:old+76]==original[old:old+76]
@@ -50,7 +50,7 @@ def test_owned_original_gncp_roundtrip_if_available():
     m=module('hud_gncp');a=(root/'ui_gameplay.gncp').read_bytes();b=(root/'ui_soft_keyboard.gncp').read_bytes()
     tls=(root/'ui_soft_keyboard.tls').read_bytes();new=m.overlay(a,b,keyboard_tls=tls);s=m.scene(a,'info_2');bonus=m.scene(a,'info_bonus')
     assert new[bonus:bonus+76]==a[bonus:bonus+76]
-    assert m.u(new,s+36)==7 and m.u(new,s+44)==88 and m.u(new,s+20)==13
+    assert m.u(new,s+36)==8 and m.u(new,s+44)==103 and m.u(new,s+20)==13
     for name in ('num_score','word_score'):
         try:old=m.cast(a,s,name)
         except ValueError:continue
@@ -66,7 +66,7 @@ def test_owned_original_gncp_roundtrip_if_available():
         assert struct.unpack_from('>f',new,c+12)[0]==0.
     # Native 805DE874 uses bsearch for font names, as does cast lookup.
     # A linear parser alone would miss an appended, unsorted dictionary.
-    for table,count,stride in [(m.ptr(new,s+48),88,12),
+    for table,count,stride in [(m.ptr(new,s+48),103,12),
                                (m.ptr(new,m.ptr(new,60)+8),3,8)]:
         names=[m.string(new,m.ptr(new,table+i*stride)) for i in range(count)]
         assert names==sorted(names)
@@ -96,7 +96,7 @@ def test_owned_original_gncp_roundtrip_if_available():
         assert cropped[2]-cropped[0]<=original[2]-original[0]+1e-7
 
     groups=m.ptr(new,s+40);animation=m.ptr(new,s+56)
-    assert m.u(new,animation)==7
+    assert m.u(new,animation)==8
     animation_groups=m.ptr(new,animation+4)
     for i in range(2,7):
         assert m.u(new,groups+i*16)==15
@@ -112,7 +112,7 @@ def test_owned_map_parent_preserves_original_ring_and_rank_casts():
     keyboard=(root/'ui_soft_keyboard.gncp').read_bytes();tls=(root/'ui_soft_keyboard.tls').read_bytes()
     new=m.overlay(a,keyboard,texture_index=13,keyboard_tls=tls,scene_name='info_1',base_y=176.)
     parent=m.scene(a,'info_1')
-    assert m.u(new,parent+36)==8 and m.u(new,parent+44)==96 and m.u(new,parent+20)==14
+    assert m.u(new,parent+36)==9 and m.u(new,parent+44)==111 and m.u(new,parent+20)==14
     for name in ('num_life','num_rank','num_ring'):
         old=m.cast(a,parent,name)
         assert m.cast(new,parent,name)==old and new[old:old+116]==a[old:old+116]
@@ -136,7 +136,7 @@ def test_connected_assets_start_blank_with_bounded_shared_mailboxes():
         assert new[box+16:box+144]==b' '+b'\0'*127
         assert m.u(new,box+8)==0
         controller=m.ptr(new,box+4);controls.add(controller)
-        assert [m.u(new,controller+j*4) for j in range(4)]==[0x41504844,0,128,75]
+        assert [m.u(new,controller+j*4) for j in range(4)]==[0x41504844,0,128,90]
         info=m.ptr(new,record+48)
         assert m.u(new,info+0x20)==(0x000000ff if '_outline' in name else 0xffffffff)
     assert len(controls)==1

@@ -24,7 +24,7 @@ def discover(memory):
                 layer=memory.read_ptr_checked(pointer,0xe0)
                 if memory.read_u32(layer)!=0x807abc40:continue
                 layout=memory.read_ptr_checked(layer+12,0x34)
-                if memory.read_u32(layout+44) not in ((81,88) if rows[0]['scene']=='gameplay' else (96,)):continue
+                if memory.read_u32(layout+44) not in ((96,103) if rows[0]['scene']=='gameplay' else (111,)):continue
                 table=memory.read_ptr_checked(layout+48,memory.read_u32(layout+44)*12)
                 sourcegroups=memory.read_ptr_checked(layout+40,128)
                 boxes={};control=None
@@ -33,7 +33,7 @@ def discover(memory):
                     name=memory.read_bytes(nameptr,48).split(b'\0')[0].decode('ascii')
                     if not name.startswith('ap_'):continue
                     group=memory.read_u32(entry+4);index=memory.read_u32(entry+8)
-                    if not 1<=group<8 or not 0<=index<15:raise MemoryUnavailable('HUD cast index differs')
+                    if not 1<=group<10 or not 0<=index<15:raise MemoryUnavailable('HUD cast index differs')
                     sourcearray=memory.read_ptr_checked(sourcegroups+group*16+4,(index+1)*4)
                     record=memory.read_ptr_checked(sourcearray+index*4,116)
                     if memory.read_u32(record+4)!=2:raise MemoryUnavailable('HUD cast is not a font')
@@ -48,7 +48,7 @@ def discover(memory):
                         if memory.read_bytes(memory.read_ptr_checked(box+12,4),48).split(b'\0')[0].decode('ascii')!=name:
                             raise MemoryUnavailable('HUD mailbox name differs')
                     boxes[name]=(record,box)
-                if len(boxes)!=75:continue
+                if len(boxes)!=90:continue
                 handle=actor+offset-4
                 anchors=[(actor,memory.read_bytes(actor,16)),(handle,memory.read_bytes(handle,8)),
                          (pointer,memory.read_bytes(pointer,4)),(layer,memory.read_bytes(layer,4)),
@@ -63,10 +63,29 @@ def validate(memory,owner):
     if any(memory.read_bytes(a,len(value))!=value for a,value in owner['anchors']):
         raise MemoryUnavailable('AP HUD owner changed')
 
-def payloads(owner,events,metrics):
+def payloads(owner,events,metrics,music=None):
     result={}
     for name,(record,box) in owner['boxes'].items():
         base=name.split('_outline')[0];shadow='_outline' in name
+        if base.startswith('ap_music_'):
+            music=music or {'alpha':0,'title':''}
+            text={'ap_music_icon':' ','ap_music_heading':'NOW PLAYING:','ap_music_title':music.get('title','')}.get(base,'')
+            alpha=music.get('alpha',0);colour=0x00000000 if shadow else 0xffffff00
+            colour|=alpha
+            fitted='';width=0.
+            for char in ascii_text(text):
+                if width+metrics[char]>540 or len(fitted)>=127:break
+                fitted+=char;width+=metrics[char]
+            # Align the panel to the native right HUD edge. The icon sits just
+            # before the heading; the title has its own right-aligned baseline.
+            heading_width=sum(metrics[c] for c in 'NOW PLAYING:')
+            x=590.-width
+            if base=='ap_music_icon':x=590.-heading_width-6.-width
+            if shadow:x+=(-0.8,0.8,0.,0.)[int(name[-1])]
+            raw=(fitted or ' ').encode('ascii').ljust(128,b'\0')
+            result[box+8]=struct.pack('>I',owner['handle']);result[box+16]=raw
+            result[box+144]=struct.pack('>If',colour,x)
+            continue
         if base.startswith('ap_prefix'):slot=int(base[len('ap_prefix'):]);kind='prefix'
         else:
             match=re.fullmatch(r'ap_(title|subtitle)(?:_(\d))?',base)
@@ -132,8 +151,10 @@ def render(runtime,memory):
     runtime.hud_ticker.elapsed_visible(True)
     if runtime.hud_ticker.data['queue']:runtime.hud_ticker.remaining=0
     events=runtime.hud_ticker.panel_events() if enabled else []
-    if events!=state['shown']:
-        writes=payloads(owner,events,state['metrics'])
+    from .music_popup import update
+    music=update(runtime)
+    if events!=state['shown'] or music!=state.get('music'):
+        writes=payloads(owner,events,state['metrics'],music)
         # One bounded data write per cast, preserving its relocated name.
         # Previously handle/text/colour each incurred separate pre/post owner
         # validation, tripling the initial publication's process round trips.
@@ -152,5 +173,6 @@ def render(runtime,memory):
             write(owner['control']+4,struct.pack('>I',generation))
         finally:memory._hud_transaction=None
         state['pending']={'generation':generation,'events':events,'candidate':runtime.hud_ticker.candidate() if enabled and runtime.hud_ticker.has_pending_candidate() else None}
+        state['music']=dict(music)
     return {'hud_ready':enabled and state['shown'] is not None,'font_ready':True,'owner_verified':True,
             'publisher_ack':state['pending'] is None,'status':'AP panel connected','displayed':len(state['shown'] or [])}

@@ -1,0 +1,527 @@
+{
+  "format": 1,
+  "tracks": {
+    "bgm_sys_theme": {
+      "cue_id": 0,
+      "title": "bgm_sys_theme",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_sys_op": {
+      "cue_id": 10,
+      "title": "bgm_sys_op",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_sys_end": {
+      "cue_id": 20,
+      "title": "bgm_sys_end",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg110_rso": {
+      "cue_id": 1000,
+      "title": "bgm_stg110_rso",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg120_rso": {
+      "cue_id": 1001,
+      "title": "bgm_stg120_rso",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg130_rso": {
+      "cue_id": 1002,
+      "title": "bgm_stg130_rso",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg140_rso": {
+      "cue_id": 1003,
+      "title": "bgm_stg140_rso",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg150_rso": {
+      "cue_id": 1004,
+      "title": "bgm_stg150_rso",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg160_rso": {
+      "cue_id": 1005,
+      "title": "bgm_stg160_rso",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg210_fct": {
+      "cue_id": 1010,
+      "title": "bgm_stg210_fct",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg220_fct": {
+      "cue_id": 1011,
+      "title": "bgm_stg220_fct",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg230_fct": {
+      "cue_id": 1012,
+      "title": "bgm_stg230_fct",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg240_fct": {
+      "cue_id": 1013,
+      "title": "bgm_stg240_fct",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg250_fct": {
+      "cue_id": 1014,
+      "title": "bgm_stg250_fct",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg260_fct": {
+      "cue_id": 1015,
+      "title": "bgm_stg260_fct",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg310_shp": {
+      "cue_id": 1020,
+      "title": "bgm_stg310_shp",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg320_shp": {
+      "cue_id": 1021,
+      "title": "bgm_stg320_shp",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg330_shp": {
+      "cue_id": 1022,
+      "title": "bgm_stg330_shp",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg340_shp": {
+      "cue_id": 1023,
+      "title": "bgm_stg340_shp",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg350_shp": {
+      "cue_id": 1024,
+      "title": "bgm_stg350_shp",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg360_shp": {
+      "cue_id": 1025,
+      "title": "bgm_stg360_shp",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg410_pla": {
+      "cue_id": 1030,
+      "title": "bgm_stg410_pla",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg420_pla": {
+      "cue_id": 1031,
+      "title": "bgm_stg420_pla",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg430_pla": {
+      "cue_id": 1032,
+      "title": "bgm_stg430_pla",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg440_pla": {
+      "cue_id": 1033,
+      "title": "bgm_stg440_pla",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg450_pla": {
+      "cue_id": 1034,
+      "title": "bgm_stg450_pla",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg460_pla": {
+      "cue_id": 1035,
+      "title": "bgm_stg460_pla",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg510_qua": {
+      "cue_id": 1040,
+      "title": "bgm_stg510_qua",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg520_qua": {
+      "cue_id": 1041,
+      "title": "bgm_stg520_qua",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg530_qua": {
+      "cue_id": 1042,
+      "title": "bgm_stg530_qua",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg540_qua": {
+      "cue_id": 1043,
+      "title": "bgm_stg540_qua",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg550_qua": {
+      "cue_id": 1044,
+      "title": "bgm_stg550_qua",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg560_qua": {
+      "cue_id": 1045,
+      "title": "bgm_stg560_qua",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg610_ast": {
+      "cue_id": 1050,
+      "title": "bgm_stg610_ast",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg620_ast": {
+      "cue_id": 1051,
+      "title": "bgm_stg620_ast",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg630_ast": {
+      "cue_id": 1052,
+      "title": "bgm_stg630_ast",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg640_ast": {
+      "cue_id": 1053,
+      "title": "bgm_stg640_ast",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg650_ast": {
+      "cue_id": 1054,
+      "title": "bgm_stg650_ast",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg660_ast": {
+      "cue_id": 1055,
+      "title": "bgm_stg660_ast",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg710_elv": {
+      "cue_id": 1060,
+      "title": "bgm_stg710_elv",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg720_elv": {
+      "cue_id": 1061,
+      "title": "bgm_stg720_elv",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_boss_coreboss": {
+      "cue_id": 2000,
+      "title": "bgm_boss_coreboss",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_boss_Jellyboss": {
+      "cue_id": 2010,
+      "title": "bgm_boss_Jellyboss",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_boss_shipboss": {
+      "cue_id": 2020,
+      "title": "bgm_boss_shipboss",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_boss_lastboss_1": {
+      "cue_id": 2030,
+      "title": "bgm_boss_lastboss_1",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_boss_lastboss_2": {
+      "cue_id": 2040,
+      "title": "bgm_boss_lastboss_2",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_mlt_a": {
+      "cue_id": 3000,
+      "title": "bgm_mlt_a",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_mlt_b": {
+      "cue_id": 3010,
+      "title": "bgm_mlt_b",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_mlt_c": {
+      "cue_id": 3020,
+      "title": "bgm_mlt_c",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_mlt_d": {
+      "cue_id": 3030,
+      "title": "bgm_mlt_d",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_mlt_e": {
+      "cue_id": 3040,
+      "title": "bgm_mlt_e",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_mlt_f": {
+      "cue_id": 3050,
+      "title": "bgm_mlt_f",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_mlt_g": {
+      "cue_id": 3060,
+      "title": "bgm_mlt_g",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_mlt_title": {
+      "cue_id": 3100,
+      "title": "bgm_mlt_title",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_jingle_mlt_clear": {
+      "cue_id": 3110,
+      "title": "bgm_jingle_mlt_clear",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_mlt_result": {
+      "cue_id": 3120,
+      "title": "bgm_mlt_result",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_wmap": {
+      "cue_id": 4000,
+      "title": "bgm_wmap",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_zmap_rso": {
+      "cue_id": 4010,
+      "title": "bgm_zmap_rso",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_zmap_fct": {
+      "cue_id": 4020,
+      "title": "bgm_zmap_fct",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_zmap_shp": {
+      "cue_id": 4030,
+      "title": "bgm_zmap_shp",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_zmap_pla": {
+      "cue_id": 4040,
+      "title": "bgm_zmap_pla",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_zmap_qua": {
+      "cue_id": 4050,
+      "title": "bgm_zmap_qua",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_zmap_ast": {
+      "cue_id": 4060,
+      "title": "bgm_zmap_ast",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_zmap_elv": {
+      "cue_id": 4070,
+      "title": "bgm_zmap_elv",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_sys_title": {
+      "cue_id": 5000,
+      "title": "bgm_sys_title",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_sys_option": {
+      "cue_id": 5010,
+      "title": "bgm_sys_option",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_sys_save": {
+      "cue_id": 5011,
+      "title": "bgm_sys_save",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_sys_result": {
+      "cue_id": 5020,
+      "title": "bgm_sys_result",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_jingle_stg_clear": {
+      "cue_id": 6000,
+      "title": "bgm_jingle_stg_clear",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_jingle_boss_clear": {
+      "cue_id": 6010,
+      "title": "bgm_jingle_boss_clear",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_jingle_drown": {
+      "cue_id": 6200,
+      "title": "bgm_jingle_drown",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_jingle_gameover": {
+      "cue_id": 6300,
+      "title": "bgm_jingle_gameover",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_jingle_super_sonic": {
+      "cue_id": 6500,
+      "title": "bgm_jingle_super_sonic",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_spn": {
+      "cue_id": 6100,
+      "title": "bgm_pha_spn",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_spn_wtr": {
+      "cue_id": 6101,
+      "title": "bgm_pha_spn_wtr",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_spk": {
+      "cue_id": 6110,
+      "title": "bgm_pha_spk",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_ast": {
+      "cue_id": 6120,
+      "title": "bgm_pha_ast",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_rod": {
+      "cue_id": 6130,
+      "title": "bgm_pha_rod",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_lsr": {
+      "cue_id": 6140,
+      "title": "bgm_pha_lsr",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_rkt": {
+      "cue_id": 6150,
+      "title": "bgm_pha_rkt",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_pzl": {
+      "cue_id": 6160,
+      "title": "bgm_pha_pzl",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_multi_common": {
+      "cue_id": 6460,
+      "title": "bgm_pha_multi_common",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_pha_multi_united": {
+      "cue_id": 6470,
+      "title": "bgm_pha_multi_united",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_stg730_elv": {
+      "cue_id": 1062,
+      "title": "bgm_stg730_elv",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_jingle_mlt_drown": {
+      "cue_id": 3200,
+      "title": "bgm_jingle_mlt_drown",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_sys_challenge": {
+      "cue_id": 6600,
+      "title": "bgm_sys_challenge",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    },
+    "bgm_sys_challenge_result": {
+      "cue_id": 6601,
+      "title": "bgm_sys_challenge_result",
+      "source": "Sonic Colours (Wii)",
+      "arrangement": null
+    }
+  }
+}

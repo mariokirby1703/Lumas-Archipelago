@@ -12,7 +12,7 @@ NATIVE_BLOCKERS = {
     'wisp_permissions': 'Seven colour save/live fields and the native setter hook enforce AP ownership; White Boost/scripted player grants remain unresolved.',
     'game_land_gates': 'AP ring thresholds project native gate bits without inventing physical collectibles; full Game Land navigation requires gameplay verification.',
     'emeralds': 'Super flag resolved; individual native emerald award inventory and independent boost not resolved.',
-    'native_death': 'Player death event observed; safe native invocation and cache-coherent execution not resolved.',
+    'native_death': 'Boot-patched CStateDead mailbox and native event capture implemented; live death/respawn matrix pending.',
     'swimming': 'No verified reversible swimming state; existing Gecko patch has unresolved goal interference.',
     'stage_shuffle': 'Native mission table read; intro-safe stage dispatch rewrite not implemented.',
     'movement': 'Opt-in direct PPC transition gate only; JIT and native Swim/Breath gates not live verified.',
@@ -50,6 +50,10 @@ def diagnostic(ctx, memory=None):
     result['write_capabilities'] = VERSION['capabilities']
     if ctx.runtime:
         runtime = ctx.runtime
+        result['native_events']=getattr(runtime,'native_event_status',{})
+        result['temporary_traps']=getattr(runtime,'temporary_trap_status',{})
+        result['music_popup']=getattr(runtime,'music_popup_status',{})
+        result['deathlink']=ctx.deathlink.status() if ctx.deathlink else {'status':'disabled'}
         owned = inventory([i.item for i in ctx.items_received])
         baseline = [i.item for i in ctx.items_received] if ctx.history_ready else list(runtime.journal.data['receipts'])
         baseline += [item for item in runtime.journal.data.get('permission_receipts', ()) if item not in baseline]

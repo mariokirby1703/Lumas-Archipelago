@@ -51,6 +51,7 @@ def validate_slot(data):
     if isinstance(options,dict):
         options={k:v for k,v in options.items() if k not in ('ap_item_hud','swim_trap_weight','swim_trap_duration')}
         options.setdefault('score_reset_trap_weight',0)
+        options.setdefault('dead_weight_trap_weight',0)
         if data.get('options_revision',0)<3:
             options.setdefault('super_sonic',1)
         data={**data,'options':options}
@@ -106,7 +107,8 @@ def validate_slot(data):
     if data.get('starting_world') != 0 or 'starting_slot' in data:
         raise ValueError('expected fixed Tropical Resort starting world and vanilla intro')
     for name in ('death_link',):
-        if options[name]:
+        from .versions import VERSION
+        if options[name] and not VERSION.get('live_validation',{}).get('deathlink'):
             raise ValueError(f'{name}: requires_verified_hook')
     return data
 
@@ -339,6 +341,17 @@ class Runtime:
         self._capsule_memory=memory
         self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
+        try:
+            from .event_controls import configure as configure_events
+            self.native_event_status=configure_events(self,memory)
+            self.temporary_trap_status={'name':'Dead Weight Trap','remaining':self.native_event_status['remaining'],
+                                        'active':self.native_event_status['remaining']>0,'time_source':'native gameplay delta'}
+            self._death_allowed_stages=getattr(self,'_death_allowed_stages',set())
+            if (getattr(self,'_event_owner',None) and self.snapshot.scene=='gameplay'
+                    and self.guard.can_record_pickups(self.snapshot)):
+                self._death_allowed_stages.add(self._event_owner[2])
+        except MemoryUnavailable as error:
+            self.native_event_status={'installed':False,'status':str(error)}
         try:
             from .ap_hud_connected import render as render_ap_hud
             self.hud_status=render_ap_hud(self,memory)
@@ -843,6 +856,11 @@ class Runtime:
             if name not in DELIVERY_ITEMS:
                 continue
             recorded = self.journal.data['effects'].get(str(index))
+            if name=='Dead Weight Trap':
+                from .dead_weight import deliver
+                try:deliver(self,memory,index,item)
+                except MemoryUnavailable as error:self.journal.defer(index,item,str(error))
+                continue
             if (recorded and recorded.get('state')=='uncertain' and self.delivery_readback_verified(recorded)
                     and recorded.get('reason') in ('left living gameplay before verification completed',
                         'actor/context changed before verification',

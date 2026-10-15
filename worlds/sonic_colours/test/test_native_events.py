@@ -1,0 +1,175 @@
+"""Execute actual scattered PPC (not a Python reimplementation of the gates)."""
+import struct
+import pytest
+from ..client import native_events as n
+from .test_memory import FakeBackend
+
+
+class Machine:
+    def __init__(self,kind):
+        self.b=FakeBackend();self.control=0x80002e00;self.kind=kind
+        self.r=[0x80010000+i*0x100 for i in range(32)]
+        self.r[0]=1;self.r[1]=0x90100000;self.r[2]=0x808fc5c0
+        self.f=[float(i) for i in range(32)];self.lr=0x80001234;self.ctr=0x80005678;self.cr=0x12345678;self.cmp=0
+        self.stage=0x90010000;self.player=0x90020000;self.machine=0x90030000;self.input=0x90040000;self.event=0x90050000
+        self.calls=[]
+        for a,o,b in n.patches(self.control):self.b.put(a,b)
+        self.b.put(self.control,bytes(n.SIZE));self.put(self.control,n.MAGIC)
+        for i in range(4):self.put(self.control+n.JUMP_TABLE+i*4,sum(1<<(s%32) for s in n.JUMP_STATES if s//32==i))
+        self.put(self.control+n.STAGE,self.stage);self.put(self.control+n.PLAYER,self.player)
+        self.put(self.control+n.SERIAL,123);self.put(self.control+n.INPUT,self.input)
+        self.put(self.control+n.ENABLE,1)
+        self.put(self.player,0x8075aef8);self.put(self.player+12,123)
+        self.put(self.player+0x88,self.input)
+        self.put(self.stage+0x114,0x90060000);self.put(0x90060038,123)
+        self.put(self.stage+0x44,0x8001cdb4);self.put(self.player+0x70,0x90070000)
+        self.put(0x90070008,self.machine);self.put(self.machine,0x8075a0f8)
+        self.put(self.machine+0x28,self.player);self.put(self.machine+0x1c,3)
+        self.put(0x808f336c,0x90080000);self.put(0x90080004,0x90081000)
+        self.put(0x9008101c,0x90082000);self.put(0x90082034,self.stage)
+        self.put(0x808f6040,0);self.put(self.event+4,struct.unpack('>I',struct.pack('>f',.5))[0])
+        self.r[29]=self.stage;self.r[30]=self.event;self.r[4]=self.stage
+        if kind=='music':
+            self.r[31]=0x90090020;self.r[30]=0x900a0000
+            self.b.put(0x90090000,b'bgm_wmap'.ljust(32,b'\0'));self.put(0x90090020,100)
+        if kind=='jump':self.r[3]=self.input;self.r[4]=2;self.r[5]=0
+        if kind=='jump_state':self.r[3]=self.machine+0x14;self.r[4]=5;self.r[1]-=0xc0
+        self.before=self.r[:];self.before_f=self.f[:]
+
+    def put(self,a,v):self.b.put(a,(v&0xffffffff).to_bytes(4,'big'))
+    def get(self,a):return int.from_bytes(self.read(a,4),'big')
+    def read(self,a,size):
+        assert 0x80000000<=a<a+size<=0x94000000,f'invalid native read {a:#x}'
+        return self.b.read_bytes(a,size)
+    def run(self):
+        pc=n.HOOKS[self.kind][0]
+        for _ in range(4000):
+            if pc in (n.HOOKS[self.kind][0]+4,0x80001234):return
+            w=self.get(pc);next_pc=pc+4;op=w>>26;rt=w>>21&31;ra=w>>16&31;rb=w>>11&31;u=w&65535;imm=u-65536 if u&32768 else u
+            if op==14:self.r[rt]=((self.r[ra] if ra else 0)+imm)&0xffffffff
+            elif op==15:self.r[rt]=(imm<<16)&0xffffffff
+            elif op==24:self.r[ra]=self.r[rt]|u
+            elif op==28:
+                self.r[ra]=self.r[rt]&u;self.cmp=(self.r[ra]>0)
+            elif op==32:self.r[rt]=self.get((self.r[ra]+imm)&0xffffffff)
+            elif op in (36,37,38):
+                a=(self.r[ra]+imm)&0xffffffff;size=1 if op==38 else 4
+                self.b.write_bytes(a,(self.r[rt]&((1<<(8*size))-1)).to_bytes(size,'big'))
+                if op==37:self.r[ra]=a
+            elif op in (46,47):
+                a=self.r[ra]+imm
+                for r in range(rt,32):
+                    if op==47:self.put(a+4*(r-rt),self.r[r])
+                    else:self.r[r]=self.get(a+4*(r-rt))
+            elif op in (48,50):self.f[rt]=struct.unpack('>f' if op==48 else '>d',self.read(self.r[ra]+imm,4 if op==48 else 8))[0]
+            elif op in (52,54):self.b.write_bytes(self.r[ra]+imm,struct.pack('>f' if op==52 else '>d',self.f[rt]))
+            elif op==11:
+                v=self.r[ra];v=v-(1<<32) if v>>31 else v
+                self.cmp=(v>imm)-(v<imm)
+            elif op==16:
+                take={0x41820000:self.cmp==0,0x40820000:self.cmp!=0,0x41800000:self.cmp<0,
+                      0x40800000:self.cmp>=0,0x41810000:self.cmp>0,0x40810000:self.cmp<=0}[w&0xffff0000]
+                if take:next_pc=pc+imm
+            elif op==18:
+                delta=w&0x3fffffc
+                if delta&0x2000000:delta-=0x4000000
+                if w&1:self.lr=pc+4
+                next_pc=(pc+delta)&0xffffffff
+            elif w==0x7c000026:self.r[0]=self.cr
+            elif w==0x7c0802a6:self.r[0]=self.lr
+            elif w==0x7c0902a6:self.r[0]=self.ctr
+            elif w==0x7c0ff120:self.cr=self.r[0]
+            elif w==0x7c0803a6:self.lr=self.r[0]
+            elif w==0x7c0903a6:self.ctr=self.r[0]
+            elif w==0x7d8903a6:self.ctr=self.r[12]
+            elif w==0x4e800421:
+                assert self.ctr==0x800338e8
+                self.calls.append((self.r[3],self.r[4]))
+                self.lr=pc+4;self.cr=0xabcdef01
+                for r in (0,*range(3,13)):self.r[r]=0xdddddddd
+                for f in range(14):self.f[f]=-999.
+                self.ctr=0xcccccccc
+            elif w==0x4e800020:next_pc=self.lr
+            elif w==0xec000828:self.f[0]-=self.f[1]
+            elif w==0xfc001040:self.cmp=(self.f[0]>self.f[2])-(self.f[0]<self.f[2])
+            elif w==0xfc001090:self.f[0]=self.f[2]
+            elif w==0x5484103a:self.r[4]=(self.r[4]<<2)&0xffffffff
+            elif op==21:
+                sh=w>>11&31;mb=w>>6&31;me=w>>1&31;value=self.r[rt]
+                rotated=((value<<sh)|(value>>(32-sh if sh else 32)))&0xffffffff
+                mask=sum(1<<(31-i) for i in range(mb,me+1));self.r[ra]=rotated&mask
+            elif w in (0x60000000,0x7c0004ac):pass
+            elif op==31 and w&0x7ff==0:self.cmp=(self.r[ra]>self.r[rb])-(self.r[ra]<self.r[rb])
+            elif op==31 and w&0x7ff==0x378:self.r[ra]=self.r[rt]|self.r[rb]
+            elif op==31 and w&0x7ff==46:self.r[rt]=self.get(self.r[ra]+self.r[rb])
+            elif op==31 and w&0x7ff==48:self.r[ra]=(self.r[rt]<<(self.r[rb]&63))&0xffffffff
+            elif op==31 and w&0x7ff==57:
+                self.r[ra]=self.r[rt]&self.r[rb];self.cmp=(self.r[ra]>0)
+            else:raise AssertionError(f'{pc:#x}: {w:#x}')
+            pc=next_pc
+        raise AssertionError('native program did not terminate')
+
+
+def test_death_event_is_published_at_real_native_counter_write():
+    m=Machine('death');m.run()
+    assert m.get(m.control+n.DEATH_SEQ)==2
+    assert m.get(m.control+n.DEATH_STAGE)==m.stage
+    assert m.get(m.control+n.DEATH_COUNT)==m.get(m.stage+0x468)==0
+    assert m.r==m.before and m.lr==0x80001234 and m.ctr==0x80005678 and m.cr==0x12345678
+
+
+def test_successful_bgm_start_copies_bounded_identity_and_ignores_sfx():
+    m=Machine('music');m.run()
+    assert m.get(m.control+n.MUSIC_SEQ)==2
+    assert m.read(m.control+n.NAME,8)==b'bgm_wmap'
+    assert m.r==m.before
+    m=Machine('music');m.b.put(0x90090000,b'se_jump\0');m.run()
+    assert m.get(m.control+n.MUSIC_SEQ)==0
+
+
+@pytest.mark.parametrize('state',[3,24,25,26,65,112])
+def test_remote_kill_calls_native_dead_once_only_in_safe_state(state):
+    m=Machine('frame');m.put(m.control+n.REQUEST,1);m.put(m.machine+0x1c,state)
+    m.run()
+    assert m.calls==([(m.machine,24)] if state==3 else [])
+    expected=m.before[:];expected[0]=m.get(m.stage+0xa4)  # displaced native load
+    assert m.f==m.before_f and m.r==expected and m.cr==0x12345678 and m.ctr==0x80005678
+    m.run();assert len(m.calls)==int(state==3)
+
+
+def test_countdown_uses_native_gameplay_delta_and_acks_then_clamps_zero():
+    m=Machine('frame');m.put(m.control+n.REMAINING,0x3f800000);m.put(m.control+n.TRAP_REQUEST,7)
+    m.run();assert struct.unpack('>f',m.read(m.control+n.REMAINING,4))[0]==.5
+    assert m.get(m.control+n.TRAP_ACK)==7
+    m.run();m.run();assert m.get(m.control+n.REMAINING)==0
+    m=Machine('frame');m.put(m.control+n.ENABLE,0);m.put(m.control+n.REMAINING,0x3f800000)
+    m.run();assert m.get(m.control+n.REMAINING)==0x3f800000
+
+
+@pytest.mark.parametrize('action,remaining,match,blocked',[(0,30,True,True),(1,30,True,False),(0,0,True,False),(0,30,False,False)])
+def test_jump_query_suppression_is_scoped_and_reversible(action,remaining,match,blocked):
+    m=Machine('jump');m.r[5]=action
+    if not match:m.r[3]+=0x100
+    m.put(m.control+n.REMAINING,struct.unpack('>I',struct.pack('>f',remaining))[0]);m.run()
+    assert (m.r[3]==0)==blocked
+
+
+def test_reused_input_pointer_cannot_lock_a_replaced_player():
+    m=Machine('jump');m.put(m.control+n.REMAINING,0x41f00000)
+    m.put(m.player+12,456);m.run()
+    assert m.r[3]==m.input
+
+
+@pytest.mark.parametrize('state',n.JUMP_STATES)
+def test_all_registered_jump_requests_are_denied_without_entry_callbacks(state):
+    m=Machine('jump_state');m.r[4]=state;m.put(m.control+n.REMAINING,0x41f00000)
+    m.run()
+    assert m.r[1]==m.before[1]+0xc0 and m.lr==0x80001234
+    assert m.r[4]==state and not m.calls
+
+
+@pytest.mark.parametrize('state',[3,4,16,24,25,38,67,88,100,112])
+def test_non_jump_requests_and_native_death_are_not_trapped(state):
+    m=Machine('jump_state');m.r[4]=state;m.put(m.control+n.REMAINING,0x41f00000)
+    m.run()
+    assert m.r[1]==m.before[1] and m.r[0]==0x80001234

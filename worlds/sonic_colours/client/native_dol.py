@@ -12,7 +12,7 @@ from functools import lru_cache
 PAL_DOL_SHA256='92aefe33b577493b492f8433ca68b90d25d29d2d6f9c85310a6829481281f8a9'
 ARENA=0x80001800
 SIGNATURE=0x80002fc0
-ABI=1
+ABI=2
 MAGIC=b'SCAPNAT1'
 
 def branch(source,target):
@@ -86,6 +86,14 @@ def plan():
     hooks.append({'hook':area_map_refresh.HOOK,'target':cursor,'size':len(blob),'return':area_map_refresh.HOOK+4})
     payload.extend(blob);cursor+=len(blob)
     patches.extend(hud());patches.extend(rocket())
+    from . import native_events
+    patches.extend(native_events.patches(cursor))
+    mailbox=bytearray(native_events.SIZE);struct.pack_into('>I',mailbox,0,native_events.MAGIC)
+    for state in native_events.JUMP_STATES:
+        offset=native_events.JUMP_TABLE+(state//32)*4
+        value=struct.unpack_from('>I',mailbox,offset)[0]|(1<<(state%32))
+        struct.pack_into('>I',mailbox,offset,value)
+    payload.extend(mailbox);cursor+=len(mailbox)
     patches.append((ADDRESS,bytes.fromhex(ORIGINAL_HEX),replacement()))
     ownership=[]
     for address,old,new in patches:
@@ -115,8 +123,15 @@ def handshake(memory):
     if raw[:8]!=MAGIC:return None
     patches,payload,digest,hooks=plan()
     if raw[8:48]!=struct.pack('>II',ABI,len(payload))+digest:raise memory.error('incompatible native AP hook ABI/signature')
+    pages={}
     for address,old,new in patches:
-        if memory.read_bytes(address,len(new))!=new:raise memory.error(f'native AP patch modified at {address:#x}; disable legacy Gecko/Riivolution')
+        observed=bytearray();cursor=address
+        while cursor<address+len(new):
+            page=cursor&~0xfff
+            if page not in pages:pages[page]=memory.read_bytes(page,4096)
+            size=min(page+4096,address+len(new))-cursor
+            observed.extend(pages[page][cursor-page:cursor-page+size]);cursor+=size
+        if observed!=new:raise memory.error(f'native AP patch modified at {address:#x}; disable legacy Gecko/Riivolution')
     from .area_map_refresh import HOOK as AREA_HOOK
     area=next(h for h in hooks if h['hook']==AREA_HOOK)
     offset=area['target']-ARENA;size=area['size']

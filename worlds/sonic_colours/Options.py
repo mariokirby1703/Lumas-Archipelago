@@ -64,6 +64,16 @@ class MusicRandomization(DefaultOnToggle):
     display_name = 'Music Randomization'
 
 
+class DeadWeightTrapWeight(Choice):
+    """Relative frequency of Dead Weight Traps. Blocks jumping for 30 seconds of gameplay."""
+    display_name = 'Dead Weight Trap Weight'
+    option_off = 0
+    option_low = 1
+    option_medium = 2
+    option_high = 3
+    default = 0
+
+
 class WorldProgression(Choice):
     """Unlock Acts in Order: each clear opens the next Act like in Vanilla.
     All Acts then Boss: unlocking a world opens all six Acts independently; clear all six to open its boss."""
@@ -168,6 +178,7 @@ class SonicColoursOptions(PerGameCommonOptions):
     trap_percentage: TrapPercentage
     ring_loss_trap_weight: RingLossTrapWeight
     score_reset_trap_weight: ScoreResetTrapWeight
+    dead_weight_trap_weight: DeadWeightTrapWeight
     music_randomization: MusicRandomization
     death_link: SonicDeathLink
     wisp_capsules: WispCapsules
@@ -178,6 +189,6 @@ OPTION_GROUPS = [
     OptionGroup('Progression', [Goal, WorldProgression, BoostLock, MovementUnlocks, SuperSonic]),
     OptionGroup('Checks', [RedRingChecks, RankChecks, OneUpSanity, WispDiscoveryChecks]),
     OptionGroup('Game Land', [GameLandChecks, ChaosEmeraldChecks, EggmanHeartSanity, GameLandRequirementReduction]),
-    OptionGroup('Traps', [TrapPercentage, RingLossTrapWeight, ScoreResetTrapWeight]),
+    OptionGroup('Traps', [TrapPercentage, RingLossTrapWeight, ScoreResetTrapWeight, DeadWeightTrapWeight]),
     OptionGroup('Miscellaneous', [MusicRandomization, SonicDeathLink]),
 ]

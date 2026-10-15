@@ -315,6 +315,30 @@ class WritePolicy:
     def __call__(self, operation, address, size):
         if not VERSION['capabilities'].get(operation, False):
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
+        if operation=='native_event_controls':
+            self.memory.verify_revision()
+            from . import native_events as events
+            from .event_controls import owner
+            base=events.address(self.memory)
+            tx=getattr(self.memory,'_event_transaction',None)
+            if not tx or tx['allowed'].get(address)!=size:
+                raise MemoryUnavailable('WRITE_BLOCKED: no native event transaction')
+            if tx['disable']:
+                if address!=base+events.ENABLE or size!=4 or tx['values'].get(events.ENABLE)!=bytes(4):
+                    raise MemoryUnavailable('WRITE_BLOCKED: native event disarm range')
+                return ('disarm',base)
+            if tx.get('cancel'):
+                if address!=base+events.REQUEST or size!=4 or tx['values'].get(events.REQUEST)!=self.memory.read_bytes(base+events.ACK,4):
+                    raise MemoryUnavailable('WRITE_BLOCKED: invalid native request cancellation')
+                return ('cancel',base)
+            snapshot=self.snapshot_reader(self.memory)
+            self.guard.check_stats(snapshot);row,player=owner(snapshot)
+            context=(snapshot.session,snapshot.stage_epoch,row['stage'],player['actor'],row['player_actor_id'])
+            expected={base+events.STAGE:12,base+events.REQUEST:4,base+events.INPUT:4,
+                      base+events.ENABLE:4,base+events.REMAINING:4,base+events.TRAP_REQUEST:4}
+            if context!=tx['context'] or expected.get(address)!=size:
+                raise MemoryUnavailable('WRITE_BLOCKED: native event ownership changed')
+            return context
         if operation=='hud_mailbox':
             from .ap_hud_connected import validate
             from .ap_hud_publisher import HOOK

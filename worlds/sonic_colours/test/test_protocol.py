@@ -165,3 +165,13 @@ def test_transport_retries_failed_journal_fsync_before_sending(tmp_path, monkeyp
         assert sent==[{'cmd':'LocationChecks','locations':[code]}]
         ctx.server=None;ctx.release_runtime();await ctx.shutdown()
     asyncio.run(scenario())
+
+
+def test_new_disabled_trap_preserves_existing_slot_journal_digest():
+    import hashlib,json
+    from ..client.client import slot_identity_digest
+    old={'options_revision':3,'options':{'score_reset_trap_weight':0},'seed_name':'Existing'}
+    normalized={**old,'options':{**old['options'],'dead_weight_trap_weight':0}}
+    assert slot_identity_digest(normalized)==hashlib.sha256(json.dumps(old,sort_keys=True).encode()).hexdigest()
+    current={**normalized,'options_revision':4}
+    assert slot_identity_digest(current)==hashlib.sha256(json.dumps(current,sort_keys=True).encode()).hexdigest()

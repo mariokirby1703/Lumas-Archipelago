@@ -48,7 +48,7 @@ def test_two_phase_panel_ack_expiry_and_always_enabled(monkeypatch):
     ticker=Ticker(SimpleNamespace(data={},save=lambda:None),lambda:clock[0],lambda:wall[0])
     event=dict(kind='Received',item='Double Jump',player='P',flags=1)
     ticker.enqueue(event)
-    runtime=SimpleNamespace(slot_data={'options':{'ap_item_hud':1}},hud_ticker=ticker,
+    runtime=SimpleNamespace(slot_data={'seed_name':'Fixture','options':{'ap_item_hud':1,'music_randomization':0}},clock=lambda:clock[0],hud_ticker=ticker,
                             snapshot=SimpleNamespace(scene='gameplay',scene_verified=True,session='S',stage_epoch='A'))
     hud.render(runtime,memory)
     pending=runtime._hud_connected['pending']
@@ -106,3 +106,16 @@ def test_area_map_owner_is_not_excluded_by_gameplay_class_filter(monkeypatch):
         def read_bytes(self,a,n):reads.append((a,n));return bytes(n)
     with pytest.raises(MemoryUnavailable,match='not uniquely resolved'):hud.discover(MapOwner())
     assert reads==[(0x90001000,0x480)]
+
+
+def test_music_right_alignment_and_independent_fade():
+    from ..world_constants import load_data
+    metrics=load_data('hud_glyph_metrics.json')
+    boxes={'ap_music_title':(0,0x1000),'ap_music_title_outline0':(0,0x2000),'ap_title':(0,0x3000)}
+    event=dict(kind='Received',item='Double Jump',player='P',flags=1,alpha=255)
+    result=hud.payloads({'handle':0x90001000,'boxes':boxes},[event],metrics,{'alpha':64,'title':'Test Song'})
+    colour,x=struct.unpack('>If',result[0x1090])
+    assert abs(x+sum(metrics[c] for c in 'Test Song')-590.)<0.001
+    assert colour==0xffffff40
+    assert result[0x2090][:4]==bytes.fromhex('00000040')
+    assert result[0x3090][:4]==bytes.fromhex('af70ffff')

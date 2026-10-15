@@ -13,7 +13,9 @@ from .client.asset_patch import PAL_CPK_SHA256
 FORMAT=1
 # This released component has the same seed/resource contract. Rebuilding
 # from it installs the corrected wrapper traversal, never its old machine code.
-UPGRADABLE_NATIVE_COMPONENTS={'6988a734ac3f5e8776d0a461d4f229967382886958c8cbe2412c267411eb8929'}
+UPGRADABLE_NATIVE_COMPONENTS={'6988a734ac3f5e8776d0a461d4f229967382886958c8cbe2412c267411eb8929',
+                             '79fe3ce64a1bbce739ceaabc86486b72988b589aaeb1093318f5be277efc009d'}
+UPGRADABLE_RESOURCES={'9281b474c4023c15944860247c65a4de6adc79a1282b8eb02862603dc91d9a20'}
 
 @lru_cache(maxsize=1)
 def resource_component_id():
@@ -62,11 +64,13 @@ class SonicColoursPatch(APAutoPatchInterface):
         if len(names)!=len(set(names)) or set(names)!={'archipelago.json','seed.json'}:raise InvalidDataError('invalid or duplicate patch components')
         if any(i.file_size>2*1024*1024 for i in infos):raise InvalidDataError('patch component too large')
         manifest=super().read_contents(archive)
+        legacy=(manifest.get('native_abi')==1 and manifest.get('native_component_sha256') in UPGRADABLE_NATIVE_COMPONENTS
+                and manifest.get('resource_component_sha256') in UPGRADABLE_RESOURCES)
         if (manifest.get('game')!=GAME or manifest.get('sonic_patch_format')!=FORMAT
-                or manifest.get('native_abi')!=ABI or manifest.get('disc_id')!='SNCP8P' or manifest.get('revision')!=0
+                or not (manifest.get('native_abi')==ABI or legacy) or manifest.get('disc_id')!='SNCP8P' or manifest.get('revision')!=0
                 or manifest.get('native_component_sha256') not in {plan()[2].hex(),*UPGRADABLE_NATIVE_COMPONENTS}
                 or manifest.get('resource_transform_version')!=1
-                or manifest.get('resource_component_sha256')!=resource_component_id()
+                or not (manifest.get('resource_component_sha256')==resource_component_id() or legacy)
                 or manifest.get('source_hashes')!={'main.dol':PAL_DOL_SHA256,'sonic2010_0.cpk':PAL_CPK_SHA256}):
             raise InvalidDataError('unsupported Sonic Colours patch/ABI; use the generating APWorld version')
         raw=archive.read('seed.json')

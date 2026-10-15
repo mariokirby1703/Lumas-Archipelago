@@ -9,7 +9,7 @@ RING_VALUES = {'Red Ring': 1, '5 Red Rings': 5, '10 Red Rings': 10}
 LEGACY_FILLER = ('Rings (+10)', 'Rings (+25)', 'Rings (+50)')
 FILLER_WEIGHTS = {'Rings': 40, '1-Up': 30, 'Half Boost Refill': 20, 'Full Boost Refill': 10}
 FILLER = tuple(FILLER_WEIGHTS)
-TRAPS = ('Ring Loss Trap', 'Score Reset Trap')
+TRAPS = ('Ring Loss Trap', 'Score Reset Trap', 'Dead Weight Trap')
 # Keep retired Terminal Velocity Access offset 6 out of the public item table.
 NAMES = tuple(f'{w} Shuttle' for w in WORLDS) + WISP_ITEMS + EMERALDS + tuple(RING_VALUES) + LEGACY_FILLER + ('1-Up',) + ('Ring Loss Trap','Swim Everywhere Trap')
 # Offset 22 is retired. Existing counter/filler/trap IDs must not move.
@@ -49,6 +49,7 @@ MOVEMENT_POOL += ('Progressive Skydiving',)*2
 ITEM_TABLE['Quick Step'] = BASE_ID + 52
 ITEM_TABLE.pop('Swim Everywhere Trap')
 ITEM_TABLE['Score Reset Trap'] = BASE_ID + 53
+ITEM_TABLE['Dead Weight Trap'] = BASE_ID + 54
 MOVEMENT_ITEMS += ('Quick Step',)
 MOVEMENT_POOL += ('Quick Step',)
 BY_ID = {value: name for name, value in ITEM_TABLE.items()}

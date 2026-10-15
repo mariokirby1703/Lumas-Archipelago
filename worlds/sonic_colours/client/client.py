@@ -343,6 +343,33 @@ class SonicCommands(ClientCommandProcessor):
         log_diagnostic(diagnostic(self.ctx, self.ctx.memory))
 
     @mark_raw
+    def _cmd_sonicdeathtest(self, raw=''):
+        """Local native kill test: /sonicdeathtest enable, then /sonicdeathtest kill. No broadcast."""
+        action=raw.strip().lower()
+        if action=='enable':
+            self.ctx.native_death_test_enabled=True
+            logger.info('Native death test enabled for this client session. /sonicdeathtest kill requests one ordinary death.')
+        elif action=='kill' and getattr(self.ctx,'native_death_test_enabled',False):
+            self.ctx.pending_native_death_test=True
+            logger.info('One local native death requested; delivery waits for safe living gameplay.')
+        else:logger.info('Test disabled by default. Use /sonicdeathtest enable, then /sonicdeathtest kill.')
+
+    def _cmd_sonicdeathlinktest(self):
+        """Receive one synthetic local DeathLink, without broadcasting to the server."""
+        if not self.ctx.runtime:
+            logger.info('Connect to an attributed Sonic Colours session first.');return
+        if not self.ctx.deathlink:self.ctx.deathlink=DeathLink(self.ctx.runtime.journal)
+        self.ctx.deathlink.receive({'source':'LOCAL TEST ONLY','time':time.time()},time.monotonic())
+        logger.info('Synthetic incoming DeathLink queued locally. This command sends no DeathLink packet.')
+
+    @mark_raw
+    def _cmd_sonictraptest(self,raw=''):
+        """Explicit local Dead Weight test: /sonictraptest dead weight. No AP receipt or broadcast."""
+        if raw.strip().lower()!='dead weight':
+            logger.info('Use /sonictraptest dead weight for a 30-second local Jump lock.');return
+        self.ctx.pending_trap_test=True
+
+    @mark_raw
     def _cmd_soniclogs(self, raw=''):
         """Show suppressed routine client logs: /soniclogs [NUMBER|all|clear]."""
         argument = raw.strip().lower()
@@ -379,6 +406,16 @@ class SonicCommands(ClientCommandProcessor):
             logger.error('Recovery failed: %s', error)
             return
         logger.info('Receipt %s skipped durably.', index)
+
+
+def slot_identity_digest(data):
+    """Keep old seed journals stable when adding a disabled optional trap."""
+    if data.get('options_revision', 0) < 4:
+        options = dict(data['options'])
+        if options.get('dead_weight_trap_weight') == 0:
+            options.pop('dead_weight_trap_weight', None)
+        data = {**data, 'options': options}
+    return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
 
 
 class SonicContext(CommonContext):
@@ -483,7 +520,7 @@ class SonicContext(CommonContext):
                 self.authenticated_identity = (self.team, self.slot, self.server_seed)
                 identity = {'seed': self.server_seed, 'team': self.team, 'slot': self.slot,
                             'revision': VERSION['dol_sha256'], 'game': GAME,
-                            'slot_digest': hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()}
+                            'slot_digest': slot_identity_digest(data)}
                 if not self.runtime or self.runtime.journal.identity != identity:
                     self.release_runtime()
                     journal = Journal(self.journal_directory, identity)
@@ -720,17 +757,40 @@ async def dolphin_loop(ctx):
                 verified = bool((memory.revision_observation or {}).get('verified'))
                 if ctx.deathlink:
                     snap = ctx.runtime.snapshot
-                    if VERSION['capabilities']['native_death']:
+                    native=getattr(ctx.runtime,'native_event_status',{})
+                    if native.get('installed'):
+                        from .event_controls import safe_kill,cancel_kill
                         local_death = ctx.deathlink.poll(
-                            safe=ctx.runtime.guard.can_send(snap) and snap.scene_verified and snap.scene in ('gameplay', 'dying'),
+                            safe=bool(snap.scene_verified and (ctx.runtime.guard.can_record_pickups(snap) or
+                                      native['death_stage'] in getattr(ctx.runtime,'_death_allowed_stages',set()))),
                             native_state=snap.death_state, now=time.monotonic(),
+                            native_sequence=native['death_sequence'],remote_ack=native['remote_ack'],
+                            kill_safe=safe_kill(snap),
+                            cancel=lambda:cancel_kill(memory,snap,ctx.runtime.guard),
                             kill=lambda: ctx.runtime.hooks.kill(memory, snap))
-                        if local_death:
+                        if local_death and ctx.runtime.slot_data['options']['death_link']:
                             await ctx.send_death('Sonic died.')
+                if getattr(ctx,'pending_native_death_test',False):
+                    from .event_controls import safe_kill
+                    if safe_kill(ctx.runtime.snapshot):
+                        if ctx.deathlink:
+                            ctx.deathlink.remote_cycle=True
+                            ctx.deathlink.journal.data['remote_cycle']=True
+                            ctx.deathlink.journal.save()
+                        request=ctx.runtime.hooks.kill(memory,ctx.runtime.snapshot)
+                        ctx.pending_native_death_test=False
+                        logger.info('Local native kill request %s published; no network event sent.',request)
+                if getattr(ctx,'pending_trap_test',False):
+                    from .dead_weight import test_request
+                    request=test_request(ctx.runtime,memory)
+                    ctx.pending_trap_test=False
+                    logger.info('Local Dead Weight request %s published; awaiting native ACK.',request)
                 # Runtime returns durable checks only after current attribution
                 # is valid. Do not bypass its identity gate by rereading journal.
                 snap = ctx.runtime.snapshot
                 ctx.operation_status.update(
+                    native_events=getattr(ctx.runtime,'native_event_status',{}),
+                    deathlink=ctx.deathlink.status() if ctx.deathlink else {'status':'disabled'},
                     gameplay_detection={'scene': snap.scene, 'mission': snap.actual_mission, 'verified': snap.scene_verified},
                     pickup_detection={'verified': snap.pickup_verified, 'authorized': ctx.runtime.guard.can_record_pickups(snap),
                                       'capsule_capture':getattr(ctx.runtime,'capsule_capture_status',{})},

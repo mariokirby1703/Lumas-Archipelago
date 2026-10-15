@@ -28,10 +28,11 @@ class SonicColoursWorld(World):
                         'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS)}
 
     def generate_early(self):
-        for option, capability in [('death_link', 'native_death')]:
-            if getattr(self.options, option).value:
+        validation=load_data('versions.json').get('live_validation',{})
+        for option, capability in [('death_link', 'deathlink'),('dead_weight_trap_weight','dead_weight')]:
+            if getattr(self.options, option).value and not validation.get(capability):
                 raise ValueError(f'Sonic Colours: {option} requires_verified_hook: {capability}. '
-                                 'Use off until PAL live validation; see docs/development.md.')
+                                 'Native implementation awaits the PAL live test matrix; use off until verified.')
         self.starting_stage = next(s for s in STAGES if s['mission_id'] == 'stg110')
         self.starting_world = 0
         self.gates = game_land_gates(self.options.game_land_requirement_reduction.value)
@@ -110,7 +111,8 @@ class SonicColoursWorld(World):
         if filler_count < 0:
             raise ValueError('Sonic Colours: enable more checks for mandatory progression.')
         weights = (0, 1, 3, 6)
-        trap_weights = [weights[self.options.ring_loss_trap_weight.value], weights[self.options.score_reset_trap_weight.value]]
+        trap_weights = [weights[self.options.ring_loss_trap_weight.value], weights[self.options.score_reset_trap_weight.value],
+                        weights[self.options.dead_weight_trap_weight.value]]
         if self.options.trap_percentage.value and not any(trap_weights):
             logger.warning('Sonic Colours: all trap weights off; keeping ordinary filler.')
         trap_count = (filler_count * self.options.trap_percentage.value + 50) // 100 if any(trap_weights) else 0
@@ -126,7 +128,7 @@ class SonicColoursWorld(World):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'options_revision':3, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':4, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),

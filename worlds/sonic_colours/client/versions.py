@@ -150,6 +150,14 @@ def verify_revision(memory):
             offset = PREVIOUS_HOOK-section['address']
             if int.from_bytes(data[offset:offset+4],'big') != PREVIOUS_ORIGINAL and previous_installed(memory):
                 data = data[:offset]+PREVIOUS_ORIGINAL.to_bytes(4,'big')+data[offset+4:]
+        if getattr(memory,'native_patch',None):
+            from .native_dol import plan,ARENA
+            from .native_events import patches as event_patches,SIZE
+            data=bytearray(data)
+            for address,old,new in event_patches(ARENA+len(plan()[1])-SIZE):
+                if section['address']<=address and address+len(new)<=section['address']+len(data):
+                    offset=address-section['address']
+                    data[offset:offset+len(old)]=old
         digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:
             raise memory.error(f'unknown_revision: text at 0x{section["address"]:08X}, '

@@ -374,8 +374,11 @@ class NativeHooks:
         # this same permission byte. No host writes to actor handlers/models.
 
     def kill(self, memory, snapshot):
-        self.require('native_death')
-        raise MemoryUnavailable('WRITE_BLOCKED: native kill routine not resolved')
+        from .event_controls import request_kill
+        if self.journal is None:raise MemoryUnavailable('Native kill requires an attributed journal')
+        from .state import SaveGuard
+        guard=SaveGuard(self.journal);guard.observe(snapshot)
+        return request_kill(memory,snapshot,guard)
 
     def swim(self, memory, snapshot, enabled):
         self.require('swimming')

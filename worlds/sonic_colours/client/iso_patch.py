@@ -95,6 +95,7 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None):
     if source is None:
         group=settings_group();source=str(group.iso_file)
     source=Path(source).resolve();disc_header(source)
+    default_target=target is None
     target=Path(target or Path(patch.path).with_suffix('.iso')).resolve()
     if target==source:raise ValueError('The original ISO must never be the output')
     if target.suffix.lower()!='.iso':raise ValueError('Output must be a separate .iso')
@@ -112,6 +113,13 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None):
                     and record.get('resource_component_sha256')==resource_component_id()
                     and record.get('output_iso_sha256')==sha(target)):
                 progress('Reusing verified ISO for this seed');return target
+        if default_target:
+            # Keep an old ABI/resource build intact. A component-specific name
+            # also makes repeated Open Patch calls reuse the upgraded image.
+            suffix=hashlib.sha256((plan()[2].hex()+resource_component_id()).encode()).hexdigest()[:10]
+            upgraded=target.with_name(target.stem+'-ap-'+suffix+'.iso')
+            progress('Keeping existing ISO; building/reusing updated components at '+str(upgraded))
+            return install(patch,source=source,target=upgraded,wit=wit,progress=progress,cancel=cancel)
         raise FileExistsError('Output already exists and is not a verified cache match; choose another output path')
     # Extraction, a separate CPK and the output image coexist during validation.
     required=source.stat().st_size*3+2*1024**3

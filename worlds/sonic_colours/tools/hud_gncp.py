@@ -109,7 +109,7 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
     fontroot=append(struct.pack('>III',nf+1,table-BASE,ids-BASE))
     offset(fontroot+4,table);offset(fontroot+8,ids);offset(60,fontroot)
 
-    controller=append(struct.pack('>4I',0x41504844,0,128,75)) if ap_connected else None
+    controller=append(struct.pack('>4I',0x41504844,0,128,90)) if ap_connected else None
     source=cast(keyboard,ks,'text_name');records=[]
     if not 1<=len(messages)<=5 or any(len(message)!=2 for message in messages):
         raise ValueError('overlay requires one to five two-line messages')
@@ -120,7 +120,16 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
     for j in range(77):
         ch=chr(u(newmap,j*8));uv=struct.unpack_from('>ffff',sub,(oldsubs+j)*20+4)
         metrics[ch]=(uv[2]-uv[0])*312*0.45
-    for message,(title,subtitle) in enumerate(messages):
+    for message,(title,subtitle) in enumerate(tuple(messages)+(('BGM Now Playing','Track'),)):
+        if message==len(messages):
+            parts=(('ap_music_icon',' ',565.,430.,0xffffffff),
+                   ('ap_music_heading','NOW PLAYING:',580.,430.,0xffffffff),
+                   ('ap_music_title','Track',550.,447.,0xffffffff))
+            for name,label,x,y,colour in parts:
+                for shadow,(dx,dy) in enumerate(((-0.8,0.),(0.8,0.),(0.,-0.8),(0.,0.8))):
+                    specs.append((name+'_outline'+str(shadow),label,x+dx,y+dy,0x000000ff))
+                specs.append((name,label,x,y,colour))
+            break
         prefix,item=title.split(' ',1);prefix+=' '
         y=base_y+message*40.
         parts=((f'ap_prefix{message}',prefix,HUD_LEFT,y,0xffffffff),
@@ -131,7 +140,8 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
             for shadow,(dx,dy) in enumerate(((-0.8,0.),(0.8,0.),(0.,-0.8),(0.,0.8))):
                 specs.append((name+'_outline'+str(shadow),label,x+dx,y+dy,0x000000ff))
             specs.append((name,label,x,y,colour))
-    count=len(specs);per_message=count//len(messages)
+    group_count=len(messages)+1
+    count=len(specs);per_message=count//group_count
     for i,(name,label,x,y,colour_value) in enumerate(specs):
         rec=append(keyboard[source:source+116]);records.append(rec)
         info=append(keyboard[ptr(keyboard,source+48):ptr(keyboard,source+48)+60])
@@ -158,14 +168,14 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
     # Replicate the live-validated two-cast group per message. Do not grow
     # its sibling traversal to ten casts (the v4 variant failed live).
     group_rows=[]
-    for message in range(len(messages)):
+    for message in range(group_count):
         pair=records[message*per_message:(message+1)*per_message]
         casts=append(struct.pack('>'+'I'*per_message,*(r-BASE for r in pair)))
         for i,r in enumerate(pair):offset(casts+4*i,r)
         tree=append(b''.join(struct.pack('>ii',-1,i+1 if i+1<per_message else -1) for i in range(per_message)))
         group_rows.append(struct.pack('>IIII',per_message,casts-BASE,0,tree-BASE))
     original_groups=ptr(gameplay,s+40)
-    ngroups=original_ngroups+len(messages)
+    ngroups=original_ngroups+group_count
     groups=append(gameplay[original_groups:original_groups+original_ngroups*16]+b''.join(group_rows))
     for i in range(ngroups):
         offset(groups+16*i+4,ptr(out,groups+16*i+4));offset(groups+16*i+12,ptr(out,groups+16*i+12))
@@ -183,11 +193,11 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
     animation=ptr(gameplay,s+56);adata=ptr(gameplay,animation+4)
     if u(gameplay,animation)!=original_ngroups:raise ValueError('animation group count differs')
     empty=append(b'\0'*(8*per_message))
-    agroups=append(gameplay[adata:adata+original_ngroups*8]+struct.pack('>II',per_message,empty-BASE)*len(messages))
+    agroups=append(gameplay[adata:adata+original_ngroups*8]+struct.pack('>II',per_message,empty-BASE)*group_count)
     for i in range(ngroups):offset(agroups+i*8+4,ptr(out,agroups+i*8+4))
     anew=append(struct.pack('>II',ngroups,agroups-BASE));offset(anew+4,agroups);offset(s+56,anew)
     a2=ptr(gameplay,s+72);a2group=ptr(gameplay,a2);a2data=ptr(gameplay,a2group+4)
-    a2entries=append(gameplay[a2data:a2data+original_ngroups*4]+b'\0'*(4*len(messages)))
+    a2entries=append(gameplay[a2data:a2data+original_ngroups*4]+b'\0'*(4*group_count))
     for i in range(original_ngroups):offset(a2entries+i*4,ptr(out,a2entries+i*4))
     a2new=append(gameplay[a2group:a2group+8]);offset(a2new+4,a2entries)
     a2table=append(struct.pack('>I',a2new-BASE));offset(a2table,a2new);offset(s+72,a2table)
