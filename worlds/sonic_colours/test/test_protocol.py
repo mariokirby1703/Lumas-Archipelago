@@ -175,3 +175,33 @@ def test_new_disabled_trap_preserves_existing_slot_journal_digest():
     assert slot_identity_digest(normalized)==hashlib.sha256(json.dumps(old,sort_keys=True).encode()).hexdigest()
     current={**normalized,'options_revision':4}
     assert slot_identity_digest(current)==hashlib.sha256(json.dumps(current,sort_keys=True).encode()).hexdigest()
+
+
+def test_score_reset_network_receipt_delivers_once_and_reconnect_does_not_replay(tmp_path,monkeypatch):
+    from .test_score_reset import setup
+    from ..client import score_reset
+    async def scenario():
+        data=generate().worlds[1].fill_slot_data()
+        ctx=SonicContext(journal_directory=tmp_path);ctx.team,ctx.slot=0,1
+        async def send(messages):pass
+        ctx.send_msgs=send
+        ctx.on_package('RoomInfo',{'seed_name':data['seed_name']})
+        ctx.on_package('Connected',{'slot_data':data});await asyncio.sleep(0)
+        item=ITEM_TABLE['Score Reset Trap'];packet={'index':0,'items':[[item,123,2,4]]}
+        ctx.items_received=[NetworkItem(item,123,2,4)]
+        ctx.on_package('ReceivedItems',packet)
+        assert ctx.runtime.journal.data['receipts']==[item]
+        assert ctx.runtime.pending_effects()==[0]
+        memory,backend,stage,snapshot,guard,_=setup(monkeypatch)
+        score_reset.deliver(memory,snapshot,guard,ctx.runtime.journal,0,item)
+        assert memory.read_u32(stage+0x80)==0
+        assert ctx.runtime.journal.data['effects']['0']['state']=='confirmed'
+        writes=len(backend.writes)
+        ctx.on_package('ReceivedItems',packet)
+        score_reset.deliver(memory,snapshot,guard,ctx.runtime.journal,0,item)
+        assert len(backend.writes)==writes
+        ctx.release_runtime()
+        ctx.on_package('Connected',{'slot_data':data});await asyncio.sleep(0)
+        assert ctx.runtime.pending_effects()==[]
+        ctx.release_runtime();await ctx.shutdown()
+    asyncio.run(scenario())

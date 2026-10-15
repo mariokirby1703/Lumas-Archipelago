@@ -114,8 +114,10 @@ def test_deathlink_one_event_remote_no_echo_and_expiration():
         death = DeathLink(journal)  # Reconnect before remote death becomes visible.
         for _ in range(10):
             assert not poll('alive')
-        assert death.remote_cycle
-        assert not poll('dying')
+        # A restarted host cancels the old native request. Fresh living polls
+        # release suppression, so a later unrelated natural death is sent.
+        assert not death.remote_cycle
+        assert poll('dying')
         assert not poll('dead')
         assert not poll('respawning')
         for _ in range(3): assert not poll('alive')

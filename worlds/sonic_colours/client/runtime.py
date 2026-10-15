@@ -341,6 +341,19 @@ class Runtime:
         self._capsule_memory=memory
         self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
+        # Publish the HUD before owner configuration performs its guarded
+        # writes. A new scene's music must not wait behind those transactions.
+        try:
+            from .native_events import status as event_status
+            self.native_event_status=event_status(memory)
+        except MemoryUnavailable as error:
+            self.native_event_status={'installed':False,'status':str(error)}
+        try:
+            from .ap_hud_connected import render as render_ap_hud
+            self.hud_status=render_ap_hud(self,memory)
+        except MemoryUnavailable as error:
+            self.hud_status={'hud_ready':False,'status':str(error)}
+            self.hud_ticker.elapsed_visible(False)
         try:
             from .event_controls import configure as configure_events
             self.native_event_status=configure_events(self,memory)
@@ -352,12 +365,6 @@ class Runtime:
                 self._death_allowed_stages.add(self._event_owner[2])
         except MemoryUnavailable as error:
             self.native_event_status={'installed':False,'status':str(error)}
-        try:
-            from .ap_hud_connected import render as render_ap_hud
-            self.hud_status=render_ap_hud(self,memory)
-        except MemoryUnavailable as error:
-            self.hud_status={'hud_ready':False,'status':str(error)}
-            self.hud_ticker.elapsed_visible(False)
         # Capture irreversible pickup/result evidence before slow permission
         # writes. Network clients can transmit this checkpoint and receive
         # acknowledgements before continuing the same synchronous poll.

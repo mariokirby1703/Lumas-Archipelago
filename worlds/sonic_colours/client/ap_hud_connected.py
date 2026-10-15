@@ -8,7 +8,7 @@ from .ap_hud_publisher import MAGIC,installed,HOOK,patches
 
 def discover(memory):
     rows=read_stage_objects(memory,False)
-    if len(rows)!=1 or rows[0]['scene'] not in ('gameplay','world_map','global_map'):
+    if len(rows)!=1 or rows[0]['scene'] not in ('gameplay','world_map','global_map','game_land_select','results'):
         raise MemoryUnavailable('HUD requires gameplay or a map')
     found={}
     for actor in read_actors(memory,rows[0]['context']):
@@ -24,7 +24,9 @@ def discover(memory):
                 layer=memory.read_ptr_checked(pointer,0xe0)
                 if memory.read_u32(layer)!=0x807abc40:continue
                 layout=memory.read_ptr_checked(layer+12,0x34)
-                if memory.read_u32(layout+44) not in ((96,103) if rows[0]['scene']=='gameplay' else (111,)):continue
+                counts={'gameplay':(96,103),'world_map':(111,),'global_map':(111,),
+                        'game_land_select':(93,),'results':(95,)}
+                if memory.read_u32(layout+44) not in counts[rows[0]['scene']]:continue
                 table=memory.read_ptr_checked(layout+48,memory.read_u32(layout+44)*12)
                 sourcegroups=memory.read_ptr_checked(layout+40,128)
                 boxes={};control=None
@@ -79,8 +81,8 @@ def payloads(owner,events,metrics,music=None):
             # Align the panel to the native right HUD edge. The icon sits just
             # before the heading; the title has its own right-aligned baseline.
             heading_width=sum(metrics[c] for c in 'NOW PLAYING:')
-            x=590.-width
-            if base=='ap_music_icon':x=590.-heading_width-6.-width
+            x=630.-width
+            if base=='ap_music_icon':x=630.-heading_width-6.-width
             if shadow:x+=(-0.8,0.8,0.,0.)[int(name[-1])]
             raw=(fitted or ' ').encode('ascii').ljust(128,b'\0')
             result[box+8]=struct.pack('>I',owner['handle']);result[box+16]=raw
@@ -124,7 +126,7 @@ def render(runtime,memory):
     state=getattr(runtime,'_hud_connected',None)
     snapshot=runtime.snapshot
     if ((not enabled and state is None) or not snapshot.scene_verified
-            or snapshot.scene not in ('gameplay','world_map','global_map')
+            or snapshot.scene not in ('gameplay','world_map','global_map','game_land_select','results')
             or snapshot.scene=='gameplay' and getattr(snapshot,'death_state','alive')!='alive'):
         runtime.hud_ticker.elapsed_visible(False)
         return {'hud_ready':False,'status':'HUD disabled or scene unavailable'}
@@ -147,6 +149,8 @@ def render(runtime,memory):
             return {'hud_ready':False,'font_ready':True,'owner_verified':True,'status':'waiting for game-thread ACK','generation':pending['generation'],
                     'pending_casts':sum(memory.read_u32(box)!=pending['generation'] for record,box in owner['boxes'].values())}
         if pending['candidate']:runtime.hud_ticker.published(pending['candidate'])
+        popup=getattr(runtime,'music_popup',None)
+        if popup:popup.published(pending.get('music_generation'),runtime.clock())
         state['shown']=pending['events'];state['pending']=None
     runtime.hud_ticker.elapsed_visible(True)
     if runtime.hud_ticker.data['queue']:runtime.hud_ticker.remaining=0
@@ -172,7 +176,8 @@ def render(runtime,memory):
             for a,data in writes.items():write(a,data)
             write(owner['control']+4,struct.pack('>I',generation))
         finally:memory._hud_transaction=None
-        state['pending']={'generation':generation,'events':events,'candidate':runtime.hud_ticker.candidate() if enabled and runtime.hud_ticker.has_pending_candidate() else None}
+        state['pending']={'generation':generation,'events':events,'candidate':runtime.hud_ticker.candidate() if enabled and runtime.hud_ticker.has_pending_candidate() else None,
+                          'music_generation':getattr(getattr(runtime,'music_popup',None),'generation',None)}
         state['music']=dict(music)
     return {'hud_ready':enabled and state['shown'] is not None,'font_ready':True,'owner_verified':True,
             'publisher_ack':state['pending'] is None,'status':'AP panel connected','displayed':len(state['shown'] or [])}

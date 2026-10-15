@@ -115,7 +115,7 @@ def test_music_right_alignment_and_independent_fade():
     event=dict(kind='Received',item='Double Jump',player='P',flags=1,alpha=255)
     result=hud.payloads({'handle':0x90001000,'boxes':boxes},[event],metrics,{'alpha':64,'title':'Test Song'})
     colour,x=struct.unpack('>If',result[0x1090])
-    assert abs(x+sum(metrics[c] for c in 'Test Song')-590.)<0.001
+    assert abs(x+sum(metrics[c] for c in 'Test Song')-630.)<0.001
     assert colour==0xffffff40
     assert result[0x2090][:4]==bytes.fromhex('00000040')
     assert result[0x3090][:4]==bytes.fromhex('af70ffff')

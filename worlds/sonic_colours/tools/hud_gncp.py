@@ -57,7 +57,8 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
     """Build static PoC casts. Visual placement and lifetime need Dolphin QA."""
     s=scene(gameplay,scene_name);ks=scene(keyboard,'Scene_soft_keyboad_bg')
     original_ngroups=u(gameplay,s+36);original_casts=u(gameplay,s+44)
-    if u(gameplay,s+52)!=1:raise ValueError('overlay parent must have one animation')
+    animation_count=u(gameplay,s+52)
+    if not 1<=animation_count<=32:raise ValueError('unsupported animation count')
     original_textures=u(gameplay,s+20)
     no=u(gameplay,20)
     if gameplay[no:no+4]!=b'NOF0':raise ValueError('missing relocation chunk')
@@ -122,9 +123,9 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
         metrics[ch]=(uv[2]-uv[0])*312*0.45
     for message,(title,subtitle) in enumerate(tuple(messages)+(('BGM Now Playing','Track'),)):
         if message==len(messages):
-            parts=(('ap_music_icon',' ',565.,430.,0xffffffff),
-                   ('ap_music_heading','NOW PLAYING:',580.,430.,0xffffffff),
-                   ('ap_music_title','Track',550.,447.,0xffffffff))
+            parts=(('ap_music_icon',' ',605.,365.,0xffffffff),
+                   ('ap_music_heading','NOW PLAYING:',620.,365.,0xffffffff),
+                   ('ap_music_title','Track',590.,382.,0xffffffff))
             for name,label,x,y,colour in parts:
                 for shadow,(dx,dy) in enumerate(((-0.8,0.),(0.8,0.),(0.,-0.8),(0.,0.8))):
                     specs.append((name+'_outline'+str(shadow),label,x+dx,y+dy,0x000000ff))
@@ -189,18 +190,26 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
     dictionary=append(b''.join(entries))
     for i in range(original_casts+count):offset(dictionary+i*12,ptr(out,dictionary+i*12))
     offset(s+48,dictionary);word(s+44,original_casts+count)
-    # Expand the existing animation's group arrays; new casts have no tracks.
-    animation=ptr(gameplay,s+56);adata=ptr(gameplay,animation+4)
-    if u(gameplay,animation)!=original_ngroups:raise ValueError('animation group count differs')
+    # Preserve every original animation; overlay groups have no timed tracks.
+    animation=ptr(gameplay,s+56)
     empty=append(b'\0'*(8*per_message))
-    agroups=append(gameplay[adata:adata+original_ngroups*8]+struct.pack('>II',per_message,empty-BASE)*group_count)
-    for i in range(ngroups):offset(agroups+i*8+4,ptr(out,agroups+i*8+4))
-    anew=append(struct.pack('>II',ngroups,agroups-BASE));offset(anew+4,agroups);offset(s+56,anew)
-    a2=ptr(gameplay,s+72);a2group=ptr(gameplay,a2);a2data=ptr(gameplay,a2group+4)
-    a2entries=append(gameplay[a2data:a2data+original_ngroups*4]+b'\0'*(4*group_count))
-    for i in range(original_ngroups):offset(a2entries+i*4,ptr(out,a2entries+i*4))
-    a2new=append(gameplay[a2group:a2group+8]);offset(a2new+4,a2entries)
-    a2table=append(struct.pack('>I',a2new-BASE));offset(a2table,a2new);offset(s+72,a2table)
+    animations=[];a2groups=[];a2=ptr(gameplay,s+72)
+    for index in range(animation_count):
+        entry=animation+index*8;adata=ptr(gameplay,entry+4)
+        if u(gameplay,entry)!=original_ngroups:raise ValueError('animation group count differs')
+        agroups=append(gameplay[adata:adata+original_ngroups*8]+struct.pack('>II',per_message,empty-BASE)*group_count)
+        for i in range(ngroups):offset(agroups+i*8+4,ptr(out,agroups+i*8+4))
+        animations.append((ngroups,agroups))
+        a2group=ptr(gameplay,a2+index*4);a2data=ptr(gameplay,a2group+4)
+        a2entries=append(gameplay[a2data:a2data+original_ngroups*4]+b'\0'*(4*group_count))
+        for i in range(original_ngroups):offset(a2entries+i*4,ptr(out,a2entries+i*4))
+        a2new=append(gameplay[a2group:a2group+8]);offset(a2new+4,a2entries);a2groups.append(a2new)
+    anew=append(b''.join(struct.pack('>II',count,groups-BASE) for count,groups in animations))
+    for i,(_,groups) in enumerate(animations):offset(anew+i*8+4,groups)
+    offset(s+56,anew)
+    a2table=append(b''.join(struct.pack('>I',group-BASE) for group in a2groups))
+    for i,group in enumerate(a2groups):offset(a2table+i*4,group)
+    offset(s+72,a2table)
     out.extend(b'\0'*((-len(out))%32));newno=len(out)
     struct.pack_into('<I',out,36,newno-40)
     word(16,newno-32);word(20,newno)

@@ -147,6 +147,22 @@ def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,a
         if before_multi.keys()!=after_multi.keys() or any(after_multi[n]!=multi_replacements.get(n,b) for n,b in before_multi.items()):
             raise ValueError('Game Land U8 roundtrip differs')
         changes.update({i:multi_patch for i in multi_indices})
+        # These screens use separate native resources from gameplay/maps.
+        for arc,stem,scene_name in (('ui_title_multi_e.arc','ui_title_multi','multi_bg'),
+                                    ('ui_result_e.arc','ui_result','result')):
+            gncp=find_asset(cpk,arc,stem+'.gncp');tls=find_asset(cpk,arc,stem+'.tls')
+            additions={stem+'.gncp':overlay(gncp,resources['ui_soft_keyboard.gncp'],
+                texture_index=len(textures(tls)),keyboard_tls=resources['ui_soft_keyboard.tls'],
+                messages=SAMPLE_MESSAGES[:message_count],scene_name=scene_name,base_y=176.,ap_connected=True),
+                stem+'.tls':append_texture(tls,resources['ui_soft_keyboard.tls'],3)}
+            indices=[i for i,r in enumerate(cpk.toc.rows) if r.get('DirName')=='ui' and r.get('FileName')==arc]
+            original=cpk.read(cpk.toc.rows[indices[0]])
+            if any(cpk.read(cpk.toc.rows[i])!=original for i in indices):raise ValueError(arc+' aliases differ')
+            modified=replace_u8(original,additions)
+            before=dict(u8_members(original));after=dict(u8_members(modified))
+            if before.keys()!=after.keys() or any(after[n]!=additions.get(n,b) for n,b in before.items()):
+                raise ValueError(arc+' U8 roundtrip differs')
+            changes.update({i:modified for i in indices})
     if include_maps:
         map_gncp=find_asset(cpk,'ui_worldmap_e.arc','ui_worldmap.gncp')
         map_tls=find_asset(cpk,'ui_worldmap_e.arc','ui_worldmap.tls')

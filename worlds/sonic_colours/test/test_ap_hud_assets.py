@@ -140,3 +140,33 @@ def test_connected_assets_start_blank_with_bounded_shared_mailboxes():
         info=m.ptr(new,record+48)
         assert m.u(new,info+0x20)==(0x000000ff if '_outline' in name else 0xffffffff)
     assert len(controls)==1
+
+
+@pytest.mark.parametrize('arc,stem,parent,animations',[
+    ('ui_title_multi_e.arc','ui_title_multi','multi_bg',1),
+    ('ui_result_e.arc','ui_result','result',2),
+])
+def test_owned_selection_and_results_preserve_all_native_animations(arc,stem,parent,animations):
+    source=Path(__file__).resolve().parents[1]/'notes/memdumps_and_more/sonic2010_0.cpk'
+    if not source.exists():pytest.skip('private original CPK not supplied')
+    from ..tools.hud_cpk import CPK
+    from ..tools.hud_original_assets import find_asset
+    from ..tools.hud_tpl import textures
+    cpk=CPK(source);m=module('hud_gncp')
+    original=find_asset(cpk,arc,stem+'.gncp');tls=find_asset(cpk,arc,stem+'.tls')
+    keyboard=find_asset(cpk,'ui_name_entry_e.arc','ui_soft_keyboard.gncp')
+    keyboard_tls=find_asset(cpk,'ui_name_entry_e.arc','ui_soft_keyboard.tls')
+    new=m.overlay(original,keyboard,len(textures(tls)),keyboard_tls,scene_name=parent,ap_connected=True)
+    scene=m.scene(original,parent);groups=m.u(original,scene+36)
+    assert m.u(new,scene+52)==animations
+    old_dictionary=m.ptr(original,scene+48)
+    for i in range(m.u(original,scene+44)):
+        name=m.string(original,m.ptr(original,old_dictionary+i*12))
+        record=m.cast(original,scene,name)
+        assert m.cast(new,scene,name)==record and original[record:record+116]==new[record:record+116]
+    for i in range(animations):
+        old_anim=m.ptr(original,scene+56)+i*8;new_anim=m.ptr(new,scene+56)+i*8
+        assert m.u(new,new_anim)==groups+6
+        before=m.ptr(original,old_anim+4);after=m.ptr(new,new_anim+4)
+        assert original[before:before+groups*8]==new[after:after+groups*8]
+        for group in range(groups,groups+6):assert m.u(new,after+group*8)==15

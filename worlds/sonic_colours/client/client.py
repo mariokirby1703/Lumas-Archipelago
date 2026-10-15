@@ -779,12 +779,12 @@ async def dolphin_loop(ctx):
                             ctx.deathlink.journal.save()
                         request=ctx.runtime.hooks.kill(memory,ctx.runtime.snapshot)
                         ctx.pending_native_death_test=False
-                        logger.info('Local native kill request %s published; no network event sent.',request)
+                        logger.debug('Local native kill request %s published; no network event sent.',request)
                 if getattr(ctx,'pending_trap_test',False):
                     from .dead_weight import test_request
                     request=test_request(ctx.runtime,memory)
                     ctx.pending_trap_test=False
-                    logger.info('Local Dead Weight request %s published; awaiting native ACK.',request)
+                    logger.debug('Local Dead Weight request %s published; awaiting native ACK.',request)
                 # Runtime returns durable checks only after current attribution
                 # is valid. Do not bypass its identity gate by rereading journal.
                 snap = ctx.runtime.snapshot

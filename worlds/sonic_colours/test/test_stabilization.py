@@ -49,7 +49,8 @@ def test_normal_poll_configures_white_before_optional_failures_and_after_receipt
         assert memory.read_u32(address+8) == 0
         assert hooks.gameplay_controls_status['white_capsules'] == {'available': True, 'white_allowed': False,
                                                                   'random_capsules_allowed': False,
-                                                                  'collision_reenable_installed': True}
+                                                                  'collision_reenable_installed': True,
+                                                                  'spawn_refresh_installed': True}
         runtime.poll(memory, white, True)
         assert memory.read_u32(address+8) == 1
         assert hooks.gameplay_controls_status['white_capsules']['white_allowed']

@@ -44,3 +44,20 @@ def test_no_event_or_sfx_cannot_invent_a_song_and_unavailable_hud_does_not_pause
     assert p.display(12)['alpha']==0
     assert not p.observe(event(2),13)
     assert not p.observe(event(3,'bgm_jingle_drown'),14)
+
+
+def test_first_visible_period_starts_at_guest_ack_and_text_survives_zero_alpha():
+    p=MusicPopup({});p.observe(event(),0,defer_start=True)
+    assert p.display(20)['alpha']==255
+    p.published(p.generation,20)
+    assert p.display(25)['alpha']==255
+    assert p.display(27.5)['alpha']==128
+    assert p.display(30)['alpha']==0
+    assert p.display(30)['title']=='bgm wmap'
+
+
+def test_result_music_is_supported_without_enabling_death_jingles():
+    p=MusicPopup({})
+    assert p.observe(event(1,'bgm_jingle_stg_clear'),0)
+    assert p.display(0)['title']=='bgm jingle stg clear'
+    assert not p.observe(event(2,'bgm_jingle_drown'),1)
