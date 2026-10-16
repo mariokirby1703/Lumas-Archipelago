@@ -6,7 +6,7 @@ from CommonClient import get_base_parser, handle_url_arg
 
 def select_player_patch(parsed):
     if (parsed.patch_file or parsed.url or parsed.connect
-            or parsed.nogui or parsed.no_start_dolphin):
+            or getattr(parsed,'nogui',False) or parsed.no_start_dolphin):
         return True
     from Utils import open_filename
     selected=open_filename('Select your Sonic Colours player patch',
