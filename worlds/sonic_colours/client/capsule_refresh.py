@@ -41,7 +41,7 @@ class PPC:
         return self.words
 
 
-def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False, spawn_refresh=True, lean=True):
+def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False, spawn_refresh=True, lean=True, extended_models=True):
     if epilogue_abi and not compact_abi:
         raise ValueError('epilogue ABI requires the compact native-call profile')
     # 800D4828 overwrites CR0; 800D4850..4860 restores the enclosing LR.
@@ -132,6 +132,13 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
     a.label('white_permission'); a.d(32,3,1,0x74)
     a.label('permission_ready')
     a.d(32,4,31,0xb0); a.d(32,0,4,0x88)  # constructor mode 0 ghost / 1 content
+    if extended_models:
+        # Native 800D3F04..3F20 selects enabled mode 2 when actor+144 is
+        # set. Treat it as enabled for permission comparison only; retain
+        # its native constructor variant, physics and reward parameters.
+        a.d(11,0,0,2); a.branch('model_mode_ready',0x40820000)
+        a.d(14,0,0,1)
+        a.label('model_mode_ready')
     a.emit(0x7C001800); a.branch('matched',0x41820000)
     a.d(10,0,0,1); a.branch('end',0x41810000)
     a.d(11,0,3,0); a.branch('lock',0x41820000)
@@ -312,6 +319,11 @@ def inspect_installed(memory):
                   ('before_random_capsule_refresh', load_data('capsule_before_random.json')),
                   ('previous_white_collision_refresh', load_data('capsule_white_previous.json'))]
     candidates.insert(1,('current_compact_white_collision_refresh',payload_words(compact_abi=True,epilogue_abi=True,cache_permissions=True,lean=False)))
+    # Recognize the previously shipped mode-0/1 helper exactly as well.
+    for options in ({'compact_abi':True,'epilogue_abi':True,'cache_permissions':True},
+                    {'compact_abi':True,'epilogue_abi':True}, {'compact_abi':True}, {}):
+        candidates.append(('current_compact_white_collision_refresh' if options else
+                           'current_white_collision_refresh',payload_words(**options,extended_models=False)))
     for variant, words in candidates:
         offset = data_offset(words)
         try:

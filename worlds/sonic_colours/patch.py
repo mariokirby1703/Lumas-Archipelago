@@ -13,7 +13,8 @@ from .client.asset_patch import PAL_CPK_SHA256
 FORMAT=1
 # This released component has the same seed/resource contract. Rebuilding
 # from it installs the corrected wrapper traversal, never its old machine code.
-UPGRADABLE_NATIVE_COMPONENTS={'4fb7b39e6a3006585da629615d7aff634ba5fe2c633cc6d4ca58bd2611dbbb1b',
+UPGRADABLE_NATIVE_COMPONENTS={'85eebb98e87ebd22a6fcf7a99e0ae838c91514235a5c9ce73012bf785e1c813f',
+                             '4fb7b39e6a3006585da629615d7aff634ba5fe2c633cc6d4ca58bd2611dbbb1b',
                              '0c27cd93a3589a8dad2a1a3debfb85495e4aa75ef61f0474352496bdac1976d3',
                              '41b26cdb1c4f8af9f862f3cb4c6a226a003d9e6ec7e3cd97c119190224fea816',
                              '61f7a1e4cea3cfba60700465647311f882ca98ddcad56ed507d9c46b6ea39a8d',

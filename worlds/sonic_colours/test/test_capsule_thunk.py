@@ -245,3 +245,37 @@ def test_all_question_mark_model_variants_require_random_item(special,random_cap
                random_capsule=random_capsule)[1] == 0
     assert run(0,False,colour=0xffffffff,white_control=True,special=special,
                random_capsule=random_capsule,random_owned=True)[1] == 1
+
+
+@pytest.mark.parametrize('compact',[False,True])
+@pytest.mark.parametrize('colour',[0xffffffff,0,6])
+@pytest.mark.parametrize('owned',[False,True])
+def test_native_alternate_enabled_mode_two_obeys_lock_without_rebuilding(monkeypatch,compact,colour,owned):
+    from ..client import capsule_refresh as capsule
+    if compact:
+        monkeypatch.setitem(globals(),'payload_words',lambda:capsule.payload_words(
+            compact_abi=True,epilogue_abi=True,cache_permissions=True))
+    calls,mode=run(2,owned,colour=colour,white_control=True,compact=compact)
+    if owned:
+        assert mode==2
+        assert 0x800D3DA4 not in calls and 0x800D3EB4 not in calls
+    else:
+        assert mode==0
+        assert calls[-2:]==[0x800D3DA4,0x800D5490]
+
+
+def test_native_alternate_model_mode_is_original_constructor_contract():
+    from pathlib import Path
+    from ..tools.ppc import Executable
+    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    if not path.exists():pytest.skip('private original ELF absent')
+    e=Executable(path)
+    assert e.read(0x800D3F04,4)==bytes.fromhex('88030144')
+    assert e.read(0x800D3F10,8)==bytes.fromhex('380000029001002c')
+    assert e.read(0x800D3F1C,8)==bytes.fromhex('380000019001002c')
+
+
+def test_alternate_mode_never_reopens_collected_capsules_or_unknown_models():
+    assert run(2,False,colour=0xffffffff,white_control=True,opened=1)[0]==[]
+    calls,mode=run(3,False,colour=0xffffffff,white_control=True)
+    assert mode==3 and 0x800D3DA4 not in calls and 0x800D3EB4 not in calls
