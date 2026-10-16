@@ -44,6 +44,14 @@ def payload(start,control):
     a.d(11,0,8,1);a.branch('reset',0x41820000)
     a.d(32,7,5,20);eq(3,7);a.branch('fresh',0x40820000)
     a.d(32,7,6,12);a.d(32,0,5,28);eq(7,0);a.branch('fresh',0x40820000)
+    # Water re-entry can reuse the same plugin and actor serial while the
+    # native timer is reset outside the bubble-reset path. Positive floors
+    # (0..20 seconds of granted air) must be reapplied immediately, not after
+    # the host eventually samples that reset. IEEE positive floats retain
+    # integer ordering; do not use it for negative floors (40/60 seconds).
+    a.d(32,7,5,24);a.d(11,0,7,0);a.branch('adjust',0x40810000)
+    a.d(32,0,3,0x20);eq(0,7);a.branch('fresh',0x41800000)
+    a.label('adjust')
     # Preserve remaining air when the received progressive level changes.
     a.d(48,1,3,0x20);a.d(48,0,5,24)
     a.emit(0xEC210028) # fsubs f1,f1,f0

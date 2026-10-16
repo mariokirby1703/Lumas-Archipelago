@@ -3,6 +3,19 @@ import struct
 from ..client import ap_hud_connected as hud
 from ..client.ap_hud_ticker import Ticker
 
+def test_result_layers_sharing_exact_mailboxes_are_one_target():
+    a={'control':0x913c05d0,'boxes':{'ap_title':(100,200)},'handle':10}
+    b={**a,'handle':20,'boxes':dict(a['boxes'])}
+    assert hud.unique_owner([a,b]) is a
+
+def test_distinct_result_mailboxes_remain_ambiguous():
+    import pytest
+    from ..client.memory import MemoryUnavailable
+    a={'control':100,'boxes':{'ap_title':(200,300)}}
+    for b in ({**a,'control':101},{**a,'boxes':{'ap_title':(200,304)}}):
+        with pytest.raises(MemoryUnavailable,match='not uniquely resolved'):
+            hud.unique_owner([a,b])
+
 class Memory:
     def __init__(self):self.data={};self.writes=[]
     def verify_revision(self):pass

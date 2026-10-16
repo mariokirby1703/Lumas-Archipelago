@@ -175,7 +175,7 @@ def installed(memory, kind):
     return address
 
 
-def configure(memory, snapshot, owned, slot, temporary_boost=False):
+def configure(memory, snapshot, owned, slot, temporary_boost=False, kinds=None):
     from ..Items import GAME_LAND_SPEED
     from .state import live_control_profile
     chain = live_control_profile(memory, snapshot, getattr(getattr(memory, 'write_guard', None), 'guard', None))
@@ -184,7 +184,7 @@ def configure(memory, snapshot, owned, slot, temporary_boost=False):
     locked = int(bool(slot['options'].get('boost_lock') and not owned['counts']['White Boost Wisp']))
     values = (chain[1], chain[2], maximum, model, 2 if locked and temporary_boost else locked)
     status = {}
-    for kind in HOOKS:
+    for kind in (HOOKS if kinds is None else kinds):
         # Neutralize the previously installed erroneous coloured-Wisp gate too.
         desired = (*values[:4], 0) if kind == 'boost' else values
         address = installed(memory, kind)
@@ -203,8 +203,8 @@ def configure(memory, snapshot, owned, slot, temporary_boost=False):
         memory.write_u32(address, values[0], expected=0, operation='gameplay_controls')
     return {'installed': status, 'maximum_speed': maximum+1, 'boost_locked': bool(locked and not temporary_boost), 'temporary_boost':bool(locked and temporary_boost),
             'boost_consumption_safe':getattr(memory, 'boost_consumption_safe', False),
-            'boost_lock_active': bool(locked and model and all(status[k] for k in ('boost_use', 'boost_query', 'boost_add'))),
-            'speed_controls_active': all(status[k] for k in ('speed_get', 'speed_set', 'speed_ui'))}
+            'boost_lock_active': bool(locked and model and all(status.get(k,False) for k in ('boost_use', 'boost_query', 'boost_add'))),
+            'speed_controls_active': all(status.get(k,False) for k in ('speed_get', 'speed_set', 'speed_ui'))}
 
 
 def gecko_lines(close_scope=True):

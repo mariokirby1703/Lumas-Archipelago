@@ -14,10 +14,13 @@ FORMAT=1
 # This released component has the same seed/resource contract. Rebuilding
 # from it installs the corrected wrapper traversal, never its old machine code.
 UPGRADABLE_NATIVE_COMPONENTS={'0c27cd93a3589a8dad2a1a3debfb85495e4aa75ef61f0474352496bdac1976d3',
+                             'ddbb9ab5e96a36deb330ba58d2773d093a032982a2b52809e9116b7126f30fd1',
                              '84207fd5a41582c96a49d1a89396be331f74aa0de2046725a389d119cf028fe4',
                              '6988a734ac3f5e8776d0a461d4f229967382886958c8cbe2412c267411eb8929',
                              '79fe3ce64a1bbce739ceaabc86486b72988b589aaeb1093318f5be277efc009d'}
 UPGRADABLE_RESOURCES={'9281b474c4023c15944860247c65a4de6adc79a1282b8eb02862603dc91d9a20'}
+# Same resource contract, with the Game Land overlay formerly behind the frame.
+UPGRADABLE_RESOURCES.add('d8f49fe95368298932065e51d507bae00afdb50823fffd5ccf9b6efc01c20fd2')
 UPGRADABLE_NATIVE_COMPONENTS.update({'c3bfebc29447406ee3fad98473c140496c8a0870ed0c2101897b28e7bbc77ff4', 'f3155c39f82e1b8e8708f9ea1bfb993bb349d8d4bd40f6a8ffa5cf5a1d59fde4'})
 UPGRADABLE_RESOURCES.update({'d6500135d5b7a36c618d00961974c223b5d5ef9dff8488751693330c11aa0a08', 'ab0276016b694b38761ecc47aab8c2506086d2c7e9dd5bebff8ba0a3dbeeb0e9', 'a72d8cd9d9f2226092a3ce4cee0944e97cde8585bb6c2f0c57e5566778739521'})
 
@@ -68,7 +71,7 @@ class SonicColoursPatch(APAutoPatchInterface):
         if len(names)!=len(set(names)) or set(names)!={'archipelago.json','seed.json'}:raise InvalidDataError('invalid or duplicate patch components')
         if any(i.file_size>2*1024*1024 for i in infos):raise InvalidDataError('patch component too large')
         manifest=super().read_contents(archive)
-        legacy=(manifest.get('native_abi') in (1,2) and manifest.get('native_component_sha256') in UPGRADABLE_NATIVE_COMPONENTS
+        legacy=(manifest.get('native_abi') in (1,2) and manifest.get('native_component_sha256') in {plan()[2].hex(),*UPGRADABLE_NATIVE_COMPONENTS}
                 and manifest.get('resource_component_sha256') in UPGRADABLE_RESOURCES)
         if (manifest.get('game')!=GAME or manifest.get('sonic_patch_format')!=FORMAT
                 or not (manifest.get('native_abi')==ABI or legacy) or manifest.get('disc_id')!='SNCP8P' or manifest.get('revision')!=0

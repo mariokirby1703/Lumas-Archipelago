@@ -152,8 +152,14 @@ def detect_checks(slot_data, snapshot, owned_wisps=frozenset()):
 def capsule_check_allowed(slot_data, data, snapshot, owned_wisps):
     from ..capsules import CAPSULES
     capsule = CAPSULES[data.instance_key]
-    return (capsule.eligible and capsule.key in snapshot.opened_capsules
-            and capsule.wisp_item in owned_wisps)
+    if not capsule.eligible or capsule.key not in snapshot.opened_capsules:
+        return False
+    from ..wisps import wisp_level
+    colour = capsule.wisp_item.removeprefix('Progressive ').removesuffix(' Wisp')
+    # The selected YAML may provide a single normal Wisp, two progressive
+    # tiers, or vanilla White Boost. Keep the actual opening as the witness.
+    counts = Counter({name: 1 for name in owned_wisps})
+    return wisp_level(counts, colour, slot_data.get('options', {})) >= 1
 
 
 def victory(slot_data, snapshot, ever_collected_mask=None, owned=None, observed_clears=frozenset()):
@@ -179,7 +185,7 @@ class Runtime:
         self.journal, self.guard, self.hooks = journal, guard, hooks
         self.snapshot = None
         from .test_inventory import LocalInventoryOverrides
-        self.test_inventory = LocalInventoryOverrides()
+        self.test_inventory = LocalInventoryOverrides(self.slot_data['options'])
         from .ap_hud_ticker import Ticker
         self.hud_ticker=Ticker(journal)
         self.last_error = None
@@ -374,6 +380,34 @@ class Runtime:
             self.journal.add_checks(saved_checks)
         yield (set(self.journal.data['checks']) if can_send else set(),
                bool(can_send and self.journal.data.get('goal_observed')))
+        # Arm time-critical controls before the 90-cast HUD publication.
+        early_items=list(item_ids if history_ready else self.journal.data['receipts'])
+        early_items+=[item for item in self.journal.data.get('permission_receipts',()) if item not in early_items]
+        early_owned=self.effective_inventory(inventory(early_items))
+        from .capsule_refresh import configure as configure_early_capsules
+        from .gameplay_controls import configure as configure_early_controls
+        for name,action in (
+                ('white_capsules',lambda:configure_early_capsules(memory,self.snapshot,early_owned,self.slot_data)),
+                ('boost_controls',lambda:configure_early_controls(memory,self.snapshot,early_owned,self.slot_data,
+                    temporary_boost=self.temporary_boost_allowed(memory),kinds=('boost_use','boost_query','boost_add')))):
+            try:self.hooks.gameplay_controls_status[name]=action()
+            except MemoryUnavailable as error:self.hooks.gameplay_controls_status[name]={'status':str(error)}
+        self.enforce_white_boost_gain_lock(memory,early_owned)
+        # Water entry and controller replacement must be handled before slow
+        # journal, resource-bank and progression operations in this poll.
+        if self.slot_data['options'].get('movement_unlocks'):
+            early_items=list(item_ids if history_ready else self.journal.data['receipts'])
+            early_items+=[item for item in self.journal.data.get('permission_receipts',()) if item not in early_items]
+            early_owned=self.effective_inventory(inventory(early_items))
+            from .movement_gate import configure as configure_movement
+            from .water_native import configure as configure_breath
+            for name,action in (('movement_status',configure_movement),('breath_status',configure_breath)):
+                try:
+                    result=(action(memory,self.snapshot,early_owned,transport=('direct' if self.experimental_direct_hooks else 'gecko')) if name=='movement_status'
+                            else action(memory,self.snapshot,self.guard,early_owned,self.journal))
+                    setattr(self,name,result)
+                except MemoryUnavailable as error:
+                    setattr(self,name,{'status':str(error),'write_verified':False})
         # Publish the HUD before owner configuration performs its guarded
         # writes. A new scene's music must not wait behind those transactions.
         try:
@@ -398,21 +432,6 @@ class Runtime:
                 self._death_allowed_stages.add(self._event_owner[2])
         except MemoryUnavailable as error:
             self.native_event_status={'installed':False,'status':str(error)}
-        # Water entry and controller replacement must be handled before slow
-        # journal, resource-bank and progression operations in this poll.
-        if self.slot_data['options'].get('movement_unlocks'):
-            early_items=list(item_ids if history_ready else self.journal.data['receipts'])
-            early_items+=[item for item in self.journal.data.get('permission_receipts',()) if item not in early_items]
-            early_owned=self.effective_inventory(inventory(early_items))
-            from .movement_gate import configure as configure_movement
-            from .water_native import configure as configure_breath
-            for name,action in (('movement_status',configure_movement),('breath_status',configure_breath)):
-                try:
-                    result=(action(memory,self.snapshot,early_owned,transport=('direct' if self.experimental_direct_hooks else 'gecko')) if name=='movement_status'
-                            else action(memory,self.snapshot,self.guard,early_owned,self.journal))
-                    setattr(self,name,result)
-                except MemoryUnavailable as error:
-                    setattr(self,name,{'status':str(error),'write_verified':False})
         try:
             from .physical_rings import apply as restore_physical_rings
             self.physical_ring_status = restore_physical_rings(memory, self.snapshot, self.guard)

@@ -143,7 +143,7 @@ def test_connected_assets_start_blank_with_bounded_shared_mailboxes():
 
 
 @pytest.mark.parametrize('arc,stem,parent,animations',[
-    ('ui_title_multi_e.arc','ui_title_multi','multi_bg',1),
+    ('ui_title_multi_e.arc','ui_title_multi','multi_frame',4),
     ('ui_result_e.arc','ui_result','result',2),
 ])
 def test_owned_selection_and_results_preserve_all_native_animations(arc,stem,parent,animations):

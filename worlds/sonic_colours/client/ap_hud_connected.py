@@ -25,7 +25,7 @@ def discover(memory):
                 if memory.read_u32(layer)!=0x807abc40:continue
                 layout=memory.read_ptr_checked(layer+12,0x34)
                 counts={'gameplay':(96,103),'world_map':(111,),'global_map':(111,),
-                        'game_land_select':(93,),'results':(95,)}
+                        'game_land_select':(93,104),'results':(95,)}
                 if memory.read_u32(layout+44) not in counts[rows[0]['scene']]:continue
                 table=memory.read_ptr_checked(layout+48,memory.read_u32(layout+44)*12)
                 sourcegroups=memory.read_ptr_checked(layout+40,128)
@@ -58,8 +58,23 @@ def discover(memory):
                 found[layer]={'layer':layer,'handle':handle,'control':control,'boxes':boxes,'anchors':anchors,
                               'key':(rows[0]['context'],rows[0]['scene'])}
             except (MemoryUnavailable,UnicodeDecodeError,ValueError):continue
-    if len(found)!=1:raise MemoryUnavailable('AP HUD owner not uniquely resolved')
-    return next(iter(found.values()))
+    return unique_owner(found.values())
+
+
+def unique_owner(owners):
+    """Result UI instances can share one resource-owned mailbox set.
+
+    PAL results owns two layers (owner offsets 0x88 and 0x90). Both
+    reference the same relocated font records and controller. They are one
+    publication target; unrelated resources must still fail closed.
+    """
+    targets={}
+    for owner in owners:
+        key=(owner['control'],tuple(sorted(owner['boxes'].items())))
+        targets.setdefault(key,owner)
+    if len(targets)!=1:
+        raise MemoryUnavailable('AP HUD owner not uniquely resolved')
+    return next(iter(targets.values()))
 
 def validate(memory,owner):
     if any(memory.read_bytes(a,len(value))!=value for a,value in owner['anchors']):
@@ -130,7 +145,11 @@ def render(runtime,memory):
             or snapshot.scene=='gameplay' and getattr(snapshot,'death_state','alive')!='alive'):
         runtime.hud_ticker.elapsed_visible(False)
         return {'hud_ready':False,'status':'HUD disabled or scene unavailable'}
-    memory.verify_revision()
+    # Runtime's fresh snapshot already verifies the executable on every poll.
+    # The publisher and owner are additionally byte-checked below and on each
+    # mailbox write. Avoid hashing the full DOL twice before the first text.
+    if not (getattr(memory,'revision_observation',None) or {}).get('verified'):
+        memory.verify_revision()
     if not installed(memory):return {'hud_ready':False,'status':'install AP-connected Riivolution patch'}
     identity=(snapshot.session,snapshot.stage_epoch,snapshot.scene)
     if state is None or state['identity']!=identity:

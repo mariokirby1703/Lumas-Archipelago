@@ -4,6 +4,18 @@ import sys
 from CommonClient import get_base_parser, handle_url_arg
 
 
+def select_player_patch(parsed):
+    if (parsed.patch_file or parsed.url or parsed.connect
+            or parsed.nogui or parsed.no_start_dolphin):
+        return True
+    from Utils import open_filename
+    selected=open_filename('Select your Sonic Colours player patch',
+        [('Sonic Colours player patch', ['.apsoniccolours','.apsonic'])])
+    if not selected:return False
+    parsed.patch_file=selected
+    return True
+
+
 def launch_client(*args):
     from .client import main
     parser = get_base_parser(description='Sonic Colours PAL Archipelago Client')
@@ -90,6 +102,9 @@ def launch_client(*args):
             patch_music(*parsed.patch_music, slot['seed_name'], mode)
         logging.info('Separate seed music CPK and manifest verified. Install into a separate disc copy and restart emulation; file creation does not verify Dolphin playback.')
         return
+    # The Launcher component and Open Patch enter the same installation flow.
+    # Explicit URL/headless/client-only invocations retain their CLI behavior.
+    if not select_player_patch(parsed):return
     parsed.generated_iso=None
     parsed.dolphin_launch_status=None
     if parsed.patch_file:

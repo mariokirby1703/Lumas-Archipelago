@@ -52,6 +52,19 @@ def test_receiving_level_preserves_elapsed_time_and_owner_replacement_restarts(m
     assert run(m)==20.
 
 
+@pytest.mark.parametrize('seconds',[0,5,10,20])
+def test_reused_water_plugin_reentry_without_bubble_callback(monkeypatch,seconds):
+    m=fixture(monkeypatch,seconds)
+    run(m,reset=True)
+    # Same allocated plugin and same Sonic, but native water entry reset its
+    # elapsed time without going through the hooked bubble reset.
+    m.b.put(m.plugin+0x20,struct.pack('>f',.016))
+    floor=30.05 if seconds==0 else 30-seconds
+    assert run(m)==pytest.approx(floor+.016,abs=.00001)
+    m.b.put(m.plugin+0x20,struct.pack('>f',floor+1.))
+    assert run(m)==pytest.approx(floor+1.,abs=.00001)
+
+
 @pytest.mark.parametrize('failure',['disabled','save','slot','plugin','machine','reverse'])
 def test_unowned_or_changed_context_executes_vanilla_reset(monkeypatch,failure):
     m=fixture(monkeypatch)

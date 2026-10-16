@@ -53,7 +53,7 @@ def cast(b,s,name):
             return ptr(b,ptr(b,group+4)+4*u(b,row+8))
     raise ValueError('missing cast '+name)
 
-def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE_MESSAGES,scene_name='info_2',base_y=140.,ap_connected=False):
+def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE_MESSAGES,scene_name='info_2',base_y=140.,ap_connected=False,music_y_offset=0.):
     """Build static PoC casts. Visual placement and lifetime need Dolphin QA."""
     s=scene(gameplay,scene_name);ks=scene(keyboard,'Scene_soft_keyboad_bg')
     original_ngroups=u(gameplay,s+36);original_casts=u(gameplay,s+44)
@@ -123,9 +123,9 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
         metrics[ch]=(uv[2]-uv[0])*312*0.45
     for message,(title,subtitle) in enumerate(tuple(messages)+(('BGM Now Playing','Track'),)):
         if message==len(messages):
-            parts=(('ap_music_icon',' ',775.,365.,0xffffffff),
-                   ('ap_music_heading','NOW PLAYING:',790.,365.,0xffffffff),
-                   ('ap_music_title','Track',760.,382.,0xffffffff))
+            parts=(('ap_music_icon',' ',775.,365.+music_y_offset,0xffffffff),
+                   ('ap_music_heading','NOW PLAYING:',790.,365.+music_y_offset,0xffffffff),
+                   ('ap_music_title','Track',760.,382.+music_y_offset,0xffffffff))
             for name,label,x,y,colour in parts:
                 for shadow,(dx,dy) in enumerate(((-0.8,0.),(0.8,0.),(0.,-0.8),(0.,0.8))):
                     specs.append((name+'_outline'+str(shadow),label,x+dx,y+dy,0x000000ff))

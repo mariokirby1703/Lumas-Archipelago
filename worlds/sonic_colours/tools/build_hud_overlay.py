@@ -137,7 +137,8 @@ def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,a
         multi_replacements={
             'ui_gameplay_multi.gncp':overlay(multi_gncp,resources['ui_soft_keyboard.gncp'],
                 texture_index=len(textures(multi_tls)),keyboard_tls=resources['ui_soft_keyboard.tls'],
-                messages=SAMPLE_MESSAGES[:message_count],scene_name='info_1',base_y=140.,ap_connected=True),
+                messages=SAMPLE_MESSAGES[:message_count],scene_name='info_1',base_y=140.,ap_connected=True,
+                music_y_offset=-20.),
             'ui_gameplay_multi.tls':append_texture(multi_tls,resources['ui_soft_keyboard.tls'],3)}
         multi_indices=[i for i,r in enumerate(cpk.toc.rows) if r.get('DirName')=='ui' and r.get('FileName')=='ui_cockpit_multi_e.arc']
         original_multi=cpk.read(cpk.toc.rows[multi_indices[0]])
@@ -148,7 +149,9 @@ def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,a
             raise ValueError('Game Land U8 roundtrip differs')
         changes.update({i:multi_patch for i in multi_indices})
         # These screens use separate native resources from gameplay/maps.
-        for arc,stem,scene_name in (('ui_title_multi_e.arc','ui_title_multi','multi_bg'),
+        # The background is behind the opaque cabinet artwork. Attach AP
+        # casts to the frame itself so they draw after its decorative quads.
+        for arc,stem,scene_name in (('ui_title_multi_e.arc','ui_title_multi','multi_frame'),
                                     ('ui_result_e.arc','ui_result','result')):
             gncp=find_asset(cpk,arc,stem+'.gncp');tls=find_asset(cpk,arc,stem+'.tls')
             additions={stem+'.gncp':overlay(gncp,resources['ui_soft_keyboard.gncp'],

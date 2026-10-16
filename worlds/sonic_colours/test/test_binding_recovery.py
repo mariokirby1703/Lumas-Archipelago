@@ -30,8 +30,8 @@ def test_recovered_pickup_without_epoch_is_restored_only_with_bound_recovery(rec
     assert witnessed(journal)==({'stg160':1} if recovered else {})
 
 
-@pytest.mark.parametrize('change',['score_up','score_down','time','rank','profile','rollback'])
-def test_bound_resume_accepts_only_score_improvement_with_stable_witnesses(change):
+@pytest.mark.parametrize('change',['score_up','score_down','time','time_better','rank','profile','rollback'])
+def test_bound_resume_accepts_monotonic_record_improvements(change):
     from copy import deepcopy
     from .test_runtime import snapshot
     records={m:dict(raw_rank=2,score=100,time_raw=120) for m in ('stg110','stg130')}
@@ -42,9 +42,10 @@ def test_bound_resume_accepts_only_score_improvement_with_stable_witnesses(chang
     if change=='score_up':saved['rank_records']['stg130']['score']=101
     if change=='score_down':saved['rank_records']['stg130']['score']=99
     if change=='time':saved['rank_records']['stg130']['time_raw']=121
+    if change=='time_better':saved['rank_records']['stg130']['time_raw']=119
     if change=='rank':saved['rank_records']['stg130']['raw_rank']=1
     if change=='profile':saved['profile_hex']='other'
     if change=='rollback':saved['rank_records']['stg130']['score']=101
     snap=snapshot(progress_verified=True,persisted_clears=frozenset(['stg110'] if change=='rollback' else ['stg110','stg130']))
     result=SaveBinding(journal).attribute(snap,saved)
-    assert result.save_identity_verified==(change=='score_up')
+    assert result.save_identity_verified==(change in ('score_up','rank','time_better'))
