@@ -138,7 +138,7 @@ def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,a
             'ui_gameplay_multi.gncp':overlay(multi_gncp,resources['ui_soft_keyboard.gncp'],
                 texture_index=len(textures(multi_tls)),keyboard_tls=resources['ui_soft_keyboard.tls'],
                 messages=SAMPLE_MESSAGES[:message_count],scene_name='info_1',base_y=140.,ap_connected=True,
-                music_y_offset=-20.),
+                music_y_offset=-45.),
             'ui_gameplay_multi.tls':append_texture(multi_tls,resources['ui_soft_keyboard.tls'],3)}
         multi_indices=[i for i,r in enumerate(cpk.toc.rows) if r.get('DirName')=='ui' and r.get('FileName')=='ui_cockpit_multi_e.arc']
         original_multi=cpk.read(cpk.toc.rows[multi_indices[0]])

@@ -99,7 +99,9 @@ def discover(memory):
                     origin,transform_anchors=result_origin(memory,layer)
                     anchors+=transform_anchors
                 found[layer]={'layer':layer,'handle':handle,'control':control,'boxes':boxes,'anchors':anchors,
-                              'key':(rows[0]['context'],rows[0]['scene']),'origin':origin}
+                              'key':(rows[0]['context'],rows[0]['scene']),'origin':origin,
+                              'music_x_offset':(-25. if rows[0]['scene']=='gameplay'
+                                                and memory.read_u32(layout+44)==96 else 0.)}
             except (MemoryUnavailable,UnicodeDecodeError,ValueError):continue
     return unique_owner(found.values())
 
@@ -139,8 +141,8 @@ def payloads(owner,events,metrics,music=None):
             # Align the panel to the native right HUD edge. The icon sits just
             # before the heading; the title has its own right-aligned baseline.
             heading_width=sum(metrics[c] for c in 'NOW PLAYING:')
-            x=800.-width-owner.get('origin',(0.,0.))[0]
-            if base=='ap_music_icon':x=800.-heading_width-6.-width-owner.get('origin',(0.,0.))[0]
+            x=800.+owner.get('music_x_offset',0.)-width-owner.get('origin',(0.,0.))[0]
+            if base=='ap_music_icon':x=800.+owner.get('music_x_offset',0.)-heading_width-6.-width-owner.get('origin',(0.,0.))[0]
             if shadow:x+=(-0.8,0.8,0.,0.)[int(name[-1])]
             raw=(fitted or ' ').encode('ascii').ljust(128,b'\0')
             result[box+8]=struct.pack('>I',owner['handle']);result[box+16]=raw
