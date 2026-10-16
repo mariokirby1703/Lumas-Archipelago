@@ -14,6 +14,7 @@ FORMAT=1
 # This released component has the same seed/resource contract. Rebuilding
 # from it installs the corrected wrapper traversal, never its old machine code.
 UPGRADABLE_NATIVE_COMPONENTS={'0c27cd93a3589a8dad2a1a3debfb85495e4aa75ef61f0474352496bdac1976d3',
+                             '61f7a1e4cea3cfba60700465647311f882ca98ddcad56ed507d9c46b6ea39a8d',
                              'ddbb9ab5e96a36deb330ba58d2773d093a032982a2b52809e9116b7126f30fd1',
                              '84207fd5a41582c96a49d1a89396be331f74aa0de2046725a389d119cf028fe4',
                              '6988a734ac3f5e8776d0a461d4f229967382886958c8cbe2412c267411eb8929',

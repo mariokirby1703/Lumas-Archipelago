@@ -74,6 +74,19 @@ def request_kill(memory,snapshot,guard):
     return request
 
 
-def cancel_kill(memory,snapshot,guard):
+def cancel_kill(memory,snapshot,guard,request=None):
     base=n.address(memory)
+    # Disarm before cancelling. A later completed frame is the guest-side
+    # barrier: alive samples or a host write/readback alone are insufficient.
+    write(memory,snapshot,guard,{n.ENABLE:bytes(4)},disable=True)
+    ack=memory.read_u32(base+n.ACK)
     write(memory,snapshot,guard,{n.REQUEST:memory.read_bytes(base+n.ACK,4)},cancel=True)
+    if request is None or ack==request:
+        return False  # consumed request may still be transitioning to death
+    key=(base,snapshot.session,request,ack)
+    previous=getattr(memory,'_kill_cancel_fence',None)
+    counter=memory.read_u32(base+n.FRAME_FENCE)
+    memory._kill_cancel_fence=(key,counter)
+    return bool(previous and previous[0]==key and previous[1]!=counter
+                and memory.read_u32(base+n.REQUEST)==ack
+                and memory.read_u32(base+n.ACK)==ack)

@@ -18,6 +18,7 @@ HOOKS={'frame':(0x8001CE60,0x800400A4),'death':(0x8001D2B8,0x2C1A0000),
 ENABLE,STAGE,PLAYER,SERIAL,REQUEST,ACK,DEATH_SEQ,DEATH_STAGE,DEATH_COUNT=4,8,12,16,20,24,28,32,36
 REMAINING,TRAP_REQUEST,TRAP_ACK,INPUT,MUSIC_SEQ,CHANNEL,CUE,NAME=40,44,48,52,60,64,68,72
 JUMP_TABLE=112
+FRAME_FENCE=56  # completed native frame callbacks, including disabled frames
 JUMP_STATES=(5,6,7,8,9,11,12,18,19,29,30,36,37,39,40,46,47,58,80,106,107,115)
 
 
@@ -112,6 +113,7 @@ def program(kind,control):
         a.d(36,3,31,ACK);a.mr(3,4);a.d(14,4,0,24);call(0x800338E8)
     a.label('done')
     if kind=='frame':
+        a.d(32,3,31,FRAME_FENCE);a.d(14,3,3,1);a.emit(0x7C0004AC);a.d(36,3,31,FRAME_FENCE)
         for f in range(14):a.d(50,f,1,160+f*8)
     def restore():
         for word,off in ((0x7C0FF120,144),(0x7C0803A6,148),(0x7C0903A6,152)):
@@ -180,6 +182,7 @@ def status(memory):
             'death_count':struct.unpack_from('>I',raw,DEATH_COUNT)[0],
             'remote_request':struct.unpack_from('>I',raw,REQUEST)[0],
             'remote_ack':struct.unpack_from('>I',raw,ACK)[0],
+            'frame_fence':struct.unpack_from('>I',raw,FRAME_FENCE)[0],
             'trap_request':struct.unpack_from('>I',raw,TRAP_REQUEST)[0],
             'trap_ack':struct.unpack_from('>I',raw,TRAP_ACK)[0],
             'remaining':max(0.,struct.unpack_from('>f',raw,REMAINING)[0]),

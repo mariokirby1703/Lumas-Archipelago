@@ -789,7 +789,7 @@ async def dolphin_loop(ctx):
                             native_state=snap.death_state, now=time.monotonic(),
                             native_sequence=native['death_sequence'],remote_ack=native['remote_ack'],
                             kill_safe=safe_kill(snap),
-                            cancel=lambda:cancel_kill(memory,snap,ctx.runtime.guard),
+                            cancel=lambda:cancel_kill(memory,snap,ctx.runtime.guard,ctx.deathlink.remote_request),
                             kill=lambda: ctx.runtime.hooks.kill(memory, snap))
                         if local_death and ctx.runtime.slot_data['options']['death_link']:
                             await ctx.send_death('Sonic died.')

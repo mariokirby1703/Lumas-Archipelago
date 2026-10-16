@@ -19,7 +19,7 @@ class DeathLink:
             self.state = 'RESPAWN_WAIT'
         self.alive_polls = 0
         self.sequence = None
-        self.remote_request = None
+        self.remote_request = journal.data.get('remote_request')
         self.remote_deadline = None
         self.last_action = 'idle'
         self.last_error = None
@@ -58,7 +58,6 @@ class DeathLink:
             else:
                 self.last_action = 'remote request expired/cancellation attempted'
             self.remote_deadline = None
-            self.remote_request = None
             self.state = 'RESPAWN_WAIT'
             # remote_cycle remains sticky until a witnessed native death.
         if event:
@@ -70,6 +69,19 @@ class DeathLink:
         if not safe:
             self.alive_polls = 0
             return False
+        if (self.remote_cycle and not self.remote_witnessed and self.remote_deadline is None
+                and self.remote_request is not None and native_state=='alive' and cancel):
+            try:recovered=cancel() is True
+            except Exception as error:
+                self.last_error=f'cancel not verified: {error}'
+                recovered=False
+            if recovered:
+                self.remote_cycle=False;self.remote_request=None
+                self.journal.data['remote_cycle']=False
+                self.journal.data.pop('remote_request',None)
+                self.journal.save()
+                self.state='COOLDOWN';self.alive_polls=0
+                self.last_action='unconsumed request cancelled across native frame fence'
         if self.pending is not None and native_state == 'alive' and not self.remote_cycle and kill_safe:
             self.remote_cycle = True  # Suppress echo BEFORE native invocation.
             self.journal.data['remote_cycle'] = True
@@ -79,6 +91,8 @@ class DeathLink:
             self.remote_witnessed=False
             try:
                 self.remote_request=kill()
+                self.journal.data['remote_request']=self.remote_request
+                self.journal.save()
                 self.remote_deadline=now+30
                 self.last_action='native remote kill requested'
             except Exception as error:
@@ -111,6 +125,7 @@ class DeathLink:
                 self.remote_request = None
                 if self.journal.data.get('remote_cycle'):
                     self.journal.data['remote_cycle'] = False
+                    self.journal.data.pop('remote_request',None)
                     self.journal.save()
             else:
                 self.state = 'COOLDOWN'
