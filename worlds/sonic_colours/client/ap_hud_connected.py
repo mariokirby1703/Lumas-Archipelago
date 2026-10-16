@@ -101,7 +101,7 @@ def discover(memory):
                 found[layer]={'layer':layer,'handle':handle,'control':control,'boxes':boxes,'anchors':anchors,
                               'key':(rows[0]['context'],rows[0]['scene']),'origin':origin,
                               'music_x_offset':(-25. if rows[0]['scene']=='gameplay'
-                                                and memory.read_u32(layout+44)==96 else 0.)}
+                                                and memory.read_u32(layout+44) in (96,103) else 0.)}
             except (MemoryUnavailable,UnicodeDecodeError,ValueError):continue
     return unique_owner(found.values())
 
