@@ -181,7 +181,7 @@ def test_disabled_option_and_conservative_traversal_rule():
 
 @pytest.mark.parametrize('seed',range(100))
 def test_medals_white_lock_and_goals_fill_without_tv_item(seed):
-    m=generate({'eggman_heart_sanity':True,'boost_lock':seed%2,'goal':seed%4,
+    m=generate({'eggman_heart_sanity':True,'boost_lock':seed%2,'goal':seed%3,
                 'red_ring_checks':('off','singles','per_level')[seed%3],
                 'rank_checks':('off','c','all')[seed%3]},seed,fill=True)
     assert m.can_beat_game() and not m.get_unfilled_locations()

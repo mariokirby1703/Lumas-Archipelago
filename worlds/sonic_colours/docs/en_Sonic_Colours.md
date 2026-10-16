@@ -5,10 +5,11 @@ before starting a fresh vanilla New Game. The mandatory Tropical Resort
 Acts 1 and 2 still run before save selection. Checks are immediate and durable.
 
 World Access and Wisp items always use Archipelago ownership. Seven coloured
-Chaos Emeralds control Super Sonic. The five goals are Nega Wisp Armor,
-All Bosses, All Red Rings, All Game Land Stages and Super Sonic. All Red Rings
+Chaos Emeralds control optional Super Sonic. The three goals are Nega-Wisp Armor
+(including Terminal Velocity Act 2), All Bosses and All Red Rings. All Red Rings
 requires all 180 physical pickups across attempts, independently of the selected
-Red Ring check mode. Super Sonic requires all seven AP Emerald items.
+Red Ring check mode. Retired Game Land and Super Sonic goals are accepted only
+in their older seed formats; values 3 and 4 are not reassigned.
 
 Random Starting Act includes normal Acts, six world bosses. Terminal Velocity cannot be a Starting Act. It applies after the vanilla intro and does not mark stages cleared.
 Physical Red Rings provide checks; AP Red Ring items open Game Land. Reduction

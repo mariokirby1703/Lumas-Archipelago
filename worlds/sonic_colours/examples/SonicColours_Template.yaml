@@ -7,7 +7,7 @@ name: SonicPlayer
 game: Sonic Colours (Wii)
 Sonic Colours (Wii):
   # nega_wisp_armor / all_bosses / all_red_rings /
-  # all_game_land_stages / super_sonic
+  # nega_wisp_armor / all_bosses / all_red_rings
   goal: nega_wisp_armor
   # sequential: Act 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> Boss
   # open_acts: all six Acts at World Access, Boss after all six clears

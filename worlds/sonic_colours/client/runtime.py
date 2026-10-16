@@ -42,7 +42,7 @@ def validate_slot(data):
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
     revision=data.get('options_revision',0)
-    if type(revision) is not int or not 0<=revision<=6:raise ValueError('unsupported slot options revision')
+    if type(revision) is not int or not 0<=revision<=7:raise ValueError('unsupported slot options revision')
     options = data.get('options')
     # Old seeds have no physical 1-Up locations; adding the optional toggle
     # must not force regeneration or change their selected location set.
@@ -66,6 +66,10 @@ def validate_slot(data):
         if type(value) is not int:
             raise ValueError(f'slot option {name} must be resolved integer')
         cls = SonicColoursOptions.type_hints[name]
+        # Retired Game Land goal: readable only in already generated slots.
+        if name=='goal' and value==3 and revision<7:
+            resolved[name]=cls(value)
+            continue
         # Previously generated Super Sonic goal seeds remain playable.
         # New generators no longer offer this goal.
         if name=='goal' and value==4 and data.get('options_revision',0)<3:
@@ -186,6 +190,10 @@ class Runtime:
     def __init__(self, slot_data, journal, guard, hooks):
         self.slot_data = validate_slot(slot_data)
         self.journal, self.guard, self.hooks = journal, guard, hooks
+        # Read-only/replay adapters need not implement native control status.
+        # Their pickup checkpoint must not fail on optional diagnostics.
+        if self.hooks is not None and not hasattr(self.hooks,'gameplay_controls_status'):
+            self.hooks.gameplay_controls_status={}
         self.snapshot = None
         from .test_inventory import LocalInventoryOverrides
         self.test_inventory = LocalInventoryOverrides(self.slot_data['options'])

@@ -7,7 +7,6 @@ class Goal(Choice):
     option_nega_wisp_armor = 0
     option_all_bosses = 1
     option_all_red_rings = 2
-    option_all_game_land_stages = 3
     default = 0
 
     @classmethod

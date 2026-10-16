@@ -141,7 +141,7 @@ class SonicColoursWorld(World):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'options_revision':6, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':7, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),

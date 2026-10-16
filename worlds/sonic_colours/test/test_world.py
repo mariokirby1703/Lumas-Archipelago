@@ -91,7 +91,7 @@ def test_exact_packing(target):
 @pytest.mark.parametrize('settings', [
     {'red_ring_checks': 'off', 'game_land_checks': 0, 'chaos_emerald_checks': 0},
     {'red_ring_checks': 'per_level'}, {'trap_percentage': 100}, {'trap_percentage': 0},
-    {'goal': 'all_game_land_stages'}, {'world_progression': 'open_acts'},
+    {'goal': 'all_red_rings'}, {'world_progression': 'open_acts'},
 ])
 def test_fill_100_seeds(settings):
     for seed in range(100):

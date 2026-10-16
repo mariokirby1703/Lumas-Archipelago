@@ -26,7 +26,7 @@ def test_schema_and_stable_emerald_ids():
     assert EMERALDS == tuple(c+' Chaos Emerald' for c in ('Green','Red','Blue','Yellow','Purple','Cyan','White'))
     assert [ITEM_TABLE[n] for n in EMERALDS] == list(range(BASE_ID+15,BASE_ID+22))
     assert not {'wisp_unlocks','world_unlocks','chaos_emerald_items','red_ring_bundle_strategy','wisp_capsule_sanity'} & set(OPTION_NAMES)
-    assert set(Goal.options) == {'nega_wisp_armor','all_bosses','all_red_rings','all_game_land_stages','super_sonic'}
+    assert set(Goal.options) == {'nega_wisp_armor','all_bosses','all_red_rings'}
     assert 'starting_act' not in OPTION_NAMES
     assert len(STARTING_STAGES) == 42 and 'stg790' not in {s['mission_id'] for s in STARTING_STAGES}
     assert sum(s['kind']=='Boss' for s in STARTING_STAGES) == 6
@@ -215,7 +215,7 @@ def test_both_world_progression_modes_have_a_fillable_seed(mode):
     assert m.worlds[1].starting_stage['mission_id']!='stg790'
 
 
-@pytest.mark.parametrize('goal',range(5))
+@pytest.mark.parametrize('goal',range(3))
 def test_capsule_and_rank_checks_fill_with_every_goal(goal):
     from ..Locations import LOCATION_TABLE
     m=generate({'goal':goal,'wisp_capsules':True,'rank_checks':'all'},goal,fill=True)
