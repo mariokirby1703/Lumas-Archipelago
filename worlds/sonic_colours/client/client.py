@@ -127,7 +127,7 @@ class SonicCommands(ClientCommandProcessor):
                     logger.info('No change: %s already %s.', label,
                                 'unlocked' if action == 'give' else 'removed')
                 return
-            name, quantity = parse_item_request(raw)
+            name, quantity = parse_item_request(raw, getattr(overlay, 'options', None))
             result = overlay.change(action, name, quantity, original)
             refresh=True
             if result['before'] == result['effective']:

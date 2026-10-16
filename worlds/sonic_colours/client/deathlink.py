@@ -47,11 +47,20 @@ class DeathLink:
         if self.pending is not None and now >= self.pending:
             self.pending = None
             self.last_action = 'remote event expired'
-        if self.remote_deadline is not None and now>=self.remote_deadline:
-            if cancel:cancel()
-            self.remote_deadline=None;self.remote_request=None
-            self.state='RESPAWN_WAIT'
-            self.last_action='remote request expired/cancelled'
+        if self.remote_deadline is not None and now >= self.remote_deadline:
+            try:
+                if cancel:cancel()
+            except Exception as error:
+                # The guest may have executed the request already. A failed
+                # cancellation is not proof that it did not die later.
+                self.last_error = f'cancel not verified: {error}'
+                self.last_action = 'remote request cancellation uncertain'
+            else:
+                self.last_action = 'remote request expired/cancellation attempted'
+            self.remote_deadline = None
+            self.remote_request = None
+            self.state = 'RESPAWN_WAIT'
+            # remote_cycle remains sticky until a witnessed native death.
         if event:
             if self.remote_cycle:self.remote_witnessed=True
             local_event=safe and not self.remote_cycle and self.state=='ALIVE'
@@ -88,7 +97,11 @@ class DeathLink:
             self.alive_polls = 0
             return False
         if native_state == 'alive':
-            if self.state == 'REMOTE_DYING' and not self.remote_witnessed:
+            if self.remote_cycle and not self.remote_witnessed:
+                # ACK / timeout / three alive polls do NOT prove that an
+                # interrupted native death request cannot execute later.
+                # Fail closed until a native death sequence is observed.
+                self.alive_polls = 0
                 return False
             self.alive_polls += 1
             if self.alive_polls >= 3:

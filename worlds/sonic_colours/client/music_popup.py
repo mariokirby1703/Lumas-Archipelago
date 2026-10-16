@@ -1,5 +1,6 @@
 """Ephemeral now-playing model, driven only by native successful starts."""
 from .ap_hud_ticker import ascii_text
+from functools import lru_cache
 
 RESULT_CUES={'bgm_jingle_stg_clear','bgm_jingle_boss_clear','bgm_jingle_mlt_clear'}
 
@@ -47,10 +48,18 @@ class MusicPopup:
         return {'alpha':alpha,'title':self.title,'cue':self.cue,'heard':self.heard}
 
 
+@lru_cache(maxsize=8)
+def _seed_mapping(seed_name, music_randomization):
+    # The global 87-cue matching is deterministic and seed-owned. Running its
+    # recursive matching on every HUD fade tick can delay check/receipt polls.
+    from .music_bank import plan
+    return plan(seed_name, 'anywhere' if music_randomization else 'off')
+
+
 def update(runtime):
     if not hasattr(runtime,'music_popup'):runtime.music_popup=MusicPopup()
-    from .music_bank import plan
-    mapping=plan(runtime.slot_data['seed_name'],'anywhere' if runtime.slot_data['options']['music_randomization'] else 'off')
+    mapping=_seed_mapping(runtime.slot_data['seed_name'],
+                          bool(runtime.slot_data['options']['music_randomization']))
     snapshot=getattr(runtime,'snapshot',None)
     restart_key=(getattr(snapshot,'session',None),getattr(snapshot,'stage_epoch',None),getattr(snapshot,'scene',None))
     runtime.music_popup.observe(getattr(runtime,'native_event_status',{}),runtime.clock(),mapping,restart_key,defer_start=True)

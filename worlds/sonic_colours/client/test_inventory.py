@@ -89,7 +89,7 @@ def resolve_item(raw):
         raise ValueError('Tropical Resort is always available as the starting world; its access cannot be removed.')
     if key in ('terminal', 'terminalvelocity', 'terminalvelocityshuttle',
                'worldterminal', 'worldterminalvelocity'):
-        raise ValueError('Terminal Velocity has no Shuttle item; its access requires all eight Wisps. Use /give wisps or /remove wisps.')
+        raise ValueError('Terminal Velocity has no Shuttle item; its access requires all seven colours plus White Boost only when Boost Lock is on. Use /give wisps or /remove wisps.')
     lookup = {_key(item): item for item in TESTABLE}
     # Explicit aliases intentionally override full item names: `breath`
     # refers to Progressive Breathing rather than the legacy one-off Breath.
@@ -104,7 +104,7 @@ def resolve_item(raw):
     raise ValueError('Unknown or non-testable item: ' + repr(raw) + '. Use /testitems list.')
 
 
-def parse_item_request(raw):
+def parse_item_request(raw, options=None):
     """Accept `Double Jump`, `\"White Boost Wisp\"`, and a trailing count/all."""
     try:
         tokens = shlex.split(raw)
@@ -118,14 +118,37 @@ def parse_item_request(raw):
         quantity = 'all' if token.lower() == 'all' else int(token)
         if quantity != 'all' and not 1 <= quantity <= 99:
             raise ValueError('Quantity must be from 1 to 99')
-    return resolve_item(' '.join(tokens)), quantity
+    name = resolve_item(' '.join(tokens))
+    if options is not None and not options.get('movement_unlocks', True):
+        # Bare 'drill'/'hover'/'spikes' in a vanilla-movement seed must give
+        # the actual single Wisp item, not a non-pool progressive variant.
+        description = ' '.join(tokens).casefold()
+        if 'progressive' not in description and name in (
+                'Progressive Yellow Drill Wisp', 'Progressive Green Hover Wisp',
+                'Progressive Pink Spikes Wisp'):
+            name = name.removeprefix('Progressive ')
+    return name, quantity
 
 
 class LocalInventoryOverrides:
     """Signed differences from genuine AP item counts, never persisted."""
 
-    def __init__(self):
+    def __init__(self, options=None):
         self.deltas = {}
+        self.options = options
+
+    def _wisp_selection(self):
+        if self.options is None:
+            return WISP_ITEMS  # Legacy/unconfigured dev harness semantics.
+        movement = bool(self.options.get('movement_unlocks', True))
+        boost = bool(self.options.get('boost_lock', True))
+        normals = {'Yellow Drill Wisp','Green Hover Wisp','Pink Spikes Wisp'}
+        progressive = {'Progressive '+name for name in normals}
+        return tuple(name for name in WISP_ITEMS if
+                     (boost or name != 'White Boost Wisp') and
+                     (movement or name not in progressive) and
+                     (not movement or name not in normals))
+
 
     def reset(self):
         self.deltas.clear()
@@ -162,14 +185,31 @@ class LocalInventoryOverrides:
                 'quantity_mode': 'target_level' if action == 'give' and name in MAXIMUM else 'delta'}
 
     def change_all_abilities(self, action, genuine):
-        return [self.change(action, name, 'all', genuine) for name in ABILITY_SET]
+        if self.options is None:
+            return [self.change(action, name, 'all', genuine) for name in ABILITY_SET]
+        movement = bool(self.options.get('movement_unlocks', True))
+        targets = tuple(MOVEMENT_ITEMS if movement else ()) + self._wisp_selection()
+        results = [self.change(action, name, 'all', genuine) for name in targets]
+        # Remove aliases/tiers not supplied in this YAML, including retired
+        # seed variants. The server's actual ReceivedItems are never modified.
+        excluded = set(ABILITY_SET) - set(targets)
+        if action == 'remove':excluded.update(ABILITY_SET)
+        for name in sorted(excluded):
+            results.append(self.change('remove', name, 'all', genuine))
+        if movement:results.append(self.change('remove','Breath','all',genuine))
+        return results
 
     def change_ability_group(self, action, group, genuine):
         """Apply a batch of local permissions without forging AP receipts."""
         if group not in ABILITY_GROUPS:
             raise ValueError('Unknown ability group: ' + repr(group))
-        results = [self.change(action, name, 'all', genuine)
-                   for name in ABILITY_GROUPS[group]]
+        targets = self._wisp_selection() if group == 'wisps' else ABILITY_GROUPS[group]
+        results = [self.change(action, name, 'all', genuine) for name in targets]
+        if group == 'wisps' and self.options is not None:
+            excluded = set(WISP_ITEMS) - set(targets)
+            if action == 'remove':excluded.update(WISP_ITEMS)
+            for name in sorted(excluded):
+                results.append(self.change('remove', name, 'all', genuine))
         if group == 'movements':
             # Even an AP-owned or earlier manually given retired Breath must
             # not win over maximum Progressive Breathing (nor survive remove).

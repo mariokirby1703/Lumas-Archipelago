@@ -74,8 +74,10 @@ def entry_match(world,state,entry,*,movement_field=False):
     if not routes or status=='needs_review':
         # Codex should ensure all unresolved routes are reviewed before release.
         raise ValueError('Ambiguous or unparsed route: '+entry.get('raw',''))
-    if 'check_and_or_precedence' in entry.get('review',[]):
-        return all(available(world,state,atom) for route in routes for atom in route)
+    # The sheet importer has already parsed conventional AND-before-OR
+    # precedence into distinct routes. Keep the ambiguity review note for
+    # human confirmation, but never silently replace alternatives with AND.
+    # Advanced routes stay excluded because they live in a separate field.
     return any(route_match(world,state,route) for route in routes)
 
 
@@ -92,11 +94,14 @@ def check(world,state,manifest,key,rank=None):
         rank_entry=manifest['rank_observations'].get(record['mission_id'],{}).get('logic',{}).get(rank)
         if rank_entry:
             if rank_entry['status']=='needs_review':
-                # Don't claim score rank achievable from an unparsed strategy.
-                # Fall back conservatively until user resolves skill-based note.
-                from .client.test_inventory import MAXIMUM
-                return (all(colour_available(world,state,c,2 if c in PROGRESSIVE_COLOURS else 1) for c in ('White Boost',)+COLOURS)
-                        and (not option(world,'movement_unlocks') or all(state.has(x,world.player,MAXIMUM.get(x,1)) for x in MOVEMENT_NAMES if x!='Assist Change' or option(world,'game_land_checks'))))
+                # The only outstanding rank note is Asteroid Coaster Act 4:
+                # "Sidestep and Kill Enemies for S Rank". It describes a
+                # technique, not item ownership. Quick Step is already gated
+                # by this stage's Movement entry when Ability Locks is on.
+                # The actual S-rank still requires the native result/grade.
+                if key == 'stg650' and rank == 'S':
+                    return True
+                raise ValueError('Unreviewed rank strategy: '+key+' '+str(rank))
             return entry_match(world,state,rank_entry)
     return True
 

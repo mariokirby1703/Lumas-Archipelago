@@ -70,7 +70,8 @@ def test_or_of_and_progressive_tiers_and_conservative_review():
     assert logic.entry_match(w,State(['Progressive Pink Spikes Wisp']),entry)
     assert not logic.entry_match(w,State(['Cyan Laser Wisp']),entry)
     reviewed={**entry,'review':['check_and_or_precedence']}
-    assert not logic.entry_match(w,State(['Progressive Pink Spikes Wisp']),reviewed)
+    assert logic.entry_match(w,State(['Progressive Pink Spikes Wisp']),reviewed)
+    assert not logic.entry_match(w,State(['Cyan Laser Wisp']),reviewed)
     assert not logic.available(w,State(['Progressive Crouch']),{'ability':'Progressive Crouch','tier':2})
     assert logic.available(world(movement_unlocks=False),State(),{'ability':'Progressive Crouch','tier':2})
     assert logic.available(world(game_land_checks=False),State(),{'ability':'Progressive Game Land Speed','tier':4})
@@ -140,3 +141,21 @@ def test_legacy_slot_normalization_preserves_the_previous_journal_digest():
     assert normalized['options']['native_feature_tests']==0
     assert slot_identity_digest(normalized)==expected
     assert wisp_level({'Progressive Yellow Drill Wisp':1},'Yellow Drill',normalized['options'])==2
+
+
+def test_sheet_normal_or_routes_remain_alternatives():
+    manifest=load_data('logic_from_sheet_v2.json')
+    # These have explicit alternative routes; ambiguity remains documented
+    # in the data rather than spuriously requiring every ability at once.
+    assert logic.check(world(),State(['Progressive Green Hover Wisp']),manifest,'stg320:ring:4')
+    assert logic.check(world(),State(['Progressive Pink Spikes Wisp']),manifest,'stg410')
+    assert logic.check(world(movement_unlocks=False),
+                       State(['Cyan Laser Wisp','Orange Rocket Wisp']),manifest,'stg430')
+    assert not logic.check(world(),State(['Cyan Laser Wisp']),manifest,'stg430')
+
+
+def test_ast_coaster_s_rank_skill_note_does_not_require_every_item():
+    manifest=load_data('logic_from_sheet_v2.json')
+    assert logic.check(world(),State(['Quick Step']),manifest,'stg650','S')
+    assert not logic.check(world(),State(),manifest,'stg650','S')
+    assert logic.check(world(movement_unlocks=False),State(),manifest,'stg650','S')

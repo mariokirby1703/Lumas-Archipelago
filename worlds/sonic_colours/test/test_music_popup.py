@@ -61,3 +61,19 @@ def test_result_music_is_supported_without_enabling_death_jingles():
     assert p.observe(event(1,'bgm_jingle_stg_clear'),0)
     assert p.display(0)['title']=='bgm jingle stg clear'
     assert not p.observe(event(2,'bgm_jingle_drown'),1)
+
+
+def test_music_mapping_is_cached_per_seed_and_mode(monkeypatch):
+    from ..client import music_bank,music_popup
+    music_popup._seed_mapping.cache_clear()
+    calls=[]
+    original=music_bank.plan
+    def traced(seed,mode):
+        calls.append((seed,mode))
+        return original(seed,mode)
+    monkeypatch.setattr(music_bank,'plan',traced)
+    assert music_popup._seed_mapping('cached-seed',True)==music_popup._seed_mapping('cached-seed',True)
+    assert calls==[('cached-seed','anywhere')]
+    music_popup._seed_mapping('cached-seed',False)
+    assert calls[-1]==('cached-seed','off') and len(calls)==2
+    music_popup._seed_mapping.cache_clear()
