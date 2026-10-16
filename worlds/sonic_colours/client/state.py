@@ -323,6 +323,12 @@ class WritePolicy:
             tx=getattr(self.memory,'_event_transaction',None)
             if not tx or tx['allowed'].get(address)!=size:
                 raise MemoryUnavailable('WRITE_BLOCKED: no native event transaction')
+            if tx.get('music_loop'):
+                from .live_music import finite_loop_policy
+                if (address!=base+events.LOOP_CUE or size!=4
+                        or tx['value']!=finite_loop_policy(self.memory)):
+                    raise MemoryUnavailable('WRITE_BLOCKED: finite music destination changed')
+                return ('verified_finite_music_destination',base,tx['value'])
             if tx['disable']:
                 if address!=base+events.ENABLE or size!=4 or tx['values'].get(events.ENABLE)!=bytes(4):
                     raise MemoryUnavailable('WRITE_BLOCKED: native event disarm range')

@@ -136,7 +136,8 @@ def test_connected_assets_start_blank_with_bounded_shared_mailboxes():
         assert new[box+16:box+144]==b' '+b'\0'*127
         assert m.u(new,box+8)==0
         controller=m.ptr(new,box+4);controls.add(controller)
-        assert [m.u(new,controller+j*4) for j in range(4)]==[0x41504844,0,128,90]
+        assert [m.u(new,controller+j*4) for j in range(5)]==[0x41504845,0,128,90,0]
+        assert m.ptr(new,controller+20)==controller+16
         info=m.ptr(new,record+48)
         assert m.u(new,info+0x20)==(0x000000ff if '_outline' in name else 0xffffffff)
     assert len(controls)==1

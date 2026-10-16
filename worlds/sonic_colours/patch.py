@@ -13,7 +13,9 @@ from .client.asset_patch import PAL_CPK_SHA256
 FORMAT=1
 # This released component has the same seed/resource contract. Rebuilding
 # from it installs the corrected wrapper traversal, never its old machine code.
-UPGRADABLE_NATIVE_COMPONENTS={'0c27cd93a3589a8dad2a1a3debfb85495e4aa75ef61f0474352496bdac1976d3',
+UPGRADABLE_NATIVE_COMPONENTS={'4fb7b39e6a3006585da629615d7aff634ba5fe2c633cc6d4ca58bd2611dbbb1b',
+                             '0c27cd93a3589a8dad2a1a3debfb85495e4aa75ef61f0474352496bdac1976d3',
+                             '41b26cdb1c4f8af9f862f3cb4c6a226a003d9e6ec7e3cd97c119190224fea816',
                              '61f7a1e4cea3cfba60700465647311f882ca98ddcad56ed507d9c46b6ea39a8d',
                              'ddbb9ab5e96a36deb330ba58d2773d093a032982a2b52809e9116b7126f30fd1',
                              '84207fd5a41582c96a49d1a89396be331f74aa0de2046725a389d119cf028fe4',
@@ -23,6 +25,11 @@ UPGRADABLE_RESOURCES={'9281b474c4023c15944860247c65a4de6adc79a1282b8eb02862603dc
 # Same resource contract, with the Game Land overlay formerly behind the frame.
 UPGRADABLE_RESOURCES.add('d8f49fe95368298932065e51d507bae00afdb50823fffd5ccf9b6efc01c20fd2')
 UPGRADABLE_RESOURCES.add('c0b53f72da43de419d12151554433a5850cdadc851309fda11c3d9df37b9f0aa')
+UPGRADABLE_RESOURCES.add('31fc40bf9b2c89a924b8b9863e7903b2562d84e2d95a3e5669a34dbc10b4b095')
+# Same built assets; audition now preserves original finite destinations.
+UPGRADABLE_RESOURCES.add('10e74fe2d77c0940bf2d348c66f7ffe4e8c6dbe56f63416467676157aed32c92')
+# Registry v2 assets; only optional host-side finite-song audition was added.
+UPGRADABLE_RESOURCES.add('bb6538ce29d3a0b70f47814f9ede3fa45a496b1908b58bd0e41c1d03ea7adce1')
 UPGRADABLE_NATIVE_COMPONENTS.update({'c3bfebc29447406ee3fad98473c140496c8a0870ed0c2101897b28e7bbc77ff4', 'f3155c39f82e1b8e8708f9ea1bfb993bb349d8d4bd40f6a8ffa5cf5a1d59fde4'})
 UPGRADABLE_RESOURCES.update({'d6500135d5b7a36c618d00961974c223b5d5ef9dff8488751693330c11aa0a08', 'ab0276016b694b38761ecc47aab8c2506086d2c7e9dd5bebff8ba0a3dbeeb0e9', 'a72d8cd9d9f2226092a3ce4cee0944e97cde8585bb6c2f0c57e5566778739521'})
 

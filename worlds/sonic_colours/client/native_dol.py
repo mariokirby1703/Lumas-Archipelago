@@ -85,7 +85,7 @@ def plan():
     patches.append((area_map_refresh.HOOK,area_map_refresh.ORIGINAL.to_bytes(4,'big'),branch(area_map_refresh.HOOK,cursor).to_bytes(4,'big')))
     hooks.append({'hook':area_map_refresh.HOOK,'target':cursor,'size':len(blob),'return':area_map_refresh.HOOK+4})
     payload.extend(blob);cursor+=len(blob)
-    patches.extend(hud());patches.extend(rocket())
+    patches.extend(hud(native_registry=True));patches.extend(rocket())
     from . import native_events,oxygen_native
     # Oxygen code and its data precede the event mailbox, keeping that ABI's
     # end-relative address stable and within the reserved executable section.
@@ -110,7 +110,7 @@ def plan():
     for address,old,new in patches:
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')
         ownership.append((address,address+len(new)))
-    if cursor>SIGNATURE:raise ValueError('native executable section exhausted')
+    if cursor>SIGNATURE-4:raise ValueError('native executable section exhausted (HUD registry reserved)')
     digest=hashlib.sha256(bytes(payload)+b''.join(struct.pack('>I',a)+n for a,o,n in patches)).digest()
     return patches,bytes(payload),digest,hooks
 

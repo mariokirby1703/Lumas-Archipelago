@@ -131,11 +131,11 @@ class SaveBinding:
                            visible_slot=index + 1,
                            evidence={**snapshot.evidence, 'save_binding_proof': binding['kind']},
                            status='seeded native save/profile/intro records attributed; live gameplay verification pending')
-        if not bootstrap or bootstrap['session'] != snapshot.session:
+        if not bootstrap:
             return snapshot
-        if self.intro_session != snapshot.session:
-            return snapshot
-        if snapshot.actual_mission == INTRO[1] and snapshot.scene in ('gameplay', 'results'):
+        same_intro_session = (bootstrap['session'] == snapshot.session
+                              and self.intro_session == snapshot.session)
+        if same_intro_session and snapshot.actual_mission == INTRO[1] and snapshot.scene in ('gameplay', 'results'):
             self.second_act_seen = True
             record = current[INTRO[0]]
             if INTRO[0] in snapshot.persisted_clears and 0 <= record['raw_rank'] <= 4 and record['time_raw'] > 0:
@@ -147,7 +147,7 @@ class SaveBinding:
         witnesses = [e for e in self.journal.data.get('pickup_events', ())
                      if e.get('kind') == 'result' and e.get('mission') in INTRO
                      and e.get('playthrough_epoch') == bootstrap['epoch']
-                     and e.get('session') == snapshot.session
+                     and e.get('session') == bootstrap['session']
                      and e.get('provenance') == 'stage9C_native_UI_state7_grade124']
         witnessed = {}
         for e in witnesses:
@@ -157,7 +157,11 @@ class SaveBinding:
                     and witnessed[m]['score'] == current[m]['score']
                     and witnessed[m]['grade'] == current[m]['raw_rank']
                     and current[m]['time_raw'] > 0 for m in INTRO))
-        old_verified_route = (self.second_act_seen and self.first_record == current[INTRO[0]])
+        # A reboot may occur after saving but before the first map poll. Only
+        # the two durable results from this bootstrap's original session may
+        # bridge that gap; session-local observations cannot cross a reboot.
+        old_verified_route = (same_intro_session and self.second_act_seen
+                              and self.first_record == current[INTRO[0]])
         if (index <= 2 and (old_verified_route or saved_matches_witnesses)
                 and snapshot.scene in ('global_map', 'world_map') and snapshot.scene_verified
                 and snapshot.persisted_clears == frozenset(INTRO)

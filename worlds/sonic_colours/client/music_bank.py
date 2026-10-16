@@ -73,13 +73,22 @@ def plan(seed, mode):
     return result
 
 
-def rewrite_bank(original, mapping):
+def rewrite_bank(original, mapping, *, finite_audition=False):
     if hashlib.sha256(original).hexdigest() != CATALOG['bank_sha256']:
         raise ValueError('original PAL BGM bank SHA256 mismatch')
-    if set(mapping) != set(CUES) or set(mapping.values()) != set(CUES):
-        raise ValueError('BGM mapping must be a permutation of the complete original cue catalog')
+    if set(mapping) != set(CUES) or not set(mapping.values()) <= set(CUES):
+        raise ValueError('BGM mapping must use the complete original cue catalog')
     if any(mapping[n] != n for n in FINITE_CUES):
-        raise ValueError('finite BGM cues must remain vanilla as sources and destinations')
+        raise ValueError('finite BGM cue destinations must remain vanilla')
+    if finite_audition:
+        # Duplicate only these audited donors, retaining their original cues.
+        # A test must never put a looping stage donor into opening/credits.
+        from collections import Counter
+        duplicates={name for name,count in Counter(mapping.values()).items() if count>1}
+        if not duplicates <= {'bgm_sys_op','bgm_sys_end'}:
+            raise ValueError('finite audition can duplicate only the opening/credits audio')
+    elif set(mapping.values()) != set(CUES):
+        raise ValueError('BGM mapping must be a permutation of the complete original cue catalog')
     bank = UTF(original)
     offset, size = next(row['utf'] for row in bank.rows if row['name'] == 'CUE')
     base = bank.binary + offset; cue = UTF(original[base:base+size])

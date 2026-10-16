@@ -170,3 +170,25 @@ def test_transient_gecko_controls_use_actual_pal_index(monkeypatch,native_index)
     # indicates a changed context and must be rejected.
     with pytest.raises(MemoryUnavailable,match='no-slot native index changed'):
         live_control_profile(ProfileMemory(native_index - 1),observed,guard)
+
+
+@pytest.mark.parametrize('mismatch', [None, 'score', 'session', 'epoch', 'missing'])
+def test_first_save_reconciles_durable_intro_after_reboot(monkeypatch, mismatch):
+    journal,native,guard,snaps=initialize(monkeypatch)
+    bootstrap=journal.data['bootstrap']
+    journal.data['pickup_events']=[dict(kind='result',mission=m,score=score,
+        grade=2,session=bootstrap['session'],playthrough_epoch=bootstrap['epoch'],
+        provenance='stage9C_native_UI_state7_grade124')
+        for m,score in [('stg110',12300),('stg130',15500)]]
+    if mismatch=='session':journal.data['pickup_events'][0]['session']='unrelated'
+    if mismatch=='epoch':journal.data['pickup_events'][0]['playthrough_epoch']='unrelated'
+    if mismatch=='missing':journal.data['pickup_events'].pop()
+    saved=dict(chain=(0,0,1),profile_hex='saved-profile',rank_records={
+        m:dict(raw_rank=2,score=score,time_raw=140)
+        for m,score in [('stg110',12301 if mismatch=='score' else 12300),('stg130',15500)]})
+    snap=replace(snaps[-1],session='new-boot',scene='world_map',actual_mission=None,
+        progress_verified=True,persisted_clears=frozenset(('stg110','stg130')))
+    observed=SaveBinding(journal).attribute(snap,saved)
+    assert observed.save_identity_verified == (mismatch is None)
+    guard.observe(observed)
+    assert (journal.data['save_identity']==bootstrap['epoch']) == (mismatch is None)

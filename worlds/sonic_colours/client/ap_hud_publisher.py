@@ -10,10 +10,11 @@ from pathlib import Path
 from functools import lru_cache
 HOOK=0x805e0ddc
 ORIGINAL=0x7f63db78
-MAGIC=0x41504844
+MAGIC=0x41504845
+REGISTRY=0x80002FBC  # guest-owned word before the native ISO signature
 
-@lru_cache(maxsize=1)
-def patches():
+@lru_cache(maxsize=2)
+def patches(native_registry=False):
     if __package__:
         from ..world_constants import load_data
         sites=load_data('hud_publisher_sites.json')
@@ -43,8 +44,17 @@ def patches():
     d(32,30,27,0x40);cmp(30,0);branch('done',0x41820000)
     d(32,3,30,152);d(15,4,0,0x4150);d(24,4,4,0x4d42)
     emit(0x7c032000);branch('done',0x40820000)
-    d(32,31,30,4);d(32,3,31,0);d(15,4,0,0x4150);d(24,4,4,0x4844)
+    d(32,31,30,4);d(32,3,31,0);d(15,4,0,MAGIC>>16);d(24,4,4,MAGIC&65535)
     emit(0x7c032000);branch('done',0x40820000)
+    # 805EB054 calls 805E0C84 with its Layer this in r31. The latter saves
+    # r16..r31 at stack+40 before reusing r31 for group traversal. Recover
+    # that saved Layer at original stack+7C (our frame adds 160).
+    # The controller holds a borrowed two-hop handle, never a refcount owner.
+    # This replaces the invalid assumption that Save Select uses stage actors
+    # or that an allocator's current heap entry is a stable UI owner.
+    if native_registry:
+        d(32,3,1,0x1dc);d(36,3,31,16)
+        d(15,4,0,REGISTRY>>16);d(36,31,4,REGISTRY&65535)
     d(32,11,31,4);cmp(11,0);branch('done',0x41820000)
     emit(0x71600001);branch('done',0x40820000)
     # Also visit acknowledged casts: alpha converges on the game thread,
@@ -136,10 +146,10 @@ def patches():
 def installed(memory):
     from .hud_renderer_batch import ADDRESS,replacement
     return (memory.read_bytes(ADDRESS,len(replacement()))==replacement()
-            and all(memory.read_bytes(a,len(new))==new for a,old,new in patches()))
+            and all(memory.read_bytes(a,len(new))==new for a,old,new in patches(bool(getattr(memory,'native_patch',None)))))
 
 def normalize(memory,data,base):
-    plan=[(a,old,new) for a,old,new in patches() if base<=a and a+len(new)<=base+len(data)]
+    plan=[(a,old,new) for a,old,new in patches(bool(getattr(memory,'native_patch',None))) if base<=a and a+len(new)<=base+len(data)]
     if not any(data[a-base:a-base+len(new)]==new for a,old,new in plan):return data
     if not installed(memory):return data
     out=bytearray(data)

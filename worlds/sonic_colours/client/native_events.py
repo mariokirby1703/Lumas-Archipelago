@@ -1,4 +1,4 @@
-"""PAL game-thread death, jump-policy and successful audio-start boundaries.
+"""PAL game-thread death, jump-policy and cue-preparation boundaries.
 
 Code is boot-patched into audited, unreferenced function alignment padding.
 Only the initialized native DOL mailbox is writable at runtime.
@@ -12,12 +12,13 @@ MAGIC=0x41504532
 SIZE=128
 HOOKS={'frame':(0x8001CE60,0x800400A4),'death':(0x8001D2B8,0x2C1A0000),
        'jump_state':(0x800395B4,0x7C0802A6),
-       'music':(0x80125378,0x981E0029),'jump':(0x80056CA0,0x5484103A)}
+       'music_loop':(0x80125004,0x3803FFFF),'music':(0x80125378,0x981E0029),'jump':(0x80056CA0,0x5484103A)}
 # Mailbox offsets. A coherent host publication disables ENABLE before changing
 # ownership. Sequence/ack fields and remaining time are game-thread owned.
 ENABLE,STAGE,PLAYER,SERIAL,REQUEST,ACK,DEATH_SEQ,DEATH_STAGE,DEATH_COUNT=4,8,12,16,20,24,28,32,36
 REMAINING,TRAP_REQUEST,TRAP_ACK,INPUT,MUSIC_SEQ,CHANNEL,CUE,NAME=40,44,48,52,60,64,68,72
 JUMP_TABLE=112
+LOOP_CUE=104  # host-authenticated finite donor destination, zero disables
 FRAME_FENCE=56  # completed native frame callbacks, including disabled frames
 JUMP_STATES=(5,6,7,8,9,11,12,18,19,29,30,36,37,39,40,46,47,58,80,106,107,115)
 
@@ -33,7 +34,7 @@ def program(kind,control):
     a.d(37,1,1,-0x120);a.d(47,0,1,16)
     for word,off in ((0x7C000026,144),(0x7C0802A6,148),(0x7C0902A6,152)):
         a.emit(word);a.d(36,0,1,off)
-    if kind=='frame':
+    if kind in ('frame','music_loop'):
         for f in range(14):a.d(54,f,1,160+f*8)
     const(31,control)
     if kind=='death':
@@ -43,8 +44,39 @@ def program(kind,control):
         a.d(36,29,31,DEATH_STAGE);a.d(32,4,29,0x468);a.d(36,4,31,DEATH_COUNT)
         a.d(36,27,31,108)  # native deceased actor ID (normal Sonic or Assist)
         a.d(14,3,3,1);a.emit(0x7C0004AC);a.d(36,3,31,DEATH_SEQ)
+    elif kind=='music_loop':
+        # Native channel update: r3 is the resolved CRI status, r30 the
+        # still-owned channel. Status 4 is stopped (not playing/paused/error).
+        a.d(32,4,31,LOOP_CUE);a.d(28,4,7,0xffff);cmp(7,0);br('done',0x41820000)
+        a.d(32,5,30,0);cmp(5,0);br('done',0x40810000) # native owners remain
+        a.d(34,5,30,0x29);cmp(5,1);br('done',0x40820000) # successful start
+        a.d(34,5,30,0x28);cmp(5,0);br('done',0x40820000) # no stop/fade/pause
+        a.d(32,6,30,8);cmp(6,0);br('done',0x41820000)
+        a.d(32,5,6,0);equal(7,5);br('done',0x40820000)
+        cmp(3,2);br('loop_running',0x41820000)
+        cmp(3,3);br('loop_running',0x41820000)
+        cmp(3,4);br('done',0x40820000)
+        const(8,0x10000)
+        a.emit(31<<26|4<<21|8<<16|8<<11|28<<1|1) # and. armed bit
+        br('done',0x41820000)
+        # Consume before Start: a preparing/stopped player cannot retrigger.
+        a.d(36,7,31,LOOP_CUE)
+        # Original opening/credits cue IDs are never eligible host policies.
+        # Restart the existing descriptor/player through the original wrapper.
+        # 80600470..80600494 deliberately reuse an identical cached cue,
+        # including a finished one. Native Stop releases that instance first.
+        a.mr(29,6);a.mr(3,30);a.d(14,4,0,0);call(0x801251EC)
+        a.mr(3,30);a.mr(4,29);call(0x80125310)
+        # 80123830 prepares the cue; the handle's separate Play wrapper at
+        # 80123714 calls 80125390. Preparation alone never starts the stream.
+        a.mr(3,30);a.d(14,4,0,0);a.d(48,1,2,-0x615c);call(0x80125390)
+        br('done')
+        a.label('loop_running');const(8,0x10000)
+        a.emit(31<<26|7<<21|8<<16|8<<11|444<<1) # or r8,r7,r8
+        a.d(36,8,31,LOOP_CUE)
     elif kind=='music':
-        # 80125360 calls the CRI player's cue-start virtual function; native
+        # 80125360 prepares the CRI cue; this is NOT proof of audible playback.
+        # The separate Play request is 80125390. Native
         # status at stack+8 must be zero to reach this successful-start site.
         # r31 is the cue descriptor, preceded by the tree's 32-byte cue key.
         a.d(32,3,1,16+31*4)  # original r31, before using it as control
@@ -114,6 +146,7 @@ def program(kind,control):
     a.label('done')
     if kind=='frame':
         a.d(32,3,31,FRAME_FENCE);a.d(14,3,3,1);a.emit(0x7C0004AC);a.d(36,3,31,FRAME_FENCE)
+    if kind in ('frame','music_loop'):
         for f in range(14):a.d(50,f,1,160+f*8)
     def restore():
         for word,off in ((0x7C0FF120,144),(0x7C0803A6,148),(0x7C0903A6,152)):
@@ -154,9 +187,12 @@ def patches(control):
     from .native_dol import branch
     sites=load_data('native_event_sites.json');result=[];used=0
     for kind,(hook,old) in HOOKS.items():
-        words=program(kind,control);entry=sites[used]['address']
+        words=program(kind,control)
+        selected=(load_data('native_music_loop_sites.json') if kind=='music_loop' else sites[used:])
+        entry=selected[0]['address']
         result.append((hook,old.to_bytes(4,'big'),branch(hook,entry).to_bytes(4,'big')))
-        result.extend(scatter(words,sites[used:],hook+4));used+=len(words)
+        result.extend(scatter(words,selected,hook+4))
+        if kind!='music_loop':used+=len(words)
     return result
 
 
@@ -186,6 +222,8 @@ def status(memory):
             'trap_request':struct.unpack_from('>I',raw,TRAP_REQUEST)[0],
             'trap_ack':struct.unpack_from('>I',raw,TRAP_ACK)[0],
             'remaining':max(0.,struct.unpack_from('>f',raw,REMAINING)[0]),
+            'finite_loop_cue':struct.unpack_from('>I',raw,LOOP_CUE)[0]&0xffff,
+            'finite_loop_armed':bool(struct.unpack_from('>I',raw,LOOP_CUE)[0]&0x10000),
             'music_sequence':struct.unpack_from('>I',raw,MUSIC_SEQ)[0],
             'music_channel':struct.unpack_from('>I',raw,CHANNEL)[0],
             'cue_id':struct.unpack_from('>I',raw,CUE)[0],

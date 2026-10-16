@@ -110,7 +110,8 @@ def overlay(gameplay,keyboard,texture_index=12,keyboard_tls=None,messages=SAMPLE
     fontroot=append(struct.pack('>III',nf+1,table-BASE,ids-BASE))
     offset(fontroot+4,table);offset(fontroot+8,ids);offset(60,fontroot)
 
-    controller=append(struct.pack('>4I',0x41504844,0,128,90)) if ap_connected else None
+    controller=append(struct.pack('>6I',0x41504845,0,128,90,0,0)) if ap_connected else None
+    if ap_connected:offset(controller+20,controller+16)
     source=cast(keyboard,ks,'text_name');records=[]
     if not 1<=len(messages)<=5 or any(len(message)!=2 for message in messages):
         raise ValueError('overlay requires one to five two-line messages')

@@ -43,6 +43,19 @@ def _read_stage_objects(memory, include_pickups=True):
     context = memory.read_ptr_checked(module + 0x34, 4)
     vtable = memory.read_u32(context)
     row = {'context': context, 'vtable': vtable, 'application': application}
+    if vtable==0x807659C0 and getattr(memory,'native_patch',None):
+        # Regular title-menu selection has another context than the first
+        # post-intro save screen (map mode 6). Require its drawn AP resource;
+        # this only classifies the UI, never attributes a save or a pickup.
+        from .ap_hud_publisher import REGISTRY,MAGIC
+        try:
+            control=memory.read_ptr_checked(REGISTRY,24)
+            layer=memory.read_ptr_checked(control+16,0x34)
+            layout=memory.read_ptr_checked(layer+12,0x34)
+            if (memory.read_u32(control)==MAGIC and memory.read_u32(layer)==0x807abc40
+                    and memory.read_u32(layout+44)==350):
+                row['scene']='save_select'
+        except MemoryUnavailable:pass
     if vtable == 0x80769D90:
         mode = memory.read_u32(context + 0x74)
         row.update(map_mode=mode, scene={2: 'global_map', 3: 'world_map', 5: 'game_land_select', 6:'save_select'}.get(mode, 'unclassified'))

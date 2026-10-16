@@ -131,3 +131,36 @@ def test_legacy_compatible_bank_can_migrate_to_global_and_restore_vanilla():
     recovered=recover_original(bytes(legacy));assert recovered==original
     updated=music_bank.rewrite_bank(recovered,music_bank.plan('global-migration','anywhere'))
     assert recover_original(updated)==original
+
+
+@pytest.mark.skipif(not SOURCE.exists(),reason='original PAL CPK absent')
+@pytest.mark.parametrize('donor',['bgm_sys_op','bgm_sys_end'])
+def test_finite_song_audition_is_explicit_and_recoverable(donor):
+    original=bank();mapping=music_bank.plan('audition','anywhere')
+    destination='bgm_stg110_rso'
+    mapping[destination]=donor
+    with pytest.raises(ValueError,match='permutation'):
+        music_bank.rewrite_bank(original,mapping)
+    changed=music_bank.rewrite_bank(original,mapping,finite_audition=True)
+    assert changed!=original and music_bank.recover_bank(changed)==original
+    assert music_bank.plan('audition','anywhere')[donor]==donor
+
+
+@pytest.mark.skipif(not SOURCE.exists(),reason='original PAL CPK absent')
+@pytest.mark.parametrize('donor',['bgm_sys_op','bgm_sys_end','bgm_zmap_rso'])
+def test_loop_policy_requires_actual_finite_audio_in_eligible_destination(monkeypatch,donor):
+    from ..client import live_music,native_events
+    original=bank();mapping=music_bank.plan('policy','off');destination='bgm_stg130_rso'
+    if donor in ('bgm_sys_op','bgm_sys_end'):mapping[destination]=donor
+    else:mapping[destination],mapping[donor]=mapping[donor],mapping[destination]
+    raw=music_bank.rewrite_bank(original,mapping,finite_audition=True)
+    monkeypatch.setattr(live_music,'probe_bank',lambda m:(0x90100000,raw,original))
+    event=dict(cue_name=destination,cue_id=music_bank.CUES[destination]['id'])
+    monkeypatch.setattr(native_events,'status',lambda m:event)
+    expected=event['cue_id'] if donor in ('bgm_sys_op','bgm_sys_end') else 0
+    assert live_music.finite_loop_policy(None)==expected
+    event['cue_id']=-1
+    assert live_music.finite_loop_policy(None)==0
+    for protected in ('bgm_sys_op','bgm_sys_end'):
+        event.update(cue_name=protected,cue_id=music_bank.CUES[protected]['id'])
+        assert live_music.finite_loop_policy(None)==0

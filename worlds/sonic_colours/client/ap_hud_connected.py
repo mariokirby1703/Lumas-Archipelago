@@ -8,21 +8,23 @@ from .ap_hud_publisher import MAGIC,installed,HOOK,patches
 
 def discover(memory):
     rows=read_stage_objects(memory,False)
-    if len(rows)!=1 or rows[0]['scene'] not in ('gameplay','world_map','global_map','game_land_select','results','save_select'):
+    if len(rows)!=1 or rows[0].get('scene') not in ('gameplay','world_map','global_map','game_land_select','results','save_select'):
         raise MemoryUnavailable('HUD requires gameplay or a map')
     found={}
     actors=read_actors(memory,rows[0]['context'])
     menu_anchors=[]
     if rows[0]['scene']=='save_select':
-        # Save UI is owned by the document service, outside stage actors.
-        # Live PAL chain; final authority remains exact layer/font/mailbox
-        # signatures below. Retain every reference as a transaction anchor.
-        app=rows[0]['application']
-        document=memory.read_ptr_checked(app+4,0x5c)
-        service=memory.read_ptr_checked(document+0x58,0x14)
-        owner=memory.read_ptr_checked(service+0x10,0x480)
-        menu_anchors=[(p,memory.read_bytes(p,4)) for p in (app+4,document+0x58,service+0x10,rows[0]['context']+0x74)]
-        actors=[owner]
+        from .ap_hud_publisher import REGISTRY
+        if not getattr(memory,'native_patch',None):
+            raise MemoryUnavailable('Save Select requires the native HUD registry')
+        control=memory.read_ptr_checked(REGISTRY,24)
+        if memory.read_u32(control)!=MAGIC:
+            raise MemoryUnavailable('Save Select HUD registry awaits first draw')
+        if memory.read_u32(control+20)!=control+16:
+            raise MemoryUnavailable('Save Select HUD reference not registered')
+        handle=control+16
+        menu_anchors=[(p,memory.read_bytes(p,4)) for p in (REGISTRY,control+16,control+20,rows[0]['context']+0x74)]
+        actors=[handle]
     for actor in actors:
         # Native HUD owner classes, verified in gameplay and the shared maps.
         # Scanning every gameplay object's pointer fields caused thousands of

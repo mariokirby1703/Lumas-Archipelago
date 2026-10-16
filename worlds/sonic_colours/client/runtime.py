@@ -395,6 +395,15 @@ class Runtime:
         early_items=list(item_ids if history_ready else self.journal.data['receipts'])
         early_items+=[item for item in self.journal.data.get('permission_receipts',()) if item not in early_items]
         early_owned=self.effective_inventory(inventory(early_items))
+        # Map paths are gameplay permissions. Publish them before HUD/font
+        # discovery and its guarded mailbox writes on the first attributed poll.
+        # Keep every ordinary save/write guard; this only changes scheduling.
+        if self.snapshot.scene in ('global_map','world_map','game_land_select'):
+            try:
+                self.guard.check(self.snapshot)
+                self.project_permissions(memory,early_owned)
+            except MemoryUnavailable as error:
+                self.hooks.progression_status={'available':False,'reason':str(error)}
         from .capsule_refresh import configure as configure_early_capsules
         from .gameplay_controls import configure as configure_early_controls
         for name,action in (
@@ -419,6 +428,12 @@ class Runtime:
                     setattr(self,name,result)
                 except MemoryUnavailable as error:
                     setattr(self,name,{'status':str(error),'write_verified':False})
+        if getattr(memory,'native_patch',None):
+            try:
+                from .live_music import configure_finite_loop
+                self.finite_loop_status=configure_finite_loop(memory)
+            except MemoryUnavailable as error:
+                self.finite_loop_status={'status':str(error),'loop_live_verified':False}
         # Publish the HUD before owner configuration performs its guarded
         # writes. A new scene's music must not wait behind those transactions.
         try:
@@ -465,12 +480,6 @@ class Runtime:
         durable = list(item_ids if history_ready else self.journal.data['receipts'])
         durable += [item for item in self.journal.data.get('permission_receipts',()) if item not in durable]
         known = self.effective_inventory(inventory(durable))
-        if self.snapshot.scene in ('global_map','world_map','game_land_select'):
-            try:
-                self.guard.check(self.snapshot)
-                self.project_permissions(memory,known)
-            except MemoryUnavailable as error:
-                self.hooks.progression_status={'available':False,'reason':str(error)}
         if not getattr(memory,'native_patch',None):self.observe_capsules(frozenset(known['wisps']))
         # Catch native enemy/script grants even if they bypass boost_add.
         # Do this BEFORE new AP refill receipts are applied, so the refill

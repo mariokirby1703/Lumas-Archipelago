@@ -12,7 +12,7 @@ class Machine:
         self.r[0]=1;self.r[1]=0x90100000;self.r[2]=0x808fc5c0
         self.f=[float(i) for i in range(32)];self.lr=0x80001234;self.ctr=0x80005678;self.cr=0x12345678;self.cmp=0
         self.stage=0x90010000;self.player=0x90020000;self.machine=0x90030000;self.input=0x90040000;self.event=0x90050000
-        self.calls=[]
+        self.calls=[];self.call_targets=[]
         for a,o,b in n.patches(self.control):self.b.put(a,b)
         self.b.put(self.control,bytes(n.SIZE));self.put(self.control,n.MAGIC)
         for i in range(4):self.put(self.control+n.JUMP_TABLE+i*4,sum(1<<(s%32) for s in n.JUMP_STATES if s//32==i))
@@ -84,7 +84,8 @@ class Machine:
             elif w==0x7c0903a6:self.ctr=self.r[0]
             elif w==0x7d8903a6:self.ctr=self.r[12]
             elif w==0x4e800421:
-                assert self.ctr==0x800338e8
+                assert self.ctr in ((0x801251ec,0x80125310,0x80125390) if self.kind=='music_loop' else (0x800338e8,))
+                self.call_targets.append(self.ctr)
                 self.calls.append((self.r[3],self.r[4]))
                 self.lr=pc+4;self.cr=0xabcdef01
                 for r in (0,*range(3,13)):self.r[r]=0xdddddddd
@@ -205,3 +206,39 @@ def test_stale_actor_context_cannot_consume_a_native_effect(field,value):
     m.run()
     assert not m.calls and m.get(m.control+n.ACK)==0
     assert m.get(m.control+n.REMAINING)==0x41f00000
+
+
+@pytest.mark.parametrize('blocked',[None,'playing','paused','error','disabled','unowned','not_started','stopping','other_cue','no_descriptor','unarmed'])
+def test_finite_song_restart_uses_native_end_and_preserves_registers(blocked):
+    m=Machine('music_loop');channel=0x900a0000;descriptor=0x90090020
+    m.r[3]=4;m.r[30]=channel;m.put(channel,1);m.put(channel+8,descriptor)
+    m.b.put(channel+0x28,b'\0\1');m.put(descriptor,1002);m.put(m.control+n.LOOP_CUE,0x10000|1002)
+    if blocked=='unarmed':m.put(m.control+n.LOOP_CUE,1002)
+    if blocked=='playing':m.r[3]=2
+    if blocked=='paused':m.r[3]=3
+    if blocked=='error':m.r[3]=5
+    if blocked=='disabled':m.put(m.control+n.LOOP_CUE,0)
+    if blocked=='unowned':m.put(channel,0)
+    if blocked=='not_started':m.b.put(channel+0x29,b'\0')
+    if blocked=='stopping':m.b.put(channel+0x28,b'\2')
+    if blocked=='other_cue':m.put(descriptor,2001)
+    if blocked=='no_descriptor':m.put(channel+8,0)
+    before=m.r[:];m.run()
+    assert m.calls==([(channel,0),(channel,descriptor),(channel,0)] if blocked is None else [])
+    if blocked is None:assert m.call_targets==[0x801251ec,0x80125310,0x80125390]
+    before[0]=(before[3]-1)&0xffffffff # displaced native addi r0,r3,-1
+    assert m.r==before and m.f==m.before_f
+    assert (m.lr,m.ctr,m.cr)==(0x80001234,0x80005678,0x12345678)
+
+
+def test_restart_latch_waits_for_playing_before_another_end():
+    m=Machine('music_loop');channel=0x900a0000;descriptor=0x90090020
+    m.r[3]=4;m.r[30]=channel;m.put(channel,1);m.put(channel+8,descriptor)
+    m.b.put(channel+0x28,b'\0\1');m.put(descriptor,1002)
+    m.put(m.control+n.LOOP_CUE,0x10000|1002)
+    m.run();assert len(m.calls)==3
+    assert m.get(m.control+n.LOOP_CUE)==1002
+    for state in (4,1,4,1,4):
+        m.r[3]=state;m.run();assert len(m.calls)==3
+    m.r[3]=2;m.run();assert m.get(m.control+n.LOOP_CUE)==0x10000|1002
+    m.r[3]=4;m.run();assert len(m.calls)==6

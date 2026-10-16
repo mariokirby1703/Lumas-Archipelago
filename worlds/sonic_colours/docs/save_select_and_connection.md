@@ -14,9 +14,13 @@ downloading to have its website embed the address directly.
 
 Save-selection HUD resources are now generated locally from ui_file_select's
 Scene_GameData, preserving all four original animations and original casts.
-The native map context's mode 6 identifies this screen. Live PAL inspection
-found its layer through application+4 -> document+58 -> service+10, with a
-reference pair at root+BC/C0 (260 original casts). Discovery verifies the added
+The native map context's mode 6 identifies this screen. The original
+application+4 -> document+58 -> service+10 observation was an allocator link,
+not a stable UI owner; the next live test disproved it. The replacement native
+font publisher registers its actual scene reference on the guest thread in
+the reserved native ISO word 0x80002FBC. The extended resource controller uses
+magic 0x41504845 and includes that reference at +16. Legacy Riivolution builds
+do not write the native registry. Discovery verifies the added
 350-cast layout, 90 AP mailboxes, publisher, controller and reference anchors.
 The menu mode is anchored too, preventing writes after a scene switch.
 
