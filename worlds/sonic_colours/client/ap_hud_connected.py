@@ -1,10 +1,35 @@
 """Authenticated resource mailboxes; all native text allocation is guest-owned."""
 import re
+import math
 import struct
 from .memory import MemoryUnavailable
 from .native_read import read_stage_objects,read_actors
 from .ap_hud_ticker import ascii_text,item_colour
 from .ap_hud_publisher import MAGIC,installed,HOOK,patches
+
+def result_origin(memory,layer):
+    """Measured PAL result coordinate controller, never a mutable UI write.
+
+    The 2x3 affine matrix translates result-local pixels. Its horizontal
+    origin additionally includes the native widescreen centre adjustment.
+    """
+    style=memory.read_ptr_checked(layer+0x8c,16)
+    if memory.read_u32(style)!=0x807ab988:
+        raise MemoryUnavailable('Result coordinate-controller class differs')
+    view=memory.read_ptr_checked(style+12,0xd0)
+    width=struct.unpack('>f',memory.read_bytes(view+0x18,4))[0]
+    viewport=struct.unpack('>f',memory.read_bytes(view+0x30,4))[0]
+    matrix=struct.unpack('>6f',memory.read_bytes(view+0xb8,24))
+    if (not all(math.isfinite(v) for v in (width,viewport,*matrix))
+            or not 320<=width<=1920 or not 320<=viewport<=3840
+            or any(abs(a-b)>0.0001 for a,b in zip((matrix[0],matrix[1],matrix[3],matrix[4]),(1,0,0,1)))
+            or abs(matrix[2])>1920 or abs(matrix[5])>1080):
+        raise MemoryUnavailable('Result transform is not a supported translation')
+    origin=(matrix[2]+(viewport-width)*0.5,matrix[5])
+    anchors=[(a,memory.read_bytes(a,n)) for a,n in
+             ((layer+0x8c,4),(style,16),(view+0x18,4),(view+0x30,4),(view+0xb8,24))]
+    return origin,anchors
+
 
 def discover(memory):
     rows=read_stage_objects(memory,False)
@@ -69,8 +94,12 @@ def discover(memory):
                 anchors=menu_anchors+([] if menu_anchors else [(actor,memory.read_bytes(actor,16))])+[(handle,memory.read_bytes(handle,8)),
                          (pointer,memory.read_bytes(pointer,4)),(layer,memory.read_bytes(layer,4)),
                          (layer+12,memory.read_bytes(layer+12,4)),(layer+0x8c,memory.read_bytes(layer+0x8c,4)),(control,memory.read_bytes(control,4))]
+                origin=(0.,0.)
+                if rows[0]['scene']=='results':
+                    origin,transform_anchors=result_origin(memory,layer)
+                    anchors+=transform_anchors
                 found[layer]={'layer':layer,'handle':handle,'control':control,'boxes':boxes,'anchors':anchors,
-                              'key':(rows[0]['context'],rows[0]['scene'])}
+                              'key':(rows[0]['context'],rows[0]['scene']),'origin':origin}
             except (MemoryUnavailable,UnicodeDecodeError,ValueError):continue
     return unique_owner(found.values())
 
@@ -110,8 +139,8 @@ def payloads(owner,events,metrics,music=None):
             # Align the panel to the native right HUD edge. The icon sits just
             # before the heading; the title has its own right-aligned baseline.
             heading_width=sum(metrics[c] for c in 'NOW PLAYING:')
-            x=800.-width
-            if base=='ap_music_icon':x=800.-heading_width-6.-width
+            x=800.-width-owner.get('origin',(0.,0.))[0]
+            if base=='ap_music_icon':x=800.-heading_width-6.-width-owner.get('origin',(0.,0.))[0]
             if shadow:x+=(-0.8,0.8,0.,0.)[int(name[-1])]
             raw=(fitted or ' ').encode('ascii').ljust(128,b'\0')
             result[box+8]=struct.pack('>I',owner['handle']);result[box+16]=raw
@@ -140,7 +169,7 @@ def payloads(owner,events,metrics,music=None):
             limit=580.-sum(metrics[c] for c in prefix) if kind=='title' else 580.
             if width+advance>limit or len(fitted)>=127:break
             fitted+=char;width+=advance
-        x=50.+(sum(metrics[c] for c in prefix) if kind=='title' else 0.)
+        x=50.+(sum(metrics[c] for c in prefix) if kind=='title' else 0.)-owner.get('origin',(0.,0.))[0]
         if shadow:
             direction=int(name[-1]);x+=(-0.8,0.8,0.,0.)[direction];colour=0x000000ff
         if slot<len(events):colour=(colour&0xffffff00)|events[slot].get('alpha',255)

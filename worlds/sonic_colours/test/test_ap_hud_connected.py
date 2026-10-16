@@ -132,3 +132,37 @@ def test_music_right_alignment_and_independent_fade():
     assert colour==0xffffff40
     assert result[0x2090][:4]==bytes.fromhex('00000040')
     assert result[0x3090][:4]==bytes.fromhex('af70ffff')
+
+
+
+def test_result_origin_uses_live_affine_and_widescreen_translation():
+    from ..client.memory import SonicMemory
+    from .test_memory import FakeBackend
+    b=FakeBackend();m=SonicMemory(b);layer,style,view=0x90001000,0x90002000,0x90003000
+    b.put(layer+0x8c,struct.pack('>I',style));b.put(style,struct.pack('>I',0x807ab988))
+    b.put(style+12,struct.pack('>I',view))
+    b.put(view+0x18,struct.pack('>f',640.));b.put(view+0x30,struct.pack('>f',822.5692))
+    b.put(view+0xb8,struct.pack('>6f',1.,0.,267.87067,0.,1.,110.))
+    origin,anchors=hud.result_origin(m,layer)
+    assert abs(origin[0]-359.1553)<0.001 and origin[1]==110.
+    hud.validate(m,{'anchors':anchors})
+    b.put(view+0xc0,struct.pack('>f',268.))
+    import pytest
+    from ..client.memory import MemoryUnavailable
+    with pytest.raises(MemoryUnavailable,match='owner changed'):hud.validate(m,{'anchors':anchors})
+    b.put(view+0xb8,struct.pack('>f',2.))
+    with pytest.raises(MemoryUnavailable,match='supported translation'):hud.result_origin(m,layer)
+
+
+def test_result_item_and_music_x_compensation_does_not_change_gameplay():
+    from ..world_constants import load_data
+    boxes={'ap_prefix0':(0,0x1000),'ap_music_heading':(0,0x2000),'ap_music_title':(0,0x3000)}
+    owner={'handle':0x90001000,'boxes':boxes}
+    event=dict(kind='Received',item='Rings',player='Luma',flags=0)
+    music=dict(alpha=255,title='Song')
+    normal=hud.payloads(owner,[event],load_data('hud_glyph_metrics.json'),music)
+    results=hud.payloads({**owner,'origin':(359.1553,110.)},[event],load_data('hud_glyph_metrics.json'),music)
+    for box in (0x1000,0x2000,0x3000):
+        before=struct.unpack('>If',normal[box+144]);after=struct.unpack('>If',results[box+144])
+        assert abs(before[1]-after[1]-359.1553)<0.001
+        assert before[0]==after[0] and normal[box+16]==results[box+16]

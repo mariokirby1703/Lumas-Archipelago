@@ -157,7 +157,9 @@ def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,a
             gncp=find_asset(cpk,arc,stem+'.gncp');tls=find_asset(cpk,arc,stem+'.tls')
             additions={stem+'.gncp':overlay(gncp,resources['ui_soft_keyboard.gncp'],
                 texture_index=len(textures(tls)),keyboard_tls=resources['ui_soft_keyboard.tls'],
-                messages=SAMPLE_MESSAGES[:message_count],scene_name=scene_name,base_y=176.,ap_connected=True),
+                messages=SAMPLE_MESSAGES[:message_count],scene_name=scene_name,
+                base_y=0. if scene_name=='result' else 176.,ap_connected=True,
+                music_y_offset=-110. if scene_name=='result' else 0.),
                 stem+'.tls':append_texture(tls,resources['ui_soft_keyboard.tls'],3)}
             indices=[i for i,r in enumerate(cpk.toc.rows) if r.get('DirName')=='ui' and r.get('FileName')==arc]
             original=cpk.read(cpk.toc.rows[indices[0]])

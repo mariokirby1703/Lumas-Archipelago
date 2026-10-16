@@ -172,3 +172,29 @@ def test_owned_selection_and_results_preserve_all_native_animations(arc,stem,par
         before=m.ptr(original,old_anim+4);after=m.ptr(new,new_anim+4)
         assert original[before:before+groups*8]==new[after:after+groups*8]
         for group in range(groups,groups+6):assert m.u(new,after+group*8)==15
+
+
+
+def test_private_result_overlay_has_left_column_and_visible_music_baselines():
+    from .test_native_assets import SOURCE
+    if not SOURCE.exists():pytest.skip('private original CPK absent')
+    from ..client.cpk import CPK
+    from ..tools.hud_original_assets import find_asset
+    from ..tools import hud_gncp as g
+    c=CPK(SOURCE)
+    original=find_asset(c,'ui_result_e.arc','ui_result.gncp')
+    keyboard=find_asset(c,'ui_name_entry_e.arc','ui_soft_keyboard.gncp')
+    tls=find_asset(c,'ui_name_entry_e.arc','ui_soft_keyboard.tls')
+    scene=g.scene(original,'result');table=g.ptr(original,scene+48)
+    old={g.string(original,g.ptr(original,table+i*12)):None for i in range(g.u(original,scene+44))}
+    for name in old:
+        r=g.cast(original,scene,name);old[name]=original[r:r+116]
+    patched=g.overlay(original,keyboard,texture_index=g.u(original,scene+20),keyboard_tls=tls,
+        scene_name='result',base_y=0.,music_y_offset=-110.,ap_connected=True)
+    newscene=g.scene(patched,'result')
+    for name,record in old.items():
+        r=g.cast(patched,newscene,name);assert patched[r:r+116]==record
+    for name,y in [('ap_prefix0',0.),('ap_prefix4',160.),('ap_music_heading',255.),('ap_music_title',272.)]:
+        r=g.cast(patched,newscene,name)
+        assert struct.unpack_from('>f',patched,r+108)[0]==y
+    assert g.u(patched,newscene+44)==len(old)+90
