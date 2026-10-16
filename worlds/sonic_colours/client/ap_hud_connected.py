@@ -8,10 +8,22 @@ from .ap_hud_publisher import MAGIC,installed,HOOK,patches
 
 def discover(memory):
     rows=read_stage_objects(memory,False)
-    if len(rows)!=1 or rows[0]['scene'] not in ('gameplay','world_map','global_map','game_land_select','results'):
+    if len(rows)!=1 or rows[0]['scene'] not in ('gameplay','world_map','global_map','game_land_select','results','save_select'):
         raise MemoryUnavailable('HUD requires gameplay or a map')
     found={}
-    for actor in read_actors(memory,rows[0]['context']):
+    actors=read_actors(memory,rows[0]['context'])
+    menu_anchors=[]
+    if rows[0]['scene']=='save_select':
+        # Save UI is owned by the document service, outside stage actors.
+        # Live PAL chain; final authority remains exact layer/font/mailbox
+        # signatures below. Retain every reference as a transaction anchor.
+        app=rows[0]['application']
+        document=memory.read_ptr_checked(app+4,0x5c)
+        service=memory.read_ptr_checked(document+0x58,0x14)
+        owner=memory.read_ptr_checked(service+0x10,0x480)
+        menu_anchors=[(p,memory.read_bytes(p,4)) for p in (app+4,document+0x58,service+0x10,rows[0]['context']+0x74)]
+        actors=[owner]
+    for actor in actors:
         # Native HUD owner classes, verified in gameplay and the shared maps.
         # Scanning every gameplay object's pointer fields caused thousands of
         # unnecessary cross-process reads on every Act transition.
@@ -25,7 +37,7 @@ def discover(memory):
                 if memory.read_u32(layer)!=0x807abc40:continue
                 layout=memory.read_ptr_checked(layer+12,0x34)
                 counts={'gameplay':(96,103),'world_map':(111,),'global_map':(111,),
-                        'game_land_select':(93,104),'results':(95,)}
+                        'game_land_select':(93,104),'results':(95,),'save_select':(350,)}
                 if memory.read_u32(layout+44) not in counts[rows[0]['scene']]:continue
                 table=memory.read_ptr_checked(layout+48,memory.read_u32(layout+44)*12)
                 sourcegroups=memory.read_ptr_checked(layout+40,128)
@@ -35,7 +47,7 @@ def discover(memory):
                     name=memory.read_bytes(nameptr,48).split(b'\0')[0].decode('ascii')
                     if not name.startswith('ap_'):continue
                     group=memory.read_u32(entry+4);index=memory.read_u32(entry+8)
-                    if not 1<=group<10 or not 0<=index<15:raise MemoryUnavailable('HUD cast index differs')
+                    if not 1<=group<32 or not 0<=index<15:raise MemoryUnavailable('HUD cast index differs')
                     sourcearray=memory.read_ptr_checked(sourcegroups+group*16+4,(index+1)*4)
                     record=memory.read_ptr_checked(sourcearray+index*4,116)
                     if memory.read_u32(record+4)!=2:raise MemoryUnavailable('HUD cast is not a font')
@@ -52,7 +64,7 @@ def discover(memory):
                     boxes[name]=(record,box)
                 if len(boxes)!=90:continue
                 handle=actor+offset-4
-                anchors=[(actor,memory.read_bytes(actor,16)),(handle,memory.read_bytes(handle,8)),
+                anchors=menu_anchors+([] if menu_anchors else [(actor,memory.read_bytes(actor,16))])+[(handle,memory.read_bytes(handle,8)),
                          (pointer,memory.read_bytes(pointer,4)),(layer,memory.read_bytes(layer,4)),
                          (layer+12,memory.read_bytes(layer+12,4)),(layer+0x8c,memory.read_bytes(layer+0x8c,4)),(control,memory.read_bytes(control,4))]
                 found[layer]={'layer':layer,'handle':handle,'control':control,'boxes':boxes,'anchors':anchors,
@@ -141,7 +153,7 @@ def render(runtime,memory):
     state=getattr(runtime,'_hud_connected',None)
     snapshot=runtime.snapshot
     if ((not enabled and state is None) or not snapshot.scene_verified
-            or snapshot.scene not in ('gameplay','world_map','global_map','game_land_select','results')
+            or snapshot.scene not in ('gameplay','world_map','global_map','game_land_select','results','save_select')
             or snapshot.scene=='gameplay' and getattr(snapshot,'death_state','alive')!='alive'):
         runtime.hud_ticker.elapsed_visible(False)
         return {'hud_ready':False,'status':'HUD disabled or scene unavailable'}

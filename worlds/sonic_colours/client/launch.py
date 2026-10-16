@@ -16,6 +16,29 @@ def select_player_patch(parsed):
     return True
 
 
+def patch_server_address(patch,explicit=None,gui=True):
+    """Never silently fall back to another room when a download lacks a port."""
+    address=explicit or patch.server
+    if not address and gui:
+        import tkinter as tk
+        from tkinter.simpledialog import askstring
+        root=tk.Tk();root.withdraw()
+        try:
+            address=askstring('Archipelago room address',
+                'This patch has no room address. Start the room on the website, then enter its address and port (host:port).',
+                parent=root)
+        finally:root.destroy()
+    if not address:
+        raise ValueError('Player patch has no server address. Supply --connect HOST:PORT or download it again after the room has started.')
+    from urllib.parse import urlsplit
+    address=address.strip()
+    endpoint=urlsplit(address if '://' in address else 'ws://'+address)
+    if (endpoint.scheme not in ('ws','wss') or not endpoint.hostname or endpoint.port is None or endpoint.port<1
+            or endpoint.username or endpoint.password or endpoint.path not in ('','/') or endpoint.query or endpoint.fragment):
+        raise ValueError('Use an Archipelago host and explicit port, for example archipelago.gg:38281.')
+    return address
+
+
 def launch_client(*args):
     from .client import main
     parser = get_base_parser(description='Sonic Colours PAL Archipelago Client')
@@ -111,6 +134,28 @@ def launch_client(*args):
         from ..patch import load_patch
         from .iso_patch import install,install_with_progress,settings_group
         patch=load_patch(parsed.patch_file)
+        if not parsed.patch_only:
+            try:
+                parsed.connect=patch_server_address(patch,parsed.connect,not getattr(parsed,'nogui',False))
+                if not patch.server:
+                    # Preserve the download. A separate official player patch
+                    # remembers the supplied endpoint for subsequent launches.
+                    from pathlib import Path
+                    original=Path(parsed.patch_file)
+                    target=original.with_name(original.stem+'_connected.apsoniccolours')
+                    suffix=1
+                    while target.exists():
+                        target=original.with_name(original.stem+f'_connected_{suffix}.apsoniccolours');suffix+=1
+                    patch.server=parsed.connect
+                    with target.open('xb') as stream:patch.write(stream)
+                    logging.info('Player patch with server address saved to %s',target)
+                    parsed.patch_file=str(target)
+            except (OSError,ValueError) as error:
+                logging.error('Room address: %s',error)
+                if not getattr(parsed,'nogui',False):
+                    import Utils
+                    Utils.messagebox('Archipelago room address',str(error),error=True)
+                return
         group=settings_group()
         automatic=(not parsed.no_start_dolphin and (parsed.start_dolphin or
                    not parsed.patch_only and (bool(group.auto_start) or

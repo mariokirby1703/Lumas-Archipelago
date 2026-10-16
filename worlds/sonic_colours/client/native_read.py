@@ -45,7 +45,7 @@ def _read_stage_objects(memory, include_pickups=True):
     row = {'context': context, 'vtable': vtable, 'application': application}
     if vtable == 0x80769D90:
         mode = memory.read_u32(context + 0x74)
-        row.update(map_mode=mode, scene={2: 'global_map', 3: 'world_map', 5: 'game_land_select'}.get(mode, 'unclassified'))
+        row.update(map_mode=mode, scene={2: 'global_map', 3: 'world_map', 5: 'game_land_select', 6:'save_select'}.get(mode, 'unclassified'))
         if mode == 3:
             try:
                 maps = [actor for actor in read_actors(memory, context) if memory.read_u32(actor) == 0x807773F8]

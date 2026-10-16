@@ -152,6 +152,7 @@ def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,a
         # The background is behind the opaque cabinet artwork. Attach AP
         # casts to the frame itself so they draw after its decorative quads.
         for arc,stem,scene_name in (('ui_title_multi_e.arc','ui_title_multi','multi_frame'),
+                                    ('ui_file_select_e.arc','ui_file_select','Scene_GameData'),
                                     ('ui_result_e.arc','ui_result','result')):
             gncp=find_asset(cpk,arc,stem+'.gncp');tls=find_asset(cpk,arc,stem+'.tls')
             additions={stem+'.gncp':overlay(gncp,resources['ui_soft_keyboard.gncp'],
