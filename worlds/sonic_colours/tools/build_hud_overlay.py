@@ -113,7 +113,7 @@ def replace_u8(arc,replacements):
     return bytes(out)
 
 
-def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,ap_connected=False,music_mapping=None,write_xml=True):
+def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,ap_connected=False,music_mapping=None,write_xml=True,music_mapping_version=1):
     report=audit(source);cpk=CPK(source)
     resources={n:find_asset(cpk,arc,n) for arc,n in
         [('ui_cockpit_e.arc','ui_gameplay.gncp'),('ui_cockpit_e.arc','ui_gameplay.tls'),
@@ -189,7 +189,7 @@ def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,a
         music_indices=[i for i,r in enumerate(cpk.toc.rows) if r.get('DirName')=='sound' and r.get('FileName')=='bgm.strm.csb']
         if len(music_indices)!=1:raise ValueError('BGM bank not unique')
         index=music_indices[0]
-        changes[index]=rewrite_bank(cpk.read(cpk.toc.rows[index]),music_mapping)
+        changes[index]=rewrite_bank(cpk.read(cpk.toc.rows[index]),music_mapping,mapping_version=music_mapping_version)
     publish_aliases(cpk,output,list(changes),changes,EXPECTED_CPK)
     rebuilt=CPK(output)
     if any(rebuilt.read(rebuilt.toc.rows[i])!=blob for i,blob in changes.items()):raise ValueError('CPK roundtrip differs')

@@ -49,17 +49,18 @@ class MusicPopup:
 
 
 @lru_cache(maxsize=8)
-def _seed_mapping(seed_name, music_randomization):
+def _seed_mapping(seed_name, music_randomization,version=1):
     # The global 87-cue matching is deterministic and seed-owned. Running its
     # recursive matching on every HUD fade tick can delay check/receipt polls.
     from .music_bank import plan
-    return plan(seed_name, 'anywhere' if music_randomization else 'off')
+    mode='anywhere' if music_randomization else 'off'
+    return plan(seed_name,mode) if version==1 else plan(seed_name,mode,version)
 
 
 def update(runtime):
     if not hasattr(runtime,'music_popup'):runtime.music_popup=MusicPopup()
     mapping=_seed_mapping(runtime.slot_data['seed_name'],
-                          bool(runtime.slot_data['options']['music_randomization']))
+                          bool(runtime.slot_data['options']['music_randomization']),runtime.slot_data.get('music_mapping_version',1))
     snapshot=getattr(runtime,'snapshot',None)
     restart_key=(getattr(snapshot,'session',None),getattr(snapshot,'stage_epoch',None),getattr(snapshot,'scene',None))
     runtime.music_popup.observe(getattr(runtime,'native_event_status',{}),runtime.clock(),mapping,restart_key,defer_start=True)

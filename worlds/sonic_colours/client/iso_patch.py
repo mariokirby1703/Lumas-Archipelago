@@ -141,12 +141,12 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None):
         native,registry=patch_dol(dol.read_bytes(),patch.slot_data['seed_name']);dol.write_bytes(native)
         mapping=None
         if patch.slot_data['options']['music_randomization']:
-            from .music_bank import plan as music_plan
-            mapping=music_plan(patch.slot_data['seed_name'],'anywhere')
+            from .music_bank import slot_plan
+            mapping=slot_plan(patch.slot_data)
         progress('Building gameplay, maps, Game Land HUD and seed music together')
         from ..tools.build_hud_overlay import build
         modified=tmp/'sonic2010_0.cpk'
-        build(cpk,modified,include_maps=True,ap_connected=True,music_mapping=mapping,write_xml=False)
+        build(cpk,modified,include_maps=True,ap_connected=True,music_mapping=mapping,music_mapping_version=patch.slot_data.get('music_mapping_version',1),write_xml=False)
         modified.replace(cpk)
         progress('Rebuilding Wii filesystem, encrypted DATA partition and hashes')
         output=tmp/'patched.iso'

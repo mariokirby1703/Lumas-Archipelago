@@ -53,7 +53,7 @@ def implementation_info():
                  progression_hook.events, progression_hook.identity_tag, music.cue_records, music.apply_music, music.mapping_for,
                  gameplay_controls.payload, gameplay_controls.installed, gameplay_controls.configure, capsule_refresh.configure, capsule_refresh.installed_data,
                  native_read.read_medals, medal_hook.payload, medal_hook.installed_data, medal_hook.configure, medal_hook.observe,
-                 music_bank.plan, music_bank.rewrite_bank, music_bank.recover_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch, journal.Journal.record_permissions,
+                 music_bank.plan, music_bank.replay_plan, music_bank.slot_plan, music_bank.rewrite_bank, music_bank.recover_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch, journal.Journal.record_permissions,
                  live_music.apply, live_music.probe_bank, live_music.recover_original,
                  direct_hooks.plan, direct_hooks.install, direct_hooks.inspect, movement_gate.payload, movement_gate.permissions, movement_gate.observed, movement_gate.configure, movement_gate.installed_data, movement_gate.gecko_lines, movement_gate.water_observed, client.log_diagnostic, gameplay_controls.gecko_lines,
                  map_refresh.payload, map_refresh.installed_data, map_refresh.configure, map_transition.payload, map_transition.installed, map_transition.update_payload, map_transition.update_installed, capsule_refresh.gecko_ini)

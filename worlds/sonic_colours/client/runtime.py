@@ -41,6 +41,8 @@ def validate_slot(data):
         raise ValueError('Sonic Colours schema 7 required: movement/Swim/Breath item IDs and options. Regenerate seed and .apsonic; do not reuse old seed journals.')
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
+    if type(data.get('music_mapping_version',1)) is not int or data.get('music_mapping_version',1) not in (1,2):
+        raise ValueError('unsupported music mapping version')
     revision=data.get('options_revision',0)
     if type(revision) is not int or not 0<=revision<=7:raise ValueError('unsupported slot options revision')
     options = data.get('options')

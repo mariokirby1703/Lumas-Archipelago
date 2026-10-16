@@ -9,7 +9,7 @@ Guest code and Dolphin JIT state are never modified by this module.
 import hashlib
 import struct
 from .memory import MemoryUnavailable, valid_range
-from .music_bank import CATALOG, CUES, WISP_CUES, FINITE_CUES, SHUFFLE_CUES, plan, rewrite_bank, recover_bank
+from .music_bank import CATALOG, CUES, WISP_CUES, FINITE_CUES, SHUFFLE_CUES, plan, slot_plan, rewrite_bank, recover_bank
 from .cpk import UTF
 
 ORIGINAL_SHA256 = CATALOG['bank_sha256']
@@ -67,17 +67,18 @@ def apply(memory, slot, test_pair=None):
     """
     base, current, original = probe_bank(memory)
     on = bool(slot['options']['music_randomization'])
-    mapping = plan(slot['seed_name'], 'anywhere' if on else 'off')
+    mapping = slot_plan(slot)
     if test_pair is not None:
         destination,donor=test_pair
         if not on or destination not in SHUFFLE_CUES or donor not in (SHUFFLE_CUES | {'bgm_sys_op','bgm_sys_end'}):
-            raise MemoryUnavailable('music test requires a looping destination and an eligible donor with Music Randomization On')
+            raise MemoryUnavailable('music test requires a looping destination and an eligible donor with Music Randomization On; other finite cues stay vanilla')
         if donor in ('bgm_sys_op','bgm_sys_end'):
             mapping[destination]=donor # retain original opening/credits audio
         else:
-            owner=next(name for name,value in mapping.items() if value==donor)
-            mapping[owner],mapping[destination]=mapping[destination],mapping[owner]
-    replacement = rewrite_bank(original, mapping, finite_audition=test_pair is not None)
+            owner=next((name for name,value in mapping.items() if value==donor),None)
+            if owner is None:mapping[destination]=donor
+            else:mapping[owner],mapping[destination]=mapping[destination],mapping[owner]
+    replacement = rewrite_bank(original, mapping, finite_audition=test_pair is not None,mapping_version=slot.get('music_mapping_version',1))
     if current != replacement:
         memory._music_bank_transaction = (base, hashlib.sha256(current).hexdigest(),
                                           hashlib.sha256(replacement).hexdigest())
@@ -89,12 +90,15 @@ def apply(memory, slot, test_pair=None):
                        'verified PAL BGM bank already matches this seed',
             'bank_address':f'0x{base:08X}', 'scope':'one global pool / destination control graphs retained',
             'strategy':'destination_graph_audio_leaves_v1',
-            'pool_size':len(SHUFFLE_CUES), 'excluded_cues':sorted(FINITE_CUES),
+            'music_mapping_version':slot.get('music_mapping_version',1),
+            'pool_size':len(SHUFFLE_CUES)+(2 if slot.get('music_mapping_version',1)==2 else 0), 'excluded_cues':sorted(FINITE_CUES),
             'transformation_cues':sorted(WISP_CUES),
-            'excluded_finite_tracks':sorted(FINITE_CUES),
+            'excluded_finite_tracks':sorted(FINITE_CUES-({'bgm_sys_op','bgm_sys_end'} if slot.get('music_mapping_version',1)==2 else set())),
             'finite_audio_destinations':{n:d for n,d in mapping.items() if n != d and d in FINITE_CUES},
-            'duration_validation':('finite music excluded from both sources and destinations; audible looping validation pending'
-                                   if on else 'vanilla bank restored; no shuffled duration adaptation'),
+            'duration_validation':('vanilla bank restored; no shuffled duration adaptation' if not on else
+                'native full-song replay for opening/credits donors; original finite destinations retained'
+                if slot.get('music_mapping_version',1)==2 or test_pair and test_pair[1] in ('bgm_sys_op','bgm_sys_end')
+                else 'legacy looping-only mapping'),
             'wisp_music_mapping':{n:mapping[n] for n in sorted(WISP_CUES)},
             'test_pair':test_pair,
             'randomized_cues':sum(name!=donor for name,donor in mapping.items()),

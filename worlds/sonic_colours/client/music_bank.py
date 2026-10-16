@@ -23,6 +23,8 @@ for name, evidence in PLAYBACK['cues'].items():
         raise ValueError('PAL playback audio graph mismatch')
 FINITE_CUES = frozenset(n for n,r in PLAYBACK['cues'].items() if not r['audio_has_loop'])
 SHUFFLE_CUES = frozenset(CUES) - FINITE_CUES
+REPLAY_DONORS = frozenset(('bgm_sys_op', 'bgm_sys_end'))
+CURRENT_MAPPING_VERSION = 2
 if GRAPHS['bank_sha256'] != CATALOG['bank_sha256'] or set(GRAPHS['graphs']) != set(CUES):
     raise ValueError('PAL BGM graph catalog mismatch')
 if AUDIO['bank_sha256'] != CATALOG['bank_sha256'] or set(AUDIO['cues']) != set(CUES):
@@ -45,9 +47,11 @@ LEGACY_PROTECTED = frozenset(n for n in CUES if n.startswith(('bgm_jingle_', 'bg
                              or n in ('bgm_sys_theme', 'bgm_sys_op', 'bgm_sys_end'))
 
 
-def plan(seed, mode):
+def plan(seed, mode, version=1):
     if mode not in ('off', 'anywhere') or not isinstance(seed, str) or not seed:
         raise ValueError('BGM bank requires a seed and supported music mode')
+    if type(version) is not int or version not in (1,2):raise ValueError('unsupported music mapping version')
+    if version==2:return replay_plan(seed,mode)
     result = {name: name for name in CUES}
     if mode == 'off': return result
     rng = random.Random(int.from_bytes(hashlib.sha256(f'{seed}:sonic-bgm-looping-v1'.encode()).digest(), 'big'))
@@ -73,14 +77,50 @@ def plan(seed, mode):
     return result
 
 
-def rewrite_bank(original, mapping, *, finite_audition=False):
+def replay_plan(seed,mode):
+    """V2: one donor pool, with original finite destinations protected.
+
+    Both full songs occur once at randomized eligible destinations. Their
+    original opening/credits uses remain vanilla, so two ordinary donors are
+    omitted rather than putting looping audio into a finite cutscene.
+    """
+    result={name:name for name in CUES}
+    if mode=='off':return result
+    rng=random.Random(int.from_bytes(hashlib.sha256(f'{seed}:sonic-bgm-replay-v2'.encode()).digest(),'big'))
+    names=sorted(SHUFFLE_CUES);rng.shuffle(names)
+    finite=sorted(REPLAY_DONORS);rng.shuffle(finite)
+    result.update(zip(names[:2],finite))
+    donors=sorted(SHUFFLE_CUES);rng.shuffle(donors)
+    choices={n:[d for d in donors if AUDIO['cues'][n]!=AUDIO['cues'][d]] for n in names[2:]}
+    assigned={}
+    def assign(name,seen):
+        for donor in choices[name]:
+            if donor in seen:continue
+            seen.add(donor)
+            if donor not in assigned or assign(assigned[donor],seen):
+                assigned[donor]=name
+                return True
+        return False
+    if not all(assign(n,set()) for n in names[2:]):
+        raise ValueError('music donor matching failed')
+    result.update({name:donor for donor,name in assigned.items()})
+    return result
+
+
+def slot_plan(slot):
+    version=slot.get('music_mapping_version',1)
+    return plan(slot['seed_name'],'anywhere' if slot['options']['music_randomization'] else 'off',version)
+
+
+def rewrite_bank(original, mapping, *, finite_audition=False, mapping_version=1):
     if hashlib.sha256(original).hexdigest() != CATALOG['bank_sha256']:
         raise ValueError('original PAL BGM bank SHA256 mismatch')
     if set(mapping) != set(CUES) or not set(mapping.values()) <= set(CUES):
         raise ValueError('BGM mapping must use the complete original cue catalog')
     if any(mapping[n] != n for n in FINITE_CUES):
-        raise ValueError('finite BGM cue destinations must remain vanilla')
-    if finite_audition:
+        raise ValueError('finite BGM cue destinations must remain vanilla; mapping is not a permitted permutation')
+    if type(mapping_version) is not int or mapping_version not in (1,2):raise ValueError('unsupported music mapping version')
+    if finite_audition or mapping_version==2:
         # Duplicate only these audited donors, retaining their original cues.
         # A test must never put a looping stage donor into opening/credits.
         from collections import Counter
@@ -158,7 +198,7 @@ def recover_bank(data):
     return bytes(original)
 
 
-def patch(source, output, seed, mode):
+def patch(source, output, seed, mode, mapping_version=1):
     from .asset_patch import PAL_CPK_SHA256
     if mode == 'off': raise ValueError('Music Randomization is off')
     output = Path(output); manifest_path = Path(str(output) + '.json')
@@ -167,9 +207,9 @@ def patch(source, output, seed, mode):
     indices = [i for i, r in enumerate(archive.toc.rows) if r['DirName'] == 'sound' and r['FileName'] == 'bgm.strm.csb']
     if len(indices) != 1: raise ValueError('original PAL BGM member not unique')
     index = indices[0]; original = archive.read(archive.toc.rows[index])
-    mapping = plan(seed, mode); replacement = rewrite_bank(original, mapping)
+    mapping = plan(seed, mode,mapping_version); replacement = rewrite_bank(original, mapping,mapping_version=mapping_version)
     archive.replace_member(output, index, replacement, PAL_CPK_SHA256)
-    manifest = {'format': 'sonic-pal-bgm-bank-v1', 'seed': seed, 'mode': mode,
+    manifest = {'music_mapping_version':mapping_version,'format': 'sonic-pal-bgm-bank-v1', 'seed': seed, 'mode': mode,
                 'source_cpk_sha256': PAL_CPK_SHA256, 'resource_file': output.name,
                 'original_bank_sha256': CATALOG['bank_sha256'],
                 'patched_bank_sha256': hashlib.sha256(replacement).hexdigest(),
@@ -179,8 +219,8 @@ def patch(source, output, seed, mode):
     return manifest
 
 
-def validate_resource_bank(data, mapping):
-    if rewrite_bank(recover_bank(data), mapping) != data:
+def validate_resource_bank(data, mapping, mapping_version=1):
+    if rewrite_bank(recover_bank(data), mapping,mapping_version=mapping_version) != data:
         raise ValueError('resource bank differs from the seed redirects')
 
 
@@ -190,7 +230,8 @@ def load_manifest(path, slot):
     mode = 'anywhere' if slot['options']['music_randomization'] else 'off'
     if (manifest.get('format') != 'sonic-pal-bgm-bank-v1' or manifest.get('seed') != slot['seed_name']
             or manifest.get('mode') != mode or mode == 'off'
-            or manifest.get('music_mapping') != plan(slot['seed_name'], mode)
+            or manifest.get('music_mapping_version',1)!=slot.get('music_mapping_version',1)
+            or manifest.get('music_mapping') != slot_plan(slot)
             or manifest.get('runtime_cue_policy') != 'original'):
         raise ValueError('music resource manifest does not match the authenticated seed/mode')
     name = manifest.get('resource_file')
@@ -203,7 +244,7 @@ def load_manifest(path, slot):
     data = archive.read(rows[0])
     if hashlib.sha256(data).hexdigest() != manifest.get('patched_bank_sha256'):
         raise ValueError('selected music resource bank does not match its manifest')
-    validate_resource_bank(data, manifest['music_mapping'])
+    validate_resource_bank(data, manifest['music_mapping'],slot.get('music_mapping_version',1))
     return {'status': 'seed resource verified on disk; loaded Dolphin resource and playback unverified',
             'seed': manifest['seed'], 'scope': 'global_audio_content_bank', 'runtime_cue_policy': 'original',
             'resource_verified': True, 'audible_verified': False}
