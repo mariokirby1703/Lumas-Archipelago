@@ -28,6 +28,9 @@ class SonicColoursWorld(World):
                         'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS)}
 
     def generate_early(self):
+        if not self.options.game_land_checks:
+            self.options.eggman_heart_sanity.value=0
+            self.options.chaos_emerald_checks.value=0
         validation=load_data('versions.json').get('live_validation',{})
         for option, capability in [('death_link', 'deathlink'),('dead_weight_trap_weight','dead_weight')]:
             if getattr(self.options, option).value and not validation.get(capability) and not self.options.native_feature_tests:
@@ -85,8 +88,7 @@ class SonicColoursWorld(World):
                 stage['mission_id'] for stage in STAGES if stage['zone_index']==Items.WORLD_ITEMS.index(item) and stage['slot']==1))]
             if opening:access=opening
             early.setdefault(self.random.choice(access), 1)
-        needs_land = bool(self.options.game_land_checks or self.options.chaos_emerald_checks
-                          or self.options.goal.value == 3 or self.options.wisp_capsules or self.options.eggman_heart_sanity)
+        needs_land = bool(self.options.game_land_checks)
         self.game_land_speed_items = bool(self.options.game_land_checks.value)
         speed_count = max(0, 4 - sum(i.name == Items.GAME_LAND_SPEED for i in precollected)) if self.game_land_speed_items else 0
         self.ring_required = max(self.gates.values()) if needs_land else 0
@@ -139,7 +141,7 @@ class SonicColoursWorld(World):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'options_revision':5, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':6, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),

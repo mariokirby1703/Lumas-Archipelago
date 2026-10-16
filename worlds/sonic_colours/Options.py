@@ -87,7 +87,8 @@ class WorldProgression(Choice):
 
 class GameLandChecks(DefaultOnToggle):
     """Add a Clear check for each of the 21 Game Land stages.
-    Stages require AP Red Ring items to unlock."""
+    Stages require AP Red Ring items to unlock. When off, also disables
+    Eggman Heart Sanity and Chaos Emerald Checks and removes Red Ring items."""
     display_name = 'Game Land Checks'
 
 

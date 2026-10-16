@@ -53,11 +53,11 @@ for oneup in ONEUPS.values():
     LOCATION_TABLE[oneup['location_name']] = LocationData(oneup['code'], oneup['mission_id'], 'one_up', instance_key=oneup['key'])
 
 
-def enabled(data, options):
+def enabled(data, options, respect_game_land=True):
     if data.kind == 'one_up':
         return bool(getattr(options,'one_up_sanity',False))
     if data.kind == 'medal':
-        return bool(options.eggman_heart_sanity)
+        return bool(options.eggman_heart_sanity and (options.game_land_checks or not respect_game_land))
     if data.kind == 'clear':
         return BY_MISSION[data.mission]['zone_index'] < 7 or bool(options.game_land_checks)
     if data.kind == 'ring':
@@ -70,7 +70,7 @@ def enabled(data, options):
         value = options.rank_checks.value
         return value == 6 or value == data.index + 1
     if data.kind == 'emerald':
-        return bool(options.chaos_emerald_checks)
+        return bool(options.chaos_emerald_checks and (options.game_land_checks or not respect_game_land))
     if data.kind == 'capsule':
         capsule = CAPSULES[data.instance_key]
         return capsule.eligible and bool(options.wisp_capsules)

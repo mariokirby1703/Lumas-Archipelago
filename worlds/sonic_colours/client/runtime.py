@@ -42,7 +42,7 @@ def validate_slot(data):
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
     revision=data.get('options_revision',0)
-    if type(revision) is not int or not 0<=revision<=5:raise ValueError('unsupported slot options revision')
+    if type(revision) is not int or not 0<=revision<=6:raise ValueError('unsupported slot options revision')
     options = data.get('options')
     # Old seeds have no physical 1-Up locations; adding the optional toggle
     # must not force regeneration or change their selected location set.
@@ -91,7 +91,10 @@ def validate_slot(data):
     if data.get('stage_mapping') != expected_mapping:
         raise ValueError('unsupported native stage permutation')
     from types import SimpleNamespace
-    expected_locations = {n: d.code for n, d in LOCATION_TABLE.items() if enabled(d, SimpleNamespace(**resolved))}
+    if revision>=6 and not options['game_land_checks'] and (options['eggman_heart_sanity'] or options['chaos_emerald_checks']):
+        raise ValueError('Game Land master switch requires disabled Heart/Emerald checks')
+    expected_locations = {n: d.code for n, d in LOCATION_TABLE.items()
+                          if enabled(d, SimpleNamespace(**resolved),respect_game_land=revision>=6)}
     # Display-name migration only; stable IDs and enabled location set must
     # still match exactly. Existing servers may retain the old Discovery label.
     legacy_discoveries = {n.removesuffix(' Discovery')+' - First Discovery':n
