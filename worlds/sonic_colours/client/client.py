@@ -688,6 +688,10 @@ async def poll_runtime(ctx,memory):
     items=[item.item for item in ctx.items_received]
     steps=runtime.poll_steps(memory,items,ctx.history_ready)
     started=time.monotonic();longest=0.;phases=0
+    backend=getattr(memory,'backend',None)
+    counters=('read_calls','write_calls','process_enumerations')
+    before={name:getattr(backend,name,0) for name in counters}
+    blocking_ms=[]
     try:
         while True:
             try:
@@ -696,7 +700,9 @@ async def poll_runtime(ctx,memory):
                     with memory.control_scope() if hasattr(memory,'control_scope') else nullcontext():
                         checks,goal=next(steps)
                 finally:
-                    longest=max(longest,time.monotonic()-phase_start);phases+=1
+                    duration=time.monotonic()-phase_start
+                    longest=max(longest,duration);phases+=1
+                    blocking_ms.append(round(duration*1000,2))
             except StopIteration as done:return done.value
             try:await transmit_checks(ctx,checks,goal)
             except (MemoryUnavailable,ConnectionClosed,OSError) as error:
@@ -711,7 +717,9 @@ async def poll_runtime(ctx,memory):
         steps.close()
         ctx.operation_status['sync_performance']={'cycle_ms':round((time.monotonic()-started)*1000,2),
             'longest_blocking_phase_ms':round(longest*1000,2),'phases':phases,
-            'strategy':'single native-memory owner; cooperative server checkpoints'}
+            'blocking_phases_ms':blocking_ms,
+            'dolphin_io':{name:getattr(backend,name,0)-before[name] for name in counters},
+            'strategy':'authenticated fast scene reads; fresh write proofs; AP checkpoints'}
 
 
 async def wait_for_sync(ctx,delay):
@@ -719,9 +727,15 @@ async def wait_for_sync(ctx,delay):
     wakeup=getattr(ctx,'sync_wakeup',None)
     if wakeup is None:
         await asyncio.sleep(delay);return
-    try:await asyncio.wait_for(wakeup.wait(),delay)
-    except asyncio.TimeoutError:pass
-    finally:wakeup.clear()
+    if wakeup.is_set():
+        wakeup.clear()
+        return
+    try:
+        await asyncio.wait_for(wakeup.wait(), delay)
+    except asyncio.TimeoutError:
+        # Do not erase a wakeup that arrived concurrently with the timeout.
+        return
+    wakeup.clear()
 
 
 async def dolphin_loop(ctx):

@@ -380,7 +380,17 @@ class Runtime:
 
     def poll_steps(self, memory, item_ids, history_ready):
         self._capsule_memory=memory
-        self.snapshot = self.hooks.snapshot(memory)
+        # Frame-rate native reads should not rehash the full PAL executable on
+        # every pass. Read-only identity is checked against the fresh boot and
+        # native signatures, with mandatory full revalidation every 250 ms.
+        # WritePolicy still performs its independent full proof on writes.
+        fast = getattr(memory, 'scene_read_verified', None)
+        recent = bool(fast and fast())
+        from .hooks import NativeHooks
+        if recent and isinstance(self.hooks, NativeHooks) and getattr(self.hooks.snapshot, '__func__', None) is NativeHooks.snapshot:
+            self.snapshot = self.hooks.snapshot(memory, verify_executable=False)
+        else:
+            self.snapshot = self.hooks.snapshot(memory)
         self.guard.observe(self.snapshot)
         # Capture irreversible pickup/result evidence before slow permission
         # writes. Network clients can transmit this checkpoint and receive

@@ -35,21 +35,35 @@ class DMEBackend:
         self.fallback = None
         self._empty_text_polls = 0
         self._last_read_rehook = float("-inf")
+        self._process_cache = None
+        self._mutation_batch = None
+        self.read_calls = 0
+        self.write_calls = 0
+        self.process_enumerations = 0
 
     def active(self):
         return self.engine.is_hooked() and getattr(self.engine.get_status(), 'name', None) == 'hooked'
 
-    def instance_info(self):
+    def instance_info(self, *, fresh=False):
         status = self.engine.get_status()
-        result = {'dme_status': getattr(status, 'name', str(status)), 'emulation_active': self.active(),
+        hooked = self.engine.is_hooked() and getattr(status, 'name', None) == 'hooked'
+        result = {'dme_status': getattr(status, 'name', str(status)), 'emulation_active': hooked,
                   'selected_pid': self.fallback.pid if self.fallback else None,
                   'pid_attribution': 'verified MEM2 alias' if self.fallback else 'DME does not expose selected PID'}
         if os.name == 'nt':
             from .mem2_windows import dolphin_processes
-            try:
-                result['process_candidates'] = dolphin_processes()
-            except OSError as error:
-                result['process_enumeration_error'] = str(error)
+            now = time.monotonic()
+            cache = self._process_cache
+            if (fresh or cache is None or now - cache[0] >= .25 or not hooked):
+                self.process_enumerations += 1
+                try:
+                    candidates = {'process_candidates': dolphin_processes()}
+                except OSError as error:
+                    candidates = {'process_enumeration_error': str(error)}
+                self._process_cache = (now, candidates) if hooked else None
+            else:
+                candidates = cache[1]
+            result.update(candidates)
         return result
 
     def recover_empty_text_mapping(self,error):
@@ -83,11 +97,36 @@ class DMEBackend:
             raise MemoryUnavailable('emulation_not_running')
 
     def assert_instance(self, info=None):
-        info = self.instance_info() if info is None else info
+        # The loop may use a short-lived diagnostic cache. Mutations NEVER do.
+        # Clear it explicitly to preserve compatibility with diagnostic/test
+        # instance_info implementations that take no keyword arguments.
+        if info is None:
+            self._process_cache = None
+            info = self.instance_info()
         if info.get('process_enumeration_error'):
             raise MemoryUnavailable('dolphin_instance_unverified: process enumeration failed')
         if 'process_candidates' in info and len(info['process_candidates']) != 1:
             raise MemoryUnavailable('dolphin_instance_unverified: exactly one Dolphin process is required; DME cannot select an explicit PID')
+        if (self.fallback is not None and 'process_candidates' in info
+                and info['process_candidates'][0]['pid'] != self.fallback.pid):
+            raise MemoryUnavailable('dolphin_instance_unverified: verified MEM2 PID changed')
+
+    @contextmanager
+    def hud_write_batch(self):
+        """Short, synchronous process-attribution batch for HUD *only*.
+
+        The complete Windows process enumeration is fresh at entry and at
+        most 30ms old at each HUD write. No guest inventory/stat write uses
+        this optimization. Never retain the batch across a coroutine yield.
+        """
+        if self._mutation_batch is not None:
+            raise MemoryUnavailable('nested HUD process attribution batch')
+        self.assert_instance()
+        self._mutation_batch=time.monotonic()
+        try:
+            yield
+        finally:
+            self._mutation_batch=None
 
     def _fallback(self):
         if os.name != 'nt':
@@ -98,6 +137,7 @@ class DMEBackend:
         return self.fallback
 
     def read_bytes(self, address, size):
+        self.read_calls += 1
         self._check()
         try:
             return bytes(self.engine.read_bytes(address, size))
@@ -107,10 +147,15 @@ class DMEBackend:
             return self._fallback().read(address, size)
 
     def write_bytes(self, address, data):
+        self.write_calls += 1
         self._check()
-        # Repeat process attribution at the mutation boundary, not just when
-        # attaching. No automatic selection between concurrently running games.
-        self.assert_instance()
+        # Repeat attribution on every ordinary mutation. A HUD transaction
+        # may share a freshly enumerated, <=30 ms process proof only while
+        # synchronously publishing its already authenticated text mailboxes.
+        batch=self._mutation_batch
+        if batch is None or not self.active() or time.monotonic()-batch>=.03:
+            self.assert_instance()
+            if batch is not None:self._mutation_batch=time.monotonic()
         # Choose one backend BEFORE mutation. A failed write may have partially
         # applied; retrying through another alias would conceal uncertainty.
         if address >= 0x90000000 and self.fallback:
@@ -119,6 +164,8 @@ class DMEBackend:
             self.engine.write_bytes(address, data)
 
     def close(self):
+        self._process_cache = None
+        self._mutation_batch = None
         if self.fallback:
             self.fallback.close()
             self.fallback = None
@@ -134,6 +181,29 @@ class SonicMemory:
         self.latest_write = None
         self.latest_blocked_native_write = None
         self.revision_observation = None
+        self._scene_proof = None
+
+    def scene_read_verified(self):
+        """Cheap *read-only* proof between full PAL executable audits.
+
+        Every 250ms (or after a boot/signature change) the caller must redo the
+        entire code hash. Never authorize a guest write using this proof: write
+        policy keeps the full executable and scene checks for mutations.
+        """
+        proof = self._scene_proof
+        if proof is None or time.monotonic() - proof[0] >= .25:
+            return False
+        from .native_dol import SIGNATURE
+        try:
+            matches = (self.read_bytes(0x80000000, 8) == proof[1]
+                       and self.read_bytes(SIGNATURE, 64) == proof[2])
+        except MemoryUnavailable:
+            self._scene_proof = None
+            raise
+        if not matches:
+            self._scene_proof = None
+            raise MemoryUnavailable('PAL boot/native signature changed; full verification required')
+        return True
 
     def read_bytes(self, address, size):
         if not valid_range(address, size):
@@ -409,11 +479,17 @@ class SonicMemory:
 
     def verify_revision(self):
         from .versions import verify_revision
-        self._control_proof=None
-        result=verify_revision(self)
-        if getattr(self,'_control_scope',False) and getattr(self,'native_patch',None):
-            from .native_dol import SIGNATURE
-            self._control_proof=(time.monotonic(),self.read_bytes(0x80000000,8),self.read_bytes(SIGNATURE,64))
+        self._control_proof = None
+        self._scene_proof = None
+        result = verify_revision(self)
+        # Cache only the *identity* of the just-verified executable, never its
+        # authority to write. Any failed verification leaves the cache empty.
+        from .native_dol import SIGNATURE
+        boot = self.read_bytes(0x80000000, 8)
+        signature = self.read_bytes(SIGNATURE, 64)
+        self._scene_proof = (time.monotonic(), boot, signature)
+        if getattr(self, '_control_scope', False) and getattr(self, 'native_patch', None):
+            self._control_proof = self._scene_proof
         return result
 
     @contextmanager

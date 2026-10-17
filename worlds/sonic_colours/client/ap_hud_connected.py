@@ -2,6 +2,7 @@
 import re
 import math
 import struct
+from contextlib import nullcontext
 from .memory import MemoryUnavailable,valid_range
 from .native_read import read_stage_objects,read_actors
 from .ap_hud_ticker import ascii_text,item_colour
@@ -207,6 +208,36 @@ def payloads(owner,events,metrics,music=None):
         result[box+144]=struct.pack('>If',colour,x)
     return result
 
+def mailbox_acks(memory, boxes):
+    """Read 90 guest ACK words in bounded spans rather than 90 DME round trips.
+
+    ACK ownership is already checked by discover()/validate(). Only coherent
+    contiguous read-only snapshots are grouped. An unreadable span falls back
+    to individual addresses; an invalid individual ACK still aborts the frame.
+    """
+    positions=sorted({box for record,box in boxes.values()})
+    if not positions:
+        return {}
+    spans=[];start=positions[0];end=start+4;words=[start]
+    for address in positions[1:]:
+        if address-end<=512 and address+4-start<=4096 and valid_range(start,address+4-start):
+            end=address+4;words.append(address)
+        else:
+            spans.append((start,end,words))
+            start=address;end=address+4;words=[address]
+    spans.append((start,end,words))
+    result={}
+    for start,end,words in spans:
+        try:
+            data=memory.read_bytes(start,end-start)
+        except MemoryUnavailable:
+            # A gap may cross an unmapped guest page. Never treat that as an ACK.
+            for address in words:result[address]=memory.read_u32(address)
+        else:
+            for address in words:result[address]=struct.unpack_from('>I',data,address-start)[0]
+    return result
+
+
 def render(runtime,memory):
     enabled=True
     state=getattr(runtime,'_hud_connected',None)
@@ -216,17 +247,23 @@ def render(runtime,memory):
             or snapshot.scene=='gameplay' and getattr(snapshot,'death_state','alive')!='alive'):
         runtime.hud_ticker.elapsed_visible(False)
         return {'hud_ready':False,'status':'HUD disabled or scene unavailable'}
-    # Runtime's fresh snapshot already verifies the executable on every poll.
-    # The publisher and owner are additionally byte-checked below and on each
-    # mailbox write. Avoid hashing the full DOL twice before the first text.
+    # A recent authenticated scene observation is sufficient for read-only
+    # discovery. Every mailbox write separately validates guest-owned anchors
+    # and the exact publisher entry point.
     if not (getattr(memory,'revision_observation',None) or {}).get('verified'):
         memory.verify_revision()
-    if not installed(memory):return {'hud_ready':False,'status':'install AP-connected Riivolution patch'}
+    if state is None and not installed(memory):
+        return {'hud_ready':False,'status':'install AP-connected Riivolution patch'}
     identity=(snapshot.session,snapshot.stage_epoch,snapshot.scene)
-    if state is None or state['identity']!=identity:
+    changed_owner = state is None or state['identity'] != identity
+    if changed_owner:
+        if state is not None and not installed(memory):
+            return {'hud_ready':False,'status':'install AP-connected Riivolution patch'}
         owner=discover(memory)
         from ..world_constants import load_data
-        state={'identity':identity,'owner':owner,'metrics':load_data('hud_glyph_metrics.json'),'pending':None,'shown':None}
+        state={'identity':identity,'owner':owner,'metrics':load_data('hud_glyph_metrics.json'),'pending':None,'shown':None,
+               'publisher_verified_at':runtime.clock(),
+               'publisher_hook':memory.read_bytes(HOOK,4)}
         runtime._hud_connected=state
     owner=state['owner']
     try:validate(memory,owner)
@@ -235,9 +272,11 @@ def render(runtime,memory):
         raise
     pending=state['pending']
     if pending:
-        if not all(memory.read_u32(box)==pending['generation'] for record,box in owner['boxes'].values()):
+        acknowledgements=mailbox_acks(memory,owner['boxes'])
+        outstanding=sum(value!=pending['generation'] for value in acknowledgements.values())
+        if outstanding:
             return {'hud_ready':False,'font_ready':True,'owner_verified':True,'status':'waiting for game-thread ACK','generation':pending['generation'],
-                    'pending_casts':sum(memory.read_u32(box)!=pending['generation'] for record,box in owner['boxes'].values())}
+                    'pending_casts':outstanding}
         if pending['candidate']:runtime.hud_ticker.published(pending['candidate'])
         popup=getattr(runtime,'music_popup',None)
         if popup:popup.published(pending.get('music_generation'),runtime.clock())
@@ -248,6 +287,20 @@ def render(runtime,memory):
     from .music_popup import update
     music=update(runtime)
     if events!=state['shown'] or music!=state.get('music'):
+        # Complete publisher re-verification is expensive (~120 guest reads).
+        # Perform it at most four times per second, and on each new owner.
+        # On intervening frames check the exact entry instruction, while the
+        # write policy independently checks owner anchors and native hook.
+        if not changed_owner:
+            if runtime.clock() - state['publisher_verified_at'] >= .25:
+                if not installed(memory):
+                    runtime._hud_connected=None
+                    raise MemoryUnavailable('HUD publisher signature changed')
+                state['publisher_verified_at']=runtime.clock()
+            else:
+                if memory.read_bytes(HOOK,4)!=state['publisher_hook']:
+                    runtime._hud_connected=None
+                    raise MemoryUnavailable('HUD publisher entry changed')
         writes=payloads(owner,events,state['metrics'],music)
         # One bounded data write per cast, preserving its relocated name.
         # Previously handle/text/colour each incurred separate pre/post owner
@@ -270,12 +323,14 @@ def render(runtime,memory):
         memory._hud_transaction={'owner':owner,'allowed':{a:len(v) for a,v in writes.items()}|{owner['control']+4:4},
                                  'hook':memory.read_bytes(HOOK,4),'identity':identity}
         try:
-            def write(a,data):
-                before=memory.read_bytes(a,len(data))
-                if before!=data:memory.write_bytes_verified(a,data,expected=before,operation='hud_mailbox')
-            write(owner['control']+4,struct.pack('>I',generation-1))
-            for a,data in writes.items():write(a,data)
-            write(owner['control']+4,struct.pack('>I',generation))
+            batch=getattr(getattr(memory,'backend',None),'hud_write_batch',None)
+            with batch() if batch else nullcontext():
+                def write(a,data):
+                    before=memory.read_bytes(a,len(data))
+                    if before!=data:memory.write_bytes_verified(a,data,expected=before,operation='hud_mailbox')
+                write(owner['control']+4,struct.pack('>I',generation-1))
+                for a,data in writes.items():write(a,data)
+                write(owner['control']+4,struct.pack('>I',generation))
         finally:memory._hud_transaction=None
         state['published_payloads']=desired
         state['pending']={'generation':generation,'events':events,'candidate':runtime.hud_ticker.candidate() if enabled and runtime.hud_ticker.has_pending_candidate() else None,
