@@ -415,6 +415,7 @@ class Runtime:
             try:self.hooks.gameplay_controls_status[name]=action()
             except MemoryUnavailable as error:self.hooks.gameplay_controls_status[name]={'status':str(error)}
         self.enforce_white_boost_gain_lock(memory,early_owned)
+        yield set(),False  # service AP receipts/ACKs after time-critical capsule gates
         # Water entry and controller replacement must be handled before slow
         # journal, resource-bank and progression operations in this poll.
         if self.slot_data['options'].get('movement_unlocks'):
@@ -430,6 +431,7 @@ class Runtime:
                     setattr(self,name,result)
                 except MemoryUnavailable as error:
                     setattr(self,name,{'status':str(error),'write_verified':False})
+        yield set(),False  # release the event loop before resource/HUD discovery
         if getattr(memory,'native_patch',None):
             try:
                 from .live_music import configure_finite_loop
@@ -449,6 +451,7 @@ class Runtime:
         except MemoryUnavailable as error:
             self.hud_status={'hud_ready':False,'status':str(error)}
             self.hud_ticker.elapsed_visible(False)
+        yield set(),False  # publish HUD before lower-priority reconciliation
         try:
             from .event_controls import configure as configure_events
             self.native_event_status=configure_events(self,memory)
@@ -479,6 +482,7 @@ class Runtime:
         except MemoryUnavailable as error:
             self.intro_box_status = {'status':str(error),'applied':False}
         self.settle_effects(memory)
+        yield set(),False
         durable = list(item_ids if history_ready else self.journal.data['receipts'])
         durable += [item for item in self.journal.data.get('permission_receipts',()) if item not in durable]
         known = self.effective_inventory(inventory(durable))

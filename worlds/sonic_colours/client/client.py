@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import nullcontext
 import hashlib
 import json
 from pathlib import Path
@@ -442,6 +443,7 @@ class SonicContext(CommonContext):
         self.runtime = None
         self.deathlink = None
         self.memory = None
+        self.sync_wakeup = asyncio.Event()
         self.history_ready = False
         self.history_desynced = False
         self.barrier = None
@@ -509,6 +511,9 @@ class SonicContext(CommonContext):
         return str(self.player_names.get(slot,f'Player {slot}'))
 
     def on_package(self, cmd, args):
+        if cmd in ('Connected','ReceivedItems','RoomUpdate','Retrieved','Bounced'):
+            wakeup=getattr(self,'sync_wakeup',None)
+            if wakeup is not None:wakeup.set()
         if cmd == 'RoomInfo':
             self.authenticated_identity = None
             seed = args.get('seed_name')
@@ -595,7 +600,10 @@ class SonicContext(CommonContext):
                 index=args.get('index')
                 if type(index) is int and 0<=index<=len(self.items_received):
                     self.runtime.hud_ticker.received(self.items_received[index:],index,lambda item:self.hud_item_name(item,self.slot),self.hud_player_name,self.slot)
-            self.refresh_movement_permissions()
+            # Socket callbacks record durable receipts; the Dolphin loop owns
+            # native permission writes. Do not block the next server packet
+            # with controller, resource and executable probes here.
+            self.operation_status['permission_refresh']='queued for Dolphin synchronization'
         elif cmd == 'Retrieved' and self.barrier in args.get('keys', {}) and not self.history_desynced:
             self.history_ready = True
             if self.runtime and self.authenticated_identity==(self.team,self.slot,self.server_seed):
@@ -679,20 +687,41 @@ async def poll_runtime(ctx,memory):
     expected=(identity['team'],identity['slot'],identity['seed'])
     items=[item.item for item in ctx.items_received]
     steps=runtime.poll_steps(memory,items,ctx.history_ready)
+    started=time.monotonic();longest=0.;phases=0
     try:
         while True:
-            try:checks,goal=next(steps)
+            try:
+                phase_start=time.monotonic()
+                try:
+                    with memory.control_scope() if hasattr(memory,'control_scope') else nullcontext():
+                        checks,goal=next(steps)
+                finally:
+                    longest=max(longest,time.monotonic()-phase_start);phases+=1
             except StopIteration as done:return done.value
             try:await transmit_checks(ctx,checks,goal)
             except (MemoryUnavailable,ConnectionClosed,OSError) as error:
                 ctx.operation_status['ap_transport']='Location transmission pending: '+str(error)
             # Let socket acknowledgements and inventory messages run before
             # expensive data projection; no concurrent native-memory worker.
-            await asyncio.sleep(.001)
+            await asyncio.sleep(0)
             if ctx.runtime is not runtime or ctx.authenticated_identity!=expected:
                 return set(),False
             items[:]=[item.item for item in ctx.items_received]
-    finally:steps.close()
+    finally:
+        steps.close()
+        ctx.operation_status['sync_performance']={'cycle_ms':round((time.monotonic()-started)*1000,2),
+            'longest_blocking_phase_ms':round(longest*1000,2),'phases':phases,
+            'strategy':'single native-memory owner; cooperative server checkpoints'}
+
+
+async def wait_for_sync(ctx,delay):
+    """Incoming AP traffic wakes idle synchronization without a busy wait."""
+    wakeup=getattr(ctx,'sync_wakeup',None)
+    if wakeup is None:
+        await asyncio.sleep(delay);return
+    try:await asyncio.wait_for(wakeup.wait(),delay)
+    except asyncio.TimeoutError:pass
+    finally:wakeup.clear()
 
 
 async def dolphin_loop(ctx):
@@ -875,7 +904,9 @@ async def dolphin_loop(ctx):
             # Five-bit masks persist through normal gameplay, so bulk bit changes
             # capture multiple rings. Sample promptly; capsule pulses will need a
             # native retained event source, not an assumption about this interval.
-            await asyncio.sleep(max(0.001, 0.02 - (time.monotonic() - started)) if backend.active() else 1)
+            delay=(max(0.001,0.02-(time.monotonic()-started))
+                   if backend.active() and ctx.runtime else .25)
+            await wait_for_sync(ctx,delay)
     finally:
         backend.close()
         ctx.memory = None

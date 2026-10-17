@@ -4,6 +4,7 @@ The code ID hashes actual loaded code objects. A packaged commit is attribution
 from the build manifest, not a guess based on the surrounding checkout's HEAD.
 """
 import hashlib
+import inspect
 import json
 import marshal
 import subprocess
@@ -67,18 +68,19 @@ def implementation_info():
                      capsule_capture.payload,capsule_capture.read_events,capsule_capture.control_context,capsule_capture.configure,native_events.program,
                      wisps.wisp_level,wisps.project_inventory,wisps.all_wisps_owned,
                      logic_v2.check,logic_v2.entry_match,logic_v2.available):
-        digest.update(function.__qualname__.encode());digest.update(marshal.dumps(function.__code__))
+        digest.update(function.__qualname__.encode());digest.update(marshal.dumps(inspect.unwrap(function).__code__))
     for function in (hud_patches.__wrapped__,hud_normalize,hud_discover,hud_render,hud_payloads,Ticker.received,Ticker.sent,Ticker.published,Ticker.panel_events,client.SonicCommands._cmd_sonichud):
-        digest.update(function.__qualname__.encode());digest.update(marshal.dumps(function.__code__))
+        digest.update(function.__qualname__.encode());digest.update(marshal.dumps(inspect.unwrap(function).__code__))
     for function in (sky_payload,sky_configure,sky_normalize,sky_installed,medal_hook._validated_data,medal_hook._previous_data,
                      movement_gate._gecko_install,movement_gate._legacy_gecko_install,Runtime.movement_policy,Runtime.refresh_movement_permissions,client.SonicContext.refresh_movement_permissions,
                      client.SonicCommands._change_test_ability,Runtime.poll_steps,
                      Runtime.delivery_readback_verified,client.poll_runtime,journal.Journal.confirm):
         digest.update(function.__qualname__.encode())
-        digest.update(marshal.dumps(function.__code__))
+        digest.update(marshal.dumps(inspect.unwrap(function).__code__))
+    functions+=(SonicMemory.verify_revision,SonicMemory.verify_for_write,SonicMemory.control_scope)
     for function in functions:
         digest.update(function.__qualname__.encode())
-        digest.update(marshal.dumps(function.__code__))
+        digest.update(marshal.dumps(inspect.unwrap(function).__code__))
     result = {'loaded_code_id': digest.hexdigest(),
               'loaded_python_paths': {module.__name__: module.__file__
                                       for module in (hooks, runtime, state, binding, native_read)},

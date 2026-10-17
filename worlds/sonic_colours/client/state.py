@@ -356,7 +356,10 @@ class WritePolicy:
                 raise MemoryUnavailable('WRITE_BLOCKED: HUD publisher changed')
             return (*tx['identity'],tx['owner']['layer'],tx['owner']['handle'],tx['owner']['control'])
         ui_batch=getattr(self.memory,'_game_land_ui_batch',None) if operation=='game_land_ui' else None
-        if ui_batch is None:self.memory.verify_revision()
+        if ui_batch is None:
+            verifier=getattr(self.memory,'verify_for_write',None)
+            if verifier is None:self.memory.verify_revision()
+            else:verifier(operation)
         else:
             from .game_land_ui import validate_batch
             validate_batch(self.memory,ui_batch)

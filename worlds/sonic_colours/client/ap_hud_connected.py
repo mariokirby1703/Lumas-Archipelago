@@ -2,10 +2,10 @@
 import re
 import math
 import struct
-from .memory import MemoryUnavailable
+from .memory import MemoryUnavailable,valid_range
 from .native_read import read_stage_objects,read_actors
 from .ap_hud_ticker import ascii_text,item_colour
-from .ap_hud_publisher import MAGIC,installed,HOOK,patches
+from .ap_hud_publisher import MAGIC,installed,HOOK
 
 def result_origin(memory,layer):
     """Measured PAL result coordinate controller, never a mutable UI write.
@@ -66,27 +66,40 @@ def discover(memory):
                 counts={'gameplay':(96,103),'world_map':(111,),'global_map':(111,),
                         'game_land_select':(93,104),'results':(95,),'save_select':(350,)}
                 if memory.read_u32(layout+44) not in counts[rows[0]['scene']]:continue
-                table=memory.read_ptr_checked(layout+48,memory.read_u32(layout+44)*12)
+                count=memory.read_u32(layout+44)
+                table=memory.read_ptr_checked(layout+48,count*12)
+                dictionary=memory.read_bytes(table,count*12)
                 sourcegroups=memory.read_ptr_checked(layout+40,128)
-                boxes={};control=None
-                for i in range(memory.read_u32(layout+44)):
-                    entry=table+i*12;nameptr=memory.read_ptr_checked(entry,4)
+                boxes={};control=None;arrays={}
+                def checked_pointer(value,size):
+                    if value%4 or not valid_range(value,size):raise MemoryUnavailable('invalid HUD resource pointer')
+                    return value
+                for i in range(count):
+                    nameptr,group,index=struct.unpack_from('>III',dictionary,i*12)
+                    checked_pointer(nameptr,4)
                     name=memory.read_bytes(nameptr,48).split(b'\0')[0].decode('ascii')
                     if not name.startswith('ap_'):continue
-                    group=memory.read_u32(entry+4);index=memory.read_u32(entry+8)
                     if not 1<=group<32 or not 0<=index<15:raise MemoryUnavailable('HUD cast index differs')
-                    sourcearray=memory.read_ptr_checked(sourcegroups+group*16+4,(index+1)*4)
-                    record=memory.read_ptr_checked(sourcearray+index*4,116)
-                    if memory.read_u32(record+4)!=2:raise MemoryUnavailable('HUD cast is not a font')
-                    box=memory.read_ptr_checked(record+64,156)
-                    if memory.read_u32(box+152)!=0x41504d42:raise MemoryUnavailable('AP mailbox marker missing')
-                    shared=memory.read_ptr_checked(box+4,16)
-                    if memory.read_u32(shared)!=MAGIC or memory.read_u32(shared+8)!=128:raise MemoryUnavailable('HUD mailbox signature missing')
+                    if group not in arrays:
+                        sourcearray=memory.read_ptr_checked(sourcegroups+group*16+4,60)
+                        arrays[group]=memory.read_bytes(sourcearray,60)
+                    record=checked_pointer(struct.unpack_from('>I',arrays[group],index*4)[0],116)
+                    font=memory.read_bytes(record,116)
+                    if struct.unpack_from('>I',font,4)[0]!=2:raise MemoryUnavailable('HUD cast is not a font')
+                    box=checked_pointer(struct.unpack_from('>I',font,64)[0],156)
+                    mailbox=memory.read_bytes(box,156)
+                    if struct.unpack_from('>I',mailbox,152)[0]!=0x41504d42:raise MemoryUnavailable('AP mailbox marker missing')
+                    shared=checked_pointer(struct.unpack_from('>I',mailbox,4)[0],16)
+                    if control is None:
+                        header=memory.read_bytes(shared,16)
+                        if struct.unpack_from('>I',header)[0]!=MAGIC or struct.unpack_from('>I',header,8)[0]!=128:
+                            raise MemoryUnavailable('HUD mailbox signature missing')
                     if control not in (None,shared):raise MemoryUnavailable('HUD controller differs')
                     control=shared
-                    if memory.read_u32(box+12)!=nameptr:
+                    boxname=checked_pointer(struct.unpack_from('>I',mailbox,12)[0],4)
+                    if boxname!=nameptr:
                         # Builder may emit a second identical string for the dictionary.
-                        if memory.read_bytes(memory.read_ptr_checked(box+12,4),48).split(b'\0')[0].decode('ascii')!=name:
+                        if memory.read_bytes(boxname,48).split(b'\0')[0].decode('ascii')!=name:
                             raise MemoryUnavailable('HUD mailbox name differs')
                     boxes[name]=(record,box)
                 if len(boxes)!=90:continue
@@ -239,9 +252,19 @@ def render(runtime,memory):
         # One bounded data write per cast, preserving its relocated name.
         # Previously handle/text/colour each incurred separate pre/post owner
         # validation, tripling the initial publication's process round trips.
-        writes={box+8:writes[box+8]+memory.read_bytes(box+12,4)+writes[box+16]+writes[box+144]
-                for record,box in owner['boxes'].values()}
+        previous=state.get('published_payloads',{})
+        mailboxes={}
+        for record,box in owner['boxes'].values():
+            raw=writes[box+8]+writes[box+16]+writes[box+144]
+            old=previous.get(box+8)
+            mailboxes[box+8]=(old if old is not None and old[:4]+old[8:]==raw else
+                             writes[box+8]+memory.read_bytes(box+12,4)+writes[box+16]+writes[box+144])
+        writes=mailboxes
         writes.update(owner.get('music_y_positions',{}))
+        # These mailbox payload bytes are host-owned; the guest writes only
+        # ACKs outside them. Fade one row without republishing the other rows.
+        desired=writes
+        writes={a:data for a,data in desired.items() if previous.get(a)!=data}
         generation=(memory.read_u32(owner['control']+4)+2)&0xfffffffe
         if generation==0:generation=2
         memory._hud_transaction={'owner':owner,'allowed':{a:len(v) for a,v in writes.items()}|{owner['control']+4:4},
@@ -254,6 +277,7 @@ def render(runtime,memory):
             for a,data in writes.items():write(a,data)
             write(owner['control']+4,struct.pack('>I',generation))
         finally:memory._hud_transaction=None
+        state['published_payloads']=desired
         state['pending']={'generation':generation,'events':events,'candidate':runtime.hud_ticker.candidate() if enabled and runtime.hud_ticker.has_pending_candidate() else None,
                           'music_generation':getattr(getattr(runtime,'music_popup',None),'generation',None)}
         state['music']=dict(music)

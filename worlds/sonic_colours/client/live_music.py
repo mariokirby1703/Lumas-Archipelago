@@ -8,9 +8,9 @@ Guest code and Dolphin JIT state are never modified by this module.
 """
 import hashlib
 import struct
+from functools import lru_cache
 from .memory import MemoryUnavailable, valid_range
-from .music_bank import CATALOG, CUES, WISP_CUES, FINITE_CUES, SHUFFLE_CUES, plan, slot_plan, rewrite_bank, recover_bank
-from .cpk import UTF
+from .music_bank import CATALOG, CUES, WISP_CUES, FINITE_CUES, SHUFFLE_CUES, slot_plan, rewrite_bank, recover_bank
 
 ORIGINAL_SHA256 = CATALOG['bank_sha256']
 # Exact original bank size from multiple independent PAL memory captures.
@@ -19,6 +19,7 @@ CANDIDATE_POINTERS = (0x80B3ECD8, 0x80B3ECDC)
 CANDIDATE_HINTS = (0x9017E8A0,)
 
 
+@lru_cache(maxsize=4)
 def recover_original(raw):
     """Reconstruct the PAL original using immutable CSB string identities.
 

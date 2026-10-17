@@ -6,9 +6,13 @@ operation; multi-write transactions cannot guarantee rollback across scene exits
 import os
 import struct
 import time
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Protocol
 
+_BATCHED_CONTROLS=frozenset({'movement_controls','gameplay_controls','capsule_controls',
+    'oxygen_controls','one_up_controls','egg_medal_controls','stunts','drill_turbo',
+    'hover_ring_dash','assist_change','skydiving','quick_step'})
 
 class MemoryUnavailable(RuntimeError):
     pass
@@ -383,4 +387,33 @@ class SonicMemory:
 
     def verify_revision(self):
         from .versions import verify_revision
-        return verify_revision(self)
+        self._control_proof=None
+        result=verify_revision(self)
+        if getattr(self,'_control_scope',False) and getattr(self,'native_patch',None):
+            from .native_dol import SIGNATURE
+            self._control_proof=(time.monotonic(),self.read_bytes(0x80000000,8),self.read_bytes(SIGNATURE,64))
+        return result
+
+    @contextmanager
+    def control_scope(self):
+        """Synchronous control batch, never retained across an await.
+
+        Full executable proofs are shared for at most 50 ms. Every ephemeral
+        control write still checks boot identity, its exact native module,
+        and a fresh scene/save profile. Persistent writes and effects do not
+        use the shared proof. Exiting, including on failure, invalidates it.
+        """
+        if getattr(self,'_control_scope',False):
+            raise MemoryUnavailable('nested native control scope')
+        self._control_scope=True;self._control_proof=None
+        try:yield
+        finally:self._control_scope=False;self._control_proof=None
+
+    def verify_for_write(self,operation):
+        proof=getattr(self,'_control_proof',None)
+        if (operation in _BATCHED_CONTROLS and getattr(self,'_control_scope',False)
+                and proof is not None and 0<=time.monotonic()-proof[0]<=.05):
+            from .native_dol import SIGNATURE
+            if self.read_bytes(0x80000000,8)==proof[1] and self.read_bytes(SIGNATURE,64)==proof[2]:
+                return
+        self.verify_revision()
