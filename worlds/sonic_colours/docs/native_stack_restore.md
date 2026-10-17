@@ -107,3 +107,16 @@ It cannot intercept guest-native writes. The connected test is needed to
 separate those cases. No ISO change is required beyond native_arena_guard.iso.
 
 52 memory, firewall, scoped-proof, protocol and native-patch tests passed.
+
+## Connected live passage after relocation
+
+The user reports that the section completed with the connected client on the
+arena-guard ISO, after a very short severe lag spike. A read-only live sample
+immediately afterwards contained `d01f1bb2` at 0x80001800 and the intact stack
+prologue `9421fe00` at relocated entry 0x80001820. The loaded header identifies
+the 0x17b0-byte arena build. Thus the observed fixed-address corruption recurred
+without replacing that hook's stack allocation. This is positive verification
+of containment at the reported passage, not identification of the writer or a
+complete crash/scene matrix. The lag spike remains unexplained; no live client
+performance report or matching current log was available in this inspection.
+No production-wide live-validation flags were enabled.
