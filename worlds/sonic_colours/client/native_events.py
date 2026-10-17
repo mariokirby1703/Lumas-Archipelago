@@ -151,7 +151,7 @@ def program(kind,control):
     def restore():
         for word,off in ((0x7C0FF120,144),(0x7C0803A6,148),(0x7C0903A6,152)):
             a.d(32,0,1,off);a.emit(word)
-        a.d(46,0,1,16);a.d(14,1,1,0x120)
+        a.d(46,2,1,24);a.d(32,0,1,16);a.d(14,1,1,0x120)
     restore();a.emit(HOOKS[kind][1]);br('return')
     if kind in ('jump','jump_state'):
         a.label('blocked');restore()
@@ -185,7 +185,12 @@ def scatter(words,sites,return_to):
 def patches(control):
     from ..world_constants import load_data
     from .native_dol import branch
-    sites=load_data('native_event_sites.json');result=[];used=0
+    from .ap_hud_publisher import patches as hud_patches
+    # The publisher may grow into previously unused audited padding. Keep
+    # native event allocation disjoint rather than relying on old list order.
+    occupied={address for address,_,_ in hud_patches(native_registry=True)}
+    sites=[s for s in load_data('native_event_sites.json') if s['address'] not in occupied]
+    result=[];used=0
     for kind,(hook,old) in HOOKS.items():
         words=program(kind,control)
         selected=(load_data('native_music_loop_sites.json') if kind=='music_loop' else sites[used:])

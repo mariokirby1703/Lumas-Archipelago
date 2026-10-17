@@ -133,7 +133,10 @@ def handshake(memory):
     raw=memory.read_bytes(SIGNATURE,64)
     if raw[:8]!=MAGIC:return None
     patches,payload,digest,hooks=plan()
-    if raw[8:48]!=struct.pack('>II',ABI,len(payload))+digest:raise memory.error('incompatible native AP hook ABI/signature')
+    if raw[8:48]!=struct.pack('>II',ABI,len(payload))+digest:
+        if raw[16:48].hex()=='032d23d9e9395d2fe9e53e3c9139bc0fd8c42e2cf71adc124088f78969240081':
+            raise memory.error('Older native ISO has unsafe PowerPC stack restores; repatch the original ISO with this APWorld and your existing player patch')
+        raise memory.error('incompatible native AP hook ABI/signature')
     pages={}
     for address,old,new in patches:
         observed=bytearray();cursor=address

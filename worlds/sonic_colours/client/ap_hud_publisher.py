@@ -19,8 +19,9 @@ def patches(native_registry=False):
         from ..world_constants import load_data
         sites=load_data('hud_publisher_sites.json')
     else:sites=json.loads((Path(__file__).parents[1]/'data'/'hud_publisher_sites.json').read_text())
-    # Slots 120..149 belong to the two Rocket guards. Keep their fixed ABI.
-    sites=sites[:120]+sites[150:]
+    # Slots 120..148 are reserved for the Rocket guards. Slot 149 was unused
+    # and supplies the two extra words needed for valid stack-base restores.
+    sites=sites[:120]+sites[149:]
     slots=[row['address']+off for row in sites for off in (0,4)]
     code=[];labels={};fix=[]
     def emit(w):code.append(w)
@@ -124,7 +125,7 @@ def patches(native_registry=False):
         for f in range(14):d(50,f,1,0xb0+f*8)
         for op,offset in ((0x7c0ff120,0xa0),(0x7c0803a6,0xa4),(0x7c0903a6,0xa8),(0x7c0103a6,0xac)):
             d(32,0,1,offset);emit(op)
-        d(46,0,1,0x20);d(14,1,1,0x160);emit(ORIGINAL)
+        d(46,2,1,0x28);d(32,0,1,0x20);d(14,1,1,0x160);emit(ORIGINAL)
         fix.append((len(code),target,0x48000000));emit(0)
     restore(HOOK+4)
     label('restore_skip');restore(0x805e0f50)

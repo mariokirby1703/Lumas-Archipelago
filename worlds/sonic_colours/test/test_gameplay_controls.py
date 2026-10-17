@@ -40,6 +40,7 @@ def run(kind, selected=4, maximum=0, locked=1, colour=0, profile=1, expected_pro
             addr=(regs[ra]+imm)&0xffffffff;mem[addr]=regs[rt]
             if op==37:regs[ra]=addr
         elif op in (46,47):
+            if op==46:assert ra<rt, 'invalid lmw: base register is in load range'
             addr=regs[ra]+imm
             for r in range(rt,32):
                 if op==47:mem[addr+(r-rt)*4]=regs[r]

@@ -84,6 +84,7 @@ def test_guest_native_setter_ack_and_register_preservation(generation,ack,layer_
             else:mem[address]=r[rt]
             if op==37:r[ra]=address
         elif op in (46,47):
+            if op==46:assert ra<rt, 'invalid lmw: base register is in load range'
             address=r[ra]+imm
             for reg in range(rt,32):
                 if op==46:r[reg]=mem[address]

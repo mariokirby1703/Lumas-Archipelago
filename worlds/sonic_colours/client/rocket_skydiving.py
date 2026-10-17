@@ -19,7 +19,7 @@ def _patches(fast):
         from ..world_constants import load_data
         sites=load_data('hud_publisher_sites.json')
     else:sites=json.loads((Path(__file__).parents[1]/'data/hud_publisher_sites.json').read_text())
-    sites=sites[134:150] if fast else sites[120:134]
+    sites=sites[134:149] if fast else sites[120:134]
     slots=[s['address']+o for s in sites for o in (0,4)]
     code=[];labels={};fix=[]
     def emit(w):code.append(w)

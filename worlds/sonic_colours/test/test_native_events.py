@@ -58,6 +58,7 @@ class Machine:
                 self.b.write_bytes(a,(self.r[rt]&((1<<(8*size))-1)).to_bytes(size,'big'))
                 if op==37:self.r[ra]=a
             elif op in (46,47):
+                if op==46:assert ra<rt, 'invalid lmw: base register is in load range'
                 a=self.r[ra]+imm
                 for r in range(rt,32):
                     if op==47:self.put(a+4*(r-rt),self.r[r])

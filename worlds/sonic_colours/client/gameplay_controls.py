@@ -112,7 +112,10 @@ def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_
         else:
             a.d(32, 0, 1, 148); a.emit(0x7C0FF120)
             a.d(32, 0, 1, 144); a.emit(0x7C0803A6)
-        a.d(46, 0, 1, 16)
+        # lmw r0,16(r1) is an invalid PowerPC form: its base is in the
+        # destination range. Never reload the stack base during a restore.
+        a.d(46, 2, 1, 24)
+        a.d(32, 0, 1, 16)
     else:
         for r in saved:
             if r != output: a.d(32, r, 1, 20 + saved.index(r)*4)
@@ -152,10 +155,12 @@ def installed(memory, kind):
     layouts.append(('before_hover',before_hover,before_hover_offset))
     before_drill=load_data('gameplay_before_drill.json').get(kind)
     if before_drill:layouts.append(('before_drill',before_drill['words'],before_drill['offset']))
+    before_stack=load_data('gameplay_before_stack_restore.json').get(kind)
+    if before_stack:layouts.append(('before_stack',before_stack['words'],before_stack['offset']))
     if legacy: layouts.append(('legacy', legacy['words'], legacy['offset']))
     for name, candidate, candidate_offset in layouts:
         try:
-            size = 12 if name in (kind, 'before_dead_lr', 'before_hover', 'before_drill', 'stack_lr', 'before_lean') and kind.startswith('speed') else 20
+            size = 12 if name in (kind, 'before_stack', 'before_dead_lr', 'before_hover', 'before_drill', 'stack_lr', 'before_lean') and kind.startswith('speed') else 20
             result = inspect_c2(memory, hook, original, {name:candidate}, ((candidate_offset,size),), label=kind)
             offset = candidate_offset
             break
@@ -163,7 +168,7 @@ def installed(memory, kind):
             failure = error
     else: raise failure
     if not result['installed']: return None
-    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'before_dead_lr', 'before_hover', 'before_drill', 'stack_lr', 'before_lean')
+    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'before_stack', 'before_dead_lr', 'before_hover', 'before_drill', 'stack_lr', 'before_lean')
     address = result['target'] + offset
     values = struct.unpack('>'+'I'*(size//4), memory.read_bytes(address,size))
     owner, index, maximum, model, locked = (*values, 0, 0) if size == 12 else values
