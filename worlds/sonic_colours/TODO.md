@@ -1,6 +1,6 @@
 # Outstanding verification and implementation
 
-Current implementation/evidence: [2026-10-15 report](docs/implementation_2026_10_15.md).
+Current implementation/evidence: [current feature and verification summary](docs/sonic_colours.md#logic-and-verification-limits).
 Historical observations below remain useful; a code fix is not a live pass.
 
 - **Unresolved:** AP-unlocked Area Map Acts can still use a black locked model.
@@ -42,4 +42,4 @@ Historical observations below remain useful; a code fix is not a live pass.
 - **Release gate:** DeathLink/Dead Weight/music live-validation flags remain
   false. Hidden `native_feature_tests` is an explicit disposable-seed test opt-in,
   not production verification. Full-suite historical fixture failures remain
-  listed in the verification report.
+  recorded in local full-suite test output under build/.

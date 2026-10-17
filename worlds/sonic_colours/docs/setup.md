@@ -2,9 +2,9 @@
 
 Supported source: an uncompressed original **PAL SNCP8P Revision 0 ISO**.
 Use Archipelago 0.6.7+ and 64-bit Dolphin with Dolphin Memory Engine support.
-See [the latest implementation/verification report](implementation_2026_10_15.md)
-and [the migration verification report](native_patch_migration.md) for tests
-actually performed and outstanding gameplay verification.
+See [features, options and verification limits](sonic_colours.md) for the
+current scope. This guide describes the native ISO workflow, not the retired
+manual Gecko/Riivolution installation.
 
 ## Install and generate
 
@@ -124,5 +124,68 @@ option. Random Capsules only exists with Game Land Checks.
 Existing schema-7 seed containers/receipts remain supported. Rebuild their ISO
 with the new APWorld for native oxygen/capsule fixes; rebuilding cannot change
 the old server's item placements or logic. Output upgrades preserve existing ISO
-files. DeathLink/Dead Weight still require the explicit developer test opt-in
-shown in the verification report until their remaining live matrix is completed.
+files. DeathLink and Dead Weight are selectable without the hidden developer flag,
+but their full live safety matrix remains incomplete. See the overview
+before enabling them in an important multiworld.
+
+## Server address and port
+
+A hosted-room download should contain that room's full address, including its
+port. The patch's connection metadata supplies the initial client address and
+player name. A locally generated patch cannot predict a future room's port.
+If no complete address is embedded, the launcher asks for it; use exactly the
+host and port shown by the room page (for example `example.org:38281`). An
+explicit `--connect` overrides patch metadata. Never infer a new room's port
+from an old client session. Password-protected rooms still require their
+password. Reusing generation output does not make a new room a new seed; saved
+AP ownership/journals must remain consistent with that seed and slot.
+
+## Original-source verification
+
+The installer checks the ISO/DATA disc ID and revision, partition integrity,
+and these original-file SHA256 values:
+
+| File | SHA256 |
+| --- | --- |
+| `main.dol` | `92aefe33b577493b492f8433ca68b90d25d29d2d6f9c85310a6829481281f8a9` |
+| `sonic2010_0.cpk` | `58bbf2be97a2f08effb5752bd40eea8a1ba76a18349937a32351624d855651bf` |
+
+An ISO that already contains mods is not a replacement for the verified
+original source. Reopen the same player patch with the updated APWorld to
+rebuild a changed native component. A matching existing image is reused; an
+older verified output is kept and the upgrade gets a component-specific name.
+You normally do not need a new seed for a client/native correction. A new
+seed is required to change the server's item pool, options or logic placements.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| No patch chooser or wrong client opens | Restart Archipelago after installing the APWorld. Remove duplicate installed copies; verify the intended world/client version. Open Patch and the Sonic client launcher both support the player patch chooser. |
+| ISO builds but Dolphin does not start | Verify the stored executable path and automatic-start setting. Resolve Dolphin's own close confirmation if it was already running. Keep only one Dolphin process. |
+| Client cannot attach or writes stay blocked | Use the supported PAL Rev0 game, the matching generated native ISO and exactly one Dolphin instance. Dolphin Memory Engine must be available to the Archipelago Python/client environment. Run `/sonicstatus`, `/sonicbinding` and `/sonicdebug`. |
+| Incompatible native signature or modified entry | Stop emulation, repatch the original ISO using the current APWorld and the same player patch, then restart the client and new image. Disable old AP Gecko/Riivolution patches. Do not apply runtime instruction fixes. |
+| Checks/items defer after a save switch | Confirm the selected save belongs to the seed/slot. Let the client observe stable native ownership. Keep the original journal; do not delete it to force receipt replay. `/sonicbinding` explains attribution. |
+| HUD test works but AP messages do not | `/sonichud test` is only local preview. Check the actual server/port, selected player, connection and `/sonicitems`. An already checked location does not give another server check. |
+| Missing text in a menu/results scene | Keep the scene open for discovery. This is not necessarily a lost check: compare server receipt/check state with `/sonicstatus`. Some visual scene coverage remains unverified. |
+| Slow updates or a short severe stall | `/sonicdebug` includes `sync_performance`, per-phase blocking times and Dolphin I/O/process-enumeration counts. Read-only identity proofs are bounded; mutating effects retain separate authenticated checks. Record the scene and action so a stall can be reproduced. |
+| `protected native entry` write blocked | Diagnostics include `latest_blocked_native_write` with the attempted operation/address and bounded caller trace. Keep this evidence; the protection deliberately prevents mutation. |
+| Dolphin invalid read/crash | Keep the error state available for diagnosis. The displayed PC may belong to the crash reporter rather than the original fault. The Game Land low-memory fix has one confirmed connected passage; broader coverage is still pending. |
+
+Do not enable MMU or repeatedly ignore an invalid-read dialog as a substitute
+for diagnosing an AP hook fault. No unsupported game revision is made safe by
+disabling the write checks.
+
+## Local developer commands
+
+`/testitems list` lists local ability overrides. Examples are `/give Double Jump`,
+`/give Progressive Crouch 2`, `/remove White Boost Wisp` and `/testitems reset`.
+These affect only the running client's test overlay; they do not send AP items,
+change server placements or inject durable received-item receipts. Reconnect or
+restart clears the overrides. Use real server delivery for end-to-end tests.
+
+For repository verification, run the full world suite and build the APWorld.
+The package's two canonical documents plus generated WebHost game-info alias
+can be read directly from the ZIP. A fresh original-source build and a real
+Dolphin/server playthrough are separate checks: offline tests and successful
+Wii partition verification alone are not live gameplay verification.

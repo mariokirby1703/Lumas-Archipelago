@@ -7,6 +7,34 @@ import subprocess
 from pathlib import Path
 import zipfile
 
+CANONICAL_DOCS = {'sonic_colours.md', 'setup.md'}
+# WebHostLib.misc.game_info uses secure_filename(game), regardless of Tutorials.
+WEB_GAME_INFO = 'en_Sonic_Colours_Wii.md'
+PATCH_TOOLS = {'__init__.py','build_hud_overlay.py','hud_cpk.py','hud_gncp.py',
+               'hud_original_assets.py','hud_preflight.py','hud_tpl.py'}
+PUBLIC_EXAMPLES = {'SonicColours.yaml', 'SonicColours_Template.yaml'}
+EXCLUDED_PARTS = {'notes','test','__pycache__','.pytest_cache','.mypy_cache',
+                  '.ruff_cache','build','.git'}
+
+
+def release_file(relative):
+    """Explicit release boundary; preserve all runtime/data files locally."""
+    if any(part in EXCLUDED_PARTS for part in relative.parts):
+        return False
+    if relative.suffix not in {'.py','.json','.md','.yaml','.txt','.ini','.csv','.png'}:
+        return False
+    if len(relative.parts)==1:
+        return (relative.suffix=='.py' and relative.name!='build_apworld.py'
+                or relative.name in {'archipelago.json','README.md','requirements.txt'})
+    directory=relative.parts[0]
+    if directory=='docs':
+        return len(relative.parts)==2 and relative.name in CANONICAL_DOCS
+    if directory=='tools':
+        return len(relative.parts)==2 and relative.name in PATCH_TOOLS
+    if directory=='examples':
+        return len(relative.parts)==2 and relative.name in PUBLIC_EXAMPLES
+    return directory in {'client','data','assets'}
+
 
 def build(destination):
     root = Path(__file__).resolve().parent
@@ -18,13 +46,7 @@ def build(destination):
         with zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for path in sorted(root.rglob('*')):
                 relative = path.relative_to(root)
-                patch_tools={'__init__.py','build_hud_overlay.py','hud_cpk.py','hud_gncp.py','hud_original_assets.py','hud_preflight.py','hud_tpl.py'}
-                if (not path.is_file() or any(p in {'notes', 'test', '__pycache__', '.pytest_cache'}
-                                             for p in relative.parts)
-                        or 'tools' in relative.parts and relative.name not in patch_tools
-                        or relative.name == 'build_apworld.py'
-                        or relative.name.startswith('live_pal_') and path.suffix == '.json'
-                        or path.suffix not in {'.py', '.json', '.md', '.yaml', '.txt', '.ini', '.csv', '.png'}):
+                if not path.is_file() or not release_file(relative):
                     continue
                 content = path.read_bytes()
                 if path.suffix == '.py':
@@ -35,8 +57,16 @@ def build(destination):
                 info.compress_type = zipfile.ZIP_DEFLATED
                 info.external_attr = 0o644 << 16
                 archive.writestr(info, content)
-                if path.suffix in {'.py', '.json', '.ini', '.csv', '.png'}:
-                    contents[relative.as_posix()] = hashlib.sha256(content).hexdigest()
+                contents[relative.as_posix()] = hashlib.sha256(content).hexdigest()
+            # Source has two maintained guides. Stock WebHost requires this
+            # third filename for /games/Sonic Colours (Wii)/info/en.
+            overview=(root/'docs/sonic_colours.md').read_bytes()
+            alias='docs/'+WEB_GAME_INFO
+            info=zipfile.ZipInfo('sonic_colours/'+alias,(2026,10,9,0,0,0))
+            info.compress_type=zipfile.ZIP_DEFLATED
+            info.external_attr=0o644<<16
+            archive.writestr(info,overview)
+            contents[alias]=hashlib.sha256(overview).hexdigest()
             # Include provenance in the artifact itself. Dirty builds are explicit
             # and receive a content ID; HEAD alone must never imply identical code.
             try:

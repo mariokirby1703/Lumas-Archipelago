@@ -11,6 +11,13 @@ import re
 import struct
 
 
+def write_report(root, report):
+    destination = Path(root).resolve().parents[1] / 'build/research_audit.json'
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+    return destination
+
+
 def audit():
     root = Path(__file__).resolve().parents[1]
     notes = root / 'notes'
@@ -97,8 +104,7 @@ def audit():
               'manager_global_candidate': '0x808F3628', 'live_validation': False,
               'missing_inputs': ['original main.dol', 'CPK and Lua originals/asset index', 'raw MEM1/MEM2 captures'],
               'runtime_dependencies_on_notes': False}
-    destination = root / 'docs/research_audit.json'
-    destination.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+    write_report(root, report)
     print(f'{len(entries)} files read; {instruction_count} disassembled instructions; '
           f'{call_count} direct calls verified against ELF. No live proof implied.')
 

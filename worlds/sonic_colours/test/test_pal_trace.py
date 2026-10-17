@@ -81,7 +81,7 @@ def test_chain_switch_during_poll_is_rejected():
     'live_pal_world_map_slot2_reloaded.json', 'live_pal_act3.json', 'live_pal_act3_result.json',
     'live_pal_act3_saved.json', 'live_pal_act3_reloaded.json'])
 def test_recorded_pal_reads_through_production_adapter(filename):
-    report = json.loads((Path(__file__).parents[1] / 'docs' / filename).read_text())
+    report = json.loads((Path(__file__).parent / 'fixtures' / 'pal_traces' / filename).read_text())
     hooks = NativeHooks()
     for sample in report['samples']:
         recorded_bytes = {}
@@ -114,8 +114,8 @@ def test_recorded_pal_reads_through_production_adapter(filename):
 
 def test_real_intro_save_and_reload_bit_transitions():
     from ..tools.compare_pal_traces import compare
-    docs = Path(__file__).parents[1] / 'docs'
-    read = lambda name: json.loads((docs / name).read_text())
+    traces = Path(__file__).parent / 'fixtures' / 'pal_traces'
+    read = lambda name: json.loads((traces / name).read_text())
     changes = compare(read('live_pal_act1.json'), read('live_pal_world_map_slot2.json'))['changed_bits']
     assert {'bit': 150, 'before': False, 'after': True} in changes
     assert {'bit': 151, 'before': False, 'after': True} in changes
@@ -125,8 +125,8 @@ def test_real_intro_save_and_reload_bit_transitions():
 
 def test_regular_act3_live_clear_and_reload():
     from ..tools.compare_pal_traces import compare
-    docs = Path(__file__).parents[1] / 'docs'
-    read = lambda name: json.loads((docs / name).read_text())
+    traces = Path(__file__).parent / 'fixtures' / 'pal_traces'
+    read = lambda name: json.loads((traces / name).read_text())
     assert compare(read('live_pal_act3.json'), read('live_pal_act3_result.json'))['changed_bits'] == []
     changes = compare(read('live_pal_act3.json'), read('live_pal_act3_saved.json'))['changed_bits']
     assert {'bit': 152, 'before': False, 'after': True} in changes
@@ -139,7 +139,7 @@ def test_real_clear_reads_do_not_bypass_native_identity_gate(tmp_path):
     from ..client.runtime import Runtime
     from ..client.state import SaveGuard
     from . import generate
-    report = json.loads((Path(__file__).parents[1] / 'docs' / 'live_pal_act3_reloaded.json').read_text())
+    report = json.loads((Path(__file__).parent / 'fixtures' / 'pal_traces' / 'live_pal_act3_reloaded.json').read_text())
     backend = FakeBackend()
     for read in report['samples'][-1]['reads']:
         backend.put(read['address'], bytes.fromhex(read['hex']))

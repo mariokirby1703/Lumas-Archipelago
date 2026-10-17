@@ -201,3 +201,10 @@ Thumbs.db
 [Dd]esktop.ini
 /worlds/create/notes
 /worlds/sonic_colours/notes
+
+# Local analysis and lint caches
+.ruff_cache/
+
+# Sonic Colours development release archives
+/worlds/sonic_colours/*.zip
+/worlds/sonic_colours/*.apworld

@@ -28,7 +28,7 @@
     "grade": "code-derived",
     "offset": 28,
     "kind": "inline_structure",
-    "proof": "0x8015F940 returns selected_save+0x1C; 0x8016C1D4 wraps that address on stack before bit helper dereferences it; live Act 1 chain captured in docs/live_pal_act1.json",
+    "proof": "0x8015F940 returns selected_save+0x1C; 0x8016C1D4 wraps that address on stack before bit helper dereferences it; live Act 1 chain captured in test/fixtures/pal_traces/live_pal_act1.json",
     "live_read": false,
     "live_write": false
   },
@@ -42,7 +42,7 @@
   "validated_clear_bits": {
     "grade": "live-read-validated",
     "kind": "persisted_clear_subset",
-    "proof": "Actual PAL traces docs/live_pal_*.json: bits 150/151 unset during forced intro, set after first save, retained after title-menu reload; bit 152 unset in Act 3/result, set after map/save, retained after title-menu reload; phases operator-reported; no native scene or identity proof",
+    "proof": "Actual PAL traces test/fixtures/pal_traces/live_pal_*.json: bits 150/151 unset during forced intro, set after first save, retained after title-menu reload; bit 152 unset in Act 3/result, set after map/save, retained after title-menu reload; phases operator-reported; no native scene or identity proof",
     "live_read": true,
     "live_write": false
   },
@@ -63,7 +63,7 @@
   "new_game_indicator": {
     "grade": "live-read-validated",
     "kind": "native_factory_state",
-    "proof": "Gameplay stg110 plus exact factory flag words from 8015EBC0/8016DEF8 and untouched 66 rank records; original mandatory Act 1 capture. October 10 live New Game detected automatically without /sonicnewgame, followed by unsaved Act 1 Red Ring 847001001 and genuine server acknowledgement; see docs/oct10_validation.md.",
+    "proof": "Gameplay stg110 plus exact factory flag words from 8015EBC0/8016DEF8 and untouched 66 rank records; original mandatory Act 1 capture. October 10 live New Game detected automatically without /sonicnewgame, followed by unsaved Act 1 Red Ring 847001001 and genuine server acknowledgement; historical 2026-10-10 report retained in Git history; see docs/sonic_colours.md for current verification limits.",
     "live_read": true,
     "live_write": false
   },
