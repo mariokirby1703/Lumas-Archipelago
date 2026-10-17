@@ -118,7 +118,7 @@ def test_native_migration_full_revision_handshake_and_returns():
         assert image.read(hook['target']+hook['size']-4,4)==branch(hook['target']+hook['size']-4,hook['return']).to_bytes(4,'big')
     class Backend:
         def read_bytes(self,a,n):
-            if a==0x80000000:return b'SNCP8P'
+            if a==0x80000000:return (b'SNCP8P'+bytes(2))[:n]
             if a==0x80000007:return bytes(1)
             try:return image.read(a,n)
             except ValueError:return bytes(n)

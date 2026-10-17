@@ -18,7 +18,7 @@ def test_captured_low_memory_write_no_longer_replaces_a_stack_prologue():
     class Backend:
         def read_bytes(self, address, size):
             if address == 0x80000000:
-                return b'SNCP8P'
+                return (b'SNCP8P'+bytes(2))[:size]
             if address == 0x80000007:
                 return bytes(1)
             try:
