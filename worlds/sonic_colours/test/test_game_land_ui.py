@@ -62,7 +62,9 @@ def test_existing_linear_seed_gets_free_starter_without_changing_other_gates():
     from . import generate
     from ..client.runtime import validate_slot
     data=generate().worlds[1].fill_slot_data()
-    old={**data,'game_land_gates':{**data['game_land_gates'],'1-1':1}}
+    from ..world_constants import game_land_gates
+    gates=game_land_gates(data['options']['game_land_requirement_reduction'])
+    old={**data,'options_revision':7,'game_land_gates':{**gates,'1-1':1}}
     current=validate_slot(old)
     assert current['game_land_gates']['1-1']==0
     assert all(current['game_land_gates'][k]==v for k,v in old['game_land_gates'].items() if k!='1-1')

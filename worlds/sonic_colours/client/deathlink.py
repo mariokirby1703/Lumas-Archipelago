@@ -1,7 +1,7 @@
 """Native-death-independent, no-echo protocol state machine.
 
 One remote event waits for safe gameplay for at most 30 seconds. DeathLink is
-not exposed by the current generation profile until a native kill is verified.
+selectable but PAL end-to-end death delivery is still awaiting live validation.
 """
 import hashlib
 import json

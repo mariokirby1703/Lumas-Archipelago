@@ -9,13 +9,13 @@
     },
     "bgm_sys_op": {
       "cue_id": 10,
-      "title": "Reach for the Stars (Opening)",
+      "title": "Reach for the Stars",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },
     "bgm_sys_end": {
       "cue_id": 20,
-      "title": "Speak with your Heart (Credits)",
+      "title": "Speak with your Heart",
       "source": "Sonic Colours (Wii)",
       "arrangement": null
     },

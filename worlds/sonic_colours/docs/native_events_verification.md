@@ -1,3 +1,9 @@
+> **Update 2026-10-16:** DeathLink and Dead Weight can now be selected in
+> ordinary YAML/web options without the developer-only testing flag. Their
+> `live_validation` flags intentionally remain false, because enabling an
+> experimental feature is not equivalent to completing Dolphin PAL live QA.
+> See `game_land_percentage_native_options_2026_10_16.md`.
+
 # Native events, music popup and Dead Weight ? 2026-10-15
 
 ## Implementation and boundaries

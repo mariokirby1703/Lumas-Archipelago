@@ -33,6 +33,18 @@ def wisp_item(colour, movement_unlocks=True):
 RANKS = ('S', 'A', 'B', 'C')
 
 
+def game_land_reduction_points(percentage):
+    """Map the new 0..99 percent slider onto the original 0..179 point scale.
+
+    Use integer ceiling of 180 * percentage / 100: 50% -> 90 and 99% -> 179.
+    Leave game_land_gates() in its historical units so all stage thresholds,
+    including those in old seeds, are calculated exactly as before.
+    """
+    if type(percentage) is not int or not 0 <= percentage <= 99:
+        raise ValueError('Game Land reduction percentage must be an integer in 0..99')
+    return (180 * percentage + 99) // 100
+
+
 def game_land_gates(reduction):
     if type(reduction) is not int or not 0 <= reduction <= 179:
         raise ValueError('Game Land reduction must be an integer in 0..179')

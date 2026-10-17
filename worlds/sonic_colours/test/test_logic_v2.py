@@ -93,12 +93,16 @@ def test_all_five_uses_each_individual_route():
     assert logic.all_five_rings(world(),State(['Cyan Laser Wisp']),d,'stg110')
 
 
-def test_test_only_feature_opt_in_is_explicit_and_does_not_change_verification():
+def test_native_death_and_dead_weight_options_do_not_require_test_opt_in():
     from ..world_constants import load_data
-    assert not load_data('versions.json')['live_validation']['deathlink']
-    with pytest.raises(ValueError,match='requires_verified_hook'):generate({'death_link':1})
-    m=generate({'native_feature_tests':1,'death_link':1,'dead_weight_trap_weight':1,'trap_percentage':100},fill=True)
-    assert validate_slot(m.worlds[1].fill_slot_data())['options']['native_feature_tests']==1
+    flags=load_data('versions.json')['live_validation']
+    assert not flags['deathlink'] and not flags['dead_weight']
+    m=generate({'native_feature_tests':0,'death_link':1,'dead_weight_trap_weight':1,
+                'trap_percentage':100,'ring_loss_trap_weight':'off',
+                'score_reset_trap_weight':'off'},fill=True)
+    options=validate_slot(m.worlds[1].fill_slot_data())['options']
+    assert options['native_feature_tests']==0 and options['death_link']==1
+    assert options['dead_weight_trap_weight']==1
     assert any(i.name=='Dead Weight Trap' for i in m.itempool)
 
 
@@ -134,7 +138,9 @@ def test_legacy_slot_normalization_preserves_the_previous_journal_digest():
     import hashlib,json
     from ..client.client import slot_identity_digest
     data=generate({'movement_unlocks':0,'boost_lock':0}).worlds[1].fill_slot_data()
+    from ..world_constants import game_land_gates
     legacy={**data,'options_revision':4,'logic_policy':'provisional_clears_conservative_pickups',
+            'game_land_gates':game_land_gates(data['options']['game_land_requirement_reduction']),
             'options':{k:v for k,v in data['options'].items() if k!='native_feature_tests'}}
     expected=hashlib.sha256(json.dumps(legacy,sort_keys=True).encode()).hexdigest()
     normalized=validate_slot(legacy)

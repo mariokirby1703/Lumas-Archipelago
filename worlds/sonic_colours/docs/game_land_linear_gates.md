@@ -1,5 +1,12 @@
 # Linear Game Land gates
 
+For new seeds (`options_revision >= 8`), the Game Land Requirement Reduction
+slider is **0..99%**, default **50%**. Convert it to the historical *point*
+input using `(180 * percentage + 99) // 100` before applying the formula
+below. Examples: 50% -> old reduction 90, 99% -> old 179. The gate formula
+remains unchanged, and revision 0..7 seeds still use their original raw
+0..179 reduction values.
+
 All 21 stages require AP Red Ring item value. Order: 1-1 through 7-1,
 then 1-2 through 7-2, then 1-3 through 7-3. Requirements start at 1.
 Integer step = max(1, floor((179 - reduction) / 20)). No rings are consumed.
@@ -7,7 +14,8 @@ Integer step = max(1, floor((179 - reduction) / 20)). No rings are consumed.
 | Reduction | Step | First / last requirement |
 |---|---|---|
 | 0 | 8 | 1 / 161 |
-| 40 | 6 | 1 / 121 |
+| 40 (legacy) | 6 | 1 / 121 |
+| 90 (new default 50%) | 4 | 1 / 81 |
 | 100 | 3 | 1 / 61 |
 | 113 | 3 | 1 / 61 |
 | 150 | 1 | 1 / 21 |
@@ -22,7 +30,7 @@ The native gate bits are 210 + (world-1)*3 + (Act-1), including Act 1.
 Game Land entry remains available; individual stages stay locked until their
 AP value is met. Own Wisps/Shuttles are placed outside Game Land to avoid
 ring-gated startup dependency cycles. Generation was checked for six option
-sets at 100 seeds each, with all 180 reduction values checked for spacing.
+sets at 100 seeds each, with all 180 legacy reduction values checked for spacing.
 
 Existing schema-7 server slot data with the exact prior threshold formula is
 accepted without changing that seed. A new generated seed is required for

@@ -13,14 +13,14 @@ Sonic Colours (Wii):
   eggman_heart_sanity: true
   boost_lock: true
   movement_unlocks: true
-  game_land_requirement_reduction: 40
+  game_land_requirement_reduction: 50  # Percent: 50% equals former 90 reduction points
   music_randomization: true
   ring_loss_trap_weight: medium
   score_reset_trap_weight: low
   trap_percentage: 10
   death_link: false
-  dead_weight_trap_weight: off
+  dead_weight_trap_weight: low
   wisp_capsules: false
 
-  # Developer testing only; incomplete native PAL live matrix. Hidden from web/template.
+  # Developer-only experimental hooks. DeathLink and Dead Weight no longer require this option.
   native_feature_tests: false

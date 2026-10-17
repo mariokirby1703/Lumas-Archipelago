@@ -8,7 +8,7 @@ from worlds.AutoWorld import World
 from . import Items, Locations, Regions, Rules
 from .Options import SonicColoursOptions, OPTION_NAMES
 from .web_world import SonicColoursWeb
-from .world_constants import GAME, SCHEMA_VERSION, STAGES, WORLDS, load_data, game_land_gates, pack_rings
+from .world_constants import GAME, SCHEMA_VERSION, STAGES, WORLDS, load_data, game_land_gates, game_land_reduction_points, pack_rings
 
 logger = logging.getLogger(__name__)
 
@@ -31,16 +31,18 @@ class SonicColoursWorld(World):
         if not self.options.game_land_checks:
             self.options.eggman_heart_sanity.value=0
             self.options.chaos_emerald_checks.value=0
+        # Both experimental effects are normal, selectable options. Never
+        # represent their lack of Dolphin live-verification as success.
         validation=load_data('versions.json').get('live_validation',{})
         for option, capability in [('death_link', 'deathlink'),('dead_weight_trap_weight','dead_weight')]:
-            if getattr(self.options, option).value and not validation.get(capability) and not self.options.native_feature_tests:
-                raise ValueError(f'Sonic Colours: {option} requires_verified_hook: {capability}. '
-                                 'Native implementation awaits the PAL live test matrix; use off until verified.')
+            if getattr(self.options, option).value and not validation.get(capability):
+                logger.warning('Sonic Colours: %s enabled, but PAL %s live-validation remains incomplete.',
+                               option, capability)
         if self.options.native_feature_tests:
             logger.warning('Sonic Colours: unverified native feature TEST opt-in; PAL live matrix incomplete.')
         self.starting_stage = next(s for s in STAGES if s['mission_id'] == 'stg110')
         self.starting_world = 0
-        self.gates = game_land_gates(self.options.game_land_requirement_reduction.value)
+        self.gates = game_land_gates(game_land_reduction_points(self.options.game_land_requirement_reduction.value))
         self.active_locations = tuple(n for n, d in Locations.LOCATION_TABLE.items() if Locations.enabled(d, self.options))
         self.logic = load_data('logic_from_sheet_v2.json')
         from .logic_v2 import validate_manifest
@@ -141,7 +143,7 @@ class SonicColoursWorld(World):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'options_revision':7, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':8, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),

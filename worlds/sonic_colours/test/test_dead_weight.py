@@ -68,18 +68,13 @@ def test_restart_never_replays_unconfirmed_publication_and_arbitrary_write_block
     finally:runtime.journal.close()
 
 
-def test_item_id_and_weighted_pool_preserve_progression(monkeypatch):
+def test_item_id_and_weighted_pool_preserve_progression():
     from ..world_constants import BASE_ID
-    from .. import world as module
     assert ITEM_TABLE['Dead Weight Trap']==BASE_ID+54
     assert classification('Dead Weight Trap').trap
-    assert not any(i.name=='Dead Weight Trap' for i in generate().itempool)
-    original=module.load_data
-    def load(name):
-        data=original(name)
-        if name=='versions.json':data['live_validation']['dead_weight']=True
-        return data
-    monkeypatch.setattr(module,'load_data',load)
+    assert generate().worlds[1].options.dead_weight_trap_weight.value==1
+    from ..world_constants import load_data
+    assert not load_data('versions.json')['live_validation']['dead_weight']
     base={'trap_percentage':100,'ring_loss_trap_weight':'off','score_reset_trap_weight':'off'}
     for value in ('low','medium','high'):
         multi=generate({**base,'dead_weight_trap_weight':value})

@@ -100,17 +100,23 @@ def test_fill_100_seeds(settings):
         assert not multiworld.get_unfilled_locations()
 
 
-@pytest.mark.parametrize('option,value', [('death_link', 1)])
-def test_unverified_options_fail_precisely(option, value):
-    for seed in range(100):
-        with pytest.raises(ValueError, match='requires_verified_hook'):
-            generate({option: value}, seed)
+def test_deathlink_and_dead_weight_can_be_selected_without_developer_opt_in():
+    from ..world_constants import load_data
+    flags = load_data('versions.json')['live_validation']
+    assert not flags['deathlink'] and not flags['dead_weight']
+    for seed in range(5):
+        mw = generate({'death_link': 1, 'dead_weight_trap_weight': 'low',
+                       'native_feature_tests': False}, seed)
+        options = validate_slot(mw.worlds[1].fill_slot_data())['options']
+        assert options['death_link'] == 1
+        assert options['dead_weight_trap_weight'] == 1
+        assert options['native_feature_tests'] == 0
 
 
 def test_low_capacity_error_and_trap_classification():
     with pytest.raises(ValueError, match='Too few'):
         pack_rings(187, 1)
-    world = generate({'trap_percentage': 100, 'ring_loss_trap_weight': 'off', 'score_reset_trap_weight': 'off'}).worlds[1]
+    world = generate({'trap_percentage': 100, 'ring_loss_trap_weight': 'off', 'score_reset_trap_weight': 'off', 'dead_weight_trap_weight': 'off'}).worlds[1]
     assert not any(i.trap for i in world.multiworld.itempool)
     world = generate({'trap_percentage': 100}).worlds[1]
     assert all(i.advancement or i.trap or i.useful for i in world.multiworld.itempool)

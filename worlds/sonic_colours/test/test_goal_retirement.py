@@ -24,13 +24,17 @@ def test_legacy_game_land_goal_still_loads_but_new_slot_rejects_it():
     data=generate().worlds[1].fill_slot_data()
     data['options']={**data['options'],'goal':3}
     with pytest.raises((ValueError,KeyError)):validate_slot(data)
+    from ..world_constants import game_land_gates
     data['options_revision']=6
+    data['game_land_gates']=game_land_gates(data['options']['game_land_requirement_reduction'])
     assert validate_slot(data)['options']['goal']==3
 
 
 def test_legacy_super_sonic_goal_remains_supported():
     data=generate().worlds[1].fill_slot_data()
+    from ..world_constants import game_land_gates
     data['options_revision']=2
+    data['game_land_gates']=game_land_gates(data['options']['game_land_requirement_reduction'])
     data['options']={**data['options'],'goal':4}
     data['logic_policy']='provisional_clears_conservative_pickups'
     assert validate_slot(data)['options']['goal']==4

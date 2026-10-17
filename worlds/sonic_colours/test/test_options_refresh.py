@@ -12,6 +12,8 @@ def test_defaults_groups_and_hidden_capsules():
     assert options.boost_lock.value==options.movement_unlocks.value==options.wisp_discovery_checks.value==1
     assert options.chaos_emerald_checks.value==0
     assert options.score_reset_trap_weight.value==1
+    assert options.dead_weight_trap_weight.value==1
+    assert options.game_land_requirement_reduction.value==50
     groups=get_option_groups(SonicColoursWorld)
     assert list(groups['Checks']).index('one_up_sanity')==list(groups['Checks']).index('rank_checks')+1
     assert set(groups['Game Land'])=={'game_land_checks','chaos_emerald_checks','eggman_heart_sanity','game_land_requirement_reduction'}

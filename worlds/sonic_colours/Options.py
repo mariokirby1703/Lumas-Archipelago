@@ -70,7 +70,7 @@ class DeadWeightTrapWeight(Choice):
     option_low = 1
     option_medium = 2
     option_high = 3
-    default = 0
+    default = 1
 
 
 class WorldProgression(Choice):
@@ -110,12 +110,11 @@ class WispDiscoveryChecks(DefaultOnToggle):
 
 
 class GameLandRequirementReduction(Range):
-    """Lower the number of AP Red Rings needed to open Game Land stages.
-    Higher values make stages cheaper."""
+    """Percentage-based reduction for Game Land Stage unlock costs."""
     display_name = 'Game Land Requirement Reduction'
     range_start = 0
-    range_end = 179
-    default = 40
+    range_end = 99
+    default = 50
 
 
 class TrapPercentage(Range):
@@ -144,7 +143,7 @@ class EggmanHeartSanity(DefaultOnToggle):
 
 
 class SonicDeathLink(DeathLink):
-    """Share deaths with other players. Keep Off until native death delivery has been verified."""
+    """Share deaths with other players."""
     display_name = 'Death Link'
 
 
@@ -161,8 +160,8 @@ class BoostLock(DefaultOnToggle):
 
 
 class NativeFeatureTests(Toggle):
-    """Developer opt-in for the incomplete PAL DeathLink/Dead Weight live matrix.
-    Never implies production verification. Use only with a disposable test seed."""
+    """Developer opt-in for other unfinished PAL native experiments.
+    DeathLink and Dead Weight can be selected normally, but are not live-verified."""
     display_name = 'Unverified Native Feature Tests'
     visibility = Visibility.none
 

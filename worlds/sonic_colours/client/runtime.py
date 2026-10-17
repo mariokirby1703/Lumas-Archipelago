@@ -8,7 +8,7 @@ import struct
 from ..Items import BY_ID, ITEM_TABLE, RING_VALUES, EMERALDS, WISP_ITEMS, ALL_WISP_ITEMS, FILLER, LEGACY_FILLER, TRAPS
 from ..Locations import LOCATION_TABLE, enabled
 from ..Options import SonicColoursOptions, OPTION_NAMES
-from ..world_constants import GAME, SCHEMA_VERSION, STAGES, BY_MISSION, game_land_gates
+from ..world_constants import GAME, SCHEMA_VERSION, STAGES, BY_MISSION, game_land_gates, game_land_reduction_points
 from .memory import MemoryUnavailable
 
 logger = logging.getLogger('Client')
@@ -44,7 +44,7 @@ def validate_slot(data):
     if type(data.get('music_mapping_version',1)) is not int or data.get('music_mapping_version',1) not in (1,2):
         raise ValueError('unsupported music mapping version')
     revision=data.get('options_revision',0)
-    if type(revision) is not int or not 0<=revision<=7:raise ValueError('unsupported slot options revision')
+    if type(revision) is not int or not 0<=revision<=8:raise ValueError('unsupported slot options revision')
     options = data.get('options')
     # Old seeds have no physical 1-Up locations; adding the optional toggle
     # must not force regeneration or change their selected location set.
@@ -77,6 +77,13 @@ def validate_slot(data):
         if name=='goal' and value==4 and data.get('options_revision',0)<3:
             resolved[name]=cls(value)
             continue
+        # Existing revision 0..7 slots store raw 0..179 reduction points,
+        # not slider percentages. Permit those values only in legacy slots.
+        if name == 'game_land_requirement_reduction' and revision < 8:
+            if not 0 <= value <= 179:
+                raise ValueError('invalid legacy Game Land reduction')
+            resolved[name] = cls(value)
+            continue
         option = cls.from_any(value)
         if getattr(option, 'options', None) and value not in option.options.values():
             raise ValueError(f'invalid choice {name}')
@@ -84,9 +91,15 @@ def validate_slot(data):
             raise ValueError(f'invalid range {name}')
         resolved[name] = option
     from ..world_constants import legacy_game_land_gates
-    current_gates=game_land_gates(options['game_land_requirement_reduction'])
-    previous_gates={**current_gates,'1-1':1}
-    if data.get('game_land_gates') not in (current_gates,previous_gates,legacy_game_land_gates(options['game_land_requirement_reduction'])):
+    points = (game_land_reduction_points(options['game_land_requirement_reduction']) if revision >= 8
+              else options['game_land_requirement_reduction'])
+    current_gates=game_land_gates(points)
+    if revision >= 8:
+        valid_gates=(current_gates,)
+    else:
+        previous_gates={**current_gates,'1-1':1}
+        valid_gates=(current_gates,previous_gates,legacy_game_land_gates(points))
+    if data.get('game_land_gates') not in valid_gates:
         raise ValueError('slot Game Land gates mismatch')
     data={**data,'game_land_gates':{**data['game_land_gates'],'1-1':0}}
     expected_speed = (bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'] or options['eggman_heart_sanity'])
@@ -118,10 +131,6 @@ def validate_slot(data):
         raise ValueError('unsupported native prologue contract')
     if data.get('starting_world') != 0 or 'starting_slot' in data:
         raise ValueError('expected fixed Tropical Resort starting world and vanilla intro')
-    for name in ('death_link',):
-        from .versions import VERSION
-        if options[name] and not options.get('native_feature_tests') and not VERSION.get('live_validation',{}).get('deathlink'):
-            raise ValueError(f'{name}: requires_verified_hook')
     return data
 
 

@@ -23,10 +23,10 @@ Sonic Colours (Wii):
   eggman_heart_sanity: false
   boost_lock: false
   movement_unlocks: false
-  game_land_requirement_reduction: 40
+  game_land_requirement_reduction: 50  # 0..99 percent; 50% = old 90, 99% = old 179
   # true enables original PAL CSB synth shuffling directly in RAM;
   # audible playback in maps/Game Land is experimental.
   music_randomization: true
   trap_percentage: 10
   ring_loss_trap_weight: medium
-  death_link: false
+  death_link: false  # Selectable; PAL live validation still incomplete
