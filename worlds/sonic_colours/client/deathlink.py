@@ -62,7 +62,10 @@ class DeathLink:
             # remote_cycle remains sticky until a witnessed native death.
         if event:
             if self.remote_cycle:self.remote_witnessed=True
-            local_event=safe and not self.remote_cycle and self.state=='ALIVE'
+            # The retained native counter is already a distinct death proof.
+            # A fast respawn/death can happen before three living host samples;
+            # do not discard that proof because the scene fallback is unarmed.
+            local_event=safe and not self.remote_cycle
             self.state='DEAD';self.alive_polls=0
             self.last_action='remote death witnessed' if self.remote_cycle else 'local death witnessed'
             if local_event:return True
@@ -102,7 +105,11 @@ class DeathLink:
             return False
         if native_state in ('dying', 'dead'):
             if self.remote_cycle:self.remote_witnessed=True
-            local_event = self.state == 'ALIVE' and not self.remote_cycle
+            # With a native counter, a dying scene is preliminary: its life-loss
+            # callback may arrive on a later poll. Reporting both duplicates the
+            # same death. Scene-edge detection is only the legacy fallback.
+            local_event = (native_sequence is None and self.state == 'ALIVE'
+                           and not self.remote_cycle)
             self.state = 'DEAD'
             self.alive_polls = 0
             return local_event

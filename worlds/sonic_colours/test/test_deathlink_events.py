@@ -20,6 +20,36 @@ def test_short_native_death_survives_missed_dying_frame_and_deduplicates():
     assert poll(d,8,2)
 
 
+def test_four_rapid_deaths_do_not_require_three_living_samples_between_them():
+    d=setup()
+    poll(d,0)
+    for sequence in (2,4,6,8):  # native seqlock advances twice per death
+        assert poll(d,sequence,sequence,native_state='dying')
+        assert not poll(d,sequence+.01,sequence,native_state='dying')
+        assert not poll(d,sequence+.02,sequence)  # only one alive observation
+
+
+def test_new_native_death_is_not_lost_when_respawn_was_not_sampled():
+    d=setup();poll(d,0)
+    assert poll(d,1,2,native_state='dying')
+    assert poll(d,2,4,native_state='dying')
+    assert not poll(d,3,4,native_state='dying')
+
+
+def test_dying_scene_and_later_native_callback_send_only_once():
+    d=setup()
+    for i in range(3):poll(d,i)
+    assert not poll(d,3,0,native_state='dying')
+    assert poll(d,4,2,native_state='dying')
+    assert not poll(d,5,2,native_state='dying')
+
+
+def test_unsafe_native_event_does_not_send_or_replay_on_return():
+    d=setup();poll(d,0)
+    assert not poll(d,1,2,safe=False,native_state='dying')
+    assert not poll(d,2,2)
+
+
 def test_native_ack_cannot_end_echo_suppression_before_death_event():
     d=setup()
     for i in range(3):poll(d,i)
