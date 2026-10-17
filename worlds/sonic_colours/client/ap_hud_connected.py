@@ -95,10 +95,23 @@ def discover(memory):
                          (pointer,memory.read_bytes(pointer,4)),(layer,memory.read_bytes(layer,4)),
                          (layer+12,memory.read_bytes(layer+12,4)),(layer+0x8c,memory.read_bytes(layer+0x8c,4)),(control,memory.read_bytes(control,4))]
                 origin=(0.,0.)
+                music_y={}
                 if rows[0]['scene']=='results':
                     origin,transform_anchors=result_origin(memory,layer)
                     anchors+=transform_anchors
+                    from ..world_constants import BY_MISSION
+                    offset=-50. if BY_MISSION.get(rows[0].get('mission'),{}).get('kind')=='Game Land' else 0.
+                    for name,(record,box) in boxes.items():
+                        if not name.startswith('ap_music_'):continue
+                        info=memory.read_ptr_checked(record+48,60)
+                        baseline=memory.read_f32(info+8)*480.
+                        if not math.isfinite(baseline) or not -480<=baseline<=960:
+                            raise MemoryUnavailable('Result music baseline invalid')
+                        anchors.extend(((record+48,memory.read_bytes(record+48,4)),
+                                        (info+8,memory.read_bytes(info+8,4))))
+                        music_y[record+108]=struct.pack('>f',baseline+offset)
                 found[layer]={'layer':layer,'handle':handle,'control':control,'boxes':boxes,'anchors':anchors,
+                              'music_y_positions':music_y,
                               'key':(rows[0]['context'],rows[0]['scene']),'origin':origin,
                               'music_x_offset':(-25. if rows[0]['scene']=='gameplay'
                                                 and memory.read_u32(layout+44) in (96,103) else 0.)}
@@ -228,6 +241,7 @@ def render(runtime,memory):
         # validation, tripling the initial publication's process round trips.
         writes={box+8:writes[box+8]+memory.read_bytes(box+12,4)+writes[box+16]+writes[box+144]
                 for record,box in owner['boxes'].values()}
+        writes.update(owner.get('music_y_positions',{}))
         generation=(memory.read_u32(owner['control']+4)+2)&0xfffffffe
         if generation==0:generation=2
         memory._hud_transaction={'owner':owner,'allowed':{a:len(v) for a,v in writes.items()}|{owner['control']+4:4},
