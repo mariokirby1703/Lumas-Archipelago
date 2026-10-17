@@ -1,7 +1,8 @@
 """File-only PAL DOL integration of the complete AP hook policy.
 
-The unused DOL text slot maps the SDK-reserved 80001800..80003000 range
-at load time. No codehandler executes, no JIT invalidation or host instruction
+The unused DOL text slot maps 80001800..80003000 at load time. The first
+cache line is non-executable reserved data: PAL runtime writes were observed
+at 80001800. No codehandler executes, no JIT invalidation or host instruction
 writes are used. The original BSS and all game sections remain in place.
 """
 import hashlib
@@ -11,6 +12,9 @@ from functools import lru_cache
 
 PAL_DOL_SHA256='92aefe33b577493b492f8433ca68b90d25d29d2d6f9c85310a6829481281f8a9'
 ARENA=0x80001800
+# Captured PAL gameplay writes modify the word at ARENA. Do not execute it.
+# Keep the whole first cache line out of code and all policy mailboxes.
+ARENA_PREFIX_SIZE=32
 SIGNATURE=0x80002fc0
 ABI=2
 MAGIC=b'SCAPNAT1'
@@ -58,7 +62,7 @@ def plan():
     from .ap_hud_publisher import patches as hud
     from .rocket_skydiving import patches as rocket
     from .hud_renderer_batch import ADDRESS,ORIGINAL_HEX,replacement
-    rows=pairs(movement_ini(enforce_budget=False));i=0;cursor=ARENA;patches=[];payload=bytearray();hooks=[]
+    rows=pairs(movement_ini(enforce_budget=False));i=0;cursor=ARENA+ARENA_PREFIX_SIZE;patches=[];payload=bytearray(ARENA_PREFIX_SIZE);hooks=[]
     while i<len(rows):
         first,second=rows[i];i+=1;kind=first>>24;address=0x80000000+(first&0xffffff)
         if kind==0xc2:
@@ -134,8 +138,9 @@ def handshake(memory):
     if raw[:8]!=MAGIC:return None
     patches,payload,digest,hooks=plan()
     if raw[8:48]!=struct.pack('>II',ABI,len(payload))+digest:
-        if raw[16:48].hex()=='032d23d9e9395d2fe9e53e3c9139bc0fd8c42e2cf71adc124088f78969240081':
-            raise memory.error('Older native ISO has unsafe PowerPC stack restores; repatch the original ISO with this APWorld and your existing player patch')
+        if raw[16:48].hex() in {'032d23d9e9395d2fe9e53e3c9139bc0fd8c42e2cf71adc124088f78969240081',
+                                '131e58fb3e7f593daa983f66d61251ee417080c88dfe5646f7e7aa04514642b5'}:
+            raise memory.error('Older native ISO lacks arena-entry protection; repatch the original ISO with this APWorld and your existing player patch')
         raise memory.error('incompatible native AP hook ABI/signature')
     pages={}
     for address,old,new in patches:
@@ -146,6 +151,16 @@ def handshake(memory):
             size=min(page+4096,address+len(new))-cursor
             observed.extend(pages[page][cursor-page:cursor-page+size]);cursor+=size
         if observed!=new:raise memory.error(f'native AP patch modified at {address:#x}; disable legacy Gecko/Riivolution')
+    # Previously only external hook branches and area-map code were checked
+    # here. A valid signature does not prove the arena's entry instructions
+    # survived; the captured failure changed its first stack allocation.
+    arena_data=memory.read_bytes(ARENA,len(payload))
+    if arena_data[4:ARENA_PREFIX_SIZE]!=payload[4:ARENA_PREFIX_SIZE]:
+        raise memory.error('Unexpected native arena prefix modification beyond the observed low-memory word')
+    for hook in hooks:
+        target=hook['target'];offset=target-ARENA
+        if arena_data[offset:offset+4]!=payload[offset:offset+4]:
+            raise memory.error(f'native AP executable entry modified at {target:#x}; restart the corrected ISO')
     from .area_map_refresh import HOOK as AREA_HOOK
     area=next(h for h in hooks if h['hook']==AREA_HOOK)
     offset=area['target']-ARENA;size=area['size']
@@ -154,4 +169,5 @@ def handshake(memory):
     if (memory.read_bytes(area['target'],size-36)!=payload[offset:offset+size-36]
             or memory.read_bytes(area['target']+size-4,4)!=payload[offset+size-4:offset+size]):
         raise memory.error('native area-map refresh executable modified')
-    return {'abi':ABI,'seed_digest':raw[48:].hex(),'code_sha256':digest.hex(),'gecko_required':False}
+    return {'abi':ABI,'seed_digest':raw[48:].hex(),'code_sha256':digest.hex(),'gecko_required':False,
+            'reserved_low_word':hex(int.from_bytes(arena_data[:4],'big'))}

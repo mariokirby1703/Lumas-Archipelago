@@ -50,3 +50,40 @@ their complete original byte sequences for guarded non-native compatibility.
 - Music names hash remains `6aafc7d6b6f894dad16389001d8ce8cb78db731c6c902fede0ba96f5debdbaef`.
 - Boot/gameplay/crash-reproduction live validation remains pending. No live
   validation flags were enabled and no emulated memory was changed during diagnosis.
+
+## Live rejection and actual arena-entry damage
+
+The user reproduced the crash on the corrected stack-restore ISO. Its loaded
+component signature was verified as 131e58fb..., so the lmw correction did not
+resolve this failure. The first comparison covered the original DOL text and
+external patch sites; it did not establish integrity of every arena instruction.
+
+The subsequent comparison of the added arena found the capsule helper's first
+instruction at 0x80001800 changed from `9421fe00` (stack allocation) to
+`d01f1baf`. The earlier capture contained `d01f03af` at the same address. Thus
+its unchanged epilogue deallocates a frame that the damaged entry never creates.
+This explains the displaced stack and invalid return captured in OSDumpContext.
+The source of this write is not yet identified; do not label it a proven SDK,
+Gecko, host-client or game-actor write without observing that writer.
+
+The follow-up native build reserves a 32-byte cache line at the arena start and
+moves every code entry and mailbox past it. Branches, PIC-relative addresses,
+end-relative mailboxes and the component signature are rebuilt together. Only
+the observed first word may vary; modification of the remaining prefix blocks
+verification. The original word is exposed in handshake diagnostics.
+
+The handshake now also checks the entry instruction of every arena hook, even
+when the component signature and the external DOL branches still match. All
+existing complete module inspectors remain in force. The regression test
+replays both actual corrupt words into a patched original DOL, verifies that no
+entry is damaged, then damages the relocated entry and verifies rejection.
+This is containment of the captured corruption; identifying the writer and
+confirming crash-free Game Land gameplay remain live tasks.
+
+Follow-up verification: 261 targeted native/patch tests passed, followed by
+48 patch/protocol/package/control-proof tests (overlapping subsets). Release
+ZIP smoke and original/generated Wii DATA integrity checks passed. The new
+component is `fc6c95ea6b774d3a505aa0072c33d573334046443721cacf0cb4ce435884114c`.
+The private same-seed ISO is `build/sonic_next_pass/native_arena_guard.iso`.
+Live confirmation is pending; relocation would not solve a writer that follows
+the relocated hook address instead of writing the fixed low-memory word.
