@@ -87,3 +87,23 @@ component is `fc6c95ea6b774d3a505aa0072c33d573334046443721cacf0cb4ce435884114c`.
 The private same-seed ISO is `build/sonic_next_pass/native_arena_guard.iso`.
 Live confirmation is pending; relocation would not solve a writer that follows
 the relocated hook address instead of writing the fixed low-memory word.
+
+## Client-disconnected control run
+
+The user reports no crash at the same section after restarting the
+stack-restore ISO with the AP client closed. This attributes the trigger to
+an active host write or client-armed native behavior; it does not distinguish
+them or identify the writer. The arena-guard ISO still requires the connected
+reproduction test.
+
+An independent host-write firewall now rejects any native-image host write
+that overlaps the reserved prefix or any relocated arena hook's first
+instruction. It executes before operation-specific guards and backend writes.
+The first blocked caller/operation/address/value is logged with a bounded
+Python call stack and exposed in diagnostics as latest_blocked_native_write.
+Repeated attempts at the same site do not flood the log. This catches a host
+writer even if it follows a relocated entry rather than the old fixed address.
+It cannot intercept guest-native writes. The connected test is needed to
+separate those cases. No ISO change is required beyond native_arena_guard.iso.
+
+52 memory, firewall, scoped-proof, protocol and native-patch tests passed.

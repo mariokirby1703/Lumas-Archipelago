@@ -40,6 +40,7 @@ def diagnostic(ctx, memory=None):
     current_memory = memory or getattr(ctx, 'memory', None)
     result.update(latest_successful_read=getattr(current_memory, 'latest_read', None),
                   latest_successful_write=getattr(current_memory, 'latest_write', None),
+                  latest_blocked_native_write=getattr(current_memory, 'latest_blocked_native_write', None),
                   last_revision_observation=getattr(current_memory, 'revision_observation', None))
     instance = result['dolphin_instance'] or {}
     observed = result['last_revision_observation'] or {}

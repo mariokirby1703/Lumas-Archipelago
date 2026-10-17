@@ -132,6 +132,7 @@ class SonicMemory:
         self.write_guard = write_guard
         self.latest_read = None
         self.latest_write = None
+        self.latest_blocked_native_write = None
         self.revision_observation = None
 
     def read_bytes(self, address, size):
@@ -168,6 +169,27 @@ class SonicMemory:
     def write_bytes_verified(self, address, data, *, expected, operation):
         if not valid_range(address, len(data)) or len(expected) != len(data):
             raise MemoryUnavailable('invalid_write_range')
+        # Independent of operation-specific pointer attribution: no normal
+        # host writer may mutate the reserved word or an installed entry.
+        # Record the actual call chain if this is the writer seen in captures.
+        if address < 0x80003000 and address+len(data) > 0x80001800:
+            from .native_dol import MAGIC, SIGNATURE, ARENA, ARENA_PREFIX_SIZE, plan
+            if self.read_bytes(SIGNATURE, len(MAGIC)) == MAGIC:
+                protected=[(ARENA, ARENA+ARENA_PREFIX_SIZE)]
+                protected.extend((h['target'],h['target']+4) for h in plan()[3])
+                if any(address<end and start<address+len(data) for start,end in protected):
+                    previous=self.latest_blocked_native_write or {}
+                    if (previous.get('address'),previous.get('operation')) != (f'0x{address:08X}',operation):
+                        import logging
+                        import traceback
+                        self.latest_blocked_native_write={
+                            'time_utc':datetime.now(timezone.utc).isoformat(),
+                            'address':f'0x{address:08X}', 'operation':operation,
+                            'size':len(data), 'expected':expected[:32].hex(), 'requested':data[:32].hex(),
+                            'call_stack':traceback.format_stack(limit=10)}
+                        logging.getLogger('SonicClient').error(
+                            'Blocked host write to protected native entry: %s',self.latest_blocked_native_write)
+                    raise MemoryUnavailable(f'WRITE_BLOCKED: protected native entry {address:#x} from {operation}; call stack recorded')
         if self.write_guard is None:
             raise MemoryUnavailable('WRITE_BLOCKED: no verified write policy')
         if operation == 'map_availability' and (data != (2).to_bytes(4, 'big') or expected != (1).to_bytes(4, 'big')):
