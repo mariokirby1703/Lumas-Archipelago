@@ -1,18 +1,18 @@
 {
   "schema": "sonic_colours_sheet_logic_v2_draft",
-  "source_spreadsheet": "https://docs.google.com/spreadsheets/d/1s-P2C2tzL1fAvkoT1MCyrmeIt7cxa3tH4hhArM52_L8/edit",
+  "source_spreadsheet": "Sonic Colours (Wii) AP Logic.xlsx (user upload 2026-10-18)",
   "repository_branch": "Sonic-Colours-Wii-AP",
   "source_commit": "86742827203c82edbac7559c45047542d4c2980d",
   "interpretation": {
-    "normal": "prerequisites for individual pickups/stage clear; alternatives encoded as OR-of-ANDs",
-    "movement": "extra movement prerequisites only when movement_unlocks on; blank means not documented, not proven unnecessary",
-    "available": "informational ONLY, never an unconditional prerequisite",
-    "advanced_routes": "recorded for review, disabled for standard logic",
-    "all_required_wisps": "terminal boss special case, depends on boost_lock and movement_unlocks",
-    "wisp_names": "abstract abilities; Codex resolves normal/progressive item names per YAML",
-    "boost": "when boost_lock false, boost prerequisite is automatically satisfied",
-    "unknown": "unknown or ambiguous entries must be manually reviewed, not interpreted as empty routes",
-    "ranks": "score/time are metadata; ranks are checked by actual game result, not simulated from items"
+    "normal": "NL, used exclusively when Movement Unlocks is off; no movement ability requirements",
+    "movement": "ML, used exclusively when Movement Unlocks is on; replaces NL and includes required Wisps plus movement abilities",
+    "movement_blank": "Inherit the NL route until a researched ML route is provided, NEVER treat missing ML as unrestricted",
+    "available": "Wisp availability informational, not mandatory unless required by route",
+    "advanced_routes": "Parenthetical advanced-only strategies excluded from standard fill logic",
+    "ranks": "S-rank NL/ML notes supply ability gates; score/time and native awarded grade are still authoritative",
+    "red_rings": "Five physical ring routes per act; the all-five check requires all five route conditions",
+    "game_land": "Each stage and its Eggman Heart have independently parsed NL/ML; Emerald checks require all three stages",
+    "world_progression": "Sequential mode requires predecessor reachability and clearability; all-open mode requires six act clearabilities for boss"
   },
   "counts": {
     "clear": 66,
@@ -100,11 +100,17 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -166,11 +172,17 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -198,11 +210,15 @@
       "movement": {
         "status": "documented",
         "routes": [
-          []
+          [
+            {
+              "ability": "Progressive Rail"
+            }
+          ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "None"
+        "raw": "Rail Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -232,11 +248,17 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -282,18 +304,32 @@
       "normal": {
         "status": "documented",
         "routes": [
-          []
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
         ],
         "advanced_routes": [],
-        "review": [],
-        "raw": "None"
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Drill (none for advanced logic)"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Drill Lv1 (Stomp for advanced logic)"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -316,11 +352,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -347,11 +385,17 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -374,11 +418,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -434,11 +480,17 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -496,11 +548,22 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Homing Attack"
+            }
+          ],
+          [
+            {
+              "ability": "Mid-Air Boost"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Homing Attack or Mid-Air Boost"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -556,11 +619,21 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Drill Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -587,11 +660,21 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Drill Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -618,11 +701,21 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Laser"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -645,11 +738,21 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Homing Attack"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -709,11 +812,20 @@
         "raw": "Drill and Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            },
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1 and Frenzy"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -743,11 +855,20 @@
         "raw": "Drill and Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            },
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1 and Frenzy"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -803,11 +924,17 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -859,11 +986,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -895,11 +1024,22 @@
         "raw": "Laser or Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ],
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1 or Laser"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -922,25 +1062,26 @@
             }
           ]
         ],
-        "advanced_routes": [
+        "advanced_routes": [],
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Spikes (or Laser Advanced Logic)"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
           [
             {
-              "ability": "Cyan Laser"
+              "ability": "Pink Spikes"
             }
           ]
         ],
-        "review": [],
-        "raw": "Spikes (or Laser Advanced Logic",
-        "advanced_note": [
-          "or Laser Advanced Logic"
-        ]
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Spikes Lv1 (or Laser Advanced Logic)"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -960,23 +1101,24 @@
             {
               "ability": "Cyan Laser"
             }
-          ],
+          ]
+        ],
+        "advanced_routes": [],
+        "review": [],
+        "raw": "Laser"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
           [
             {
-              "ability": "Pink Spikes"
+              "ability": "Cyan Laser"
             }
           ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "Laser or Spikes"
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
-        "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "raw": "Laser"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -1008,11 +1150,22 @@
         "raw": "Laser or Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Laser or Spikes Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -1044,11 +1197,22 @@
         "raw": "Laser or Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Laser or Spikes Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -1080,11 +1244,22 @@
         "raw": "Laser or Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Laser or Spikes Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -1116,11 +1291,22 @@
         "raw": "Laser or Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Laser or Spikes Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -1264,11 +1450,17 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -1324,11 +1516,17 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -1351,11 +1549,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Tropical Resort",
@@ -1381,11 +1581,21 @@
       "movement": {
         "status": "documented",
         "routes": [
-          []
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "None"
+        "raw": "Progressive Crouch Lv2 or Drill Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1409,11 +1619,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1440,11 +1652,17 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1471,11 +1689,17 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Drill Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1498,11 +1722,23 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 or Drill Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1525,11 +1761,23 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 or Drill Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1552,11 +1800,35 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Stomp"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ],
+          [
+            {
+              "ability": "Yellow Drill"
+            },
+            {
+              "ability": "Stomp"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Stomp + Homing Attack or Drill Lv1 + Stomp + Homing Attack"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1579,11 +1851,18 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1611,11 +1890,36 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Green Hover"
+            },
+            {
+              "ability": "Mid-Air Boost"
+            }
+          ],
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Green Hover"
+            },
+            {
+              "ability": "Double Jump"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Hover Lv1 + Mid-Air Boost or Progressive Crouch Lv2 + Hover Lv1 + Double Jump"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1638,11 +1942,18 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1665,11 +1976,18 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1685,18 +2003,33 @@
       "normal": {
         "status": "documented",
         "routes": [
-          []
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "None"
+        "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Green Hover",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Hover Lv2"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1719,11 +2052,18 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1750,11 +2090,22 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Green Hover",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Hover Lv2"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1840,11 +2191,17 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Rocket"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1871,11 +2228,17 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1902,11 +2265,34 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            },
+            {
+              "ability": "Progressive Crouch"
+            },
+            {
+              "ability": "Wall Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            },
+            {
+              "ability": "Progressive Crouch"
+            },
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1 + Crouch Lv1 + Wall Jump or Spikes Lv1 + Crouch Lv1 + Rocket"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1929,11 +2315,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Rail"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Rail Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1960,11 +2352,17 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Rocket"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -1987,11 +2385,18 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2014,25 +2419,26 @@
             }
           ]
         ],
-        "advanced_routes": [
+        "advanced_routes": [],
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Laser (or Boost Advanced Logic)"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
           [
             {
-              "ability": "White Boost"
+              "ability": "Cyan Laser"
             }
           ]
         ],
-        "review": [],
-        "raw": "Laser (or Boost Advanced Logic)",
-        "advanced_note": [
-          "or Boost Advanced Logic"
-        ]
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Laser (or Double Jump + Mid-Air Boost for Advanced Logic)"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2059,11 +2465,17 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Laser"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2086,11 +2498,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2117,11 +2531,17 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Frenzy"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2144,11 +2564,18 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2175,11 +2602,17 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Frenzy"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2202,11 +2635,23 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 or Spikes Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2230,11 +2675,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2257,11 +2704,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2284,11 +2733,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2311,18 +2762,37 @@
             {
               "ability": "Blue Cube"
             }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
           ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "Boost + Cube"
+        "raw": "Boost + Cube or Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "White Boost"
+            },
+            {
+              "ability": "Blue Cube"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Boost + Cube or Spikes Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2349,11 +2819,17 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2373,18 +2849,47 @@
             {
               "ability": "Blue Cube"
             }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ],
+          [
+            {
+              "ability": "White Boost"
+            }
           ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "Cube"
+        "raw": "Cube or Spikes or Boost"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ],
+          [
+            {
+              "ability": "White Boost"
+            },
+            {
+              "ability": "Mid-Air Boost"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Cube or Spikes Lv1 or Boost + Mid-Air Boost"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2407,11 +2912,23 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 or Spikes Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2441,11 +2958,21 @@
             {
               "ability": "Stomp"
             }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ],
+          [
+            {
+              "ability": "Mid-Air Boost"
+            }
           ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "Stomp"
+        "raw": "Stomp or Spikes Lv1 or Mid-Air Boost"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2468,11 +2995,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2499,11 +3028,29 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Blue Cube"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            },
+            {
+              "ability": "Blue Cube"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Cube or Spikes Lv1 + Cube"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2526,11 +3073,23 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 or Spikes Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2553,11 +3112,44 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Progressive Rail"
+            }
+          ],
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Mid-Air Boost"
+            }
+          ],
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Double Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 + Progressive Rail Lv1 or Progressive Crouch Lv2 + Mid-Air Boost or Progressive Crouch Lv2 + Double Jump or Spikes Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2580,11 +3172,23 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Crouch Lv2 or Spikes Lv1"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2607,11 +3211,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Sweet Mountain",
@@ -2639,11 +3245,20 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Cube + Homing Attack"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2676,11 +3291,46 @@
         "raw": "Cube or Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ],
+          [
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Mid-Air Boost"
+            },
+            {
+              "ability": "Pink Spikes"
+            }
+          ],
+          [
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Double Jump"
+            },
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Cube + Homing Attack or Homing Attack + Progressive Crouch Lv2 + Mid-Air Boost + Spikes Lv1 or Homing Attack + Double Jump + Spikes Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2698,20 +3348,91 @@
         "routes": [
           [
             {
+              "ability": "Blue Cube"
+            }
+          ],
+          [
+            {
               "ability": "Pink Spikes"
             }
           ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "Spikes"
+        "raw": "Cube or Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            },
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Blue Cube"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            },
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Double Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            },
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Mid-Air Boost"
+            }
+          ],
+          [
+            {
+              "ability": "Blue Cube"
+            },
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "Wall Jump"
+            },
+            {
+              "ability": "Mid-Air Boost"
+            }
+          ],
+          [
+            {
+              "ability": "Blue Cube"
+            },
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Double Jump"
+            },
+            {
+              "ability": "Wall Jump"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1 + Homing Attack + Cube or Spikes Lv1 + Homing Attack + Double Jump or Spikes Lv1 + Homing Attack + Mid-Air Boost or Cube + Homing Attack + Progressive Crouch Lv2 + Wall Jump + Mid-Air Boost or Cube + Homing Attack + Double Jump + Wall Jump"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2734,11 +3455,46 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Quick Step"
+            },
+            {
+              "ability": "Blue Cube"
+            }
+          ],
+          [
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Quick Step"
+            },
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Quick Step"
+            },
+            {
+              "ability": "Double Jump"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Homing Attack + Quick Step + Cube or Homing Attack + Quick Step + Progressive Crouch Lv2 or Homing Attack + Quick Step + Double Jump"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2765,11 +3521,20 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Cube + Homing Attack"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2796,11 +3561,20 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Cube + Homing Attack"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2827,11 +3601,20 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Cube + Homing Attack"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2854,11 +3637,22 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Wall Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Wall Jump or Spikes Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2886,11 +3680,19 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Spikes Lv1 (or Cube + Progressive Crouch Lv2 + Double Jump or Cube + Double Jump for Advanced Logic)"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2917,11 +3719,17 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2944,11 +3752,22 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Wall Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Wall Jump or Spikes Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -2970,21 +3789,26 @@
             }
           ]
         ],
-        "advanced_routes": [
-          []
+        "advanced_routes": [],
+        "review": [
+          "advanced_route_excluded"
         ],
-        "review": [],
-        "raw": "Spikes (None for Advanced Logic)",
-        "advanced_note": [
-          "None for Advanced Logic"
-        ]
+        "raw": "Spikes (None for Advanced Logic)"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Spikes Lv1 (Wall Jump Advanced Logic)"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3006,25 +3830,24 @@
             }
           ]
         ],
-        "advanced_routes": [
+        "advanced_routes": [],
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Spikes (Cube for Advanced Logic)"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
           [
             {
-              "ability": "Blue Cube"
+              "ability": "Pink Spikes"
             }
           ]
         ],
-        "review": [],
-        "raw": "Spikes (Cube for Advanced Logic)",
-        "advanced_note": [
-          "Cube for Advanced Logic"
-        ]
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1 (or Wall Jump + Cube)"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3046,25 +3869,24 @@
             }
           ]
         ],
-        "advanced_routes": [
+        "advanced_routes": [],
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Spikes (Cube for Advanced Logic)"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
           [
             {
-              "ability": "Blue Cube"
+              "ability": "Pink Spikes"
             }
           ]
         ],
-        "review": [],
-        "raw": "Spikes (Cube for Advanced Logic)",
-        "advanced_note": [
-          "Cube for Advanced Logic"
-        ]
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1 (or Wall Jump + Cube)"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3311,11 +4133,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3339,11 +4163,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3366,11 +4192,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3393,11 +4221,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3424,11 +4254,17 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Frenzy"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3455,11 +4291,17 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Frenzy"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3486,11 +4328,17 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Frenzy"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3517,11 +4365,17 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Hover Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3545,11 +4399,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3576,11 +4432,17 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Spikes Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3603,11 +4465,33 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Wall Jump"
+            },
+            {
+              "ability": "Double Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Wall Jump"
+            },
+            {
+              "ability": "Mid-Air Boost"
+            }
+          ],
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Wall Jump + Double Jump or Wall Jump + Mid-Air Boost or Hover Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3630,7 +4514,39 @@
           ],
           [
             {
-              "ability": "White Boost"
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
+        "advanced_routes": [],
+        "review": [],
+        "raw": "Hover or Spikes"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            },
+            {
+              "ability": "Mid-Air Boost"
+            },
+            {
+              "ability": "Wall Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Wall Jump"
             },
             {
               "ability": "Pink Spikes"
@@ -3638,17 +4554,8 @@
           ]
         ],
         "advanced_routes": [],
-        "review": [
-          "check_and_or_precedence"
-        ],
-        "raw": "Hover or Boost + Spikes"
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
-        "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Hover Lv1 or Spikes Lv1 + Mid-Air Boost + Wall Jump or Homing Attack + Wall Jump + Spikes Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3675,11 +4582,17 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Hover Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3702,11 +4615,25 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ],
+          [
+            {
+              "ability": "Wall Jump"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Hover Lv1 or Wall Jump + Homing Attack"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3733,11 +4660,26 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Green Hover"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Hover Lv2 or Hover Lv1 + Homing Attack"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3761,11 +4703,25 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ],
+          [
+            {
+              "ability": "Double Jump"
+            },
+            {
+              "ability": "Mid-Air Boost"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Hover Lv1 or Double Jump + Mid-Air Boost"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3788,11 +4744,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3819,11 +4777,17 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Hover Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3850,11 +4814,17 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Hover Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3881,11 +4851,17 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Hover Lv1"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3917,8 +4893,7 @@
           ],
           [
             {
-              "ability": "Green Hover",
-              "tier": 1
+              "ability": "Green Hover"
             }
           ]
         ],
@@ -3947,11 +4922,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Homing Attack"
       },
       "source": {
         "tab": "Starlight Carnival",
@@ -3983,17 +4964,43 @@
           ]
         ],
         "advanced_routes": [],
-        "review": [
-          "check_and_or_precedence"
-        ],
+        "review": [],
         "raw": "Boost + Rocket or Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "White Boost"
+            },
+            {
+              "ability": "Orange Rocket"
+            },
+            {
+              "ability": "Progressive Rail"
+            },
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            },
+            {
+              "ability": "Progressive Rail"
+            },
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Boost + Rocket + Progressive Rail Lv1 + Progressive Stunts Lv5 or Spikes Lv1 + Progressive Rail Lv1 + Progressive Stunts Lv5"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4065,13 +5072,16 @@
         "routes": [
           [
             {
+              "ability": "Progressive Rail"
+            },
+            {
               "ability": "Orange Rocket"
             }
           ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "Rocket"
+        "raw": "Progressive Rail Lv1 + Rocket"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4096,18 +5106,67 @@
             {
               "ability": "Pink Spikes"
             }
+          ],
+          [
+            {
+              "ability": "Orange Rocket"
+            }
           ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "Boost or Spikes"
+        "raw": "Boost or Spikes or Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Rail"
+            },
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            },
+            {
+              "ability": "Pink Spikes"
+            }
+          ],
+          [
+            {
+              "ability": "Progressive Rail"
+            },
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            },
+            {
+              "ability": "Orange Rocket"
+            },
+            {
+              "ability": "Wall Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Progressive Rail"
+            },
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            },
+            {
+              "ability": "Orange Rocket"
+            },
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Rail Lv1 + Progressive Stunts Lv5 + Spikes Lv1 or Progressive Rail Lv1 + Progressive Stunts Lv5 + Rocket + Wall Jump or Progressive Rail Lv1 + Progressive Stunts Lv5 + Rocket + Progressive Crouch Lv2"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4132,18 +5191,60 @@
             {
               "ability": "Pink Spikes"
             }
+          ],
+          [
+            {
+              "ability": "Orange Rocket"
+            }
           ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "Boost or Spikes"
+        "raw": "Boost or Spikes or Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "White Boost"
+            },
+            {
+              "ability": "Progressive Rail"
+            },
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            }
+          ],
+          [
+            {
+              "ability": "Pink Spikes"
+            },
+            {
+              "ability": "Progressive Rail"
+            },
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            }
+          ],
+          [
+            {
+              "ability": "Orange Rocket"
+            },
+            {
+              "ability": "Progressive Rail"
+            },
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Boost + Progressive Rail Lv1 + Progressive Stunts Lv5 or Spikes Lv1 + Progressive Rail Lv1 + Progressive Stunts Lv5 or Rocket + Progressive Rail Lv1 + Progressive Stunts Lv5"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4165,28 +5266,33 @@
             }
           ]
         ],
-        "advanced_routes": [
+        "advanced_routes": [],
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Spikes (or Boost + Rocket for advanced logic)"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
           [
             {
-              "ability": "White Boost"
+              "ability": "Progressive Rail"
             },
             {
-              "ability": "Orange Rocket"
+              "ability": "Progressive Stunts",
+              "tier": 5
+            },
+            {
+              "ability": "Pink Spikes"
             }
           ]
         ],
-        "review": [],
-        "raw": "Spikes (or Boost + Rocket for advanced logic)",
-        "advanced_note": [
-          "or Boost + Rocket for advanced logic"
-        ]
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Progressive Rail Lv1 + Progressive Stunts Lv5 + Spikes Lv1 (or Progressive Rail Lv1 + Progressive Stunts Lv5 + Mid Air Boost + Boost + Rocket for Advanced Logic)"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4213,11 +5319,24 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Rail"
+            },
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            },
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Rail Lv1 + Progressive Stunts Lv5 + Rocket"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4240,11 +5359,48 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Stomp"
+            },
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            },
+            {
+              "ability": "White Boost"
+            }
+          ],
+          [
+            {
+              "ability": "Stomp"
+            },
+            {
+              "ability": "Mid-Air Boost"
+            },
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Stomp"
+            },
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Stomp + Progressive Crouch Lv2 + Boost or Stomp + Mid-Air Boost + Progressive Crouch Lv2 or Stomp + Homing Attack + Progressive Crouch Lv2"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4268,11 +5424,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Stomp"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Stomp"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4295,11 +5457,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Stomp"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Stomp"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4322,11 +5490,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Stomp"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Stomp"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4353,11 +5527,17 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Frenzy"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4380,11 +5560,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Stomp"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Stomp"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4407,11 +5593,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Stomp"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Stomp"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4438,11 +5630,17 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Cube"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4504,12 +5702,17 @@
           [
             {
               "ability": "Cyan Laser"
+            },
+            {
+              "ability": "Quick Step"
             }
           ]
         ],
         "advanced_routes": [],
-        "review": [],
-        "raw": "Laser"
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Laser + Quick Step (or Laser for Advanced Logic)"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4531,25 +5734,26 @@
             }
           ]
         ],
-        "advanced_routes": [
+        "advanced_routes": [],
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Cube (or Laser for advanced logic)"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
           [
             {
-              "ability": "Cyan Laser"
+              "ability": "Blue Cube"
             }
           ]
         ],
-        "review": [],
-        "raw": "Cube (or Laser for advanced logic)",
-        "advanced_note": [
-          "or Laser for advanced logic"
-        ]
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Cube (or Double Jump + Laser for Advanced Logic)"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4581,11 +5785,22 @@
         "raw": "Cube or Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            }
+          ],
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Cube or Laser"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4612,11 +5827,20 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            },
+            {
+              "ability": "Double Jump"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Cube + Double Jump"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4678,20 +5902,11 @@
             }
           ]
         ],
-        "advanced_routes": [
-          [
-            {
-              "ability": "Cyan Laser"
-            }
-          ]
-        ],
+        "advanced_routes": [],
         "review": [
-          "check_and_or_precedence"
+          "advanced_route_excluded"
         ],
-        "raw": "Boost + Laser or Laser + Rocket (or just Laser for advanced logic)",
-        "advanced_note": [
-          "or just Laser for advanced logic"
-        ]
+        "raw": "Boost + Laser or Laser + Rocket (or just Laser for advanced logic)"
       },
       "movement": {
         "status": "documented",
@@ -4700,12 +5915,40 @@
             {
               "ability": "Progressive Stunts",
               "tier": 5
+            },
+            {
+              "ability": "White Boost"
+            },
+            {
+              "ability": "Cyan Laser"
+            }
+          ],
+          [
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            },
+            {
+              "ability": "Cyan Laser"
+            },
+            {
+              "ability": "Orange Rocket"
+            },
+            {
+              "ability": "Homing Attack"
+            }
+          ],
+          [
+            {
+              "ability": "Mid-Air Boost"
             }
           ]
         ],
         "advanced_routes": [],
-        "review": [],
-        "raw": "Stunts (Lv5)"
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Stunts (Lv5) + Boost + Laser or Stunts Lv5 + Laser + Rocket + Homing Attack/Mid Air Boost (or Stunts Lv5 + Laser + Homing Attack or Mid Air Boost for Advanced Logic"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4729,11 +5972,18 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Stunts Lv5"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4756,11 +6006,18 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Stunts Lv5"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4787,11 +6044,21 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            },
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Stunts Lv5 + Laser"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4816,25 +6083,36 @@
             }
           ]
         ],
-        "advanced_routes": [
+        "advanced_routes": [],
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Laser + Rocket (or Laser for Advanced Logic)"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
           [
             {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            },
+            {
               "ability": "Cyan Laser"
+            },
+            {
+              "ability": "Orange Rocket"
+            },
+            {
+              "ability": "Homing Attack"
             }
           ]
         ],
-        "review": [],
-        "raw": "Laser + Rocket (or Laser for Advanced Logic)",
-        "advanced_note": [
-          "or Laser for Advanced Logic"
-        ]
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Stunts Lv5 + Laser + Rocket + Homing Attack (or Stunts Lv5 + Laser + Homing Attack for Advanced Logic)"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4867,27 +6145,40 @@
             }
           ]
         ],
-        "advanced_routes": [
+        "advanced_routes": [],
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Boost + Laser or Laser + Rocket (or just Laser for advanced logic)"
+      },
+      "movement": {
+        "status": "documented",
+        "routes": [
           [
             {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            },
+            {
               "ability": "Cyan Laser"
+            },
+            {
+              "ability": "Orange Rocket"
+            },
+            {
+              "ability": "Homing Attack"
+            },
+            {
+              "ability": "Progressive Crouch",
+              "tier": 2
             }
           ]
         ],
-        "review": [
-          "check_and_or_precedence"
-        ],
-        "raw": "Boost + Laser or Laser + Rocket (or just Laser for advanced logic)",
-        "advanced_note": [
-          "or just Laser for advanced logic"
-        ]
-      },
-      "movement": {
-        "status": "not_documented",
-        "routes": null,
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "advanced_route_excluded"
+        ],
+        "raw": "Stunts Lv5 + Laser + Rocket + Homing Attack + Progressive Crouch Lv2 (or Stunts Lv5 + Laser + Homing Attack + Progressive Crouch Lv2 for Advanced Logic)"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4912,11 +6203,16 @@
       "movement": {
         "status": "documented",
         "routes": [
-          []
+          [
+            {
+              "ability": "Progressive Stunts",
+              "tier": 5
+            }
+          ]
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "None"
+        "raw": "Stunts Lv5"
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4939,11 +6235,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4971,11 +6272,20 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Rocket",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -4998,11 +6308,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5029,11 +6344,20 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Rocket",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5056,11 +6380,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5083,11 +6412,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5114,11 +6448,20 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Rocket",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5141,11 +6484,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5169,11 +6517,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5196,11 +6549,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5227,11 +6585,20 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Spikes",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5254,11 +6621,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5285,11 +6657,20 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Spikes",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5312,11 +6693,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5339,11 +6725,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Planet Wisp",
@@ -5367,11 +6758,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5395,11 +6791,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5422,11 +6820,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5453,11 +6856,20 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Drill",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5484,11 +6896,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5511,11 +6932,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5538,11 +6964,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5565,11 +6996,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5593,11 +7029,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5624,11 +7065,20 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Cube",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5651,11 +7101,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5678,11 +7133,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5709,11 +7169,20 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Cube",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5736,11 +7205,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5768,11 +7242,20 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Rocket",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5799,11 +7282,20 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Rocket",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5830,11 +7322,20 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Rocket",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5861,11 +7362,20 @@
         "raw": "Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Rocket",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5897,11 +7407,25 @@
         "raw": "Rocket or Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ],
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Rocket or Frenzy",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5924,11 +7448,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5955,11 +7484,20 @@
         "raw": "Boost"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "White Boost"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Boost",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -5983,11 +7521,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6014,11 +7557,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6041,11 +7593,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6072,11 +7629,20 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Drill",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6103,11 +7669,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6130,11 +7705,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6191,11 +7771,22 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Double Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Stomp"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Double Jump or Stomp"
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6218,11 +7809,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6245,11 +7838,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6272,11 +7867,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6299,11 +7896,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6330,11 +7929,20 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Hover",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6358,11 +7966,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6389,11 +8002,20 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Hover",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6423,11 +8045,23 @@
         "raw": "Boost + Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "White Boost"
+            },
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Boost + Hover",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6454,11 +8088,20 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Hover",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6485,11 +8128,20 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Hover",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6516,11 +8168,20 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Drill",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6543,11 +8204,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Aquarium Park",
@@ -6609,11 +8275,17 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Homing Attack"
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6636,11 +8308,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Homing Attack"
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6663,11 +8341,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Homing Attack"
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6690,11 +8374,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Homing Attack"
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6721,11 +8411,17 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Homing Attack"
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6748,11 +8444,17 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Homing Attack"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Homing Attack"
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6809,11 +8511,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6836,11 +8543,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6863,11 +8575,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6890,11 +8607,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6917,11 +8639,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6953,11 +8680,25 @@
         "raw": "Spikes or Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ],
+          [
+            {
+              "ability": "Blue Cube"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Spikes or Cube",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -6990,11 +8731,25 @@
         "raw": "Spikes or Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ],
+          [
+            {
+              "ability": "Blue Cube"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Spikes or Cube",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7021,11 +8776,20 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Spikes",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7048,11 +8812,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7075,11 +8844,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7135,11 +8909,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7365,11 +9144,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7393,11 +9181,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7429,11 +9222,25 @@
         "raw": "Frenzy or Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ],
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Frenzy or Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7460,11 +9267,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7491,11 +9307,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7522,11 +9347,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7558,11 +9392,25 @@
         "raw": "Frenzy or Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ],
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Frenzy or Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7589,11 +9437,20 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Frenzy",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7617,11 +9474,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7644,11 +9506,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7675,11 +9542,20 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Frenzy",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7706,11 +9582,20 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Frenzy",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7737,11 +9622,20 @@
         "raw": "Frenzy"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Purple Frenzy"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Frenzy",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7764,11 +9658,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Asteroid Coaster",
@@ -7792,11 +9691,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Terminal Velocity",
@@ -7820,17 +9724,24 @@
           ]
         ],
         "advanced_routes": [],
-        "review": [
-          "interpret_all_wisps_using_yaml_pool"
-        ],
+        "review": [],
         "raw": "All*"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "special",
+        "routes": [
+          [
+            {
+              "ability": "ALL_REQUIRED_WISPS"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "All*",
+        "source_blank": true
       },
       "source": {
         "tab": "Terminal Velocity",
@@ -7854,11 +9765,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Terminal Velocity",
@@ -7887,7 +9803,7 @@
           [
             {
               "ability": "Progressive Game Land Speed",
-              "tier": 1
+              "tier": 2
             }
           ],
           [
@@ -7903,7 +9819,7 @@
         ],
         "advanced_routes": [],
         "review": [],
-        "raw": "Progressive Game Land Speed Lv2+ or Homing Attack or Double Jump"
+        "raw": "Progressive Game Land Speed Lv2 or Homing Attack or Double Jump"
       },
       "source": {
         "tab": "Game Land",
@@ -7926,11 +9842,28 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Game Land Speed",
+              "tier": 2
+            }
+          ],
+          [
+            {
+              "ability": "Homing Attack"
+            }
+          ],
+          [
+            {
+              "ability": "Double Jump"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Game Land Speed Lv2 or Homing Attack or Double Jump"
       },
       "source": {
         "tab": "Game Land",
@@ -7953,11 +9886,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -7981,11 +9919,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8012,11 +9955,20 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Cube",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8044,11 +9996,20 @@
         "raw": "Cube"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Blue Cube"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Cube",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8071,11 +10032,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Game Land",
@@ -8098,11 +10061,28 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Double Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Mid-Air Boost"
+            }
+          ],
+          [
+            {
+              "ability": "Progressive Game Land Speed",
+              "tier": 2
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Double Jump or Mid-Air Boost or Progressive Game Land Speed Lv2"
       },
       "source": {
         "tab": "Game Land",
@@ -8125,11 +10105,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8157,11 +10142,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8184,11 +10178,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8212,11 +10211,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8239,11 +10243,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Game Land",
@@ -8267,11 +10273,13 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "None"
       },
       "source": {
         "tab": "Game Land",
@@ -8294,11 +10302,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8322,11 +10335,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8358,11 +10376,25 @@
         "raw": "Laser or Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ],
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser or Drill",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8395,11 +10427,25 @@
         "raw": "Laser or Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ],
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser or Drill",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8422,11 +10468,22 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Double Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Assist Change"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Double Jump or Assist Change"
       },
       "source": {
         "tab": "Game Land",
@@ -8449,11 +10506,22 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Double Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Assist Change"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Double Jump or Assist Change"
       },
       "source": {
         "tab": "Game Land",
@@ -8476,11 +10544,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8504,11 +10577,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8535,11 +10613,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8567,11 +10654,20 @@
         "raw": "Laser"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Cyan Laser"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Laser",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8594,11 +10690,30 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Breathing",
+              "tier": 3
+            },
+            {
+              "ability": "Double Jump"
+            }
+          ],
+          [
+            {
+              "ability": "Progressive Breathing",
+              "tier": 3
+            },
+            {
+              "ability": "Wall Jump"
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Breathing Lv3 + Double Jump or Progressive Breathing Lv3 + Wall Jump"
       },
       "source": {
         "tab": "Game Land",
@@ -8622,11 +10737,18 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Progressive Breathing",
+              "tier": 3
+            }
+          ]
+        ],
         "advanced_routes": [],
         "review": [],
-        "raw": ""
+        "raw": "Progressive Breathing Lv3"
       },
       "source": {
         "tab": "Game Land",
@@ -8649,11 +10771,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8681,11 +10808,20 @@
         "raw": "Drill"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Drill",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8712,11 +10848,20 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Spikes",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8744,11 +10889,20 @@
         "raw": "Spikes"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Pink Spikes"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Spikes",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8805,11 +10959,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8836,11 +10995,20 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Hover",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8868,11 +11036,20 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Hover",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8899,11 +11076,20 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Hover",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8931,11 +11117,20 @@
         "raw": "Hover"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Green Hover"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Hover",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8958,11 +11153,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -8986,11 +11186,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -9013,11 +11218,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -9041,11 +11251,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -9077,11 +11292,25 @@
         "raw": "Drill or Rocket"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          [
+            {
+              "ability": "Yellow Drill"
+            }
+          ],
+          [
+            {
+              "ability": "Orange Rocket"
+            }
+          ]
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "Drill or Rocket",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -9105,11 +11334,16 @@
         "raw": "None"
       },
       "movement": {
-        "status": "not_documented",
-        "routes": null,
+        "status": "documented",
+        "routes": [
+          []
+        ],
         "advanced_routes": [],
-        "review": [],
-        "raw": ""
+        "review": [
+          "movement_inherits_normal_due_to_empty_sheet_cell"
+        ],
+        "raw": "None",
+        "source_blank": true
       },
       "source": {
         "tab": "Game Land",
@@ -9864,7 +12098,26 @@
           "sheet_cell": "N21"
         }
       },
-      "logic": {}
+      "logic": {
+        "S": {
+          "status": "documented",
+          "routes": [
+            []
+          ],
+          "movement_routes": [
+            [
+              {
+                "ability": "Stomp"
+              }
+            ]
+          ],
+          "advanced_routes": [],
+          "review": [
+            "only_unlockable_abilities;native_grade_still_authoritative"
+          ],
+          "raw": ""
+        }
+      }
     },
     "stg350": {
       "tab": "Starlight Carnival",
@@ -9907,7 +12160,30 @@
           "sheet_cell": "N28"
         }
       },
-      "logic": {}
+      "logic": {
+        "S": {
+          "status": "documented",
+          "routes": [
+            [
+              {
+                "ability": "Purple Frenzy"
+              }
+            ]
+          ],
+          "movement_routes": [
+            [
+              {
+                "ability": "Purple Frenzy"
+              }
+            ]
+          ],
+          "advanced_routes": [],
+          "review": [
+            "only_unlockable_abilities;native_grade_still_authoritative"
+          ],
+          "raw": ""
+        }
+      }
     },
     "stg320": {
       "tab": "Starlight Carnival",
@@ -10036,7 +12312,36 @@
           "sheet_cell": "N49"
         }
       },
-      "logic": {}
+      "logic": {
+        "S": {
+          "status": "documented",
+          "routes": [
+            [
+              {
+                "ability": "Cyan Laser"
+              }
+            ]
+          ],
+          "movement_routes": [
+            [
+              {
+                "ability": "Homing Attack"
+              },
+              {
+                "ability": "Cyan Laser"
+              },
+              {
+                "ability": "Quick Step"
+              }
+            ]
+          ],
+          "advanced_routes": [],
+          "review": [
+            "only_unlockable_abilities;native_grade_still_authoritative"
+          ],
+          "raw": ""
+        }
+      }
     },
     "stg410": {
       "tab": "Planet Wisp",
@@ -10387,9 +12692,23 @@
               }
             ]
           ],
+          "movement_routes": [
+            [
+              {
+                "ability": "White Boost"
+              }
+            ],
+            [
+              {
+                "ability": "Pink Spikes"
+              }
+            ]
+          ],
           "advanced_routes": [],
-          "review": [],
-          "raw": "Boost or Spikes"
+          "review": [
+            "only_unlockable_abilities;native_grade_still_authoritative"
+          ],
+          "raw": "None for A Rank or lower | Boost or Spikes for S Rank"
         }
       }
     },
@@ -10706,9 +13025,18 @@
               }
             ]
           ],
+          "movement_routes": [
+            [
+              {
+                "ability": "Yellow Drill"
+              }
+            ]
+          ],
           "advanced_routes": [],
-          "review": [],
-          "raw": "Drill"
+          "review": [
+            "only_unlockable_abilities;native_grade_still_authoritative"
+          ],
+          "raw": "Drill for S Rank"
         }
       }
     },
@@ -10888,24 +13216,18 @@
       },
       "logic": {
         "S": {
-          "status": "needs_review",
+          "status": "documented",
           "routes": [
-            [
-              {
-                "unparsed": "Sidestep"
-              },
-              {
-                "unparsed": "Kill Enemies"
-              }
-            ]
+            []
+          ],
+          "movement_routes": [
+            []
           ],
           "advanced_routes": [],
           "review": [
-            "unparsed:Sidestep",
-            "unparsed:Kill Enemies",
-            "unknown_ability_token"
+            "technique_only_no_ability_gate"
           ],
-          "raw": "Sidestep and Kill Enemies"
+          "raw": "Sidestep and Kill Enemies for S Rank"
         }
       }
     },
@@ -11050,9 +13372,18 @@
               }
             ]
           ],
+          "movement_routes": [
+            [
+              {
+                "ability": "Orange Rocket"
+              }
+            ]
+          ],
           "advanced_routes": [],
-          "review": [],
-          "raw": "Rocket"
+          "review": [
+            "only_unlockable_abilities;native_grade_still_authoritative"
+          ],
+          "raw": "Rocket for S Rank"
         }
       }
     },
@@ -11160,8 +13491,15 @@
       },
       "logic": {
         "S": {
-          "status": "special",
+          "status": "documented",
           "routes": [
+            [
+              {
+                "ability": "ALL_REQUIRED_WISPS"
+              }
+            ]
+          ],
+          "movement_routes": [
             [
               {
                 "ability": "ALL_REQUIRED_WISPS"
@@ -11170,7 +13508,7 @@
           ],
           "advanced_routes": [],
           "review": [
-            "interpret_all_wisps_using_yaml_pool"
+            "only_unlockable_abilities;native_grade_still_authoritative"
           ],
           "raw": "All*"
         }
@@ -11222,66 +13560,760 @@
   },
   "review_warnings": [
     {
-      "location": "stg320:ring:4",
-      "kind": "normal",
-      "raw": "Hover or Boost + Spikes",
+      "location": "stg460",
+      "kind": "movement",
       "review": [
-        "check_and_or_precedence"
-      ],
-      "tab": "Starlight Carnival",
-      "row": 36
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
     },
     {
-      "location": "stg410",
-      "kind": "normal",
-      "raw": "Boost + Rocket or Spikes",
+      "location": "stg460:ring:1",
+      "kind": "movement",
       "review": [
-        "check_and_or_precedence"
-      ],
-      "tab": "Planet Wisp",
-      "row": 4
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
     },
     {
-      "location": "stg430",
-      "kind": "normal",
-      "raw": "Boost + Laser or Laser + Rocket (or just Laser for advanced logic)",
+      "location": "stg460:ring:2",
+      "kind": "movement",
       "review": [
-        "check_and_or_precedence"
-      ],
-      "tab": "Planet Wisp",
-      "row": 25
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
     },
     {
-      "location": "stg430:ring:5",
-      "kind": "normal",
-      "raw": "Boost + Laser or Laser + Rocket (or just Laser for advanced logic)",
+      "location": "stg460:ring:3",
+      "kind": "movement",
       "review": [
-        "check_and_or_precedence"
-      ],
-      "tab": "Planet Wisp",
-      "row": 30
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg460:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg460:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg460:one_up",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg420",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg420:ring:1",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg420:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg420:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg420:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg420:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg420:one_up",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg490",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg510",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg510:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg510:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg510:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg510:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg510:one_up",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg540",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg540:ring:1",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg540:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg540:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg540:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg540:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg550",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg550:ring:1",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg550:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg550:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg550:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg550:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg550:one_up",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg530",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg530:ring:1",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg530:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg530:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg530:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg530:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg530:one_up",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg520",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg520:ring:1",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg520:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg520:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg520:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg520:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg520:one_up",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg590",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg630:ring:1",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg630:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg630:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg630:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg630:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg640",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg640:ring:1",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg640:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg640:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg640:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg640:one_up",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg660",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg660:ring:1",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg660:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg660:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg660:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg660:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg660:one_up",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg620",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg620:ring:1",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg620:ring:2",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg620:ring:3",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg620:ring:4",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg620:ring:5",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg690",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stg710",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
     },
     {
       "location": "stg790",
-      "kind": "normal",
-      "raw": "All*",
+      "kind": "movement",
       "review": [
-        "interpret_all_wisps_using_yaml_pool"
-      ],
-      "tab": "Terminal Velocity",
-      "row": 10
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
     },
     {
-      "location": "stg650:rank:S",
-      "kind": "rank",
-      "raw": "Sidestep and Kill Enemies for S Rank",
+      "location": "stg720",
+      "kind": "movement",
       "review": [
-        "unparsed:Sidestep",
-        "unparsed:Kill Enemies",
-        "unknown_ability_token"
-      ],
-      "tab": "Asteroid Coaster",
-      "row": 29
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgB20",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgB20:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgE50",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgE50:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgB30",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgB30:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgF30",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgF30:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgG30",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgG30:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgA10",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgA10:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgG20",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgG20:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgC50",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgC50:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgB10",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgB10:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgE40",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgE40:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgG40:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgC40",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgC40:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgF40",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgF40:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgA30",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgA30:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgE20",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgE20:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgC10",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
+    },
+    {
+      "location": "stgC10:eggman_heart",
+      "kind": "movement",
+      "review": [
+        "movement_inherits_normal_due_to_empty_sheet_cell"
+      ]
     }
   ]
 }

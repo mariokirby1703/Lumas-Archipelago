@@ -41,10 +41,13 @@ def validate_slot(data):
         raise ValueError('Sonic Colours schema 7 required: movement/Swim/Breath item IDs and options. Regenerate seed and .apsonic; do not reuse old seed journals.')
     if not isinstance(data.get('seed_name'), str) or not data['seed_name']:
         raise ValueError('slot seed identity missing')
+    if 'music_seed' in data and (not isinstance(data['music_seed'],str)
+            or len(data['music_seed'])!=64 or any(c not in '0123456789abcdef' for c in data['music_seed'])):
+        raise ValueError('invalid player music seed')
     if type(data.get('music_mapping_version',1)) is not int or data.get('music_mapping_version',1) not in (1,2):
         raise ValueError('unsupported music mapping version')
     revision=data.get('options_revision',0)
-    if type(revision) is not int or not 0<=revision<=8:raise ValueError('unsupported slot options revision')
+    if type(revision) is not int or not 0<=revision<=9:raise ValueError('unsupported slot options revision')
     options = data.get('options')
     # Old seeds have no physical 1-Up locations; adding the optional toggle
     # must not force regeneration or change their selected location set.
@@ -104,6 +107,8 @@ def validate_slot(data):
     data={**data,'game_land_gates':{**data['game_land_gates'],'1-1':0}}
     expected_speed = (bool(options['game_land_checks'] or options['chaos_emerald_checks'] or options['goal'] == 3 or options['wisp_capsules'] or options['eggman_heart_sanity'])
                       if legacy_options else bool(options['game_land_checks']))
+    if revision>=9:
+        expected_speed=bool(options['game_land_checks'] and options['movement_unlocks'])
     if type(data.get('game_land_speed_items')) is not bool or data['game_land_speed_items'] != expected_speed:
         raise ValueError('slot Game Land speed pool contract mismatch')
     expected_mapping = {s['stage_slot_id']: s['mission_id'] for s in STAGES}
@@ -180,7 +185,8 @@ def capsule_check_allowed(slot_data, data, snapshot, owned_wisps):
     return wisp_level(counts, colour, slot_data.get('options', {})) >= 1
 
 
-def victory(slot_data, snapshot, ever_collected_mask=None, owned=None, observed_clears=frozenset()):
+def victory(slot_data, snapshot, ever_collected_mask=None, owned=None, observed_clears=frozenset(),
+            verified_save=False):
     goal = slot_data['options']['goal']
     clears = snapshot.persisted_clears | observed_clears
     if goal == 0:
@@ -188,7 +194,16 @@ def victory(slot_data, snapshot, ever_collected_mask=None, owned=None, observed_
     if goal == 1:
         return all(s['mission_id'] in clears for s in STAGES if s['kind'] == 'Boss')
     if goal == 2:
-        return all((ever_collected_mask or {}).get(s['mission_id'], 0) == 31
+        # These are the 180 *physical* Wii Red Rings, NOT AP Red Ring currency
+        # items or location-check receipts. The authenticated journal records
+        # native pickups immediately, including before the vanilla NAND flush.
+        # After exact save identity is verified, native persisted physical flags
+        # may also satisfy the goal (e.g. returning to a 180-ring save).
+        journal_masks=ever_collected_mask or {}
+        native_rings=snapshot.persisted_rings if verified_save else {}
+        return all((journal_masks.get(s['mission_id'],0) |
+                    sum(1 << (i-1) for i in native_rings.get(s['mission_id'], ())
+                        if type(i) is int and 1<=i<=5)) == 31
                    for s in STAGES if s['normal'])
     if goal == 3:
         return all(s['mission_id'] in clears for s in STAGES if s['zone_index'] >= 7)
@@ -434,6 +449,11 @@ class Runtime:
             try:self.hooks.gameplay_controls_status[name]=action()
             except MemoryUnavailable as error:self.hooks.gameplay_controls_status[name]={'status':str(error)}
         self.enforce_white_boost_gain_lock(memory,early_owned)
+        from .wisp_inventory import apply as clear_unowned_wisp
+        try:
+            self.wisp_inventory_status=clear_unowned_wisp(memory,self.snapshot,self.guard,early_owned,self.slot_data)
+        except MemoryUnavailable as error:
+            self.wisp_inventory_status={'status':str(error),'cleared':False}
         yield set(),False  # service AP receipts/ACKs after time-critical capsule gates
         # Water entry and controller replacement must be handled before slow
         # journal, resource-bank and progression operations in this poll.
@@ -544,7 +564,9 @@ class Runtime:
                        if LOCATION_TABLE[name].kind in ('ring', 'rings', 'capsule')}
             observed = frozenset(e['mission'] for e in self.journal.data['pickup_events'] if e['kind'] == 'result')
             goal = victory(self.slot_data, self.snapshot, self.journal.data['ever_collected_mask'],
-                           inventory(durable) if self.slot_data['options']['goal'] == 4 else owned, observed)
+                           inventory(durable) if self.slot_data['options']['goal'] == 4 else owned, observed,
+                           verified_save=self.journal.data['save_identity'] is not None
+                           and self.guard.can_send(self.snapshot))
             if self.guard.can_send(self.snapshot):
                 self.journal.add_checks(checks)
                 if goal and not self.journal.data.get('goal_observed'):

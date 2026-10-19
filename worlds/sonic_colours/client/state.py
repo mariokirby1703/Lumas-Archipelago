@@ -499,6 +499,14 @@ class WritePolicy:
                 machine=observed(self.memory,player)['request_machine']
                 return ('verified ephemeral Stunts owner; no persistent save writes',snapshot.session,snapshot.stage_epoch,machine,base)
             return self.guard.check(snapshot),base
+        if operation == 'wisp_inventory':
+            from .wisp_inventory import owner
+            tx=getattr(self.memory,'_wisp_inventory_transaction',None)
+            context=owner(self.memory,snapshot,self.guard)
+            if (not tx or tx['owner']!=context or (address,size) not in
+                    ((context[4]+0xc,0x1c),(context[4]+0x60,4))):
+                raise MemoryUnavailable('WRITE_BLOCKED: Wisp inventory owner/address changed')
+            return context
         if operation == 'assist_change':
             from .player_switch import installed_data
             base=installed_data(self.memory)

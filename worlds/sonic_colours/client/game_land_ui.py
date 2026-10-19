@@ -25,8 +25,11 @@ def verified_batch(memory,fields):
     # Retain owner, dictionary, graph, and each allocated colour-data link.
     pointers=[(actor,4),(actor+12,4),(actor+0x88,4),(ref,4),(layer,4),(layer+12,4),(layer+0x8c,4)]
     for address,(kind,_) in fields.items():
-        if kind in ('dirty_colour','dirty','dirty_matrix','dirty_scale'):pointers.extend(((address+4,4),(address+8,4)))
-        if kind=='dirty_colour':pointers.append((address-4,4))
+        if kind in ('dirty_colour','dirty','dirty_matrix','dirty_scale','dirty_visibility','dirty_colour_visibility'):pointers.extend(((address+4,4),(address+8,4)))
+        if kind in ('dirty_colour','dirty_colour_visibility'):pointers.append((address-4,4))
+        if kind in ('stage_hidden','stage_hidden_cache'):
+            pane=address-(0x28 if kind=='stage_hidden' else 0x20)
+            pointers.extend(((actor+0x9c,4),(pane+0x74,4),(pane+0x140,4),(pane+0x80,4)))
         if kind=='column_scale':
             pane=address-(0x38 if fields.get(address+0x44,('',))[0]=='dirty_scale' else 0x3c)
             pointers.extend(((pane+0x74,4),(pane+0x80,4)))
@@ -34,7 +37,7 @@ def verified_batch(memory,fields):
         pointers.append((actor+0x9c,4))
         flags=memory.resolve_flags_ptr(allow_working=True)[-1]
         pointers.extend((flags+0x10+i*4,4) for i in (6,7))
-    anchors=tuple((a,memory.read_bytes(a,n)) for a,n in pointers)
+    anchors=tuple((a,memory.read_bytes(a,n)) for a,n in sorted(set(pointers)))
     code=tuple((a,memory.read_bytes(a,n)) for a,n in ((0x80000000,8),(0x802f0d98,4),(0x802f0dd4,4)))
     if getattr(memory,'_game_land_ui_batch',None) is not None:raise MemoryUnavailable('nested UI batch')
     memory._game_land_ui_batch={'fields':fields,'anchors':anchors,'code':code}
@@ -56,26 +59,32 @@ def apply(memory,snapshot,guard,owned):
         from .game_land_columns import targets as column_targets
         for address,value in column_targets(memory,flags).items():
             if (value[0]=='dirty_scale' or address not in fields
-                    or value[0]=='dirty_matrix' and fields[address][0]!='dirty_colour'):
+                    or value[0]=='dirty_matrix' and fields[address][0] not in ('dirty_colour','dirty_colour_visibility','dirty_visibility')):
                 fields[address]=value
-    identity=tuple(sorted((a,stage_colour(memory,flags,c))
-                          for a,(k,c) in fields.items() if k=='stage_colour'))
+    identity=tuple(sorted((a,stage_colour(memory,flags,c) if k=='stage_colour' else int(not memory.read_progress_bit(flags,210+c)))
+                          for a,(k,c) in fields.items() if k in ('stage_colour','stage_hidden','stage_hidden_cache')))
     # Prune disappeared native allocations; retain an interrupted publication.
     _PENDING_REFRESH.intersection_update({identity})
     _COMPLETED_REFRESH.intersection_update({identity})
     if identity not in _COMPLETED_REFRESH or any(memory.read_u32(a)!=value for a,value in identity):
         _PENDING_REFRESH.add(identity)
     refresh=identity in _PENDING_REFRESH or any(k=='column_scale' for k,_ in fields.values())
+    if not refresh:
+        return {'status':'Game Land availability and clears displayed separately','changed_fields':0,'visual_verified':False}
     # All pane/ancestor dirtiness precedes root cache reset. Publish both
     # native redraw markers LAST: the emulation can run between host writes.
-    order={'stage_colour':0,'column_scale':0,'dirty_colour':1,'dirty_matrix':1,'dirty_scale':1,'dirty':1,'zero':2,'one':3}
+    order={'stage_colour':0,'stage_hidden':0,'stage_hidden_cache':0,'column_scale':0,'dirty_colour':1,
+           'dirty_visibility':1,'dirty_colour_visibility':1,'dirty_matrix':1,'dirty_scale':1,'dirty':1,'zero':2,'one':3}
     with verified_batch(memory,fields):
         for address,(kind,colour) in sorted(fields.items(),key=lambda row:order[row[1][0]]):
             before=memory.read_u32(address)
             if kind=='stage_colour':after=stage_colour(memory,flags,colour)
+            elif kind in ('stage_hidden','stage_hidden_cache'):after=int(not memory.read_progress_bit(flags,210+colour))
             elif kind=='column_scale':after=0x3f800000
             elif not refresh:continue
             elif kind=='dirty_colour':after=before & ~0x00180080
+            elif kind=='dirty_visibility':after=before & ~0x001a0001
+            elif kind=='dirty_colour_visibility':after=before & ~0x001e0081
             elif kind=='dirty_matrix':after=before & ~0x00180000
             elif kind=='dirty_scale':after=before & ~0x00180030
             elif kind=='dirty':after=before & ~0x00100000

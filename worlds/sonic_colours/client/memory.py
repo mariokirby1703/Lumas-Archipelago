@@ -282,6 +282,10 @@ class SonicMemory:
             tx=getattr(self,'_capsule_event_transaction',None)
             if not tx or tx[2].get(address-tx[0])!=data:
                 raise MemoryUnavailable('WRITE_BLOCKED: capsule control value outside transaction')
+        if operation == 'wisp_inventory':
+            tx=getattr(self,'_wisp_inventory_transaction',None)
+            if not tx or tx['values'].get(address)!=data:
+                raise MemoryUnavailable('WRITE_BLOCKED: Wisp inventory value outside transaction')
         if operation == 'oxygen_controls':
             tx=getattr(self,'_oxygen_transaction',None)
             if not tx or tx[2].get(address-tx[0])!=data:

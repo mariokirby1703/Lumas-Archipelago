@@ -28,6 +28,7 @@ def test_exact_option_pools_native_projection_and_complete_seed(boost,movement,l
         assert counts[colour+' Wisp']==1-movement
         assert counts['Progressive '+colour+' Wisp']==2*movement
     assert counts['White Boost Wisp']==boost
+    assert counts['Progressive Game Land Speed']==4*land*movement
     assert counts[RANDOM_CAPSULES]==land
     if land:assert next(i for i in multi.itempool if i.name==RANDOM_CAPSULES).classification==(ItemClassification.progression if capsules else ItemClassification.useful)
     assert multi.can_beat_game()
@@ -56,6 +57,16 @@ def test_normal_ids_are_append_only_and_legacy_progressive_ids_decode():
         assert wisp_level(Counter({'Progressive '+colour+' Wisp':1}),colour,{'movement_unlocks':False})==2
         assert wisp_level(Counter(),colour,{'movement_unlocks':False})==0
 
+
+def test_speed_pool_contract_preserves_old_seeds_and_rejects_wrong_new_pool():
+    data=generate({'movement_unlocks':False,'game_land_checks':True}).worlds[1].fill_slot_data()
+    assert data['options_revision']==9 and not data['game_land_speed_items']
+    assert validate_slot(data)['game_land_speed_items'] is False
+    old={**data,'options_revision':8,'game_land_speed_items':True}
+    assert validate_slot(old)['game_land_speed_items'] is True
+    with pytest.raises(ValueError,match='speed pool contract'):
+        validate_slot({**data,'game_land_speed_items':True})
+
 @pytest.mark.parametrize('colour,move',[('Yellow Drill','Yellow Drill Turbo'),('Green Hover','Green Hover Ring Dash'),('Pink Spikes','Pink Spikes Spin Dash')])
 def test_special_moves_require_real_ownership_and_correct_tiers(colour,move):
     assert not logic.available(world(movement_unlocks=False),State(),{'ability':move})
@@ -75,6 +86,7 @@ def test_or_of_and_progressive_tiers_and_conservative_review():
     assert not logic.available(w,State(['Progressive Crouch']),{'ability':'Progressive Crouch','tier':2})
     assert logic.available(world(movement_unlocks=False),State(),{'ability':'Progressive Crouch','tier':2})
     assert logic.available(world(game_land_checks=False),State(),{'ability':'Progressive Game Land Speed','tier':4})
+    assert logic.available(world(movement_unlocks=False),State(),{'ability':'Progressive Game Land Speed','tier':4})
 
 
 def test_rank_metadata_never_awards_a_native_result():
@@ -139,7 +151,7 @@ def test_legacy_slot_normalization_preserves_the_previous_journal_digest():
     from ..client.client import slot_identity_digest
     data=generate({'movement_unlocks':0,'boost_lock':0}).worlds[1].fill_slot_data()
     from ..world_constants import game_land_gates
-    legacy={**data,'options_revision':4,'logic_policy':'provisional_clears_conservative_pickups',
+    legacy={**data,'options_revision':4,'game_land_speed_items':True,'logic_policy':'provisional_clears_conservative_pickups',
             'game_land_gates':game_land_gates(data['options']['game_land_requirement_reduction']),
             'options':{k:v for k,v in data['options'].items() if k!='native_feature_tests'}}
     expected=hashlib.sha256(json.dumps(legacy,sort_keys=True).encode()).hexdigest()

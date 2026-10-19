@@ -856,6 +856,7 @@ async def dolphin_loop(ctx):
                 snap = ctx.runtime.snapshot
                 ctx.operation_status.update(
                     native_events=getattr(ctx.runtime,'native_event_status',{}),
+                    wisp_inventory=getattr(ctx.runtime,'wisp_inventory_status',{}),
                     deathlink=ctx.deathlink.status() if ctx.deathlink else {'status':'disabled'},
                     gameplay_detection={'scene': snap.scene, 'mission': snap.actual_mission, 'verified': snap.scene_verified},
                     pickup_detection={'verified': snap.pickup_verified, 'authorized': ctx.runtime.guard.can_record_pickups(snap),

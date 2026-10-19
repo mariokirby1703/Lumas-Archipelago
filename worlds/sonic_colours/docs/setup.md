@@ -159,6 +159,27 @@ seed is required to change the server's item pool, options or logic placements.
 
 ## Troubleshooting
 
+Newly generated multiworlds use a separate deterministic music shuffle for each
+Sonic Colours player slot. Each player's patch, ISO and now-playing display use
+that same shuffle. Older seeds keep their original shared music mapping.
+
+The patcher keeps a private original-partition cache in Archipelago's user
+directory under `sonic_colours_cache/original-v1`. The first build may take
+slightly longer while preparing it and needs additional disk space. Later
+seeds copy and hash these files instead of verifying and decrypting the whole
+original Wii partition again. The original ISO is still hashed, every restored
+file is checked, and the generated Wii partition is verified. HUD and music are
+still built together for each seed. A corrupt cache falls back to extraction;
+you can delete this disposable cache while the patcher is closed to reclaim
+space or recreate it. Keep your original ISO, generated ISO receipts and client
+journals. No cached game resources are distributed with the APWorld.
+
+The window shows elapsed time, checksum progress and WIT progress. Cancellation
+stops WIT promptly; an in-progress HUD-resource calculation finishes its current
+step before cleanup. Existing verified seed ISOs are reused after full checksum
+validation. A first build and a cached build can take different amounts of time;
+the encrypted output rebuild and output verification remain necessary.
+
 | Symptom | Check |
 | --- | --- |
 | No patch chooser or wrong client opens | Restart Archipelago after installing the APWorld. Remove duplicate installed copies; verify the intended world/client version. Open Patch and the Sonic client launcher both support the player patch chooser. |

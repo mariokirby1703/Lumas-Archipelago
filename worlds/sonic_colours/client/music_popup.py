@@ -59,7 +59,7 @@ def _seed_mapping(seed_name, music_randomization,version=1):
 
 def update(runtime):
     if not hasattr(runtime,'music_popup'):runtime.music_popup=MusicPopup()
-    mapping=_seed_mapping(runtime.slot_data['seed_name'],
+    mapping=_seed_mapping(runtime.slot_data.get('music_seed',runtime.slot_data['seed_name']),
                           bool(runtime.slot_data['options']['music_randomization']),runtime.slot_data.get('music_mapping_version',1))
     snapshot=getattr(runtime,'snapshot',None)
     restart_key=(getattr(snapshot,'session',None),getattr(snapshot,'stage_epoch',None),getattr(snapshot,'scene',None))

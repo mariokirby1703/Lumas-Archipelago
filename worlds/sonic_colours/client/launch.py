@@ -120,9 +120,9 @@ def launch_client(*args):
             parser.error('music_randomization is off in this seed')
         if parsed.patch_all_music:
             from .music_bank import patch
-            patch(*parsed.patch_all_music, slot['seed_name'], mode,slot.get('music_mapping_version',1))
+            patch(*parsed.patch_all_music, slot['seed_name'], mode,slot.get('music_mapping_version',1),music_seed=slot.get('music_seed'))
         else:
-            patch_music(*parsed.patch_music, slot['seed_name'], mode,slot.get('music_mapping_version',1))
+            patch_music(*parsed.patch_music, slot['seed_name'], mode,slot.get('music_mapping_version',1),music_seed=slot.get('music_seed'))
         logging.info('Separate seed music CPK and manifest verified. Install into a separate disc copy and restart emulation; file creation does not verify Dolphin playback.')
         return
     # The Launcher component and Open Patch enter the same installation flow.

@@ -36,7 +36,7 @@ def test_generated_slot_client_and_popup_use_same_version(enabled):
     slot=multi.worlds[1].fill_slot_data();validate_slot(slot)
     assert slot['music_mapping_version']==2
     mapping=mb.slot_plan(slot)
-    assert mapping==_seed_mapping(slot['seed_name'],enabled,2)
+    assert mapping==_seed_mapping(slot['music_seed'],enabled,2)
     if not enabled:assert all(n==d for n,d in mapping.items())
     with pytest.raises(ValueError,match='music mapping version'):
         validate_slot({**slot,'music_mapping_version':3})

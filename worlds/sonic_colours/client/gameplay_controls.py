@@ -184,7 +184,9 @@ def configure(memory, snapshot, owned, slot, temporary_boost=False, kinds=None):
     from ..Items import GAME_LAND_SPEED
     from .state import live_control_profile
     chain = live_control_profile(memory, snapshot, getattr(getattr(memory, 'write_guard', None), 'guard', None))
-    maximum = min(4, owned['counts'][GAME_LAND_SPEED]) if slot.get('game_land_speed_items') else 4
+    speed_locked = (slot.get('game_land_speed_items') and slot['options'].get('game_land_checks')
+                    and slot['options'].get('movement_unlocks'))
+    maximum = min(4, owned['counts'][GAME_LAND_SPEED]) if speed_locked else 4
     model = snapshot.boost_address - 8 if snapshot.boost_address is not None else 0
     locked = int(bool(slot['options'].get('boost_lock') and not owned['counts']['White Boost Wisp']))
     values = (chain[1], chain[2], maximum, model, 2 if locked and temporary_boost else locked)

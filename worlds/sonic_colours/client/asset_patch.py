@@ -39,11 +39,11 @@ def replace_music(script, mapping):
     return script
 
 
-def patch_music(source, output, seed, mode,mapping_version=1):
+def patch_music(source, output, seed, mode,mapping_version=1, *, music_seed=None):
     # Retired Act-only exporter now delegates to the same complete global bank
     # permutation. Production uses live_music and never requires this copy.
     from .music_bank import patch
-    return patch(source, output, seed, mode,mapping_version)
+    return patch(source, output, seed, mode,mapping_version,music_seed=music_seed)
 
 
 def main():

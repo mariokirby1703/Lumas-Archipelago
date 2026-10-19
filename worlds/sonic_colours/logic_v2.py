@@ -48,7 +48,7 @@ def available(world,state,atom):
         colour,tier=SPECIAL_COLOUR_MOVES[ability]
         return colour_available(world,state,colour,tier if movement else 1)
     if ability=='Progressive Game Land Speed':
-        return not option(world,'game_land_checks') or state.has('Progressive Game Land Speed',player,max(1,int(atom.get('tier',1))))
+        return not (option(world,'game_land_checks') and movement) or state.has('Progressive Game Land Speed',player,max(1,int(atom.get('tier',1))))
     if ability in MOVEMENT_NAMES:
         if not movement:return True
         return state.has(ability,player,max(1,int(atom.get('tier',1))))
@@ -82,26 +82,26 @@ def entry_match(world,state,entry,*,movement_field=False):
 
 
 def check(world,state,manifest,key,rank=None):
-    """Check an AP location's item requirement, NOT world/map reachability.
+    """Select NL or ML routes, never require both alternative strategies.
 
-    Keys: `stg110` clear; `stg110:ring:1`; `stg110:one_up`;
-    `stgD10:eggman_heart`. `rank='S'|'A'|'B'|'C'` uses sheet rank notes.
+    A documented ML route may deliberately replace an NL Wisp route (e.g.
+    alternative movement path). Absent ML notes inherit NL in the sheet
+    manifest, rather than allowing the pickup for free.
     """
     record=manifest['locations'][key]
-    if not entry_match(world,state,record['normal']):return False
-    if not entry_match(world,state,record['movement'],movement_field=True):return False
+    movement=option(world,'movement_unlocks')
+    branch=record['movement'] if movement else record['normal']
+    if branch['status']=='not_documented':
+        branch=record['normal']
+    if not entry_match(world,state,branch):return False
     if rank:
         rank_entry=manifest['rank_observations'].get(record['mission_id'],{}).get('logic',{}).get(rank)
         if rank_entry:
             if rank_entry['status']=='needs_review':
-                # The only outstanding rank note is Asteroid Coaster Act 4:
-                # "Sidestep and Kill Enemies for S Rank". It describes a
-                # technique, not item ownership. Quick Step is already gated
-                # by this stage's Movement entry when Ability Locks is on.
-                # The actual S-rank still requires the native result/grade.
-                if key == 'stg650' and rank == 'S':
-                    return True
                 raise ValueError('Unreviewed rank strategy: '+key+' '+str(rank))
+            if movement and 'movement_routes' in rank_entry:
+                selected={**rank_entry,'routes':rank_entry['movement_routes']}
+                return entry_match(world,state,selected)
             return entry_match(world,state,rank_entry)
     return True
 
@@ -150,6 +150,9 @@ def validate_manifest(manifest):
             if entry['status']=='needs_review':
                 if mission!='stg650' or rank!='S':raise ValueError('Unrecognized unparsed rank route')
                 continue
-            for route in entry.get('routes') or []:
-                if any(a.get('ability') not in abilities for a in route):raise ValueError('Unknown rank token: '+mission)
+            for field in ('routes','movement_routes'):
+                for route in entry.get(field) or []:
+                    if any(a.get('ability') not in abilities or type(a.get('tier',1)) is not int
+                           or a.get('tier',1)<1 for a in route):
+                        raise ValueError('Unknown rank token: '+mission+' '+field)
     return manifest

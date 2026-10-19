@@ -57,8 +57,6 @@ def riivolution_xml(archive_name,ap_connected=False):
 def publish_aliases(cpk,output,indices,replacement,expected_sha):
     output=Path(output)
     if output.exists() or output.resolve()==cpk.path.resolve():raise ValueError('output must be new')
-    with cpk.path.open('rb') as f:
-        if hashlib.file_digest(f,'sha256').hexdigest()!=expected_sha:raise ValueError('original hash mismatch')
     row=cpk.header.rows[0]
     if row['Align']!=2048 or row['TocCrc'] or row.get('GtocCrc',0):raise ValueError('unsupported CPK header')
     header=bytearray(cpk.header.data);toc=bytearray(cpk.toc.data)
@@ -86,12 +84,17 @@ def publish_aliases(cpk,output,indices,replacement,expected_sha):
     fd,tmp=tempfile.mkstemp(prefix='.hud-cpk-',dir=output.parent)
     try:
         with os.fdopen(fd,'w+b') as f,cpk.path.open('rb') as source:
-            shutil.copyfileobj(source,f,1024*1024)
+            # Validate exactly the bytes copied, avoiding a separate multi-GB
+            # read and closing the old hash-then-copy modification window.
+            digest=hashlib.sha256()
+            while chunk:=source.read(4*1024*1024):
+                digest.update(chunk);f.write(chunk)
+            if digest.hexdigest()!=expected_sha:raise ValueError('original hash mismatch')
             for position,blob in chunks:
                 f.write(b'\0'*(position-f.tell()));f.write(blob)
             f.seek(16);f.write(header);f.seek(cpk.toc_offset+16);f.write(toc)
             f.flush();os.fsync(f.fileno())
-        os.rename(tmp,output)
+        os.link(tmp,output)  # atomic publication that cannot overwrite a race
     finally:
         if os.path.exists(tmp):os.unlink(tmp)
 

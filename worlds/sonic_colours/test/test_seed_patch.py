@@ -135,7 +135,8 @@ def test_dol_rejects_corrupt_original_and_out_of_range_branch():
     with pytest.raises(ValueError,match='SHA256'):patch_dol(bytes(256),'x')
     with pytest.raises(ValueError,match='range'):branch(0x80000000,0x90000000)
 
-def test_verified_iso_cache_and_tamper_refusal(tmp_path):
+@pytest.mark.parametrize('previous_resources',[False,True])
+def test_verified_iso_cache_and_tamper_refusal(tmp_path,previous_resources,monkeypatch):
     from ..patch import resource_component_id
     source=tmp_path/'original.iso';header=bytearray(32);header[:6]=b'SNCP8P';header[24:28]=bytes.fromhex('5d1c9ea3');source.write_bytes(header)
     target=tmp_path/'out.iso';target.write_bytes(b'verified generated image')
@@ -146,8 +147,16 @@ def test_verified_iso_cache_and_tamper_refusal(tmp_path):
             'native_component_sha256':plan()[2].hex(),'pipeline_version':1,
             'resource_component_sha256':resource_component_id(),
             'output_iso_sha256':hashlib.sha256(target.read_bytes()).hexdigest()}
+    if previous_resources:
+        from ..patch import EQUIVALENT_RESOURCES
+        record['resource_component_sha256']=next(iter(EQUIVALENT_RESOURCES))
     Path(str(target)+'.sonic.json').write_text(json.dumps(record))
     assert install(patch,source,target)==target.resolve()
+    if previous_resources:
+        from .. import patch as patch_module
+        with monkeypatch.context() as future:
+            future.setattr(patch_module,'resource_component_id',lambda:'future different assets')
+            with pytest.raises(FileExistsError):install(patch,source,target)
     target.write_bytes(b'tampered')
     with pytest.raises(FileExistsError):install(patch,source,target)
 

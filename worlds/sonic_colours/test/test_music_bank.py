@@ -57,7 +57,7 @@ def test_actual_cpk_copy_and_seed_resource_selection(tmp_path):
     world=generate({'music_randomization':True}).worlds[1]
     slot=world.fill_slot_data();out=tmp_path/'music.cpk'
     before=SOURCE.stat().st_size
-    manifest=music_bank.patch(SOURCE,out,slot['seed_name'],'anywhere',slot['music_mapping_version'])
+    manifest=music_bank.patch(SOURCE,out,slot['seed_name'],'anywhere',slot['music_mapping_version'],music_seed=slot['music_seed'])
     assert SOURCE.stat().st_size==before and out.exists()
     assert manifest['audible_verified'] is False
     path=Path(str(out)+'.json')

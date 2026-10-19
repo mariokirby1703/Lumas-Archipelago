@@ -171,7 +171,8 @@ def test_pre_compaction_payload_is_still_accepted(kind):
 
 
 @pytest.mark.parametrize('historical', [False, True])
-def test_host_neutralizes_coloured_gate_without_disabling_white_lock(historical):
+@pytest.mark.parametrize('land,movement',[(0,0),(0,1),(1,0),(1,1)])
+def test_host_neutralizes_coloured_gate_without_disabling_white_lock(historical,land,movement):
     from types import SimpleNamespace
     from ..client.gameplay_controls import configure
     from ..world_constants import load_data
@@ -188,7 +189,9 @@ def test_host_neutralizes_coloured_gate_without_disabling_white_lock(historical)
             install(b, kind, target)
     m.resolve_flags_ptr = lambda **kw: (0x90001000, 0x90002000, 1, 0x90003000)
     configure(m, SimpleNamespace(boost_address=0x90004008), inventory([]),
-              {'options': {'boost_lock': 1}, 'game_land_speed_items': True})
+              {'options': {'boost_lock': 1,'game_land_checks':land,'movement_unlocks':movement}, 'game_land_speed_items': True})
+    for kind in ('speed_get','speed_set','speed_ui'):
+        assert m.read_u32(installed(m,kind)+8)==(0 if land and movement else 4)
     assert m.read_u32(installed(m, 'boost')+16) == 0
     for kind in ('boost_use', 'boost_query', 'boost_add'):
         assert m.read_u32(installed(m, kind)+16) == 1

@@ -109,7 +109,7 @@ def replay_plan(seed,mode):
 
 def slot_plan(slot):
     version=slot.get('music_mapping_version',1)
-    return plan(slot['seed_name'],'anywhere' if slot['options']['music_randomization'] else 'off',version)
+    return plan(slot.get('music_seed',slot['seed_name']),'anywhere' if slot['options']['music_randomization'] else 'off',version)
 
 
 def rewrite_bank(original, mapping, *, finite_audition=False, mapping_version=1):
@@ -198,7 +198,7 @@ def recover_bank(data):
     return bytes(original)
 
 
-def patch(source, output, seed, mode, mapping_version=1):
+def patch(source, output, seed, mode, mapping_version=1, *, music_seed=None):
     from .asset_patch import PAL_CPK_SHA256
     if mode == 'off': raise ValueError('Music Randomization is off')
     output = Path(output); manifest_path = Path(str(output) + '.json')
@@ -207,7 +207,7 @@ def patch(source, output, seed, mode, mapping_version=1):
     indices = [i for i, r in enumerate(archive.toc.rows) if r['DirName'] == 'sound' and r['FileName'] == 'bgm.strm.csb']
     if len(indices) != 1: raise ValueError('original PAL BGM member not unique')
     index = indices[0]; original = archive.read(archive.toc.rows[index])
-    mapping = plan(seed, mode,mapping_version); replacement = rewrite_bank(original, mapping,mapping_version=mapping_version)
+    mapping = plan(music_seed if music_seed is not None else seed, mode,mapping_version); replacement = rewrite_bank(original, mapping,mapping_version=mapping_version)
     archive.replace_member(output, index, replacement, PAL_CPK_SHA256)
     manifest = {'music_mapping_version':mapping_version,'format': 'sonic-pal-bgm-bank-v1', 'seed': seed, 'mode': mode,
                 'source_cpk_sha256': PAL_CPK_SHA256, 'resource_file': output.name,
@@ -215,6 +215,7 @@ def patch(source, output, seed, mode, mapping_version=1):
                 'patched_bank_sha256': hashlib.sha256(replacement).hexdigest(),
                 'music_mapping': mapping, 'pool_size': len(CUES),
                 'runtime_cue_policy': 'original', 'audible_verified': False}
+    if music_seed is not None:manifest['music_seed']=music_seed
     manifest_path.write_text(json.dumps(manifest, indent=2)+'\n', encoding='utf-8')
     return manifest
 
@@ -229,6 +230,7 @@ def load_manifest(path, slot):
     path = Path(path); manifest = json.loads(path.read_text(encoding='utf-8'))
     mode = 'anywhere' if slot['options']['music_randomization'] else 'off'
     if (manifest.get('format') != 'sonic-pal-bgm-bank-v1' or manifest.get('seed') != slot['seed_name']
+            or manifest.get('music_seed',manifest.get('seed')) != slot.get('music_seed',slot['seed_name'])
             or manifest.get('mode') != mode or mode == 'off'
             or manifest.get('music_mapping_version',1)!=slot.get('music_mapping_version',1)
             or manifest.get('music_mapping') != slot_plan(slot)

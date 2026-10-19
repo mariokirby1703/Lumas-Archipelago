@@ -53,19 +53,34 @@ def targets(memory, stages=False):
         graph=memory.read_ptr_checked(layer+0x8c,0x10)
         groups=memory.read_ptr_checked(memory.read_ptr_checked(graph+0xc,8)+4,16)
         for (group,index),value in wanted.items():
-            if stages and memory.read_progress_bit(flags,252+value):continue
             if not 0<=group<512 or not 0<=index<512:raise MemoryUnavailable('Invalid Game Land pane index')
             array=memory.read_ptr_checked(groups+group*16+4,(index+1)*0x144)
             pane=array+index*0x144
-            if not memory.read_u32(pane+0x74)&0x80:
-                raise MemoryUnavailable('Game Land pane colour not initialized')
-            data=memory.read_ptr_checked(pane+0x78,0x20)
-            result[data+0x1c]=('stage_colour' if stages else 'colour',value)
+            # 805E0CF0 skips a pane whenever its cached hide property (+20)
+            # is nonzero. Rows 2/3 start hidden in the native layout. Tinting
+            # them alone never reveals them after AP availability changes.
+            # Repair only settled, resolved panes with no native hide override;
+            # no guest allocation, animation, or save bits are touched.
+            visibility=(stages and memory.read_u32(actor+0x9c)==13
+                        and memory.read_u32(pane+0x140)==1
+                        and not memory.read_u32(pane+0x74)&1)
+            if visibility:
+                result[pane+0x28]=('stage_hidden',value)
+                result[pane+0x20]=('stage_hidden_cache',value)
+            cleared=stages and memory.read_progress_bit(flags,252+value)
+            if not cleared:
+                if not memory.read_u32(pane+0x74)&0x80:
+                    raise MemoryUnavailable('Game Land pane colour not initialized')
+                data=memory.read_ptr_checked(pane+0x78,0x20)
+                result[data+0x1c]=('stage_colour' if stages else 'colour',value)
+            elif not visibility:
+                continue
             ancestors=set()
             while True:
                 if pane in ancestors or len(ancestors)>=64:raise MemoryUnavailable('Game Land pane parent cycle')
                 ancestors.add(pane)
-                result[pane+0x7c]=('dirty_colour' if len(ancestors)==1 else 'dirty',None)
+                leaf=('dirty_visibility' if cleared else 'dirty_colour_visibility') if visibility else 'dirty_colour'
+                result[pane+0x7c]=(leaf if len(ancestors)==1 else 'dirty',None)
                 if not memory.read_u32(pane+0x80):break
                 pane=memory.read_ptr_checked(pane+0x80,0x88)
             root=memory.read_ptr_checked(pane+0x84,0x10)

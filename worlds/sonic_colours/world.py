@@ -1,4 +1,5 @@
 import json
+import hashlib
 import logging
 from pathlib import Path
 from typing import ClassVar
@@ -91,7 +92,7 @@ class SonicColoursWorld(World):
             if opening:access=opening
             early.setdefault(self.random.choice(access), 1)
         needs_land = bool(self.options.game_land_checks)
-        self.game_land_speed_items = bool(self.options.game_land_checks.value)
+        self.game_land_speed_items = bool(self.options.game_land_checks.value and self.options.movement_unlocks.value)
         speed_count = max(0, 4 - sum(i.name == Items.GAME_LAND_SPEED for i in precollected)) if self.game_land_speed_items else 0
         self.ring_required = max(self.gates.values()) if needs_land else 0
         self.ring_target = (4 * self.ring_required + 2) // 3
@@ -143,7 +144,8 @@ class SonicColoursWorld(World):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'options_revision':8, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':9, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+                'music_seed': hashlib.sha256(json.dumps(['sonic-bgm-player-v1',self.multiworld.seed_name,self.player],separators=(',',':')).encode()).hexdigest(),
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),
