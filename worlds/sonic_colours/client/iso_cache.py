@@ -31,10 +31,40 @@ def _files(root):
         if path.is_file():yield path.relative_to(root).as_posix(),path
 
 
+def _entry(root, source_hash):
+    if (not isinstance(source_hash,str) or len(source_hash)!=64
+            or any(c not in '0123456789abcdef' for c in source_hash)):
+        raise ValueError('Invalid original cache source hash')
+    return Path(root)/source_hash
+
+
+def _retire_invalid(entry, observed):
+    """Remove only the failed disposable entry, not a concurrent replacement."""
+    if observed is None:return
+    try:
+        current=entry.lstat()
+    except FileNotFoundError:return
+    fields=('st_dev','st_ino','st_mtime_ns','st_ctime_ns')
+    if any(getattr(current,f)!=getattr(observed,f) for f in fields):return
+    root=entry.parent.resolve()
+    if entry.is_symlink():
+        entry.unlink()  # unlink the cache link, never its target
+        return
+    if entry.resolve().parent != root:
+        raise ValueError('Unsafe invalid cache path')
+    # First remove the entry from the publication name. A cancelled/failed
+    # future store cannot leave this known-bad entry blocking every build.
+    with tempfile.TemporaryDirectory(prefix='.invalid-',dir=root) as directory:
+        quarantine=Path(directory).resolve()
+        if quarantine.parent != root:raise ValueError('Unsafe cache quarantine')
+        try:os.rename(entry,quarantine/'entry')
+        except FileNotFoundError:return
+
+
 def store(root, extracted, source_hash, cancel=None):
     """Atomically publish a complete immutable original tree, once per source."""
-    root=Path(root);root.mkdir(parents=True,exist_ok=True)
-    entry=root/source_hash
+    root=Path(root);entry=_entry(root,source_hash)
+    root.mkdir(parents=True,exist_ok=True)
     if entry.exists():return
     with tempfile.TemporaryDirectory(prefix='.prepare-',dir=root) as directory:
         tmp=Path(directory);tree=tmp/'tree';tree.mkdir();rows={}
@@ -51,14 +81,20 @@ def store(root, extracted, source_hash, cancel=None):
 
 def restore(root, extracted, source_hash, progress, cancel=None):
     """Return False on a stale/damaged cache; caller re-extracts the original."""
-    entry=Path(root)/source_hash;extracted=Path(extracted)
+    entry=_entry(root,source_hash);extracted=Path(extracted)
     if extracted.exists():raise FileExistsError('Cache work directory must be new')
+    try:observed=entry.lstat()
+    except FileNotFoundError:observed=None
     try:
         if entry.is_symlink() or (entry/'tree').is_symlink():raise ValueError('Symlink in partition cache')
-        record=json.loads((entry/'manifest.json').read_text(encoding='utf-8'))
-        if record.get('version')!=1 or record.get('source_sha256')!=source_hash:return False
+        try:raw=(entry/'manifest.json').read_text(encoding='utf-8')
+        except FileNotFoundError as error:raise ValueError('Partition cache manifest missing') from error
+        record=json.loads(raw)
+        if not isinstance(record,dict):raise ValueError('Invalid partition cache manifest')
+        if record.get('version')!=1 or record.get('source_sha256')!=source_hash:
+            raise ValueError('Partition cache identity/version differs')
         rows=record['files']
-        if not isinstance(rows,dict) or not rows:return False
+        if not isinstance(rows,dict) or not rows:raise ValueError('Empty partition cache manifest')
         # Validate all names before any destination creation.
         for name in rows:
             path=PurePosixPath(name)
@@ -82,10 +118,17 @@ def restore(root, extracted, source_hash, progress, cancel=None):
     except (OSError,ValueError,KeyError,TypeError) as error:
         if isinstance(error,InterruptedError):raise
         # This is a freshly created work directory inside the installer's temp
-        # root. Never delete the cache or any user-selected source/output.
+        # root. Never delete any user-selected source/output.
         if extracted.exists():
             resolved=extracted.resolve()
             if resolved.parent!=extracted.parent.resolve():raise ValueError('Unsafe cache work directory')
             shutil.rmtree(resolved)
-        if entry.exists():progress('Original cache unavailable/damaged; extracting the original ISO instead')
+        if observed is not None:
+            progress('Original cache unavailable/damaged; extracting the original ISO instead')
+            # Destination I/O errors (e.g. a full work volume) do not prove
+            # corruption. Only retire an entry with failed cache validation.
+            if isinstance(error,(ValueError,KeyError,TypeError)):
+                try:_retire_invalid(entry,observed)
+                except (OSError,ValueError) as cleanup_error:
+                    progress('Invalid original cache could not be retired: '+str(cleanup_error))
         return False

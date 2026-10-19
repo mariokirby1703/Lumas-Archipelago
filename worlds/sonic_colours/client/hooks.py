@@ -289,7 +289,8 @@ class NativeHooks:
             if stage['zone_index'] < 6:
                 world_owned = stage['zone_index'] == 0 or inventory['counts'][WORLD_ITEMS[stage['zone_index']]] > 0
                 available = world_owned and stage['mission_id'] in available_story_stages(
-                    stage['zone_index'], clears, slot_data['options']['world_progression'])
+                    stage['zone_index'], clears, slot_data['options']['world_progression'],
+                    unlock_bosses=inventory.get('local_boss_unlocks',False))
                 values[int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))] = available
         # The mandatory intro remains native/vanilla before first save selection.
         if snapshot.save_identity is None:
@@ -311,7 +312,7 @@ class NativeHooks:
                 for stage in STAGES:
                     if stage['zone_index'] == 6:
                         bit = int(next(row['bank_A'] for row in self.progress_rows if row['mission'] == stage['mission_id']))
-                        values[bit] = full_access and stage['mission_id'] in available_story_stages(6,clears,0)
+                        values[bit] = full_access and stage['mission_id'] in available_story_stages(6,clears,0,unlock_bosses=inventory.get('local_boss_unlocks',False))
             values[20 + zone] = granted
         # All 21 gates use the generated AP thresholds, independently from
         # physical collectibles (8016CB5C table).

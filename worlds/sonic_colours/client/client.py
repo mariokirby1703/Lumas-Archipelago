@@ -78,6 +78,7 @@ class SonicCommands(ClientCommandProcessor):
                                         '/give sweet', '/remove sweet',
                                         '/give asteroid', '/remove aquarium',
                                         '/give worlds', '/remove worlds',
+                                        '/give bosses', '/remove bosses',
                                         '/give all', '/remove all', '/testitems reset'],
                             'ability_groups': {group: list(items) for group, items in ABILITY_GROUPS.items()},
                             'note':('Only local test abilities. No AP item is sent/removed on the server. '
@@ -105,6 +106,13 @@ class SonicCommands(ClientCommandProcessor):
         try:
             original = self._test_inventory_base()
             overlay = self.ctx.runtime.test_inventory
+            if raw.strip().lower() == 'bosses':
+                overlay.unlock_bosses=action=='give'
+                wakeup=getattr(self.ctx,'sync_wakeup',None)
+                if wakeup is not None:wakeup.set()
+                logger.info('Local boss unlocks %s. World access is still required; no Acts marked cleared.',
+                            'on' if overlay.unlock_bosses else 'off')
+                return
             if raw.strip().lower() == 'all':
                 results = overlay.change_all_abilities(action, original)
                 refresh=True

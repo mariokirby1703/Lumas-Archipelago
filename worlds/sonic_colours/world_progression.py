@@ -2,7 +2,7 @@
 from .world_constants import STAGES
 
 
-def available_story_stages(zone: int, cleared: set[str], mode: int) -> frozenset[str]:
+def available_story_stages(zone: int, cleared: set[str], mode: int, *, unlock_bosses=False) -> frozenset[str]:
     """Only world-owned progress grants entry; caller must separately gate World Access.
 
     The two forced Tropical Resort intro Acts are handled by native bootstrap,
@@ -12,7 +12,8 @@ def available_story_stages(zone: int, cleared: set[str], mode: int) -> frozenset
         raise ValueError('invalid story zone or world progression mode')
     if zone==6:
         chain=('stg710','stg790','stg720')
-        return frozenset(mission for i,mission in enumerate(chain) if all(m in cleared for m in chain[:i]))
+        return frozenset(mission for i,mission in enumerate(chain)
+                         if unlock_bosses or all(m in cleared for m in chain[:i]))
     acts = [s for s in STAGES if s['zone_index'] == zone and 1 <= s['slot'] <= 6]
     if len(acts) != 6:
         raise ValueError('incomplete original PAL world act catalog')
@@ -30,6 +31,7 @@ def available_story_stages(zone: int, cleared: set[str], mode: int) -> frozenset
         available.update(s['mission_id'] for s in acts)
         if all(s['mission_id'] in cleared for s in acts):
             available.add(boss['mission_id'])
+    if unlock_bosses:available.add(boss['mission_id'])
     return frozenset(available)
 
 

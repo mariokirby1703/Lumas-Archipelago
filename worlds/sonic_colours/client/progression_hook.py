@@ -176,7 +176,8 @@ def configure(memory, snapshot, inventory, slot, journal=None):
     story = 0
     for zone in range(7):
         if not world & (1 << (20+zone)): continue
-        available = available_story_stages(zone, progression_clears(snapshot), slot['options']['world_progression'])
+        available = available_story_stages(zone, progression_clears(snapshot), slot['options']['world_progression'],
+                                           unlock_bosses=inventory.get('local_boss_unlocks',False))
         if snapshot.save_identity is None and zone == 0: available = {'stg110','stg130'}
         for row in rows:
             if row['mission'] in available: story |= 1 << (int(row['bank_A'])-30)

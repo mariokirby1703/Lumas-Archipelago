@@ -135,6 +135,7 @@ class LocalInventoryOverrides:
 
     def __init__(self, options=None):
         self.deltas = {}
+        self.unlock_bosses = False
         self.options = options
 
     def _wisp_selection(self):
@@ -152,6 +153,7 @@ class LocalInventoryOverrides:
 
     def reset(self):
         self.deltas.clear()
+        self.unlock_bosses = False
 
     def change(self, action, name, quantity, genuine):
         if name not in TESTABLE:
@@ -217,12 +219,15 @@ class LocalInventoryOverrides:
         return results
 
     def apply(self, genuine):
+        if self.unlock_bosses:
+            genuine={**genuine,'local_boss_unlocks':True}
         if not self.deltas:
             return genuine
         counts = Counter(genuine['counts'])
         for name, delta in self.deltas.items():
             counts[name] = max(0, counts[name] + delta)
         return {
+            **genuine,
             'counts': counts,
             'red_rings': sum(counts[name] * value for name, value in RING_VALUES.items()),
             'emeralds': [name for name in EMERALDS if counts[name]],
@@ -234,7 +239,8 @@ class LocalInventoryOverrides:
         owned = self.apply(genuine)
         return {
             'mode': 'LOCAL SESSION TEST ONLY',
-            'active': bool(self.deltas),
+            'active': bool(self.deltas) or self.unlock_bosses,
+            'boss_unlocks': self.unlock_bosses,
             'changes': {name: {'ap': genuine['counts'][name],
                                'effective': owned['counts'][name],
                                'delta': delta}

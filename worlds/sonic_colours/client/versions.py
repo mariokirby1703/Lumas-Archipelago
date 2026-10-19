@@ -160,10 +160,13 @@ def verify_revision(memory):
         if getattr(memory,'native_patch',None):
             from .native_dol import plan,ARENA
             from .native_events import patches as event_patches,SIZE
+            from .boss_capsules import planned_patches as boss_patches
             data=bytearray(data)
-            for address,old,new in event_patches(ARENA+len(plan()[1])-SIZE):
+            for address,old,new in (*event_patches(ARENA+len(plan()[1])-SIZE),*boss_patches()):
                 if section['address']<=address and address+len(new)<=section['address']+len(data):
                     offset=address-section['address']
+                    if data[offset:offset+len(new)]!=new:
+                        raise memory.error(f'Native event/drop code modified at {address:#x}')
                     data[offset:offset+len(old)]=old
         digest = hashlib.sha256(data).hexdigest()
         if digest != section['sha256']:

@@ -110,6 +110,13 @@ def plan():
         struct.pack_into('>I',mailbox,offset,value)
     payload.extend(mailbox);cursor+=len(mailbox)
     patches.append((ADDRESS,bytes.fromhex(ORIGINAL_HEX),replacement()))
+    from . import boss_capsules,capsule_refresh,progression_hook
+    capsule=next(h for h in hooks if h['hook']==capsule_refresh.HOOK)
+    story=next(h for h in hooks if h['hook']==progression_hook.HOOK)
+    capsule_control=capsule['target']+capsule_refresh.data_offset(capsule_refresh.payload_words(
+        compact_abi=True,epilogue_abi=True,cache_permissions=True))
+    story_control=story['target']+progression_hook.payload()[1]
+    patches.extend(boss_capsules.patches(capsule_control,story_control,patches))
     ownership=[]
     for address,old,new in patches:
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')

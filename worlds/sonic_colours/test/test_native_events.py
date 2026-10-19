@@ -70,6 +70,7 @@ class Machine:
             elif op==11:
                 v=self.r[ra];v=v-(1<<32) if v>>31 else v
                 self.cmp=(v>imm)-(v<imm)
+            elif op==10:self.cmp=(self.r[ra]>u)-(self.r[ra]<u)
             elif op==16:
                 take={0x41820000:self.cmp==0,0x40820000:self.cmp!=0,0x41800000:self.cmp<0,
                       0x40800000:self.cmp>=0,0x41810000:self.cmp>0,0x40810000:self.cmp<=0}[w&0xffff0000]
@@ -87,17 +88,22 @@ class Machine:
             elif w==0x7c0903a6:self.ctr=self.r[0]
             elif w==0x7d8903a6:self.ctr=self.r[12]
             elif w==0x4e800421:
-                assert self.ctr in ((0x801251ec,0x80125310,0x80125390) if self.kind=='music_loop' else (0x800338e8,))
+                callback=getattr(self,'native_call',None)
+                if callback is None:
+                    assert self.ctr in ((0x801251ec,0x80125310,0x80125390) if self.kind=='music_loop' else (0x800338e8,))
                 self.call_targets.append(self.ctr)
                 self.calls.append((self.r[3],self.r[4]))
+                result=callback(self.ctr) if callback else None
                 self.lr=pc+4;self.cr=0xabcdef01
                 for r in (0,*range(3,13)):self.r[r]=0xdddddddd
                 for f in range(14):self.f[f]=-999.
                 self.ctr=0xcccccccc
+                if result is not None:self.r[3]=result
             elif w==0x4e800020:next_pc=self.lr
             elif w==0xec000828:self.f[0]-=self.f[1]
             elif w==0xec210028:self.f[1]-=self.f[0]
             elif w==0xec21002a:self.f[1]+=self.f[0]
+            elif w==0xfc400890:self.f[2]=self.f[1]
             elif w==0xfc001040:self.cmp=(self.f[0]>self.f[2])-(self.f[0]<self.f[2])
             elif w==0xfc001090:self.f[0]=self.f[2]
             elif w==0x5484103a:self.r[4]=(self.r[4]<<2)&0xffffffff
@@ -110,6 +116,8 @@ class Machine:
             elif op==31 and w&0x7ff==0x378:self.r[ra]=self.r[rt]|self.r[rb]
             elif op==31 and w&0x7ff==46:self.r[rt]=self.get(self.r[ra]+self.r[rb])
             elif op==31 and w&0x7ff==48:self.r[ra]=(self.r[rt]<<(self.r[rb]&63))&0xffffffff
+            elif op==31 and w&0x7ff==0x1d6:self.r[rt]=(self.r[ra]*self.r[rb])&0xffffffff
+            elif op==31 and w&0x7ff==0x214:self.r[rt]=(self.r[ra]+self.r[rb])&0xffffffff
             elif op==31 and w&0x7ff==57:
                 self.r[ra]=self.r[rt]&self.r[rb];self.cmp=(self.r[ra]>0)
             else:raise AssertionError(f'{pc:#x}: {w:#x}')

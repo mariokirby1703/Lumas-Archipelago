@@ -125,6 +125,16 @@ false where the broader matrix is incomplete.
 
 ## Development and distribution
 
+Local client test commands require an authenticated AP connection:
+
+- `/give worlds` grants all unlockable World Shuttles locally.
+- `/give bosses` bypasses the Act-clear requirements for story bosses, including
+  the Terminal Velocity chain. World access is still required; Terminal Velocity
+  retains its Wisp requirement. No Acts are marked completed.
+- `/remove bosses` disables that bypass; `/testitems reset` clears all local
+  overrides. These overrides expire with the client runtime and never become AP
+  item receipts. Checks actually earned while using them are still sent normally.
+
 Run `python -m pytest worlds/sonic_colours/test` for the complete world suite.
 Private original files under the repository's ignored
 `build/sonic_colours_reference/` support optional native regression

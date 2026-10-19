@@ -35,6 +35,18 @@ Historical observations below remain useful; a code fix is not a live pass.
   AP Boost Refills must remain usable. Earlier user observation was inconclusive.
 - **Boss-dropped Wisp capsules:** lock capsules dropped by Frigate Orcan and
   Skullian during their boss fights when the corresponding Wisp is not unlocked.
+  Frigate Orcan's live White/Cyan drops use vtable 8077E080, colour +60 and
+  consumed byte +74, rather than ReleaseBoxSmall. A boot-patched pickup guard
+  at 802E7E28 now checks the authenticated capsule/progression permissions
+  before any reward or consumption. Requires a newly patched ISO. PPC and
+  original-DOL checks pass; live locked/unlocked pickup tests are still pending,
+  including Skullian. Native ghost mode is now selected at spawn and refreshed
+  on permission changes through the original model constructor/reference owner;
+  collision, physics and consumed state are preserved. Visual live validation
+  remains pending. The live Cyan unlock exposed a container-vs-flags owner
+  mismatch; the guard now derives container + 0x24 + index*0x19608, tested
+  against the actual save resolver for all four native records. Re-test the
+  corrected build live.
   Inspect their spawned capsule actors/pickup paths separately from placed
   capsules; verify that locked drops cannot grant a held Wisp or Boost energy,
   and that drops work normally after the relevant AP unlock.
