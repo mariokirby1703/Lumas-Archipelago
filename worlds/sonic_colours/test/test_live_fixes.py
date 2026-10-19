@@ -1,4 +1,6 @@
 """PAL live defect regressions: native original results, map gates, settlement."""
+
+from ..tools.private_assets import reference_root
 from dataclasses import replace
 from pathlib import Path
 import pytest
@@ -112,7 +114,7 @@ def test_delayed_verification_fair_trap_and_counter_reversion(tmp_path):
         assert len(backend.writes)==writes
 
 
-ROOT=Path(__file__).parents[1]/'notes/live_fix_985960d9'
+ROOT=reference_root()/'live_fix_985960d9'
 @pytest.mark.skipif(not ROOT.exists(),reason='new private captures absent')
 def test_new_capture_pause_is_not_write_safe_and_missing_map_bit():
     from ..tools.read_dumps import DumpBackend

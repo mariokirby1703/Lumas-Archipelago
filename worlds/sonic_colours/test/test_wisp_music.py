@@ -2,6 +2,8 @@
 
 These tests do not claim audible Dolphin playback or native transition timing.
 """
+
+from ..tools.private_assets import reference_root
 import json
 from pathlib import Path
 import struct
@@ -34,7 +36,7 @@ def test_every_original_transformation_is_in_the_global_source_destination_pool(
 def test_original_pal_metadata_is_reproducible_and_not_guessed_from_names():
     from ..tools.analyze_wisp_music import analyze
     root = Path(__file__).parents[1]
-    elf = root / 'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    elf = reference_root(root) / 'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not elf.exists(): pytest.skip('original PAL ELF absent')
     assert analyze(root) == json.loads((root / 'data/bgm_transformations.json').read_text())
     assert mb.TRANSFORMATIONS['cues']['bgm_pha_pzl']['transformation'] == 'Blue Cube'

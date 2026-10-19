@@ -7,7 +7,8 @@ No save, clear, rank, stage-availability or location fields are changed.
 from .memory import MemoryUnavailable
 from .native_read import read_stage_objects,read_actors
 
-UI_COLOURS=('Green','Yellow','White','Red','Purple','Blue','Cyan')
+from ..world_constants import GAME_LAND_EMERALD_COLOURS
+UI_COLOURS=GAME_LAND_EMERALD_COLOURS
 ACTOR_VTABLE=0x8077E59C
 PANE_WRAPPER_VTABLE=0x807ABA34
 _PENDING_REFRESH = set()

@@ -7,13 +7,14 @@ import sys
 os.environ.setdefault('AP_TEST_WORLDS', 'sonic_colours')
 os.environ.setdefault('SKIP_REQUIREMENTS_UPDATE', '1')
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from worlds.sonic_colours.tools.private_assets import reference_root
 from worlds.sonic_colours.client.cpk import CPK, UTF
 from worlds.sonic_colours.world_constants import load_data
 
 
 def analyze(root):
     catalog = load_data('bgm_cues.json'); graphs = load_data('bgm_graphs.json')
-    archive = CPK(root / 'notes/memdumps_and_more/sonic2010_0.cpk')
+    archive = CPK(reference_root(root) / 'memdumps_and_more/sonic2010_0.cpk')
     raw = archive.read(next(r for r in archive.toc.rows if r['FileName'] == 'bgm.strm.csb'))
     assert hashlib.sha256(raw).hexdigest() == catalog['bank_sha256']
     outer = UTF(raw)

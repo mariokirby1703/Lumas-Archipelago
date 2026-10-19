@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 from pathlib import Path
 import pytest
 from ..client.game_land_native_tint import payload,HOOK,ORIGINAL
@@ -30,7 +31,7 @@ def test_native_palette_uses_availability_not_completion(available,group,act):
     assert regs[5]==group and regs[26]==act and regs[28]==group
 
 def test_native_clear_branch_skips_tint_and_optimized_callers_restore_lr():
-    e=Executable(Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
+    e=Executable(reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
     assert int.from_bytes(e.read(HOOK,4),'big')==ORIGINAL
     assert int.from_bytes(e.read(0x802f0da0,4),'big')==0x40820078
     # Each compact probe is inside a native frame that restores LR itself.

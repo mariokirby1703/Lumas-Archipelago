@@ -34,13 +34,16 @@ UPGRADABLE_RESOURCES.add('10e74fe2d77c0940bf2d348c66f7ffe4e8c6dbe56f634164676761
 # Registry v2 assets; only optional host-side finite-song audition was added.
 UPGRADABLE_RESOURCES.add('bb6538ce29d3a0b70f47814f9ede3fa45a496b1908b58bd0e41c1d03ea7adce1')
 UPGRADABLE_NATIVE_COMPONENTS.update({'c3bfebc29447406ee3fad98473c140496c8a0870ed0c2101897b28e7bbc77ff4', 'f3155c39f82e1b8e8708f9ea1bfb993bb349d8d4bd40f6a8ffa5cf5a1d59fde4'})
+UPGRADABLE_NATIVE_COMPONENTS.add('fc6c95ea6b774d3a505aa0072c33d573334046443721cacf0cb4ce435884114c')
 UPGRADABLE_RESOURCES.update({'d6500135d5b7a36c618d00961974c223b5d5ef9dff8488751693330c11aa0a08', 'ab0276016b694b38761ecc47aab8c2506086d2c7e9dd5bebff8ba0a3dbeeb0e9', 'a72d8cd9d9f2226092a3ce4cee0944e97cde8585bb6c2f0c57e5566778739521'})
 # Same resource layout; copy/hash publication is now combined into one pass.
 EQUIVALENT_RESOURCES={'26af2d039cd4a0fcb5e6c23a1021202afa31f1658371322f2fe2e4267fc49108',
-                      'afc2af7ace43c78c67adb41bcdd4213c4ba144d7e391ca94e874c7e947e4ad07'}
+                      'afc2af7ace43c78c67adb41bcdd4213c4ba144d7e391ca94e874c7e947e4ad07',
+                      'd88e4ec37ec25fa65e281bd748eec1b7618479eba5d1094d42fd52441a0ee023',
+                      '94ee60aa1755218c297443fa8a91461dfd250c1f7987a94c03e9fc04dcda0e1d'}
 # Limit reuse to this exact implementation. Future asset changes must rebuild,
 # even if this historical alias remains in the migration allowlist.
-EQUIVALENT_RESOURCE_TARGET='d88e4ec37ec25fa65e281bd748eec1b7618479eba5d1094d42fd52441a0ee023'
+EQUIVALENT_RESOURCE_TARGET='826162aa211395096b02b3444867c0b506859d802ee86e9a52c0664365ebf19d'
 # Legacy slots have no music_seed and still produce byte-identical banks.
 # New player-scoped slots have a different full slot identity, so cannot reuse
 # an old shared-music ISO through this equivalence allowance.

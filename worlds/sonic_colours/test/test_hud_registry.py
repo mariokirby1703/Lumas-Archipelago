@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 from pathlib import Path
 import pytest
 from ..client.memory import SonicMemory
@@ -20,7 +21,7 @@ def test_regular_save_menu_requires_registered_resource(magic,count,expected):
 
 def test_saved_draw_caller_is_layer_and_not_glyph_geometry():
     from ..tools.ppc import Executable
-    elf=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    elf=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not elf.exists():pytest.skip('private PAL ELF absent')
     e=Executable(elf)
     # 805E0C84 saves original r31 at +7C. Publisher's own frame adds 160.

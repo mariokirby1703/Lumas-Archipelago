@@ -1,5 +1,4 @@
 """Canonical guides, real WebHost filenames and release-only file boundaries."""
-import json
 from pathlib import Path
 import re
 import zipfile
@@ -59,11 +58,15 @@ def test_runtime_and_local_iso_patcher_remain_release_inputs(name):
     assert release_file(Path(name))
 
 
-def test_research_report_goes_to_ignored_build_not_docs(tmp_path):
-    from ..tools.audit_research import write_report
-    root=tmp_path/'worlds/sonic_colours';root.mkdir(parents=True)
-    report={'live_validation':False,'files':[]}
-    target=write_report(root,report)
-    assert target==tmp_path/'build/research_audit.json'
-    assert json.loads(target.read_text())==report
-    assert not (root/'docs').exists()
+def test_optional_native_references_are_outside_the_world(tmp_path):
+    from ..tools.private_assets import reference_root
+    root=tmp_path/'worlds/sonic_colours'
+    assert reference_root(root)==tmp_path/'build/sonic_colours_reference'
+    assert not reference_root(root).is_relative_to(root)
+    assert not release_file(Path('tools/private_assets.py'))
+
+
+def test_legacy_yaml_is_preserved_as_a_test_fixture():
+    path=Path(__file__).parent/'fixtures/yaml/Luma_Migrated.yaml'
+    assert path.is_file()
+    assert not (Path(__file__).parents[1]/'examples/Luma_Migrated.yaml').exists()

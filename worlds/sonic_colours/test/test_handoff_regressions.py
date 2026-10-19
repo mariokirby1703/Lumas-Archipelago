@@ -1,4 +1,4 @@
-"""Post-Codex handoff regressions. Tests must run with Archipelago Core.
+"""Compatibility and native-control regressions. Tests must run with Archipelago Core.
 
 Do not mistake these generator/host tests for live Wii-PAL/Dolphin evidence.
 """

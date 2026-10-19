@@ -32,6 +32,8 @@ class Machine:
         if kind=='music':
             self.r[31]=0x90090020;self.r[30]=0x900a0000
             self.b.put(0x90090000,b'bgm_wmap'.ljust(32,b'\0'));self.put(0x90090020,100)
+        if kind=='music_loop':
+            self.put(self.control+n.CHANNEL,0x900a0000);self.put(self.control+n.CUE,1002)
         if kind=='jump':self.r[3]=self.input;self.r[4]=2;self.r[5]=0
         if kind=='jump_state':self.r[3]=self.machine+0x14;self.r[4]=5;self.r[1]-=0xc0
         self.before=self.r[:];self.before_f=self.f[:]
@@ -209,7 +211,7 @@ def test_stale_actor_context_cannot_consume_a_native_effect(field,value):
     assert m.get(m.control+n.REMAINING)==0x41f00000
 
 
-@pytest.mark.parametrize('blocked',[None,'playing','paused','error','disabled','unowned','not_started','stopping','other_cue','no_descriptor','unarmed'])
+@pytest.mark.parametrize('blocked',[None,'playing','paused','error','disabled','unowned','not_started','stopping','other_cue','no_descriptor','unarmed','other_channel','new_cue_same_channel'])
 def test_finite_song_restart_uses_native_end_and_preserves_registers(blocked):
     m=Machine('music_loop');channel=0x900a0000;descriptor=0x90090020
     m.r[3]=4;m.r[30]=channel;m.put(channel,1);m.put(channel+8,descriptor)
@@ -224,6 +226,8 @@ def test_finite_song_restart_uses_native_end_and_preserves_registers(blocked):
     if blocked=='stopping':m.b.put(channel+0x28,b'\2')
     if blocked=='other_cue':m.put(descriptor,2001)
     if blocked=='no_descriptor':m.put(channel+8,0)
+    if blocked=='other_channel':m.put(m.control+n.CHANNEL,channel+0x100)
+    if blocked=='new_cue_same_channel':m.put(m.control+n.CUE,2001)
     before=m.r[:];m.run()
     assert m.calls==([(channel,0),(channel,descriptor),(channel,0)] if blocked is None else [])
     if blocked is None:assert m.call_targets==[0x801251ec,0x80125310,0x80125390]
@@ -243,3 +247,27 @@ def test_restart_latch_waits_for_playing_before_another_end():
         m.r[3]=state;m.run();assert len(m.calls)==3
     m.r[3]=2;m.run();assert m.get(m.control+n.LOOP_CUE)==0x10000|1002
     m.r[3]=4;m.run();assert len(m.calls)==6
+
+
+def test_temporary_music_cannot_replay_or_arm_the_suspended_finite_song():
+    m=Machine('music_loop');channel=0x900a0000;descriptor=0x90090020
+    m.r[30]=channel;m.put(channel,1);m.put(channel+8,descriptor)
+    m.b.put(channel+0x28,b'\0\1');m.put(descriptor,1002)
+    m.put(m.control+n.LOOP_CUE,0x10000|1002)
+    # The guest already started Wisp music, while the host still has old policy.
+    m.put(m.control+n.CHANNEL,channel+0x100);m.put(m.control+n.CUE,2001)
+    for state in (3,4,4,2,4):m.r[3]=state;m.run()
+    assert not m.calls
+    # Returning paused/preparing is not proof the finite stream played again.
+    m.put(m.control+n.CHANNEL,channel);m.put(m.control+n.CUE,1002)
+    m.put(m.control+n.LOOP_CUE,1002)
+    for state in (1,3,4):m.r[3]=state;m.run()
+    assert not m.calls
+    m.r[3]=2;m.run();m.r[3]=4;m.run()
+    assert len(m.calls)==3 # actual end after resumed playback still loops
+
+
+def test_successful_music_change_clears_previous_end_latch_in_guest():
+    m=Machine('music');m.put(m.control+n.LOOP_CUE,0x10000|1002)
+    m.run()
+    assert m.get(m.control+n.LOOP_CUE)==1002

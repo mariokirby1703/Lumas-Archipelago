@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 import hashlib
 import json
 from pathlib import Path
@@ -102,7 +103,7 @@ def test_atomic_output_refuses_existing_unverified_file(tmp_path):
     assert target.read_bytes()==b'user data' and source.read_bytes()==header
 
 def original_dol():
-    path=Path(__file__).parents[1]/'notes/memdumps_and_more/main.dol'
+    path=reference_root()/'memdumps_and_more/main.dol'
     alternatives=[path,Path('C:/Users/Luma/Documents/Sonic Colors/DATA/sys/main.dol')]
     for p in alternatives:
         if p.exists():return p.read_bytes()

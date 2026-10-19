@@ -17,5 +17,6 @@ Build: `python worlds/sonic_colours/build_apworld.py` produces
 
 The two maintained guides are under `docs/`. The release builder generates the
 stock WebHost's required game-info filename from the overview; use the built
-APWorld for WebHost deployment. Private native test assets remain in ignored
-`notes/` and are excluded from releases, alongside tests, caches and reports.
+APWorld for WebHost deployment. Optional private native test assets live outside
+the world in `build/sonic_colours_reference/` at the repository root. They are
+excluded from releases, alongside tests, caches and reports.

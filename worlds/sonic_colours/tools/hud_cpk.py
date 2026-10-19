@@ -107,8 +107,11 @@ class UTF:
 
 
 class CPK:
-    def __init__(self, path):
+    def __init__(self, path, cache_bytes=0):
         self.path = Path(path)
+        self._cache_limit = cache_bytes
+        self._read_cache = {}
+        self._cache_size = 0
         self.header = self.table(0, b'CPK ')
         self.toc_offset = self.header.rows[0]['TocOffset']
         self.toc = self.table(self.toc_offset, b'TOC ')
@@ -129,6 +132,11 @@ class CPK:
         size = row['FileSize']
         if not 0 < size <= 64 * 1024 * 1024:
             raise ValueError('CPK member size out of range')
+        stat = self.path.stat()
+        identity = (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
+        key = (identity, row['FileOffset'], size, row['ExtractSize'])
+        if key in self._read_cache:
+            return self._read_cache[key]
         with self.path.open('rb') as stream:
             stream.seek(self.content_base + row['FileOffset'])
             data = stream.read(size)
@@ -137,6 +145,11 @@ class CPK:
         data = decompress(data)
         if len(data) != row['ExtractSize']:
             raise ValueError('CPK extracted size mismatch')
+        if self._cache_limit and len(data) <= self._cache_limit:
+            while self._read_cache and self._cache_size + len(data) > self._cache_limit:
+                self._cache_size -= len(self._read_cache.pop(next(iter(self._read_cache))))
+            self._read_cache[key] = data
+            self._cache_size += len(data)
         return data
 
     def replace_member(self, output, index, replacement, expected_sha256):

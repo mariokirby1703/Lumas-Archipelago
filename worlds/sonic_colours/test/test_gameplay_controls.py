@@ -1,4 +1,6 @@
 """Execute emitted PPC gates; native PAL callers and private dump tests are separate."""
+
+from ..tools.private_assets import reference_root
 import struct
 import pytest
 from ..client.gameplay_controls import payload, HOOKS, installed
@@ -228,7 +230,7 @@ def test_previous_refill_hook_is_identifiable_but_marked_drain_unsafe():
 def test_pal_boost_delta_and_zero_lower_bound_evidence():
     from pathlib import Path
     from ..tools.ppc import Executable
-    p = Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    p = reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not p.exists(): pytest.skip('original PAL executable absent')
     e = Executable(p)
     assert e.read(0x8000428C,8) == bytes.fromhex('3C40808F6042C5C0')

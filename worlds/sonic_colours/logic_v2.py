@@ -72,7 +72,7 @@ def entry_match(world,state,entry,*,movement_field=False):
         return all(state.has(item,world.player) for item in required_wisp_items(world))
     routes=entry['routes']
     if not routes or status=='needs_review':
-        # Codex should ensure all unresolved routes are reviewed before release.
+        # Unresolved routes require review before release.
         raise ValueError('Ambiguous or unparsed route: '+entry.get('raw',''))
     # The sheet importer has already parsed conventional AND-before-OR
     # precedence into distinct routes. Keep the ambiguity review note for

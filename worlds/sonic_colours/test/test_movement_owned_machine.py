@@ -1,4 +1,6 @@
 """Actual request-hook instruction execution; no claim of Dolphin input validation."""
+
+from ..tools.private_assets import reference_root
 import pytest
 from ..client import movement_gate as g
 from ..client.memory import SonicMemory, MemoryUnavailable
@@ -157,7 +159,7 @@ def test_complete_v11_profile_recovers_exact_pal_text_and_rejects_corruption():
     from ..client.versions import VERSION, verify_revision
     from ..client.movement_gecko import movement_ini, pairs
     from ..client import capsule_refresh, map_refresh
-    p=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    p=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not p.exists():pytest.skip('original PAL executable absent')
     e=Executable(p);regions={0x80000000:bytearray(b'SNCP8P\0\0'),0x80001000:bytearray(0x3000)}
     for section in VERSION['text_sections']:
@@ -288,7 +290,7 @@ def test_funded_air_boost_uses_same_permission_as_jump_dash():
     from pathlib import Path
     from ..tools.ppc import Executable
     assert g.STATE_PERMISSION[9]==g.STATE_PERMISSION[10]==1
-    e=Executable(Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
+    e=Executable(reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
     # Native constructor installs CStateAirBoost and registers it as ID 10.
     assert int.from_bytes(e.read(0x80033ff8,4),'big')==0x3863C960
     assert int.from_bytes(e.read(0x80034018,4),'big')==0x3880000A

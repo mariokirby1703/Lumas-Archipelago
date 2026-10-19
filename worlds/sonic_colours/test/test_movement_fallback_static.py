@@ -1,4 +1,6 @@
 """Early request gate structural tests; not Dolphin-live certification."""
+
+from ..tools.private_assets import reference_root
 from ..client import movement_gate, movement_gecko
 
 
@@ -26,7 +28,7 @@ def test_common_dispatch_is_reached_by_normal_and_forced_setters():
     from pathlib import Path
     import pytest
     from ..tools.ppc import Executable
-    elf=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    elf=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not elf.exists():pytest.skip('private executable absent')
     executable=Executable(elf)
     for site in (0x8003389c,0x80033900):

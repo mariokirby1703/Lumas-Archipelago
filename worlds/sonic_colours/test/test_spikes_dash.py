@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 from pathlib import Path
 from . import generate
 from ..Items import ITEM_TABLE
@@ -16,7 +17,7 @@ def test_spikes_two_copies_and_same_numeric_id():
 def test_native_charge_transition_precedes_dash_entry():
     import pytest
     from ..tools.ppc import Executable
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('private executable absent')
     e=Executable(path)
     assert e.read(0x801fd4e0,4)==bytes.fromhex('38800052')

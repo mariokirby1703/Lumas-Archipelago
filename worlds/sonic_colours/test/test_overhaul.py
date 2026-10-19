@@ -96,7 +96,7 @@ def test_capsule_rules_only_require_their_colour():
 
 
 def test_supplied_yaml_migrates_and_generates():
-    path=Path(__file__).parents[1]/'examples/Luma_Migrated.yaml'
+    path=Path(__file__).parent/'fixtures/yaml/Luma_Migrated.yaml'
     doc=yaml.safe_load(path.read_text())
     m=generate(doc['Sonic Colours (Wii)'],fill=True)
     assert m.can_beat_game() and m.worlds[1].ring_target==187

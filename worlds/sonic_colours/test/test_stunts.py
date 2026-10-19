@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 from collections import Counter
 from types import SimpleNamespace
 import pytest
@@ -58,7 +59,7 @@ def test_stunts_append_only_progression_and_native_counter():
     assert MOVEMENT_POOL.count('Progressive Stunts')==5
     assert classification('Progressive Stunts')==ItemClassification.progression
     from ..tools.ppc import Executable
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if path.exists():
         e=Executable(path)
         assert e.read(s.HOOK,4)==s.ORIGINAL.to_bytes(4,'big')

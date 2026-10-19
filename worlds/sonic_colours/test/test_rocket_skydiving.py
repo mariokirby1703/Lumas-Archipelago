@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 import struct
 from pathlib import Path
 import pytest
@@ -62,7 +63,7 @@ def test_boot_patch_original_callback_and_padding_do_not_overlap_hud():
     assert rocket.MOVEMENT_MASK_OFFSET==movement_payload()[2]+4
     plan=rocket.patches();occupied={a+i for a,_,new in hud_patches() for i in range(len(new))}
     assert not any(a+i in occupied for a,_,new in plan for i in range(len(new)))
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('private PAL ELF absent')
     from ..tools.ppc import Executable
     image=Executable(path)

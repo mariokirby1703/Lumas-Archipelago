@@ -2,6 +2,8 @@
 import argparse
 from pathlib import Path
 import struct
+try:from .private_assets import reference_root
+except ImportError:from private_assets import reference_root
 
 
 class Executable:
@@ -29,7 +31,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('address', type=lambda v: int(v, 0))
     parser.add_argument('size', type=lambda v: int(v, 0))
-    parser.add_argument('--elf', type=Path, default=Path(__file__).parents[1] / 'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
+    parser.add_argument('--elf', type=Path, default=reference_root() / 'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
     args = parser.parse_args()
     for instruction in Executable(args.elf).disassemble(args.address, args.size):
         print(f'{instruction.address:08X}: {instruction.mnemonic:9} {instruction.op_str}')

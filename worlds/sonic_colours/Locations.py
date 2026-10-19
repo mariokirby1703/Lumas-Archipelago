@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from BaseClasses import Location
-from .world_constants import BASE_ID, GAME, STAGES, WISPS, RANKS, BY_MISSION
+from .world_constants import BASE_ID, GAME, STAGES, WISPS, RANKS, BY_MISSION, GAME_LAND_EMERALD_COLOURS
 from .capsules import CAPSULES
 
 
@@ -31,7 +31,7 @@ for stage_index, stage in enumerate(STAGES):
             LOCATION_TABLE[f'{name} - {label} Rank'] = LocationData(base + 8 + rank, mission, 'rank', rank)
     if stage['zone_index'] >= 7 and stage['slot'] == 3:
         land = stage['zone_index'] - 6
-        LOCATION_TABLE[f'Game Land {land} - Chaos Emerald Obtained'] = LocationData(base + 16, mission, 'emerald', land)
+        LOCATION_TABLE[f'{GAME_LAND_EMERALD_COLOURS[land-1]} Chaos Emerald'] = LocationData(base + 16, mission, 'emerald', land)
 # Native discovery table at PAL 80720B98, queried by 80228B30.
 DISCOVERY_STAGES = {1:(0,3), 2:(1,1), 3:(1,3), 4:(2,1), 5:(2,5), 6:(3,1), 7:(5,1)}
 for i, wisp in enumerate(WISPS):

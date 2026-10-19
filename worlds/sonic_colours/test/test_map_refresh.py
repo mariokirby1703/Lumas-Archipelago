@@ -1,4 +1,6 @@
 """Offline emitted-PPC tests; native UI/GPU behavior requires Dolphin."""
+
+from ..tools.private_assets import reference_root
 import struct
 from pathlib import Path
 from types import SimpleNamespace
@@ -181,7 +183,7 @@ def test_consumed_mailbox_readback_requires_released_target_lock():
 
 
 def test_original_pal_epilogue_and_chain_formats():
-    elf=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    elf=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not elf.exists():pytest.skip('private executable absent')
     from ..tools.ppc import Executable
     e=Executable(elf)

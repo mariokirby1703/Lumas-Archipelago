@@ -6,6 +6,7 @@ with original 80032C9C's vtable and owner at +28. The common dispatcher at
 800395B0 gates normal and forced requests before any exit/entry callbacks.
 Underwater request 8 uses Swim instead of Double Jump; live validation required.
 """
+from .gecko import cached_payload
 from .capsule_refresh import PPC
 from .memory import MemoryUnavailable, valid_range
 from ..wisps import wisp_level
@@ -52,6 +53,7 @@ def permissions(counts):
     )) if present)
 
 
+@cached_payload
 def payload(gecko=False):
     """Return PPC words, index of deny block and authenticated data offset.
 

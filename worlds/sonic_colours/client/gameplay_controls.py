@@ -5,6 +5,7 @@ selected native profile inside each thunk, independently of host polling.
 No native calls or CTR changes; LR, CR and scratch GPRs are preserved.
 The ordinary-use hook replaces only the displaced instruction's f1 output.
 """
+from .gecko import cached_payload
 import struct
 from .capsule_refresh import PPC, valid_native_control_index
 from .gecko import inspect_c2
@@ -21,6 +22,7 @@ HOOKS = {
 }
 
 
+@cached_payload
 def payload(kind, compact=True, temporary=True, drain=True, lean=True, register_abi=True, pic_base=True, volatile_return=True, caller_lr_dead=True):
     if not compact: temporary = False
     a = PPC(); hook, original = HOOKS[kind]

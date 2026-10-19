@@ -2,6 +2,8 @@
 
 Guest execution is simulated here; this is not a Dolphin pickup validation.
 """
+
+from ..tools.private_assets import reference_root
 import struct
 from dataclasses import replace
 from pathlib import Path
@@ -22,7 +24,7 @@ from .test_pickup_integration import Overlay
 from .test_native_originals import PAIRS
 from . import generate
 
-SOURCE = Path(__file__).parents[1]/'notes/memdumps_and_more/sonic2010_0.cpk'
+SOURCE = reference_root()/'memdumps_and_more/sonic2010_0.cpk'
 
 
 @pytest.mark.skipif(not SOURCE.exists(), reason='original PAL CPK not available')

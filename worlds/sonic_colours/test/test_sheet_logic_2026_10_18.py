@@ -147,7 +147,7 @@ def test_chaos_emerald_rule_checks_each_of_three_stage_clears(monkeypatch):
     w=mw.worlds[1]
     state=CollectionState(mw)
     stages=sorted((s for s in STAGES if s['zone_index']==7),key=lambda s:s['slot'])
-    name='Game Land 1 - Chaos Emerald Obtained'
+    name='Green Chaos Emerald'
     location=w.get_location(name)
     permitted=set(s['mission_id'] for s in stages)
     monkeypatch.setattr(Rules,'can_complete',lambda w,s,mission:mission in permitted)

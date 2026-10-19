@@ -1,4 +1,6 @@
 """Native null-path regression; offline instruction execution, not Dolphin."""
+
+from ..tools.private_assets import reference_root
 from pathlib import Path
 import struct
 import pytest
@@ -38,7 +40,7 @@ def test_optional_path_cleanup(path, phase):
 
 def test_pal_displaced_instruction_and_cleanup():
     from ..tools.ppc import Executable
-    p = Path(__file__).parents[1] / 'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    p = reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not p.exists(): pytest.skip('Original PAL executable unavailable')
     e = Executable(p)
     assert e.read(t.HOOK, 8) == bytes.fromhex('806407EC80030008')
@@ -55,7 +57,7 @@ def test_full_pal_revision_accepts_only_exact_optional_path_hook(mutation, phase
     from ..tools.ppc import Executable
     from ..client.versions import VERSION, verify_revision
     from ..client.memory import SonicMemory, MemoryUnavailable
-    p = Path(__file__).parents[1] / 'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    p = reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not p.exists(): pytest.skip('Original PAL executable unavailable')
     e = Executable(p)
     regions = {0x80000000: bytearray(b'SNCP8P\0\0')}

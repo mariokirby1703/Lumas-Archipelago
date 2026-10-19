@@ -25,6 +25,7 @@ WISPS = ('White Boost', 'Cyan Laser', 'Yellow Drill', 'Orange Rocket',
 # 5 puzzle, 6 astronautes; capsule ORC colour is native index + 1.
 NATIVE_COLOURS = ('Yellow Drill', 'Cyan Laser', 'Pink Spikes', 'Orange Rocket',
                   'Purple Frenzy', 'Blue Cube', 'Green Hover')
+GAME_LAND_EMERALD_COLOURS = ('Green','Yellow','White','Red','Purple','Blue','Cyan')
 def wisp_item(colour, movement_unlocks=True):
     prefix = 'Progressive ' if movement_unlocks and colour in ('Yellow Drill','Green Hover','Pink Spikes') else ''
     return prefix + colour + ' Wisp'

@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 import struct
 from pathlib import Path
 from dataclasses import replace
@@ -20,7 +21,7 @@ from .test_runtime import snapshot
 from .test_memory import FakeBackend
 from . import generate
 
-ROOT=Path(__file__).parents[1]/'notes'
+ROOT=reference_root()
 BEFORE=(ROOT/'mem1(20261010-025156).raw',ROOT/'mem2(20261010-025205).raw')
 AFTER=(ROOT/'mem1(20261010-025226).raw',ROOT/'mem2(20261010-025235).raw')
 

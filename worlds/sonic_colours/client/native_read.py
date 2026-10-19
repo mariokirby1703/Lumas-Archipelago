@@ -239,6 +239,8 @@ def read_mission_metadata(memory, name_address, mission):
 
 def read_actors(memory, stage):
     """Traverse once for players and object instances, with native ownership."""
+    import struct
+    from .memory import valid_range
     manager = memory.read_ptr_checked(stage + 0x18, 0x20)
     count = memory.read_u32(manager + 0x14)
     if count > 4096:
@@ -251,13 +253,17 @@ def read_actors(memory, stage):
         if node in seen or len(seen) >= count:
             raise MemoryUnavailable('actor_cycle_or_count_mismatch')
         seen.add(node)
-        if memory.read_u32(node + 4) != previous:
+        # One coherent node read replaces three cross-process word reads.
+        # Retain every backlink, range, actor-owner and final-list check.
+        following, backlink, actor = struct.unpack('>3I', memory.read_bytes(node,12))
+        if backlink != previous:
             raise MemoryUnavailable('actor_backlink_mismatch')
-        actor = memory.read_ptr_checked(node + 8, 0x38)
+        if actor % 4 or not valid_range(actor,0x38) or following % 4 or not valid_range(following,8):
+            raise MemoryUnavailable('invalid_pointer')
         if memory.read_u32(actor + 0x34) != manager:
             raise MemoryUnavailable('actor_owner_mismatch')
         actors.append(actor)
-        previous, node = node, memory.read_ptr_checked(node, 8)
+        previous, node = node, following
     if len(seen) != count or memory.read_u32(sentinel + 4) != previous or memory.read_u32(manager + 0x14) != count:
         raise MemoryUnavailable('actor_list_changed')
     return actors

@@ -4,6 +4,7 @@ No host executable-memory writes. Dolphin installs the thunk and handles JIT
 invalidation. The helper uses the original actor's model replacement and state
 transition routines; it never copies actors, vtables or opened bytes.
 """
+from .gecko import cached_payload
 import struct
 from .memory import MemoryUnavailable, valid_range
 
@@ -41,6 +42,7 @@ class PPC:
         return self.words
 
 
+@cached_payload
 def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False, spawn_refresh=True, lean=True, extended_models=True):
     if epilogue_abi and not compact_abi:
         raise ValueError('epilogue ABI requires the compact native-call profile')

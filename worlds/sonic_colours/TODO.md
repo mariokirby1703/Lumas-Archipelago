@@ -33,12 +33,28 @@ Historical observations below remain useful; a code fix is not a live pass.
   unimplemented trap. Earlier guarded 600 ? 0 also passed visibly.
 - **White Boost Lock:** verify white capsules and enemy gains before ownership;
   AP Boost Refills must remain usable. Earlier user observation was inconclusive.
+- **Boss-dropped Wisp capsules:** lock capsules dropped by Frigate Orcan and
+  Skullian during their boss fights when the corresponding Wisp is not unlocked.
+  Inspect their spawned capsule actors/pickup paths separately from placed
+  capsules; verify that locked drops cannot grant a held Wisp or Boost energy,
+  and that drops work normally after the relevant AP unlock.
 - **Latency:** earned native checks are checkpointed earlier and durable queues
   retry after reconnect without a Dolphin poll. Measure actual AP-to-HUD latency
   again; historical controlled observation was about 2.7 seconds.
+  Actor-list reads now use two process reads per actor instead of four; pure
+  hook assembly/comparison data is cached without caching guest validation.
+  Early map projection no longer configures every gameplay hook twice per poll;
+  item delivery precedes optional music-bank reconciliation. Live-test both
+  sequential Act paths and the six-clears boss path: the reported ten-second
+  delay is not yet demonstrated resolved. Also measure client UI responsiveness,
+  check-to-server, receipt-to-effect and receipt/music-to-HUD times separately.
 - **Music:** preserve the user's current layout, fonts, anchor 800, names and
   timing. Complete audible donor/normal-FX, scene/result/Game Land, fades,
   reconnect and long-session resource-lifetime tests. No visual changes made.
+  Finite-song replay now checks the current native channel/cue and invalidates
+  stale end latches on successful music starts. Re-test both full songs through
+  Wisp entry/exit and a real song end in a newly patched ISO; PPC tests alone
+  do not establish audible resume/loop correctness.
 - **Release gate:** DeathLink/Dead Weight/music live-validation flags remain
   false. Hidden `native_feature_tests` is an explicit disposable-seed test opt-in,
   not production verification. Full-suite historical fixture failures remain

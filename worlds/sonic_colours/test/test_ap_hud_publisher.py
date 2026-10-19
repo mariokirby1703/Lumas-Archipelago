@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 import struct
 import pytest
 from ..client.ap_hud_publisher import patches,HOOK,ORIGINAL,MAGIC
@@ -5,7 +6,7 @@ from ..client.ap_hud_publisher import patches,HOOK,ORIGINAL,MAGIC
 def test_cast_lookup_abi_matches_original_native_caller():
     from pathlib import Path
     from ..tools.ppc import Executable
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('private PAL ELF unavailable')
     image=Executable(path)
     # Original bonus caller unwraps its scene handle, then passes that result
@@ -17,7 +18,7 @@ def test_cast_lookup_abi_matches_original_native_caller():
 def test_padding_is_ordinary_function_alignment_and_not_an_existing_branch_target():
     from pathlib import Path
     from ..tools.ppc import Executable
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('private PAL ELF unavailable')
     image=Executable(path);plan=patches();occupied={a+i for a,old,new in plan[1:] for i in range(0,12,4)}
     assert image.read(HOOK,4)==ORIGINAL.to_bytes(4,'big')

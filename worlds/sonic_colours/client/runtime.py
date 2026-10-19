@@ -123,9 +123,19 @@ def validate_slot(data):
     # still match exactly. Existing servers may retain the old Discovery label.
     legacy_discoveries = {n.removesuffix(' Discovery')+' - First Discovery':n
                           for n in expected_locations if n.endswith(' Discovery')}
+    legacy_emeralds={f'Game Land {d.index} - Chaos Emerald Obtained':n
+                     for n,d in LOCATION_TABLE.items() if d.kind=='emerald'}
     if isinstance(data.get('locations'), dict):
-        data = {**data, 'locations':{legacy_discoveries.get(n,n):code
-                                    for n,code in data['locations'].items()}}
+        aliases={**legacy_discoveries,**legacy_emeralds}
+        original=dict(data.get('_original_location_names',{}))
+        for name in data['locations']:
+            if name in legacy_emeralds:original[legacy_emeralds[name]]=name
+        if any(legacy_emeralds.get(old)!=new for new,old in original.items()):
+            raise ValueError('invalid original location name migration')
+        normalized={aliases.get(n,n):code for n,code in data['locations'].items()}
+        if len(normalized)!=len(data['locations']):raise ValueError('duplicate location aliases')
+        data={**data,'locations':normalized}
+        if original:data['_original_location_names']=original
     if data.get('locations') != expected_locations:
         raise ValueError('slot locations do not match option-selected stable IDs')
     if options['wisp_capsules'] and not any(LOCATION_TABLE[n].kind == 'capsule' for n in expected_locations):
@@ -437,7 +447,14 @@ class Runtime:
         if self.snapshot.scene in ('global_map','world_map','game_land_select'):
             try:
                 self.guard.check(self.snapshot)
-                self.project_permissions(memory,early_owned)
+                # Publish paths now; configure the unrelated gameplay hooks
+                # once in the reconciliation phase instead of twice per map poll.
+                from .game_land_notice import prepare as prepare_notice
+                prepare_notice(memory,self.snapshot,early_owned,self.slot_data,self.journal)
+                self.hooks.project_permissions(memory,self.snapshot,early_owned,self.slot_data)
+                from .progression_hook import configure as configure_progression
+                self.hooks.progression_status=configure_progression(
+                    memory,self.snapshot,early_owned,self.slot_data,self.journal)
             except MemoryUnavailable as error:
                 self.hooks.progression_status={'available':False,'reason':str(error)}
         from .capsule_refresh import configure as configure_early_capsules
@@ -538,18 +555,6 @@ class Runtime:
             except MemoryUnavailable as error:
                 self.hooks.progression_status = {'available':False,'reason':str(error)}
         self.last_error = self.snapshot.status
-        # The original CSB resource lives in MEM2 and is independently
-        # identified by its full PAL digest. Unlike the old 36-Act mission
-        # alias patch, this covers world maps, Game Land, menus and bosses.
-        # Attempt immediately, including title / mandatory prologue, then
-        # check periodically in case Sonic reloads the bank after a scene change.
-        if self.clock() >= self.next_music_poll:
-            self.next_music_poll = self.clock() + (10.0 if self.music_status.get('bank_address') else 2.0)
-            try:
-                from .live_music import apply
-                self.music_status = apply(memory, self.slot_data, getattr(self,'music_test_pair',None))
-            except MemoryUnavailable as error:
-                self.music_status = {'status':str(error), 'audible_verified':False}
         owned = known if history_ready else None
         if history_ready:
             self.journal.record_history(item_ids)
@@ -611,6 +616,19 @@ class Runtime:
                 self.last_error = self.guard.reason + '; ' + '; '.join(dict.fromkeys(errors))
         elif not history_ready:
             self.last_error = 'Received history incomplete; independently verified reads remain active.'
+        yield set(),False  # deliver permissions/items before optional bank reconciliation
+        # The original CSB resource lives in MEM2 and is independently
+        # identified by its full PAL digest. Unlike the old 36-Act mission
+        # alias patch, this covers world maps, Game Land, menus and bosses.
+        # Attempt immediately, including title / mandatory prologue, then
+        # check periodically in case Sonic reloads the bank after a scene change.
+        if self.clock() >= self.next_music_poll:
+            self.next_music_poll = self.clock() + (10.0 if self.music_status.get('bank_address') else 2.0)
+            try:
+                from .live_music import apply
+                self.music_status = apply(memory, self.slot_data, getattr(self,'music_test_pair',None))
+            except MemoryUnavailable as error:
+                self.music_status = {'status':str(error), 'audible_verified':False}
         can_send = self.guard.can_send(self.snapshot)
         # Never leak a saved journal event to another Dolphin session without
         # fresh native attribution. Bootstrap checks travel before save select.

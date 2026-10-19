@@ -126,10 +126,12 @@ false where the broader matrix is incomplete.
 ## Development and distribution
 
 Run `python -m pytest worlds/sonic_colours/test` for the complete world suite.
-Private original files under ignored `notes/` support optional native regression
+Private original files under the repository's ignored
+`build/sonic_colours_reference/` support optional native regression
 tests; keep them locally and never package them. The ten bounded PAL trace
-fixtures live in `test/fixtures/pal_traces/`. Research-audit output belongs under
-the repository's ignored `build/`, not in documentation.
+fixtures live in `test/fixtures/pal_traces/`; the legacy YAML is under
+`test/fixtures/yaml/`. Local build and test reports belong under the repository's
+ignored `build/`, not in documentation.
 
 Build with `python worlds/sonic_colours/build_apworld.py`. The release contains
 the runtime and required local patcher tools, not tests, private notes, dumps,

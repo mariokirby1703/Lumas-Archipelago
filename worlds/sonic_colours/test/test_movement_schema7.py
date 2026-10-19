@@ -1,4 +1,6 @@
 """Native movement schema 7 invariants. Live Dolphin execution NOT asserted."""
+
+from ..tools.private_assets import reference_root
 from collections import Counter
 from ..Items import MOVEMENT_ITEMS, MOVEMENT_POOL, ITEM_TABLE
 from ..world_constants import BASE_ID, SCHEMA_VERSION
@@ -58,7 +60,7 @@ def test_rail_jump_and_switch_have_independent_wide_permissions():
     assert movement_gate.permissions(Counter({"Progressive Rail":2}))==1536
     from pathlib import Path
     from ..tools.ppc import Executable
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if path.exists():
         e=Executable(path)
         getter=int.from_bytes(e.read(0x807610F8+0xc,4),'big')

@@ -3,6 +3,8 @@
 Native calls in the thunk interpreter are stubs: this is NOT a Dolphin GPU,
 collision or allocator test. The original native instructions are checked too.
 """
+
+from ..tools.private_assets import reference_root
 from pathlib import Path
 from dataclasses import replace
 import struct
@@ -18,7 +20,7 @@ from .test_runtime import IDENTITY, snapshot
 from .test_memory import FakeBackend
 from . import generate
 
-ROOT=Path(__file__).parents[1]/'notes/items_wisps_20261009'
+ROOT=reference_root()/'items_wisps_20261009'
 STAMPS=(('184948','184953'),('190119','190127'),('190432','190440'),('190513','190521'))
 PAIRS=[(ROOT/f'mem1(20261009-{a}).raw',ROOT/f'mem2(20261009-{b}).raw') for a,b in STAMPS]
 

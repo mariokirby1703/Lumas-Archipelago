@@ -26,6 +26,12 @@ def validate_logic(logic):
 
 def requirements(world,state,key,rank=None):
     from .logic_v2 import check
+    stage = BY_MISSION.get(key)
+    if (rank is None and stage is not None and stage['kind'] == 'Act'
+            and stage['zone_index'] < 7 and world.options.super_sonic
+            and not world.options.movement_unlocks
+            and all(state.has(emerald, world.player) for emerald in EMERALDS)):
+        return True
     return check(world,state,world.logic,key,rank)
 
 

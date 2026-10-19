@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 from ..world_constants import wisp_item
 """PAL native enum evidence, separate from the stable AP item ordering."""
 import struct
@@ -19,7 +20,7 @@ def test_capsule_requirements_match_native_colour_indices():
 
 def test_original_pal_indexed_sound_table_proves_colour_order():
     from ..tools.ppc import Executable
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('original PAL ELF absent')
     executable=Executable(path)
     rows=struct.unpack('>12I',executable.read(0x80765390,48))

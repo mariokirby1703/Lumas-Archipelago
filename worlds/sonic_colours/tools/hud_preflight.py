@@ -1,7 +1,7 @@
-"""Read-only PAL GNCP/TLS audit for Sonic Colours AP HUD Codex handoff.
+"""Read-only PAL GNCP/TLS audit for the Sonic Colours AP HUD.
 
-Usage: python asset_preflight_live.py /path/to/sonic2010_0.cpk
-Requires cpk.py and verify_original_assets.py from prior audited handoff.
+Usage: python -m worlds.sonic_colours.tools.hud_preflight /path/to/sonic2010_0.cpk
+Uses the local CPK reader and original-asset validators.
 Does not modify assets or inject data.
 """
 import collections

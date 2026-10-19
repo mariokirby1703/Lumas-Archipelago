@@ -423,6 +423,9 @@ class SonicCommands(ClientCommandProcessor):
 
 def slot_identity_digest(data):
     """Keep old seed journals stable when adding a disabled optional trap."""
+    if '_original_location_names' in data:
+        data=dict(data);original=data.pop('_original_location_names')
+        data['locations']={original.get(n,n):code for n,code in data['locations'].items()}
     if data.get('options_revision',0)<5 and data['options'].get('native_feature_tests')==0:
         data={**data,'options':{k:v for k,v in data['options'].items() if k!='native_feature_tests'}}
     if data.get('options_revision', 0) < 4:
@@ -835,7 +838,7 @@ async def dolphin_loop(ctx):
                             cancel=lambda:cancel_kill(memory,snap,ctx.runtime.guard,ctx.deathlink.remote_request),
                             kill=lambda: ctx.runtime.hooks.kill(memory, snap))
                         if local_death and ctx.runtime.slot_data['options']['death_link']:
-                            await ctx.send_death('Sonic died.')
+                            await ctx.send_death(f'{ctx.hud_player_name(ctx.slot)} died.')
                 if getattr(ctx,'pending_native_death_test',False):
                     from .event_controls import safe_kill
                     if safe_kill(ctx.runtime.snapshot):

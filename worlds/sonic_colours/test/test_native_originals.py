@@ -3,6 +3,8 @@
 The private captures are deliberately excluded from Git/APWorld packages.
 These tests verify native reads, never a live writer or in-game patch.
 """
+
+from ..tools.private_assets import reference_root
 from pathlib import Path
 
 import pytest
@@ -14,7 +16,7 @@ from ..tools.read_dumps import DumpBackend
 from ..world_constants import load_data
 
 
-ROOT = Path(__file__).parents[1] / 'notes/memdumps_and_more'
+ROOT = reference_root()/'memdumps_and_more'
 PAIRS = [(a, b) for directory in sorted(ROOT.glob('Sonic_Colours_RAM_Dumps_Part*'))
          for a, b in zip(sorted(directory.glob('mem1*.raw')), sorted(directory.glob('mem2*.raw')))]
 

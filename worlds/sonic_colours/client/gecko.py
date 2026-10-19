@@ -1,6 +1,25 @@
 """Exact Gecko C2 payload verification; no arbitrary executable normalization."""
 import struct
+from copy import deepcopy
+from functools import lru_cache, wraps
 from .memory import MemoryUnavailable, valid_range
+
+
+def cached_payload(function):
+    """Cache pure assembler work, never guest memory or executable validation.
+
+    Return independent containers so relocation and callers cannot poison the
+    canonical comparison program shared by later synchronization passes.
+    """
+    cached = lru_cache(maxsize=128)(function)
+
+    @wraps(function)
+    def program(*args, **kwargs):
+        return deepcopy(cached(*args, **kwargs))
+
+    program.cache_clear = cached.cache_clear
+    program.cache_info = cached.cache_info
+    return program
 
 
 def branch_target(address, word):
@@ -9,6 +28,11 @@ def branch_target(address, word):
     delta=word & 0x03fffffc
     if delta & 0x02000000:delta-=0x04000000
     return address+delta
+
+
+@lru_cache(maxsize=256)
+def _comparison_bytes(words):
+    return struct.pack('>'+'I'*(len(words)-1),*words[:-1])
 
 
 def inspect_c2(memory, hook, original, variants, mutable=(), label='capsule'):
@@ -24,14 +48,15 @@ def inspect_c2(memory, hook, original, variants, mutable=(), label='capsule'):
     for name,words in variants.items():
         size=len(words)*4
         if not valid_range(target,size):continue
-        raw=bytearray(memory.read_bytes(target,size));expected=struct.pack('>'+'I'*(len(words)-1),*words[:-1])
+        raw=bytearray(memory.read_bytes(target,size));expected=_comparison_bytes(tuple(words))
         for start,length in mutable:
             raw[start:start+length]=bytes(length)
         back=int.from_bytes(raw[-4:],'big');return_target=branch_target(target+size-4,back)
-        mismatch=next((i for i in range(len(words)-1) if raw[i*4:i*4+4]!=expected[i*4:i*4+4]),None)
-        if mismatch is None and return_target==hook+4 and (actual_length is None or actual_length==size):
+        matches=raw[:-4]==expected
+        if matches and return_target==hook+4 and (actual_length is None or actual_length==size):
             return {'installed':True,'variant':name,'hook':hook,'target':target,'payload_length':size,
                     'actual_header_length':actual_length,'return_instruction':back,'return_target':return_target}
+        mismatch=next((i for i in range(len(words)-1) if raw[i*4:i*4+4]!=expected[i*4:i*4+4]),None)
         failures.append({'variant':name,'expected_length':size,'first_differing_word':mismatch,
                          'expected_word':words[mismatch] if mismatch is not None else None,
                          'actual_word':int.from_bytes(raw[mismatch*4:mismatch*4+4],'big') if mismatch is not None else None,

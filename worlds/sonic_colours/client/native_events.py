@@ -48,13 +48,18 @@ def program(kind,control):
         # Native channel update: r3 is the resolved CRI status, r30 the
         # still-owned channel. Status 4 is stopped (not playing/paused/error).
         a.d(32,4,31,LOOP_CUE);a.d(28,4,7,0xffff);cmp(7,0);br('done',0x41820000)
+        # A Wisp/jingle can stop an old channel before the host sees its new
+        # successful-start event. Only the current native playback owner may
+        # arm/replay. Matching the cue alone also matches stale cached handles.
+        a.d(32,5,31,CHANNEL);equal(5,30);br('done',0x40820000)
+        a.d(32,5,31,CUE);equal(5,7);br('done',0x40820000)
         a.d(32,5,30,0);cmp(5,0);br('done',0x40810000) # native owners remain
         a.d(34,5,30,0x29);cmp(5,1);br('done',0x40820000) # successful start
         a.d(34,5,30,0x28);cmp(5,0);br('done',0x40820000) # no stop/fade/pause
         a.d(32,6,30,8);cmp(6,0);br('done',0x41820000)
         a.d(32,5,6,0);equal(7,5);br('done',0x40820000)
         cmp(3,2);br('loop_running',0x41820000)
-        cmp(3,3);br('loop_running',0x41820000)
+        cmp(3,3);br('done',0x41820000)  # pause is not evidence of playback
         cmp(3,4);br('done',0x40820000)
         const(8,0x10000)
         a.emit(31<<26|4<<21|8<<16|8<<11|28<<1|1) # and. armed bit
@@ -81,6 +86,9 @@ def program(kind,control):
         # r31 is the cue descriptor, preceded by the tree's 32-byte cue key.
         a.d(32,3,1,16+31*4)  # original r31, before using it as control
         a.d(32,4,3,-32);const(5,0x62676D5F);equal(4,5);br('done',0x40820000)
+        # A new native start invalidates any end latch from the previous
+        # playback. Never inherit its armed flag across temporary music.
+        a.d(32,4,31,LOOP_CUE);a.d(28,4,4,0xffff);a.d(36,4,31,LOOP_CUE)
         a.d(32,4,31,MUSIC_SEQ);a.d(14,4,4,1);a.d(36,4,31,MUSIC_SEQ)
         a.d(32,4,1,16+30*4);a.d(36,4,31,CHANNEL)
         a.d(32,4,3,0);a.d(36,4,31,CUE)

@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 import importlib.util
 from pathlib import Path
 import struct
@@ -27,7 +28,7 @@ def test_tls_import_keeps_original_pixels_and_indices():
 
 def test_game_land_overlay_preserves_other_native_scenes(monkeypatch):
     monkeypatch.syspath_prepend(str(TOOLS))
-    source=Path(__file__).parents[1]/'notes/memdumps_and_more/sonic2010_0.cpk'
+    source=reference_root()/'memdumps_and_more/sonic2010_0.cpk'
     if not source.exists():pytest.skip('private original CPK absent')
     cpk=module('hud_cpk').CPK(source);assets=module('hud_original_assets');m=module('hud_gncp')
     original=assets.find_asset(cpk,'ui_cockpit_multi_e.arc','ui_gameplay_multi.gncp')
@@ -149,7 +150,7 @@ def test_connected_assets_start_blank_with_bounded_shared_mailboxes():
     ('ui_result_e.arc','ui_result','result',2),
 ])
 def test_owned_selection_and_results_preserve_all_native_animations(arc,stem,parent,animations):
-    source=Path(__file__).resolve().parents[1]/'notes/memdumps_and_more/sonic2010_0.cpk'
+    source=reference_root()/'memdumps_and_more/sonic2010_0.cpk'
     if not source.exists():pytest.skip('private original CPK not supplied')
     from ..tools.hud_cpk import CPK
     from ..tools.hud_original_assets import find_asset

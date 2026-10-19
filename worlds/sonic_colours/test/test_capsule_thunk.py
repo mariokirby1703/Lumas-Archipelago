@@ -3,6 +3,8 @@
 This tests registers, bounds, calls and duplicate suppression, not real GPU or
 collision changes. PAL routines themselves still need live Dolphin validation.
 """
+
+from ..tools.private_assets import reference_root
 import pytest
 from ..client.capsule_refresh import payload_words, ORIGINAL
 
@@ -161,7 +163,7 @@ def test_compact_shared_callees_preserve_nonvolatile_registers(monkeypatch,mode,
 def test_spawn_wait_uses_original_native_visibility_event():
     from pathlib import Path
     from ..tools.ppc import Executable
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('original executable absent')
     e=Executable(path)
     # WaitAppear handles message 600F, writes channel 0 = 1 through 72BD8.
@@ -267,7 +269,7 @@ def test_native_alternate_enabled_mode_two_obeys_lock_without_rebuilding(monkeyp
 def test_native_alternate_model_mode_is_original_constructor_contract():
     from pathlib import Path
     from ..tools.ppc import Executable
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('private original ELF absent')
     e=Executable(path)
     assert e.read(0x800D3F04,4)==bytes.fromhex('88030144')

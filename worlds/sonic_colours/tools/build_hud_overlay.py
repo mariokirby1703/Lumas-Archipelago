@@ -6,7 +6,6 @@ from pathlib import Path
 import struct
 import sys
 import os
-import shutil
 import tempfile
 import xml.etree.ElementTree as ET
 try:
@@ -117,7 +116,7 @@ def replace_u8(arc,replacements):
 
 
 def build(source,output,message_count=5,compact_glyphs=True,include_maps=False,ap_connected=False,music_mapping=None,write_xml=True,music_mapping_version=1):
-    report=audit(source);cpk=CPK(source)
+    report=audit(source);cpk=CPK(source,cache_bytes=32*1024*1024)
     resources={n:find_asset(cpk,arc,n) for arc,n in
         [('ui_cockpit_e.arc','ui_gameplay.gncp'),('ui_cockpit_e.arc','ui_gameplay.tls'),
          ('ui_name_entry_e.arc','ui_soft_keyboard.gncp'),('ui_name_entry_e.arc','ui_soft_keyboard.tls')]}

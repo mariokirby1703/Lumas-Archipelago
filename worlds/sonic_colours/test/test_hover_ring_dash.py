@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 from collections import Counter
 from pathlib import Path
 import pytest
@@ -22,7 +23,7 @@ def test_native_predicate_and_displaced_instruction():
     words,offset=d.payload()
     assert (words,offset)==assist_payload()  # already verified boolean mask ABI
     assert offset==24 and words[5]==0x48000008
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('private executable absent')
     e=Executable(path)
     assert int.from_bytes(e.read(d.HOOK,4),'big')==d.ORIGINAL

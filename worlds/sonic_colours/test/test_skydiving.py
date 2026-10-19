@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 from collections import Counter
 from pathlib import Path
 import pytest
@@ -63,7 +64,7 @@ def test_item_and_native_callback_evidence():
     assert MOVEMENT_POOL.count('Progressive Skydiving')==2
     assert classification('Progressive Skydiving')==ItemClassification.progression
     from ..tools.ppc import Executable
-    path=Path(__file__).parents[1]/'notes/Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
+    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not path.exists():pytest.skip('original executable absent')
     e=Executable(path)
     assert e.read(s.HOOK,4)==s.ORIGINAL.to_bytes(4,'big')

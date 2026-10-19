@@ -1,3 +1,4 @@
+from ..tools.private_assets import reference_root
 from pathlib import Path
 
 import pytest
@@ -10,7 +11,7 @@ from ..world_constants import NORMAL
 from . import generate
 
 
-SOURCE = Path(__file__).parents[1] / 'notes/memdumps_and_more/sonic2010_0.cpk'
+SOURCE = reference_root()/'memdumps_and_more/sonic2010_0.cpk'
 
 
 @pytest.mark.skipif(not SOURCE.exists(), reason='private original PAL CPK not installed')

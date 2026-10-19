@@ -181,13 +181,13 @@ def test_emerald_rewards_need_native_clears_and_logical_route_requirements():
     from ..world_constants import STAGES
     missions = [s['mission_id'] for s in STAGES if s['zone_index'] == 7]
     reward = snapshot(emerald_rewards=frozenset({1}), persisted_clears=frozenset(missions[2:]))
-    code = Locations.LOCATION_TABLE['Game Land 1 - Chaos Emerald Obtained'].code
+    code = Locations.LOCATION_TABLE['Green Chaos Emerald'].code
     assert code not in detect_checks(data, reward)
     reward = replace(reward, persisted_clears=frozenset(missions), evidence={'native_data':{'progression_events':{'game_land_clears':4}}})
     assert code in detect_checks(data, reward)
     multiworld = generate({'game_land_checks': False})
     state = CollectionState(multiworld)
-    location = multiworld.get_location('Game Land 1 - Chaos Emerald Obtained', 1)
+    location = multiworld.get_location('Green Chaos Emerald', 1)
     assert not location.access_rule(state)
     for _ in range(14): state.collect(multiworld.worlds[1].create_item('10 Red Rings'), prevent_sweep=True)
     assert location.access_rule(state)

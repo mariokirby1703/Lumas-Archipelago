@@ -1,4 +1,6 @@
 """Schema 7 tests use real original PAL memory captures when available."""
+
+from ..tools.private_assets import reference_root
 from pathlib import Path
 import pytest
 from ..Options import OPTION_NAMES
@@ -56,7 +58,7 @@ def test_bgm_87_cues_seed_permutation_and_safe_recovery():
 
 
 def test_actual_original_ram_bank_can_be_rewritten_without_game_files():
-    mem2=Path(__file__).parents[1] / 'notes/items_wisps_20261009/mem2(20261009-184953).raw'
+    mem2=reference_root()/'items_wisps_20261009/mem2(20261009-184953).raw'
     if not mem2.exists():pytest.skip('original MEM2 capture not supplied')
     with mem2.open('rb') as stream:
         stream.seek(0x17e8a0)

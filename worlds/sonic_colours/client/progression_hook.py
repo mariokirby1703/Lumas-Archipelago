@@ -4,6 +4,7 @@ Gecko installs code. DME writes only its declared data words after attribution.
 Native discovery/clear events accumulate monotonically; the host never clears
 guest event words while their owner is enabled.
 """
+from .gecko import cached_payload
 import struct
 import hashlib
 import json
@@ -14,6 +15,7 @@ HOOK = 0x8015ECC0
 ORIGINAL = 0x2C050000  # cmpwi r5,0
 
 
+@cached_payload
 def payload(compact_permission=True, compact_cr=True, register_lr=True, lean=True, terminal=True):
     short=lean and register_lr and compact_cr and compact_permission
     a=PPC()
