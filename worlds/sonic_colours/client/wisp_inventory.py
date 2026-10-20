@@ -4,7 +4,6 @@ No native calls or executable writes. Reconcile only a stable living normal
 Sonic, never while a Wisp transformation/death transition owns the model.
 Normal boost energy (+8) and its maximum (+14) are preserved.
 """
-import math
 import struct
 from .memory import MemoryUnavailable
 from ..world_constants import NATIVE_COLOURS
@@ -22,9 +21,6 @@ def owner(memory,snapshot,guard):
     from .movement_gate import observed
     state=observed(memory,player['actor'])
     current,requested=state['current_id'],state['requested_id']
-    ordinary=lambda state:state in range(64) and state not in (24,25,26)
-    if not ordinary(current) or not (requested==-1 or ordinary(requested)):
-        raise MemoryUnavailable('Wisp inventory awaits an ordinary Sonic state')
     model=snapshot.boost_address-8
     if snapshot.boost_max_address!=model+0x14 or memory.read_u32(model)!=0x80763A18:
         raise MemoryUnavailable('Wisp inventory boost model changed')
@@ -34,40 +30,55 @@ def owner(memory,snapshot,guard):
             or memory.read_u32(stats)!=0x8075E088 or memory.read_u32(stats+0x24)!=0
             or memory.read_ptr_checked(stats+0x30,0x64)!=model):
         raise MemoryUnavailable('Wisp inventory owner changed')
+    ordinary=lambda state:state in range(64) and state not in (24,25,26)
+    # PAL underwater state 97 can retain the exit icon after the main slot
+    # has already been cleared. Permit only this inert HUD residue here:
+    # both usable slots empty, zero active time, and fresh underwater proof.
+    # This does not authorize inventory mutations in an active transformation.
+    inert_water=(current==97 and requested in (-1,97)
+                 and memory.read_u32(stats+0x10)&0x800
+                 and memory.read_s32(model+0x18)==-1
+                 and memory.read_s32(model+0x1c)==-1
+                 and memory.read_f32(model+0x10)==0.)
+    if not inert_water and (not ordinary(current) or not (requested==-1 or ordinary(requested))):
+        raise MemoryUnavailable('Wisp inventory awaits an ordinary Sonic state')
     return (snapshot.session,snapshot.stage_epoch,actor,stats,model,state['request_machine'])
 
 
 def apply(memory,snapshot,guard,owned,slot):
     if snapshot.scene!='gameplay' or snapshot.death_state!='alive':
         return {'status':'awaiting living gameplay','cleared':False}
-    player=next(iter(snapshot.evidence.get('native_data',{}).get('stage_objects',[])),{}).get('player',{})
-    held=player.get('held_wisp',-1)
-    if held==-1:
+    if snapshot.boost_address is None:
+        return {'status':'awaiting verified Wisp model','cleared':False}
+    model=snapshot.boost_address-8
+    if snapshot.boost_max_address!=model+0x14 or memory.read_u32(model)!=0x80763A18:
+        raise MemoryUnavailable('Wisp inventory boost model changed')
+    slots=struct.unpack('>3i',memory.read_bytes(model+0x18,12))
+    if any(value!=-1 and value not in range(len(NATIVE_COLOURS)) for value in slots):
+        raise MemoryUnavailable('Unknown held/pending/display Wisp colour')
+    locked=[value for value in slots if value!=-1 and not wisp_level(
+        owned['counts'],NATIVE_COLOURS[value],slot['options'])]
+    if not locked:
         pending=getattr(memory,'_wisp_inventory_pending_redraw',None)
         if pending:
             context=owner(memory,snapshot,guard)
-            if context==pending:
-                _notify(memory,context)
+            if context==pending:_notify(memory,context)
             else:memory._wisp_inventory_pending_redraw=None
-        return {'status':'empty','cleared':False}
-    if type(held) is not int or held not in range(len(NATIVE_COLOURS)):
-        raise MemoryUnavailable('Unknown held Wisp colour')
-    colour=NATIVE_COLOURS[held]
-    if wisp_level(owned['counts'],colour,slot['options']):
-        return {'status':'owned Wisp retained','colour':colour,'cleared':False}
+        return {'status':'empty' if slots==(-1,-1,-1) else 'owned Wisp retained','cleared':False}
+    # A pending owned Wisp must never be discarded to remove an old icon.
+    if any(value!=-1 and wisp_level(owned['counts'],NATIVE_COLOURS[value],slot['options'])
+           for value in slots[:2]):
+        return {'status':'owned current/pending Wisp retained','cleared':False}
     context=owner(memory,snapshot,guard);model=context[4]
     before=memory.read_bytes(model+0xc,0x1c)
-    if struct.unpack_from('>i',before,12)[0]!=held:
+    if struct.unpack_from('>3i',before,12)!=slots:
         raise MemoryUnavailable('Held Wisp changed before clearing')
-    # The native clear routine moves the old colour to +20 for its exit/HUD
-    # transition, looks up its duration, and clears current/pending slots.
-    duration_ptr=memory.read_u32(model+0x28+held*8)
-    duration=memory.read_f32(duration_ptr) if duration_ptr else 0.
-    if not math.isfinite(duration) or not 0<=duration<=3600:
-        raise MemoryUnavailable('Invalid native Wisp duration')
+    # Finish the native clear/reset state, rather than retaining the old
+    # colour at +20 indefinitely. All usable/display slots are empty and
+    # both colour timers zero; normal Boost and its maximum stay untouched.
     after=bytearray(before)
-    struct.pack_into('>ff',after,0,duration,0.)
-    struct.pack_into('>iiiI',after,12,-1,-1,held,0)
+    struct.pack_into('>ff',after,0,0.,0.)
+    struct.pack_into('>iiiI',after,12,-1,-1,-1,0)
     if getattr(memory,'_wisp_inventory_transaction',None) is not None:
         raise MemoryUnavailable('Nested Wisp inventory transaction')
     memory._wisp_inventory_transaction={'owner':context,'model':model,'values':{model+0xc:bytes(after)}}
@@ -76,7 +87,7 @@ def apply(memory,snapshot,guard,owned,slot):
         memory.write_bytes_verified(model+0xc,bytes(after),expected=before,operation='wisp_inventory')
     finally:memory._wisp_inventory_transaction=None
     _notify(memory,context)
-    return {'status':'unowned Wisp discarded','colour':colour,'cleared':True}
+    return {'status':'unowned Wisp discarded','colour':NATIVE_COLOURS[locked[0]],'cleared':True}
 
 
 def _notify(memory,context):

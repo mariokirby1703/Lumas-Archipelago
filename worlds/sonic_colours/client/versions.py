@@ -161,8 +161,9 @@ def verify_revision(memory):
             from .native_dol import plan,ARENA
             from .native_events import patches as event_patches,SIZE
             from .boss_capsules import planned_patches as boss_patches
+            from .wisp_hud import planned_patches as wisp_hud_patches
             data=bytearray(data)
-            for address,old,new in (*event_patches(ARENA+len(plan()[1])-SIZE),*boss_patches()):
+            for address,old,new in (*event_patches(ARENA+len(plan()[1])-SIZE),*boss_patches(),*wisp_hud_patches()):
                 if section['address']<=address and address+len(new)<=section['address']+len(data):
                     offset=address-section['address']
                     if data[offset:offset+len(new)]!=new:

@@ -82,6 +82,8 @@ def get_wit(explicit=None,progress=lambda s:None):
 def command(wit,args,progress,cancel=None):
     import queue
     import threading
+    from .patch_progress import PatchProgress
+    display=PatchProgress()
     from collections import deque
     flags={'creationflags':subprocess.CREATE_NO_WINDOW} if os.name=='nt' else {}
     process=subprocess.Popen([str(wit),*map(str,args)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
@@ -255,11 +257,15 @@ def install_with_progress(patch,**kwargs):
         import tkinter as tk
         from tkinter import ttk
         root=tk.Tk();root.title('Sonic Colours Archipelago ISO Patcher')
-        label=ttk.Label(root,text='Preparing local patch...',wraplength=500);label.pack(padx=24,pady=20)
+        label=ttk.Label(root,text=display.message,wraplength=500);label.pack(padx=24,pady=20)
+        detail=ttk.Label(root,text='',wraplength=500);detail.pack(padx=24)
         elapsed=ttk.Label(root,text='Elapsed: 0:00');elapsed.pack()
+        ttk.Label(root,text='Patching time depends on your drive and whether files are already cached.',
+                  wraplength=450).pack(padx=24,pady=8)
         bar=ttk.Progressbar(root,mode='indeterminate',length=450);bar.pack(padx=24,pady=12);bar.start()
         def request_cancel():
             cancel.set();label.config(text='Cancelling safely; temporary files will be removed...')
+            detail.config(text='')
         ttk.Button(root,text='Cancel',command=request_cancel).pack(pady=12)
         root.protocol('WM_DELETE_WINDOW',request_cancel)
     except Exception:
@@ -275,11 +281,13 @@ def install_with_progress(patch,**kwargs):
     thread=threading.Thread(target=worker,daemon=True);thread.start()
     gui_started=time.monotonic()
     def update():
-        latest=None
-        while not messages.empty():latest=messages.get()
-        if latest and not cancel.is_set():label.config(text=latest)
+        while True:
+            try:display.receive(messages.get_nowait())
+            except queue.Empty:break
+        if not cancel.is_set():
+            label.config(text=display.message);detail.config(text=display.detail)
         seconds=int(time.monotonic()-gui_started)
-        elapsed.config(text=f'Elapsed: {seconds//60}:{seconds%60:02d}')
+        elapsed.config(text=display.timing(seconds))
         if thread.is_alive():root.after(100,update)
         else:root.destroy()
     update();root.mainloop();thread.join()

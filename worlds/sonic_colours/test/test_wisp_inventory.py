@@ -41,8 +41,8 @@ def test_unowned_colour_cleared_with_native_transition_and_boost_preserved(setup
     result=w.apply(m,snap,guard,{'counts':Counter()},{'options':{'movement_unlocks':movement}})
     assert result['cleared'] and result['colour']==NATIVE_COLOURS[held]
     assert m.read_s32(model+0x18)==m.read_s32(model+0x1c)==-1
-    assert m.read_s32(model+0x20)==held and m.read_u32(model+0x24)==0
-    assert m.read_f32(model+0xc)==30.+held and m.read_f32(model+0x10)==0
+    assert m.read_s32(model+0x20)==-1 and m.read_u32(model+0x24)==0
+    assert m.read_f32(model+0xc)==0 and m.read_f32(model+0x10)==0
     assert m.read_f32(model+8)==42. and m.read_f32(model+0x14)==100.
     assert m.read_u32(model+0x60)==0x81
     assert {a for a,_ in b.writes}=={model+0xc,model+0x60}
@@ -103,4 +103,44 @@ def test_replaced_model_and_assist_are_not_written(setup):
     with pytest.raises(MemoryUnavailable):w.apply(m,snap,guard,{'counts':Counter()},{'options':{}})
     player['mode']=0;put(player['stats']+0x30,model+0x100)
     with pytest.raises(MemoryUnavailable):w.apply(m,snap,guard,{'counts':Counter()},{'options':{}})
+    assert not b.writes
+
+
+@pytest.mark.parametrize('colour',range(7))
+@pytest.mark.parametrize('state_id',[0,97])
+def test_empty_main_slot_still_clears_unowned_hud_residue(setup,colour,state_id):
+    m,b,snap,guard,state,player,model,put=setup
+    player['held_wisp']=-1
+    b.put(model+0x18,struct.pack('>iiiI',-1,-1,colour,0))
+    b.put(model+0x10,struct.pack('>f',0.))
+    state.update(current_id=state_id,requested_id=state_id)
+    put(player['stats']+0x10,0x00200a00)
+    assert w.apply(m,snap,guard,{'counts':Counter()},{'options':{}})['cleared']
+    assert struct.unpack('>3i',m.read_bytes(model+0x18,12))==(-1,-1,-1)
+    assert m.read_f32(model+8)==42. and m.read_f32(model+0x14)==100.
+    writes=len(b.writes)
+    assert not w.apply(m,snap,guard,{'counts':Counter()},{'options':{}})['cleared']
+    assert len(b.writes)==writes
+
+
+@pytest.mark.parametrize('condition',['dry','active_timer','pending_wisp','current_wisp','transform_request'])
+def test_underwater_exception_only_allows_inert_display_residue(setup,condition):
+    m,b,snap,guard,state,player,model,put=setup
+    player['held_wisp']=-1
+    b.put(model+0x18,struct.pack('>iiiI',-1,-1,0,0));b.put(model+0x10,struct.pack('>f',0.))
+    put(player['stats']+0x10,0x800);state.update(current_id=97,requested_id=97)
+    if condition=='dry':put(player['stats']+0x10,0)
+    elif condition=='active_timer':b.put(model+0x10,struct.pack('>f',1.))
+    elif condition=='pending_wisp':put(model+0x1c,0)
+    elif condition=='current_wisp':put(model+0x18,0)
+    else:state['requested_id']=64
+    with pytest.raises(MemoryUnavailable):w.apply(m,snap,guard,{'counts':Counter()},{'options':{}})
+    assert not b.writes
+
+
+def test_owned_pending_wisp_is_not_discarded_to_clear_old_locked_icon(setup):
+    m,b,snap,guard,state,player,model,put=setup
+    b.put(model+0x18,struct.pack('>iiiI',-1,1,0,0))
+    counts=Counter({'Cyan Laser Wisp':1})
+    assert not w.apply(m,snap,guard,{'counts':counts},{'options':{}})['cleared']
     assert not b.writes

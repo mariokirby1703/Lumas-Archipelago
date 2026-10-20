@@ -50,6 +50,16 @@ Historical observations below remain useful; a code fix is not a live pass.
   Inspect their spawned capsule actors/pickup paths separately from placed
   capsules; verify that locked drops cannot grant a held Wisp or Boost energy,
   and that drops work normally after the relevant AP unlock.
+- **Unowned Wisp HUD residue:** live Aquarium Park boss state 97 had empty
+  current/pending slots but Yellow in the previous/display slot. The client
+  now clears all unowned inventory/display residue and colour timers while
+  preserving Boost. State 97 cleanup requires fresh underwater ownership,
+  empty usable slots and zero active time; active transformations still defer.
+  A subsequent live read confirmed all three slots/timers were already empty
+  but cockpit +1b0 still cached Yellow. The new native cockpit reconciliation
+  sends the original removal event on the game thread; authenticated AP Wisp
+  permissions protect owned icons and queued owned replacements. Requires a
+  repatched ISO. Verify the actual icon disappears live without changing Boost.
 - **Latency:** earned native checks are checkpointed earlier and durable queues
   retry after reconnect without a Dolphin poll. Measure actual AP-to-HUD latency
   again; historical controlled observation was about 2.7 seconds.

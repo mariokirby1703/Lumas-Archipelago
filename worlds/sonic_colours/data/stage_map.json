@@ -1540,7 +1540,7 @@
     "normal": false,
     "name": "Terminal Velocity Boss",
     "rank_status": "unverified",
-    "rank_candidate": false
+    "rank_candidate": true
   },
   {
     "world": "Game Land 1",

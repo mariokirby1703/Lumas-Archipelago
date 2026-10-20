@@ -117,6 +117,8 @@ def plan():
         compact_abi=True,epilogue_abi=True,cache_permissions=True))
     story_control=story['target']+progression_hook.payload()[1]
     patches.extend(boss_capsules.patches(capsule_control,story_control,patches))
+    from . import wisp_hud
+    patches.extend(wisp_hud.patches(capsule_control,story_control,patches))
     ownership=[]
     for address,old,new in patches:
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')
