@@ -51,10 +51,12 @@ def patches(capsule_control,progression_control,occupied):
         s['address']<address+len(new) and address<s['address']+12 for address,old,new in occupied)]
     words=program(capsule_control,progression_control)
     return [(HOOK,struct.pack('>I',ORIGINAL),struct.pack('>I',branch(HOOK,sites[0]['address']))),
-            *scatter(words,sites,HOOK+4)]
+            *scatter(words,sites,HOOK+4,compact=True)]
 
 
 def planned_patches():
     from .native_dol import plan
     rows=plan()[0];start=next(i for i,row in enumerate(rows) if row[0]==HOOK)
-    return rows[start:start+1+len(program(0,0))]
+    from .homing_fallback import HOOK as following
+    end=next(i for i,row in enumerate(rows) if row[0]==following)
+    return rows[start:end]

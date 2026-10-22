@@ -104,8 +104,8 @@ def program(kind,control):
             a.d(28,4,8,31);a.d(14,7,0,1);a.emit(31<<26|7<<21|7<<16|8<<11|24<<1)
             a.emit(31<<26|6<<21|6<<16|7<<11|28<<1|1);br('done',0x41820000)
         a.d(32,6,31,ENABLE);cmp(6,1);br('done',0x40820000)
-        if kind=='jump':
-            a.d(32,6,31,INPUT);equal(3,6);br('done',0x40820000)
+        # Validate against the player's fresh input owner below. Its cached
+        # mailbox pointer may be stale after respawn/controller replacement.
         a.d(32,6,31,REMAINING);cmp(6,0);br('done',0x40810000)
         # Only the attributed living gameplay context can suppress input.
         const(7,0x808F336C);a.d(32,7,7,0);a.d(32,7,7,4);a.d(32,7,7,0x1c);a.d(32,7,7,0x34)
@@ -127,6 +127,9 @@ def program(kind,control):
     else:
         a.d(32,3,31,ENABLE);cmp(3,1);br('done',0x40820000)
         a.d(32,3,31,STAGE);equal(3,29);br('done',0x40820000)
+        # A stage object can survive into results/menus. Only its actual
+        # gameplay handler is allowed to consume the retained trap duration.
+        a.d(32,3,29,0x44);const(4,0x8001CDB4);equal(3,4);br('done',0x40820000)
         a.d(32,3,29,0xa4);a.d(28,3,3,0xc00);br('done',0x40820000)
         a.d(32,30,31,PLAYER);cmp(30,0);br('done',0x41820000)
         a.d(32,3,30,0);const(4,0x8075AEF8);equal(3,4);br('done',0x40820000)
@@ -169,8 +172,38 @@ def program(kind,control):
     return a.finish()
 
 
-def scatter(words,sites,return_to):
+def scatter(words,sites,return_to,compact=False):
     """One instruction per 12-byte site; conditional long branches stay local."""
+    if compact:
+        # Two ordinary instructions fit before a site's outgoing branch.
+        # Keep branches and the final return in separate packets, and map
+        # every original word (including the second word) to its real PC.
+        # This frees audited padding without changing any policy or mailbox.
+        from .native_dol import branch
+        packets=[];i=0;addresses={}
+        while i<len(words):
+            pair=(i+1<len(words)-1 and words[i]>>26 not in (16,18)
+                  and words[i+1]>>26 not in (16,18))
+            packets.append((i,2 if pair else 1));i+=2 if pair else 1
+        if len(packets)>len(sites):raise ValueError('native event padding exhausted')
+        for packet,(index,count) in enumerate(packets):
+            for j in range(count):addresses[index+j]=sites[packet]['address']+j*4
+        result=[]
+        for packet,(index,count) in enumerate(packets):
+            address=sites[packet]['address'];following=sites[packet+1]['address'] if packet+1<len(packets) else return_to
+            word=words[index]
+            if index==len(words)-1:chunk=[branch(address,return_to),0x60000000,0x60000000]
+            elif word>>26 in (16,18):
+                op=word>>26;mask,sign=(0xfffc,0x8000) if op==16 else (0x3fffffc,0x2000000)
+                delta=word&mask
+                if delta&sign:delta-=sign*2
+                target=addresses[index+delta//4]
+                chunk=([(word&0xffff0000)^0x01000000|8,branch(address+4,target),branch(address+8,following)]
+                       if op==16 else [branch(address,target)|(word&1),0x60000000,0x60000000])
+            elif count==2:chunk=[word,words[index+1],branch(address+8,following)]
+            else:chunk=[word,branch(address+4,following),0x60000000]
+            result.append((address,bytes(12),struct.pack('>3I',*chunk)))
+        return result
     from .native_dol import branch
     if len(words)>len(sites):raise ValueError('native event padding exhausted')
     result=[]
@@ -204,8 +237,9 @@ def patches(control):
         selected=(load_data('native_music_loop_sites.json') if kind=='music_loop' else sites[used:])
         entry=selected[0]['address']
         result.append((hook,old.to_bytes(4,'big'),branch(hook,entry).to_bytes(4,'big')))
-        result.extend(scatter(words,selected,hook+4))
-        if kind!='music_loop':used+=len(words)
+        chunks=scatter(words,selected,hook+4,compact=True)
+        result.extend(chunks)
+        if kind!='music_loop':used+=len(chunks)
     return result
 
 

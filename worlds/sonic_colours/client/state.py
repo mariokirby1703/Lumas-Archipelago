@@ -355,13 +355,15 @@ class WritePolicy:
             if self.memory.read_bytes(HOOK,4)!=tx['hook']:
                 raise MemoryUnavailable('WRITE_BLOCKED: HUD publisher changed')
             return (*tx['identity'],tx['owner']['layer'],tx['owner']['handle'],tx['owner']['control'])
-        ui_batch=getattr(self.memory,'_game_land_ui_batch',None) if operation=='game_land_ui' else None
+        ui_batch=getattr(self.memory,'_game_land_ui_batch',None) if operation in ('game_land_ui','emerald_ui') else None
         if ui_batch is None:
             verifier=getattr(self.memory,'verify_for_write',None)
             if verifier is None:self.memory.verify_revision()
             else:verifier(operation)
         else:
             from .game_land_ui import validate_batch
+            if ui_batch.get('operation','game_land_ui')!=operation:
+                raise MemoryUnavailable('WRITE_BLOCKED: UI batch operation changed')
             validate_batch(self.memory,ui_batch)
         # The production reader normally verifies the whole executable itself.
         # This policy has JUST done that; use its lean scene/profile snapshot

@@ -1,8 +1,10 @@
-"""Thirty gameplay seconds of Jump denial, with guest countdown and ACK."""
+"""Fifteen gameplay seconds of Jump denial, with guest countdown and ACK."""
 import struct
 from . import native_events as n
 from .event_controls import write
 from .memory import MemoryUnavailable
+
+DURATION=15.
 
 
 def deliver(runtime,memory,index,item):
@@ -22,11 +24,11 @@ def deliver(runtime,memory,index,item):
     if state['remaining']>0:
         journal.defer(index,item,'previous Dead Weight Trap still active');return
     request=(state['trap_request']+1)&0xffffffff or 1
-    journal.prepare(index,item,[runtime.snapshot.session,runtime.snapshot.stage_epoch],0,30)
+    journal.prepare(index,item,[runtime.snapshot.session,runtime.snapshot.stage_epoch],0,DURATION)
     effect=journal.data['effects'][str(index)]
     effect.update(family='dead_weight',native_request=request);journal.save()
     try:
-        write(memory,runtime.snapshot,runtime.guard,{n.REMAINING:struct.pack('>f',30.)})
+        write(memory,runtime.snapshot,runtime.guard,{n.REMAINING:struct.pack('>f',DURATION)})
         write(memory,runtime.snapshot,runtime.guard,{n.TRAP_REQUEST:struct.pack('>I',request)})
         effect['state']='verifying';journal.save();runtime._dead_weight_inflight=index
     except MemoryUnavailable as error:
@@ -38,6 +40,6 @@ def test_request(runtime,memory):
     state=n.status(memory)
     if state['remaining']>0:raise MemoryUnavailable('Dead Weight already active')
     request=(state['trap_request']+1)&0xffffffff or 1
-    write(memory,runtime.snapshot,runtime.guard,{n.REMAINING:struct.pack('>f',30.)})
+    write(memory,runtime.snapshot,runtime.guard,{n.REMAINING:struct.pack('>f',DURATION)})
     write(memory,runtime.snapshot,runtime.guard,{n.TRAP_REQUEST:struct.pack('>I',request)})
     return request

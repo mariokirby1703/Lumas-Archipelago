@@ -3,6 +3,36 @@
 Current implementation/evidence: [current feature and verification summary](docs/sonic_colours.md#logic-and-verification-limits).
 Historical observations below remain useful; a code fix is not a live pass.
 
+- **Underwater Drill turbo:** live Aquarium Park boss had Water Drill state 76
+  with the ground/manual turbo permission at zero. Its independent held-action
+  predicate at 801F6D2C was unpatched. The native build now masks that result
+  with the same authenticated permission word as ground Drill, before the
+  boost/effect/internal-state calls. Repatch and verify manual turbo at Drill
+  levels 1/2 underwater; preserve normal drilling and scripted acceleration.
+
+- **Rail action gates:** native grind side-change and jump decision helpers
+  now check Rail Switch / Rail Jump before issuing an action. The jump helper
+  covers both button and alternate input paths; held side actions additionally
+  require Switch. Denial returns no action and keeps the current rail, with no
+  forced Fall/reattachment or input-buffer mutation. Repatch and verify stages
+  0/1/2 of Progressive Rail with rapid presses and held directions in Dolphin,
+  including automatic rail-end/gimmick exits. Those scripted exits stay native.
+
+- **Scripted movement recovery:** live Asteroid Coaster Act 1 had active Drift
+  (38) with the movement gate armed and only Homing permitted (mask 4).
+  Native Drift, Stomp and air-jump update callbacks now independently recheck
+  permissions and exit through ordinary Run/Fall requests and cleanup. Queued
+  deaths/scripted exits are preserved. Verify the corrected ISO at this Drift
+  and after Aquarium Park Act 6 water currents/fans; the latter is not yet
+  captured live. Air-jump uses Swim underwater and Double Jump above water.
+
+- **Homing/Double Jump fallback:** the native air-action selector now treats a
+  locked Homing selection as no selected action, preserving native Double Jump
+  eligibility and the existing state permission gate. PPC and original-DOL
+  validation pass. Repatch the ISO and verify a targeted enemy/object with
+  Double Jump owned, Homing absent, including a second attempted air jump,
+  underwater, and Dead Weight. Owned Homing must still work normally.
+
 - **Unresolved:** AP-unlocked Area Map Acts can still use a black locked model.
   Adjacency/path rendering works. Safely replace/refresh the status-selected
   scene-owned model without leaking references or changing clear/locked styling.
@@ -81,3 +111,7 @@ Historical observations below remain useful; a code fix is not a live pass.
   false. Hidden `native_feature_tests` is an explicit disposable-seed test opt-in,
   not production verification. Full-suite historical fixture failures remain
   recorded in local full-suite test output under build/.
+
+- Live verification pending: native held-colour query rejects unowned Wisps before transformation selection, even with a stale hidden inventory icon. Test rapid Laser activation before/after AP unlock with the updated ISO; unit PPC matrix covers all colours and save indices.
+
+- Live verification pending: Random/multi capsule output filters each coloured flying Wisp before allocation using authenticated AP ownership. Observed Game Land stgC10 with AP mask 1 and flying colours 0/1 before fix. Verify updated ISO emits Yellow Drill only until Cyan Laser is unlocked; all five spawn callsites and seven colours covered by PPC tests.

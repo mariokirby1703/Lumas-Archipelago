@@ -6,13 +6,30 @@ _PENDING_REFRESH=set()
 _COMPLETED_REFRESH=set()
 
 
+def anchor_blocks(anchors):
+    """Batch nearby pointer proofs without comparing mutable pane padding.
+
+    Every original anchor is still compared before every write. Reading the
+    gaps in one process-memory call avoids hundreds of individual IPC reads;
+    those gaps are deliberately excluded from the proof.
+    """
+    blocks=[]
+    for address,value in sorted(anchors):
+        if (not blocks or address-blocks[-1][1]>0x144
+                or address+len(value)-blocks[-1][0]>0x8000):
+            blocks.append([address,address+len(value),[]])
+        else:blocks[-1][1]=max(blocks[-1][1],address+len(value))
+        blocks[-1][2].append((address,value))
+    return tuple((start,end-start,tuple(values)) for start,end,values in blocks)
+
+
 def stage_colour(memory,flags,index):
     if not memory.read_progress_bit(flags,210+index):return 0
     return 0xffffffff if memory.read_progress_bit(flags,252+index) else 0x606060ff
 
 
 @contextmanager
-def verified_batch(memory,fields):
+def verified_batch(memory,fields,operation='game_land_ui'):
     """One full code proof; recheck live owner/topology for every field write."""
     if not hasattr(memory,'verify_revision'):
         yield;return  # lightweight offline fixtures retain their own policy
@@ -21,9 +38,12 @@ def verified_batch(memory,fields):
     row=read_stage_objects(memory,False)[0]
     actors=[a for a in read_actors(memory,row['context']) if memory.read_u32(a)==0x8077e59c]
     if len(actors)!=1:raise MemoryUnavailable('Game Land UI owner not unique')
-    actor=actors[0];ref=memory.read_ptr_checked(actor+0x88,4);layer=memory.read_ptr_checked(ref,0xe0)
+    actor=actors[0]
     # Retain owner, dictionary, graph, and each allocated colour-data link.
-    pointers=[(actor,4),(actor+12,4),(actor+0x88,4),(ref,4),(layer,4),(layer+12,4),(layer+0x8c,4)]
+    pointers=[(actor,4),(actor+12,4)]
+    for offset in ((0x88,0x98) if operation=='emerald_ui' else (0x88,)):
+        ref=memory.read_ptr_checked(actor+offset,4);layer=memory.read_ptr_checked(ref,0xe0)
+        pointers.extend(((actor+offset,4),(ref,4),(layer,4),(layer+12,4),(layer+0x8c,4)))
     for address,(kind,_) in fields.items():
         if kind in ('dirty_colour','dirty','dirty_matrix','dirty_scale','dirty_visibility','dirty_colour_visibility'):pointers.extend(((address+4,4),(address+8,4)))
         if kind in ('dirty_colour','dirty_colour_visibility'):pointers.append((address-4,4))
@@ -40,13 +60,18 @@ def verified_batch(memory,fields):
     anchors=tuple((a,memory.read_bytes(a,n)) for a,n in sorted(set(pointers)))
     code=tuple((a,memory.read_bytes(a,n)) for a,n in ((0x80000000,8),(0x802f0d98,4),(0x802f0dd4,4)))
     if getattr(memory,'_game_land_ui_batch',None) is not None:raise MemoryUnavailable('nested UI batch')
-    memory._game_land_ui_batch={'fields':fields,'anchors':anchors,'code':code}
+    memory._game_land_ui_batch={'fields':fields,'anchors':anchors,'code':code,
+                               'blocks':anchor_blocks((*code,*anchors)), 'operation':operation}
     try:yield
     finally:memory._game_land_ui_batch=None
 
 def validate_batch(memory,batch):
-    if any(memory.read_bytes(a,len(value))!=value for a,value in (*batch['code'],*batch['anchors'])):
-        raise MemoryUnavailable('WRITE_BLOCKED: Game Land UI owner/topology changed')
+    blocks=batch.get('blocks')
+    if blocks is None:blocks=anchor_blocks((*batch['code'],*batch['anchors']))
+    for start,size,values in blocks:
+        data=memory.read_bytes(start,size)
+        if len(data)!=size or any(data[a-start:a-start+len(value)]!=value for a,value in values):
+            raise MemoryUnavailable('WRITE_BLOCKED: Game Land UI owner/topology changed')
     return batch['fields']
 
 

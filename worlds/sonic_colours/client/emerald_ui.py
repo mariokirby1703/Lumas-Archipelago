@@ -4,7 +4,8 @@
 805E6734/805E5794 update allocated colour data, then 805E34C8 dirties ancestors.
 No save, clear, rank, stage-availability or location fields are changed.
 """
-from .memory import MemoryUnavailable
+import struct
+from .memory import MemoryUnavailable,valid_range
 from .native_read import read_stage_objects,read_actors
 
 from ..world_constants import GAME_LAND_EMERALD_COLOURS
@@ -29,21 +30,22 @@ def targets(memory, stages=False):
         count=memory.read_u32(layout+0x2c)
         if not 14<=count<=512:raise MemoryUnavailable('Emerald UI dictionary size invalid')
         table=memory.read_ptr_checked(layout+0x30,count*12);wanted={}
+        dictionary=memory.read_bytes(table,count*12)
         for i in range(count):
-            entry=table+i*12
-            nameptr=memory.read_ptr_checked(entry,16)
+            nameptr,group,pane_index=struct.unpack_from('>III',dictionary,i*12)
+            if nameptr%4 or not valid_range(nameptr,16):raise MemoryUnavailable('Invalid Game Land pane name')
             name=memory.read_bytes(nameptr,16).split(b'\0')[0]
             if stages:
                 if len(name)!=7 or not name.startswith(b'act_') or name[5:6]!=b'_':continue
                 zone=name[4]-48;act=name[6]-48
                 if not (0<=zone<7 and 0<=act<3):continue
-                key=(memory.read_u32(entry+4),memory.read_u32(entry+8))
+                key=(group,pane_index)
                 if key in wanted:raise MemoryUnavailable('Duplicate Game Land stage pane')
                 wanted[key]=zone*3+act
             else:
                 for index,colour in enumerate(UI_COLOURS):
                     if name in (f'em_img_{index}'.encode(),f'em_bli_{index}'.encode()):
-                        key=(memory.read_u32(entry+4),memory.read_u32(entry+8))
+                        key=(group,pane_index)
                         if key in wanted:raise MemoryUnavailable('Duplicate Emerald pane')
                         wanted[key]=colour
         if len(wanted)!=(21 if stages else 14):raise MemoryUnavailable('Game Land UI named panes missing')
@@ -107,15 +109,17 @@ def apply(memory,snapshot,guard,owned):
     # All pane/ancestor dirtiness precedes root cache reset. Publish both
     # native redraw markers LAST: the emulation can run between host writes.
     order={'colour':0,'dirty_colour':1,'dirty':1,'zero':2,'one':3}
-    for address,(kind,colour) in sorted(fields.items(),key=lambda row:order[row[1][0]]):
-        before=memory.read_u32(address)
-        if kind=='colour':after=0xffffffff if owned['counts'].get(colour+' Chaos Emerald',0) else 0x606060ff
-        elif not refresh:continue
-        elif kind=='dirty_colour':after=before & ~0x00180080
-        elif kind=='dirty':after=before & ~0x00100000
-        else:after=int(kind=='one')
-        if before!=after:
-            memory.write_u32(address,after,expected=before,operation='emerald_ui');changed+=1
+    from .game_land_ui import verified_batch
+    with verified_batch(memory,fields,operation='emerald_ui'):
+        for address,(kind,colour) in sorted(fields.items(),key=lambda row:order[row[1][0]]):
+            before=memory.read_u32(address)
+            if kind=='colour':after=0xffffffff if owned['counts'].get(colour+' Chaos Emerald',0) else 0x606060ff
+            elif not refresh:continue
+            elif kind=='dirty_colour':after=before & ~0x00180080
+            elif kind=='dirty':after=before & ~0x00100000
+            else:after=int(kind=='one')
+            if before!=after:
+                memory.write_u32(address,after,expected=before,operation='emerald_ui');changed+=1
     _PENDING_REFRESH.discard(identity)
     _COMPLETED_REFRESH.add(identity)
     return {'status':'AP emerald colours projected','changed_fields':changed,

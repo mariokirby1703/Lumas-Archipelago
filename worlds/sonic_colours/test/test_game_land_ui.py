@@ -71,26 +71,50 @@ def test_existing_linear_seed_gets_free_starter_without_changing_other_gates():
     assert old['game_land_gates']['1-1']==1
 
 
-def test_batch_reuses_full_revision_but_rejects_owner_change(monkeypatch):
+@pytest.mark.parametrize('operation',['game_land_ui','emerald_ui'])
+def test_batch_reuses_full_revision_but_rejects_owner_change(monkeypatch,operation):
     from ..client import native_read
     monkeypatch.setattr(native_read,'read_stage_objects',lambda m,*a:[{'context':0x9000}])
     monkeypatch.setattr(native_read,'read_actors',lambda m,c:[0x9100])
     class Memory:
         _game_land_ui_batch=None
         proofs=0
-        values={0x9100:0x8077e59c,0x9188:0x9200,0x9200:0x9300}
+        values={0x9100:0x8077e59c,0x9188:0x9200,0x9200:0x9300,0x9198:0x9600,0x9600:0x9700}
         def verify_revision(self):self.proofs+=1
         def read_u32(self,a):return self.values.get(a,0)
         def read_ptr_checked(self,a,n):return self.read_u32(a)
-        def read_bytes(self,a,n):return self.read_u32(a).to_bytes(4,'big')[:n].ljust(n,b'\0')
+        def read_bytes(self,a,n):
+            return b''.join(self.read_u32(a+i).to_bytes(4,'big') for i in range(0,n,4))[:n]
     m=Memory();fields={0x9500:('stage_colour',0)}
-    with ui.verified_batch(m,fields):
+    with ui.verified_batch(m,fields,operation=operation):
         assert m.proofs==1
         for _ in range(20):assert ui.validate_batch(m,m._game_land_ui_batch)==fields
         assert m.proofs==1
         m.values[0x9200]=0x9400
         with pytest.raises(MemoryUnavailable):ui.validate_batch(m,m._game_land_ui_batch)
     assert m._game_land_ui_batch is None
+
+
+def test_bulk_proof_checks_every_anchor_and_ignores_mutable_gaps():
+    base=0x90000000
+    data=bytearray(64*0x144)
+    anchors=tuple((base+i*0x144+0x80,b'\x90\x00\x00\x00') for i in range(64))
+    for a,value in anchors:data[a-base:a-base+4]=value
+    class Memory:
+        reads=0
+        def read_bytes(self,a,n):
+            self.reads+=1
+            return bytes(data[a-base:a-base+n])
+    m=Memory();fields={}
+    batch={'fields':fields,'anchors':anchors,'code':(), 'blocks':ui.anchor_blocks(anchors)}
+    assert ui.validate_batch(m,batch)==fields
+    assert m.reads==1  # 64 former cross-process reads, for every write
+    data[0x100]=123  # native animation data between anchors is not immutable
+    ui.validate_batch(m,batch)
+    for a,value in anchors:
+        offset=a-base;data[offset]^=1
+        with pytest.raises(MemoryUnavailable):ui.validate_batch(m,batch)
+        data[offset]^=1
 
 
 @pytest.mark.parametrize('state',[12,13,14])
@@ -157,3 +181,31 @@ def test_hidden_rows_follow_availability_and_invalidate_before_redraw(monkeypatc
     assert m.writes[-2:]==[300,400]
     m.writes=[];ui.apply(m,snap,guard,{})
     assert not m.writes
+def test_early_visibility_is_published_once_and_only_reused_for_same_snapshot(monkeypatch):
+    from ..client.runtime import Runtime
+    from ..client import game_land_ui
+    runtime=Runtime.__new__(Runtime);runtime.snapshot=object();runtime.guard=object()
+    calls=[]
+    def apply(*args):calls.append(args);return {'status':'ready','changed_fields':21}
+    monkeypatch.setattr(game_land_ui,'apply',apply)
+    runtime.refresh_game_land_display(None,{},early=True)
+    assert runtime.refresh_game_land_display(None,{})['changed_fields']==21
+    assert len(calls)==1
+    runtime.snapshot=object()
+    runtime.refresh_game_land_display(None,{})
+    assert len(calls)==2
+
+
+def test_early_not_ready_is_retried_later_in_same_poll(monkeypatch):
+    from ..client.runtime import Runtime
+    from ..client import game_land_ui
+    runtime=Runtime.__new__(Runtime);runtime.snapshot=object();runtime.guard=object()
+    calls=[]
+    def apply(*args):
+        calls.append(args)
+        if len(calls)==1:raise MemoryUnavailable('panes still loading')
+        return {'status':'ready'}
+    monkeypatch.setattr(game_land_ui,'apply',apply)
+    runtime.refresh_game_land_display(None,{},early=True)
+    assert runtime.refresh_game_land_display(None,{})['status']=='ready'
+    assert len(calls)==2

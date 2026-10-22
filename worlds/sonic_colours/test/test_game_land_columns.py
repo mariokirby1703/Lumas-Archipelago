@@ -58,6 +58,18 @@ def test_unlocked_collapsed_column_unfolds_without_unlocking_other_stages(menu):
     assert fields[0x9000a038]==('one',None)
 
 
+def test_dictionary_and_parent_tree_use_single_bulk_reads(menu):
+    reads=[]
+    original=menu.read_bytes
+    def read_bytes(address,size):
+        reads.append((address,size))
+        return original(address,size)
+    menu.read_bytes=read_bytes
+    assert c.targets(menu,1)
+    assert reads.count((0x90005000,64*12))==1
+    assert reads.count((menu.array,64*0x144))==1
+
+
 @pytest.mark.parametrize('state',[0,1,9,12,14,17])
 def test_transitions_are_not_touched(menu,state):
     menu.values[menu.actor+0x9c]=state

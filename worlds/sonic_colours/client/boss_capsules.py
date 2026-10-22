@@ -114,12 +114,12 @@ def patches(capsule_control,progression_control,occupied):
               (UPDATE_HOOK,UPDATE_ORIGINAL,update_program(capsule_control,progression_control),None))
     used=0
     for hook,original,words,denied in programs:
-        selected=sites[used:];chunks=scatter(words,selected,hook+4)
+        selected=sites[used:];chunks=scatter(words,selected,hook+4,compact=denied is None)
         if denied is not None:
             address,old,_=chunks[denied]
             chunks[denied]=(address,old,struct.pack('>3I',branch(address,BLOCKED),0x60000000,0x60000000))
         result.append((hook,original.to_bytes(4,'big'),branch(hook,selected[0]['address']).to_bytes(4,'big')))
-        result.extend(chunks);used+=len(words)
+        result.extend(chunks);used+=len(chunks)
     return result
 
 
@@ -127,5 +127,6 @@ def planned_patches():
     from .native_dol import plan
     rows=plan()[0]
     start=next(i for i,row in enumerate(rows) if row[0]==HOOK)
-    count=3+len(program(0,0)[0])+len(create_program(0,0))+len(update_program(0,0))
-    return rows[start:start+count]
+    from .wisp_hud import HOOK as following
+    end=next(i for i,row in enumerate(rows) if row[0]==following)
+    return rows[start:end]

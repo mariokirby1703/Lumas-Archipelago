@@ -24,6 +24,7 @@ from .versions import VERSION
 from .deathlink import DeathLink
 from .build_info import implementation_info
 from .status import StatusReporter
+from .tracker_bridge import publish_scene
 from . import quiet_logging
 
 
@@ -888,6 +889,12 @@ async def dolphin_loop(ctx):
                     item_writes={'history_ready': ctx.history_ready, 'pending_receipts': ctx.runtime.pending_effects(), 'status': ctx.runtime.last_error})
                 ctx.dolphin_status = (snap.status if snap.evidence.get('executable_error')
                                       else ctx.runtime.guard.reason)
+                # PopTracker auto-navigation: publish verified scenes over AP Data Storage.
+                # Uses the snapshot already read by poll_runtime (no extra DME calls).
+                try:
+                    await publish_scene(ctx, snap)
+                except (ConnectionClosed, OSError, RuntimeError) as error:
+                    logger.debug('PopTracker scene publication pending: %s', error)
             except MemoryUnavailable as error:
                 ctx.dolphin_status = str(error)
                 ctx.operation_status['gameplay_detection'] = str(error)

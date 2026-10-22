@@ -118,8 +118,9 @@ class Machine:
             elif op==31 and w&0x7ff==48:self.r[ra]=(self.r[rt]<<(self.r[rb]&63))&0xffffffff
             elif op==31 and w&0x7ff==0x1d6:self.r[rt]=(self.r[ra]*self.r[rb])&0xffffffff
             elif op==31 and w&0x7ff==0x214:self.r[rt]=(self.r[ra]+self.r[rb])&0xffffffff
-            elif op==31 and w&0x7ff==57:
-                self.r[ra]=self.r[rt]&self.r[rb];self.cmp=(self.r[ra]>0)
+            elif op==31 and w&0x7ff in (56,57):
+                self.r[ra]=self.r[rt]&self.r[rb]
+                if w&1:self.cmp=(self.r[ra]>0)
             else:raise AssertionError(f'{pc:#x}: {w:#x}')
             pc=next_pc
         raise AssertionError('native program did not terminate')
@@ -173,6 +174,27 @@ def test_reused_input_pointer_cannot_lock_a_replaced_player():
     m=Machine('jump');m.put(m.control+n.REMAINING,0x41f00000)
     m.put(m.player+12,456);m.run()
     assert m.r[3]==m.input
+
+
+def test_jump_block_uses_fresh_controller_after_respawn():
+    m=Machine('jump');replacement=m.input+0x100
+    m.put(m.player+0x88,replacement);m.r[3]=replacement
+    m.put(m.control+n.REMAINING,0x41700000)
+    m.run();assert m.r[3]==0
+
+
+@pytest.mark.parametrize('handler',[0,0x80010000])
+def test_results_and_other_non_gameplay_handlers_preserve_trap_time(handler):
+    m=Machine('frame');m.put(m.stage+0x44,handler)
+    m.put(m.control+n.REMAINING,0x41700000)
+    m.run();assert m.get(m.control+n.REMAINING)==0x41700000
+
+
+def test_fifteen_native_gameplay_seconds_expire_even_without_host_polling():
+    m=Machine('frame');m.put(m.control+n.REMAINING,0x41700000)
+    for _ in range(29):m.run()
+    assert struct.unpack('>f',m.read(m.control+n.REMAINING,4))[0]==.5
+    m.run();assert m.get(m.control+n.REMAINING)==0
 
 
 @pytest.mark.parametrize('state',n.JUMP_STATES)

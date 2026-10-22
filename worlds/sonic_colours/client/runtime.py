@@ -455,6 +455,9 @@ class Runtime:
                 from .progression_hook import configure as configure_progression
                 self.hooks.progression_status=configure_progression(
                     memory,self.snapshot,early_owned,self.slot_data,self.journal)
+                if self.snapshot.scene=='game_land_select':
+                    self.refresh_game_land_display(memory,early_owned,early=True)
+                    self.refresh_emerald_display(memory,early_owned,early=True)
             except MemoryUnavailable as error:
                 self.hooks.progression_status={'available':False,'reason':str(error)}
         from .capsule_refresh import configure as configure_early_capsules
@@ -692,6 +695,38 @@ class Runtime:
             except MemoryUnavailable as error:result={'status':str(error)}
             self.hooks.gameplay_controls_status[name]=result
 
+    def refresh_game_land_display(self,memory,owned,early=False):
+        """Publish menu visibility before optional HUD work, once per snapshot.
+
+        Failed discovery is retried later in the same poll: native menu panes
+        can finish construction while other reconciliation work runs.
+        """
+        cached=getattr(self,'_early_game_land_display',None)
+        if not early:
+            self._early_game_land_display=None
+            if cached is not None and cached[0] is self.snapshot:return cached[1]
+        from .game_land_ui import apply
+        try:result=apply(memory,self.snapshot,self.guard,owned)
+        except MemoryUnavailable as error:return {'status':str(error)}
+        if early:self._early_game_land_display=(self.snapshot,result)
+        return result
+
+    def refresh_emerald_display(self,memory,owned,early=False):
+        """Publish menu visibility before optional HUD work, once per snapshot.
+
+        Failed discovery is retried later in the same poll: native menu panes
+        can finish construction while other reconciliation work runs.
+        """
+        cached=getattr(self,'_early_emerald_display',None)
+        if not early:
+            self._early_emerald_display=None
+            if cached is not None and cached[0] is self.snapshot:return cached[1]
+        from .emerald_ui import apply
+        try:result=apply(memory,self.snapshot,self.guard,owned)
+        except MemoryUnavailable as error:return {'status':str(error)}
+        if early:self._early_emerald_display=(self.snapshot,result)
+        return result
+
     def configure_native_hooks(self, memory, owned):
         """Project authenticated ownership into independent native controls.
 
@@ -700,11 +735,7 @@ class Runtime:
         Each writer retains its own executable/profile/scene checks.
         """
         owned=self.movement_policy(owned)
-        from .game_land_ui import apply as apply_game_land_ui
-        try:
-            game_land_display=apply_game_land_ui(memory,self.snapshot,self.guard,owned)
-        except MemoryUnavailable as error:
-            game_land_display={'status':str(error)}
+        game_land_display=self.refresh_game_land_display(memory,owned)
         from .capsule_refresh import configure as configure_capsules
         from .progression_hook import configure as configure_progression
         from .gameplay_controls import configure as configure_controls
@@ -722,11 +753,7 @@ class Runtime:
         except MemoryUnavailable as error:
             controls = {'error': str(error), 'installed': {}}
         self.hooks.gameplay_controls_status = {**controls, 'white_capsules': capsules,'game_land_ui':game_land_display}
-        from .emerald_ui import apply as apply_emerald_ui
-        try:
-            self.hooks.gameplay_controls_status['emerald_ui']=apply_emerald_ui(memory,self.snapshot,self.guard,owned)
-        except MemoryUnavailable as error:
-            self.hooks.gameplay_controls_status['emerald_ui']={'status':str(error)}
+        self.hooks.gameplay_controls_status['emerald_ui']=self.refresh_emerald_display(memory,owned)
         from .stunts import configure as configure_stunts
         try:
             self.hooks.gameplay_controls_status['stunts']=configure_stunts(memory,self.snapshot,owned,self.slot_data)

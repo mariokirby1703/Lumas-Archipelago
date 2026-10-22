@@ -6,7 +6,8 @@ that parent, and its collapsed transform puts the cursor on the Emerald.
 Only settled stage selection (state 13) is eligible; intro/exit animations
 retain exclusive control of the layout while they run.
 """
-from .memory import MemoryUnavailable
+import struct
+from .memory import MemoryUnavailable,valid_range
 from .native_read import read_stage_objects, read_actors
 
 
@@ -31,11 +32,12 @@ def targets(memory, flags):
     graph = memory.read_ptr_checked(layer + 0x8c, 16)
     groups = memory.read_ptr_checked(memory.read_ptr_checked(graph + 12, 8) + 4, 16)
     columns = {}
+    dictionary=memory.read_bytes(table,count*12)
     for i in range(count):
-        entry = table + i * 12
-        name = memory.read_bytes(memory.read_ptr_checked(entry, 16), 16).split(b'\0')[0]
+        nameptr,group,index=struct.unpack_from('>III',dictionary,i*12)
+        if nameptr%4 or not valid_range(nameptr,16):raise MemoryUnavailable('Invalid Game Land column name')
+        name = memory.read_bytes(nameptr,16).split(b'\0')[0]
         if name in tuple(f'emerald_{j}'.encode() for j in range(7)):
-            group, index = memory.read_u32(entry + 4), memory.read_u32(entry + 8)
             if group != 0 or not 0 <= index < 64 or name in columns:
                 raise MemoryUnavailable('Game Land column dictionary mismatch')
             columns[name] = index
@@ -43,6 +45,8 @@ def targets(memory, flags):
         raise MemoryUnavailable('Game Land column topology mismatch')
     array = memory.read_ptr_checked(groups + 4, 64 * 0x144)
     panes = {array + i * 0x144 for i in range(64)}
+    pane_data=memory.read_bytes(array,64*0x144)
+    parents={pane:struct.unpack_from('>I',pane_data,pane-array+0x80)[0] for pane in panes}
     fields = {}
     for zone in range(7):
         if not any(memory.read_progress_bit(flags, 210 + zone * 3 + act) for act in range(3)):
@@ -73,7 +77,7 @@ def targets(memory, flags):
                 if ancestor == pane:
                     fields[child + 0x7c] = ('dirty_matrix', None)
                     break
-                ancestor = memory.read_u32(ancestor + 0x80)
+                ancestor = parents[ancestor]
         # Native 805E5310 reuses its cached local matrix when bits 4/5
         # remain valid, even after the world matrix is dirtied.
         fields[pane + 0x7c] = ('dirty_scale', None)

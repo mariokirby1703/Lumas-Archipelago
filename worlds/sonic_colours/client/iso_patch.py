@@ -82,8 +82,6 @@ def get_wit(explicit=None,progress=lambda s:None):
 def command(wit,args,progress,cancel=None):
     import queue
     import threading
-    from .patch_progress import PatchProgress
-    display=PatchProgress()
     from collections import deque
     flags={'creationflags':subprocess.CREATE_NO_WINDOW} if os.name=='nt' else {}
     process=subprocess.Popen([str(wit),*map(str,args)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
@@ -247,12 +245,15 @@ def install_with_progress(patch,**kwargs):
     """GUI event thread remains responsive while WIT/local builds run."""
     import queue
     import threading
+    from .patch_progress import PatchProgress
+    display=PatchProgress()
     messages=queue.Queue();cancel=threading.Event();result=[];errors=[]
     group=None
     if not kwargs.get('source'):
         group=settings_group()
         kwargs['source']=str(group.iso_file) # file selection belongs to GUI thread
         if not kwargs.get('wit'):kwargs['wit']=str(vars(group).get('wit_path','')) or None
+    root=None
     try:
         import tkinter as tk
         from tkinter import ttk
@@ -269,6 +270,10 @@ def install_with_progress(patch,**kwargs):
         ttk.Button(root,text='Cancel',command=request_cancel).pack(pady=12)
         root.protocol('WM_DELETE_WINDOW',request_cancel)
     except Exception:
+        logger.warning('Could not open the ISO progress window; continuing without GUI',exc_info=True)
+        if root is not None:
+            try:root.destroy()
+            except Exception:pass
         installed=install(patch,**kwargs)
         if group:
             group.iso_file=type(group.iso_file)(kwargs['source'])

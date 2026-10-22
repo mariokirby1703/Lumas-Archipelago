@@ -47,7 +47,7 @@ older supported seeds are not reassigned to new goals.
 | Traps: `trap_percentage` | 10%. Percentage of remaining filler slots replaced with weighted traps. |
 | `ring_loss_trap_weight` | Medium; remove the applicable normal Sonic ring counter. |
 | `score_reset_trap_weight` | Low; reset current level score, preserving saved records/ranks. |
-| `dead_weight_trap_weight` | Low; block Jump for 30 gameplay seconds. Menus, pauses and loading do not consume gameplay time. |
+| `dead_weight_trap_weight` | Low; block Jump for 15 active stage seconds. Menus, pauses and loading do not consume time; deaths preserve the remaining duration. |
 | Miscellaneous: `music_randomization` | On. Seed-based music shuffle; see below. |
 | `death_link` | Off. Share deaths with other DeathLink players, with deferred safe-state delivery and echo suppression. Remaining live coverage is listed below. |
 

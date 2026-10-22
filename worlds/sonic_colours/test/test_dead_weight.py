@@ -37,6 +37,7 @@ def test_ack_required_receipt_dedup_and_conflicting_trap_defers(tmp_path,monkeyp
     try:
         item=ITEM_TABLE['Dead Weight Trap']
         dead_weight.deliver(runtime,m,0,item)
+        assert m.read_f32(base+n.REMAINING)==15.
         assert runtime.journal.data['effects']['0']['state']=='verifying'
         request=m.read_u32(base+n.TRAP_REQUEST)
         dead_weight.deliver(runtime,m,0,item)
@@ -51,6 +52,31 @@ def test_ack_required_receipt_dedup_and_conflicting_trap_defers(tmp_path,monkeyp
         b.put(base+n.REMAINING,bytes(4))
         dead_weight.deliver(runtime,m,1,item)
         assert runtime.journal.data['effects']['1']['state']=='verifying'
+    finally:runtime.journal.close()
+
+
+def test_death_and_respawn_preserve_remaining_gameplay_time(tmp_path,monkeypatch):
+    from dataclasses import replace
+    runtime,m,b,base=setup(tmp_path,monkeypatch)
+    m.write_guard=WritePolicy(m,runtime.guard,lambda memory:runtime.snapshot)
+    try:
+        dead_weight.deliver(runtime,m,0,ITEM_TABLE['Dead Weight Trap'])
+        request=m.read_u32(base+n.TRAP_REQUEST)
+        b.put(base+n.TRAP_ACK,request.to_bytes(4,'big'))
+        dead_weight.deliver(runtime,m,0,ITEM_TABLE['Dead Weight Trap'])
+        b.put(base+n.REMAINING,struct.pack('>f',7.25))
+        alive=runtime.snapshot
+        runtime.snapshot=replace(alive,death_state='dead')
+        event_controls.configure(runtime,m)
+        assert m.read_u32(base+n.ENABLE)==0
+        assert m.read_f32(base+n.REMAINING)==7.25
+        runtime.snapshot=replace(alive,stage_epoch='respawn')
+        runtime.guard.observe(runtime.snapshot)
+        event_controls.configure(runtime,m)
+        dead_weight.deliver(runtime,m,0,ITEM_TABLE['Dead Weight Trap'])
+        assert m.read_u32(base+n.ENABLE)==1
+        assert m.read_f32(base+n.REMAINING)==7.25
+        assert m.read_u32(base+n.TRAP_REQUEST)==request
     finally:runtime.journal.close()
 
 
