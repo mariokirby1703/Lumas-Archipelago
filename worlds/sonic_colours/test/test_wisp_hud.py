@@ -66,10 +66,10 @@ def test_queued_owned_wisp_is_never_cancelled(monkeypatch):
     assert not m.events and m.get(actor+0x1b4)==1
 
 
-def test_padding_and_hook_match_original_pal_and_have_no_collisions():
+def test_padding_and_hook_match_original_pal_and_have_no_collisions(pal_dol_bytes):
     from ..tools.private_assets import reference_root
     from ..world_constants import load_data
-    original=(reference_root()/'memdumps_and_more/main.dol').read_bytes();im=Dol(original)
+    original=pal_dol_bytes;im=Dol(original)
     for address,old,new in h.planned_patches():assert im.read(address,len(old))==old
     refs=set()
     for index,offset,base,size in im.sections:

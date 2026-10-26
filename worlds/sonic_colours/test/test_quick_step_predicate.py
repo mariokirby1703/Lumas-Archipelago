@@ -22,10 +22,6 @@ def test_gate_precedes_flags_and_forced_entry():
     from ..client.drill_turbo import payload
     from ..client.native_hook_table import hook_rows
     assert q.payload()==payload()
-    e=Executable(reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
-    assert int.from_bytes(e.read(q.HOOK,4),'big')==q.ORIGINAL
-    assert list(e.disassemble(q.HOOK-4,4))[0].op_str=='0x8020d554'
-    assert int.from_bytes(e.read(q.HOOK+4,4),'big')==0x41820038
     assert q.HOOK<0x80091c84<0x80091c90
     assert hook_rows().count((0xC2091C60,4))==1
 
@@ -53,3 +49,10 @@ def test_unbound_verified_actor_can_receive_quick_step(monkeypatch):
     with pytest.raises(MemoryUnavailable):policy('quick_step',0x80002a04,4)
     snapshot.progress_verified=False
     with pytest.raises(MemoryUnavailable):policy('quick_step',0x80002a00,4)
+
+
+def test_quick_step_native_query_precedes_entry(pal_executable):
+    e=pal_executable
+    assert int.from_bytes(e.read(q.HOOK,4),'big')==q.ORIGINAL
+    assert list(e.disassemble(q.HOOK-4,4))[0].op_str=='0x8020d554'
+    assert int.from_bytes(e.read(q.HOOK+4,4),'big')==0x41820038

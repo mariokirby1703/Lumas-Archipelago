@@ -58,10 +58,10 @@ def test_inactive_policy_and_unsafe_transitions_keep_original_callback(monkeypat
     m.run();assert not m.calls
 
 
-def test_callback_slots_original_bytes_and_full_patch_are_verified():
+def test_callback_slots_original_bytes_and_full_patch_are_verified(pal_dol_bytes):
     from ..tools.private_assets import reference_root
     from ..world_constants import load_data
-    raw=(reference_root()/'memdumps_and_more/main.dol').read_bytes();im=Dol(raw)
+    raw=pal_dol_bytes;im=Dol(raw)
     for kind,(hook,original,vt,*_) in a.HOOKS.items():
         assert im.read(hook,4)==struct.pack('>I',original)
         assert im.read(vt+0x34,4)==struct.pack('>I',hook)

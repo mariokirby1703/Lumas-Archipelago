@@ -59,10 +59,10 @@ def test_ap_unlock_updates_next_spawn_without_scene_reload(monkeypatch):
     m.put(prog+8,2);m.run();assert m.spawned
 
 
-def test_original_callsites_and_padding():
+def test_original_callsites_and_padding(pal_dol_bytes):
     from ..tools.private_assets import reference_root
     from ..world_constants import load_data
-    raw=(reference_root()/'memdumps_and_more/main.dol').read_bytes();im=Dol(raw)
+    raw=pal_dol_bytes;im=Dol(raw)
     for a,old,new in w.planned_patches():assert im.read(a,len(old))==old
     for hook in w.HOOKS:assert im.read(hook,4)==struct.pack('>I',branch(hook,w.SPAWN)|1)
     refs=set()

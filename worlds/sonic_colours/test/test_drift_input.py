@@ -27,10 +27,10 @@ def test_selection_and_continuation_require_drift_permission(monkeypatch,hook,ar
     assert m.r[3]==native_pressed
 
 
-def test_native_drift_branch_semantics_and_exact_padding():
+def test_native_drift_branch_semantics_and_exact_padding(pal_dol_bytes):
     from ..tools.private_assets import reference_root
     from ..world_constants import load_data
-    raw=(reference_root()/'memdumps_and_more/main.dol').read_bytes();im=Dol(raw)
+    raw=pal_dol_bytes;im=Dol(raw)
     for a,old,new in d.planned_patches():assert im.read(a,len(old))==old
     assert im.read(0x80066f24,4)==bytes.fromhex('41820058')  # false skips drift selection
     assert im.read(0x8015058c,4)==bytes.fromhex('40820040')  # false follows Run exit

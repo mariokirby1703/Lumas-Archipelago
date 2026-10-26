@@ -60,6 +60,8 @@ def check_pip():
 
 
 def confirm(msg: str):
+    if os.environ.get('CI', '').lower() in ('1', 'true', 'yes') or not sys.stdin or not sys.stdin.isatty():
+        raise RuntimeError(f'{msg}. Dependency installation requires --yes in a non-interactive session.')
     try:
         input(f"\n{msg}")
     except KeyboardInterrupt:
@@ -70,7 +72,7 @@ def confirm(msg: str):
 def update_command():
     check_pip()
     for file in requirements_files:
-        subprocess.call([sys.executable, "-m", "pip", "install", "-r", file, "--constraint", core_constraints])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", file, "--constraint", core_constraints])
 
 
 def install_pkg_resources(yes=False):
@@ -80,7 +82,7 @@ def install_pkg_resources(yes=False):
         check_pip()
         if not yes:
             confirm("pkg_resources not found, press enter to install it")
-        subprocess.call([sys.executable, "-m", "pip", "install", "setuptools>=75,<81"])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools>=75,<81"])
 
 
 def update(yes: bool = False, force: bool = False) -> None:

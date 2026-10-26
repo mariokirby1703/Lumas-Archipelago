@@ -1,7 +1,7 @@
 {
   "schema": "sonic_colours_poptracker_sheet_logic_v3",
   "source_file": "Sonic Colours (Wii) AP Logic.xlsx",
-  "provenance": "user uploaded workbook (artifact_tool extraction), plus four subsequent user-confirmed cell corrections",
+  "provenance": "Google Sheet export from 2026-10-24 (artifact_tool extraction), plus three explicit Game Land 7-3 clarifications",
   "locations": {
     "stg110": {
       "normal": [
@@ -238,13 +238,14 @@
       ],
       "movement": [
         [
-          "crouch:2"
+          "crouch:2",
+          "stomp"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Crouch Lv2",
+      "raw_movement": "Progressive Crouch Lv2 + Stomp",
       "world": "Tropical Resort",
       "row": 18
     },
@@ -328,13 +329,19 @@
       "movement": [
         [
           "crouch:2",
-          "laser"
+          "laser",
+          "double_jump"
+        ],
+        [
+          "crouch:2",
+          "laser",
+          "mid_air_boost"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "Laser",
-      "raw_movement": "Progressive Crouch Lv2 + Laser",
+      "raw_movement": "Progressive Crouch Lv2 + Laser + Double Jump or Progressive Crouch Lv2 + Laser + Mid-Air Boost",
       "world": "Tropical Resort",
       "row": 23
     },
@@ -3365,8 +3372,6 @@
           "stomp"
         ],
         [
-          "boost",
-          "crouch:2",
           "breathing",
           "drill"
         ]
@@ -3374,7 +3379,7 @@
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Breathing Lv1 + Swim + Progressive Crouch Lv2 + Stomp or Boost + Progressive Crouch Lv2 + Progressive Breathing Lv1 + Drill Lv1",
+      "raw_movement": "Progressive Breathing Lv1 + Swim + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv1 + Drill Lv1",
       "world": "Aquarium Park",
       "row": 4
     },
@@ -6342,12 +6347,6 @@
   "review": [],
   "unresolved_routes": {},
   "user_corrections": [
-    {
-      "sheet": "Aquarium Park",
-      "row": 8,
-      "column_index": 7,
-      "corrected_value": "Boost + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv1 + Swim + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv1 + Drill Lv1 + Laser + Progressive Crouch Lv2 or Progressive Breathing Lv2 + Swim + Laser + Progressive Crouch Lv2"
-    },
     {
       "sheet": "Game Land",
       "row": 44,

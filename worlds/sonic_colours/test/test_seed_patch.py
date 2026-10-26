@@ -150,6 +150,8 @@ def test_verified_iso_cache_and_tamper_refusal(tmp_path,previous_resources,monke
             'output_iso_sha256':hashlib.sha256(target.read_bytes()).hexdigest()}
     if previous_resources:
         from ..patch import EQUIVALENT_RESOURCES
+        # Model the release whose older resource transforms were equivalent.
+        monkeypatch.setattr('worlds.sonic_colours.patch.EQUIVALENT_RESOURCE_TARGET',resource_component_id())
         record['resource_component_sha256']=next(iter(EQUIVALENT_RESOURCES))
     Path(str(target)+'.sonic.json').write_text(json.dumps(record))
     assert install(patch,source,target)==target.resolve()

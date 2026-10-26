@@ -1,4 +1,4 @@
-"""Schema 6 tests use real original PAL memory captures when available."""
+"""Current schema and stable medal IDs; private PAL captures are optional."""
 
 from ..tools.private_assets import reference_root
 from pathlib import Path
@@ -12,7 +12,7 @@ from . import generate
 
 
 def test_new_public_options_and_unchanged_medal_ids():
-    assert SCHEMA_VERSION == 6
+    assert SCHEMA_VERSION == 7
     assert 'starting_act' not in OPTION_NAMES and 'level_randomization' not in OPTION_NAMES
     assert {'eggman_heart_sanity','world_progression','music_randomization'} <= set(OPTION_NAMES)
     for mode in (0,1):

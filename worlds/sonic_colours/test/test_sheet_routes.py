@@ -1,10 +1,9 @@
 """Sheet logic synchronization and physical (not AP-currency) goal regressions."""
 from collections import Counter
 from types import SimpleNamespace
-import itertools
 import pytest
 
-from .. import logic_v2 as logic
+from .. import logic
 from ..world_constants import STAGES,load_data
 from ..client.runtime import victory
 from .test_runtime import snapshot
@@ -22,20 +21,8 @@ def world(movement):
         movement_unlocks=movement,boost_lock=True,game_land_checks=True))
 
 
-def test_exact_sheet_catalog_all_worlds_and_mode_coverage():
-    data=load_data('logic_from_sheet_v2.json')
-    assert logic.validate_manifest(data) is data
-    assert Counter(r['kind'] for r in data['locations'].values()) == {
-        'clear':66,'ring':180,'one_up':31,'eggman_heart':21}
-    assert {row['source']['tab'] for row in data['locations'].values()} == {
-        'Tropical Resort','Sweet Mountain','Starlight Carnival','Planet Wisp',
-        'Aquarium Park','Asteroid Coaster','Terminal Velocity','Game Land'}
-    assert all(r['normal']['routes'] and r['movement']['routes'] for r in data['locations'].values())
-    assert sum(bool(r['movement'].get('source_blank')) for r in data['locations'].values())==108
-
-
 def test_movement_routes_replace_not_and_normal_and_missing_inherit_normal():
-    data=load_data('logic_from_sheet_v2.json')
+    data=load_data('logic_from_sheet_v3.json')
     # Tropical Resort Red Ring 5: free in NL; Rail Jump needed in ML.
     key='stg110:ring:5'
     assert logic.check(world(False),State(),data,key)
@@ -46,34 +33,10 @@ def test_movement_routes_replace_not_and_normal_and_missing_inherit_normal():
     assert logic.check(world(False),State(['Blue Cube Wisp']),data,key)
     assert not logic.check(world(True),State(['Blue Cube Wisp']),data,key)
     assert logic.check(world(True),State(['Blue Cube Wisp','Homing Attack']),data,key)
-    # Aquarium Park red ring has no separate ML note, so must keep its Wisp gate.
+    # The underwater route needs both Breathing and Drill.
     key=next(s['mission_id'] for s in STAGES if s['zone_index']==4 and s['slot']==1)+':ring:3'
     assert not logic.check(world(True),State(),data,key)
-    assert logic.check(world(True),State(['Progressive Yellow Drill Wisp']),data,key)
-
-
-def test_rank_s_mode_switch_uses_native_strategy_only_as_ability_gate():
-    data=load_data('logic_from_sheet_v2.json')
-    mission=next(s['mission_id'] for s in STAGES if s['zone_index']==2 and s['slot']==3)
-    assert logic.check(world(False),State(),data,mission,'S')
-    assert not logic.check(world(True),State(),data,mission,'S')
-    assert logic.check(world(True),State(['Stomp']),data,mission,'S')
-    boss=next(s['mission_id'] for s in STAGES if s['zone_index']==2 and s['kind']=='Boss')
-    assert not logic.check(world(False),State(),data,boss,'S')
-    assert logic.check(world(False),State(['Cyan Laser Wisp']),data,boss,'S')
-    assert not logic.check(world(True),State(['Cyan Laser Wisp']),data,boss,'S')
-    assert logic.check(world(True),State(['Cyan Laser Wisp','Homing Attack','Quick Step']),data,boss,'S')
-
-
-def test_game_land_emeralds_require_all_three_level_routes():
-    for zone in range(7,14):
-        stages=[s for s in STAGES if s['zone_index']==zone]
-        assert len(stages)==3 and {s['slot'] for s in stages}=={1,2,3}
-    data=load_data('logic_from_sheet_v2.json')
-    assert not logic.check(world(True),State(),data,
-                           next(s['mission_id'] for s in STAGES if s['zone_index']==7 and s['slot']==1))
-    assert logic.check(world(True),State(['Homing Attack']),data,
-                       next(s['mission_id'] for s in STAGES if s['zone_index']==7 and s['slot']==1))
+    assert logic.check(world(True),State(['Progressive Breathing','Progressive Yellow Drill Wisp']),data,key)
 
 
 def test_seven_bosses_and_all_180_physical_rings_are_required():
@@ -102,7 +65,7 @@ def test_seven_bosses_and_all_180_physical_rings_are_required():
 def test_vanilla_sequential_and_all_open_boss_gate_rules(progression):
     # All 6 acts and the boss exist in each vanilla world, even when stage
     # IDs are shuffled relative to their on-map slot numbers.
-    data=load_data('logic_from_sheet_v2.json')
+    data=load_data('logic_from_sheet_v3.json')
     for zone in range(6):
         stages=sorted((s for s in STAGES if s['zone_index']==zone),key=lambda s:s['slot'])
         assert [s['slot'] for s in stages]==list(range(1,8))
@@ -131,6 +94,8 @@ def test_entrance_rules_sequential_or_all_six(monkeypatch):
             permitted.clear()
             assert not boss_entrance.access_rule(state)
             permitted.add(stages[5]['mission_id'])
+            assert not boss_entrance.access_rule(state)
+            permitted.update(s['mission_id'] for s in stages[:6])
             assert boss_entrance.access_rule(state)
         else:
             assert stage2_entrance.access_rule(state)

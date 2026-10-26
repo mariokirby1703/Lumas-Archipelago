@@ -94,6 +94,13 @@ def copy_tutorials_files_to_static() -> None:
                 shutil.copyfile(Utils.local_path(source_path, file),
                                 Utils.local_path(target_path, secure_filename(file)))
 
+        # Worlds may keep a short source filename while stock hosts expect
+        # a language-prefixed game-info filename in the generated directory.
+        for lang, source_file in getattr(world.web, 'game_info_files', {}).items():
+            alias = os.path.join(target_path, f'{secure_filename(lang)}_{secure_filename(game)}.md')
+            if not os.path.isfile(alias):
+                shutil.copyfile(os.path.join(target_path, secure_filename(source_file)), alias)
+
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()

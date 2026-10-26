@@ -18,8 +18,9 @@ def test_movement_ids_are_append_only_and_progressive_crouch_has_two_copies():
     c = Counter(item.name for item in w.multiworld.itempool)
     assert all(c[name] == (2 if name in ('Progressive Crouch','Progressive Rail','Progressive Skydiving') else 5 if name in ('Progressive Breathing','Progressive Stunts') else 1) for name in MOVEMENT_ITEMS)
     assert w.fill_slot_data()['options']['movement_unlocks'] == 1
-    default = generate().worlds[1]
-    assert not any(i.name in MOVEMENT_ITEMS for i in default.multiworld.itempool)
+    assert generate().worlds[1].options.movement_unlocks.value==1
+    unlocked = generate({'movement_unlocks':False}).worlds[1]
+    assert not any(i.name in MOVEMENT_ITEMS for i in unlocked.multiworld.itempool)
 
 
 def test_progressive_permissions_and_independent_jumpdash():

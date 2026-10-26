@@ -31,16 +31,24 @@ def test_assist_item_and_stomp_ids():
     assert classification('Assist Change')==ItemClassification.progression
 
 
+@pytest.mark.parametrize('preserve_lr',[False,True])
 @pytest.mark.parametrize('pressed',[0,1])
 @pytest.mark.parametrize('allowed',[0,1])
-def test_native_assist_predicate_before_transfer(pressed,allowed):
+def test_native_assist_predicate_before_transfer(pressed,allowed,preserve_lr):
     from capstone import Cs,CS_ARCH_PPC,CS_MODE_32,CS_MODE_BIG_ENDIAN
-    words,offset=p.payload()
-    ops=list(Cs(CS_ARCH_PPC,CS_MODE_32|CS_MODE_BIG_ENDIAN).disasm(b''.join(x.to_bytes(4,'big') for x in words[:8]),0x80002000))
-    assert [x.mnemonic for x in ops]==['mflr','bl','mflr','lwz','and','mtlr','cmpwi','b']
-    assert ops[3].op_str=='r12, 0x18(r12)'
-    assert ops[4].op_str=='r3, r3, r12'
-    assert 8+0x18==offset
+    words,offset=p.payload(preserve_lr)
+    count=8 if preserve_lr else 6
+    ops=list(Cs(CS_ARCH_PPC,CS_MODE_32|CS_MODE_BIG_ENDIAN).disasm(b''.join(x.to_bytes(4,'big') for x in words[:count]),0x80002000))
+    if preserve_lr:
+        assert [x.mnemonic for x in ops]==['mflr','bl','mflr','lwz','and','mtlr','cmpwi','b']
+        assert ops[3].op_str=='r12, 0x18(r12)'
+        assert ops[4].op_str=='r3, r3, r12'
+        assert 8+0x18==offset
+    else:
+        assert [x.mnemonic for x in ops]==['bl','mflr','lwz','and','cmpwi','b']
+        assert ops[2].op_str=='r12, 0x14(r12)'
+        assert ops[3].op_str=='r3, r3, r12'
+        assert 4+0x14==offset
     assert bool(pressed & allowed)==bool(pressed and allowed)
     assert p.HOOK+4==p.ADDRESS
 

@@ -40,10 +40,13 @@ def test_goals_and_ring_pool_reachability(checks,goal):
         w=m.worlds[1]
         assert m.can_beat_game() and not m.get_unfilled_locations()
         counts=Counter(i.name for i in m.itempool)
-        assert all(counts[n] == 1 for n in EMERALDS)
-        assert sum(RING_VALUES.get(i.name,0) for i in m.itempool) == 187
-        if checks=='singles':
-            assert counts['Red Ring']==187 and not counts['5 Red Rings'] and not counts['10 Red Rings']
+        assert all(counts[n] == 0 for n in EMERALDS)
+        assert not w.options.super_sonic
+        assert sum(RING_VALUES.get(i.name,0) for i in m.itempool) == w.ring_target
+        assert w.ring_target == (4*max(w.gates.values())+2)//3
+        assert not counts['20 Red Rings'] and not counts['50 Red Rings']
+        if w.options.red_ring_checks.value==1:
+            assert counts['Red Ring']==w.ring_target and not counts['5 Red Rings'] and not counts['10 Red Rings']
         else:assert counts['5 Red Rings'] + counts['10 Red Rings'] > 0
         validate_slot(w.fill_slot_data())
 
@@ -74,7 +77,12 @@ def test_goals_use_physical_pickups_bosses_and_owned_emeralds():
 
 
 def test_red_ring_goal_tracks_when_location_checks_are_off(tmp_path):
-    data=generate({'red_ring_checks':'off','goal':'all_red_rings'}).worlds[1].fill_slot_data()
+    data=generate({'goal':'all_red_rings'}).worlds[1].fill_slot_data()
+    from ..Locations import LOCATION_TABLE
+    data={**data,'options_revision':9,'options':{**data['options'],'red_ring_checks':0},
+          'locations':{name:code for name,code in data['locations'].items()
+                       if LOCATION_TABLE[name].kind not in ('ring','rings')}}
+    data=validate_slot(data)
     value=snapshot(save_identity=None,scene_verified=True,pickup_verified=True,stage_epoch='intro',actual_mission='stg110',
                    new_game_verified=True,fresh_fields=(True,True))
     class Hooks:
@@ -99,11 +107,11 @@ def test_supplied_yaml_migrates_and_generates():
     path=Path(__file__).parent/'fixtures/yaml/Luma_Migrated.yaml'
     doc=yaml.safe_load(path.read_text())
     m=generate(doc['Sonic Colours (Wii)'],fill=True)
-    assert m.can_beat_game() and m.worlds[1].ring_target==187
+    assert m.can_beat_game() and m.worlds[1].ring_target==108
     old={'Sonic Colours (Wii)':{'goal':'all_story_clears','wisp_capsule_sanity':'story','wisp_unlocks':'vanilla','world_unlocks':'vanilla','chaos_emerald_items':False}}
     new,changes=migrate_yaml(old)
     assert new['Sonic Colours (Wii)']=={'goal':'all_bosses','wisp_capsules':True,'world_progression':'sequential','music_randomization':True,'movement_unlocks':False} and changes
-    with pytest.raises(ValueError,match='schema migration'):
+    with pytest.raises(ValueError,match='schema 7 required'):
         validate_slot({**m.worlds[1].fill_slot_data(),'schema_version':2})
 
 

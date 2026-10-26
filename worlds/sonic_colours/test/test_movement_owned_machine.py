@@ -290,10 +290,13 @@ def test_funded_air_boost_uses_same_permission_as_jump_dash():
     from pathlib import Path
     from ..tools.ppc import Executable
     assert g.STATE_PERMISSION[9]==g.STATE_PERMISSION[10]==1
-    e=Executable(reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
-    # Native constructor installs CStateAirBoost and registers it as ID 10.
-    assert int.from_bytes(e.read(0x80033ff8,4),'big')==0x3863C960
-    assert int.from_bytes(e.read(0x80034018,4),'big')==0x3880000A
     for request in (9,10):
         for owned in (0,2):
             test_encoded_gate_preserves_original_request_flow(request,owned,3,True,False,True,False)
+
+
+def test_air_boost_constructor_registers_state_10(pal_executable):
+    e=pal_executable
+    # Native constructor installs CStateAirBoost and registers it as ID 10.
+    assert int.from_bytes(e.read(0x80033ff8,4),'big')==0x3863C960
+    assert int.from_bytes(e.read(0x80034018,4),'big')==0x3880000A

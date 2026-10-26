@@ -122,6 +122,7 @@ def test_reported_minimal_fills_through_main(case,tmp_path,monkeypatch):
         args,seed=roll(mystery_argparse([
             '--player_files_path',str(players),'--weights_file_path','absent.yaml',
             '--meta_file_path','absent_meta.yaml','--seed',str(case['seed']),
+            '--multi','1',
             '--skip_output','--outputpath',str(output)]))
         multi=main(args,seed)
     finally:

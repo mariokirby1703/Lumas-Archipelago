@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 from ..client.deathlink import DeathLink
 from ..client.test_inventory import LocalInventoryOverrides,parse_item_request
-from .. import logic_v2
+from .. import logic
 from ..world_constants import load_data
 from ..Items import ALL_WISP_ITEMS
 
@@ -30,17 +30,17 @@ def _world(**options):
 
 
 def test_actual_sheet_or_routes_do_not_require_incompatible_alternatives():
-    manifest = load_data('logic_from_sheet_v2.json')
-    assert logic_v2.check(_world(), State('Progressive Green Hover Wisp'),
+    manifest = load_data('logic_from_sheet_v3.json')
+    assert logic.check(_world(), State('Progressive Green Hover Wisp'),
                           manifest, 'stg320:ring:4')
-    assert logic_v2.check(_world(), State('Progressive Pink Spikes Wisp','Progressive Rail',
+    assert logic.check(_world(), State('Progressive Pink Spikes Wisp','Progressive Rail',
                                          *(['Progressive Stunts']*5)),
                           manifest, 'stg410')
-    assert logic_v2.check(_world(), State('White Boost Wisp', 'Cyan Laser Wisp',
+    assert logic.check(_world(), State('White Boost Wisp', 'Cyan Laser Wisp',
                                          'Progressive Stunts', 'Progressive Stunts',
                                          'Progressive Stunts', 'Progressive Stunts',
                                          'Progressive Stunts'), manifest, 'stg430')
-    assert not logic_v2.check(_world(), State('Cyan Laser Wisp'), manifest, 'stg430')
+    assert not logic.check(_world(), State('Cyan Laser Wisp'), manifest, 'stg430')
 
 
 def test_test_wisp_group_matches_actual_yaml_items():

@@ -23,13 +23,6 @@ def test_native_predicate_and_displaced_instruction():
     words,offset=d.payload()
     assert (words,offset)==assist_payload()  # already verified boolean mask ABI
     assert offset==24 and words[5]==0x48000008
-    path=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
-    if not path.exists():pytest.skip('private executable absent')
-    e=Executable(path)
-    assert int.from_bytes(e.read(d.HOOK,4),'big')==d.ORIGINAL
-    calls=list(e.disassemble(d.HOOK-4,4))
-    assert calls[0].mnemonic=='bl' and calls[0].op_str=='0x8020b020'
-    assert int.from_bytes(e.read(0x80104d20,4),'big')==0x901D0060
 
 
 def test_two_progression_copies_and_existing_item_id():
@@ -64,11 +57,11 @@ def test_actual_water_turbo_predicate_uses_same_permission_as_ground(monkeypatch
     assert not m.b.writes and not m.calls
 
 
-def test_water_drill_original_input_and_padding():
+def test_water_drill_original_input_and_padding(pal_dol_bytes):
     import struct
     from ..client.native_dol import Dol,patch_dol
     from ..world_constants import load_data
-    im=Dol((reference_root()/'memdumps_and_more/main.dol').read_bytes())
+    im=Dol(pal_dol_bytes)
     assert im.read(d.WATER_HOOK,4)==struct.pack('>I',d.WATER_ORIGINAL)
     # Independent held-action 1 query, before effects/internal turbo state.
     assert im.read(d.WATER_HOOK-8,4)==bytes.fromhex('38800001')
@@ -91,4 +84,13 @@ def test_water_drill_original_input_and_padding():
         assert before==0x4e800020 or before>>26==18 and not before&1
         assert not any(a+i in refs for i in range(12))
     patch_dol(bytes(im.data),'water-drill-turbo')
+
+
+
+def test_drill_native_predicate_matches_original(pal_executable):
+    e=pal_executable
+    assert int.from_bytes(e.read(d.HOOK,4),'big')==d.ORIGINAL
+    calls=list(e.disassemble(d.HOOK-4,4))
+    assert calls[0].mnemonic=='bl' and calls[0].op_str=='0x8020b020'
+    assert int.from_bytes(e.read(0x80104d20,4),'big')==0x901D0060
 

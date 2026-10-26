@@ -51,7 +51,7 @@ def test_removed_features_leave_holes_in_ids_and_options():
     assert BASE_ID + 22 not in Items.BY_ID
     assert Items.ITEM_TABLE['Red Ring'] == BASE_ID + 23
     assert not any(name.endswith(' - D Rank') for name in Locations.LOCATION_TABLE)
-    assert sum(d.kind == 'rank' for d in Locations.LOCATION_TABLE.values()) == 176
+    assert sum(d.kind == 'rank' for d in Locations.LOCATION_TABLE.values()) == 180
     assert GAME == 'Sonic Colours (Wii)'
     assert not inventory([Items.ITEM_TABLE[n] for n in Items.EMERALDS[:-1]])['super_sonic_allowed']
     assert inventory([Items.ITEM_TABLE[n] for n in Items.EMERALDS])['super_sonic_allowed']
@@ -118,20 +118,34 @@ def test_new_game_prologue_any_slot_binding_resume_and_switch():
             guard.confirm_new_game()
             hooks.value = snapshot(save_identity=None, visible_slot=None, actual_mission='stg110', new_game_verified=True,
                 scene_verified=True, fresh_fields=(True, True), progress_verified=True,
-                persisted_clears=frozenset({'stg110'}))
+                persisted_clears=frozenset({'stg110'}),stage_epoch='intro-1',pickup_verified=True)
             assert runtime.poll(memory, [], False) == (set(), False)
             assert guard.state == PlaythroughState.MANDATORY_PROLOGUE
-            assert journal.data['bootstrap']['checks'] == [Locations.LOCATION_TABLE['Tropical Resort Act 1 - Clear'].code]
-            hooks.value = replace(hooks.value, persisted_clears=frozenset({'stg110', 'stg130'}), scene='save_selection')
+            # Unbound persisted flags alone cannot import another save's checks.
+            assert not journal.data['bootstrap']['checks']
+            hooks.value = replace(hooks.value,scene='results',current_result={
+                'mission':'stg110','final':True,'grade':3,
+                'provenance':'stage9C_native_UI_state7_grade124'})
+            runtime.poll(memory,[],False)
+            assert journal.data['pickup_checks'] == [Locations.LOCATION_TABLE['Tropical Resort Act 1 - Clear'].code]
+            hooks.value = replace(hooks.value,actual_mission='stg130',stage_epoch='intro-2',scene='gameplay',current_result={})
+            runtime.poll(memory,[],False)
+            hooks.value = replace(hooks.value,scene='results',persisted_clears=frozenset({'stg110','stg130'}),
+                                  current_result={'mission':'stg130','final':True,'grade':3,
+                                                  'provenance':'stage9C_native_UI_state7_grade124'})
+            runtime.poll(memory,[],False)
+            hooks.value = replace(hooks.value,scene='save_selection',current_result={})
             runtime.poll(memory, [], False)
             assert guard.state == PlaythroughState.VANILLA_SAVE_SELECTION
-            assert len(journal.data['bootstrap']['checks']) == 2 and not journal.data['checks']
+            assert len(journal.data['pickup_checks']) == 2
+            assert len(journal.data['checks']) == 2 and not journal.data['bootstrap']['checks']
             hooks.value = replace(hooks.value, scene='world_map', save_identity='verified-save-slot-three',
                                   visible_slot=3, save_identity_verified=True, new_save_selected=True)
             checks, goal = runtime.poll(memory, [], True)
             assert len(checks) == 2 and not goal and guard.armed
             assert journal.data['save_identity'] == 'verified-save-slot-three'
-            assert 'native permissions awaiting proof' in runtime.last_error
+            assert runtime.last_error
+            assert not memory.backend.writes
             checks, goal = runtime.poll(memory, [], True)
             assert len(checks) == 2 and not goal
             bound = hooks.value
@@ -177,7 +191,7 @@ def test_native_snapshot_reads_candidate_chain_without_promoting_it():
 
 
 def test_emerald_rewards_need_native_clears_and_logical_route_requirements():
-    data = generate({'game_land_checks': False}).worlds[1].fill_slot_data()
+    data = generate({'game_land_checks': True,'chaos_emerald_checks':True}).worlds[1].fill_slot_data()
     from ..world_constants import STAGES
     missions = [s['mission_id'] for s in STAGES if s['zone_index'] == 7]
     reward = snapshot(emerald_rewards=frozenset({1}), persisted_clears=frozenset(missions[2:]))
@@ -185,10 +199,16 @@ def test_emerald_rewards_need_native_clears_and_logical_route_requirements():
     assert code not in detect_checks(data, reward)
     reward = replace(reward, persisted_clears=frozenset(missions), evidence={'native_data':{'progression_events':{'game_land_clears':4}}})
     assert code in detect_checks(data, reward)
-    multiworld = generate({'game_land_checks': False})
+    multiworld = generate({'game_land_checks': True,'chaos_emerald_checks':True})
     state = CollectionState(multiworld)
     location = multiworld.get_location('Green Chaos Emerald', 1)
     assert not location.access_rule(state)
     for _ in range(14): state.collect(multiworld.worlds[1].create_item('10 Red Rings'), prevent_sweep=True)
+    assert not location.access_rule(state)
+    from ..Items import MOVEMENT_POOL,ALL_WISP_ITEMS,GAME_LAND_SPEED,RANDOM_CAPSULES
+    for name in list(MOVEMENT_POOL)+list(ALL_WISP_ITEMS)*2+[GAME_LAND_SPEED]*4+[RANDOM_CAPSULES]:
+        state.collect(multiworld.worlds[1].create_item(name),prevent_sweep=True)
     assert location.access_rule(state)
+    off=generate({'game_land_checks':False,'chaos_emerald_checks':True})
+    assert not any(Locations.LOCATION_TABLE[loc.name].kind=='emerald' for loc in off.get_locations() if loc.address is not None)
     assert not any('Clear Event' in l.name for l in multiworld.get_locations())

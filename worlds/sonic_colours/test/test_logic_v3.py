@@ -32,6 +32,82 @@ def test_v3_manifest_complete_and_route_tokens_real():
     assert MANIFEST['unresolved_routes'] == {}
 
 
+def test_current_catalog_covers_every_check_kind():
+    kinds=Counter(key.split(':')[1] if ':' in key else 'clear'
+                  for key in MANIFEST['locations'])
+    assert kinds=={'clear':66,'ring':180,'one_up':31,'eggman_heart':21}
+    broken={**MANIFEST,'locations':{key:value for key,value in MANIFEST['locations'].items()
+                                  if key!='stg130'}}
+    with pytest.raises(ValueError,match='mismatch'):logic.validate_manifest(broken)
+
+
+@pytest.mark.parametrize('colour,token',[
+    ('Yellow Drill','drill:2'),('Green Hover','hover:2'),('Pink Spikes','spikes:2'),
+])
+def test_special_wisp_moves_need_ownership_and_the_correct_tier(colour,token):
+    assert not logic.available(world(movement=False),State(),token)
+    assert logic.available(world(movement=False),State(colour+' Wisp'),token)
+    item='Progressive '+colour+' Wisp'
+    assert not logic.available(world(),State(item),token)
+    assert logic.available(world(),State(item,item),token)
+
+
+def test_alternative_routes_and_option_dependent_tiers():
+    routes=[['laser','rocket'],['spikes']]
+    assert logic.matches(world(),State('Cyan Laser Wisp','Orange Rocket Wisp'),routes)
+    assert logic.matches(world(),State('Progressive Pink Spikes Wisp'),routes)
+    assert not logic.matches(world(),State('Cyan Laser Wisp'),routes)
+    assert not logic.available(world(),State('Progressive Crouch'),'crouch:2')
+    assert logic.available(world(movement=False),State(),'crouch:2')
+    assert logic.available(world(land=False),State(),'land_speed:4')
+    assert logic.available(world(movement=False),State(),'land_speed:4')
+
+
+def test_all_five_ring_location_checks_the_last_ring_route():
+    from copy import deepcopy
+    multi=generate({'red_ring_checks':'per_level','movement_unlocks':False})
+    active=multi.worlds[1];active.logic=deepcopy(active.logic)
+    for index in range(1,6):
+        active.logic['locations'][f'stg110:ring:{index}']['normal']=[[]] if index<5 else [['laser']]
+    location=active.get_location('Tropical Resort Act 1 - All 5 Red Rings')
+    assert not location.can_reach(multi.state)
+    multi.state.collect(active.create_item('Cyan Laser Wisp'),prevent_sweep=True)
+    assert location.can_reach(multi.state)
+
+
+def test_game_land_first_stage_has_three_movement_alternatives():
+    assert not logic.check(world(),State(),MANIFEST,'stgD10')
+    for item in ('Progressive Game Land Speed','Homing Attack','Double Jump'):
+        assert logic.check(world(),State(item),MANIFEST,'stgD10')
+
+
+def test_tropical_resort_3_clear_needs_slide_and_stomp_with_ability_locks():
+    slide=('Progressive Crouch',)*2
+    assert not logic.check(world(),State(*slide),MANIFEST,'stg120')
+    assert not logic.check(world(),State('Progressive Crouch','Stomp'),MANIFEST,'stg120')
+    assert logic.check(world(),State(*slide,'Stomp'),MANIFEST,'stg120')
+    assert logic.check(world(movement=False),State(),MANIFEST,'stg120')
+
+
+@pytest.mark.parametrize('ability',['Double Jump','Mid-Air Boost'])
+def test_tropical_resort_3_ring_5_needs_an_aerial_ability(ability):
+    base=('Progressive Crouch','Progressive Crouch','Cyan Laser Wisp')
+    assert not logic.check(world(),State(*base),MANIFEST,'stg120:ring:5')
+    assert logic.check(world(),State(*base,ability),MANIFEST,'stg120:ring:5')
+    assert logic.check(world(movement=False),State('Cyan Laser Wisp'),MANIFEST,'stg120:ring:5')
+
+
+def test_aquarium_park_1_clear_drill_route_needs_only_breathing_and_drill():
+    owned=('Progressive Breathing','Progressive Yellow Drill Wisp')
+    assert logic.check(world(),State(*owned),MANIFEST,'stg510')
+    assert not logic.check(world(),State(owned[0]),MANIFEST,'stg510')
+    assert not logic.check(world(),State(owned[1]),MANIFEST,'stg510')
+    assert not logic.check(world(),State('Progressive Breathing','Swim',
+                                       'Progressive Crouch','Progressive Crouch'),MANIFEST,'stg510')
+    assert logic.check(world(),State('Progressive Breathing','Swim',
+                                   'Progressive Crouch','Progressive Crouch','Stomp'),MANIFEST,'stg510')
+
+
 def test_aquarium_park_1_red_ring_4_exactly_four_alternative_routes():
     routes = MANIFEST['locations']['stg510:ring:4']['movement']
     assert len(routes) == 4

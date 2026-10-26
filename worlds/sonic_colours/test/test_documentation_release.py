@@ -15,6 +15,21 @@ def test_source_has_only_two_canonical_guides():
     assert {p.name for p in docs.iterdir()}=={'setup.md','sonic_colours.md'}
 
 
+def test_source_webhost_publishes_canonical_game_info(tmp_path,monkeypatch):
+    import WebHost
+    import Utils
+    from werkzeug.utils import secure_filename
+    original=Utils.local_path
+    def local_path(*parts):
+        if parts[:4]==('WebHostLib','static','generated','docs'):
+            return str(tmp_path.joinpath(*parts[4:]))
+        return original(*parts)
+    monkeypatch.setattr(Utils,'local_path',local_path)
+    WebHost.copy_tutorials_files_to_static()
+    generated=tmp_path/secure_filename(GAME)
+    assert (generated/WEB_GAME_INFO).read_bytes()==(Path(__file__).parents[1]/'docs/sonic_colours.md').read_bytes()
+
+
 def test_built_guides_and_tutorial_follow_stock_webhost_conventions(tmp_path):
     from werkzeug.utils import secure_filename
     assert WEB_GAME_INFO=='en_'+secure_filename(GAME)+'.md'
@@ -42,7 +57,6 @@ def test_built_guides_and_tutorial_follow_stock_webhost_conventions(tmp_path):
     'data/.mypy_cache/report.json','data/.ruff_cache/report.json',
     'build/log.json','old_release.zip','old_release.apworld','TODO.md',
     'research_audit.json','docs/obsolete_report.md','tools/audit_research.py',
-    'logic_v2.py','data/logic_from_sheet_v2.json',
     'examples/SonicColours_Native_Test.yaml','examples/Luma_Migrated.yaml',
 ])
 def test_development_files_are_never_release_inputs(name):

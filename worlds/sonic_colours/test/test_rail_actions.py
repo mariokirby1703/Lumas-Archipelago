@@ -51,10 +51,10 @@ def test_unrelated_or_unverified_context_uses_native_helper(monkeypatch,kind,cas
     m.run();assert m.r[3]==state and m.r[1]==m.before[1]-0x10
 
 
-def test_native_input_routes_and_padding_are_byte_verified():
+def test_native_input_routes_and_padding_are_byte_verified(pal_dol_bytes):
     from ..tools.private_assets import reference_root
     from ..world_constants import load_data
-    raw=(reference_root()/'memdumps_and_more/main.dol').read_bytes();im=Dol(raw)
+    raw=pal_dol_bytes;im=Dol(raw)
     assert im.read(0x800ca2c4,4)==struct.pack('>I',r.HOOKS['jump'][1])
     # Both press and alternate jump query occur AFTER our helper entry gate.
     for address,target in ((0x800ca2e0,0x8020afe8),(0x800ca2f0,0x8020b1e0)):

@@ -57,15 +57,14 @@ Sonic Colours is a Wii platformer in which Sonic explores Eggman's interstellar 
 
 ## Notes
 
-The New Game introduction still begins in Tropical Resort before save selection. Connect before starting it so the client can observe checks during the opening Acts.
+The New Game introduction still begins in Tropical Resort before save selection. Connect **before** starting it so the client can observe checks during the opening Acts.
 
 Physical Red Ring checks are separate from AP Red Ring items used to unlock Game Land stages. Wisp discovery checks do not grant their corresponding Wisp items, and Chaos Emerald checks do not grant the matching Emerald items.
 
-Disabling Game Land Checks also disables its Eggman Heart and Chaos Emerald checks and removes its associated items from the pool. Super Sonic is a separate option. With Ability Locks enabled, Drill, Hover and Spikes use progressive unlocks; otherwise each has one complete unlock.
-
-This integration is still in development. Some features, including rapid Wisp Capsule pickups, DeathLink and Dead Weight, need broader live testing.
+Disabling Game Land Checks also disables its Eggman Heart and Chaos Emerald checks and removes its associated items from the pool.
+With Ability Locks enabled, Drill, Hover and Spikes use progressive unlocks; otherwise each has one complete unlock.
 
 ## Credits
 
-- **MysticPika:** Help with logic.
-- **Subna:** Logo.
+- **MysticPika:** for doing the majority of the logic.
+- **Subna:** for drawing the Logo.

@@ -6,6 +6,20 @@ from ..world_constants import BY_MISSION
 from . import generate
 
 
+def test_tropical_resort_3_and_later_acts_wait_for_stomp():
+    multi=generate({'movement_unlocks':True,'world_progression':0})
+    world=multi.worlds[1];state=multi.state
+    for _ in range(2):state.collect(world.create_item('Progressive Crouch'),prevent_sweep=True)
+    clear=world.get_location('Tropical Resort Act 3 - Clear')
+    act4=next(stage for stage in BY_MISSION.values() if stage['zone_index']==0 and stage['slot']==4)
+    following=world.get_region('Map Slot '+act4['stage_slot_id'])
+    assert not clear.can_reach(state)
+    assert not following.can_reach(state)
+    state.collect(world.create_item('Stomp'),prevent_sweep=True)
+    assert clear.can_reach(state)
+    assert following.can_reach(state)
+
+
 @pytest.mark.parametrize('mode',[0,1])
 @pytest.mark.parametrize('movement',[False,True])
 def test_asteroid_act_two_blocks_all_later_acts_and_boss(mode,movement):

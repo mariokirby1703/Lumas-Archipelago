@@ -51,10 +51,10 @@ def test_unlock_allows_same_capsule_without_reload(monkeypatch):
     m.put(cap+8,1);m.r[3]=0;m.run();assert m.r[3]==0
 
 
-def test_original_callsites_and_padding():
+def test_original_callsites_and_padding(pal_dol_bytes):
     from ..tools.private_assets import reference_root
     from ..world_constants import load_data
-    raw=(reference_root()/'memdumps_and_more/main.dol').read_bytes();im=Dol(raw)
+    raw=pal_dol_bytes;im=Dol(raw)
     for a,old,new in w.planned_patches():assert im.read(a,len(old))==old
     assert im.read(w.HOOK,4)==struct.pack('>I',w.ORIGINAL)
     refs=set()

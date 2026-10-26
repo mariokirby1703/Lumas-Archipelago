@@ -53,10 +53,10 @@ def test_late_item_receipt_immediately_changes_native_query(monkeypatch):
     m.put(prog+8,2);m.r[3]=model;m.run();assert m.r[3]==1
 
 
-def test_original_hook_and_padding_proof():
+def test_original_hook_and_padding_proof(pal_dol_bytes):
     from ..tools.private_assets import reference_root
     from ..world_constants import load_data
-    raw=(reference_root()/'memdumps_and_more/main.dol').read_bytes();im=Dol(raw)
+    raw=pal_dol_bytes;im=Dol(raw)
     for a,old,new in w.planned_patches():assert im.read(a,len(old))==old
     refs=set()
     for idx,off,base,size in im.sections:

@@ -133,31 +133,79 @@ class SonicColoursWorld(World):
         names += [self.get_filler_item_name() for _ in range(filler_count - trap_count)]
         self.multiworld.itempool += [self.create_item(n) for n in names]
 
+    def pre_fill(self):
+        from BaseClasses import LocationProgressType
+        for group_id,group in self.multiworld.groups.items():
+            members=group['players']
+            if not members or self.player!=min(members) or self.player not in members:
+                continue
+            requests={}
+            for player in sorted(members):
+                for name,count in self.multiworld.local_early_items[player].items():
+                    if name in group['item_pool']:requests[name]=max(requests.get(name,0),count)
+            state=self.multiworld.state.copy();state.sweep_for_advancements()
+            locations=sorted((loc for player in members for loc in self.multiworld.get_unfilled_locations(player)
+                              if loc.progress_type!=LocationProgressType.EXCLUDED and loc.can_reach(state)),
+                             key=lambda loc:(loc.player,loc.name))
+            self.random.shuffle(locations)
+            for name,count in sorted(requests.items()):
+                selected=[item for item in self.multiworld.itempool
+                          if item.player==group_id and item.name==name][:count]
+                placed=0
+                for item in selected:
+                    location=next((loc for loc in locations if loc.can_fill(state,item,True)),None)
+                    if location is None:break
+                    location.place_locked_item(item)
+                    self.multiworld.itempool.remove(item);locations.remove(location);placed+=1
+                for player in members:
+                    early=self.multiworld.local_early_items[player]
+                    if name in early:
+                        remaining=max(0,early[name]-placed)
+                        if remaining:early[name]=remaining
+                        else:early.pop(name)
+
     def fill_hook(self,progression,useful,filler,locations):
         from Fill import sweep_from_pool
         from collections import Counter
+        owners={self.player}|{gid for gid,group in self.multiworld.groups.items()
+                                  if self.player in group['players']}
         state=sweep_from_pool(self.multiworld.state,progression+useful)
         own=[loc for loc in locations if loc.player==self.player]
         total=sum(loc.can_reach(state) for loc in own)
         losses={}
-        counts=Counter(item.name for item in progression if item.player==self.player)
+        counts=Counter((item.player,item.name) for item in progression if item.player in owners)
         requirements={loc:0 for loc in own}
         for item in progression:
-            if item.player!=self.player or item.name in losses:
+            key=(item.player,item.name)
+            if item.player not in owners or key in losses:
                 continue
-            reduced=state.copy();reduced.remove(item)
-            losses[item.name]=total-sum(loc.can_reach(reduced) for loc in own)
-            for _ in range(counts[item.name]-1):reduced.remove(item)
+            if item.player==self.player:
+                reduced=state.copy();reduced.remove(item)
+            else:
+                # Linked receipts unlock events for every member. Rebuild the
+                # state so removing a group item also removes those events.
+                reduced=sweep_from_pool(self.multiworld.state,[i for i in progression if i is not item]+useful)
+            losses[key]=total-sum(loc.can_reach(reduced) for loc in own)
+            if item.player==self.player:
+                for _ in range(counts[key]-1):reduced.remove(item)
+            elif counts[key]>1:
+                reduced=sweep_from_pool(self.multiworld.state,
+                    [i for i in progression if (i.player,i.name)!=key]+useful)
             for loc in own:
-                if not loc.can_reach(reduced):requirements[loc]+=counts[item.name]
+                if not loc.can_reach(reduced):requirements[loc]+=counts[key]
         # Reverse fill uses harder checks first, leaving simple routes for
         # the last abilities even with minimal accessibility.
         positions=[i for i,loc in enumerate(locations) if loc.player==self.player]
         ordered=sorted(own,key=lambda loc:-requirements[loc])
         for i,loc in zip(positions,ordered):locations[i]=loc
-        indices=[i for i,item in enumerate(progression) if item.player==self.player]
+        indices=[i for i,item in enumerate(progression) if item.player in owners]
+        early_order={'Progressive Crouch':0}
+        if self.options.movement_unlocks and self.options.red_ring_checks.value==2:
+            # Sweet Mountain provides another check before Slide and Stomp
+            # can both be obtained for Tropical Resort Act 3.
+            early_order={'Sweet Mountain Shuttle':0,'Progressive Crouch':1}
         ordered=sorted((progression[i] for i in indices),key=lambda item:(
-            item.name!='Progressive Crouch',-losses[item.name]))
+            early_order.get(item.name,2),-losses[item.player,item.name]))
         for i,item in zip(indices,ordered):progression[i]=item
 
     def create_item(self, name):

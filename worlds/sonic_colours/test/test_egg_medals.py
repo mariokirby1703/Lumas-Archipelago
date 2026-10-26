@@ -174,9 +174,14 @@ def test_disabled_option_and_conservative_traversal_rule():
     assert len(locations)==21 and len({l.address for l in locations})==21
     from ..Locations import LOCATION_TABLE
     state=CollectionState(on)
-    assert next(l for l in locations if l.name=='Game Land 1-1 - Eggman Heart').access_rule(state)
+    first=next(l for l in locations if l.name=='Game Land 1-1 - Eggman Heart')
+    assert not first.access_rule(state)
+    state.collect(on.worlds[1].create_item('Homing Attack'),prevent_sweep=True)
+    assert first.access_rule(state)
     assert not next(l for l in locations if LOCATION_TABLE[l.name].mission=='stgE50').access_rule(state)
-    for name in WISP_ITEMS:state.collect(on.worlds[1].create_item(name),prevent_sweep=True)
+    from ..Items import ALL_WISP_ITEMS,MOVEMENT_POOL,GAME_LAND_SPEED,RANDOM_CAPSULES
+    for name in list(ALL_WISP_ITEMS)*2+list(MOVEMENT_POOL)+[GAME_LAND_SPEED]*4+[RANDOM_CAPSULES]:
+        state.collect(on.worlds[1].create_item(name),prevent_sweep=True)
     assert all(l.access_rule(state) for l in locations)
     assert not any(l.parent_region.can_reach(state) for l in locations if l.name.startswith('Game Land 1-2'))
 

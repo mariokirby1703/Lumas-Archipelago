@@ -97,7 +97,7 @@ def test_terminal_velocity_requires_every_wisp_without_access_item():
     from BaseClasses import CollectionState
     from ..Items import WISP_ITEMS, WORLD_ITEMS
     from ..world_constants import STAGES
-    multiworld = generate()
+    multiworld = generate({'movement_unlocks':False})
     world = multiworld.worlds[1]
     state = CollectionState(multiworld)
     for item in WISP_ITEMS[:-1]:
