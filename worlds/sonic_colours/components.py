@@ -2,7 +2,7 @@ from worlds.LauncherComponents import Component, SuffixIdentifier, Type, compone
 from .world_constants import GAME
 
 ICON = 'sonic_colours'
-icon_paths[ICON] = f'ap:{__package__}/assets/Colours Logo.png'
+icon_paths[ICON] = f'ap:{__package__}/assets/COLORSAPlogo.png'
 
 
 def run_client(*args):

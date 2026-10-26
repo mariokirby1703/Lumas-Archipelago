@@ -1,4 +1,3 @@
-"""Native active-state permission checks, including scripted transition recovery."""
 import struct
 from .capsule_refresh import PPC
 HOOKS={'drift':(0x80150504,0x9421FFD0,0x80769268,128,3),

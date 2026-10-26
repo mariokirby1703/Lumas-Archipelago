@@ -1,4 +1,3 @@
-"""Read and copy-patch player-owned CRI archives without loading a CPK into RAM."""
 from pathlib import Path
 import hashlib
 import os

@@ -20,14 +20,14 @@ def test_gate_precedes_flags_and_forced_entry():
     from pathlib import Path
     from ..tools.ppc import Executable
     from ..client.drill_turbo import payload
-    from ..client.movement_gecko import movement_ini
+    from ..client.native_hook_table import hook_rows
     assert q.payload()==payload()
     e=Executable(reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf')
     assert int.from_bytes(e.read(q.HOOK,4),'big')==q.ORIGINAL
     assert list(e.disassemble(q.HOOK-4,4))[0].op_str=='0x8020d554'
     assert int.from_bytes(e.read(q.HOOK+4,4),'big')==0x41820038
     assert q.HOOK<0x80091c84<0x80091c90
-    assert movement_ini().count('C2091C60 00000004')==1
+    assert hook_rows().count((0xC2091C60,4))==1
 
 
 def test_quick_step_write_capability_is_enabled():

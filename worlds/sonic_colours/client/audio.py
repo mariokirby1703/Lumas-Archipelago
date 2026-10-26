@@ -1,4 +1,3 @@
-"""Canonical Act cue identities; all shuffling belongs to music_bank.plan."""
 from ..world_constants import NORMAL
 from .memory import MemoryUnavailable
 

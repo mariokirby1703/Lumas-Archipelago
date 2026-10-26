@@ -162,14 +162,15 @@ def verify_revision(memory):
             from .native_events import patches as event_patches,SIZE
             from .boss_capsules import planned_patches as boss_patches
             from .wisp_hud import planned_patches as wisp_hud_patches
-            from .homing_fallback import planned_patches as homing_patches
             from .active_movement import planned_patches as active_movement_patches
             from .rail_actions import planned_patches as rail_patches
             from .drill_turbo import water_planned_patches
             from .wisp_activation import planned_patches as activation_patches
             from .random_wisp_spawns import planned_patches as random_spawn_patches
+            from .white_capsule_open import planned_patches as white_open_patches
+            from .drift_input import planned_patches as drift_input_patches
             data=bytearray(data)
-            for address,old,new in (*event_patches(ARENA+len(plan()[1])-SIZE),*boss_patches(),*wisp_hud_patches(),*homing_patches(),*active_movement_patches(),*rail_patches(),*water_planned_patches(),*activation_patches(),*random_spawn_patches()):
+            for address,old,new in (*event_patches(ARENA+len(plan()[1])-SIZE),*boss_patches(),*wisp_hud_patches(),*active_movement_patches(),*rail_patches(),*water_planned_patches(),*activation_patches(),*random_spawn_patches(),*white_open_patches(),*drift_input_patches()):
                 if section['address']<=address and address+len(new)<=section['address']+len(data):
                     offset=address-section['address']
                     if data[offset:offset+len(new)]!=new:

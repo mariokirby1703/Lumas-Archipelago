@@ -21,12 +21,14 @@ def release_file(relative):
     """Explicit release boundary; preserve all runtime/data files locally."""
     if any(part in EXCLUDED_PARTS for part in relative.parts):
         return False
-    if relative.suffix not in {'.py','.json','.md','.yaml','.txt','.ini','.csv','.png'}:
+    if relative.suffix not in {'.py','.json','.md','.yaml','.txt','.csv','.png'}:
         return False
     if len(relative.parts)==1:
-        return (relative.suffix=='.py' and relative.name!='build_apworld.py'
+        return (relative.suffix=='.py' and relative.name not in {'build_apworld.py','logic_v2.py'}
                 or relative.name in {'archipelago.json','README.md','requirements.txt'})
     directory=relative.parts[0]
+    if relative.as_posix() in {'logic_v2.py','data/logic_from_sheet_v2.json'}:
+        return False
     if directory=='docs':
         return len(relative.parts)==2 and relative.name in CANONICAL_DOCS
     if directory=='tools':

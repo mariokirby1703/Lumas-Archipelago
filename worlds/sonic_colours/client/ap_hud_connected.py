@@ -1,4 +1,3 @@
-"""Authenticated resource mailboxes; all native text allocation is guest-owned."""
 import re
 import math
 import struct

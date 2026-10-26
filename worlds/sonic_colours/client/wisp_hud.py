@@ -1,4 +1,3 @@
-"""Remove unowned cached cockpit icons through the native HUD event handler."""
 import struct
 from .capsule_refresh import PPC
 
@@ -57,6 +56,7 @@ def patches(capsule_control,progression_control,occupied):
 def planned_patches():
     from .native_dol import plan
     rows=plan()[0];start=next(i for i,row in enumerate(rows) if row[0]==HOOK)
-    from .homing_fallback import HOOK as following
-    end=next(i for i,row in enumerate(rows) if row[0]==following)
+    from ..world_constants import load_data
+    first=load_data('active_movement_sites.json')[0]['address']
+    end=next(i for i,row in enumerate(rows) if row[0]==first)
     return rows[start:end]

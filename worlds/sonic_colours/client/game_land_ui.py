@@ -1,4 +1,3 @@
-"""Game Land labels: hidden when locked, faded until genuinely cleared."""
 from .emerald_ui import targets
 from .memory import MemoryUnavailable
 from contextlib import contextmanager

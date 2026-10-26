@@ -1,4 +1,3 @@
-"""Offline permutation planning; never advertised as a native stage patch."""
 from ..world_constants import NORMAL, STAGES
 
 

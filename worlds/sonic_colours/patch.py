@@ -1,4 +1,3 @@
-"""Official AP player patch containers; proprietary source files stay local."""
 import hashlib
 import json
 from pathlib import Path
@@ -16,6 +15,9 @@ FORMAT=1
 UPGRADABLE_NATIVE_COMPONENTS={'85eebb98e87ebd22a6fcf7a99e0ae838c91514235a5c9ce73012bf785e1c813f',
     'cdb8612396f295a4a9b95bd3f26dd7f26bc5b47b396ff081036885807d8c3262',
     '91d374df5fd79a0a2459bbe39e6539bdf5737cf52053b37b1649a36006e3cb02',
+    '1fd791633bbe3ed0255a254551d6d02e1dbd657673819e42a9a9f8ab4bbd2f07',
+    '8bed5b046d3edf7b512e72136ea25e44be93a3e351058ef087ef2fe89ebc9781',
+    'f9a6fdc380f0bbaa8272d7fb2f90b0f7a2306635f768ea2a9cbbe059aeb88ba3',
                              '131e58fb3e7f593daa983f66d61251ee417080c88dfe5646f7e7aa04514642b5',
                              '032d23d9e9395d2fe9e53e3c9139bc0fd8c42e2cf71adc124088f78969240081',
                              '4fb7b39e6a3006585da629615d7aff634ba5fe2c633cc6d4ca58bd2611dbbb1b',

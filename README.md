@@ -28,15 +28,27 @@ Source code: [worlds/create](https://github.com/mariokirby1703/Lumas-Archipelago
 
 ## Carnival Games MiniGolf
 
-A planned Archipelago implementation for Carnival Games MiniGolf. This is the next integration I will be working on!
+An Archipelago implementation for Carnival Games MiniGolf *(Wii, European / PAL Version, `RG9P54`)*, using an external Dolphin client.
 
-Read first: Setup Guide — coming soon.
+Read first: [Setup Guide](https://github.com/mariokirby1703/Lumas-Archipelago/blob/Carnival-Games-MiniGolf-AP/worlds/carnival_games_minigolf/docs/setup_en.md)
 
-Game Documentation for goals, locations, items, and options — coming soon.
+Then skim through the [Game Documentation](https://github.com/mariokirby1703/Lumas-Archipelago/blob/Carnival-Games-MiniGolf-AP/worlds/carnival_games_minigolf/docs/en_Carnival%20Games%20MiniGolf.md) for goals, locations, items, options, and notes about the current release.
 
-Latest release: Not available yet.
+Latest release: [GitHub Releases](https://github.com/mariokirby1703/Lumas-Archipelago/releases)
 
-Source code: Coming soon.
+Source code: [worlds/carnival_games_minigolf](https://github.com/mariokirby1703/Lumas-Archipelago/tree/Carnival-Games-MiniGolf-AP/worlds/carnival_games_minigolf)
+
+## Sonic Colours (Wii)
+
+An Archipelago implementation for Sonic Colours *(Wii, European / PAL Version, `SNCP8P` Rev 0)*, using Dolphin and a locally patched ISO.
+
+Read first: [Setup Guide](https://github.com/mariokirby1703/Lumas-Archipelago/blob/Sonic-Colours-Wii-AP/worlds/sonic_colours/docs/setup.md)
+
+Then skim through the [Game Documentation](https://github.com/mariokirby1703/Lumas-Archipelago/blob/Sonic-Colours-Wii-AP/worlds/sonic_colours/docs/sonic_colours.md) for goals, locations, items, options, and verification limits.
+
+Latest releases: [GitHub Releases](https://github.com/mariokirby1703/Lumas-Archipelago/releases)
+
+Source code: [worlds/sonic_colours](https://github.com/mariokirby1703/Lumas-Archipelago/tree/Sonic-Colours-Wii-AP/worlds/sonic_colours)
 
 ---
 

@@ -22,11 +22,11 @@ class State:
 
 
 def test_super_sonic_only_bypasses_story_act_clears():
-    manifest = load_data('logic_from_sheet_v2.json')
+    manifest = load_data('logic_from_sheet_v3.json')
     # Deliberately require an absent Wisp for every route to isolate the bypass.
     import copy
     manifest = copy.deepcopy(manifest)
-    blocked = {'status': 'documented', 'routes': [[{'ability': 'Cyan Laser'}]]}
+    blocked = [['laser']]
     for row in manifest['locations'].values():
         row['normal'] = blocked
         row['movement'] = blocked
@@ -70,7 +70,7 @@ def test_movement_logic_never_gets_super_sonic_clear_bypass():
     world = multiworld.worlds[1]
     for emerald in EMERALDS:
         multiworld.state.collect(world.create_item(emerald), prevent_sweep=True)
-    from ..logic_v2 import check
+    from ..logic import check
     for stage in STAGES:
         mission = stage['mission_id']
         assert requirements(world, multiworld.state, mission) == check(world, multiworld.state, world.logic, mission)

@@ -1,4 +1,3 @@
-"""Durable AP events and bounded display scheduling; native rendering is gated."""
 import unicodedata
 import time
 CHARSET=set(' !#&()-./0123456789:;<>?@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')

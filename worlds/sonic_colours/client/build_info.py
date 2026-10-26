@@ -21,6 +21,7 @@ def implementation_info():
     from .memory import SonicMemory, DMEBackend
     from .gecko import inspect_c2, branch_target
     from . import gameplay_controls, medal_hook, music_bank, map_refresh, map_transition, live_music, direct_hooks, movement_gate
+    from .native_hook_table import hook_rows
     from .runtime import rings_amount
     from . import hooks, runtime, state, binding, native_read, client, journal, status, capsule_refresh, versions, progression_hook, music
     from ..world_progression import progression_clears, verified_result_clear
@@ -57,17 +58,17 @@ def implementation_info():
                  music_bank.plan, music_bank.replay_plan, music_bank.slot_plan, music_bank.rewrite_bank, music_bank.recover_bank, music_bank.validate_resource_bank, music_bank.load_manifest, music_bank.patch, journal.Journal.record_permissions,
                  live_music.apply, live_music.probe_bank, live_music.recover_original,
                  direct_hooks.plan, direct_hooks.install, direct_hooks.inspect, movement_gate.payload, movement_gate.permissions, movement_gate.observed, movement_gate.configure, movement_gate.installed_data, movement_gate.gecko_lines, movement_gate.water_observed, client.log_diagnostic, gameplay_controls.gecko_lines,
-                 map_refresh.payload, map_refresh.installed_data, map_refresh.configure, map_transition.payload, map_transition.installed, map_transition.update_payload, map_transition.update_installed, capsule_refresh.gecko_ini)
+                 map_refresh.payload, map_refresh.installed_data, map_refresh.configure, map_transition.payload, map_transition.installed, map_transition.update_payload, map_transition.update_installed, hook_rows)
     from .ap_hud_publisher import patches as hud_patches,normalize as hud_normalize
     from .ap_hud_connected import discover as hud_discover,render as hud_render,payloads as hud_payloads
     from .ap_hud_ticker import Ticker
     from . import oxygen_native,capsule_capture,native_events
-    from .. import wisps,logic_v2
+    from .. import wisps,logic
     digest = hashlib.sha256()
     for function in (oxygen_native.payload,oxygen_native.address,oxygen_native.context,oxygen_native.configure,
                      capsule_capture.payload,capsule_capture.read_events,capsule_capture.control_context,capsule_capture.configure,native_events.program,
                      wisps.wisp_level,wisps.project_inventory,wisps.all_wisps_owned,
-                     logic_v2.check,logic_v2.entry_match,logic_v2.available):
+                     logic.check,logic.clear_route,logic.matches,logic.available,logic.validate_manifest,logic.key_for_location):
         digest.update(function.__qualname__.encode());digest.update(marshal.dumps(inspect.unwrap(function).__code__))
     for function in (hud_patches.__wrapped__,hud_normalize,hud_discover,hud_render,hud_payloads,Ticker.received,Ticker.sent,Ticker.published,Ticker.panel_events,client.SonicCommands._cmd_sonichud):
         digest.update(function.__qualname__.encode());digest.update(marshal.dumps(inspect.unwrap(function).__code__))

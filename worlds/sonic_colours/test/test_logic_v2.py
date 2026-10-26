@@ -30,7 +30,7 @@ def test_exact_option_pools_native_projection_and_complete_seed(boost,movement,l
     assert counts['White Boost Wisp']==boost
     assert counts['Progressive Game Land Speed']==4*land*movement
     assert counts[RANDOM_CAPSULES]==land
-    if land:assert next(i for i in multi.itempool if i.name==RANDOM_CAPSULES).classification==(ItemClassification.progression if capsules else ItemClassification.useful)
+    if land:assert next(i for i in multi.itempool if i.name==RANDOM_CAPSULES).classification==(ItemClassification.progression if capsules or movement else ItemClassification.useful)
     assert multi.can_beat_game()
     assert validate_slot(w.fill_slot_data())['logic_policy']=='sheet_v2'
     owned=project_inventory(inventory([ITEM_TABLE[n] for n in required_wisp_items(w.options)]),w.fill_slot_data()['options'])
@@ -60,7 +60,7 @@ def test_normal_ids_are_append_only_and_legacy_progressive_ids_decode():
 
 def test_speed_pool_contract_preserves_old_seeds_and_rejects_wrong_new_pool():
     data=generate({'movement_unlocks':False,'game_land_checks':True}).worlds[1].fill_slot_data()
-    assert data['options_revision']==9 and not data['game_land_speed_items']
+    assert data['options_revision']==10 and not data['game_land_speed_items']
     assert validate_slot(data)['game_land_speed_items'] is False
     old={**data,'options_revision':8,'game_land_speed_items':True}
     assert validate_slot(old)['game_land_speed_items'] is True
@@ -166,7 +166,7 @@ def test_sheet_normal_or_routes_remain_alternatives():
     # These have explicit alternative routes; ambiguity remains documented
     # in the data rather than spuriously requiring every ability at once.
     assert logic.check(world(),State(['Progressive Green Hover Wisp']),manifest,'stg320:ring:4')
-    assert logic.check(world(),State(['Progressive Pink Spikes Wisp']),manifest,'stg410')
+    assert logic.check(world(movement_unlocks=False),State(['Progressive Pink Spikes Wisp']),manifest,'stg410')
     assert logic.check(world(movement_unlocks=False),
                        State(['Cyan Laser Wisp','Orange Rocket Wisp']),manifest,'stg430')
     assert not logic.check(world(),State(['Cyan Laser Wisp']),manifest,'stg430')

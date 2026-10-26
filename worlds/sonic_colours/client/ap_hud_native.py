@@ -1,4 +1,3 @@
-"""Read-only live PAL bonus-owner probe. No renderer or mutation."""
 from .memory import MemoryUnavailable
 from .native_read import read_stage_objects,read_actors
 ACTOR_VTABLE=0x80764440

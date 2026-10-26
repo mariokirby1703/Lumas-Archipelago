@@ -47,7 +47,7 @@ def validate_slot(data):
     if type(data.get('music_mapping_version',1)) is not int or data.get('music_mapping_version',1) not in (1,2):
         raise ValueError('unsupported music mapping version')
     revision=data.get('options_revision',0)
-    if type(revision) is not int or not 0<=revision<=9:raise ValueError('unsupported slot options revision')
+    if type(revision) is not int or not 0<=revision<=10:raise ValueError('unsupported slot options revision')
     options = data.get('options')
     # Old seeds have no physical 1-Up locations; adding the optional toggle
     # must not force regeneration or change their selected location set.
@@ -71,6 +71,9 @@ def validate_slot(data):
         if type(value) is not int:
             raise ValueError(f'slot option {name} must be resolved integer')
         cls = SonicColoursOptions.type_hints[name]
+        if name=='red_ring_checks' and value==0 and revision<10:
+            resolved[name]=cls(0)
+            continue
         # Retired Game Land goal: readable only in already generated slots.
         if name=='goal' and value==3 and revision<7:
             resolved[name]=cls(value)
@@ -85,8 +88,12 @@ def validate_slot(data):
         if name == 'game_land_requirement_reduction' and revision < 8:
             if not 0 <= value <= 179:
                 raise ValueError('invalid legacy Game Land reduction')
-            resolved[name] = cls(value)
+            option = cls(0)
+            option.value = value
+            resolved[name] = option
             continue
+        if hasattr(cls, 'range_start') and not cls.range_start <= value <= cls.range_end:
+            raise ValueError(f'invalid range {name}')
         option = cls.from_any(value)
         if getattr(option, 'options', None) and value not in option.options.values():
             raise ValueError(f'invalid choice {name}')
@@ -136,6 +143,15 @@ def validate_slot(data):
         if len(normalized)!=len(data['locations']):raise ValueError('duplicate location aliases')
         data={**data,'locations':normalized}
         if original:data['_original_location_names']=original
+    # Earlier schema-7 seeds predate the Terminal Velocity boss rank checks.
+    # Preserve their exact server location set; never invent checks in a seed.
+    # Only the entire option-selected rank group may be absent, not a partial
+    # group, changed stable IDs, or any other missing location.
+    terminal_ranks={n for n in expected_locations
+                    if LOCATION_TABLE[n].mission=='stg790' and LOCATION_TABLE[n].kind=='rank'}
+    if (revision<=9 and isinstance(data.get('locations'),dict) and terminal_ranks
+            and not terminal_ranks.intersection(data['locations'])):
+        expected_locations={n:code for n,code in expected_locations.items() if n not in terminal_ranks}
     if data.get('locations') != expected_locations:
         raise ValueError('slot locations do not match option-selected stable IDs')
     if options['wisp_capsules'] and not any(LOCATION_TABLE[n].kind == 'capsule' for n in expected_locations):

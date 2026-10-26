@@ -1,4 +1,3 @@
-"""Stable original Game Land EggmanMedal identities, independent of options."""
 import csv
 import io
 from importlib.resources import files

@@ -54,10 +54,6 @@ def launch_client(*args):
     parser.add_argument('--player-slot',type=int,help='Explicit AP slot number for legacy patch migration')
     parser.add_argument('--experimental-direct-hooks', action='store_true',
                         help='DANGEROUS: no Gecko allowed; inject PAL PPC hooks plus optional movement gate; may crash, JIT unverified')
-    parser.add_argument('--export-movement-gecko', metavar='OUTPUT_INI',
-                        help='Export Dolphin-managed BETA C2 movement profile for PAL Rev0; REPLACES all four original Gecko groups. NOT compatible with --experimental-direct-hooks.')
-    parser.add_argument('--export-capsule-gecko', metavar='OUTPUT_INI',
-                        help='Export all four PAL native Gecko code groups and exit')
     parser.add_argument('--migrate-yaml', nargs=2, metavar=('OLD_YAML','NEW_YAML'),
                         help='Migrate older player YAMLs; verify schema 7 options before playing; seed files and journals are not migrated')
     parser.add_argument('--patch-music', nargs=2, metavar=('ORIGINAL_CPK', 'OUTPUT_CPK'),
@@ -91,18 +87,6 @@ def launch_client(*args):
         migrated,changes=migrate_yaml(yaml.safe_load(original.read_text(encoding='utf-8')))
         output.write_text(yaml.safe_dump(migrated,sort_keys=False),encoding='utf-8')
         for change in changes:logging.info(change)
-        return
-    if parsed.export_movement_gecko:
-        from pathlib import Path
-        from .movement_gecko import movement_ini
-        Path(parsed.export_movement_gecko).write_text(movement_ini(),encoding='utf-8')
-        logging.info('BETA movement Gecko profile exported. REPLACE old 4-group code list; never enable both. Swim and Breath are NOT native-gated.')
-        return
-    if parsed.export_capsule_gecko:
-        from pathlib import Path
-        from .capsule_refresh import gecko_ini
-        Path(parsed.export_capsule_gecko).write_text(gecko_ini(), encoding='utf-8')
-        logging.info('Four PAL native code groups exported. Enable all four in Dolphin before starting emulation; runtime verification is still required.')
         return
     if parsed.patch_music and parsed.patch_all_music:
         parser.error('choose --patch-music or --patch-all-music')

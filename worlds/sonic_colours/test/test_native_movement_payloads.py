@@ -1,13 +1,11 @@
-"""PAL C2 Movement BETA invariants (not live emulation assertions)."""
-from ..client import movement_gate, movement_gecko
+from ..client import movement_gate
+from ..client.native_hook_table import hook_rows
 from ..client.gameplay_controls import HOOKS
 from ..client.map_refresh import HOOK as MAP_HOOK
 
 
-def test_movement_beta_fits_and_replaces_unwanted_hooks():
-    text = movement_gecko.movement_ini()
-    pairs = movement_gecko.pairs(text)
-    assert len(pairs)*8 <= movement_gecko.CAPACITY_BYTES
+def test_native_movement_hooks_are_present_once():
+    pairs = hook_rows()
     hooks = [0x80000000+(a&0xffffff) for a,_ in pairs if a>>24 == 0xc2]
     assert hooks.count(movement_gate.HOOK) == 1
     assert MAP_HOOK in hooks

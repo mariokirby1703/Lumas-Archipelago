@@ -1,4 +1,3 @@
-"""Canonical instance catalog; an ORC placement alone is not a playable check."""
 from dataclasses import dataclass
 import json
 from .world_constants import BASE_ID, BY_MISSION, WISPS, load_data, wisp_item

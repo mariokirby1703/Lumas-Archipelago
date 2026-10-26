@@ -1,4 +1,3 @@
-"""Story map permission policy shared by the AP player and native projection."""
 from .world_constants import STAGES
 
 

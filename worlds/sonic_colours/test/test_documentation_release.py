@@ -42,6 +42,7 @@ def test_built_guides_and_tutorial_follow_stock_webhost_conventions(tmp_path):
     'data/.mypy_cache/report.json','data/.ruff_cache/report.json',
     'build/log.json','old_release.zip','old_release.apworld','TODO.md',
     'research_audit.json','docs/obsolete_report.md','tools/audit_research.py',
+    'logic_v2.py','data/logic_from_sheet_v2.json',
     'examples/SonicColours_Native_Test.yaml','examples/Luma_Migrated.yaml',
 ])
 def test_development_files_are_never_release_inputs(name):
@@ -49,8 +50,8 @@ def test_development_files_are_never_release_inputs(name):
 
 
 @pytest.mark.parametrize('name',[
-    'client/runtime.py','data/native_event_sites.json','data/logic_from_sheet_v2.json',
-    'assets/Colours Logo.png','tools/build_hud_overlay.py','tools/hud_original_assets.py',
+    'client/runtime.py','data/native_event_sites.json','data/logic_from_sheet_v3.json',
+    'assets/COLORSAPlogo.png','tools/build_hud_overlay.py','tools/hud_original_assets.py',
     'docs/setup.md','docs/sonic_colours.md','examples/SonicColours.yaml',
     'Options.py','archipelago.json','requirements.txt',
 ])

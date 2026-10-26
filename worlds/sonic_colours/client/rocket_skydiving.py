@@ -1,4 +1,3 @@
-"""Boot-time Rocket fall callback guard sharing the authenticated Diving lock."""
 import json
 import struct
 from pathlib import Path

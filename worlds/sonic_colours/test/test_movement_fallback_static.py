@@ -1,7 +1,7 @@
 """Early request gate structural tests; not Dolphin-live certification."""
 
 from ..tools.private_assets import reference_root
-from ..client import movement_gate, movement_gecko
+from ..client import movement_gate
 
 
 def test_denied_request_becomes_noop_before_callbacks():
@@ -18,10 +18,8 @@ def test_denied_request_becomes_noop_before_callbacks():
         assert words[-1] == 0
 
 
-def test_gated_native_states_and_capacity():
-    assert set(movement_gate.STATE_PERMISSION) == {8,9,13,29,30,38,39,40,41,43,44,48,82,110}
-    text=movement_gecko.movement_ini()
-    assert len(movement_gecko.pairs(text))*8 <= movement_gecko.CAPACITY_BYTES
+def test_gated_native_states():
+    assert set(movement_gate.STATE_PERMISSION) == {8,9,10,13,29,30,38,39,40,41,43,44,82,110}
 
 
 def test_common_dispatch_is_reached_by_normal_and_forced_setters():

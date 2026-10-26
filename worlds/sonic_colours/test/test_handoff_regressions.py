@@ -33,7 +33,8 @@ def test_actual_sheet_or_routes_do_not_require_incompatible_alternatives():
     manifest = load_data('logic_from_sheet_v2.json')
     assert logic_v2.check(_world(), State('Progressive Green Hover Wisp'),
                           manifest, 'stg320:ring:4')
-    assert logic_v2.check(_world(), State('Progressive Pink Spikes Wisp'),
+    assert logic_v2.check(_world(), State('Progressive Pink Spikes Wisp','Progressive Rail',
+                                         *(['Progressive Stunts']*5)),
                           manifest, 'stg410')
     assert logic_v2.check(_world(), State('White Boost Wisp', 'Cyan Laser Wisp',
                                          'Progressive Stunts', 'Progressive Stunts',

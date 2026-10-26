@@ -1,4 +1,3 @@
-"""Host data-only publication to the initialized PAL game-thread mailbox."""
 import struct
 from . import native_events as n
 from .memory import MemoryUnavailable

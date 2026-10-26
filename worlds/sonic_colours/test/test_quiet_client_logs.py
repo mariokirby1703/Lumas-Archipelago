@@ -65,7 +65,7 @@ def test_native_and_network_automatic_messages_are_not_printed():
 def test_commands_still_print_when_requested():
     tree = ast.parse((CLIENT / 'client.py').read_text())
     for cmd in ('_cmd_soniclogs', '_cmd_sonicstatus', '_cmd_sonicdebug',
-                '_cmd_sonicmovement', '_cmd_sonicitems', '_cmd_give', '_cmd_remove'):
+                '_cmd_sonicmovement', '_cmd_sonicitems'):
         assert _function(tree, cmd)
     assert _calls(_function(tree, '_cmd_soniclogs'), 'quiet_logging', 'history')
     assert _calls(_function(tree, '_cmd_soniclogs'), 'quiet_logging', 'clear')

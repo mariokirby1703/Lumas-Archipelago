@@ -1,4 +1,3 @@
-"""Executable Sheet V2 routes; native rank awards remain authoritative."""
 from .wisps import required_wisp_items as pool_wisps,wisp_level
 from .Items import ALL_WISP_ITEMS
 

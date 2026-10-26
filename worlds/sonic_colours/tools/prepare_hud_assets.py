@@ -17,12 +17,12 @@ def prepare(source, output):
         raise ValueError('output must be a new directory')
     if source == output or output in source.parents:
         raise ValueError('output must not contain the source archive')
-    handoff=Path(__file__).resolve().parent
-    # Handoff scripts use sibling imports. Restore the search path afterwards.
+    scripts_dir=Path(__file__).resolve().parent
+    # These helpers import neighbouring scripts. Restore sys.path when done.
     previous=list(sys.path)
     try:
-        sys.path.insert(0,str(handoff))
-        spec=importlib.util.spec_from_file_location('sonic_hud_preflight',handoff/'hud_preflight.py')
+        sys.path.insert(0,str(scripts_dir))
+        spec=importlib.util.spec_from_file_location('sonic_hud_preflight',scripts_dir/'hud_preflight.py')
         module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
         report=module.audit(source)
         archive=module.CPK(source)

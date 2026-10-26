@@ -157,7 +157,7 @@ def test_complete_v11_profile_recovers_exact_pal_text_and_rejects_corruption():
     from pathlib import Path
     from ..tools.ppc import Executable
     from ..client.versions import VERSION, verify_revision
-    from ..client.movement_gecko import movement_ini, pairs
+    from ..client.native_hook_table import hook_rows
     from ..client import capsule_refresh, map_refresh
     p=reference_root()/'Sonic_Colours_PAL_Static_RE_v2/sonic_pal_disassembly.elf'
     if not p.exists():pytest.skip('original PAL executable absent')
@@ -174,7 +174,7 @@ def test_complete_v11_profile_recovers_exact_pal_text_and_rejects_corruption():
                 if base<=a and a+len(value)<=base+len(raw):
                     raw[a-base:a-base+len(value)]=value;return
             raise AssertionError(hex(a))
-    b=Backend();rows=pairs(movement_ini());i=0;cursor=0x80001800;targets={}
+    b=Backend();rows=hook_rows();i=0;cursor=0x80001800;targets={}
     while i<len(rows):
         first,count=rows[i];i+=1
         if first>>24!=0xc2:continue

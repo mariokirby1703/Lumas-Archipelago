@@ -1,4 +1,3 @@
-"""Fifteen gameplay seconds of Jump denial, with guest countdown and ACK."""
 import struct
 from . import native_events as n
 from .event_controls import write

@@ -25,7 +25,7 @@ def validate_logic(logic):
 
 
 def requirements(world,state,key,rank=None):
-    from .logic_v2 import check
+    from .logic import check
     stage = BY_MISSION.get(key)
     if (rank is None and stage is not None and stage['kind'] == 'Act'
             and stage['zone_index'] < 7 and world.options.super_sonic
@@ -67,8 +67,10 @@ def set_rules(world):
                 set_rule(region.entrances[0], lambda state, missions=all_acts: all(
                     can_complete(world, state, m) for m in missions))
             elif world.options.world_progression.value == 0:
-                dependencies=(previous,)
-                set_rule(region.entrances[0], lambda state, mission=previous: can_complete(world, state, mission))
+                dependencies=tuple(s['mission_id'] for s in STAGES
+                                   if s['zone_index']==zone and 1<=s['slot']<slot)
+                set_rule(region.entrances[0], lambda state, missions=dependencies: all(
+                    can_complete(world,state,mission) for mission in missions))
         if stage['zone_index'] == 6:
             previous={'stg790':'stg710','stg720':'stg790'}.get(stage['mission_id'])
             dependencies=(previous,) if previous else ()
@@ -92,13 +94,16 @@ def set_rules(world):
                     [f'{data.mission}:ring:{i}' for i in range(1, 6)] if data.kind == 'rings' else [data.mission])
             if data.kind == 'capsule':
                 item = CAPSULES[data.instance_key].wisp_item
-                from .logic_v2 import available
+                from .logic import available
                 colour=item.removesuffix(' Wisp').removeprefix('Progressive ')
                 set_rule(location,lambda state,colour=colour,story=CAPSULES[data.instance_key].story:
-                         available(world,state,{'ability':colour}) and
+                         available(world,state, {'Cyan Laser':'laser','Yellow Drill':'drill',
+                         'Orange Rocket':'rocket','Blue Cube':'cube',
+                         'Green Hover':'hover','Pink Spikes':'spikes',
+                         'Purple Frenzy':'frenzy','White Boost':'boost'}[colour]) and
                          (not world.options.game_land_checks or story or state.has('Random Capsules',player)))
             elif data.kind in ('one_up','medal'):
-                from .logic_v2 import key_for_location
+                from .logic import key_for_location
                 set_rule(location,lambda state,key=key_for_location(data):requirements(world,state,key))
             elif data.kind=='rank':
                 from .world_constants import RANKS
@@ -118,9 +123,7 @@ def set_rules(world):
         names = []
     else:
         names = []
-    event = SonicColoursLocation(player, 'Sonic Colours Victory', None, world.get_region('Menu'))
-    event.place_locked_item(Item('Sonic Colours Victory', ItemClassification.progression, None, player))
-    world.get_region('Menu').locations.append(event)
+    event = world.get_location('Sonic Colours Victory')
     if goal == 2:
         set_rule(event, lambda state: all(state.can_reach('Map Slot ' + s['stage_slot_id'], 'Region', player)
                 and all(requirements(world, state, f'{s["mission_id"]}:ring:{i}') for i in range(1, 6))

@@ -12,7 +12,7 @@ def test_slider_preserves_exact_previous_gate_values(percentage,old_reduction):
     world=generate({'game_land_requirement_reduction':percentage}).worlds[1]
     assert world.gates==game_land_gates(old_reduction)
     data=world.fill_slot_data()
-    assert data['options_revision']==9
+    assert data['options_revision']==10
     assert data['options']['game_land_requirement_reduction']==percentage
     assert validate_slot(data)['game_land_gates']==game_land_gates(old_reduction)
 

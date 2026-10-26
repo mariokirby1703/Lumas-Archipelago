@@ -1,4 +1,3 @@
-"""First-run Dolphin selection and graceful single-instance game startup."""
 import logging
 import os
 from pathlib import Path

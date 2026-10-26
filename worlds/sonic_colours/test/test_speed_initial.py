@@ -18,12 +18,11 @@ def test_original_reset_stores_default_speed_directly():
     assert s.PATCHED==0x38000000
 
 
-def test_exact_initial_speed_normalization_and_profile_capacity():
+def test_exact_initial_speed_normalization_and_native_patch():
     original=s.ORIGINAL.to_bytes(4,'big')
     assert s.normalize(original,s.ADDRESS)==original
     assert s.normalize(s.PATCHED.to_bytes(4,'big'),s.ADDRESS)==original
     with pytest.raises(MemoryUnavailable):s.normalize(bytes(4),s.ADDRESS)
-    from ..client.movement_gecko import movement_ini,pairs,CAPACITY_BYTES
-    codes=pairs(movement_ini())
+    from ..client.native_hook_table import hook_rows
+    codes=hook_rows()
     assert (0x0426FE80,s.PATCHED) in codes
-    assert len(codes)*8<=CAPACITY_BYTES

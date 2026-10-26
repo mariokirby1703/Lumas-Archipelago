@@ -1,4 +1,3 @@
-"""Location of optional, user-owned native regression inputs outside the world."""
 from pathlib import Path
 
 

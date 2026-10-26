@@ -1,4 +1,3 @@
-"""Game-thread pickup permission gate for scripted ReleaseBox drops."""
 import struct
 from .capsule_refresh import PPC
 

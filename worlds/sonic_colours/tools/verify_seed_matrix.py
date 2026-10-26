@@ -25,7 +25,7 @@ def main():
     results=[];start=time.monotonic()
     root=Path(__file__).resolve().parents[1]
     source={name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in
-            ('world.py','Rules.py','Items.py','Options.py','wisps.py','logic_v2.py','data/logic_from_sheet_v2.json')}
+            ('world.py','Rules.py','Items.py','Options.py','wisps.py','logic.py','data/logic_from_sheet_v3.json')}
     for boost,movement,land,capsules in itertools.product((0,1),repeat=4):
         options=dict(boost_lock=boost,movement_unlocks=movement,game_land_checks=land,wisp_capsules=capsules)
         for seed in range(args.seeds):

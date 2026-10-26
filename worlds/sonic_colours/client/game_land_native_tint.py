@@ -1,4 +1,3 @@
-"""Native selection-label tint during menu construction; no client-poll gap."""
 from .capsule_refresh import PPC
 from .gecko import inspect_c2
 from .memory import MemoryUnavailable

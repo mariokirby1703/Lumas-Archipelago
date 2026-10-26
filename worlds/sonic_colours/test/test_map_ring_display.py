@@ -1,7 +1,7 @@
 """Execute the emitted PAL UI redirect; native visual rendering is a live test."""
 import pytest
 from ..client.map_ring_display import payload, HOOK, ORIGINAL
-from ..client.movement_gecko import movement_ini, pairs, CAPACITY_BYTES
+from ..client.native_hook_table import hook_rows
 
 
 @pytest.mark.parametrize('zone',range(7))
@@ -35,7 +35,6 @@ def test_native_node_badge_creation_without_faking_clear(zone,act,status):
     assert ORIGINAL==0x40820198
 
 
-def test_combined_profile_retains_all_hooks_and_codehandler_capacity():
-    code=pairs(movement_ini())
-    assert len(code)*8<=CAPACITY_BYTES
+def test_native_table_retains_ring_display_hook():
+    code=hook_rows()
     assert sum(a==0xc2000000|(HOOK-0x80000000) for a,_ in code)==1

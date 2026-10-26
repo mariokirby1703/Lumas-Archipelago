@@ -52,6 +52,8 @@ ITEM_TABLE['Score Reset Trap'] = BASE_ID + 53
 ITEM_TABLE['Dead Weight Trap'] = BASE_ID + 54
 NORMAL_WISP_ITEMS = ('Yellow Drill Wisp','Green Hover Wisp','Pink Spikes Wisp')
 ITEM_TABLE.update({name:BASE_ID+55+i for i,name in enumerate(NORMAL_WISP_ITEMS)})
+RING_VALUES.update({'20 Red Rings':20,'50 Red Rings':50})
+ITEM_TABLE.update({'20 Red Rings':BASE_ID+58,'50 Red Rings':BASE_ID+59})
 ALL_WISP_ITEMS = WISP_ITEMS + NORMAL_WISP_ITEMS
 MOVEMENT_ITEMS += ('Quick Step',)
 MOVEMENT_POOL += ('Quick Step',)

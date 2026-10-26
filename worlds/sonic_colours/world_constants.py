@@ -1,4 +1,3 @@
-"""Stable public identifiers. Never derive IDs from enabled option subsets."""
 import json
 from importlib.resources import files
 
@@ -67,17 +66,33 @@ def legacy_game_land_gates(reduction):
 
 
 def pack_rings(target, capacity):
-    """Exact value, maximizing singles; prefer fives when singles tie."""
     if target < 0 or capacity < 0:
         raise ValueError('Invalid Red Ring budget/capacity')
-    best = None
-    for tens in range(target // 10 + 1):
-        for fives in range((target - tens * 10) // 5 + 1):
-            singles = target - tens * 10 - fives * 5
-            if singles + fives + tens <= capacity:
-                score = (singles, -tens, fives)
-                if best is None or score > best[0]:
-                    best = score, singles, fives, tens
-    if best is None:
-        raise ValueError('Too few non-excluded checks for mandatory progression; enable more checks.')
-    return (1,) * best[1] + (5,) * best[2] + (10,) * best[3]
+
+    def small_bundles(value, slots):
+        best=None
+        for tens in range(value//10+1):
+            for fives in range((value-10*tens)//5+1):
+                singles=value-10*tens-5*fives
+                if singles+fives+tens<=slots:
+                    score=(singles,-tens,fives)
+                    if best is None or score>best[0]:
+                        best=(score,(1,)*singles+(5,)*fives+(10,)*tens)
+        return None if best is None else best[1]
+
+    result=small_bundles(target,capacity)
+    if result is not None:
+        return result
+    candidates=[]
+    for fifties in range(target//50+1):
+        for twenties in range((target-50*fifties)//20+1):
+            slots=capacity-fifties-twenties
+            if slots<0:
+                continue
+            small=small_bundles(target-50*fifties-20*twenties,slots)
+            if small is not None:
+                candidates.append(((fifties+twenties,fifties,-small.count(1)),
+                                   small+(20,)*twenties+(50,)*fifties))
+    if candidates:
+        return min(candidates,key=lambda row:row[0])[1]
+    raise ValueError('Too few non-excluded checks for mandatory progression; reduce exclusions.')

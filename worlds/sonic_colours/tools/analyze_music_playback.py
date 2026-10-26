@@ -1,4 +1,3 @@
-"""Extract all PAL BGM loop/control evidence; never modifies game resources."""
 import hashlib
 import json
 import os

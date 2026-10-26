@@ -1,4 +1,3 @@
-"""Asset-derived physical 1-Up identities; pickup validation is independent."""
 from .world_constants import load_data,BASE_ID,BY_MISSION
 
 ROWS=load_data('one_up_positions.json')['locations']

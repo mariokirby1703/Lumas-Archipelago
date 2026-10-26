@@ -15,13 +15,18 @@ class Goal(Choice):
 
 
 class RedRingChecks(Choice):
-    """Add a check for each physical Red Ring, or one check per Act for collecting all five.
+    """Red Ring checks are always enabled: one per ring, or one per Act for collecting all five.
     These pickups are separate from the AP Red Ring items used to open Game Land stages."""
     display_name = 'Red Ring Checks'
-    option_off = 0
     option_singles = 1
     option_per_level = 2
     default = 1
+
+    @classmethod
+    def from_any(cls, data):
+        if data == 0 or isinstance(data,str) and data.lower() in ('off','false','0'):
+            return cls(cls.option_singles)
+        return super().from_any(data)
 
 
 class RankChecks(Choice):

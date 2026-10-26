@@ -29,6 +29,8 @@ class SonicColoursWorld(World):
                         'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS)}
 
     def generate_early(self):
+        if self.options.red_ring_checks.value==0:
+            self.options.red_ring_checks.value=1
         if not self.options.game_land_checks:
             self.options.eggman_heart_sanity.value=0
             self.options.chaos_emerald_checks.value=0
@@ -45,12 +47,12 @@ class SonicColoursWorld(World):
         self.starting_world = 0
         self.gates = game_land_gates(game_land_reduction_points(self.options.game_land_requirement_reduction.value))
         self.active_locations = tuple(n for n, d in Locations.LOCATION_TABLE.items() if Locations.enabled(d, self.options))
-        self.logic = load_data('logic_from_sheet_v2.json')
-        from .logic_v2 import validate_manifest
+        self.logic = load_data('logic_from_sheet_v3.json')
+        from .logic import validate_manifest
         validate_manifest(self.logic)
-        self.unknown_logic = tuple(k for k,v in self.logic['locations'].items() if v['normal']['status']=='not_documented')
-        logger.info('Sonic Colours: Sheet Logic V2; %d undocumented Normal routes use conservative fallback.',
-                       len(self.unknown_logic))
+        self.unknown_logic = ()
+        logger.info('Sonic Colours: Completed Sheet V3 NL/ML routes (%d), A/S rank Wisps included.',
+                    len(self.logic['locations']))
         if self.options.wisp_capsules.value and not any(
                 Locations.LOCATION_TABLE[n].kind == 'capsule' for n in self.active_locations):
             raise ValueError('wisp_capsules: no validated accessible capsule instances yet; '
@@ -80,38 +82,42 @@ class SonicColoursWorld(World):
         for item in precollected:
             if item.name in names:
                 names.remove(item.name)
-        access = [n for n in Items.WORLD_ITEMS[:6] if n in names]
-        if access:
-            # One ordinary world expands the initial check pool. The remaining
-            # access items and every Wisp use ordinary randomized fill.
-            early = self.multiworld.local_early_items[self.player]
-            from BaseClasses import CollectionState
-            initial=CollectionState(self.multiworld)
-            opening=[item for item in access if Rules.requirements(self,initial,next(
-                stage['mission_id'] for stage in STAGES if stage['zone_index']==Items.WORLD_ITEMS.index(item) and stage['slot']==1))]
-            if opening:access=opening
-            early.setdefault(self.random.choice(access), 1)
+        if self.options.movement_unlocks:
+            early=self.multiworld.local_early_items[self.player]
+            if self.options.red_ring_checks.value==2:
+                # Drill and Rail open both intro Acts' five-ring sets.
+                for name in ('Progressive Yellow Drill Wisp','Progressive Rail'):
+                    if name in names:
+                        early[name]=max(early.get(name,0),1)
+            elif names.count('Progressive Crouch'):
+                early['Progressive Crouch']=max(early.get('Progressive Crouch',0),names.count('Progressive Crouch'))
         needs_land = bool(self.options.game_land_checks)
         self.game_land_speed_items = bool(self.options.game_land_checks.value and self.options.movement_unlocks.value)
         speed_count = max(0, 4 - sum(i.name == Items.GAME_LAND_SPEED for i in precollected)) if self.game_land_speed_items else 0
         self.ring_required = max(self.gates.values()) if needs_land else 0
         self.ring_target = (4 * self.ring_required + 2) // 3
         remaining = max(0, self.ring_target - sum(Items.RING_VALUES.get(i.name, 0) for i in precollected))
-        capacity = len(self.active_locations) - len(self.options.exclude_locations.value & set(self.active_locations)) - len(names)
-        capacity = min(capacity, len(self.active_locations) - len(names) - speed_count)
+        available=len(self.active_locations)-len(self.options.exclude_locations.value & set(self.active_locations))
+        def minimum_currency(value):
+            count=0
+            for amount in (50,20,10,5,1):
+                copies,value=divmod(value,amount)
+                count+=copies
+            return count
+        capacity=available-len(names)-speed_count
         # In small check sets, mostly-single currency can occupy almost every
         # ordinary route and leave the abilities needed by Game Land stranded.
         # Bundle currency while retaining the exact target value and reserve
         # ordinary check capacity for the mandatory non-currency progression.
         ordinary=sum(next(s for s in STAGES if s['mission_id']==Locations.LOCATION_TABLE[n].mission)['zone_index']<7
                      for n in self.active_locations if n not in self.options.exclude_locations.value)
-        minimum_currency_items=remaining//10+(remaining%10)//5+remaining%5
+        minimum_currency_items=minimum_currency(remaining)
         capacity=min(capacity,max(minimum_currency_items,ordinary-len(names)-speed_count))
         ring_items = [Items.ring_name(n) for n in pack_rings(remaining, capacity)]
         names += ring_items
         # The restrictive filler already prevents item self-locks. Blanket
         # Wisp/world bans in Game Land and Red Ring bans on Clears exhaust
-        # reachable slots with Sheet V2's individual movement requirements.
+        # reachable slots with the completed per-check spreadsheet requirements.
         names += [Items.GAME_LAND_SPEED] * speed_count
         filler_count = len(self.active_locations) - len(names)
         if filler_count < 0:
@@ -127,29 +133,53 @@ class SonicColoursWorld(World):
         names += [self.get_filler_item_name() for _ in range(filler_count - trap_count)]
         self.multiworld.itempool += [self.create_item(n) for n in names]
 
-    def fill_hook(self, progitempool, usefulitempool, filleritempool, fill_locations):
-        # Reverse restrictive fill must place the many interchangeable rings
-        # while access/ability items are still in its maximum exploration state.
-        # Otherwise removing one ability can strand hundreds of ring receipts.
-        progitempool.sort(key=lambda item: item.player == self.player and item.name in Items.RING_VALUES)
+    def fill_hook(self,progression,useful,filler,locations):
+        from Fill import sweep_from_pool
+        from collections import Counter
+        state=sweep_from_pool(self.multiworld.state,progression+useful)
+        own=[loc for loc in locations if loc.player==self.player]
+        total=sum(loc.can_reach(state) for loc in own)
+        losses={}
+        counts=Counter(item.name for item in progression if item.player==self.player)
+        requirements={loc:0 for loc in own}
+        for item in progression:
+            if item.player!=self.player or item.name in losses:
+                continue
+            reduced=state.copy();reduced.remove(item)
+            losses[item.name]=total-sum(loc.can_reach(reduced) for loc in own)
+            for _ in range(counts[item.name]-1):reduced.remove(item)
+            for loc in own:
+                if not loc.can_reach(reduced):requirements[loc]+=counts[item.name]
+        # Reverse fill uses harder checks first, leaving simple routes for
+        # the last abilities even with minimal accessibility.
+        positions=[i for i,loc in enumerate(locations) if loc.player==self.player]
+        ordered=sorted(own,key=lambda loc:-requirements[loc])
+        for i,loc in zip(positions,ordered):locations[i]=loc
+        indices=[i for i,item in enumerate(progression) if item.player==self.player]
+        ordered=sorted((progression[i] for i in indices),key=lambda item:(
+            item.name!='Progressive Crouch',-losses[item.name]))
+        for i,item in zip(indices,ordered):progression[i]=item
 
     def create_item(self, name):
         from BaseClasses import ItemClassification
         kind=Items.classification(name)
         if name==Items.RANDOM_CAPSULES:
-            kind=ItemClassification.progression if self.options.wisp_capsules else ItemClassification.useful
+            kind=(ItemClassification.progression if (self.options.wisp_capsules or
+                     (self.options.game_land_checks and self.options.movement_unlocks))
+                  else ItemClassification.useful)
         return Items.SonicColoursItem(name,kind,Items.ITEM_TABLE[name],self.player)
 
     def get_filler_item_name(self):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'options_revision':9, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':10, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'music_seed': hashlib.sha256(json.dumps(['sonic-bgm-player-v1',self.multiworld.seed_name,self.player],separators=(',',':')).encode()).hexdigest(),
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
                 'stage_mapping': self.stage_mapping, 'unknown_logic': list(self.unknown_logic),
-                'logic_policy': 'sheet_v2',
+                'logic_policy': 'sheet_v2',  # Client wire compatibility; rules use Sheet V3.
+                'logic_engine_version': 3,
                 'mandatory_prologue': ['stg110', 'stg130'],
                 'locations': {n: Locations.LOCATION_TABLE[n].code for n in self.active_locations},
                 'options': self.options.as_dict(*OPTION_NAMES)}
@@ -161,8 +191,3 @@ class SonicColoursWorld(World):
                                slot_data=self.fill_slot_data())
         patch.write()
 
-    def write_spoiler_header(self, spoiler_handle):
-        spoiler_handle.write(f'\nSonic Colours (Wii) PAL\n'
-                             'Starting world: Tropical Resort (vanilla intro)\n'
-                             f'Unknown logic entries: {len(self.unknown_logic)}\n'
-                             'Logic: Sheet V2; undocumented Normal routes require all selected Wisps.\n')

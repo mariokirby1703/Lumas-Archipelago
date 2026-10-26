@@ -1,4 +1,3 @@
-"""Debounce presentation only; never delay the native event scanner."""
 class StatusReporter:
     def __init__(self):
         self.published = None

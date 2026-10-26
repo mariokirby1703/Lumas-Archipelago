@@ -1,4 +1,3 @@
-"""User-facing patch status, separate from detailed diagnostic output."""
 import re
 
 PHASES={

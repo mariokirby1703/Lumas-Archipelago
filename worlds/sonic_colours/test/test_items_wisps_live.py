@@ -14,7 +14,7 @@ from ..client.runtime import Runtime
 from ..client.journal import Journal
 from ..client.hooks import NativeHooks
 from ..client.memory import SonicMemory, MemoryUnavailable
-from ..client.capsule_refresh import HOOK, ORIGINAL, payload_words, installed, gecko_ini
+from ..client.capsule_refresh import HOOK, ORIGINAL, payload_words, installed
 from .test_pickup_integration import Overlay
 from .test_runtime import IDENTITY, snapshot
 from .test_memory import FakeBackend
@@ -192,12 +192,11 @@ def test_only_exact_gecko_thunk_can_pass_native_revision_hash():
     with pytest.raises(MemoryUnavailable,match='unrecognized capsule thunk'):m.verify_revision()
 
 
-def test_wisp_names_keep_numeric_ids_and_exported_gecko_is_packaged():
+def test_wisp_names_keep_numeric_ids():
     assert 'Cyan Laser Wisp' in WISP_ITEMS and 'Progressive Yellow Drill Wisp' in WISP_ITEMS
     assert not any('Unlock' in n for n in ITEM_TABLE)
     from ..world_constants import BASE_ID
     assert ITEM_TABLE['Cyan Laser Wisp']==BASE_ID+8
-    assert (Path(__file__).parents[1]/'data/SNCP8P_capsule_refresh.ini').read_text()==gecko_ini()
 
 
 @pytest.mark.skipif(not all(a.exists() and b.exists() for a,b in PAIRS),reason='private captures absent')

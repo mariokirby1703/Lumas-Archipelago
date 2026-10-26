@@ -1,4 +1,3 @@
-"""Per-user Windows association; never replaces another application's owner."""
 import os
 from pathlib import Path
 import subprocess

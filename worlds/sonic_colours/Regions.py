@@ -1,4 +1,4 @@
-from BaseClasses import Region
+from BaseClasses import Region, Item, ItemClassification
 from .Locations import SonicColoursLocation, LOCATION_TABLE
 from .world_constants import STAGES, WORLDS
 
@@ -20,3 +20,7 @@ def create_regions(world):
             data = LOCATION_TABLE[name]
             if data.mission == stage['mission_id']:
                 region.locations.append(SonicColoursLocation(world.player, name, data.code, region))
+
+    event = SonicColoursLocation(world.player, 'Sonic Colours Victory', None, menu)
+    event.place_locked_item(Item('Sonic Colours Victory', ItemClassification.progression, None, world.player))
+    menu.locations.append(event)

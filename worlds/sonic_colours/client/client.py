@@ -50,41 +50,14 @@ class SonicCommands(ClientCommandProcessor):
         return inventory(item_ids)
 
     @mark_raw
-    def _cmd_give(self, raw=''):
-        """TEST ONLY: /give ITEM [LEVEL|all]. Numeric progressive items set a target level; no AP receipt."""
-        self._change_test_ability('give', raw)
-
-    @mark_raw
-    def _cmd_remove(self, raw=''):
-        """TEST ONLY: /remove ITEM [COUNT|all]. Temporarily mask a real AP ability; /testitems reset restores."""
-        self._change_test_ability('remove', raw)
-
-    @mark_raw
     def _cmd_testitems(self, raw=''):
-        """List supported items or show/reset session-local /give and /remove overrides."""
+        """Show or clear session-local test overrides."""
         action=raw.strip().lower()
         if action in ('list', 'help'):
             log_diagnostic({'supported_items':list(TESTABLE), 'all_targets':list(ABILITY_SET),
                             'progressive_limits':MAXIMUM,
-                            'examples':['/give Double Jump','/remove Double Jump',
-                                        '/give White Boost Wisp','/remove Cyan Laser Wisp',
-                                        '/give Progressive Crouch 2',
-                                        '/give Progressive Breathing 5',
-                                        '/give breath 2  (level 2 = 10 seconds)',
-                                        '/give laser', '/remove drill',
-                                        '/give legacy breath  (retired 30-second item)',
-                                        '/remove Progressive Breathing all',
-                                        '/give wisps', '/remove wisps',
-                                        '/give movements', '/remove movements',
-                                        '/give sweet', '/remove sweet',
-                                        '/give asteroid', '/remove aquarium',
-                                        '/give worlds', '/remove worlds',
-                                        '/give bosses', '/remove bosses',
-                                        '/give all', '/remove all', '/testitems reset'],
-                            'ability_groups': {group: list(items) for group, items in ABILITY_GROUPS.items()},
-                            'note':('Only local test abilities. No AP item is sent/removed on the server. '
-                                    '/give progressively numbered items sets the exact target level; '
-                                    '/remove ITEM N subtracts N levels. /remove ITEM all sets 0.')})
+                            'examples':['/testitems','/testitems reset'],
+                            'ability_groups': {group: list(items) for group, items in ABILITY_GROUPS.items()}})
             return
         try:
             original=self._test_inventory_base()

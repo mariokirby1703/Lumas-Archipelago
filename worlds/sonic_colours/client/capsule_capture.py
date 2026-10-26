@@ -1,4 +1,3 @@
-"""Native successful-opening journal, independent of capsule actor lifetime."""
 import struct
 from .capsule_refresh import PPC
 from .gecko import inspect_c2

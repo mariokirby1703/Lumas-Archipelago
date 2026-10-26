@@ -1,4 +1,3 @@
-"""Ephemeral now-playing model, driven only by native successful starts."""
 from .ap_hud_ticker import ascii_text
 from functools import lru_cache
 

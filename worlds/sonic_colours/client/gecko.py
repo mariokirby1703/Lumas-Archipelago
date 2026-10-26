@@ -1,4 +1,3 @@
-"""Exact Gecko C2 payload verification; no arbitrary executable normalization."""
 import struct
 from copy import deepcopy
 from functools import lru_cache, wraps

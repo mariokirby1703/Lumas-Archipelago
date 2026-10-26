@@ -1,4 +1,3 @@
-"""Gate the native Quick Step predicate before flags and forced state entry."""
 from .gecko import inspect_c2
 from .memory import MemoryUnavailable
 

@@ -19,9 +19,16 @@ def commands():
     return command,overlay,ctx
 
 
+def test_release_has_no_give_or_remove_commands():
+    assert not hasattr(SonicCommands,'_cmd_give')
+    assert not hasattr(SonicCommands,'_cmd_remove')
+    assert 'give' not in SonicCommands.commands
+    assert 'remove' not in SonicCommands.commands
+
+
 def test_giveworlds_grants_only_shuttles_locally_and_reset_restores():
     command,overlay,ctx=commands()
-    command._cmd_give('worlds')
+    command._change_test_ability('give','worlds')
     effective=overlay.apply(inventory([]))
     assert all(effective['counts'][name]==1 for name in WORLD_UNLOCK_ITEMS)
     assert set(name for name,count in effective['counts'].items() if count)==set(WORLD_UNLOCK_ITEMS)
@@ -33,17 +40,17 @@ def test_giveworlds_grants_only_shuttles_locally_and_reset_restores():
 
 def test_boss_command_survives_inventory_projection_and_is_resettable():
     command,overlay,ctx=commands()
-    command._cmd_give('bosses')
+    command._change_test_ability('give','bosses')
     assert ctx.sync_wakeup.is_set()
     assert overlay.describe(inventory([]))['boss_unlocks']
     owned=project_inventory(overlay.apply(inventory([])),{'movement_unlocks':True,'boost_lock':True})
     assert owned['local_boss_unlocks']
     assert not any(owned['counts'].values())
-    command._cmd_give('worlds')
+    command._change_test_ability('give','worlds')
     assert overlay.apply(inventory([]))['local_boss_unlocks']
-    command._cmd_remove('bosses')
+    command._change_test_ability('remove','bosses')
     assert not overlay.unlock_bosses
-    command._cmd_give('bosses')
+    command._change_test_ability('give','bosses')
     command._cmd_testitems('reset')
     assert not overlay.unlock_bosses and not overlay.deltas
     assert ctx.items_received==[] and ctx.runtime.journal.data=={'receipts':[]}
@@ -66,12 +73,12 @@ def test_boss_override_does_not_manufacture_clears_or_unlock_other_story_acts(zo
 def test_commands_require_authenticated_runtime():
     command,overlay,ctx=commands()
     ctx.authenticated_identity=None
-    command._cmd_give('worlds');command._cmd_give('bosses')
+    command._change_test_ability('give','worlds');command._change_test_ability('give','bosses')
     assert not overlay.deltas and not overlay.unlock_bosses
 
 
 def test_bad_boss_argument_preserves_override():
     command,overlay,_=commands()
-    command._cmd_give('bosses')
-    command._cmd_give('bosses unknown')
+    command._change_test_ability('give','bosses')
+    command._change_test_ability('give','bosses unknown')
     assert overlay.unlock_bosses

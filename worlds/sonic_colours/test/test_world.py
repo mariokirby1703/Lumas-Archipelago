@@ -65,7 +65,7 @@ def test_options_and_yaml():
                 cls.from_any(value)
 
 
-@pytest.mark.parametrize('mode,count', [('off', 94), ('singles', 274), ('per_level', 130)])
+@pytest.mark.parametrize('mode,count', [('off', 274), ('singles', 274), ('per_level', 130)])
 def test_counts(mode, count):
     world = generate({'red_ring_checks': mode}, fill=True).worlds[1]
     assert len(world.active_locations) == count
@@ -74,8 +74,9 @@ def test_counts(mode, count):
     assert sum(item.name in Items.EMERALDS for item in world.multiworld.itempool) == 0
     assert all(item.classification & ItemClassification.progression for item in world.multiworld.itempool
                if item.name in Items.RING_VALUES)
-    assert sum(Items.RING_VALUES.get(item.name, 0) for item in world.multiworld.itempool) == 162
-    assert len(world.multiworld.precollected_items[1]) == 0
+    assert sum(Items.RING_VALUES.get(item.name, 0) for item in world.multiworld.itempool) == world.ring_target
+    assert world.ring_target >= max(world.gates.values())
+    assert not world.multiworld.precollected_items[1]
 
 
 @pytest.mark.parametrize('target', range(181))

@@ -1,0 +1,88 @@
+[
+  {
+    "case": "3915",
+    "seed": 405846114,
+    "weights": {
+      "description": "Sonic Colours (Wii) Template, generated with https://github.com/Eijebong/Archipelago-fuzzer/tree/0.6.2",
+      "game": "Sonic Colours (Wii)",
+      "requires": {
+        "version": "0.6.7"
+      },
+      "Sonic Colours (Wii)": {
+        "progression_balancing": 80,
+        "accessibility": "minimal",
+        "goal": "all_red_rings",
+        "world_progression": "unlock_acts_in_order",
+        "boost_lock": "true",
+        "movement_unlocks": "true",
+        "super_sonic": "true",
+        "red_ring_checks": "per_level",
+        "rank_checks": "off",
+        "one_up_sanity": "false",
+        "wisp_discovery_checks": "false",
+        "game_land_checks": "false",
+        "chaos_emerald_checks": "false",
+        "eggman_heart_sanity": "true",
+        "game_land_requirement_reduction": 48,
+        "trap_percentage": 96,
+        "ring_loss_trap_weight": "high",
+        "score_reset_trap_weight": "medium",
+        "dead_weight_trap_weight": "medium",
+        "music_randomization": "true",
+        "death_link": "false",
+        "local_items": [],
+        "non_local_items": [],
+        "start_inventory": {},
+        "start_hints": [],
+        "start_location_hints": [],
+        "exclude_locations": [],
+        "priority_locations": [],
+        "item_links": [],
+        "plando_items": []
+      }
+    }
+  },
+  {
+    "case": "815",
+    "seed": 759894442,
+    "weights": {
+      "description": "Sonic Colours (Wii) Template, generated with https://github.com/Eijebong/Archipelago-fuzzer/tree/0.6.2",
+      "game": "Sonic Colours (Wii)",
+      "requires": {
+        "version": "0.6.7"
+      },
+      "Sonic Colours (Wii)": {
+        "progression_balancing": 46,
+        "accessibility": "minimal",
+        "goal": "all_bosses",
+        "world_progression": "unlock_acts_in_order",
+        "boost_lock": "false",
+        "movement_unlocks": "true",
+        "super_sonic": "true",
+        "red_ring_checks": "per_level",
+        "rank_checks": "false",
+        "one_up_sanity": "false",
+        "wisp_discovery_checks": "false",
+        "game_land_checks": "true",
+        "chaos_emerald_checks": "false",
+        "eggman_heart_sanity": "false",
+        "game_land_requirement_reduction": 3,
+        "trap_percentage": 74,
+        "ring_loss_trap_weight": "false",
+        "score_reset_trap_weight": "false",
+        "dead_weight_trap_weight": "high",
+        "music_randomization": "true",
+        "death_link": "false",
+        "local_items": [],
+        "non_local_items": [],
+        "start_inventory": {},
+        "start_hints": [],
+        "start_location_hints": [],
+        "exclude_locations": [],
+        "priority_locations": [],
+        "item_links": [],
+        "plando_items": []
+      }
+    }
+  }
+]

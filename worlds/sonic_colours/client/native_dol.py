@@ -58,11 +58,11 @@ class Dol:
 @lru_cache(maxsize=1)
 def plan():
     """Rebuild every C2 payload as initialized native code, without C2 headers."""
-    from .movement_gecko import pairs,movement_ini
+    from .native_hook_table import hook_rows
     from .ap_hud_publisher import patches as hud
     from .rocket_skydiving import patches as rocket
     from .hud_renderer_batch import ADDRESS,ORIGINAL_HEX,replacement
-    rows=pairs(movement_ini(enforce_budget=False));i=0;cursor=ARENA+ARENA_PREFIX_SIZE;patches=[];payload=bytearray(ARENA_PREFIX_SIZE);hooks=[]
+    rows=hook_rows();i=0;cursor=ARENA+ARENA_PREFIX_SIZE;patches=[];payload=bytearray(ARENA_PREFIX_SIZE);hooks=[]
     while i<len(rows):
         first,second=rows[i];i+=1;kind=first>>24;address=0x80000000+(first&0xffffff)
         if kind==0xc2:
@@ -119,9 +119,8 @@ def plan():
     patches.extend(boss_capsules.patches(capsule_control,story_control,patches))
     from . import wisp_hud
     patches.extend(wisp_hud.patches(capsule_control,story_control,patches))
-    from . import homing_fallback,movement_gate
+    from . import movement_gate
     movement=next(h for h in hooks if h['hook']==movement_gate.HOOK)
-    patches.extend(homing_fallback.patches(movement['target']+movement_gate.payload(gecko=True)[2],patches))
     from . import active_movement
     patches.extend(active_movement.patches(movement['target']+movement_gate.payload(gecko=True)[2],patches))
     from . import rail_actions
@@ -133,6 +132,10 @@ def plan():
     patches.extend(wisp_activation.patches(capsule_control,story_control,patches))
     from . import random_wisp_spawns
     patches.extend(random_wisp_spawns.patches(capsule_control,story_control,patches))
+    from . import white_capsule_open
+    patches.extend(white_capsule_open.patches(capsule_control,patches))
+    from . import drift_input
+    patches.extend(drift_input.patches(movement['target']+movement_gate.payload(gecko=True)[2],patches))
     ownership=[]
     for address,old,new in patches:
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')

@@ -1,4 +1,3 @@
-"""Act-2 ORC placement edit before native model/physics construction."""
 import struct
 from .memory import MemoryUnavailable, valid_range
 from ..world_constants import load_data

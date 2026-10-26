@@ -90,7 +90,3 @@ def test_full_refill_id_and_weighted_filler_distribution():
         assert abs(counts[name] / 20000 - weight / 100) < .02
 
 
-def test_complete_gecko_export_fits_native_table_budget():
-    from ..client.capsule_refresh import gecko_ini
-    lines = [line for line in gecko_ini().splitlines() if len(line)==17 and line[0] in '0123456789ABCDEF']
-    assert len(lines)*8 <= 3256

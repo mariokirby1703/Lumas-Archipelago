@@ -1,4 +1,3 @@
-"""Capture the native 1-Up contact success before actor removal."""
 import struct
 from .capsule_refresh import PPC
 from .gecko import inspect_c2

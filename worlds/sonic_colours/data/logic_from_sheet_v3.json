@@ -1,0 +1,6370 @@
+{
+  "schema": "sonic_colours_poptracker_sheet_logic_v3",
+  "source_file": "Sonic Colours (Wii) AP Logic.xlsx",
+  "provenance": "user uploaded workbook (artifact_tool extraction), plus four subsequent user-confirmed cell corrections",
+  "locations": {
+    "stg110": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 4
+    },
+    "stg110:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 5
+    },
+    "stg110:ring:2": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Drill Lv1",
+      "world": "Tropical Resort",
+      "row": 6
+    },
+    "stg110:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 7
+    },
+    "stg110:ring:4": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Drill Lv1",
+      "world": "Tropical Resort",
+      "row": 8
+    },
+    "stg110:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "rail"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Rail Lv1",
+      "world": "Tropical Resort",
+      "row": 9
+    },
+    "stg110:one_up": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Drill Lv1",
+      "world": "Tropical Resort",
+      "row": 10
+    },
+    "stg130": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 11
+    },
+    "stg130:ring:1": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [
+        []
+      ],
+      "advanced_movement": [
+        [
+          "stomp",
+          "wall_jump"
+        ]
+      ],
+      "raw_normal": "Drill (none for advanced logic)",
+      "raw_movement": "Drill Lv1 (Stomp + Wall Jump for advanced logic)",
+      "world": "Tropical Resort",
+      "row": 12
+    },
+    "stg130:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 13
+    },
+    "stg130:ring:3": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Drill Lv1",
+      "world": "Tropical Resort",
+      "row": 14
+    },
+    "stg130:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 15
+    },
+    "stg130:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 16
+    },
+    "stg130:one_up": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Drill Lv1",
+      "world": "Tropical Resort",
+      "row": 17
+    },
+    "stg120": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2",
+      "world": "Tropical Resort",
+      "row": 18
+    },
+    "stg120:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack"
+        ],
+        [
+          "mid_air_boost"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack or Mid-Air Boost",
+      "world": "Tropical Resort",
+      "row": 19
+    },
+    "stg120:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 20
+    },
+    "stg120:ring:3": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Progressive Crouch Lv2 + Drill Lv1",
+      "world": "Tropical Resort",
+      "row": 21
+    },
+    "stg120:ring:4": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Progressive Crouch Lv2 + Drill Lv1",
+      "world": "Tropical Resort",
+      "row": 22
+    },
+    "stg120:ring:5": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser",
+      "raw_movement": "Progressive Crouch Lv2 + Laser",
+      "world": "Tropical Resort",
+      "row": 23
+    },
+    "stg120:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 + Homing Attack",
+      "world": "Tropical Resort",
+      "row": 24
+    },
+    "stg140": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 25
+    },
+    "stg140:ring:1": {
+      "normal": [
+        [
+          "drill",
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "drill",
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill and Frenzy",
+      "raw_movement": "Drill Lv1 and Frenzy",
+      "world": "Tropical Resort",
+      "row": 26
+    },
+    "stg140:ring:2": {
+      "normal": [
+        [
+          "drill",
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "drill",
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill and Frenzy",
+      "raw_movement": "Drill Lv1 and Frenzy",
+      "world": "Tropical Resort",
+      "row": 27
+    },
+    "stg140:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 28
+    },
+    "stg140:ring:4": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Drill Lv1",
+      "world": "Tropical Resort",
+      "row": 29
+    },
+    "stg140:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 30
+    },
+    "stg140:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 31
+    },
+    "stg150": {
+      "normal": [
+        [
+          "laser"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ],
+        [
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser or Spikes",
+      "raw_movement": "Spikes Lv1 or Laser",
+      "world": "Tropical Resort",
+      "row": 32
+    },
+    "stg150:ring:1": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_movement": [
+        [
+          "laser"
+        ]
+      ],
+      "raw_normal": "Spikes (or Laser Advanced Logic)",
+      "raw_movement": "Spikes Lv1 (or Laser Advanced Logic)",
+      "world": "Tropical Resort",
+      "row": 33
+    },
+    "stg150:ring:2": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser",
+      "raw_movement": "Laser",
+      "world": "Tropical Resort",
+      "row": 34
+    },
+    "stg150:ring:3": {
+      "normal": [
+        [
+          "laser"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser or Spikes",
+      "raw_movement": "Laser or Spikes Lv1",
+      "world": "Tropical Resort",
+      "row": 35
+    },
+    "stg150:ring:4": {
+      "normal": [
+        [
+          "laser"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser or Spikes",
+      "raw_movement": "Laser or Spikes Lv1",
+      "world": "Tropical Resort",
+      "row": 36
+    },
+    "stg150:ring:5": {
+      "normal": [
+        [
+          "laser"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser or Spikes",
+      "raw_movement": "Laser or Spikes Lv1",
+      "world": "Tropical Resort",
+      "row": 37
+    },
+    "stg150:one_up": {
+      "normal": [
+        [
+          "laser"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser or Spikes",
+      "raw_movement": "Laser or Spikes Lv1",
+      "world": "Tropical Resort",
+      "row": 38
+    },
+    "stg160": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 39
+    },
+    "stg160:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 40
+    },
+    "stg160:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 41
+    },
+    "stg160:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 42
+    },
+    "stg160:ring:4": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Spikes Lv1",
+      "world": "Tropical Resort",
+      "row": 43
+    },
+    "stg160:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 44
+    },
+    "stg160:one_up": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Spikes Lv1",
+      "world": "Tropical Resort",
+      "row": 45
+    },
+    "stg190": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Tropical Resort",
+      "row": 46
+    },
+    "stg210": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ],
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 or Drill Lv1",
+      "world": "Sweet Mountain",
+      "row": 4
+    },
+    "stg210:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Sweet Mountain",
+      "row": 5
+    },
+    "stg210:ring:2": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Drill Lv1",
+      "world": "Sweet Mountain",
+      "row": 6
+    },
+    "stg210:ring:3": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Drill Lv1",
+      "world": "Sweet Mountain",
+      "row": 7
+    },
+    "stg210:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ],
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 or Drill Lv1",
+      "world": "Sweet Mountain",
+      "row": 8
+    },
+    "stg210:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ],
+        [
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 or Drill Lv1",
+      "world": "Sweet Mountain",
+      "row": 9
+    },
+    "stg210:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "stomp",
+          "homing_attack"
+        ],
+        [
+          "drill",
+          "stomp",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 + Stomp + Homing Attack or Drill Lv1 + Stomp + Homing Attack",
+      "world": "Sweet Mountain",
+      "row": 10
+    },
+    "stg230": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2",
+      "world": "Sweet Mountain",
+      "row": 11
+    },
+    "stg230:ring:1": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "hover",
+          "mid_air_boost"
+        ],
+        [
+          "crouch:2",
+          "hover",
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Progressive Crouch Lv2 + Hover Lv1 + Mid-Air Boost or Progressive Crouch Lv2 + Hover Lv1 + Double Jump",
+      "world": "Sweet Mountain",
+      "row": 12
+    },
+    "stg230:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2",
+      "world": "Sweet Mountain",
+      "row": 13
+    },
+    "stg230:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2",
+      "world": "Sweet Mountain",
+      "row": 14
+    },
+    "stg230:ring:4": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "hover:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Progressive Crouch Lv2 + Hover Lv2",
+      "world": "Sweet Mountain",
+      "row": 15
+    },
+    "stg230:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2",
+      "world": "Sweet Mountain",
+      "row": 16
+    },
+    "stg230:one_up": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "hover:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Progressive Crouch Lv2 + Hover Lv2",
+      "world": "Sweet Mountain",
+      "row": 17
+    },
+    "stg220": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Sweet Mountain",
+      "row": 18
+    },
+    "stg220:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Sweet Mountain",
+      "row": 19
+    },
+    "stg220:ring:2": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Rocket",
+      "world": "Sweet Mountain",
+      "row": 20
+    },
+    "stg220:ring:3": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Spikes Lv1",
+      "world": "Sweet Mountain",
+      "row": 21
+    },
+    "stg220:ring:4": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes",
+          "crouch",
+          "wall_jump"
+        ],
+        [
+          "spikes",
+          "crouch",
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Spikes Lv1 + Crouch Lv1 + Wall Jump or Spikes Lv1 + Crouch Lv1 + Rocket",
+      "world": "Sweet Mountain",
+      "row": 22
+    },
+    "stg220:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "rail"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Rail Lv1",
+      "world": "Sweet Mountain",
+      "row": 23
+    },
+    "stg220:one_up": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Rocket",
+      "world": "Sweet Mountain",
+      "row": 24
+    },
+    "stg260": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2",
+      "world": "Sweet Mountain",
+      "row": 25
+    },
+    "stg260:ring:1": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "boost"
+        ]
+      ],
+      "advanced_movement": [
+        [
+          "double_jump",
+          "mid_air_boost"
+        ]
+      ],
+      "raw_normal": "Laser (or Boost Advanced Logic)",
+      "raw_movement": "Laser (or Double Jump + Mid-Air Boost for Advanced Logic)",
+      "world": "Sweet Mountain",
+      "row": 26
+    },
+    "stg260:ring:2": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser ",
+      "raw_movement": "Laser ",
+      "world": "Sweet Mountain",
+      "row": 27
+    },
+    "stg260:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Sweet Mountain",
+      "row": 28
+    },
+    "stg260:ring:4": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Frenzy",
+      "world": "Sweet Mountain",
+      "row": 29
+    },
+    "stg260:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2",
+      "world": "Sweet Mountain",
+      "row": 30
+    },
+    "stg260:one_up": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy ",
+      "raw_movement": "Frenzy",
+      "world": "Sweet Mountain",
+      "row": 31
+    },
+    "stg240": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 or Spikes Lv1",
+      "world": "Sweet Mountain",
+      "row": 32
+    },
+    "stg240:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Sweet Mountain",
+      "row": 33
+    },
+    "stg240:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Sweet Mountain",
+      "row": 34
+    },
+    "stg240:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Sweet Mountain",
+      "row": 35
+    },
+    "stg240:ring:4": {
+      "normal": [
+        [
+          "boost",
+          "cube"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "boost",
+          "cube"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Boost + Cube or Spikes",
+      "raw_movement": "Boost + Cube or Spikes Lv1",
+      "world": "Sweet Mountain",
+      "row": 36
+    },
+    "stg240:ring:5": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Spikes Lv1",
+      "world": "Sweet Mountain",
+      "row": 37
+    },
+    "stg240:one_up": {
+      "normal": [
+        [
+          "cube"
+        ],
+        [
+          "spikes"
+        ],
+        [
+          "boost"
+        ]
+      ],
+      "movement": [
+        [
+          "cube"
+        ],
+        [
+          "spikes"
+        ],
+        [
+          "boost",
+          "mid_air_boost"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube or Spikes or Boost",
+      "raw_movement": "Cube or Spikes Lv1 or Boost + Mid-Air Boost",
+      "world": "Sweet Mountain",
+      "row": 38
+    },
+    "stg250": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 or Spikes Lv1",
+      "world": "Sweet Mountain",
+      "row": 39
+    },
+    "stg250:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ],
+        [
+          "spikes"
+        ],
+        [
+          "mid_air_boost"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp or Spikes Lv1 or Mid-Air Boost",
+      "world": "Sweet Mountain",
+      "row": 40
+    },
+    "stg250:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Sweet Mountain",
+      "row": 41
+    },
+    "stg250:ring:3": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "cube"
+        ],
+        [
+          "spikes",
+          "cube"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Progressive Crouch Lv2 + Cube or Spikes Lv1 + Cube",
+      "world": "Sweet Mountain",
+      "row": 42
+    },
+    "stg250:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 or Spikes Lv1",
+      "world": "Sweet Mountain",
+      "row": 43
+    },
+    "stg250:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2",
+          "rail"
+        ],
+        [
+          "crouch:2",
+          "mid_air_boost"
+        ],
+        [
+          "crouch:2",
+          "double_jump"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 + Progressive Rail Lv1 or Progressive Crouch Lv2 + Mid-Air Boost or Progressive Crouch Lv2 + Double Jump or Spikes Lv1",
+      "world": "Sweet Mountain",
+      "row": 44
+    },
+    "stg250:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2 or Spikes Lv1",
+      "world": "Sweet Mountain",
+      "row": 45
+    },
+    "stg290": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Sweet Mountain",
+      "row": 46
+    },
+    "stg310": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube + Homing Attack",
+      "world": "Starlight Carnival",
+      "row": 4
+    },
+    "stg310:ring:1": {
+      "normal": [
+        [
+          "cube"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "cube",
+          "homing_attack"
+        ],
+        [
+          "homing_attack",
+          "crouch:2",
+          "mid_air_boost",
+          "spikes"
+        ],
+        [
+          "homing_attack",
+          "double_jump",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube or Spikes",
+      "raw_movement": "Cube + Homing Attack or Homing Attack + Progressive Crouch Lv2 + Mid-Air Boost + Spikes Lv1 or Homing Attack + Double Jump + Spikes Lv1",
+      "world": "Starlight Carnival",
+      "row": 5
+    },
+    "stg310:ring:2": {
+      "normal": [
+        [
+          "cube"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes",
+          "homing_attack",
+          "cube"
+        ],
+        [
+          "spikes",
+          "homing_attack",
+          "double_jump"
+        ],
+        [
+          "spikes",
+          "homing_attack",
+          "mid_air_boost"
+        ],
+        [
+          "cube",
+          "homing_attack",
+          "crouch:2",
+          "wall_jump",
+          "mid_air_boost"
+        ],
+        [
+          "cube",
+          "homing_attack",
+          "double_jump",
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube or Spikes",
+      "raw_movement": "Spikes Lv1 + Homing Attack + Cube or Spikes Lv1 + Homing Attack + Double Jump or Spikes Lv1 + Homing Attack + Mid-Air Boost or Cube + Homing Attack + Progressive Crouch Lv2 + Wall Jump + Mid-Air Boost or Cube + Homing Attack + Double Jump + Wall Jump",
+      "world": "Starlight Carnival",
+      "row": 6
+    },
+    "stg310:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack",
+          "quick_step",
+          "cube"
+        ],
+        [
+          "homing_attack",
+          "quick_step",
+          "crouch:2"
+        ],
+        [
+          "homing_attack",
+          "quick_step",
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack + Quick Step + Cube or Homing Attack + Quick Step + Progressive Crouch Lv2 or Homing Attack + Quick Step + Double Jump",
+      "world": "Starlight Carnival",
+      "row": 7
+    },
+    "stg310:ring:4": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube + Homing Attack",
+      "world": "Starlight Carnival",
+      "row": 8
+    },
+    "stg310:ring:5": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube + Homing Attack",
+      "world": "Starlight Carnival",
+      "row": 9
+    },
+    "stg310:one_up": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube + Homing Attack",
+      "world": "Starlight Carnival",
+      "row": 10
+    },
+    "stg330": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump or Spikes Lv1",
+      "world": "Starlight Carnival",
+      "row": 11
+    },
+    "stg330:ring:1": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [
+        [
+          "cube",
+          "crouch:2",
+          "double_jump"
+        ],
+        [
+          "cube",
+          "double_jump"
+        ]
+      ],
+      "raw_normal": "Spikes",
+      "raw_movement": "Spikes Lv1 (or Cube + Progressive Crouch Lv2 + Double Jump or Cube + Double Jump for Advanced Logic)",
+      "world": "Starlight Carnival",
+      "row": 12
+    },
+    "stg330:ring:2": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Spikes Lv1",
+      "world": "Starlight Carnival",
+      "row": 13
+    },
+    "stg330:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump or Spikes Lv1",
+      "world": "Starlight Carnival",
+      "row": 14
+    },
+    "stg330:ring:4": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [
+        []
+      ],
+      "advanced_movement": [
+        [
+          "wall_jump"
+        ]
+      ],
+      "raw_normal": "Spikes (None for Advanced Logic)",
+      "raw_movement": "Spikes Lv1 (Wall Jump Advanced Logic)",
+      "world": "Starlight Carnival",
+      "row": 15
+    },
+    "stg330:ring:5": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ],
+        [
+          "wall_jump",
+          "cube"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "cube"
+        ]
+      ],
+      "advanced_movement": [],
+      "raw_normal": "Spikes (Cube for Advanced Logic)",
+      "raw_movement": "Spikes Lv1 (or Wall Jump + Cube)",
+      "world": "Starlight Carnival",
+      "row": 16
+    },
+    "stg330:one_up": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ],
+        [
+          "wall_jump",
+          "cube"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "cube"
+        ]
+      ],
+      "advanced_movement": [],
+      "raw_normal": "Spikes (Cube for Advanced Logic)",
+      "raw_movement": "Spikes Lv1 (or Wall Jump + Cube)",
+      "world": "Starlight Carnival",
+      "row": 17
+    },
+    "stg340": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Starlight Carnival",
+      "row": 18
+    },
+    "stg340:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Starlight Carnival",
+      "row": 19
+    },
+    "stg340:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Starlight Carnival",
+      "row": 20
+    },
+    "stg340:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Starlight Carnival",
+      "row": 21
+    },
+    "stg340:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Starlight Carnival",
+      "row": 22
+    },
+    "stg340:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Starlight Carnival",
+      "row": 23
+    },
+    "stg340:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Starlight Carnival",
+      "row": 24
+    },
+    "stg350": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Starlight Carnival",
+      "row": 25
+    },
+    "stg350:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Starlight Carnival",
+      "row": 26
+    },
+    "stg350:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Starlight Carnival",
+      "row": 27
+    },
+    "stg350:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Starlight Carnival",
+      "row": 28
+    },
+    "stg350:ring:4": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Frenzy ",
+      "world": "Starlight Carnival",
+      "row": 29
+    },
+    "stg350:ring:5": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Frenzy ",
+      "world": "Starlight Carnival",
+      "row": 30
+    },
+    "stg350:one_up": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Frenzy ",
+      "world": "Starlight Carnival",
+      "row": 31
+    },
+    "stg320": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv1",
+      "world": "Starlight Carnival",
+      "row": 32
+    },
+    "stg320:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Starlight Carnival",
+      "row": 33
+    },
+    "stg320:ring:2": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Spikes Lv1",
+      "world": "Starlight Carnival",
+      "row": 34
+    },
+    "stg320:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump",
+          "double_jump"
+        ],
+        [
+          "wall_jump",
+          "mid_air_boost"
+        ],
+        [
+          "hover"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump + Double Jump or Wall Jump + Mid-Air Boost or Hover Lv1",
+      "world": "Starlight Carnival",
+      "row": 35
+    },
+    "stg320:ring:4": {
+      "normal": [
+        [
+          "hover"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "hover"
+        ],
+        [
+          "spikes",
+          "mid_air_boost",
+          "wall_jump"
+        ],
+        [
+          "homing_attack",
+          "wall_jump",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover or Spikes ",
+      "raw_movement": "Hover Lv1 or Spikes Lv1 + Mid-Air Boost + Wall Jump or Homing Attack + Wall Jump + Spikes Lv1",
+      "world": "Starlight Carnival",
+      "row": 36
+    },
+    "stg320:ring:5": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv1",
+      "world": "Starlight Carnival",
+      "row": 37
+    },
+    "stg320:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "hover"
+        ],
+        [
+          "wall_jump",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Hover Lv1 or Wall Jump + Homing Attack",
+      "world": "Starlight Carnival",
+      "row": 38
+    },
+    "stg360": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover:2"
+        ],
+        [
+          "hover",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv2 or Hover Lv1 + Homing Attack",
+      "world": "Starlight Carnival",
+      "row": 39
+    },
+    "stg360:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "hover"
+        ],
+        [
+          "double_jump",
+          "mid_air_boost"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Hover Lv1 or Double Jump + Mid-Air Boost",
+      "world": "Starlight Carnival",
+      "row": 40
+    },
+    "stg360:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Starlight Carnival",
+      "row": 41
+    },
+    "stg360:ring:3": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv1",
+      "world": "Starlight Carnival",
+      "row": 42
+    },
+    "stg360:ring:4": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv1",
+      "world": "Starlight Carnival",
+      "row": 43
+    },
+    "stg360:ring:5": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv1",
+      "world": "Starlight Carnival",
+      "row": 44
+    },
+    "stg360:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "mid_air_boost"
+        ],
+        [
+          "hover"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Mid-Air Boost or Hover Lv1",
+      "world": "Starlight Carnival",
+      "row": 45
+    },
+    "stg390": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack",
+      "world": "Starlight Carnival",
+      "row": 46
+    },
+    "stg410": {
+      "normal": [
+        [
+          "boost",
+          "rocket"
+        ],
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "boost",
+          "rocket",
+          "rail",
+          "stunts:5"
+        ],
+        [
+          "spikes",
+          "rail",
+          "stunts:5"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Boost + Rocket or Spikes",
+      "raw_movement": "Boost + Rocket + Progressive Rail Lv1 + Progressive Stunts Lv5 or Spikes Lv1 + Progressive Rail Lv1 + Progressive Stunts Lv5",
+      "world": "Planet Wisp",
+      "row": 4
+    },
+    "stg410:ring:1": {
+      "normal": [
+        [
+          "boost"
+        ]
+      ],
+      "movement": [
+        [
+          "boost",
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Boost  ",
+      "raw_movement": "Boost + Quick Step",
+      "world": "Planet Wisp",
+      "row": 5
+    },
+    "stg410:ring:2": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rail",
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Progressive Rail Lv1 + Rocket",
+      "world": "Planet Wisp",
+      "row": 6
+    },
+    "stg410:ring:3": {
+      "normal": [
+        [
+          "boost"
+        ],
+        [
+          "spikes"
+        ],
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rail",
+          "stunts:5",
+          "spikes"
+        ],
+        [
+          "rail",
+          "stunts:5",
+          "rocket",
+          "wall_jump"
+        ],
+        [
+          "rail",
+          "stunts:5",
+          "rocket",
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Boost or Spikes or Rocket",
+      "raw_movement": "Progressive Rail Lv1 + Progressive Stunts Lv5 + Spikes Lv1 or Progressive Rail Lv1 + Progressive Stunts Lv5 + Rocket + Wall Jump or Progressive Rail Lv1 + Progressive Stunts Lv5 + Rocket + Progressive Crouch Lv2",
+      "world": "Planet Wisp",
+      "row": 7
+    },
+    "stg410:ring:4": {
+      "normal": [
+        [
+          "boost"
+        ],
+        [
+          "spikes"
+        ],
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "boost",
+          "rail",
+          "stunts:5"
+        ],
+        [
+          "spikes",
+          "rail",
+          "stunts:5"
+        ],
+        [
+          "rocket",
+          "rail",
+          "stunts:5"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Boost or Spikes or Rocket",
+      "raw_movement": "Boost + Progressive Rail Lv1 + Progressive Stunts Lv5 or Spikes Lv1 + Progressive Rail Lv1 + Progressive Stunts Lv5 or Rocket + Progressive Rail Lv1 + Progressive Stunts Lv5",
+      "world": "Planet Wisp",
+      "row": 8
+    },
+    "stg410:ring:5": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "rail",
+          "stunts:5",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "boost",
+          "rocket"
+        ]
+      ],
+      "advanced_movement": [
+        [
+          "rail",
+          "stunts:5",
+          "mid_air_boost",
+          "boost",
+          "rocket"
+        ]
+      ],
+      "raw_normal": "Spikes (or Boost + Rocket for advanced logic)",
+      "raw_movement": "Progressive Rail Lv1 + Progressive Stunts Lv5 + Spikes Lv1 (or Progressive Rail Lv1 + Progressive Stunts Lv5 + Mid Air Boost + Boost + Rocket for Advanced Logic)",
+      "world": "Planet Wisp",
+      "row": 9
+    },
+    "stg410:one_up": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rail",
+          "stunts:5",
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Progressive Rail Lv1 + Progressive Stunts Lv5 + Rocket",
+      "world": "Planet Wisp",
+      "row": 10
+    },
+    "stg440": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp",
+          "crouch:2",
+          "boost"
+        ],
+        [
+          "stomp",
+          "mid_air_boost",
+          "crouch:2"
+        ],
+        [
+          "stomp",
+          "homing_attack",
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp + Progressive Crouch Lv2 + Boost or Stomp + Mid-Air Boost + Progressive Crouch Lv2 or Stomp + Homing Attack + Progressive Crouch Lv2",
+      "world": "Planet Wisp",
+      "row": 11
+    },
+    "stg440:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Planet Wisp",
+      "row": 12
+    },
+    "stg440:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Planet Wisp",
+      "row": 13
+    },
+    "stg440:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Planet Wisp",
+      "row": 14
+    },
+    "stg440:ring:4": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Frenzy",
+      "world": "Planet Wisp",
+      "row": 15
+    },
+    "stg440:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Planet Wisp",
+      "row": 16
+    },
+    "stg440:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Planet Wisp",
+      "row": 17
+    },
+    "stg450": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube",
+      "world": "Planet Wisp",
+      "row": 18
+    },
+    "stg450:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Planet Wisp",
+      "row": 19
+    },
+    "stg450:ring:2": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser",
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [
+        [
+          "laser"
+        ]
+      ],
+      "raw_normal": "Laser",
+      "raw_movement": "Laser + Quick Step (or Laser for Advanced Logic)",
+      "world": "Planet Wisp",
+      "row": 20
+    },
+    "stg450:ring:3": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_movement": [
+        [
+          "double_jump",
+          "laser"
+        ]
+      ],
+      "raw_normal": "Cube (or Laser for advanced logic)",
+      "raw_movement": "Cube (or Double Jump + Laser for Advanced Logic)",
+      "world": "Planet Wisp",
+      "row": 21
+    },
+    "stg450:ring:4": {
+      "normal": [
+        [
+          "cube"
+        ],
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "cube"
+        ],
+        [
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube or Laser",
+      "raw_movement": "Cube or Laser",
+      "world": "Planet Wisp",
+      "row": 22
+    },
+    "stg450:ring:5": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube",
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube + Double Jump",
+      "world": "Planet Wisp",
+      "row": 23
+    },
+    "stg450:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Planet Wisp",
+      "row": 24
+    },
+    "stg430": {
+      "normal": [
+        [
+          "boost",
+          "laser"
+        ],
+        [
+          "laser",
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "stunts:5",
+          "boost",
+          "laser"
+        ],
+        [
+          "stunts:5",
+          "laser",
+          "rocket",
+          "homing_attack"
+        ],
+        [
+          "stunts:5",
+          "laser",
+          "rocket",
+          "mid_air_boost"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_movement": [
+        [
+          "stunts:5",
+          "laser",
+          "homing_attack"
+        ],
+        [
+          "stunts:5",
+          "laser",
+          "mid_air_boost"
+        ]
+      ],
+      "raw_normal": "Boost + Laser or Laser + Rocket (or just Laser for advanced logic)",
+      "raw_movement": "Stunts (Lv5) + Boost + Laser or Stunts Lv5 + Laser + Rocket + Homing Attack/Mid Air Boost (or Stunts Lv5 + Laser + Homing Attack or Mid Air Boost for Advanced Logic",
+      "world": "Planet Wisp",
+      "row": 25
+    },
+    "stg430:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stunts:5"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stunts Lv5",
+      "world": "Planet Wisp",
+      "row": 26
+    },
+    "stg430:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stunts:5"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stunts Lv5",
+      "world": "Planet Wisp",
+      "row": 27
+    },
+    "stg430:ring:3": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "stunts:5",
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser",
+      "raw_movement": "Stunts Lv5 + Laser",
+      "world": "Planet Wisp",
+      "row": 28
+    },
+    "stg430:ring:4": {
+      "normal": [
+        [
+          "laser",
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "stunts:5",
+          "laser",
+          "rocket",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_movement": [
+        [
+          "stunts:5",
+          "laser",
+          "homing_attack"
+        ]
+      ],
+      "raw_normal": "Laser + Rocket (or Laser for Advanced Logic)",
+      "raw_movement": "Stunts Lv5 + Laser + Rocket + Homing Attack (or Stunts Lv5 + Laser + Homing Attack for Advanced Logic)",
+      "world": "Planet Wisp",
+      "row": 29
+    },
+    "stg430:ring:5": {
+      "normal": [
+        [
+          "boost",
+          "laser"
+        ],
+        [
+          "laser",
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "stunts:5",
+          "laser",
+          "rocket",
+          "homing_attack",
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_movement": [
+        [
+          "stunts:5",
+          "laser",
+          "homing_attack",
+          "crouch:2"
+        ]
+      ],
+      "raw_normal": "Boost + Laser or Laser + Rocket (or just Laser for advanced logic)",
+      "raw_movement": "Stunts Lv5 + Laser + Rocket + Homing Attack + Progressive Crouch Lv2 (or Stunts Lv5 + Laser + Homing Attack + Progressive Crouch Lv2 for Advanced Logic)",
+      "world": "Planet Wisp",
+      "row": 30
+    },
+    "stg430:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stunts:5"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stunts Lv5",
+      "world": "Planet Wisp",
+      "row": 31
+    },
+    "stg460": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2",
+      "world": "Planet Wisp",
+      "row": 32
+    },
+    "stg460:ring:1": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Rocket",
+      "world": "Planet Wisp",
+      "row": 33
+    },
+    "stg460:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Planet Wisp",
+      "row": 34
+    },
+    "stg460:ring:3": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Rocket",
+      "world": "Planet Wisp",
+      "row": 35
+    },
+    "stg460:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ],
+        [
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp or Frenzy",
+      "world": "Planet Wisp",
+      "row": 36
+    },
+    "stg460:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Crouch Lv2",
+      "world": "Planet Wisp",
+      "row": 37
+    },
+    "stg460:one_up": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Rocket",
+      "world": "Planet Wisp",
+      "row": 38
+    },
+    "stg420": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "rail",
+          "crouch:2"
+        ],
+        [
+          "rail",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Rail Lv1 + Progressive Crouch Lv2 or Rail Lv1 + Spikes Lv1",
+      "world": "Planet Wisp",
+      "row": 39
+    },
+    "stg420:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "rail",
+          "skydiving"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Rail Lv1 + Skydiving Lv1",
+      "world": "Planet Wisp",
+      "row": 40
+    },
+    "stg420:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "rail"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Rail Lv1",
+      "world": "Planet Wisp",
+      "row": 41
+    },
+    "stg420:ring:3": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "rail",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Rail Lv1 + Spikes Lv1",
+      "world": "Planet Wisp",
+      "row": 42
+    },
+    "stg420:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "rail",
+          "crouch:2",
+          "double_jump"
+        ],
+        [
+          "rail",
+          "spikes",
+          "double_jump"
+        ],
+        [
+          "rail",
+          "crouch:2",
+          "hover"
+        ],
+        [
+          "rail",
+          "spikes",
+          "hover"
+        ],
+        [
+          "rail",
+          "spikes",
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Rail Lv1 + Progressive Crouch Lv2 + Double Jump or Rail Lv1 + Spikes Lv1 + Double Jump or Rail Lv1 + Progressive Crouch Lv2 + Hover Lv1 or Rail Lv1 + Spikes Lv1 + Hover Lv1 or Rail Lv1 + Spikes Lv1 + Progressive Crouch Lv2",
+      "world": "Planet Wisp",
+      "row": 43
+    },
+    "stg420:ring:5": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "rail",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Rail Lv1 + Spikes Lv1",
+      "world": "Planet Wisp",
+      "row": 44
+    },
+    "stg420:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "rail",
+          "crouch:2",
+          "double_jump"
+        ],
+        [
+          "rail",
+          "spikes",
+          "double_jump"
+        ],
+        [
+          "rail",
+          "crouch:2",
+          "hover"
+        ],
+        [
+          "rail",
+          "spikes",
+          "hover"
+        ],
+        [
+          "rail",
+          "spikes",
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Rail Lv1 + Progressive Crouch Lv2 + Double Jump or Rail Lv1 + Spikes Lv1 + Double Jump or Rail Lv1 + Progressive Crouch Lv2 + Hover Lv1 or Rail Lv1 + Spikes Lv1 + Hover Lv1 or Rail Lv1 + Spikes Lv1 + Progressive Crouch Lv2",
+      "world": "Planet Wisp",
+      "row": 45
+    },
+    "stg490": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Planet Wisp",
+      "row": 46
+    },
+    "stg510": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing",
+          "swim",
+          "crouch:2",
+          "stomp"
+        ],
+        [
+          "boost",
+          "crouch:2",
+          "breathing",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Breathing Lv1 + Swim + Progressive Crouch Lv2 + Stomp or Boost + Progressive Crouch Lv2 + Progressive Breathing Lv1 + Drill Lv1",
+      "world": "Aquarium Park",
+      "row": 4
+    },
+    "stg510:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Aquarium Park",
+      "row": 5
+    },
+    "stg510:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill"
+        ],
+        [
+          "breathing:2",
+          "swim"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Breathing Lv1 + Drill Lv1 or Progressive Breathing Lv2 + Swim",
+      "world": "Aquarium Park",
+      "row": 6
+    },
+    "stg510:ring:3": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Progressive Breathing Lv1 + Drill Lv1  ",
+      "world": "Aquarium Park",
+      "row": 7
+    },
+    "stg510:ring:4": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "boost",
+          "laser",
+          "crouch:2",
+          "stomp"
+        ],
+        [
+          "breathing",
+          "swim",
+          "laser",
+          "crouch:2",
+          "stomp"
+        ],
+        [
+          "breathing",
+          "drill",
+          "laser",
+          "crouch:2"
+        ],
+        [
+          "breathing:2",
+          "swim",
+          "laser",
+          "crouch:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser",
+      "raw_movement": "Boost + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv1 + Swim + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv1 + Drill Lv1 + Laser + Progressive Crouch Lv2 or Progressive Breathing Lv2 + Swim + Laser + Progressive Crouch Lv2",
+      "world": "Aquarium Park",
+      "row": 8
+    },
+    "stg510:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing",
+          "swim",
+          "crouch:2",
+          "stomp",
+          "double_jump"
+        ],
+        [
+          "breathing",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Breathing Lv1 + Swim + Progressive Crouch Lv2 + Stomp + Double Jump or Progressive Breathing Lv1 + Drill Lv1",
+      "world": "Aquarium Park",
+      "row": 9
+    },
+    "stg510:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing",
+          "swim",
+          "crouch:2",
+          "stomp"
+        ],
+        [
+          "breathing",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Breathing Lv1 + Swim + Progressive Crouch Lv2 + Stomp  or Progressive Breathing Lv1 + Drill Lv1",
+      "world": "Aquarium Park",
+      "row": 10
+    },
+    "stg540": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Aquarium Park",
+      "row": 11
+    },
+    "stg540:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Aquarium Park",
+      "row": 12
+    },
+    "stg540:ring:2": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube",
+      "world": "Aquarium Park",
+      "row": 13
+    },
+    "stg540:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Aquarium Park",
+      "row": 14
+    },
+    "stg540:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Aquarium Park",
+      "row": 15
+    },
+    "stg540:ring:5": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube",
+      "world": "Aquarium Park",
+      "row": 16
+    },
+    "stg550": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing:3",
+          "swim"
+        ],
+        [
+          "breathing:3",
+          "rocket"
+        ],
+        [
+          "breathing:2",
+          "crouch:2",
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Breathing Lv3 + Swim or Breathing Lv3 + Rocket or Breathing Lv2 + Crouch Lv2 + Rocket",
+      "world": "Aquarium Park",
+      "row": 17
+    },
+    "stg550:ring:1": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket",
+          "breathing:2",
+          "skydiving"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Rocket + Breathing Lv2 + Skydiving Lv1",
+      "world": "Aquarium Park",
+      "row": 18
+    },
+    "stg550:ring:2": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket",
+          "breathing:2",
+          "skydiving",
+          "crouch:2"
+        ],
+        [
+          "rocket",
+          "breathing:3",
+          "skydiving"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Rocket + Breathing Lv2 + Skydiving Lv1 + Crouch Lv2 or Rocket + Breathing Lv3 + Skydiving Lv1",
+      "world": "Aquarium Park",
+      "row": 19
+    },
+    "stg550:ring:3": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket",
+          "breathing:2",
+          "skydiving",
+          "crouch:2"
+        ],
+        [
+          "rocket",
+          "breathing:3",
+          "skydiving"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Rocket + Breathing Lv2 + Skydiving Lv1 + Crouch Lv2 or Rocket + Breathing Lv3 + Skydiving Lv1",
+      "world": "Aquarium Park",
+      "row": 20
+    },
+    "stg550:ring:4": {
+      "normal": [
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket",
+          "breathing:2",
+          "skydiving",
+          "crouch:2"
+        ],
+        [
+          "rocket",
+          "breathing:3",
+          "skydiving"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket",
+      "raw_movement": "Rocket + Breathing Lv2 + Skydiving Lv1 + Crouch Lv2 or Rocket + Breathing Lv3 + Skydiving Lv1",
+      "world": "Aquarium Park",
+      "row": 21
+    },
+    "stg550:ring:5": {
+      "normal": [
+        [
+          "rocket"
+        ],
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "rocket",
+          "breathing:2",
+          "skydiving",
+          "crouch:2"
+        ],
+        [
+          "rocket",
+          "breathing:3",
+          "skydiving"
+        ],
+        [
+          "breathing:5",
+          "crouch:2",
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Rocket or Frenzy",
+      "raw_movement": "Rocket + Breathing Lv2 + Skydiving Lv1 + Crouch Lv2 or Rocket + Breathing Lv3 + Skydiving Lv1 or Breathing Lv5 + Crouch Lv2 + Frenzy",
+      "world": "Aquarium Park",
+      "row": 22
+    },
+    "stg550:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing:3"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Breathing Lv3",
+      "world": "Aquarium Park",
+      "row": 23
+    },
+    "stg530": {
+      "normal": [
+        [
+          "boost"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill",
+          "boost"
+        ],
+        [
+          "boost",
+          "stomp",
+          "laser"
+        ],
+        [
+          "breathing:2",
+          "boost"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Boost",
+      "raw_movement": "Breathing Lv1 + Drill Lv1 + Boost or Boost + Stomp + Laser or Breathing Lv2 + Boost",
+      "world": "Aquarium Park",
+      "row": 24
+    },
+    "stg530:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing",
+          "swim"
+        ],
+        [
+          "drill",
+          "breathing"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [
+        [
+          "boost"
+        ]
+      ],
+      "raw_normal": "None",
+      "raw_movement": "Breathing Lv1 + Swim or Drill Lv1 + Breathing Lv1 (Advanced Logic: just Boost if you get a boost refill filler item)",
+      "world": "Aquarium Park",
+      "row": 25
+    },
+    "stg530:ring:2": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "boost",
+          "laser"
+        ],
+        [
+          "swim",
+          "breathing",
+          "laser"
+        ],
+        [
+          "breathing",
+          "drill",
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser",
+      "raw_movement": "Boost + Laser or Swim + Breathing Lv1 + Laser or Breathing Lv1 + Drill Lv1 + Laser",
+      "world": "Aquarium Park",
+      "row": 26
+    },
+    "stg530:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing:3",
+          "swim"
+        ],
+        [
+          "breathing:2",
+          "boost"
+        ],
+        [
+          "breathing",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Breathing Lv3 + Swim or Breathing Lv 2 + Boost or Breathing Lv1 + Drill Lv1",
+      "world": "Aquarium Park",
+      "row": 27
+    },
+    "stg530:ring:4": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Breathing Lv1 + Drill Lv1",
+      "world": "Aquarium Park",
+      "row": 28
+    },
+    "stg530:ring:5": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill",
+          "laser"
+        ],
+        [
+          "boost",
+          "stomp",
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser",
+      "raw_movement": "Breathing Lv1 + Drill Lv1 + Laser or Boost + Stomp + Laser",
+      "world": "Aquarium Park",
+      "row": 29
+    },
+    "stg530:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill"
+        ],
+        [
+          "breathing",
+          "boost",
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Breathing Lv1 + Drill Lv1 or Breathing Lv1 + Boost + Laser",
+      "world": "Aquarium Park",
+      "row": 30
+    },
+    "stg560": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Aquarium Park",
+      "row": 31
+    },
+    "stg560:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "double_jump"
+        ],
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Double Jump or Stomp",
+      "world": "Aquarium Park",
+      "row": 32
+    },
+    "stg560:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Aquarium Park",
+      "row": 33
+    },
+    "stg560:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Aquarium Park",
+      "row": 34
+    },
+    "stg560:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Aquarium Park",
+      "row": 35
+    },
+    "stg560:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Aquarium Park",
+      "row": 36
+    },
+    "stg520": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover:2",
+          "mid_air_boost"
+        ],
+        [
+          "breathing",
+          "drill",
+          "hover:2"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover",
+          "stunts",
+          "mid_air_boost"
+        ],
+        [
+          "breathing",
+          "drill",
+          "hover",
+          "stunts",
+          "crouch:2"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover:2",
+          "swim"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover",
+          "stunts",
+          "swim"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover",
+          "stunts"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover:2"
+        ]
+      ],
+      "raw_normal": "Hover",
+      "raw_movement": "Breathing Lv3 + Crouch Lv2 + Hover Lv2 + Mid-Air Boost or Breathing Lv1 + Drill Lv1 + Hover Lv2 or Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 + Mid-Air Boost or Breathing Lv1 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Crouch Lv2 or Breathing Lv3 + Crouch Lv2 + Hover Lv2 + Swim or Breathing Lv1 + Drill Lv1 + Hover Lv2 or Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 + Swim or Breathing Lv1 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Crouch Lv2 (or for Advanced Logic: Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 or Breathing Lv3 + Crouch Lv2 + Hover Lv2)",
+      "world": "Aquarium Park",
+      "row": 37
+    },
+    "stg520:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing:3",
+          "crouch:2"
+        ],
+        [
+          "breathing",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Breathing Lv3 + Crouch Lv2 or Breathing Lv1 + Drill Lv1",
+      "world": "Aquarium Park",
+      "row": 38
+    },
+    "stg520:ring:2": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover",
+          "stunts"
+        ],
+        [
+          "breathing",
+          "drill",
+          "hover",
+          "stunts",
+          "crouch:2"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover:2"
+        ],
+        [
+          "breathing",
+          "drill",
+          "hover:2"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 or Breathing Lv1 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Crouch Lv2 or Breathing Lv3 + Crouch Lv2 + Hover Lv2 or Breathing Lv1 + Drill Lv1 + Hover Lv2",
+      "world": "Aquarium Park",
+      "row": 39
+    },
+    "stg520:ring:3": {
+      "normal": [
+        [
+          "boost",
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover:2",
+          "mid_air_boost",
+          "boost"
+        ],
+        [
+          "breathing",
+          "drill",
+          "hover:2",
+          "mid_air_boost",
+          "boost"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Boost + Hover",
+      "raw_movement": "Breathing Lv3 + Crouch Lv2 + Hover Lv2 + Mid-Air Boost + Boost or Breathing Lv1 + Drill Lv1 + Hover Lv2 + Mid-Air Boost + Boost",
+      "world": "Aquarium Park",
+      "row": 40
+    },
+    "stg520:ring:4": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover:2"
+        ],
+        [
+          "breathing",
+          "drill",
+          "hover:2"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover",
+          "stunts",
+          "double_jump"
+        ],
+        [
+          "breathing",
+          "drill",
+          "hover",
+          "stunts",
+          "crouch:2",
+          "double_jump"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover",
+          "stunts",
+          "mid_air_boost"
+        ],
+        [
+          "breathing",
+          "drill",
+          "hover",
+          "stunts",
+          "crouch:2",
+          "mid_air_boost"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Breathing Lv3 + Crouch Lv2 + Hover Lv2 or Breathing Lv1 + Drill Lv1 + Hover Lv2 or Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 + Double Jump or Breathing Lv1 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Crouch Lv2 + Double Jump or Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 + Mid-Air Boost or Breathing Lv1 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Crouch Lv2 + Mid-Air Boost",
+      "world": "Aquarium Park",
+      "row": 41
+    },
+    "stg520:ring:5": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill",
+          "hover",
+          "stunts",
+          "crouch:2"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover:2",
+          "swim"
+        ],
+        [
+          "breathing",
+          "drill",
+          "hover:2"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover",
+          "stunts",
+          "swim"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover",
+          "stunts"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover:2"
+        ]
+      ],
+      "raw_normal": "Hover",
+      "raw_movement": "Breathing Lv1 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Crouch Lv2 or Breathing Lv3 + Crouch Lv2 + Hover Lv2 + Swim or Breathing Lv1 + Drill Lv1 + Hover Lv2 or Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 + Swim or Breathing Lv1 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Crouch Lv2 (or for Advanced Logic: Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 or Breathing Lv3 + Crouch Lv2 + Hover Lv2)",
+      "world": "Aquarium Park",
+      "row": 42
+    },
+    "stg520:one_up": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Breathing Lv1 + Drill Lv1",
+      "world": "Aquarium Park",
+      "row": 43
+    },
+    "stg590": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing:3"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Breathing Lv3",
+      "world": "Aquarium Park",
+      "row": 44
+    },
+    "stg610": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack",
+      "world": "Asteroid Coaster",
+      "row": 4
+    },
+    "stg610:ring:1": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "homing_attack",
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Homing Attack + Frenzy",
+      "world": "Asteroid Coaster",
+      "row": 5
+    },
+    "stg610:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack",
+      "world": "Asteroid Coaster",
+      "row": 6
+    },
+    "stg610:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack",
+      "world": "Asteroid Coaster",
+      "row": 7
+    },
+    "stg610:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack",
+      "world": "Asteroid Coaster",
+      "row": 8
+    },
+    "stg610:ring:5": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "homing_attack",
+          "frenzy"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Homing Attack + Frenzy",
+      "world": "Asteroid Coaster",
+      "row": 9
+    },
+    "stg610:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack",
+      "world": "Asteroid Coaster",
+      "row": 10
+    },
+    "stg630": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump",
+      "world": "Asteroid Coaster",
+      "row": 11
+    },
+    "stg630:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump ",
+      "world": "Asteroid Coaster",
+      "row": 12
+    },
+    "stg630:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump ",
+      "world": "Asteroid Coaster",
+      "row": 13
+    },
+    "stg630:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump + Homing Attack ",
+      "world": "Asteroid Coaster",
+      "row": 14
+    },
+    "stg630:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump + Homing Attack ",
+      "world": "Asteroid Coaster",
+      "row": 15
+    },
+    "stg630:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump + Homing Attack ",
+      "world": "Asteroid Coaster",
+      "row": 16
+    },
+    "stg640": {
+      "normal": [
+        [
+          "spikes"
+        ],
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "wall_jump",
+          "spikes"
+        ],
+        [
+          "stomp",
+          "spikes"
+        ],
+        [
+          "stomp",
+          "cube"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes or Cube",
+      "raw_movement": "Wall Jump + Spikes Lv1 or Stomp + Spikes Lv1 or Stomp + Cube",
+      "world": "Asteroid Coaster",
+      "row": 17
+    },
+    "stg640:ring:1": {
+      "normal": [
+        [
+          "spikes"
+        ],
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "wall_jump",
+          "spikes"
+        ],
+        [
+          "stomp",
+          "spikes"
+        ],
+        [
+          "stomp",
+          "cube"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes or Cube",
+      "raw_movement": "Wall Jump + Spikes Lv1 or Stomp + Spikes Lv1 or Stomp + Cube",
+      "world": "Asteroid Coaster",
+      "row": 18
+    },
+    "stg640:ring:2": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "wall_jump",
+          "spikes"
+        ],
+        [
+          "stomp",
+          "spikes"
+        ],
+        [
+          "stomp",
+          "cube"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Wall Jump + Spikes Lv1 or Stomp + Spikes Lv1 or Stomp + Cube",
+      "world": "Asteroid Coaster",
+      "row": 19
+    },
+    "stg640:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Asteroid Coaster",
+      "row": 20
+    },
+    "stg640:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp",
+          "double_jump",
+          "wall_jump"
+        ],
+        [
+          "wall_jump",
+          "spikes"
+        ],
+        [
+          "stomp",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp + Double Jump + Wall Jump or Wall Jump + Spikes Lv1 or Stomp + Spikes Lv1",
+      "world": "Asteroid Coaster",
+      "row": 21
+    },
+    "stg640:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp",
+      "world": "Asteroid Coaster",
+      "row": 22
+    },
+    "stg640:one_up": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "stomp",
+          "double_jump",
+          "wall_jump"
+        ],
+        [
+          "wall_jump",
+          "spikes"
+        ],
+        [
+          "stomp",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Stomp + Double Jump + Wall Jump or Wall Jump + Spikes Lv1 or Stomp + Spikes Lv1",
+      "world": "Asteroid Coaster",
+      "row": 23
+    },
+    "stg650": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Quick Step",
+      "world": "Asteroid Coaster",
+      "row": 24
+    },
+    "stg650:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Quick Step",
+      "world": "Asteroid Coaster",
+      "row": 25
+    },
+    "stg650:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Quick Step",
+      "world": "Asteroid Coaster",
+      "row": 26
+    },
+    "stg650:ring:3": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Quick Step",
+      "world": "Asteroid Coaster",
+      "row": 27
+    },
+    "stg650:ring:4": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Quick Step",
+      "world": "Asteroid Coaster",
+      "row": 28
+    },
+    "stg650:ring:5": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Quick Step",
+      "world": "Asteroid Coaster",
+      "row": 29
+    },
+    "stg660": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_normal": [
+        []
+      ],
+      "advanced_movement": [
+        [
+          "wall_jump",
+          "homing_attack"
+        ],
+        [
+          "wall_jump",
+          "stomp"
+        ]
+      ],
+      "raw_normal": "Laser (Advanced Logic: None)",
+      "raw_movement": "Laser (Advanced Logic: Wall Jump + Homing Attack or Wall Jump + Stomp)",
+      "world": "Asteroid Coaster",
+      "row": 30
+    },
+    "stg660:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Asteroid Coaster",
+      "row": 31
+    },
+    "stg660:ring:2": {
+      "normal": [
+        [
+          "frenzy"
+        ],
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy"
+        ],
+        [
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy or Laser",
+      "raw_movement": "Frenzy or Laser",
+      "world": "Asteroid Coaster",
+      "row": 32
+    },
+    "stg660:ring:3": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser",
+          "wall_jump"
+        ],
+        [
+          "laser",
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [
+        []
+      ],
+      "advanced_movement": [
+        [
+          "wall_jump",
+          "homing_attack"
+        ],
+        [
+          "wall_jump",
+          "stomp"
+        ]
+      ],
+      "raw_normal": "Laser (Advanced Logic: None)",
+      "raw_movement": "Laser + Wall Jump or Laser + Double Jump (Advanced Logic: Wall Jump + Homing Attack or Wall Jump + Stomp)",
+      "world": "Asteroid Coaster",
+      "row": 33
+    },
+    "stg660:ring:4": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser",
+          "wall_jump"
+        ],
+        [
+          "laser",
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [
+        []
+      ],
+      "advanced_movement": [
+        [
+          "wall_jump",
+          "homing_attack"
+        ],
+        [
+          "wall_jump",
+          "stomp"
+        ]
+      ],
+      "raw_normal": "Laser (Advanced Logic: None)",
+      "raw_movement": "Laser + Wall Jump or Laser + Double Jump (Advanced Logic: Wall Jump + Homing Attack or Wall Jump + Stomp)",
+      "world": "Asteroid Coaster",
+      "row": 34
+    },
+    "stg660:ring:5": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser",
+          "wall_jump"
+        ],
+        [
+          "laser",
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser",
+      "raw_movement": "Laser + Wall Jump or Laser + Double Jump",
+      "world": "Asteroid Coaster",
+      "row": 35
+    },
+    "stg660:one_up": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser",
+          "wall_jump"
+        ],
+        [
+          "laser",
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "advanced_movement": [
+        [
+          "wall_jump",
+          "homing_attack",
+          "frenzy"
+        ],
+        [
+          "wall_jump",
+          "stomp",
+          "frenzy"
+        ]
+      ],
+      "raw_normal": "Laser (Advanced Logic: Frenzy)",
+      "raw_movement": "Laser + Wall Jump or Laser + Double Jump (Advanced Logic: Wall Jump + Homing Attack + Frenzy or Wall Jump + Stomp + Frenzy)",
+      "world": "Asteroid Coaster",
+      "row": 36
+    },
+    "stg620": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy",
+          "breathing:2",
+          "swim",
+          "double_jump",
+          "homing_attack"
+        ],
+        [
+          "frenzy",
+          "breathing:2",
+          "swim",
+          "wall_jump",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Frenzy + Breathing Lv2 + Swim + Double Jump + Homing Attack or Frenzy + Breathing Lv2 + Swim + Wall Jump + Homing Attack",
+      "world": "Asteroid Coaster",
+      "row": 37
+    },
+    "stg620:ring:1": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack",
+      "world": "Asteroid Coaster",
+      "row": 38
+    },
+    "stg620:ring:2": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Breathing Lv1",
+      "world": "Asteroid Coaster",
+      "row": 39
+    },
+    "stg620:ring:3": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy",
+          "breathing:2",
+          "swim",
+          "double_jump"
+        ],
+        [
+          "frenzy",
+          "breathing:2",
+          "swim",
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Frenzy + Breathing Lv2 + Swim + Double Jump or Frenzy + Breathing Lv2 + Swim + Wall Jump",
+      "world": "Asteroid Coaster",
+      "row": 40
+    },
+    "stg620:ring:4": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy",
+          "breathing:2",
+          "swim",
+          "double_jump"
+        ],
+        [
+          "frenzy",
+          "breathing:2",
+          "swim",
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Frenzy + Breathing Lv2 + Swim + Double Jump or Frenzy + Breathing Lv2 + Swim + Wall Jump",
+      "world": "Asteroid Coaster",
+      "row": 41
+    },
+    "stg620:ring:5": {
+      "normal": [
+        [
+          "frenzy"
+        ]
+      ],
+      "movement": [
+        [
+          "frenzy",
+          "breathing:2",
+          "swim",
+          "double_jump",
+          "skydiving"
+        ],
+        [
+          "frenzy",
+          "breathing:2",
+          "swim",
+          "wall_jump",
+          "skydiving"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Frenzy",
+      "raw_movement": "Frenzy + Breathing Lv2 + Swim + Double Jump + Skydiving Lv1 or Frenzy + Breathing Lv2 + Swim + Wall Jump + Skydiving Lv1",
+      "world": "Asteroid Coaster",
+      "row": 42
+    },
+    "stg690": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack",
+      "world": "Asteroid Coaster",
+      "row": 43
+    },
+    "stg710": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Quick Step",
+      "world": "Terminal Velocity",
+      "row": 4
+    },
+    "stg790": {
+      "normal": [
+        [
+          "all_wisps"
+        ]
+      ],
+      "movement": [
+        [
+          "all_wisps",
+          "quick_step",
+          "homing_attack"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "All Wisps",
+      "raw_movement": "ALL Wisps + Quick Step + Homing Attack",
+      "world": "Terminal Velocity",
+      "row": 10
+    },
+    "stg720": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Terminal Velocity",
+      "row": 16
+    },
+    "stgD10": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "land_speed"
+        ],
+        [
+          "homing_attack"
+        ],
+        [
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Game Land Speed Lv2 or Homing Attack or Double Jump",
+      "world": "Game Land",
+      "row": 4
+    },
+    "stgD10:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "land_speed"
+        ],
+        [
+          "homing_attack"
+        ],
+        [
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Game Land Speed Lv2 or Homing Attack or Double Jump",
+      "world": "Game Land",
+      "row": 5
+    },
+    "stgB20": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Game Land",
+      "row": 6
+    },
+    "stgB20:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "laser"
+        ],
+        [
+          "double_jump",
+          "wall_jump"
+        ],
+        [
+          "land_speed",
+          "mid_air_boost"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Laser or Double Jump + Wall Jump or Game Land Speed Lv2 + Mid-Air Boost",
+      "world": "Game Land",
+      "row": 7
+    },
+    "stgE50": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube",
+      "world": "Game Land",
+      "row": 8
+    },
+    "stgE50:eggman_heart": {
+      "normal": [
+        [
+          "cube"
+        ]
+      ],
+      "movement": [
+        [
+          "cube"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Cube",
+      "raw_movement": "Cube",
+      "world": "Game Land",
+      "row": 9
+    },
+    "stgD20": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Game Land",
+      "row": 10
+    },
+    "stgD20:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "double_jump"
+        ],
+        [
+          "mid_air_boost"
+        ],
+        [
+          "land_speed"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Double Jump or Mid-Air Boost or Progressive Game Land Speed Lv2",
+      "world": "Game Land",
+      "row": 11
+    },
+    "stgB30": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Game Land",
+      "row": 12
+    },
+    "stgB30:eggman_heart": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser",
+      "raw_movement": "Laser",
+      "world": "Game Land",
+      "row": 13
+    },
+    "stgF30": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill",
+          "double_jump"
+        ],
+        [
+          "breathing",
+          "drill",
+          "wall_jump"
+        ],
+        [
+          "breathing",
+          "drill",
+          "assist_change"
+        ],
+        [
+          "breathing:2",
+          "swim",
+          "double_jump"
+        ],
+        [
+          "breathing:2",
+          "swim",
+          "wall_jump"
+        ],
+        [
+          "breathing:2",
+          "swim",
+          "assist_change"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Breathing Lv1 + Drill Lv1 + (Double Jump/Wall Jump/Assist Mode) or Progressive Breathing Lv2 + Swim + (Double Jump/Wall Jump/Assist Mode)",
+      "world": "Game Land",
+      "row": 14
+    },
+    "stgF30:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill"
+        ],
+        [
+          "breathing:2",
+          "swim"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Breathing Lv1 + Drill Lv1 or Progressive Breathing Lv2 + Swim",
+      "world": "Game Land",
+      "row": 15
+    },
+    "stgG10": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Game Land",
+      "row": 16
+    },
+    "stgG10:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Game Land",
+      "row": 17
+    },
+    "stgG30": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump",
+      "world": "Game Land",
+      "row": 18
+    },
+    "stgG30:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Wall Jump ",
+      "world": "Game Land",
+      "row": 19
+    },
+    "stgA10": {
+      "normal": [
+        [
+          "laser"
+        ],
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "double_jump",
+          "breathing:3",
+          "laser"
+        ],
+        [
+          "double_jump",
+          "breathing:3",
+          "drill"
+        ],
+        [
+          "mid_air_boost",
+          "breathing:3",
+          "laser"
+        ],
+        [
+          "mid_air_boost",
+          "breathing:3",
+          "drill"
+        ],
+        [
+          "assist_change",
+          "breathing:3",
+          "laser"
+        ],
+        [
+          "assist_change",
+          "breathing:3",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser or Drill",
+      "raw_movement": "(Double Jump/Mid Air Boost/Assist Mode) + Breathing Lv3 + (Laser/Drill Lv1) ",
+      "world": "Game Land",
+      "row": 20
+    },
+    "stgA10:eggman_heart": {
+      "normal": [
+        [
+          "laser"
+        ],
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "double_jump",
+          "breathing:3",
+          "laser"
+        ],
+        [
+          "double_jump",
+          "breathing:3",
+          "drill"
+        ],
+        [
+          "mid_air_boost",
+          "breathing:3",
+          "laser"
+        ],
+        [
+          "mid_air_boost",
+          "breathing:3",
+          "drill"
+        ],
+        [
+          "assist_change",
+          "breathing:3",
+          "laser"
+        ],
+        [
+          "assist_change",
+          "breathing:3",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser or Drill",
+      "raw_movement": "(Double Jump/Mid Air Boost/Assist Mode) + Breathing Lv3 + (Laser/Drill Lv1) ",
+      "world": "Game Land",
+      "row": 21
+    },
+    "stgD30": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "double_jump"
+        ],
+        [
+          "assist_change"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Double Jump or Assist Change",
+      "world": "Game Land",
+      "row": 22
+    },
+    "stgD30:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "double_jump"
+        ],
+        [
+          "assist_change"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Double Jump or Assist Change",
+      "world": "Game Land",
+      "row": 23
+    },
+    "stgG20": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Quick Step",
+      "world": "Game Land",
+      "row": 24
+    },
+    "stgG20:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "quick_step"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Quick Step",
+      "world": "Game Land",
+      "row": 25
+    },
+    "stgC50": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser",
+          "double_jump"
+        ],
+        [
+          "laser",
+          "mid_air_boost"
+        ],
+        [
+          "laser",
+          "assist_change"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [
+        [
+          "laser"
+        ]
+      ],
+      "raw_normal": "Laser",
+      "raw_movement": "Laser + (Double Jump/Mid Air Boost/Assist Mode) (Laser only for advanced)",
+      "world": "Game Land",
+      "row": 26
+    },
+    "stgC50:eggman_heart": {
+      "normal": [
+        [
+          "laser"
+        ]
+      ],
+      "movement": [
+        [
+          "laser"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Laser",
+      "raw_movement": "Laser",
+      "world": "Game Land",
+      "row": 27
+    },
+    "stgE30": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing:3",
+          "double_jump"
+        ],
+        [
+          "breathing:3",
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Breathing Lv3 + Double Jump or Progressive Breathing Lv3 + Wall Jump",
+      "world": "Game Land",
+      "row": 28
+    },
+    "stgE30:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing:3"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Progressive Breathing Lv3",
+      "world": "Game Land",
+      "row": 29
+    },
+    "stgB10": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack",
+          "stomp",
+          "crouch:2",
+          "rail"
+        ],
+        [
+          "homing_attack",
+          "drill",
+          "rail"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack + Stomp + Progressive Crouch Lv2 + Rail Lv1 or Homing Attack + Drill Lv1 + Rail Lv1",
+      "world": "Game Land",
+      "row": 30
+    },
+    "stgB10:eggman_heart": {
+      "normal": [
+        [
+          "drill"
+        ]
+      ],
+      "movement": [
+        [
+          "homing_attack",
+          "drill"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill",
+      "raw_movement": "Homing Attack + Drill Lv1",
+      "world": "Game Land",
+      "row": 31
+    },
+    "stgE40": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "double_jump",
+          "spikes"
+        ],
+        [
+          "homing_attack",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Double Jump/Homing Attack + Spikes Lv1",
+      "world": "Game Land",
+      "row": 32
+    },
+    "stgE40:eggman_heart": {
+      "normal": [
+        [
+          "spikes"
+        ]
+      ],
+      "movement": [
+        [
+          "double_jump",
+          "spikes"
+        ],
+        [
+          "homing_attack",
+          "spikes"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Spikes",
+      "raw_movement": "Double Jump/Homing Attack + Spikes Lv1",
+      "world": "Game Land",
+      "row": 33
+    },
+    "stgG40": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack",
+          "mid_air_boost"
+        ],
+        [
+          "homing_attack",
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack + Mid-Air Boost or Homing Attack + Wall Jump",
+      "world": "Game Land",
+      "row": 34
+    },
+    "stgG40:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "homing_attack",
+          "mid_air_boost"
+        ],
+        [
+          "homing_attack",
+          "wall_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Homing Attack + Mid-Air Boost or Homing Attack + Wall Jump",
+      "world": "Game Land",
+      "row": 35
+    },
+    "stgC40": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv1",
+      "world": "Game Land",
+      "row": 36
+    },
+    "stgC40:eggman_heart": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv1",
+      "world": "Game Land",
+      "row": 37
+    },
+    "stgF40": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover",
+          "breathing:3",
+          "swim"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv1 + Progressive Breathing Lv3 + Swim",
+      "world": "Game Land",
+      "row": 38
+    },
+    "stgF40:eggman_heart": {
+      "normal": [
+        [
+          "hover"
+        ]
+      ],
+      "movement": [
+        [
+          "hover",
+          "breathing:3",
+          "swim"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Hover",
+      "raw_movement": "Hover Lv1 + Progressive Breathing Lv3 + Swim",
+      "world": "Game Land",
+      "row": 39
+    },
+    "stgA30": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Game Land",
+      "row": 40
+    },
+    "stgA30:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        []
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "None",
+      "world": "Game Land",
+      "row": 41
+    },
+    "stgE20": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "rocket"
+        ],
+        [
+          "double_jump"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Rocket or Double Jump",
+      "world": "Game Land",
+      "row": 42
+    },
+    "stgE20:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "double_jump",
+          "wall_jump"
+        ],
+        [
+          "rocket"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Double Jump + Wall Jump or Rocket",
+      "world": "Game Land",
+      "row": 43
+    },
+    "stgC10": {
+      "normal": [
+        [
+          "drill"
+        ],
+        [
+          "rocket"
+        ]
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill",
+          "random_capsules"
+        ],
+        [
+          "breathing:3",
+          "rocket",
+          "random_capsules"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "Drill or Rocket",
+      "raw_movement": "Breathing Lv1 + Drill + Random Capsules or Breathing Lv3 + Rocket + Random Capsules",
+      "world": "Game Land",
+      "row": 44
+    },
+    "stgC10:eggman_heart": {
+      "normal": [
+        []
+      ],
+      "movement": [
+        [
+          "breathing",
+          "drill",
+          "random_capsules"
+        ],
+        [
+          "breathing:3",
+          "rocket",
+          "random_capsules"
+        ]
+      ],
+      "advanced_normal": [],
+      "advanced_movement": [],
+      "raw_normal": "None",
+      "raw_movement": "Breathing Lv1 + Drill + Random Capsules or Breathing Lv3 + Rocket + Random Capsules",
+      "world": "Game Land",
+      "row": 45
+    }
+  },
+  "rank_wisps": {
+    "stg110": [
+      "boost",
+      "laser",
+      "drill"
+    ],
+    "stg130": [
+      "boost",
+      "laser",
+      "drill"
+    ],
+    "stg120": [
+      "boost",
+      "laser",
+      "drill"
+    ],
+    "stg140": [
+      "boost",
+      "drill",
+      "frenzy"
+    ],
+    "stg150": [
+      "boost",
+      "laser",
+      "spikes"
+    ],
+    "stg160": [
+      "boost",
+      "spikes"
+    ],
+    "stg190": [
+      "boost",
+      "laser"
+    ],
+    "stg210": [
+      "boost",
+      "laser",
+      "drill"
+    ],
+    "stg230": [
+      "boost",
+      "drill",
+      "hover"
+    ],
+    "stg220": [
+      "boost",
+      "rocket",
+      "spikes"
+    ],
+    "stg260": [
+      "boost",
+      "laser",
+      "frenzy"
+    ],
+    "stg240": [
+      "boost",
+      "spikes",
+      "cube"
+    ],
+    "stg250": [
+      "boost",
+      "spikes",
+      "cube"
+    ],
+    "stg290": [
+      "boost",
+      "drill"
+    ],
+    "stg310": [
+      "boost",
+      "spikes",
+      "cube"
+    ],
+    "stg330": [
+      "spikes",
+      "cube"
+    ],
+    "stg340": [],
+    "stg350": [
+      "boost",
+      "frenzy"
+    ],
+    "stg320": [
+      "boost",
+      "spikes",
+      "hover"
+    ],
+    "stg360": [
+      "boost",
+      "hover"
+    ],
+    "stg390": [
+      "boost",
+      "laser"
+    ],
+    "stg410": [
+      "boost",
+      "rocket",
+      "spikes"
+    ],
+    "stg440": [
+      "boost",
+      "frenzy"
+    ],
+    "stg450": [
+      "boost",
+      "laser",
+      "cube"
+    ],
+    "stg430": [
+      "boost",
+      "laser",
+      "rocket"
+    ],
+    "stg460": [
+      "boost",
+      "rocket",
+      "frenzy"
+    ],
+    "stg420": [
+      "boost",
+      "spikes",
+      "hover"
+    ],
+    "stg490": [
+      "boost",
+      "spikes"
+    ],
+    "stg510": [
+      "boost",
+      "laser",
+      "drill"
+    ],
+    "stg540": [
+      "boost",
+      "cube"
+    ],
+    "stg550": [
+      "boost",
+      "rocket",
+      "frenzy"
+    ],
+    "stg530": [
+      "boost",
+      "laser",
+      "drill"
+    ],
+    "stg560": [
+      "boost"
+    ],
+    "stg520": [
+      "boost",
+      "drill",
+      "hover"
+    ],
+    "stg590": [
+      "boost",
+      "drill"
+    ],
+    "stg610": [
+      "boost",
+      "frenzy"
+    ],
+    "stg630": [
+      "boost",
+      "frenzy"
+    ],
+    "stg640": [
+      "boost",
+      "spikes",
+      "cube"
+    ],
+    "stg650": [
+      "boost"
+    ],
+    "stg660": [
+      "boost",
+      "laser",
+      "frenzy"
+    ],
+    "stg620": [
+      "boost",
+      "frenzy"
+    ],
+    "stg690": [
+      "boost",
+      "rocket"
+    ],
+    "stg710": [
+      "boost"
+    ],
+    "stg790": [
+      "all_wisps"
+    ],
+    "stg720": [
+      "boost"
+    ]
+  },
+  "rank_s_extra_movement": {
+    "stg340": [
+      [
+        "stomp"
+      ]
+    ],
+    "stg350": [
+      [
+        "frenzy"
+      ]
+    ],
+    "stg390": [
+      [
+        "homing_attack",
+        "laser",
+        "quick_step"
+      ]
+    ]
+  },
+  "review": [],
+  "unresolved_routes": {},
+  "user_corrections": [
+    {
+      "sheet": "Aquarium Park",
+      "row": 8,
+      "column_index": 7,
+      "corrected_value": "Boost + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv1 + Swim + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv1 + Drill Lv1 + Laser + Progressive Crouch Lv2 or Progressive Breathing Lv2 + Swim + Laser + Progressive Crouch Lv2"
+    },
+    {
+      "sheet": "Game Land",
+      "row": 44,
+      "column_index": 7,
+      "corrected_value": "Breathing Lv1 + Drill + Random Capsules or Breathing Lv3 + Rocket + Random Capsules"
+    },
+    {
+      "sheet": "Game Land",
+      "row": 45,
+      "column_index": 7,
+      "corrected_value": "Breathing Lv1 + Drill + Random Capsules or Breathing Lv3 + Rocket + Random Capsules"
+    },
+    {
+      "sheet": "Game Land",
+      "row": 44,
+      "column_index": 10,
+      "corrected_value": "Boost, Drill, Rocket and Random Capsules"
+    }
+  ]
+}

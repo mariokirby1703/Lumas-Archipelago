@@ -1,4 +1,3 @@
-"""Explicit player-YAML migration; slot data and journals never change seeds."""
 from copy import deepcopy
 
 

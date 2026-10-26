@@ -208,3 +208,6 @@ Thumbs.db
 # Sonic Colours development release archives
 /worlds/sonic_colours/*.zip
 /worlds/sonic_colours/*.apworld
+
+# Local Sonic Colours task notes
+/worlds/sonic_colours/TODO.md
