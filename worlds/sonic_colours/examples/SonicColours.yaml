@@ -3,7 +3,7 @@ game: Sonic Colours (Wii)
 Sonic Colours (Wii):
   goal: nega_wisp_armor
   super_sonic: false
-  world_progression: unlock_acts_in_order
+  world_progression: all_acts_then_boss
   red_ring_checks: singles
   rank_checks: 'off'
   game_land_checks: true
