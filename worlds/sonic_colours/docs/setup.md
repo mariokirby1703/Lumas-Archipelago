@@ -12,7 +12,7 @@ Other game regions are not yet supported.
 
 ## Installing the APWorld
 
-1. Install Archipelago and download `sonic_colours.apworld`.
+1. Install Archipelago and download `sonic_colours_wii.apworld`.
 2. Double-click the `.apworld` file to install it.
 3. Restart the Archipelago Launcher and check that the Sonic Colours (Wii) Client appears.
 4. If Archipelago asks to install missing requirements, allow it. The client needs Dolphin Memory Engine to connect to Dolphin.

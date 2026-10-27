@@ -53,7 +53,7 @@ def build(destination):
                     ast.parse(content, filename=str(relative))
                 if relative.as_posix() == 'archipelago.json':
                     content = json.dumps({**json.loads(content), 'version': 2, 'compatible_version': 2}).encode()
-                info = zipfile.ZipInfo(f'sonic_colours/{relative.as_posix()}', (2026, 10, 9, 0, 0, 0))
+                info = zipfile.ZipInfo(f'sonic_colours_wii/{relative.as_posix()}', (2026, 10, 9, 0, 0, 0))
                 info.compress_type = zipfile.ZIP_DEFLATED
                 info.external_attr = 0o644 << 16
                 archive.writestr(info, content)
@@ -62,7 +62,7 @@ def build(destination):
             # third filename for /games/Sonic Colours (Wii)/info/en.
             overview=(root/'docs/sonic_colours.md').read_bytes()
             alias='docs/'+WEB_GAME_INFO
-            info=zipfile.ZipInfo('sonic_colours/'+alias,(2026,10,9,0,0,0))
+            info=zipfile.ZipInfo('sonic_colours_wii/'+alias,(2026,10,9,0,0,0))
             info.compress_type=zipfile.ZIP_DEFLATED
             info.external_attr=0o644<<16
             archive.writestr(info,overview)
@@ -78,7 +78,7 @@ def build(destination):
                 commit, dirty = None, None
             manifest = {'commit': commit, 'dirty': dirty, 'files': contents,
                         'build_id': hashlib.sha256(json.dumps(contents, sort_keys=True).encode()).hexdigest()}
-            info = zipfile.ZipInfo('sonic_colours/build_manifest.json', (2026, 10, 9, 0, 0, 0))
+            info = zipfile.ZipInfo('sonic_colours_wii/build_manifest.json', (2026, 10, 9, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o644 << 16
             archive.writestr(info, json.dumps(manifest, sort_keys=True))
@@ -95,7 +95,7 @@ def build(destination):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path(__file__).resolve().parents[2] /
-                        'build/apworlds/sonic_colours.apworld')
+                        'build/apworlds/sonic_colours_wii.apworld')
     args = parser.parse_args()
     path = build(args.output)
     print(f'{path}\nSHA256: {hashlib.sha256(path.read_bytes()).hexdigest()}')

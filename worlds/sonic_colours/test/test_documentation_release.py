@@ -33,15 +33,15 @@ def test_source_webhost_publishes_canonical_game_info(tmp_path,monkeypatch):
 def test_built_guides_and_tutorial_follow_stock_webhost_conventions(tmp_path):
     from werkzeug.utils import secure_filename
     assert WEB_GAME_INFO=='en_'+secure_filename(GAME)+'.md'
-    with zipfile.ZipFile(build(tmp_path/'sonic_colours.apworld')) as archive:
+    with zipfile.ZipFile(build(tmp_path/'sonic_colours_wii.apworld')) as archive:
         names=set(archive.namelist())
-        overview=archive.read('sonic_colours/docs/sonic_colours.md')
-        assert archive.read('sonic_colours/docs/'+WEB_GAME_INFO)==overview
+        overview=archive.read('sonic_colours_wii/docs/sonic_colours.md')
+        assert archive.read('sonic_colours_wii/docs/'+WEB_GAME_INFO)==overview
         for tutorial in SonicColoursWeb.tutorials:
             assert tutorial.file_name=='setup.md'
             assert tutorial.link=='setup'
-            assert archive.read('sonic_colours/docs/'+tutorial.file_name)
-        for name in ['sonic_colours/README.md',*sorted(n for n in names if '/docs/' in n)]:
+            assert archive.read('sonic_colours_wii/docs/'+tutorial.file_name)
+        for name in ['sonic_colours_wii/README.md',*sorted(n for n in names if '/docs/' in n)]:
             for target in re.findall(r'\]\(([^)]+)\)',archive.read(name).decode()):
                 path=target.split('#',1)[0]
                 if not path or '://' in path:continue

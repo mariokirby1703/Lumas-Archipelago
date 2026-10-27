@@ -113,9 +113,10 @@ for folder in (folder for folder in (user_folder, local_folder) if folder):
 # copies. Custom loose worlds otherwise sort ahead of the repository and can
 # silently supply an older client; APWorld duplicate handling happens too late.
 _sonic_source = os.path.join(local_folder, 'sonic_colours', '__init__.py')
-if os.path.isfile(_sonic_source):
+if any(source.name == 'sonic_colours' and source.relative and not source.is_zip
+       for source in world_sources):
     _shadowed_sonic = [source for source in world_sources
-                      if source.name == 'sonic_colours' and not (source.relative and not source.is_zip)]
+                      if source.name in {'sonic_colours', 'sonic_colours_wii'} and not (source.relative and not source.is_zip)]
     for source in _shadowed_sonic:
         logger.warning('Ignoring installed Sonic Colours copy %s; using checkout source %s',
                        source.resolved_path, _sonic_source)

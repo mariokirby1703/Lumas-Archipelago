@@ -85,13 +85,13 @@ def implementation_info():
     result = {'loaded_code_id': digest.hexdigest(),
               'loaded_python_paths': {module.__name__: module.__file__
                                       for module in (hooks, runtime, state, binding, native_read)},
-              'package_path': str(files('worlds.sonic_colours')),
+              'package_path': str(files(__package__.rsplit('.', 1)[0])),
               'commit': None, 'package_build_id': None}
-    manifest = files('worlds.sonic_colours').joinpath('build_manifest.json')
+    manifest = files(__package__.rsplit('.', 1)[0]).joinpath('build_manifest.json')
     if manifest.is_file():
         data = json.loads(manifest.read_text(encoding='utf-8'))
         mismatches = [name for name, expected in data['files'].items()
-                      if hashlib.sha256(files('worlds.sonic_colours').joinpath(name).read_bytes()).hexdigest() != expected]
+                      if hashlib.sha256(files(__package__.rsplit('.', 1)[0]).joinpath(name).read_bytes()).hexdigest() != expected]
         result.update(commit=data['commit'], package_build_id=data['build_id'],
                       build_dirty=data['dirty'], manifest_verified=not mismatches,
                       manifest_mismatches=mismatches)

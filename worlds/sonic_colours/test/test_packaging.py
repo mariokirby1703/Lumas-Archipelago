@@ -14,14 +14,14 @@ def test_apworld_has_verifiable_build_identity_without_private_assets(tmp_path):
     second = build(tmp_path / 'two.apworld')
     assert first.read_bytes() == second.read_bytes()
     with zipfile.ZipFile(first) as archive:
-        manifest = json.loads(archive.read('sonic_colours/build_manifest.json'))
+        manifest = json.loads(archive.read('sonic_colours_wii/build_manifest.json'))
         assert manifest['commit'] and len(manifest['commit']) == 40
         assert manifest['build_id'] == hashlib.sha256(
             json.dumps(manifest['files'], sort_keys=True).encode()).hexdigest()
         for name, digest in manifest['files'].items():
-            assert hashlib.sha256(archive.read('sonic_colours/' + name)).hexdigest() == digest
+            assert hashlib.sha256(archive.read('sonic_colours_wii/' + name)).hexdigest() == digest
         assert 'assets/COLORSAPlogo.png' in manifest['files']
-        assert archive.read('sonic_colours/assets/COLORSAPlogo.png').startswith(bytes.fromhex('89504e470d0a1a0a'))
+        assert archive.read('sonic_colours_wii/assets/COLORSAPlogo.png').startswith(bytes.fromhex('89504e470d0a1a0a'))
         assert not any('/notes/' in name or name.endswith(('.dol', '.cpk', '.raw'))
                        for name in archive.namelist())
 
@@ -31,7 +31,8 @@ def test_launcher_world_loader_prefers_checkout_over_both_installed_copies(tmp_p
     stale = custom / 'sonic_colours'
     stale.mkdir(parents=True)
     (stale / '__init__.py').write_text("raise RuntimeError('STALE CLIENT LOADED')\n")
-    (custom / 'sonic_colours.apworld').write_bytes(b'not a valid zip; must be ignored')
+    for name in ('sonic_colours', 'sonic_colours_wii'):
+        (custom / (name + '.apworld')).write_bytes(b'not a valid zip; must be ignored')
     script = '''
 import unittest
 import sys
@@ -41,19 +42,19 @@ custom = Path(sys.argv[1])
 Utils.user_path = lambda *parts: str(custom.joinpath(*parts))
 import worlds
 from worlds.sonic_colours.client import hooks
-assert not any(s.name == 'sonic_colours' and not s.relative for s in worlds.world_sources)
+assert not any(s.name in ('sonic_colours', 'sonic_colours_wii') and not s.relative for s in worlds.world_sources)
 print(Path(hooks.__file__).resolve())
 '''
     root = Path(__file__).resolve().parents[3]
     result = subprocess.run([sys.executable, '-c', script, str(tmp_path)], cwd=root,
-                            env={**os.environ, 'AP_TEST_WORLDS': 'sonic_colours',
+                            env={**os.environ, 'AP_TEST_WORLDS': 'sonic_colours,sonic_colours_wii',
                                  'SKIP_REQUIREMENTS_UPDATE': '1'},
                             capture_output=True, text=True, timeout=45)
     assert result.returncode == 0, result.stdout + result.stderr
     assert str(root / 'worlds/sonic_colours/client/hooks.py') in result.stdout
 
 def test_real_zip_import_contains_binding_native_reader_and_pickup_runtime(tmp_path):
-    archive = build(tmp_path / 'sonic_colours.apworld')
+    archive = build(tmp_path / 'sonic_colours_wii.apworld')
     script = '''
 import unittest
 import importlib, importlib.abc, sys, zipimport
@@ -65,22 +66,22 @@ for extension in ('.apsoniccolours','.apsonic'):
     AutoPatchRegister.file_endings.pop(extension,None)
 AutoPatchRegister.patch_types.pop('Sonic Colours (Wii)',None)
 for name in list(sys.modules):
-    if name == 'worlds.sonic_colours' or name.startswith('worlds.sonic_colours.'):
+    if name == 'worlds.sonic_colours_wii' or name.startswith('worlds.sonic_colours_wii.'):
         del sys.modules[name]
 importer = zipimport.zipimporter(sys.argv[1])
-spec = importer.find_spec('worlds.sonic_colours')
+spec = importer.find_spec('worlds.sonic_colours_wii')
 class Finder(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path=None, target=None):
-        return spec if fullname == 'worlds.sonic_colours' else None
+        return spec if fullname == 'worlds.sonic_colours_wii' else None
 sys.meta_path.insert(0, Finder())
-from worlds.sonic_colours.client import binding, native_read, runtime
-from worlds.sonic_colours.client import dolphin_launch
-from worlds.sonic_colours.client.build_info import implementation_info
-from worlds.sonic_colours.capsules import CAPSULES
-from worlds.sonic_colours.medals import MEDALS
-from worlds.sonic_colours.tools import build_hud_overlay,hud_gncp,hud_tpl
-from worlds.sonic_colours.client.native_dol import plan
-from worlds.sonic_colours.patch import resource_component_id
+from worlds.sonic_colours_wii.client import binding, native_read, runtime
+from worlds.sonic_colours_wii.client import dolphin_launch
+from worlds.sonic_colours_wii.client.build_info import implementation_info
+from worlds.sonic_colours_wii.capsules import CAPSULES
+from worlds.sonic_colours_wii.medals import MEDALS
+from worlds.sonic_colours_wii.tools import build_hud_overlay,hud_gncp,hud_tpl
+from worlds.sonic_colours_wii.client.native_dol import plan
+from worlds.sonic_colours_wii.patch import resource_component_id
 assert len(resource_component_id())==64 and plan()[1]
 assert '.apworld' in build_hud_overlay.__file__
 for module in (binding, native_read, runtime):
@@ -94,6 +95,32 @@ print(info['loaded_code_id'])
     root = Path(__file__).resolve().parents[3]
     result = subprocess.run([sys.executable, '-c', script, str(archive)], cwd=root,
                             env={**os.environ, 'AP_TEST_WORLDS': 'sonic_colours',
+                                 'SKIP_REQUIREMENTS_UPDATE': '1'},
+                            capture_output=True, text=True, timeout=45)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_wii_archive_loads_through_archipelago_world_discovery(tmp_path):
+    custom = tmp_path / 'worlds'
+    custom.mkdir()
+    build(custom / 'sonic_colours_wii.apworld')
+    script = """
+import unittest
+import sys
+from pathlib import Path
+import Utils
+custom = Path(sys.argv[1])
+Utils.user_path = lambda *parts: str(custom.joinpath(*parts))
+import worlds
+assert not worlds.failed_world_loads, worlds.failed_world_loads
+world = worlds.AutoWorldRegister.world_types['Sonic Colours (Wii)']
+assert world.__module__ == 'worlds.sonic_colours_wii.world'
+from worlds.sonic_colours_wii.client.build_info import implementation_info
+assert implementation_info()['manifest_verified']
+"""
+    result = subprocess.run([sys.executable, '-c', script, str(tmp_path)],
+                            cwd=Path(__file__).resolve().parents[3],
+                            env={**os.environ, 'AP_TEST_WORLDS': 'sonic_colours_wii',
                                  'SKIP_REQUIREMENTS_UPDATE': '1'},
                             capture_output=True, text=True, timeout=45)
     assert result.returncode == 0, result.stdout + result.stderr
