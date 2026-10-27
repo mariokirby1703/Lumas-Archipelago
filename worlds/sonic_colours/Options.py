@@ -86,7 +86,7 @@ class WorldProgression(Choice):
     option_all_acts_then_boss = 1
     alias_sequential = 0
     alias_open_acts = 1
-    default = 0
+    default = 1
 
 
 class GameLandChecks(DefaultOnToggle):
