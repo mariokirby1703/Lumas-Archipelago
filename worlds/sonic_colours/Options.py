@@ -98,9 +98,7 @@ class GameLandChecks(DefaultOnToggle):
 
 class SuperSonic(Toggle):
     """Add the seven Chaos Emerald items to the pool to unlock Super Sonic.
-    In Normal Logic, all seven different Emeralds provide an alternative route for Act Clear checks.
-    Red Ring and rank requirements remain unchanged.
-    When Off, Chaos Emerald items are not added to the pool."""
+    The logic for this feature is not fully implemented, so you may be able to collect red rings out of logic."""
     display_name = 'Super Sonic'
 
 

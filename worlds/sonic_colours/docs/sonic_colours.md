@@ -33,7 +33,7 @@ Sonic Colours is a Wii platformer in which Sonic explores Eggman's interstellar 
 - **World Progression:** unlock Acts in order, or open all Acts instantly except the boss
 - **White Boost Wisp Lock:** require the White Boost Wisp for ordinary Boost gains; given Boost Refills remain usable
 - **Ability Locks:** lock various movement abilities
-- **Super Sonic:** add seven Chaos Emerald items to the item pool, which allows you to use Super Sonic when all are obtained (Logic for this isnt implemented yet)
+- **Super Sonic:** add the seven Chaos Emerald items to unlock Super Sonic. The logic for this feature is not fully implemented, so you may be able to collect red rings out of logic
 
 ## Check Options
 
