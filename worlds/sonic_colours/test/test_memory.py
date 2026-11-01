@@ -103,6 +103,22 @@ def test_partial_read_and_revision_rejection():
         memory.read_u32(0x90001000)
 
 
+def test_missing_native_capsule_capture_reports_memory_error(monkeypatch):
+    from ..client import capsule_capture, native_dol
+
+    backend = FakeBackend()
+    backend.put(0x80000000, b'SNCP8P')
+    backend.put(capsule_capture.HOOK, capsule_capture.ORIGINAL.to_bytes(4, 'big'))
+    memory = SonicMemory(backend)
+    monkeypatch.setattr(native_dol, 'handshake', lambda m: {'seed_digest': 'test'})
+    monkeypatch.setattr(capsule_capture, 'installed_data', lambda m: None)
+    monkeypatch.setitem(VERSION, 'text_sections', [
+        {'address': capsule_capture.HOOK, 'size': 4}])
+    with pytest.raises(MemoryUnavailable, match='native capsule capture missing'):
+        verify_revision(memory)
+    assert not backend.writes
+
+
 def test_wrong_game_reports_observed_disc_and_never_claims_verification():
     backend = FakeBackend()
     backend.put(0x80000000, b'RMCP01')

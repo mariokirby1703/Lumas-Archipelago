@@ -90,6 +90,10 @@ def check(world, state, manifest, key, rank=None):
     route_type = 'movement' if selected(world, 'movement_unlocks') else 'normal'
     if not matches(world, state, record[route_type]):
         return False
+    if rank in ('B', 'A', 'S'):
+        extra = manifest.get('rank_b_extra', {}).get(key.split(':', 1)[0])
+        if extra is not None and not matches(world, state, extra):
+            return False
     if rank in ('S', 'A'):
         mission = key.split(':', 1)[0]
         if not all(available(world, state, wisp) for wisp in manifest['rank_wisps'].get(mission, [])):
@@ -147,12 +151,15 @@ def validate_manifest(manifest):
         for token in tokens:
             if token_parts(token)[0] not in (set(COLOURS) | {'boost', 'all_wisps'}):
                 raise ValueError('Non-Wisp rank requirement: ' + str(token))
-    for mission, alternatives in manifest['rank_s_extra_movement'].items():
-        if mission not in missions or not alternatives:
-            raise ValueError('Invalid S rank additional route: ' + mission)
-        for route in alternatives:
-            for token in route:
-                token_parts(token)
+    for field in ('rank_s_extra_movement', 'rank_b_extra'):
+        for mission, alternatives in manifest.get(field, {}).items():
+            if mission not in missions or not isinstance(alternatives, list) or not alternatives:
+                raise ValueError('Invalid additional rank route: ' + mission)
+            for route in alternatives:
+                if not isinstance(route, list):
+                    raise ValueError('Malformed additional rank route: ' + mission)
+                for token in route:
+                    token_parts(token)
     if manifest.get('unresolved_routes'):
         raise ValueError('Spreadsheet contains unresolved routes')
     return manifest

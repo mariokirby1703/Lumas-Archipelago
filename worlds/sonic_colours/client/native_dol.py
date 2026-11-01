@@ -55,8 +55,8 @@ class Dol:
         for base,value in ((0,offset),(0x48,address),(0x90,len(blob))):struct.pack_into('>I',self.data,base+4*slot,value)
         self.sections.append((slot,offset,address,len(blob)))
 
-@lru_cache(maxsize=1)
-def plan():
+@lru_cache(maxsize=16)
+def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True):
     """Rebuild every C2 payload as initialized native code, without C2 headers."""
     from .native_hook_table import hook_rows
     from .ap_hud_publisher import patches as hud
@@ -136,38 +136,73 @@ def plan():
     patches.extend(white_capsule_open.patches(capsule_control,patches))
     from . import drift_input
     patches.extend(drift_input.patches(movement['target']+movement_gate.payload(gecko=True)[2],patches))
+    if include_ring_materials:
+        from .red_ring_render_test import allocation_patches
+        patches.extend(allocation_patches())
+        if include_ring_spawn:
+            from .red_ring_spawn import patches as spawn_patches
+            patches.extend(spawn_patches(include_accessible_colors))
+    if cursor>SIGNATURE-4:raise ValueError('native executable section exhausted (HUD registry reserved)')
+    if include_boot_guards:
+        from .white_capsule_spawn import patches as white_spawn
+        patches.extend(white_spawn(capsule_control,patches))
+        from .boost_startup import apply as boost_startup
+        payload,boost_patches=boost_startup(payload,hooks,patches)
+        patches.extend(boost_patches)
     ownership=[]
     for address,old,new in patches:
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')
         ownership.append((address,address+len(new)))
-    if cursor>SIGNATURE-4:raise ValueError('native executable section exhausted (HUD registry reserved)')
     digest=hashlib.sha256(bytes(payload)+b''.join(struct.pack('>I',a)+n for a,o,n in patches)).digest()
     return patches,bytes(payload),digest,hooks
 
-def patch_dol(original,seed):
+def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
     if hashlib.sha256(original).hexdigest()!=PAL_DOL_SHA256:raise ValueError('unsupported original main.dol SHA256')
     image=Dol(original);patches,payload,digest,hooks=plan();registry=[]
+    from .red_ring_spawn import validate_colors,prefill
+    validate_colors(ring_colors)
     for address,old,new in patches:
+        new=prefill(address,new,ring_colors)
         old=image.read(address,len(new)) if old is None else old
         image.replace(address,old,new)
         registry.append({'address':address,'length':len(new),'original':old.hex(),'replacement':new.hex()})
+    boot={}
+    if options is not None:
+        from .boot_permissions import initialize
+        payload,boot=initialize(payload,hooks,options,initial_items)
     native=bytearray(SIGNATURE-ARENA+64);native[:len(payload)]=payload
     identity=hashlib.sha256(str(seed).encode()).digest()
     native[-64:]=MAGIC+struct.pack('>II',ABI,len(payload))+digest+identity[:16]
     image.add_text(ARENA,native)
     return bytes(image.data),{'abi':ABI,'signature':SIGNATURE,'native_payload_bytes':len(payload),
                             'native_sha256':digest.hex(),'hooks':hooks,'ownership':registry,
-                            'source_sha256':PAL_DOL_SHA256,'seed_digest':identity.hex()}
+                            'source_sha256':PAL_DOL_SHA256,'seed_digest':identity.hex(),
+                            'boot_permissions':boot}
+
+@lru_cache(maxsize=8)
+def plan_for_digest(digest):
+    for candidate in (plan(),plan(include_accessible_colors=False),
+                      plan(include_boot_guards=False,include_accessible_colors=False),
+                      plan(include_ring_spawn=False,include_boot_guards=False,include_accessible_colors=False),
+                      plan(include_ring_materials=False,include_boot_guards=False,include_accessible_colors=False)):
+        if candidate[2].hex()==digest:return candidate
+    raise ValueError('incompatible native AP hook ABI/signature')
+
 
 def handshake(memory):
     raw=memory.read_bytes(SIGNATURE,64)
     if raw[:8]!=MAGIC:return None
-    patches,payload,digest,hooks=plan()
+    try:patches,payload,digest,hooks=plan_for_digest(raw[16:48].hex())
+    except ValueError:patches,payload,digest,hooks=plan()
     if raw[8:48]!=struct.pack('>II',ABI,len(payload))+digest:
         if raw[16:48].hex() in {'032d23d9e9395d2fe9e53e3c9139bc0fd8c42e2cf71adc124088f78969240081',
                                 '131e58fb3e7f593daa983f66d61251ee417080c88dfe5646f7e7aa04514642b5'}:
             raise memory.error('Older native ISO lacks arena-entry protection; repatch the original ISO with this APWorld and your existing player patch')
         raise memory.error('incompatible native AP hook ABI/signature')
+    from .red_ring_spawn import normalized,HOOK as SPAWN_HOOK
+    has_spawn=any(a==SPAWN_HOOK for a,o,n in patches)
+    from .red_ring_spawn import layout,MAGIC_V2
+    has_accessible=has_spawn and any(a==layout()[0] and n[:4]==struct.pack('>I',MAGIC_V2) for a,o,n in patches)
     pages={}
     for address,old,new in patches:
         observed=bytearray();cursor=address
@@ -176,13 +211,28 @@ def handshake(memory):
             if page not in pages:pages[page]=memory.read_bytes(page,4096)
             size=min(page+4096,address+len(new))-cursor
             observed.extend(pages[page][cursor-page:cursor-page+size]);cursor+=size
-        if observed!=new:raise memory.error(f'native AP patch modified at {address:#x}; disable legacy Gecko/Riivolution')
+        try:checked=normalized(address,bytes(observed),new,has_accessible) if has_spawn else observed
+        except ValueError as error:raise memory.error(str(error)) from error
+        if checked!=new:raise memory.error(f'native AP patch modified at {address:#x}; disable legacy Gecko/Riivolution')
     # Previously only external hook branches and area-map code were checked
     # here. A valid signature does not prove the arena's entry instructions
     # survived; the captured failure changed its first stack allocation.
     arena_data=memory.read_bytes(ARENA,len(payload))
-    if arena_data[4:ARENA_PREFIX_SIZE]!=payload[4:ARENA_PREFIX_SIZE]:
-        raise memory.error('Unexpected native arena prefix modification beyond the observed low-memory word')
+    # Dolphin's HLE::PatchFixedFunctions writes the HBReload signature here
+    # when cheats are disabled. This prefix contains no AP code or mailboxes.
+    prefix = arena_data[4:ARENA_PREFIX_SIZE]
+    dolphin_prefix = b'STUBHAXX' + payload[12:ARENA_PREFIX_SIZE]
+    if prefix not in (payload[4:ARENA_PREFIX_SIZE], dolphin_prefix):
+        changed = [f'0x{ARENA + offset:08X}' for offset in range(4, ARENA_PREFIX_SIZE)
+                   if arena_data[offset] != payload[offset]]
+        entries_match = all(
+            arena_data[hook['target']-ARENA:hook['target']-ARENA+4]
+            == payload[hook['target']-ARENA:hook['target']-ARENA+4] for hook in hooks)
+        raise memory.error(
+            'Unexpected native arena prefix modification beyond the observed low-memory word; '
+            f'prefix_address=0x{ARENA:08X}; observed={arena_data[:ARENA_PREFIX_SIZE].hex()}; '
+            f'expected={payload[:ARENA_PREFIX_SIZE].hex()}; '
+            f'changed_addresses={",".join(changed)}; executable_entries_match={entries_match}')
     for hook in hooks:
         target=hook['target'];offset=target-ARENA
         if arena_data[offset:offset+4]!=payload[offset:offset+4]:
@@ -195,5 +245,14 @@ def handshake(memory):
     if (memory.read_bytes(area['target'],size-36)!=payload[offset:offset+size-36]
             or memory.read_bytes(area['target']+size-4,4)!=payload[offset+size-4:offset+size]):
         raise memory.error('native area-map refresh executable modified')
+    from .red_ring_render_test import allocation_patches
+    ring_words = [memory.read_bytes(address,4) for address,old,new in allocation_patches()]
+    ring_materials = ring_words == [new for address,old,new in allocation_patches()]
+    if not ring_materials and ring_words != [old for address,old,new in allocation_patches()]:
+        raise memory.error('incomplete Red Ring material allocation patch; repatch ISO')
     return {'abi':ABI,'seed_digest':raw[48:].hex(),'code_sha256':digest.hex(),'gecko_required':False,
+            'red_ring_materials':ring_materials,
+            'red_ring_spawn':has_spawn,
+            'accessible_ring_colors':has_accessible,
+            'white_capsule_spawn':any(a==0x800D3C84 for a,o,n in patches),
             'reserved_low_word':hex(int.from_bytes(arena_data[:4],'big'))}

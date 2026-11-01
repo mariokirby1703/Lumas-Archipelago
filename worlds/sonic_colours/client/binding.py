@@ -148,7 +148,9 @@ class SaveBinding:
                      if e.get('kind') == 'result' and e.get('mission') in INTRO
                      and e.get('playthrough_epoch') == bootstrap['epoch']
                      and e.get('session') == bootstrap['session']
-                     and e.get('provenance') == 'stage9C_native_UI_state7_grade124']
+                     and (e.get('provenance') == 'stage9C_native_UI_state7_grade124'
+                          or e.get('mission') == INTRO[0]
+                          and e.get('provenance') == 'native_intro_act2_record_transition_v1')]
         witnessed = {}
         for e in witnesses:
             witnessed.setdefault(e['mission'], e)

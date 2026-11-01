@@ -125,6 +125,46 @@ class SonicCommands(ClientCommandProcessor):
         finally:
             if refresh:self.ctx.refresh_movement_permissions()
 
+    @mark_raw
+    def _cmd_sonicringcolors(self, raw=''):
+        """Enable scouted Red Ring colors for this connection, including older seeds."""
+        if raw.strip() not in ('', 'on'):
+            logger.info('Use /sonicringcolors on to enable reward colors for this connection.')
+            return
+        if (not self.ctx.runtime or self.ctx.authenticated_identity !=
+                (self.ctx.team,self.ctx.slot,self.ctx.server_seed)):
+            logger.info('Connect to your AP slot first.')
+            return
+        from .red_ring_colors import RedRingColors
+        data = self.ctx.runtime.slot_data
+        colors = RedRingColors({**data, 'options': {**data['options'], 'red_ring_item_colors': 1}},
+                               self.ctx.slot,self.ctx.team)
+        self.ctx.runtime.red_ring_colors = colors
+        message = colors.scout_message()
+        if message:
+            asyncio.create_task(self.ctx.scout_red_rings(self.ctx.authenticated_identity,colors,message))
+        logger.info('Red Ring reward colors enabled for this connection. Your own rewards and traps follow the seed settings.')
+
+    @mark_raw
+    def _cmd_sonicringtest(self, raw=''):
+        """Experimental ring probe, or one-ring flat color: /sonicringtest 1 purple. Red restores vanilla."""
+        from .red_ring_render_test import inspect, apply
+        if not self.ctx.runtime or not self.ctx.memory:
+            logger.info('Connect the Sonic client and enter an Act first.')
+            return
+        try:
+            rows = inspect(self.ctx.memory)
+            if not raw.strip():
+                log_diagnostic({'rings': rows, 'test': 'one-ring flat-color prototype; not production rendering'})
+                return
+            ring, color = raw.split()
+            row = next((r for r in rows if r['ring'] == int(ring)), None)
+            if row is None:
+                raise ValueError('That ring is not currently loaded and uncollected')
+            log_diagnostic(apply(self.ctx.memory, row, color))
+        except (MemoryUnavailable, ValueError) as error:
+            logger.error('Ring material test blocked: %s', error)
+
     def _cmd_soniccapsules(self):
         """Read-only capsule/ghost-spawn evidence, including missing models."""
         snap = self.ctx.runtime.snapshot if self.ctx.runtime else None
@@ -405,6 +445,11 @@ class SonicCommands(ClientCommandProcessor):
 
 def slot_identity_digest(data):
     """Keep old seed journals stable when adding a disabled optional trap."""
+    if data.get('options_revision',0)<12:
+        data={**data,'options':{k:v for k,v in data['options'].items() if k!='colorblind_mode'}}
+    if data.get('options_revision', 0) < 11:
+        data = {**data, 'options': {k: v for k, v in data['options'].items()
+                if k not in ('red_ring_item_colors', 'own_item_red_ring_colors', 'trap_red_ring_colors')}}
     if '_original_location_names' in data:
         data=dict(data);original=data.pop('_original_location_names')
         data['locations']={original.get(n,n):code for n,code in data['locations'].items()}
@@ -542,6 +587,14 @@ class SonicContext(CommonContext):
                     if data['options']['death_link']:
                         self.deathlink = DeathLink(journal)
                 asyncio.create_task(self.update_death_link(bool(data['options']['death_link'])))
+                self.runtime.red_ring_colors = None
+                if data['options']['red_ring_item_colors']:
+                    from .red_ring_colors import RedRingColors
+                    self.runtime.red_ring_colors = RedRingColors(data, self.slot, self.team)
+                    scout = self.runtime.red_ring_colors.scout_message()
+                    if scout:
+                        asyncio.create_task(self.scout_red_rings(self.authenticated_identity,
+                                                                self.runtime.red_ring_colors, scout))
                 # CommonClient processes packets in order. An ordered Get reply
                 # handles AP's omitted empty ReceivedItems without a timeout guess.
                 self.barrier = f'_sonic_history_{time.monotonic_ns()}'
@@ -552,6 +605,11 @@ class SonicContext(CommonContext):
                 self.release_runtime()
                 self.dolphin_status = f'Slot rejected: {error}'
                 logger.error(self.dolphin_status)
+        elif cmd == 'LocationInfo':
+            if self.runtime and self.authenticated_identity == (self.team, self.slot, self.server_seed):
+                colors = getattr(self.runtime, 'red_ring_colors', None)
+                if colors is not None:
+                    colors.receive(args.get('locations', ()))
         elif cmd == 'PrintJSON':
             if self.runtime and self.authenticated_identity==(self.team,self.slot,self.server_seed):
                 self.runtime.hud_ticker.sent(args,self.team,self.slot,self.hud_item_name,self.hud_player_name)
@@ -605,6 +663,11 @@ class SonicContext(CommonContext):
             if self.runtime:
                 self.runtime.journal.acknowledge(self.checked_locations)
             self.last_observed_checked = set(self.checked_locations)
+
+    async def scout_red_rings(self, identity, colors, message):
+        if (identity == self.authenticated_identity and self.runtime is not None
+                and getattr(self.runtime, 'red_ring_colors', None) is colors):
+            await self.send_msgs([message])
 
     def reset_server_state(self):
         # Keep the already authenticated seed's native observer while offline.
@@ -879,11 +942,11 @@ async def dolphin_loop(ctx):
                         ctx.runtime.guard.disarm()
                     else:
                         ctx.runtime.guard.suspend()
-                if str(error).startswith(('wrong_game', 'unknown_revision')):
+                if str(error).startswith(('wrong_game', 'unknown_revision', 'read_failed')):
                     verified = False
                     try:
                         if backend.recover_empty_text_mapping(error):
-                            ctx.dolphin_status='Reattaching Dolphin after repeated empty native text reads; PAL verification pending'
+                            ctx.dolphin_status='Reattaching Dolphin after repeated invalid memory reads; PAL verification pending'
                             if ctx.runtime:ctx.runtime.hooks.invalidate_session()
                     except (MemoryUnavailable,RuntimeError,OSError):
                         pass

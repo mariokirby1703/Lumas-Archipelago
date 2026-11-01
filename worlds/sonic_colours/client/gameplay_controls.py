@@ -151,6 +151,10 @@ def installed(memory, kind):
     before_lean, before_lean_offset = payload(kind, lean=False,register_abi=False)
     stack_lr,stack_lr_offset=payload(kind,register_abi=False)
     layouts = [(kind, words, offset), ('stack_lr',stack_lr,stack_lr_offset), ('before_lean', before_lean, before_lean_offset), ('before_drain', no_drain, no_drain_offset), ('before_temporary', old_compact, old_offset), ('previous', previous_words, previous_offset)]
+    if kind in ('boost_use','boost_query','boost_add'):
+        from .boost_startup import words_for
+        layouts.insert(0,('native_startup',words_for(kind),offset))
+        layouts.insert(1,('native_startup',words_for(kind,False),offset))
     old_lr,old_lr_offset=payload(kind,caller_lr_dead=False)
     layouts.append(('before_dead_lr',old_lr,old_lr_offset))
     before_hover, before_hover_offset=payload(kind,volatile_return=False,caller_lr_dead=False)
@@ -170,7 +174,7 @@ def installed(memory, kind):
             failure = error
     else: raise failure
     if not result['installed']: return None
-    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'before_stack', 'before_dead_lr', 'before_hover', 'before_drill', 'stack_lr', 'before_lean')
+    if kind == 'boost_add': memory.boost_consumption_safe = name in (kind, 'native_startup', 'before_stack', 'before_dead_lr', 'before_hover', 'before_drill', 'stack_lr', 'before_lean')
     address = result['target'] + offset
     values = struct.unpack('>'+'I'*(size//4), memory.read_bytes(address,size))
     owner, index, maximum, model, locked = (*values, 0, 0) if size == 12 else values

@@ -167,10 +167,46 @@ class BoostLock(DefaultOnToggle):
 
 
 class NativeFeatureTests(Toggle):
-    """Developer opt-in for other unfinished PAL native experiments.
-    DeathLink and Dead Weight can be selected normally, but are not live-verified."""
+    """Developer opt-in for other unfinished PAL native experiments."""
     display_name = 'Unverified Native Feature Tests'
     visibility = Visibility.none
+
+
+class RedRingItemColors(DefaultOnToggle):
+    """Color Red Rings by their AP rewards: purple for progression, blue for useful and light blue for filler."""
+    display_name = 'Red Ring Item Colors'
+
+
+class ColorblindMode(Toggle):
+    """Use gold, blue, gray and orange for progression, useful, filler and traps in Red Ring colors and the item HUD.
+    Own rewards and disguised traps still follow their separate settings below."""
+    display_name = 'Colorblind Mode'
+
+
+class OwnItemRedRingColors(Choice):
+    """Keep your own rewards red, keep only your own AP Red Ring currency red, or color every reward by item type. Traps use their separate setting below."""
+    display_name = 'Own Item Red Ring Colors'
+    option_always_red = 0
+    option_red_ring_items_only = 1
+    option_item_classification = 2
+    default = 2
+
+
+class TrapRedRingColors(Choice):
+    """Keep traps red (orange in Colorblind Mode), or disguise them with a fixed random item color."""
+    display_name = 'Trap Red Ring Colors'
+    option_red = 0
+    option_random_colors = 1
+    default = 1
+
+    @classmethod
+    def from_text(cls, text):
+        if text.lower() == 'random':
+            return cls(cls.option_random_colors)
+        return super().from_text(text)
+
+
+TrapRedRingColors.name_lookup = {0: 'red', 1: 'random'}
 
 
 @dataclass
@@ -196,6 +232,10 @@ class SonicColoursOptions(PerGameCommonOptions):
     death_link: SonicDeathLink
     wisp_capsules: WispCapsules
     native_feature_tests: NativeFeatureTests
+    red_ring_item_colors: RedRingItemColors
+    colorblind_mode: ColorblindMode
+    own_item_red_ring_colors: OwnItemRedRingColors
+    trap_red_ring_colors: TrapRedRingColors
 
 OPTION_NAMES = tuple(SonicColoursOptions.__annotations__)
 
@@ -204,5 +244,6 @@ OPTION_GROUPS = [
     OptionGroup('Checks', [RedRingChecks, RankChecks, OneUpSanity, WispDiscoveryChecks]),
     OptionGroup('Game Land', [GameLandChecks, ChaosEmeraldChecks, EggmanHeartSanity, GameLandRequirementReduction]),
     OptionGroup('Traps', [TrapPercentage, RingLossTrapWeight, ScoreResetTrapWeight, DeadWeightTrapWeight]),
+    OptionGroup('Red Ring Colors', [RedRingItemColors, ColorblindMode, OwnItemRedRingColors, TrapRedRingColors]),
     OptionGroup('Miscellaneous', [MusicRandomization, SonicDeathLink]),
 ]

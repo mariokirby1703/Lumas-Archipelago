@@ -68,7 +68,7 @@ def test_nonfinal_result_is_not_credited(tmp_path):
 
 @pytest.mark.skipif(not PAIRS, reason='private original captures absent')
 def test_all_world_items_grant_only_first_act_and_starting_act(tmp_path):
-    data=generate({}).worlds[1].fill_slot_data()
+    data=generate({'world_progression':0}).worlds[1].fill_slot_data()
     with Journal(tmp_path,IDENTITY) as journal:
         hooks=NativeHooks(journal);guard=SaveGuard(journal);runtime=Runtime(data,journal,guard,hooks)
         for stamp in ('200443','202546','205502'):
@@ -138,7 +138,7 @@ def test_supplied_sweet_mountain_first_waypoint_refresh(tmp_path):
     class BoundFixture:
         def check(self,state):return ('test-bound-save',state.session)
     memory.write_guard=WritePolicy(memory,BoundFixture(),hooks.snapshot)
-    data=generate({}).worlds[1].fill_slot_data()
+    data=generate({'world_progression':0}).worlds[1].fill_slot_data()
     hooks.project_permissions(memory,state,inventory([ITEM_TABLE['Sweet Mountain Shuttle']]),data)
     assert memory.read_u32(access['status_address'])==2
     flags=memory.resolve_flags_ptr()[-1]

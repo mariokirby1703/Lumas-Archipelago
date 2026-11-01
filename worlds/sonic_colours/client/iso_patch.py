@@ -141,6 +141,10 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
     target.parent.mkdir(parents=True,exist_ok=True)
     receipt=Path(str(target)+'.sonic.json')
     seed_data={'game':patch.game,'player':patch.player,'player_name':patch.player_name,'slot_data':patch.slot_data}
+    from .boot_permissions import VERSION
+    seed_data['boot_permissions_version']=VERSION
+    seed_data['initial_items']=getattr(patch,'initial_items',[])
+    if getattr(patch,'ring_colors',None) is not None:seed_data['ring_colors']=patch.ring_colors
     identity=hashlib.sha256(json.dumps(seed_data,sort_keys=True).encode()).hexdigest()
     resources=resource_component_id()
     compatible_resources={resources}
@@ -158,7 +162,10 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
         if default_target:
             # Keep an old ABI/resource build intact. A component-specific name
             # also makes repeated Open Patch calls reuse the upgraded image.
-            suffix=hashlib.sha256((plan()[2].hex()+resource_component_id()).encode()).hexdigest()[:10]
+            suffix=hashlib.sha256((plan()[2].hex()+resource_component_id()+str(VERSION)
+                                   +json.dumps(seed_data['initial_items'])).encode()).hexdigest()[:10]
+            if getattr(patch,'ring_colors',None) is not None:
+                suffix=hashlib.sha256((suffix+json.dumps(patch.ring_colors,sort_keys=True)).encode()).hexdigest()[:10]
             upgraded=target.with_name(target.stem+'-ap-'+suffix+'.iso')
             progress('Keeping existing ISO; building/reusing updated components at '+str(upgraded))
             return install(patch,source=source,target=upgraded,wit=wit,progress=progress,cancel=cancel,cache_dir=cache_dir)
@@ -199,7 +206,10 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
             except OSError as error:logger.warning('Optional original cache not saved: %s',error)
         check_cancel(cancel)
         phase('Building all native AP hooks and patch handshake')
-        native,registry=patch_dol(dol.read_bytes(),patch.slot_data['seed_name']);dol.write_bytes(native)
+        native,registry=patch_dol(dol.read_bytes(),patch.slot_data['seed_name'],
+                                  ring_colors=getattr(patch,'ring_colors',None),
+                                  options=patch.slot_data['options'],
+                                  initial_items=getattr(patch,'initial_items',[]));dol.write_bytes(native)
         mapping=None
         if patch.slot_data['options']['music_randomization']:
             from .music_bank import slot_plan

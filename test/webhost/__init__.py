@@ -12,6 +12,9 @@ class TestBase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        if hasattr(TestBase, 'app'):
+            cls.app = TestBase.app
+            return
         from WebHostLib import app as raw_app
         from WebHost import get_app
 
@@ -31,6 +34,7 @@ class TestBase(unittest.TestCase):
             if "register_blueprint" not in e.args[0]:
                 raise
             cls.app = raw_app
+        TestBase.app = cls.app
 
     def setUp(self) -> None:
         from WebHostLib.models import db

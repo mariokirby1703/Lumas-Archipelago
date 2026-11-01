@@ -10,6 +10,7 @@ from .client.native_dol import ABI,PAL_DOL_SHA256,plan
 from .client.asset_patch import PAL_CPK_SHA256
 
 FORMAT=1
+UPGRADABLE_RING_COMPONENT='d37b812a9e186695a45db4519ebada0f557e4523dc26dcea5098d95c6ddadc47'
 # This released component has the same seed/resource contract. Rebuilding
 # from it installs the corrected wrapper traversal, never its old machine code.
 UPGRADABLE_NATIVE_COMPONENTS={'85eebb98e87ebd22a6fcf7a99e0ae838c91514235a5c9ce73012bf785e1c813f',
@@ -28,6 +29,10 @@ UPGRADABLE_NATIVE_COMPONENTS={'85eebb98e87ebd22a6fcf7a99e0ae838c91514235a5c9ce73
                              '84207fd5a41582c96a49d1a89396be331f74aa0de2046725a389d119cf028fe4',
                              '6988a734ac3f5e8776d0a461d4f229967382886958c8cbe2412c267411eb8929',
                              '79fe3ce64a1bbce739ceaabc86486b72988b589aaeb1093318f5be277efc009d'}
+UPGRADABLE_NATIVE_COMPONENTS.add(UPGRADABLE_RING_COMPONENT)
+UPGRADABLE_NATIVE_COMPONENTS.add('764482868d5f318544187b1b1e921358b7d43adaf65f80b9fe63895c6205db4f')
+UPGRADABLE_NATIVE_COMPONENTS.add('7116322cb03cd9dd3ecd9e118a824cd791160113a056965b9120efb5fa8bbdc7')
+UPGRADABLE_NATIVE_COMPONENTS.add('b06bf00e44c7d8c8036dedd99a920638e941a1fb05d86d828743c7793d1b8a39')
 UPGRADABLE_RESOURCES={'f0fd05d4057dee524a98f169bec10dd75a5541e1f652db0903d6917acd1bd02d','f42313794c7059f88137fa6901a10c5517465012169b30a180f7fe2e5183ff79','1b9e9fa6c94d3559b0d0d791fd7471d4e6b9658bd7f445f92ab341644a380b51','9281b474c4023c15944860247c65a4de6adc79a1282b8eb02862603dc91d9a20'}
 # Same resource contract, with the Game Land overlay formerly behind the frame.
 UPGRADABLE_RESOURCES.add('d8f49fe95368298932065e51d507bae00afdb50823fffd5ccf9b6efc01c20fd2')
@@ -79,15 +84,30 @@ class SonicColoursPatch(APAutoPatchInterface):
     result_file_ending='.iso'
     procedure='custom'
 
-    def __init__(self,*args,slot_data=None,**kwargs):
+    def __init__(self,*args,slot_data=None,ring_colors=None,initial_items=None,**kwargs):
         super().__init__(*args,**kwargs)
         self.slot_data=slot_data
+        self.ring_colors=ring_colors
+        self.initial_items=[] if initial_items is None else list(initial_items)
+
+    def seed_payload(self):
+        data={'game':GAME,'player':self.player,'player_name':self.player_name,'slot_data':self.slot_data}
+        if self.initial_items:
+            from .client.boot_permissions import validate_items
+            data['initial_items']=validate_items(self.initial_items)
+        if self.ring_colors is not None:
+            from .client.red_ring_spawn import validate_colors
+            validate_colors(self.ring_colors)
+            if not self.slot_data['options'].get('red_ring_item_colors'):
+                raise ValueError('Red Ring color prefill requires the color option')
+            data['ring_colors']=self.ring_colors
+        return data
 
     def get_manifest(self):
         manifest=super().get_manifest()
         if self.slot_data is None:raise ValueError('seed slot data missing')
         if type(self.player) is not int or self.player<1:raise ValueError('a positive AP player slot is required')
-        seed=canonical({'game':GAME,'player':self.player,'player_name':self.player_name,'slot_data':self.slot_data})
+        seed=canonical(self.seed_payload())
         manifest.update(result_file_ending=self.result_file_ending,sonic_patch_format=FORMAT,native_abi=ABI,
                         seed_name=self.slot_data['seed_name'],disc_id='SNCP8P',revision=0,
                         source_hashes={'main.dol':PAL_DOL_SHA256,'sonic2010_0.cpk':PAL_CPK_SHA256},
@@ -99,7 +119,7 @@ class SonicColoursPatch(APAutoPatchInterface):
     def write_contents(self,archive):
         manifest=self.get_manifest()
         files={'archipelago.json':canonical(manifest),
-               'seed.json':canonical({'game':GAME,'player':self.player,'player_name':self.player_name,'slot_data':self.slot_data})}
+               'seed.json':canonical(self.seed_payload())}
         for name,data in sorted(files.items()):
             info=zipfile.ZipInfo(name,(2026,10,14,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
             info.external_attr=0o644<<16;archive.writestr(info,data)
@@ -125,6 +145,12 @@ class SonicColoursPatch(APAutoPatchInterface):
             raise InvalidDataError('patch player identity differs')
         from .client.runtime import validate_slot
         self.slot_data=validate_slot(data['slot_data'])
+        from .client.boot_permissions import validate_items
+        self.initial_items=validate_items(data.get('initial_items',[]))
+        from .client.red_ring_spawn import validate_colors
+        self.ring_colors=validate_colors(data.get('ring_colors'))
+        if self.ring_colors is not None and not self.slot_data['options'].get('red_ring_item_colors'):
+            raise InvalidDataError('Red Ring color prefill conflicts with slot options')
         if manifest.get('seed_name')!=self.slot_data['seed_name'] or type(self.player) is not int or self.player<1:
             raise InvalidDataError('patch seed/slot identity invalid')
         return manifest

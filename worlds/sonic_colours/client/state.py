@@ -152,6 +152,8 @@ class SaveGuard:
                 return
             bootstrap = {'epoch': uuid.uuid4().hex, 'session': snapshot.session, 'checks': [],
                          'observed_missions': [], 'goal': False, 'intro_stage_epoch':snapshot.stage_epoch,
+                         'initial_clears':sorted(snapshot.candidate_clears),
+                         'intro_chain':snapshot.evidence.get('chain'),
                          'intro_proof': ('native_unselected_intro_v1' if
                                          snapshot.evidence.get('native_intro_without_selected_slot')
                                          else 'native_factory_save_v1')}
@@ -245,6 +247,13 @@ class SaveGuard:
             raise MemoryUnavailable('WRITE_BLOCKED: stats require a stable attributed living actor')
         return snapshot.session, snapshot.stage_epoch, snapshot.actual_mission, snapshot.rings_address, snapshot.lives_address
 
+    def check_visual(self, snapshot):
+        if (not snapshot.scene_verified or snapshot.scene != 'gameplay'
+                or snapshot.death_state != 'alive' or not snapshot.stage_epoch
+                or not snapshot.actual_mission or snapshot.stable_polls < 1):
+            raise MemoryUnavailable('WRITE_BLOCKED: visuals require a verified living stage actor')
+        return snapshot.session, snapshot.stage_epoch, snapshot.actual_mission
+
     def arm(self, snapshot, *, operator_confirmed, fresh_evidence):
         # Kept as an explicit call for adapter integrations; no slot-number rule.
         if operator_confirmed:
@@ -313,8 +322,12 @@ class WritePolicy:
         self.memory, self.guard, self.snapshot_reader = memory, guard, snapshot_reader
 
     def __call__(self, operation, address, size):
-        if not VERSION['capabilities'].get(operation, False):
+        if not VERSION['capabilities'].get(operation, False) and operation not in ('ring_material_test', 'red_ring_material','red_ring_spawn'):
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
+        if operation=='red_ring_spawn':
+            self.memory.verify_for_write(operation)
+            from .red_ring_spawn import authorize
+            return authorize(self.memory,self.guard,address,size)
         if operation=='native_event_controls':
             self.memory.verify_revision()
             from . import native_events as events
@@ -375,6 +388,30 @@ class WritePolicy:
             snapshot = owner._snapshot_after_revision(self.memory)
         else:
             snapshot = self.snapshot_reader(self.memory)
+        if operation in ('ring_material_test', 'red_ring_material'):
+            from .red_ring_render_test import validate_row
+            if operation == 'red_ring_material':
+                self.guard.check_visual(snapshot)
+            else:
+                self.guard.check_stats(snapshot)
+            tx = getattr(self.memory, '_ring_material_test', None)
+            if not tx or len(tx['values'].get(address, b'')) != size:
+                raise MemoryUnavailable('WRITE_BLOCKED: no ring material test transaction')
+            if operation == 'red_ring_material':
+                colors = getattr(self.memory, '_red_ring_color_source', None)
+                row = tx['row']
+                if (colors is None or not colors.enabled or row['mission'] != snapshot.actual_mission
+                        or colors.identity != tuple(self.guard.journal.identity[key] for key in ('seed','team','slot'))):
+                    raise MemoryUnavailable('WRITE_BLOCKED: unauthenticated ring colors')
+                import hashlib
+                if (getattr(self.memory,'native_patch',None) or {}).get('seed_digest') != hashlib.sha256(
+                        colors.identity[0].encode()).digest()[:16].hex():
+                    raise MemoryUnavailable('WRITE_BLOCKED: ring colors belong to another native seed')
+                color = colors.stage_colors(row['mission'])[row['ring']-1]
+                if tx['color'] != (color + '_shaded' if color != 'red' else 'red'):
+                    raise MemoryUnavailable('WRITE_BLOCKED: ring color differs from scouted reward')
+            validate_row(self.memory, tx['row'],snapshot=snapshot if operation == 'red_ring_material' else None)
+            return snapshot.session, snapshot.stage_epoch, tx['row']['actor'], tx['row']['model']
         if operation == 'one_up_controls':
             from .oneup_hook import installed_data
             base=installed_data(self.memory)

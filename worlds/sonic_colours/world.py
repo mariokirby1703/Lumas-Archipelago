@@ -221,7 +221,7 @@ class SonicColoursWorld(World):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'options_revision':10, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':12, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'music_seed': hashlib.sha256(json.dumps(['sonic-bgm-player-v1',self.multiworld.seed_name,self.player],separators=(',',':')).encode()).hexdigest(),
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,
@@ -234,8 +234,23 @@ class SonicColoursWorld(World):
 
     def generate_output(self, output_directory):
         from .patch import SonicColoursPatch
+        colors=None
+        if self.options.red_ring_item_colors:
+            from .client.red_ring_colors import RedRingColors
+            choices=RedRingColors(self.fill_slot_data(),self.player,0)
+            rewards=[]
+            for name,code in self.fill_slot_data()['locations'].items():
+                if code not in choices.scout_ids:continue
+                item=self.multiworld.get_location(name,self.player).item
+                if item is None:raise ValueError('Red Ring item colors require completed item placement')
+                rewards.append((item.code if type(item.code) is int else 0,code,item.player,item.flags))
+            choices.receive(rewards)
+            from .client.red_ring_spawn import missions
+            colors={mission:list(choices.stage_colors(mission)) for mission in missions()}
         path=Path(output_directory)/f'{self.multiworld.get_out_file_name_base(self.player)}.apsoniccolours'
         patch=SonicColoursPatch(str(path),self.player,self.multiworld.get_player_name(self.player),
-                               slot_data=self.fill_slot_data())
+                               slot_data=self.fill_slot_data(),ring_colors=colors,
+                               initial_items=[item.code for item in self.multiworld.precollected_items[self.player]
+                                              if item.code is not None])
         patch.write()
 

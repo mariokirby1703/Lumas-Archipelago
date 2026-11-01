@@ -63,6 +63,17 @@ def test_alternative_routes_and_option_dependent_tiers():
     assert logic.available(world(movement=False),State(),'land_speed:4')
 
 
+@pytest.mark.parametrize('key', ['stg330:ring:5', 'stg330:one_up'])
+def test_starlight_act_two_cube_route_is_advanced_only(key):
+    items = State('Wall Jump', 'Blue Cube Wisp')
+    assert not logic.check(world(), items, MANIFEST, key)
+    assert logic.matches(world(), items, MANIFEST['locations'][key]['advanced_movement'])
+    spikes=('Progressive Pink Spikes Wisp',)*(2 if key.endswith('ring:5') else 1)
+    assert logic.check(world(), State(*spikes), MANIFEST, key)
+    assert not logic.check(world(movement=False), items, MANIFEST, key)
+    assert logic.check(world(movement=False), State('Pink Spikes Wisp'), MANIFEST, key)
+
+
 def test_all_five_ring_location_checks_the_last_ring_route():
     from copy import deepcopy
     multi=generate({'red_ring_checks':'per_level','movement_unlocks':False})
@@ -98,13 +109,13 @@ def test_tropical_resort_3_ring_5_needs_an_aerial_ability(ability):
 
 
 def test_aquarium_park_1_clear_drill_route_needs_only_breathing_and_drill():
-    owned=('Progressive Breathing','Progressive Yellow Drill Wisp')
+    owned=('Progressive Breathing','Progressive Breathing','Progressive Yellow Drill Wisp')
     assert logic.check(world(),State(*owned),MANIFEST,'stg510')
     assert not logic.check(world(),State(owned[0]),MANIFEST,'stg510')
-    assert not logic.check(world(),State(owned[1]),MANIFEST,'stg510')
+    assert not logic.check(world(),State(owned[2]),MANIFEST,'stg510')
     assert not logic.check(world(),State('Progressive Breathing','Swim',
                                        'Progressive Crouch','Progressive Crouch'),MANIFEST,'stg510')
-    assert logic.check(world(),State('Progressive Breathing','Swim',
+    assert logic.check(world(),State('Progressive Breathing','Progressive Breathing','Swim',
                                    'Progressive Crouch','Progressive Crouch','Stomp'),MANIFEST,'stg510')
 
 

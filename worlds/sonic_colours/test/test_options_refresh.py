@@ -18,6 +18,8 @@ def test_defaults_groups_and_hidden_capsules():
     assert list(groups['Checks']).index('one_up_sanity')==list(groups['Checks']).index('rank_checks')+1
     assert set(groups['Game Land'])=={'game_land_checks','chaos_emerald_checks','eggman_heart_sanity','game_land_requirement_reduction'}
     assert set(groups['Miscellaneous'])=={'music_randomization','death_link'}
+    assert set(groups['Red Ring Colors'])=={'red_ring_item_colors','colorblind_mode',
+                                           'own_item_red_ring_colors','trap_red_ring_colors'}
     visible={key for group in groups.values() for key in group}
     assert not {'wisp_capsules','ap_item_hud','swim_trap_weight','swim_trap_duration'}&visible
     assert WispCapsules.visibility==Visibility.none

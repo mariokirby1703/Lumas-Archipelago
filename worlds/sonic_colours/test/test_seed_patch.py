@@ -143,6 +143,8 @@ def test_verified_iso_cache_and_tamper_refusal(tmp_path,previous_resources,monke
     target=tmp_path/'out.iso';target.write_bytes(b'verified generated image')
     patch=make_patch(tmp_path/'seed.apsoniccolours')
     seed_data={'game':patch.game,'player':patch.player,'player_name':patch.player_name,'slot_data':patch.slot_data}
+    from ..client.boot_permissions import VERSION
+    seed_data.update(boot_permissions_version=VERSION,initial_items=[])
     record={'identity':hashlib.sha256(json.dumps(seed_data,sort_keys=True).encode()).hexdigest(),
             'source_iso_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
             'native_component_sha256':plan()[2].hex(),'pipeline_version':1,

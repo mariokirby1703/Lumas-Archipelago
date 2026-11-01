@@ -2,25 +2,25 @@ name: SonicPlayer
 game: Sonic Colours (Wii)
 Sonic Colours (Wii):
   goal: nega_wisp_armor
-  super_sonic: false
   world_progression: all_acts_then_boss
-  red_ring_checks: singles
-  rank_checks: 'off'
-  game_land_checks: true
-  chaos_emerald_checks: false
-  wisp_discovery_checks: true
-  one_up_sanity: false
-  eggman_heart_sanity: true
   boost_lock: true
   movement_unlocks: true
-  game_land_requirement_reduction: 50  # Percent: 50% equals former 90 reduction points
-  music_randomization: true
+  super_sonic: false
+  red_ring_checks: singles
+  rank_checks: 'off'
+  one_up_sanity: false
+  wisp_discovery_checks: true
+  game_land_checks: true
+  chaos_emerald_checks: false
+  eggman_heart_sanity: true
+  game_land_requirement_reduction: 50
+  trap_percentage: 10
   ring_loss_trap_weight: medium
   score_reset_trap_weight: low
-  trap_percentage: 10
-  death_link: false
   dead_weight_trap_weight: low
-  wisp_capsules: false
-
-  # Developer-only experimental hooks. DeathLink and Dead Weight no longer require this option.
-  native_feature_tests: false
+  red_ring_item_colors: true
+  colorblind_mode: false
+  own_item_red_ring_colors: item_classification
+  trap_red_ring_colors: random
+  music_randomization: true
+  death_link: false

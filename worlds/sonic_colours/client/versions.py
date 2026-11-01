@@ -36,6 +36,10 @@ def verify_revision(memory):
     direct_plans = [direct_plan(include_movement=False), direct_plan(include_movement=True)]
     for section in VERSION['text_sections']:
         data = memory.read_bytes(section['address'], section['size'])
+        from .red_ring_render_test import normalize as normalize_ring_test
+        data = normalize_ring_test(data, section['address'])
+        from .red_ring_spawn import normalize as normalize_ring_spawn
+        data = normalize_ring_spawn(memory,data,section['address'])
         from .ap_hud_publisher import normalize as normalize_hud_publisher
         data=normalize_hud_publisher(memory,data,section['address'])
         from .hud_renderer_batch import normalize as normalize_hud_batch
@@ -116,7 +120,7 @@ def verify_revision(memory):
                 data = data[:offset] + MEDAL_ORIGINAL.to_bytes(4, 'big') + data[offset+4:]
         from .capsule_capture import HOOK as CAP_HOOK, ORIGINAL as CAP_ORIGINAL, installed_data as capture_data
         if getattr(memory,'native_patch',None) and section['address']<=CAP_HOOK<section['address']+section['size']:
-            if capture_data(memory) is None:raise MemoryUnavailable('native capsule capture missing')
+            if capture_data(memory) is None:raise memory.error('native capsule capture missing')
             offset=CAP_HOOK-section['address']
             data=data[:offset]+CAP_ORIGINAL.to_bytes(4,'big')+data[offset+4:]
         if getattr(memory,'native_patch',None):
@@ -158,22 +162,17 @@ def verify_revision(memory):
             if int.from_bytes(data[offset:offset+4],'big') != PREVIOUS_ORIGINAL and previous_installed(memory):
                 data = data[:offset]+PREVIOUS_ORIGINAL.to_bytes(4,'big')+data[offset+4:]
         if getattr(memory,'native_patch',None):
-            from .native_dol import plan,ARENA
-            from .native_events import patches as event_patches,SIZE
-            from .boss_capsules import planned_patches as boss_patches
-            from .wisp_hud import planned_patches as wisp_hud_patches
-            from .active_movement import planned_patches as active_movement_patches
-            from .rail_actions import planned_patches as rail_patches
-            from .drill_turbo import water_planned_patches
-            from .wisp_activation import planned_patches as activation_patches
-            from .random_wisp_spawns import planned_patches as random_spawn_patches
-            from .white_capsule_open import planned_patches as white_open_patches
-            from .drift_input import planned_patches as drift_input_patches
+            from .native_dol import plan_for_digest
+            native_plan=plan_for_digest(memory.native_patch['code_sha256'])
             data=bytearray(data)
-            for address,old,new in (*event_patches(ARENA+len(plan()[1])-SIZE),*boss_patches(),*wisp_hud_patches(),*active_movement_patches(),*rail_patches(),*water_planned_patches(),*activation_patches(),*random_spawn_patches(),*white_open_patches(),*drift_input_patches()):
+            for address,old,new in native_plan[0]:
+                if old is None:
+                    continue
                 if section['address']<=address and address+len(new)<=section['address']+len(data):
                     offset=address-section['address']
-                    if data[offset:offset+len(new)]!=new:
+                    observed=data[offset:offset+len(new)]
+                    # Earlier module normalizers may already have restored this site.
+                    if observed not in (old,new):
                         raise memory.error(f'Native event/drop code modified at {address:#x}')
                     data[offset:offset+len(old)]=old
         digest = hashlib.sha256(data).hexdigest()

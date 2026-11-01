@@ -60,7 +60,7 @@ def payload(gecko=False):
     Control data lives in the same direct-hook allocation. The host writes
     only the exact two-word controller/mask range with compare/readback validation.
     The guest C2 preserves register state while rejecting denied transitions. The hook
-    is inert until the host supplies a verified living player's controller.
+    checks the native player itself; patched ISOs can arm it before gameplay.
     """
     a = PPC()
     a.d(37, 1, 1, -0x80)       # stwu r1,-64(r1)
@@ -385,7 +385,7 @@ def configure(memory, snapshot, owned, transport=None):
     Bound map scenes can preload policy before the next actor is constructed.
     The guest treats the mailbox as activation and independently verifies its
     current machine/player/reverse link on every request. No stale host pointer
-    is dereferenced. The owner is cleared BEFORE mask changes and armed LAST.
+    is dereferenced. Permissions change with one aligned word write.
     No effect is
     claimed if the native gate has not demonstrably run in Dolphin gameplay.
     """
@@ -448,6 +448,11 @@ def configure(memory, snapshot, owned, transport=None):
     if menu_preload:
         ctrl = MENU_POLICY_ARMED
         controller_reason = 'bound map policy preloaded; guest resolves next living owner'
+    elif not ctrl and prior_ctrl:
+        # The guest validates each new machine itself. Loading, death and
+        # missing host samples must not reopen permissions between actors.
+        ctrl = MENU_POLICY_ARMED
+        controller_reason = 'native policy retained across actor replacement'
     if not ctrl or menu_preload:
         # Only transient -1 samples from the SAME previously stable stage may
         # retain grace; otherwise stale epoch trust must be forgotten.
@@ -462,12 +467,12 @@ def configure(memory, snapshot, owned, transport=None):
         skydiving = {'status':str(error),'installed':False}
     before_ctrl, before_mask = prior_ctrl, memory.read_u32(data+4)
     if (before_ctrl, before_mask) != (ctrl, mask):
-        if before_ctrl:
-            memory.write_u32(data, 0, expected=before_ctrl, operation='movement_controls')
+        # The guest resolves its own owner. Keep activation while replacing
+        # its single permission word; clearing it would briefly allow moves.
         if before_mask != mask:
             memory.write_u32(data+4, mask, expected=before_mask, operation='movement_controls')
-        if ctrl:
-            memory.write_u32(data, ctrl, expected=0, operation='movement_controls')
+        if before_ctrl != ctrl:
+            memory.write_u32(data, ctrl, expected=before_ctrl, operation='movement_controls')
     # Runtime telemetry from the guest hook, never a substitute for a live
     # end-to-end ability/animation test. Only read after exact payload verification.
     denied_count, last_denied = 0, 0

@@ -112,7 +112,7 @@ class WindowsMEM2:
             region = MemoryRegion()
             while k.VirtualQueryEx(self.handle, address, c.byref(region), c.sizeof(region)):
                 base = region.base or 0
-                if mapped_ram(region, 0x2000000):
+                if mapped_ram(region, 0x2000000) or mapped_ram(region, 0x1800000):
                     try:
                         matches = self._read(base, len(reference)) == reference
                     except OSError:

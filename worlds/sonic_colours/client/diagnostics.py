@@ -51,6 +51,9 @@ def diagnostic(ctx, memory=None):
     result['write_capabilities'] = VERSION['capabilities']
     if ctx.runtime:
         runtime = ctx.runtime
+        colors = getattr(runtime, 'red_ring_colors', None)
+        result['red_ring_colors'] = (colors.status(runtime.snapshot.actual_mission if runtime.snapshot else None)
+                                     if colors is not None else {'enabled': False, 'native_rendering': False})
         result['native_events']=getattr(runtime,'native_event_status',{})
         result['temporary_traps']=getattr(runtime,'temporary_trap_status',{})
         result['music_popup']=getattr(runtime,'music_popup_status',{})

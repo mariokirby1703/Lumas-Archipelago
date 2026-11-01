@@ -12,7 +12,7 @@ from typing import Protocol
 
 _BATCHED_CONTROLS=frozenset({'movement_controls','gameplay_controls','capsule_controls',
     'oxygen_controls','one_up_controls','egg_medal_controls','stunts','drill_turbo',
-    'hover_ring_dash','assist_change','skydiving','quick_step'})
+    'hover_ring_dash','assist_change','skydiving','quick_step','red_ring_spawn'})
 
 class MemoryUnavailable(RuntimeError):
     pass
@@ -40,6 +40,8 @@ class DMEBackend:
         self.read_calls = 0
         self.write_calls = 0
         self.process_enumerations = 0
+        self._next_mem2_probe = 0
+        self.mem2_mapping_status = {'backend':'DME','status':'not independently probed'}
 
     def active(self):
         return self.engine.is_hooked() and getattr(self.engine.get_status(), 'name', None) == 'hooked'
@@ -50,6 +52,7 @@ class DMEBackend:
         result = {'dme_status': getattr(status, 'name', str(status)), 'emulation_active': hooked,
                   'selected_pid': self.fallback.pid if self.fallback else None,
                   'pid_attribution': 'verified MEM2 alias' if self.fallback else 'DME does not expose selected PID'}
+        result['mem2_mapping'] = dict(self.mem2_mapping_status)
         if os.name == 'nt':
             from .mem2_windows import dolphin_processes
             now = time.monotonic()
@@ -67,18 +70,25 @@ class DMEBackend:
         return result
 
     def recover_empty_text_mapping(self,error):
-        """Reattach only for repeated PAL/header boot reads with empty text.
+        """Reattach after repeated invalid headers or empty PAL boot reads.
 
         This never accepts an altered executable. The next poll must verify
         the complete PAL text and every installed hook again before writing.
         """
-        if not str(error).startswith(('unknown_revision','wrong_game')) or not self.active():
+        if not str(error).startswith(('unknown_revision','wrong_game','read_failed')) or not self.active():
             self._empty_text_polls=0
             return False
         self.assert_instance()
-        header=bytes(self.engine.read_bytes(0x80000000,6))
-        empty=all(bytes(self.engine.read_bytes(a,4))==bytes(4) for a in (0x8003388C,0x802ED70C))
-        if header not in (b'SNCP8P',bytes(6)) or not empty:
+        try:
+            header=bytes(self.engine.read_bytes(0x80000000,6))
+        except (RuntimeError,OSError):
+            header=None
+        invalid_header = header is None or len(header)!=6 or any(
+            byte not in b'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' for byte in header)
+        empty = False
+        if header in (b'SNCP8P',bytes(6)):
+            empty=all(bytes(self.engine.read_bytes(a,4))==bytes(4) for a in (0x8003388C,0x802ED70C))
+        if not invalid_header and not empty:
             self._empty_text_polls=0
             return False
         self._empty_text_polls+=1
@@ -110,6 +120,9 @@ class DMEBackend:
         if (self.fallback is not None and 'process_candidates' in info
                 and info['process_candidates'][0]['pid'] != self.fallback.pid):
             raise MemoryUnavailable('dolphin_instance_unverified: verified MEM2 PID changed')
+        validate = getattr(self.fallback,'validate_source',None)
+        if validate is not None:
+            validate()
 
     @contextmanager
     def hud_write_batch(self):
@@ -132,13 +145,75 @@ class DMEBackend:
         if os.name != 'nt':
             raise MemoryUnavailable('MEM2 unavailable in DME')
         if self.fallback is None:
-            from .mem2_windows import WindowsMEM2
-            self.fallback = WindowsMEM2(self.engine)
+            self.fallback = self._open_mem2_alias()
+            self.mem2_mapping_status = {'backend':getattr(self.fallback,'kind','verified Windows MEM2 alias'),
+                                        'status':'DME read failed; alternate mapping selected'}
         return self.fallback
+
+    def _open_mem2_alias(self):
+        from .mem2_shared import WindowsSharedMEM2
+        from .mem2_windows import WindowsMEM2
+        try:
+            return WindowsSharedMEM2(self.engine)
+        except (RuntimeError,OSError,ValueError) as shared_error:
+            try:
+                return WindowsMEM2(self.engine)
+            except (RuntimeError,OSError,ValueError) as alias_error:
+                raise MemoryUnavailable(f'Shared memory: {shared_error}; process alias: {alias_error}') from alias_error
+
+    def recover_zero_mem2(self, context, table):
+        """Probe a separately attributed alias, never treat zero as gameplay."""
+        now = time.monotonic()
+        if os.name != 'nt' or self.fallback is not None or now < self._next_mem2_probe:
+            return False
+        self._next_mem2_probe = now + 5
+        candidate = None
+        def word(address):
+            if not 0x80000000 <= address <= 0x817FFFFC or address % 4:
+                raise MemoryUnavailable('MEM2 probe requires MEM1-owned roots')
+            return int.from_bytes(self.engine.read_bytes(address,4),'big')
+        def roots():
+            app = word(0x808F336C)
+            document = word(app+4)
+            module = word(document+0x1C)
+            return app,document,module,word(module+0x34),word(0x808F34F8)
+        try:
+            self._check()
+            self.assert_instance()
+            before = roots()
+            if (before[-2:] != (context,table) or any(
+                    not valid_range(address,4) or not 0x90000000 <= address or address % 4
+                    for address in (context,table))):
+                return False
+            if any(bytes(self.engine.read_bytes(address,4)) != bytes(4) for address in (context,table)):
+                return False
+            candidate = self._open_mem2_alias()
+            if (candidate.read(context,4) != bytes.fromhex('80759438')
+                    or candidate.read(table,4) != bytes.fromhex('8075db5c')):
+                raise MemoryUnavailable('independent MEM2 alias did not validate stage/table owners')
+            info = self.instance_info(fresh=True)
+            self.assert_instance(info)
+            if [row['pid'] for row in info.get('process_candidates',())] != [candidate.pid]:
+                raise MemoryUnavailable('MEM2 probe Dolphin PID changed')
+            if roots() != before:
+                raise MemoryUnavailable('MEM2 probe scene roots changed')
+            self.fallback = candidate
+            candidate = None
+            self.mem2_mapping_status = {'backend':getattr(self.fallback,'kind','verified Windows MEM2 alias'),
+                'status':'recovered zero-filled DME mapping','context':hex(context),'table':hex(table)}
+            return True
+        except (MemoryUnavailable,RuntimeError,OSError,ValueError) as error:
+            self.mem2_mapping_status = {'backend':'DME','status':'independent MEM2 probe failed','reason':str(error)}
+            return False
+        finally:
+            if candidate is not None:
+                candidate.close()
 
     def read_bytes(self, address, size):
         self.read_calls += 1
         self._check()
+        if address >= 0x90000000 and self.fallback is not None:
+            return self.fallback.read(address,size)
         try:
             return bytes(self.engine.read_bytes(address, size))
         except (RuntimeError, OSError):
@@ -166,6 +241,8 @@ class DMEBackend:
     def close(self):
         self._process_cache = None
         self._mutation_batch = None
+        self._next_mem2_probe = 0
+        self.mem2_mapping_status = {'backend':'DME','status':'attachment closed'}
         if self.fallback:
             self.fallback.close()
             self.fallback = None
@@ -286,6 +363,14 @@ class SonicMemory:
             tx=getattr(self,'_wisp_inventory_transaction',None)
             if not tx or tx['values'].get(address)!=data:
                 raise MemoryUnavailable('WRITE_BLOCKED: Wisp inventory value outside transaction')
+        if operation in ('ring_material_test', 'red_ring_material'):
+            tx = getattr(self, '_ring_material_test', None)
+            if not tx or tx['values'].get(address) != data:
+                raise MemoryUnavailable('WRITE_BLOCKED: ring material value outside transaction')
+        if operation=='red_ring_spawn':
+            tx=getattr(self,'_ring_spawn_transaction',None)
+            if not tx or tx['values'].get(address)!=data:
+                raise MemoryUnavailable('WRITE_BLOCKED: native ring palette value outside transaction')
         if operation == 'oxygen_controls':
             tx=getattr(self,'_oxygen_transaction',None)
             if not tx or tx[2].get(address-tx[0])!=data:

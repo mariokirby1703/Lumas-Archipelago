@@ -39,9 +39,27 @@ def test_captured_low_memory_write_no_longer_replaces_a_stack_prologue():
             assert image.read(hook['target'], 4) == payload[offset:offset+4]
         previous = damaged
 
-    image.replace(ARENA+4, bytes(4), bytes.fromhex('01000000'))
+    # Dolphin installs this marker with cheats disabled, before gameplay.
+    image.replace(ARENA+4, bytes(8), b'STUBHAXX')
+    assert memory.verify_revision() == hashlib.sha256(original).hexdigest()
+    image.replace(ARENA+12, bytes(4), bytes.fromhex('01000000'))
     with pytest.raises(MemoryUnavailable, match='prefix modification'):
         memory.verify_revision()
+    image.replace(ARENA+12, bytes.fromhex('01000000'), bytes(4))
+    image.replace(ARENA+4, b'STUBHAXX', b'STUBHAXY')
+    with pytest.raises(MemoryUnavailable, match='prefix modification'):
+        memory.verify_revision()
+    image.replace(ARENA+4, b'STUBHAXY', bytes(8))
+
+    image.replace(ARENA+4, bytes(4), bytes.fromhex('01000000'))
+    with pytest.raises(MemoryUnavailable, match='prefix modification') as failure:
+        memory.verify_revision()
+    message = str(failure.value)
+    assert 'prefix_address=0x80001800' in message
+    assert 'observed=' + previous.hex() + '01000000' + bytes(24).hex() in message
+    assert 'expected=' + bytes(32).hex() in message
+    assert 'changed_addresses=0x80001804;' in message
+    assert 'executable_entries_match=True' in message
     image.replace(ARENA+4, bytes.fromhex('01000000'), bytes(4))
 
     # Damage to actual code must still block writes, even with a valid header.

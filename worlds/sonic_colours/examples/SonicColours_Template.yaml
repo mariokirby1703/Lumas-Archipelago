@@ -1,32 +1,53 @@
-# Sonic Colours (Wii) custom player YAML / slot schema 7
-# Run this with the matching APWorld and an entirely NEW seed.
-# The normal PAL Wii intro is always Tropical Resort Acts 1 and 2.
-# Open the generated player patch to build a separate native AP ISO.
-# See docs/setup.md; no manual AP Gecko/Riivolution setup is required.
+# Copy this file and change SonicPlayer to your AP player name.
+# Settings below use the current defaults. See docs/setup.md for installation.
 name: SonicPlayer
 game: Sonic Colours (Wii)
 Sonic Colours (Wii):
-  # nega_wisp_armor / all_bosses / all_red_rings /
+
+  # Progression
   # nega_wisp_armor / all_bosses / all_red_rings
   goal: nega_wisp_armor
-  # sequential: Act 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> Boss
-  # open_acts: all six Acts at World Access, Boss after all six clears
+  # unlock_acts_in_order / all_acts_then_boss
   world_progression: all_acts_then_boss
-  # off / singles / per_level
+  boost_lock: true
+  movement_unlocks: true
+  super_sonic: false
+
+  # Checks
+  # singles / per_level
   red_ring_checks: singles
   # off / s / a / b / c / all
   rank_checks: 'off'
+  one_up_sanity: false
+  wisp_discovery_checks: true
+
+  # Game Land
+  # When off, also disables Emerald and Eggman Heart checks and removes AP Red Ring items.
   game_land_checks: true
-  chaos_emerald_checks: true
-  wisp_discovery_checks: false
-  wisp_capsules: false
-  eggman_heart_sanity: false
-  boost_lock: false
-  movement_unlocks: false
-  game_land_requirement_reduction: 50  # 0..99 percent; 50% = old 90, 99% = old 179
-  # true enables seed-based music shuffling in the local ISO build;
-  # see docs/sonic_colours.md for remaining live verification.
-  music_randomization: true
+  chaos_emerald_checks: false
+  eggman_heart_sanity: true
+  # 0-99 percent reduction in Game Land unlock costs.
+  game_land_requirement_reduction: 50
+
+  # Traps
+  # Percentage of remaining filler slots replaced with traps.
   trap_percentage: 10
+  # off / low / medium / high
   ring_loss_trap_weight: medium
-  death_link: false  # Selectable; PAL live validation still incomplete
+  # off / low / medium / high
+  score_reset_trap_weight: low
+  # off / low / medium / high
+  dead_weight_trap_weight: low
+
+  # Red Ring Colors
+  red_ring_item_colors: true
+  # Use gold, blue, gray and orange for Red Rings and item HUD text.
+  colorblind_mode: false
+  # always_red / red_ring_items_only / item_classification
+  own_item_red_ring_colors: item_classification
+  # red / random
+  trap_red_ring_colors: random
+
+  # Miscellaneous
+  music_randomization: true
+  death_link: false

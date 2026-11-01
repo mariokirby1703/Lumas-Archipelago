@@ -47,7 +47,7 @@ def validate_slot(data):
     if type(data.get('music_mapping_version',1)) is not int or data.get('music_mapping_version',1) not in (1,2):
         raise ValueError('unsupported music mapping version')
     revision=data.get('options_revision',0)
-    if type(revision) is not int or not 0<=revision<=10:raise ValueError('unsupported slot options revision')
+    if type(revision) is not int or not 0<=revision<=12:raise ValueError('unsupported slot options revision')
     options = data.get('options')
     # Old seeds have no physical 1-Up locations; adding the optional toggle
     # must not force regeneration or change their selected location set.
@@ -56,12 +56,16 @@ def validate_slot(data):
         data={**data,'options':options}
     legacy_options=data.get('options_revision',0)<2
     if isinstance(options,dict):
+        if revision < 12:options={**options,'colorblind_mode':options.get('colorblind_mode',0)}
         options={k:v for k,v in options.items() if k not in ('ap_item_hud','swim_trap_weight','swim_trap_duration')}
         options.setdefault('score_reset_trap_weight',0)
         options.setdefault('dead_weight_trap_weight',0)
         if data.get('options_revision',0)<5:options.setdefault('native_feature_tests',0)
         if data.get('options_revision',0)<3:
             options.setdefault('super_sonic',1)
+        if revision < 11:
+            for name in ('red_ring_item_colors', 'own_item_red_ring_colors', 'trap_red_ring_colors'):
+                options.setdefault(name, 0)
         data={**data,'options':options}
     if not isinstance(options, dict) or set(options) != set(OPTION_NAMES):
         raise ValueError('slot options missing or unexpected')
@@ -94,9 +98,9 @@ def validate_slot(data):
             continue
         if hasattr(cls, 'range_start') and not cls.range_start <= value <= cls.range_end:
             raise ValueError(f'invalid range {name}')
-        option = cls.from_any(value)
-        if getattr(option, 'options', None) and value not in option.options.values():
+        if getattr(cls, 'options', None) and value not in cls.options.values():
             raise ValueError(f'invalid choice {name}')
+        option = cls.from_any(value)
         if hasattr(option, 'range_start') and not option.range_start <= value <= option.range_end:
             raise ValueError(f'invalid range {name}')
         resolved[name] = option
@@ -247,6 +251,7 @@ class Runtime:
         if self.hooks is not None and not hasattr(self.hooks,'gameplay_controls_status'):
             self.hooks.gameplay_controls_status={}
         self.snapshot = None
+        self.red_ring_colors = None
         from .test_inventory import LocalInventoryOverrides
         self.test_inventory = LocalInventoryOverrides(self.slot_data['options'])
         from .ap_hud_ticker import Ticker
@@ -368,6 +373,58 @@ class Runtime:
             quiet_logging.record('result', 'Result detected: %s grade %s; Location queued: %s',
                         snapshot.actual_mission, result['grade'], sorted(checks))
 
+    def recover_intro_clear(self):
+        snapshot = self.snapshot
+        bootstrap = self.journal.data.get('bootstrap')
+        if (self.journal.data.get('save_identity') is not None or not bootstrap
+                or bootstrap['session'] != snapshot.session
+                or bootstrap.get('intro_proof') not in ('native_factory_save_v1','native_unselected_intro_v1')
+                or not self.guard.can_record_pickups(snapshot) or not snapshot.progress_verified
+                or snapshot.scene != 'gameplay' or snapshot.actual_mission != 'stg130'
+                or snapshot.stage_epoch == bootstrap.get('intro_stage_epoch')
+                or 'stg110' not in snapshot.persisted_clears
+                or not snapshot.candidate_clears <= frozenset({'stg110','stg130'})):
+            return
+        events = self.journal.data.get('pickup_events',())
+        if any(e.get('kind') == 'result' and e.get('mission') == 'stg110'
+               and e.get('playthrough_epoch') == bootstrap['epoch'] for e in events):
+            return
+        saved = snapshot.evidence.get('native_data',{}).get('saved_progress',{})
+        chain = snapshot.evidence.get('chain')
+        if not chain or saved.get('chain') != chain:
+            return
+        if bootstrap.get('intro_chain') is not None and bootstrap['intro_chain'] != chain:
+            return
+        if 'initial_clears' in bootstrap:
+            if bootstrap['initial_clears']:
+                return
+        else:
+            # Older journals lack the baseline. Require a pickup witnessed in
+            # this fresh intro and the untouched factory profile/other records.
+            if (saved.get('profile_hex') != '23'*10+'00'*10 or not any(
+                    e.get('kind') == 'red_ring' and e.get('mission') == 'stg110'
+                    and e.get('stage_epoch') == bootstrap.get('intro_stage_epoch')
+                    and e.get('playthrough_epoch') == bootstrap['epoch'] for e in events)):
+                return
+            if any(record.get('raw_rank') != 255 or record.get('score') != 0 or record.get('time_raw') != 0
+                   for mission,record in saved.get('rank_records',{}).items() if mission != 'stg110'):
+                return
+        record = saved.get('rank_records',{}).get('stg110',{})
+        grade = record.get('raw_rank')
+        if (type(grade) is not int or not 0 <= grade <= 4
+                or type(record.get('score')) is not int or record['score'] < 0
+                or type(record.get('time_raw')) is not int or record['time_raw'] <= 0):
+            return
+        checks = {code for name,code in self.slot_data['locations'].items()
+                  if LOCATION_TABLE[name].mission == 'stg110'
+                  and (LOCATION_TABLE[name].kind == 'clear'
+                       or LOCATION_TABLE[name].kind == 'rank' and grade <= LOCATION_TABLE[name].index)}
+        self.journal.record_pickups([{'kind':'result','mission':'stg110','grade':grade,
+            'score':record['score'],'time_raw':record['time_raw'],'session':snapshot.session,
+            'playthrough_epoch':bootstrap['epoch'],'stage_epoch':bootstrap['intro_stage_epoch'],
+            'provenance':'native_intro_act2_record_transition_v1'}],{},checks)
+        quiet_logging.record('result','Missed intro result recovered from native Act 2 transition: %s',sorted(checks))
+
     def observe_pickups(self):
         snapshot = self.snapshot
         if not self.guard.can_record_pickups(snapshot):
@@ -421,6 +478,8 @@ class Runtime:
 
     def poll_steps(self, memory, item_ids, history_ready):
         self._capsule_memory=memory
+        memory._collect_ring_materials = bool(self.red_ring_colors and self.red_ring_colors.enabled
+            and not (getattr(memory,'native_patch',None) or {}).get('red_ring_spawn'))
         # Frame-rate native reads should not rehash the full PAL executable on
         # every pass. Read-only identity is checked against the fresh boot and
         # native signatures, with mandatory full revalidation every 250 ms.
@@ -432,12 +491,15 @@ class Runtime:
             self.snapshot = self.hooks.snapshot(memory, verify_executable=False)
         else:
             self.snapshot = self.hooks.snapshot(memory)
+        if self.red_ring_colors is not None:
+            self.red_ring_colors.stage_colors(self.snapshot.actual_mission)
         self.guard.observe(self.snapshot)
         # Capture irreversible pickup/result evidence before slow permission
         # writes. Network clients can transmit this checkpoint and receive
         # acknowledgements before continuing the same synchronous poll.
         self.observe_pickups()
         self.observe_results()
+        self.recover_intro_clear()
         if getattr(memory,'native_patch',None):
             try:
                 from .capsule_capture import configure as arm_capture
@@ -453,6 +515,10 @@ class Runtime:
             self.journal.add_checks(saved_checks)
         yield (set(self.journal.data['checks']) if can_send else set(),
                bool(can_send and self.journal.data.get('goal_observed')))
+        if self.red_ring_colors is not None:
+            from .red_ring_spawn import publish
+            publish(self,memory)
+            yield set(),False
         # Arm time-critical controls before the 90-cast HUD publication.
         early_items=list(item_ids if history_ready else self.journal.data['receipts'])
         early_items+=[item for item in self.journal.data.get('permission_receipts',()) if item not in early_items]
@@ -507,6 +573,8 @@ class Runtime:
                 except MemoryUnavailable as error:
                     setattr(self,name,{'status':str(error),'write_verified':False})
         yield set(),False  # release the event loop before resource/HUD discovery
+        if self.red_ring_colors is not None:
+            yield from self.red_ring_colors.renderer.poll_steps(memory,self.snapshot,self.guard,self.red_ring_colors)
         if getattr(memory,'native_patch',None):
             try:
                 from .live_music import configure_finite_loop

@@ -3,8 +3,9 @@ import time
 CHARSET=set(' !#&()-./0123456789:;<>?@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
 DISPLAY_SECONDS=60
 FADE_SECONDS=10
-def item_colour(flags):
-    return '#F05252' if flags&4 else '#AF70FF' if flags&1 else '#305BD8' if flags&2 else '#64C8FF'
+def item_colour(flags, colorblind=False):
+    from .item_colors import item_color
+    return item_color(flags,colorblind)
 
 def ascii_text(text):
     text=str(text).replace('\u00df','ss').replace('\u00c4','Ae').replace('\u00d6','Oe').replace('\u00dc','Ue').replace('\u00e4','ae').replace('\u00f6','oe').replace('\u00fc','ue')

@@ -1,6 +1,6 @@
 # Sonic Colours (Wii) Archipelago World
 
-Sonic Colours is a Wii platformer in which Sonic explores Eggman's interstellar amusement park and uses the powers of the Wisps. This Archipelago world supports the PAL `SNCP8P` revision 0 release in Dolphin. See the [Setup Guide](setup.md) to get started.
+Sonic Colours is a Wii platformer in which Sonic explores Eggman's interstellar amusement park and uses the powers of the Wisps. This Archipelago world supports the PAL `SNCP8P` release in Dolphin. See the [Setup Guide](setup.md) to get started.
 
 ## Goals
 
@@ -52,6 +52,13 @@ Sonic Colours is a Wii platformer in which Sonic explores Eggman's interstellar 
 - **Trap Weights:** adjust Ring Loss, Score Reset and Dead Weight frequency
 - **Music Randomization:** shuffle music
 - **DeathLink:** share deaths with other DeathLink players
+
+## Red Ring Colors
+
+- **Red Ring Item Colors:** color rings purple for progression, blue for useful and light blue for filler
+- **Colorblind Mode:** use gold, blue, gray and orange for both ring colors and the item HUD
+- **Own Item Red Ring Colors:** keep your own rewards red, keep only your own AP Red Ring currency red, or color all your rewards by item type
+- **Trap Red Ring Colors:** show traps in their category color or disguise them with a fixed random item color
 
 ## Notes
 

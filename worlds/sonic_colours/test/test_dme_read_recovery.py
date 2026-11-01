@@ -2,7 +2,7 @@ from types import SimpleNamespace
 import pytest
 from ..client.memory import DMEBackend
 
-@pytest.mark.parametrize('header,text,recover',[(b'SNCP8P',bytes(4),True),(bytes(6),bytes(4),True),(b'SNCE8P',bytes(4),False),(b'SNCP8P',bytes.fromhex('60000000'),False)])
+@pytest.mark.parametrize('header,text,recover',[(b'SNCP8P',bytes(4),True),(bytes(6),bytes(4),True),(b'SNCE8P',bytes(4),False),(b'SNCP8P',bytes.fromhex('60000000'),False),(bytes.fromhex('00201f15aa02'),bytes.fromhex('60000000'),True)])
 def test_reattach_only_repeated_empty_boot_mapping(monkeypatch,header,text,recover):
     from ..client import memory as module
     monkeypatch.setattr(module.time,'monotonic',lambda:100.)

@@ -42,6 +42,11 @@ def _read_stage_objects(memory, include_pickups=True):
         return []
     context = memory.read_ptr_checked(module + 0x34, 4)
     vtable = memory.read_u32(context)
+    if vtable == 0 and context >= 0x90000000:
+        recover = getattr(getattr(memory,'backend',None),'recover_zero_mem2',None)
+        table = memory.read_u32(STAGE_TABLE_GLOBAL)
+        if recover is not None and recover(context,table):
+            vtable = memory.read_u32(context)
     row = {'context': context, 'vtable': vtable, 'application': application}
     if vtable==0x807659C0 and getattr(memory,'native_patch',None):
         # Regular title-menu selection has another context than the first
@@ -166,10 +171,15 @@ def _read_stage_objects(memory, include_pickups=True):
                     if not coherent(): raise MemoryUnavailable('stage_context_changed')
                     return [row]
                 try:
-                    capsules = read_capsules(memory, stage, row['mission'], actors)
+                    ring_actors = [] if getattr(memory,'_collect_ring_materials',False) else None
+                    capsules = (read_capsules(memory, stage, row['mission'], actors)
+                                if ring_actors is None else
+                                read_capsules(memory, stage, row['mission'], actors, ring_actors=ring_actors))
                     if not coherent():
                         raise MemoryUnavailable('stage_context_changed')
                     row['capsules'] = capsules
+                    if ring_actors is not None:
+                        row['red_ring_actors'] = ring_actors
                 except MemoryUnavailable as error:
                     row['capsule_error'] = str(error)
                 try:
@@ -269,7 +279,7 @@ def read_actors(memory, stage):
     return actors
 
 
-def read_capsules(memory, stage, mission, actors):
+def read_capsules(memory, stage, mission, actors, *, ring_actors=None):
     """ReleaseBoxSmall's retained opened state and native ORC instance handle.
 
     800D4FA8 sets actor+110 after the item-spawn call; 800D5D38 keeps the
@@ -281,7 +291,10 @@ def read_capsules(memory, stage, mission, actors):
     from ..capsules import CAPSULES_BY_NATIVE_ID
     result = []
     for actor in actors:
-        if memory.read_u32(actor) != 0x80761534:
+        vtable = memory.read_u32(actor)
+        if ring_actors is not None and vtable == 0x8076F8D0:
+            ring_actors.append(actor)
+        if vtable != 0x80761534:
             continue
         wrapper = memory.read_ptr_checked(actor + 0x64, 0x18)
         if memory.read_u32(wrapper + 4) != actor:
