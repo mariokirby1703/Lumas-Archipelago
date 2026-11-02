@@ -40,7 +40,7 @@ Source code: [worlds/carnival_games_minigolf](https://github.com/mariokirby1703/
 
 ## Sonic Colours (Wii)
 
-An Archipelago implementation for Sonic Colours *(Wii, European / PAL Version, `SNCP8P` Rev 0)*, using Dolphin and a locally patched ISO.
+An Archipelago implementation for Sonic Colours *(Wii, PAL and NTSC-U Versions supported)*, using Dolphin and a locally patched ISO.
 
 Read first: [Setup Guide](https://github.com/mariokirby1703/Lumas-Archipelago/blob/Sonic-Colours-Wii-AP/worlds/sonic_colours/docs/setup.md)
 

@@ -165,7 +165,7 @@ class BoostLock(DefaultOnToggle):
 
 
 class NativeFeatureTests(Toggle):
-    """Developer opt-in for other unfinished PAL native experiments."""
+    """Developer opt-in for other unfinished native experiments."""
     display_name = 'Unverified Native Feature Tests'
     visibility = Visibility.none
 

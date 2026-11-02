@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class SonicColoursWorld(World):
-    """Sonic Colours Wii PAL Archipelago integration."""
+    """Sonic Colours Wii PAL and NTSC-U Archipelago integration."""
     game = GAME
     web = SonicColoursWeb()
     options_dataclass = SonicColoursOptions
@@ -39,10 +39,10 @@ class SonicColoursWorld(World):
         validation=load_data('versions.json').get('live_validation',{})
         for option, capability in [('death_link', 'deathlink'),('dead_weight_trap_weight','dead_weight')]:
             if getattr(self.options, option).value and not validation.get(capability):
-                logger.warning('Sonic Colours: %s enabled, but PAL %s live-validation remains incomplete.',
+                logger.warning('Sonic Colours: %s enabled, but %s live-validation remains incomplete.',
                                option, capability)
         if self.options.native_feature_tests:
-            logger.warning('Sonic Colours: unverified native feature TEST opt-in; PAL live matrix incomplete.')
+            logger.warning('Sonic Colours: unverified native feature TEST opt-in; live matrix incomplete.')
         self.starting_stage = next(s for s in STAGES if s['mission_id'] == 'stg110')
         self.starting_world = 0
         self.gates = game_land_gates(game_land_reduction_points(self.options.game_land_requirement_reduction.value))

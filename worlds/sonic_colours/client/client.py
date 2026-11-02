@@ -236,7 +236,7 @@ class SonicCommands(ClientCommandProcessor):
                         'movement_status':self.ctx.runtime.movement_status})
 
     def _cmd_sonicwater(self):
-        """Read-only PAL underwater stats; does NOT implement Swim/Breath gates."""
+        """Read-only underwater stats; does NOT implement Swim/Breath gates."""
         if not self.ctx.runtime or not self.ctx.memory or not self.ctx.runtime.snapshot:
             logger.info('Connect to a Sonic Colours slot and Dolphin first.')
             return
@@ -347,7 +347,7 @@ class SonicCommands(ClientCommandProcessor):
             logger.error(str(error))
 
     def _cmd_sonic(self):
-        """Show inventory, synchronization and PAL hook status."""
+        """Show inventory, synchronization and native hook status."""
         report = diagnostic(self.ctx)
         if 'native_evidence' in report:
             report.pop('native_evidence')
@@ -839,13 +839,13 @@ async def dolphin_loop(ctx):
                     # header is ready. During Dolphin boot/reset, an all-zero
                     # header must defer the experiment, not permanently mark a
                     # never-attempted installation as partially failed.
-                    # No guest writes are permitted before a full verified PAL
+                    # No guest writes are permitted before a full verified game
                     # revision check succeeds. Re-check on the next poll.
                     try:
                         memory.verify_revision()
                     except MemoryUnavailable as error:
                         ctx.direct_hook_status = {
-                            'status': 'WAITING: verified PAL executable required before experimental install',
+                            'status': 'WAITING: verified PAL or NTSC-U executable required before experimental install',
                             'preflight_error': str(error),
                             'installed_in_guest_ram': False,
                             'jit_execution_verified': False,
