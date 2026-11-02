@@ -17,6 +17,7 @@ import time
 from .iso_cache import check_cancel,restore as restore_original,store as store_original
 from .native_dol import patch_dol,PAL_DOL_SHA256,plan
 from .asset_patch import PAL_CPK_SHA256
+from .regions import supported_header
 
 logger=logging.getLogger('Client')
 WIT_URL='https://wit.wiimm.de/download/wit-v3.05a-r8638-cygwin64.zip'
@@ -40,8 +41,8 @@ def disc_header(path):
     path=Path(path)
     if path.suffix.lower()!='.iso':raise ValueError('Only uncompressed .iso disc images are supported')
     with path.open('rb') as f:header=f.read(32)
-    if len(header)!=32 or header[:6]!=b'SNCP8P' or header[7]!=0 or header[24:28]!=bytes.fromhex('5d1c9ea3'):
-        raise ValueError('Original Sonic Colours Wii PAL SNCP8P Revision 0 ISO required')
+    if len(header)!=32 or not supported_header(header) or header[24:28]!=bytes.fromhex('5d1c9ea3'):
+        raise ValueError('Original Sonic Colours Wii PAL SNCP8P or NTSC-U SNCE8P Revision 0 ISO required')
     return header
 
 def settings_group():
@@ -133,7 +134,8 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
     group=None
     if source is None:
         group=settings_group();source=str(group.iso_file)
-    source=Path(source).resolve();disc_header(source)
+    source=Path(source).resolve();source_header=disc_header(source)
+    disc_id=source_header[:6].decode('ascii')
     default_target=target is None
     target=Path(target or Path(patch.path).with_suffix('.iso')).resolve()
     if target==source:raise ValueError('The original ISO must never be the output')
@@ -163,7 +165,7 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
             # Keep an old ABI/resource build intact. A component-specific name
             # also makes repeated Open Patch calls reuse the upgraded image.
             suffix=hashlib.sha256((plan()[2].hex()+resource_component_id()+str(VERSION)
-                                   +json.dumps(seed_data['initial_items'])).encode()).hexdigest()[:10]
+                                   +json.dumps(seed_data['initial_items'])+disc_id).encode()).hexdigest()[:10]
             if getattr(patch,'ring_colors',None) is not None:
                 suffix=hashlib.sha256((suffix+json.dumps(patch.ring_colors,sort_keys=True)).encode()).hexdigest()[:10]
             upgraded=target.with_name(target.stem+'-ap-'+suffix+'.iso')
@@ -187,7 +189,7 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
             command(wit,['EXTRACT',source,extract,'--psel','DATA','--progress'],progress,cancel)
         tree=find_disc_tree(extract);dol=tree/'sys/main.dol';cpk=tree/'files/sonic2010_0.cpk'
         boot=(tree/'sys/boot.bin').read_bytes()
-        if boot[:6]!=b'SNCP8P' or boot[7]!=0:raise ValueError('DATA partition game/revision differs')
+        if not supported_header(boot) or boot[:8]!=source_header[:8]:raise ValueError('DATA partition game/revision differs')
         if sha(dol)!=PAL_DOL_SHA256 or sha(cpk)!=PAL_CPK_SHA256:raise ValueError('Original main.dol or CPK checksum mismatch; modified/unsupported ISO')
         if cache and not cached:
             # Optional acceleration must not make an otherwise valid build fail
@@ -223,7 +225,7 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
         phase('Rebuilding Wii filesystem, encrypted DATA partition and hashes')
         output=tmp/'patched.iso'
         command(wit,['COPY',extract,output,'--iso','--psel','DATA','--progress'],progress,cancel)
-        disc_header(output)
+        if disc_header(output)[:8]!=source_header[:8]:raise ValueError('Generated ISO game/revision differs from original')
         phase('Verifying generated Wii partition integrity')
         command(wit,['VERIFY',output,'--psel','DATA'],progress,cancel)
         phase('Final source and output checksums')
@@ -234,7 +236,7 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
                 'source_iso_sha256':source_hash,'output_iso_sha256':sha(output,progress,cancel),
                 'patched_dol_sha256':sha(dol),'patched_cpk_sha256':sha(cpk),
                 'native_registry':registry,'music_mapping':mapping,'boot_verified':False,'live_verified':False,
-                'original_cache_used':cached}
+                'original_cache_used':cached,'disc_id':disc_id}
         phase('Publishing verified ISO')
         record['build_timings_seconds']=timings
         record['build_elapsed_seconds']=round(time.monotonic()-started,3)
@@ -261,7 +263,16 @@ def install_with_progress(patch,**kwargs):
     group=None
     if not kwargs.get('source'):
         group=settings_group()
-        kwargs['source']=str(group.iso_file) # file selection belongs to GUI thread
+        selected=str(vars(group).get('iso_file',''))
+        try:
+            disc_header(selected)
+        except (OSError,ValueError):
+            from Utils import open_filename
+            selected=open_filename('Select your original Sonic Colours Wii ISO (PAL or NTSC-U)',
+                                   [('Wii ISO',['.iso'])],selected)
+            if not selected:raise InterruptedError('Original ISO selection cancelled')
+            disc_header(selected)
+        kwargs['source']=selected
         if not kwargs.get('wit'):kwargs['wit']=str(vars(group).get('wit_path','')) or None
     root=None
     try:

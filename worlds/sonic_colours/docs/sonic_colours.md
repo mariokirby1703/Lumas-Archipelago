@@ -1,6 +1,6 @@
 # Sonic Colours (Wii) Archipelago World
 
-Sonic Colours is a Wii platformer in which Sonic explores Eggman's interstellar amusement park and uses the powers of the Wisps. This Archipelago world supports the PAL `SNCP8P` release in Dolphin. See the [Setup Guide](setup.md) to get started.
+Sonic Colours is a Wii platformer in which Sonic explores Eggman's interstellar amusement park and uses the powers of the Wisps. This Archipelago world supports the PAL `SNCP8P` and NTSC-U `SNCE8P` Rev0 releases in Dolphin. See the [Setup Guide](setup.md) to get started.
 
 ## Goals
 

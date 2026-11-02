@@ -12,6 +12,7 @@ from .state import Snapshot
 from .native_read import read_saved_progress, read_stage_objects
 from ..world_constants import load_data, STAGES, STARTING_STAGES, NATIVE_COLOURS, WISPS, wisp_item
 from .binding import SaveBinding
+from .regions import DISC_IDS
 
 
 class NativeHooks:
@@ -58,7 +59,7 @@ class NativeHooks:
             # PAL structures can still be observed read-only when executable
             # changes are unknown. Never attach pickup/save/write authority.
             observation = memory.revision_observation or {}
-            if observation.get('disc_id') != VERSION['disc_id']:
+            if observation.get('disc_id') not in DISC_IDS:
                 raise
             try:
                 rows = read_stage_objects(memory)

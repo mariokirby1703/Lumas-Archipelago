@@ -138,7 +138,7 @@ def test_installer_warm_build_skips_source_verify_and_extraction_but_verifies_ou
     monkeypatch.setattr(iso_patch,'PAL_DOL_SHA256',hashlib.sha256(b'dol').hexdigest())
     monkeypatch.setattr(iso_patch,'PAL_CPK_SHA256',hashlib.sha256(b'cpk').hexdigest())
     monkeypatch.setattr(iso_patch,'get_wit',lambda *a:Path('fake'))
-    monkeypatch.setattr(iso_patch,'patch_dol',lambda raw,seed:(raw+b' patched',{}))
+    monkeypatch.setattr(iso_patch,'patch_dol',lambda raw,seed,**kwargs:(raw+b' patched',{}))
     monkeypatch.setattr(build_hud_overlay,'build',lambda source,output,**kw:Path(output).write_bytes(Path(source).read_bytes()+b' HUD'))
     calls=[]
     def tool(wit,args,progress,cancel):

@@ -683,7 +683,7 @@ class SonicContext(CommonContext):
         from kvui import GameManager
 
         class SonicManager(GameManager):
-            base_title = 'Sonic Colours (Wii) PAL — ' + self.implementation['loaded_code_id'][:12]
+            base_title = 'Sonic Colours (Wii) — ' + self.implementation['loaded_code_id'][:12]
             logging_pairs = [('Client', 'Archipelago')]
 
         return SonicManager
@@ -830,7 +830,7 @@ async def dolphin_loop(ctx):
                     memory.verify_revision()
                     verified = True
                 if not ctx.runtime:
-                    raise MemoryUnavailable('PAL executable verified; waiting for AP slot.')
+                    raise MemoryUnavailable('Game executable verified; waiting for AP slot.')
                 memory.write_guard = WritePolicy(memory, ctx.runtime.guard, ctx.runtime.hooks.snapshot)
                 if ctx.experimental_direct_hooks and ctx.direct_hook_status.get('status', '').startswith('FAILED'):
                     raise MemoryUnavailable('EXPERIMENT BLOCKED: restart Dolphin and client after a partial experimental install')
@@ -946,7 +946,7 @@ async def dolphin_loop(ctx):
                     verified = False
                     try:
                         if backend.recover_empty_text_mapping(error):
-                            ctx.dolphin_status='Reattaching Dolphin after repeated invalid memory reads; PAL verification pending'
+                            ctx.dolphin_status='Reattaching Dolphin after repeated invalid memory reads; executable verification pending'
                             if ctx.runtime:ctx.runtime.hooks.invalidate_session()
                     except (MemoryUnavailable,RuntimeError,OSError):
                         pass

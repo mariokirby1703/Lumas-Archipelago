@@ -61,8 +61,9 @@ class WindowsSharedMEM2:
         return buffer.raw
 
     def validate_source(self):
+        from .regions import supported_header
         header = bytes(self.engine.read_bytes(0x80000000,8))
-        if header[:6] != b'SNCP8P' or header[7] != 0 or self._read_offset(0,8) != header:
+        if not supported_header(header) or self._read_offset(0,8) != header:
             raise RuntimeError('Dolphin shared MEM1 disc/revision differs from DME')
         for address,size in ((0x80004000,32),(0x80002FC0,64),(0x808F336C,4),
                              (0x808F34F8,4),(0x808F3628,4)):

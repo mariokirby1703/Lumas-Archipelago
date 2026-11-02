@@ -45,12 +45,13 @@ def test_thresholds(reduction):
         assert ordered == [0]+list(range(7,122,6))
 
 
-def test_options_and_yaml():
-    path = Path(__file__).parents[1] / 'examples/SonicColours.yaml'
+@pytest.mark.parametrize('filename', ('SonicColours.yaml', 'SonicColours_Template.yaml'))
+def test_options_and_yaml(filename):
+    path = Path(__file__).parents[1] / 'examples' / filename
     data = yaml.safe_load(path.read_text())
     assert data['game'] == 'Sonic Colours (Wii)'
     options = data['Sonic Colours (Wii)']
-    assert set(options) == set(OPTION_NAMES)
+    assert set(options) == set(OPTION_NAMES) - {'wisp_capsules', 'native_feature_tests'}
     for name, value in options.items():
         cls = SonicColoursOptions.type_hints[name]
         assert cls.from_any(value).value == cls.from_any(cls.default).value
@@ -139,7 +140,7 @@ def test_plans_are_bijections_and_not_native_patches():
 
 
 def test_output_and_tamper_rejection():
-    world = generate().worlds[1]
+    world = generate(fill=True).worlds[1]
     data = world.fill_slot_data()
     assert validate_slot(json.loads(json.dumps(data))) == data
     for mutation in [dict(schema_version=999), dict(game_land_gates={}), dict(locations={}), dict(stage_mapping={})]:
@@ -150,3 +151,10 @@ def test_output_and_tamper_rejection():
         from ..patch import load_patch
         output=load_patch(next(Path(directory).glob('*.apsoniccolours')))
         assert output.slot_data==data
+
+
+def test_output_rejects_missing_ring_reward_placement(tmp_path):
+    world = generate().worlds[1]
+    with pytest.raises(ValueError, match='completed item placement'):
+        world.generate_output(tmp_path)
+    assert not list(tmp_path.glob('*.apsoniccolours'))

@@ -86,7 +86,8 @@ class DMEBackend:
         invalid_header = header is None or len(header)!=6 or any(
             byte not in b'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' for byte in header)
         empty = False
-        if header in (b'SNCP8P',bytes(6)):
+        from .regions import DISC_BYTES
+        if header in (*DISC_BYTES,bytes(6)):
             empty=all(bytes(self.engine.read_bytes(a,4))==bytes(4) for a in (0x8003388C,0x802ED70C))
         if not invalid_header and not empty:
             self._empty_text_polls=0

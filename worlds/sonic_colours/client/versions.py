@@ -1,6 +1,7 @@
 import hashlib
 from datetime import datetime, timezone
 from ..world_constants import load_data
+from .regions import DISC_BYTES
 
 VERSION = load_data('versions.json')
 
@@ -17,8 +18,8 @@ def verify_revision(memory):
     memory.revision_observation = {'time_utc': datetime.now(timezone.utc).isoformat(),
                                    'disc_id': disc.decode('ascii', errors='backslashreplace'),
                                    'disc_id_hex': disc.hex(), 'revision': revision, 'verified': False}
-    if disc != VERSION['disc_id'].encode('ascii'):
-        raise memory.error(f'wrong_game: observed {disc!r} (hex={disc.hex()}), expected PAL SNCP8P')
+    if disc not in DISC_BYTES:
+        raise memory.error(f'wrong_game: observed {disc!r} (hex={disc.hex()}), expected PAL SNCP8P or NTSC-U SNCE8P')
     if revision != VERSION['revision']:
         raise memory.error(f'unknown_revision: observed disc revision {revision}, expected {VERSION["revision"]}')
     from .native_dol import handshake

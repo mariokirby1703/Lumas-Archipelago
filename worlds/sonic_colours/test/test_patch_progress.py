@@ -45,6 +45,51 @@ def test_log_noise_never_replaces_phase_or_exposes_local_paths():
     assert p.message==text and p.detail=='40/100 MiB'
 
 
+import pytest
+
+
+@pytest.mark.parametrize('saved', ('valid', 'missing', 'invalid'))
+def test_gui_reuses_valid_original_and_replaces_unusable_path(monkeypatch,tmp_path,saved):
+    import sys
+    import Utils
+    import settings
+    from types import SimpleNamespace
+    from ..client import iso_patch
+    from .test_regions import header
+    pal=tmp_path/'pal.iso';pal.write_bytes(header('SNCP8P'))
+    us=tmp_path/'us.iso';us.write_bytes(header('SNCE8P'))
+    invalid=tmp_path/'invalid.iso';invalid.write_bytes(bytes(32))
+    initial={'valid':pal,'missing':tmp_path/'missing.iso','invalid':invalid}[saved]
+    group=SimpleNamespace(iso_file=str(initial));selected=iter((str(us),))
+    dialogs=[];sources=[]
+    def choose(title,types,suggest):
+        dialogs.append(suggest)
+        return next(selected)
+    monkeypatch.setattr(Utils,'open_filename',choose)
+    monkeypatch.setattr(iso_patch,'settings_group',lambda:group)
+    monkeypatch.setattr(settings,'get_settings',lambda:SimpleNamespace(save=lambda:None))
+    def no_tk():raise RuntimeError('No progress window in unit test')
+    monkeypatch.setitem(sys.modules,'tkinter',SimpleNamespace(Tk=no_tk,ttk=object()))
+    def install(patch,**kwargs):sources.append(kwargs['source']);return 'patched.iso'
+    monkeypatch.setattr(iso_patch,'install',install)
+    assert iso_patch.install_with_progress(object())=='patched.iso'
+    assert iso_patch.install_with_progress(object())=='patched.iso'
+    expected=str(pal if saved=='valid' else us)
+    assert sources==[expected,expected]
+    assert dialogs==([] if saved=='valid' else [str(initial)])
+
+
+def test_cancelled_iso_selection_never_installs(monkeypatch):
+    import pytest
+    import Utils
+    from types import SimpleNamespace
+    from ..client import iso_patch
+    monkeypatch.setattr(iso_patch,'settings_group',lambda:SimpleNamespace(iso_file='old.iso'))
+    monkeypatch.setattr(Utils,'open_filename',lambda *args:None)
+    monkeypatch.setattr(iso_patch,'install',lambda *args,**kwargs:pytest.fail('Cancelled selection must not install'))
+    with pytest.raises(InterruptedError):iso_patch.install_with_progress(object())
+
+
 def test_step_eta_clears_on_phase_change_instead_of_becoming_total_eta():
     p=PatchProgress()
     p.receive('Rebuilding Wii filesystem, encrypted DATA partition and hashes')

@@ -80,8 +80,9 @@ class WindowsMEM2:
         # Only compare the immutable disc ID. The low-memory header also contains
         # live OS values (0xC0..0xE7) that change between two reads.
         reference = engine.read_bytes(0x80000000, 6)
-        if reference[:6] != b"SNCP8P":
-            raise RuntimeError("MEM2 fallback requires Sonic Colours SNCP8P.")
+        from .regions import DISC_BYTES
+        if reference[:6] not in DISC_BYTES:
+            raise RuntimeError("MEM2 fallback requires Sonic Colours SNCP8P or SNCE8P.")
         snapshot = k.CreateToolhelp32Snapshot(2, 0)
         if snapshot == c.c_void_p(-1).value:
             raise OSError(c.get_last_error(), "Cannot enumerate Dolphin")

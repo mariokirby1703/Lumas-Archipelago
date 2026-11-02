@@ -41,9 +41,9 @@ def patch_server_address(patch,explicit=None,gui=True):
 
 def launch_client(*args):
     from .client import main
-    parser = get_base_parser(description='Sonic Colours PAL Archipelago Client')
+    parser = get_base_parser(description='Sonic Colours Wii PAL / NTSC-U Archipelago Client')
     parser.add_argument('--name', help='Archipelago slot name')
-    parser.add_argument('--original-iso',help='Original PAL SNCP8P Rev0 ISO (saved path/file selection otherwise)')
+    parser.add_argument('--original-iso',help='Original PAL SNCP8P or NTSC-U SNCE8P Rev0 ISO (saved path/file selection otherwise)')
     parser.add_argument('--output-iso',help='Separate output ISO; existing mismatching files are never overwritten')
     parser.add_argument('--wit',help='Wiimms ISO Tools executable; Windows download is verified automatically')
     parser.add_argument('--patch-only',action='store_true',help='Build/verify the ISO, then exit')
@@ -157,6 +157,9 @@ def launch_client(*args):
         installer=install if getattr(parsed,'nogui',False) else install_with_progress
         try:
             parsed.generated_iso=str(installer(patch,source=parsed.original_iso,target=parsed.output_iso,wit=parsed.wit))
+        except InterruptedError:
+            logging.info('ISO installation cancelled.')
+            return
         except Exception as error:
             logging.error('ISO installation failed: %s',error)
             if not getattr(parsed,'nogui',False):

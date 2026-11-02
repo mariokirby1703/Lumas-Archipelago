@@ -114,6 +114,10 @@ class SonicColoursPatch(APAutoPatchInterface):
                         components={'seed.json':hashlib.sha256(seed).hexdigest()},
                         native_component_sha256=plan()[2].hex(),resource_transform_version=1,
                         resource_component_sha256=resource_component_id())
+        from .client.regions import DISC_IDS
+        # Keep the legacy disc_id for older patch readers; both regions share
+        # the verified source files and can use the same player patch.
+        manifest['supported_disc_ids']=list(DISC_IDS)
         return manifest
 
     def write_contents(self,archive):
@@ -129,10 +133,16 @@ class SonicColoursPatch(APAutoPatchInterface):
         if len(names)!=len(set(names)) or set(names)!={'archipelago.json','seed.json'}:raise InvalidDataError('invalid or duplicate patch components')
         if any(i.file_size>2*1024*1024 for i in infos):raise InvalidDataError('patch component too large')
         manifest=super().read_contents(archive)
+        from .client.regions import DISC_IDS
+        supported=manifest.get('supported_disc_ids',[manifest.get('disc_id')])
+        if (not isinstance(supported,list) or not supported or any(type(disc) is not str for disc in supported)
+                or len(supported)!=len(set(supported))
+                or any(disc not in DISC_IDS for disc in supported) or manifest.get('disc_id') not in supported):
+            raise InvalidDataError('unsupported Sonic Colours source regions')
         legacy=(manifest.get('native_abi') in (1,2) and manifest.get('native_component_sha256') in {plan()[2].hex(),*UPGRADABLE_NATIVE_COMPONENTS}
                 and manifest.get('resource_component_sha256') in UPGRADABLE_RESOURCES)
         if (manifest.get('game')!=GAME or manifest.get('sonic_patch_format')!=FORMAT
-                or not (manifest.get('native_abi')==ABI or legacy) or manifest.get('disc_id')!='SNCP8P' or manifest.get('revision')!=0
+                or not (manifest.get('native_abi')==ABI or legacy) or manifest.get('disc_id') not in DISC_IDS or manifest.get('revision')!=0
                 or manifest.get('native_component_sha256') not in {plan()[2].hex(),*UPGRADABLE_NATIVE_COMPONENTS}
                 or manifest.get('resource_transform_version')!=1
                 or not (manifest.get('resource_component_sha256')==resource_component_id() or legacy)

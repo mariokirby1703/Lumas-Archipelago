@@ -38,6 +38,10 @@ def diagnostic(ctx, memory=None):
     # Historical successful accesses remain timestamped; they do not imply that
     # the current Dolphin connection is active or that the current disc is PAL.
     current_memory = memory or getattr(ctx, 'memory', None)
+    if current_memory is not None:
+        result['disc_id']=(getattr(current_memory,'revision_observation',None) or {}).get('disc_id',result['disc_id'])
+    from .regions import DISC_IDS
+    result['supported_disc_ids']=list(DISC_IDS)
     result.update(latest_successful_read=getattr(current_memory, 'latest_read', None),
                   latest_successful_write=getattr(current_memory, 'latest_write', None),
                   latest_blocked_native_write=getattr(current_memory, 'latest_blocked_native_write', None),

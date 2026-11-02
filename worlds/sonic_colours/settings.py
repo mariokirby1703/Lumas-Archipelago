@@ -10,7 +10,7 @@ class OptionalFilePath(settings.OptionalUserFilePath):
 
 class SonicColoursSettings(settings.Group):
     class ISOFile(settings.UserFilePath):
-        description='Original Sonic Colours Wii PAL SNCP8P Rev0 ISO'
+        description='Original Sonic Colours Wii PAL SNCP8P or NTSC-U SNCE8P Rev0 ISO'
         copy_to=None
     class ToolPath(OptionalFilePath):
         description='Optional Wiimms ISO Tools executable'

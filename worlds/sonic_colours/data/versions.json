@@ -1,5 +1,6 @@
 {
   "disc_id": "SNCP8P",
+  "supported_disc_ids": ["SNCP8P", "SNCE8P"],
   "revision": 0,
   "dol_sha256": "92aefe33b577493b492f8433ca68b90d25d29d2d6f9c85310a6829481281f8a9",
   "text_sections": [
