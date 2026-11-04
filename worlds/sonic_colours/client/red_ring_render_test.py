@@ -4,6 +4,7 @@ import struct
 
 from ..world_constants import load_data
 from .memory import MemoryUnavailable, valid_range
+from .item_colors import LUMA
 from .native_read import read_stage_objects, read_actors
 
 ALLOCATION_SITE = 0x801D52E0
@@ -17,7 +18,8 @@ MODEL_VTABLE = 0x807AA950
 PALETTE = {'purple': (175, 112, 255), 'blue': (48, 91, 216), 'light_blue': (100, 200, 255),
            'purple_dim': (44, 14, 64), 'gold':(240,228,66), 'accessible_blue':(0,114,178),
            'gray':(153,153,153), 'orange':(213,94,0)}
-SHADED = {name + '_shaded': name for name in ('purple', 'blue', 'light_blue','gold','accessible_blue','gray','orange')}
+PALETTE.update({'luma_' + name: tuple(bytes.fromhex(color[1:])) for name,color in LUMA.items()})
+SHADED = {name + '_shaded': name for name in ('purple', 'blue', 'light_blue','gold','accessible_blue','gray','orange',*("luma_" + name for name in LUMA))}
 
 
 def allocation_patches():

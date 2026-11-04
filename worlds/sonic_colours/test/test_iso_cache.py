@@ -127,14 +127,15 @@ def test_tool_cancellation_terminates_process(tmp_path):
 
 
 @pytest.mark.parametrize('damage',[False,True])
-def test_installer_warm_build_skips_source_verify_and_extraction_but_verifies_output(tmp_path,monkeypatch,damage):
+@pytest.mark.parametrize('sixty_fps',[False,True])
+def test_installer_warm_build_skips_source_verify_and_extraction_but_verifies_output(tmp_path,monkeypatch,damage,sixty_fps):
     from types import SimpleNamespace
     from ..client import iso_patch
     from ..tools import build_hud_overlay
     header=bytearray(32);header[:6]=b'SNCP8P';header[24:28]=bytes.fromhex('5d1c9ea3')
     source=tmp_path/'original.iso';source.write_bytes(header)
     patch=SimpleNamespace(path=str(tmp_path/'seed.apsoniccolours'),game='Sonic Colours (Wii)',
-                          player=1,player_name='Test',slot_data={'seed_name':'test','options':{'music_randomization':False}})
+                          player=1,player_name='Test',slot_data={'seed_name':'test','options':{'music_randomization':False,'sixty_fps':sixty_fps}})
     monkeypatch.setattr(iso_patch,'PAL_DOL_SHA256',hashlib.sha256(b'dol').hexdigest())
     monkeypatch.setattr(iso_patch,'PAL_CPK_SHA256',hashlib.sha256(b'cpk').hexdigest())
     monkeypatch.setattr(iso_patch,'get_wit',lambda *a:Path('fake'))

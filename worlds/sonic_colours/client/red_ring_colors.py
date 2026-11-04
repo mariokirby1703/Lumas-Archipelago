@@ -25,15 +25,25 @@ def trap_color(identity, location):
 
 
 def reward_color(item, receiver, flags, own_slot, options, identity, location):
+    if options.get('luma',0):
+        from .item_colors import category
+        return 'luma_' + category(flags)
     # AP's trap flag wins even when progression/useful flags are also present.
     if flags & 4:
         color=trap_color(identity, location) if options.get('trap_red_ring_colors', 0) else 'red'
-        return accessible(color) if options.get('colorblind_mode',0) else color
+        return palette_color(color,options)
     own_mode = options.get('own_item_red_ring_colors', 0)
     if receiver == own_slot and (own_mode == 0 or own_mode == 1 and item in RING_ITEM_IDS):
         return 'red'
     color='purple' if flags & 1 else 'blue' if flags & 2 else 'light_blue'
-    return accessible(color) if options.get('colorblind_mode',0) else color
+    return palette_color(color,options)
+
+
+def palette_color(color, options):
+    if options.get('luma', 0):
+        return {'purple':'luma_progression', 'blue':'luma_useful',
+                'light_blue':'luma_filler', 'red':'luma_trap'}[color]
+    return accessible(color) if options.get('colorblind_mode', 0) else color
 
 
 def accessible(color):
@@ -43,7 +53,7 @@ def accessible(color):
 class RedRingColors:
     def __init__(self, slot_data, own_slot, team):
         self.options = slot_data['options']
-        self.enabled = bool(self.options.get('red_ring_item_colors', 0))
+        self.enabled = bool(self.options.get('luma',0) or self.options.get('red_ring_item_colors', 0))
         self.own_slot = own_slot
         self.identity = (slot_data['seed_name'], team, own_slot)
         self.locations = {}

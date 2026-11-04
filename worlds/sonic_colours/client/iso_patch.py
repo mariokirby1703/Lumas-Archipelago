@@ -148,6 +148,8 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
     seed_data['initial_items']=getattr(patch,'initial_items',[])
     if getattr(patch,'ring_colors',None) is not None:seed_data['ring_colors']=patch.ring_colors
     identity=hashlib.sha256(json.dumps(seed_data,sort_keys=True).encode()).hexdigest()
+    native_component=plan(include_sixty_fps=bool(patch.slot_data.get('options',{}).get('sixty_fps',0)),
+                          include_luma_colors=bool(patch.slot_data.get('options',{}).get('luma',0)))[2].hex()
     resources=resource_component_id()
     compatible_resources={resources}
     if resources==EQUIVALENT_RESOURCE_TARGET:compatible_resources.update(EQUIVALENT_RESOURCES)
@@ -157,15 +159,15 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
         if target.is_file() and receipt.is_file():
             record=json.loads(receipt.read_text(encoding='utf-8'))
             if (record.get('identity')==identity and record.get('source_iso_sha256')==source_hash
-                    and record.get('native_component_sha256')==plan()[2].hex() and record.get('pipeline_version')==1
+                    and record.get('native_component_sha256')==native_component and record.get('pipeline_version')==1
                     and record.get('resource_component_sha256') in compatible_resources
                     and record.get('output_iso_sha256')==sha(target,progress,cancel)):
                 progress('Reusing verified ISO for this seed');return target
         if default_target:
             # Keep an old ABI/resource build intact. A component-specific name
             # also makes repeated Open Patch calls reuse the upgraded image.
-            suffix=hashlib.sha256((plan()[2].hex()+resource_component_id()+str(VERSION)
-                                   +json.dumps(seed_data['initial_items'])+disc_id).encode()).hexdigest()[:10]
+            suffix=hashlib.sha256((native_component+resource_component_id()+str(VERSION)
+                                   +json.dumps(seed_data['initial_items'])+disc_id+str(patch.slot_data.get('options',{}).get('sixty_fps',0))+str(patch.slot_data.get('options',{}).get('luma',0))).encode()).hexdigest()[:10]
             if getattr(patch,'ring_colors',None) is not None:
                 suffix=hashlib.sha256((suffix+json.dumps(patch.ring_colors,sort_keys=True)).encode()).hexdigest()[:10]
             upgraded=target.with_name(target.stem+'-ap-'+suffix+'.iso')
@@ -231,7 +233,7 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
         phase('Final source and output checksums')
         if sha(source,progress,cancel)!=source_hash:raise ValueError('Source ISO changed during build; refusing finalization')
         if cancel and cancel.is_set():raise InterruptedError('ISO build cancelled')
-        record={**seed_data,'identity':identity,'pipeline_version':1,'native_component_sha256':plan()[2].hex(),
+        record={**seed_data,'identity':identity,'pipeline_version':1,'native_component_sha256':native_component,
                 'resource_component_sha256':resource_component_id(),
                 'source_iso_sha256':source_hash,'output_iso_sha256':sha(output,progress,cancel),
                 'patched_dol_sha256':sha(dol),'patched_cpk_sha256':sha(cpk),

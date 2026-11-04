@@ -51,7 +51,7 @@ def test_options_and_yaml(filename):
     data = yaml.safe_load(path.read_text())
     assert data['game'] == 'Sonic Colours (Wii)'
     options = data['Sonic Colours (Wii)']
-    assert set(options) == set(OPTION_NAMES) - {'wisp_capsules', 'native_feature_tests'}
+    assert set(options) == set(OPTION_NAMES) - {'wisp_capsules', 'native_feature_tests', 'luma'}
     for name, value in options.items():
         cls = SonicColoursOptions.type_hints[name]
         assert cls.from_any(value).value == cls.from_any(cls.default).value

@@ -63,6 +63,14 @@ class ScoreResetTrapWeight(Choice):
     default = 1
 
 
+class SixtyFPS(Toggle):
+    """Run the game at 60 FPS.
+
+    Known physics issues affect loops, springs and the final boss. Leave off
+    for the original gameplay behavior."""
+    display_name = "60 FPS"
+
+
 class MusicRandomization(DefaultOnToggle):
     """Shuffle music across everywhere."""
     display_name = 'Music Randomization'
@@ -181,6 +189,15 @@ class ColorblindMode(Toggle):
     display_name = 'Colorblind Mode'
 
 
+class Luma(Choice):
+    """Use Luma's Red Ring palette."""
+    display_name = 'Luma'
+    visibility = Visibility.none
+    option_off = 0
+    option_luma = 1
+    default = 0
+
+
 class OwnItemRedRingColors(Choice):
     """Keep your own rewards red, keep only your own AP Red Ring currency red, or color every reward by item type. Traps use their separate setting below."""
     display_name = 'Own Item Red Ring Colors'
@@ -226,12 +243,14 @@ class SonicColoursOptions(PerGameCommonOptions):
     ring_loss_trap_weight: RingLossTrapWeight
     score_reset_trap_weight: ScoreResetTrapWeight
     dead_weight_trap_weight: DeadWeightTrapWeight
+    sixty_fps: SixtyFPS
     music_randomization: MusicRandomization
     death_link: SonicDeathLink
     wisp_capsules: WispCapsules
     native_feature_tests: NativeFeatureTests
     red_ring_item_colors: RedRingItemColors
     colorblind_mode: ColorblindMode
+    luma: Luma
     own_item_red_ring_colors: OwnItemRedRingColors
     trap_red_ring_colors: TrapRedRingColors
 
@@ -243,5 +262,5 @@ OPTION_GROUPS = [
     OptionGroup('Game Land', [GameLandChecks, ChaosEmeraldChecks, EggmanHeartSanity, GameLandRequirementReduction]),
     OptionGroup('Traps', [TrapPercentage, RingLossTrapWeight, ScoreResetTrapWeight, DeadWeightTrapWeight]),
     OptionGroup('Red Ring Colors', [RedRingItemColors, ColorblindMode, OwnItemRedRingColors, TrapRedRingColors]),
-    OptionGroup('Miscellaneous', [MusicRandomization, SonicDeathLink]),
+    OptionGroup('Miscellaneous', [MusicRandomization, SixtyFPS, SonicDeathLink]),
 ]

@@ -112,6 +112,8 @@ def test_trap_hash_rejects_the_biased_tail(monkeypatch):
 def test_legacy_slot_and_journal_identity_remain_unchanged():
     old = deepcopy(data_for())
     old['options_revision'] = 10
+    old['options'].pop('sixty_fps')
+    old['options'].pop('luma')
     for name in OPTION_DEFAULTS:
         old['options'].pop(name)
     expected = hashlib.sha256(json.dumps(old, sort_keys=True).encode()).hexdigest()
@@ -124,7 +126,7 @@ def test_legacy_slot_and_journal_identity_remain_unchanged():
 
 def test_new_slot_requires_valid_explicit_color_options():
     data = data_for()
-    assert data['options_revision'] == 12
+    assert data['options_revision'] == 14
     assert validate_slot(data) == data
     for name in OPTION_DEFAULTS:
         missing = deepcopy(data)

@@ -60,6 +60,8 @@ def test_existing_seed_identity_and_palette_are_preserved(revision):
     old=deepcopy(generate({'red_ring_item_colors':False}).worlds[1].fill_slot_data())
     old['options_revision']=revision
     old['options'].pop('colorblind_mode')
+    old['options'].pop('sixty_fps')
+    old['options'].pop('luma')
     if revision<11:
         for key in ('red_ring_item_colors','own_item_red_ring_colors','trap_red_ring_colors'):old['options'].pop(key)
     expected=hashlib.sha256(json.dumps(old,sort_keys=True).encode()).hexdigest()

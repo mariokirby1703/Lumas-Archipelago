@@ -97,8 +97,8 @@ class SonicColoursPatch(APAutoPatchInterface):
             data['initial_items']=validate_items(self.initial_items)
         if self.ring_colors is not None:
             from .client.red_ring_spawn import validate_colors
-            validate_colors(self.ring_colors)
-            if not self.slot_data['options'].get('red_ring_item_colors'):
+            validate_colors(self.ring_colors,luma=bool(self.slot_data['options'].get('luma',0)))
+            if not (self.slot_data['options'].get('red_ring_item_colors') or self.slot_data['options'].get('luma')):
                 raise ValueError('Red Ring color prefill requires the color option')
             data['ring_colors']=self.ring_colors
         return data
@@ -158,8 +158,8 @@ class SonicColoursPatch(APAutoPatchInterface):
         from .client.boot_permissions import validate_items
         self.initial_items=validate_items(data.get('initial_items',[]))
         from .client.red_ring_spawn import validate_colors
-        self.ring_colors=validate_colors(data.get('ring_colors'))
-        if self.ring_colors is not None and not self.slot_data['options'].get('red_ring_item_colors'):
+        self.ring_colors=validate_colors(data.get('ring_colors'),luma=bool(self.slot_data['options'].get('luma',0)))
+        if self.ring_colors is not None and not (self.slot_data['options'].get('red_ring_item_colors') or self.slot_data['options'].get('luma')):
             raise InvalidDataError('Red Ring color prefill conflicts with slot options')
         if manifest.get('seed_name')!=self.slot_data['seed_name'] or type(self.player) is not int or self.player<1:
             raise InvalidDataError('patch seed/slot identity invalid')

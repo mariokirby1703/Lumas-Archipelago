@@ -15,6 +15,9 @@ class RingRenderer:
 
     def poll(self, memory, snapshot, guard, colors):
         if (getattr(memory,'native_patch',None) or {}).get('red_ring_spawn'):
+            if bool(colors.options.get('luma')) != bool(memory.native_patch.get('luma_ring_colors')):
+                self.status={'native_rendering':False,'reason':'Repatch ISO for selected ring palette'}
+                return False
             if colors.options.get('colorblind_mode') and not memory.native_patch.get('accessible_ring_colors',False):
                 self.status={'native_rendering':False,'reason':'Repatch ISO for Colorblind Mode ring colors'}
                 return False

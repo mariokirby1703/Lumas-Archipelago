@@ -67,7 +67,8 @@ def test_original_and_patched_executable_validation_in_both_regions(disc):
     if not path.exists():pytest.skip('private verified shared PAL/NTSC-U main.dol absent')
     source=path.read_bytes()
     assert hashlib.sha256(source).hexdigest()==PAL_DOL_SHA256
-    for data in (source,patch_dol(source,'RegionsTest')[0]):
+    for data in (source,patch_dol(source,'RegionsTest')[0],
+                 patch_dol(source,'RegionsTest',options={'sixty_fps':1})[0]):
         image=Dol(data)
         class Backend:
             def read_bytes(self,address,size):

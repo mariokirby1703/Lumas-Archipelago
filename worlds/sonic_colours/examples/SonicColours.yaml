@@ -24,3 +24,4 @@ Sonic Colours (Wii):
   trap_red_ring_colors: random
   music_randomization: true
   death_link: false
+  sixty_fps: false

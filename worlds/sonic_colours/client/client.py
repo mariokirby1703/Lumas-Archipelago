@@ -445,6 +445,10 @@ class SonicCommands(ClientCommandProcessor):
 
 def slot_identity_digest(data):
     """Keep old seed journals stable when adding a disabled optional trap."""
+    if data.get('options_revision',0)<14:
+        data={**data,'options':{k:v for k,v in data['options'].items() if k!='luma'}}
+    if data.get('options_revision',0)<13:
+        data={**data,'options':{k:v for k,v in data['options'].items() if k!='sixty_fps'}}
     if data.get('options_revision',0)<12:
         data={**data,'options':{k:v for k,v in data['options'].items() if k!='colorblind_mode'}}
     if data.get('options_revision', 0) < 11:

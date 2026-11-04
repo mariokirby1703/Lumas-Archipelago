@@ -51,3 +51,4 @@ Sonic Colours (Wii):
   # Miscellaneous
   music_randomization: true
   death_link: false
+  sixty_fps: false

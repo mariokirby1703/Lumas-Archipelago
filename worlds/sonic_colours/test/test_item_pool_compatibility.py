@@ -39,7 +39,7 @@ def test_normal_ids_are_append_only_and_legacy_progressive_ids_decode():
 
 def test_speed_pool_contract_preserves_old_seeds_and_rejects_wrong_new_pool():
     data=generate({'movement_unlocks':False,'game_land_checks':True}).worlds[1].fill_slot_data()
-    assert data['options_revision']==12 and not data['game_land_speed_items']
+    assert data['options_revision']==14 and not data['game_land_speed_items']
     assert validate_slot(data)['game_land_speed_items'] is False
     old={**data,'options_revision':8,'game_land_speed_items':True}
     assert validate_slot(old)['game_land_speed_items'] is True
@@ -90,7 +90,7 @@ def test_legacy_slot_normalization_preserves_the_previous_journal_digest():
     legacy={**data,'options_revision':4,'game_land_speed_items':True,'logic_policy':'provisional_clears_conservative_pickups',
             'game_land_gates':game_land_gates(data['options']['game_land_requirement_reduction']),
             'options':{k:v for k,v in data['options'].items() if k not in
-                       ('native_feature_tests', 'red_ring_item_colors', 'own_item_red_ring_colors', 'trap_red_ring_colors', 'colorblind_mode')}}
+                       ('native_feature_tests', 'red_ring_item_colors', 'own_item_red_ring_colors', 'trap_red_ring_colors', 'colorblind_mode', 'sixty_fps', 'luma')}}
     expected=hashlib.sha256(json.dumps(legacy,sort_keys=True).encode()).hexdigest()
     normalized=validate_slot(legacy)
     assert normalized['options']['native_feature_tests']==0

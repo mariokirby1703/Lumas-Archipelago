@@ -52,6 +52,7 @@ Sonic Colours is a Wii platformer in which Sonic explores Eggman's interstellar 
 - **Trap Weights:** adjust Ring Loss, Score Reset and Dead Weight frequency
 - **Music Randomization:** shuffle music
 - **DeathLink:** share deaths with other DeathLink players
+- **60 FPS:** Optional frame-rate override baked into the ISO. There are known physics issues that you may experience with this option enabled
 
 ## Red Ring Colors
 

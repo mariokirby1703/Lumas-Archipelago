@@ -55,8 +55,8 @@ class Dol:
         for base,value in ((0,offset),(0x48,address),(0x90,len(blob))):struct.pack_into('>I',self.data,base+4*slot,value)
         self.sections.append((slot,offset,address,len(blob)))
 
-@lru_cache(maxsize=16)
-def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True):
+@lru_cache(maxsize=32)
+def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False):
     """Rebuild every C2 payload as initialized native code, without C2 headers."""
     from .native_hook_table import hook_rows
     from .ap_hud_publisher import patches as hud
@@ -141,7 +141,7 @@ def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards
         patches.extend(allocation_patches())
         if include_ring_spawn:
             from .red_ring_spawn import patches as spawn_patches
-            patches.extend(spawn_patches(include_accessible_colors))
+            patches.extend(spawn_patches(include_accessible_colors,include_luma_colors))
     if cursor>SIGNATURE-4:raise ValueError('native executable section exhausted (HUD registry reserved)')
     if include_boot_guards:
         from .white_capsule_spawn import patches as white_spawn
@@ -149,6 +149,9 @@ def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards
         from .boost_startup import apply as boost_startup
         payload,boost_patches=boost_startup(payload,hooks,patches)
         patches.extend(boost_patches)
+    if include_sixty_fps:
+        from .sixty_fps import patches as fps_patches
+        patches.extend(fps_patches(patches))
     ownership=[]
     for address,old,new in patches:
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')
@@ -158,11 +161,11 @@ def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards
 
 def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
     if hashlib.sha256(original).hexdigest()!=PAL_DOL_SHA256:raise ValueError('unsupported original main.dol SHA256')
-    image=Dol(original);patches,payload,digest,hooks=plan();registry=[]
+    image=Dol(original);patches,payload,digest,hooks=plan(include_sixty_fps=bool((options or {}).get('sixty_fps',0)),include_luma_colors=bool((options or {}).get('luma',0)));registry=[]
     from .red_ring_spawn import validate_colors,prefill
-    validate_colors(ring_colors)
+    validate_colors(ring_colors,luma=bool((options or {}).get('luma',0)))
     for address,old,new in patches:
-        new=prefill(address,new,ring_colors)
+        new=prefill(address,new,ring_colors,luma=bool((options or {}).get('luma',0)))
         old=image.read(address,len(new)) if old is None else old
         image.replace(address,old,new)
         registry.append({'address':address,'length':len(new),'original':old.hex(),'replacement':new.hex()})
@@ -179,9 +182,10 @@ def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
                             'source_sha256':PAL_DOL_SHA256,'seed_digest':identity.hex(),
                             'boot_permissions':boot}
 
-@lru_cache(maxsize=8)
+@lru_cache(maxsize=16)
 def plan_for_digest(digest):
-    for candidate in (plan(),plan(include_accessible_colors=False),
+    for candidate in (plan(),plan(include_sixty_fps=True),plan(include_luma_colors=True),
+                      plan(include_luma_colors=True,include_sixty_fps=True),plan(include_accessible_colors=False),
                       plan(include_boot_guards=False,include_accessible_colors=False),
                       plan(include_ring_spawn=False,include_boot_guards=False,include_accessible_colors=False),
                       plan(include_ring_materials=False,include_boot_guards=False,include_accessible_colors=False)):
@@ -201,8 +205,9 @@ def handshake(memory):
         raise memory.error('incompatible native AP hook ABI/signature')
     from .red_ring_spawn import normalized,HOOK as SPAWN_HOOK
     has_spawn=any(a==SPAWN_HOOK for a,o,n in patches)
-    from .red_ring_spawn import layout,MAGIC_V2
-    has_accessible=has_spawn and any(a==layout()[0] and n[:4]==struct.pack('>I',MAGIC_V2) for a,o,n in patches)
+    from .red_ring_spawn import layout,MAGIC_V2,MAGIC_LUMA
+    has_luma=has_spawn and any(a==layout()[0] and n[:4]==struct.pack('>I',MAGIC_LUMA) for a,o,n in patches)
+    has_accessible=has_luma or has_spawn and any(a==layout()[0] and n[:4]==struct.pack('>I',MAGIC_V2) for a,o,n in patches)
     pages={}
     for address,old,new in patches:
         observed=bytearray();cursor=address
@@ -254,5 +259,6 @@ def handshake(memory):
             'red_ring_materials':ring_materials,
             'red_ring_spawn':has_spawn,
             'accessible_ring_colors':has_accessible,
+            'luma_ring_colors':has_luma,
             'white_capsule_spawn':any(a==0x800D3C84 for a,o,n in patches),
             'reserved_low_word':hex(int.from_bytes(arena_data[:4],'big'))}

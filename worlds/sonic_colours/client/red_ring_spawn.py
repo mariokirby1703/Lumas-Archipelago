@@ -3,6 +3,7 @@ from functools import lru_cache
 import struct
 
 from .capsule_refresh import PPC
+from .item_colors import LUMA
 from ..world_constants import load_data
 
 HOOK = 0x801D52F0
@@ -11,31 +12,35 @@ COPY_MATERIAL = 0x805BC810
 CACHE_FLUSH = 0x8033B130
 MAGIC = 0x52524331
 MAGIC_V2 = 0x52524332
+MAGIC_LUMA = 0x52524C31
 PALETTE = ('red','purple','blue','light_blue','gold','accessible_blue','gray','orange')
 RGB = ((0,0,0),(175,112,255),(48,91,216),(100,200,255),
        (240,228,66),(0,114,178),(153,153,153),(213,94,0))
+
+LUMA_PALETTE = PALETTE[:4] + tuple('luma_' + name for name in LUMA)
+LUMA_RGB = RGB[:4] + tuple(tuple(bytes.fromhex(color[1:])) for color in LUMA.values())
 
 
 def missions():
     return tuple(sorted({row['mission_id'] for row in load_data('red_rings.json')}))
 
 
-def encode(colors,extended=True):
-    palette=PALETTE if extended else PALETTE[:4]
+def encode(colors,extended=True,luma=False):
+    palette=(LUMA_PALETTE if luma else PALETTE) if extended else PALETTE[:4]
     if not isinstance(colors,(tuple,list)) or len(colors) != 5 or any(c not in palette for c in colors):
         raise ValueError('five valid Red Ring colors required')
     return 0x8000 | sum(palette.index(c) << ((3 if extended else 2)*i) for i,c in enumerate(colors))
 
 
-def validate_colors(colors):
+def validate_colors(colors,luma=False):
     if colors is None:return None
     if not isinstance(colors,dict) or set(colors) != set(missions()):
         raise ValueError('complete normal-Act Red Ring colors required')
-    for row in colors.values():encode(row)
+    for row in colors.values():encode(row,luma=luma)
     return colors
 
 
-def program(header, first, extended=False, table=0):
+def program(header, first, extended=False, table=0, luma=False):
     a = PPC()
     def const(r,v):
         a.d(15,r,0,(v>>16)&65535);a.d(24,r,r,v&65535)
@@ -50,7 +55,7 @@ def program(header, first, extended=False, table=0):
         a.emit(instruction);a.d(36,0,1,offset)
     a.d(47,3,1,0x40)
     for f in range(14):a.d(54,f,1,0xC0+f*8)
-    const(14,header);a.d(32,3,14,0);check(3,MAGIC_V2 if extended else MAGIC)
+    const(14,header);a.d(32,3,14,0);check(3,MAGIC_LUMA if luma else MAGIC_V2 if extended else MAGIC)
     a.d(32,19,14,4);a.d(11,0,19,0);a.branch('done',0x41820000)
     a.d(28,19,3,1);a.branch('done',0x40820000)
     a.emit(0x7C0004AC)
@@ -168,11 +173,11 @@ def layout():
     return header,rows,code
 
 
-@lru_cache(maxsize=2)
-def patches(extended=True):
+@lru_cache(maxsize=4)
+def patches(extended=True,luma=False):
     from .native_dol import branch
     header,rows,sites=layout()
-    result=[(header,bytes(8),struct.pack('>II',MAGIC_V2 if extended else MAGIC,0))]
+    result=[(header,bytes(8),struct.pack('>II',MAGIC_LUMA if luma else MAGIC_V2 if extended else MAGIC,0))]
     names=tuple(rows)
     for i,(name,address) in enumerate(rows.items()):
         following=rows[names[i+1]] if i+1<len(names) else 0
@@ -181,10 +186,10 @@ def patches(extended=True):
     if extended:
         colors,sites=sites[:8],sites[8:]
         table=colors[0]['address']
-        for i,(red,green,blue) in enumerate(RGB):
+        for i,(red,green,blue) in enumerate(LUMA_RGB if luma else RGB):
             following=colors[i+1]['address'] if i<7 else 0
             result.append((colors[i]['address'],bytes(8),struct.pack('>4BI',red,green,blue,0,following)))
-    code=scatter(program(header,next(iter(rows.values())),extended,table),sites)
+    code=scatter(program(header,next(iter(rows.values())),extended,table,luma),sites)
     return result+[(HOOK,ORIGINAL.to_bytes(4,'big'),branch(HOOK,code[0][0]).to_bytes(4,'big'))]+code
 
 
@@ -202,11 +207,11 @@ def normalized(address, observed, expected, extended=True):
     return observed
 
 
-def prefill(address, expected, colors):
+def prefill(address, expected, colors,luma=False):
     header,rows,_=layout()
     if colors is not None and address==header:return expected[:4]+(2).to_bytes(4,'big')
     for mission,slot in rows.items():
-        if colors is not None and address==slot:return expected[:2]+encode(colors[mission]).to_bytes(2,'big')+expected[4:]
+        if colors is not None and address==slot:return expected[:2]+encode(colors[mission],luma=luma).to_bytes(2,'big')+expected[4:]
     return expected
 
 
@@ -214,7 +219,7 @@ def normalize(memory, data, base):
     if not (getattr(memory,'native_patch',None) or {}).get('red_ring_spawn'):return data
     data=bytearray(data)
     extended=(getattr(memory,'native_patch',None) or {}).get('accessible_ring_colors',False)
-    for address,old,new in patches(extended):
+    for address,old,new in patches(extended,bool(memory.native_patch.get('luma_ring_colors'))):
         if base<=address and address+len(new)<=base+len(data):
             offset=address-base
             if normalized(address,bytes(data[offset:offset+len(new)]),new,extended)!=new:
@@ -230,13 +235,17 @@ def publish(runtime,memory):
         return
     header,rows,_=layout()
     extended=bool(memory.native_patch.get('accessible_ring_colors',True))
+    luma=bool(colors.options.get('luma',0))
+    if luma != bool(memory.native_patch.get('luma_ring_colors')):
+        colors.renderer.status={'native_rendering':False,'reason':'Repatch ISO for selected ring palette'}
+        return
     if colors.options.get('colorblind_mode') and not extended:
         colors.renderer.status={'native_rendering':False,'reason':'Repatch ISO for Colorblind Mode ring colors'}
         return
     values={}
     for mission,address in rows.items():
         if all(colors.locations.get((mission,ring)) in colors.rewards for ring in range(1,6)):
-            values[address+2]=encode(colors.stage_colors(mission),extended).to_bytes(2,'big')
+            values[address+2]=encode(colors.stage_colors(mission),extended,luma).to_bytes(2,'big')
     if not values:return
     values={address:data for address,data in values.items() if memory.read_bytes(address,len(data))!=data}
     old_generation=memory.read_bytes(header+4,4)
@@ -270,6 +279,7 @@ def authorize(memory,guard,address,size):
     native=getattr(memory,'native_patch',None) or {}
     if (not tx or not native.get('red_ring_spawn') or tx['identity']!=identity
             or tx['source'].identity!=identity or not tx['source'].enabled
+            or bool(tx['source'].options.get('luma')) != bool(native.get('luma_ring_colors'))
             or native.get('seed_digest')!=hashlib.sha256(identity[0].encode()).digest()[:16].hex()):
         raise memory.error('WRITE_BLOCKED: unauthenticated native ring palette')
     header,rows,_=layout()
@@ -285,6 +295,6 @@ def authorize(memory,guard,address,size):
         mission=next((name for name,slot in rows.items() if address==slot+2),None)
         colors=tx['source']
         if (mission is None or not all(colors.locations.get((mission,ring)) in colors.rewards for ring in range(1,6))
-                or value!=encode(colors.stage_colors(mission),native.get('accessible_ring_colors',True)).to_bytes(2,'big')):
+                or value!=encode(colors.stage_colors(mission),native.get('accessible_ring_colors',True),native.get('luma_ring_colors',False)).to_bytes(2,'big')):
             raise memory.error('WRITE_BLOCKED: palette differs from authenticated scout data')
     return identity,native['code_sha256'],address

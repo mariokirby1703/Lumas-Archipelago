@@ -47,7 +47,7 @@ def validate_slot(data):
     if type(data.get('music_mapping_version',1)) is not int or data.get('music_mapping_version',1) not in (1,2):
         raise ValueError('unsupported music mapping version')
     revision=data.get('options_revision',0)
-    if type(revision) is not int or not 0<=revision<=12:raise ValueError('unsupported slot options revision')
+    if type(revision) is not int or not 0<=revision<=14:raise ValueError('unsupported slot options revision')
     options = data.get('options')
     # Old seeds have no physical 1-Up locations; adding the optional toggle
     # must not force regeneration or change their selected location set.
@@ -56,6 +56,8 @@ def validate_slot(data):
         data={**data,'options':options}
     legacy_options=data.get('options_revision',0)<2
     if isinstance(options,dict):
+        if revision < 14:options={**options,'luma':options.get('luma',0)}
+        if revision < 13:options={**options,'sixty_fps':options.get('sixty_fps',0)}
         if revision < 12:options={**options,'colorblind_mode':options.get('colorblind_mode',0)}
         options={k:v for k,v in options.items() if k not in ('ap_item_hud','swim_trap_weight','swim_trap_duration')}
         options.setdefault('score_reset_trap_weight',0)

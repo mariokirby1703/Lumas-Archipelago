@@ -151,7 +151,7 @@ def validate(memory,owner):
     if any(memory.read_bytes(a,len(value))!=value for a,value in owner['anchors']):
         raise MemoryUnavailable('AP HUD owner changed')
 
-def payloads(owner,events,metrics,music=None,colorblind=False):
+def payloads(owner,events,metrics,music=None,colorblind=False,luma=False):
     result={}
     for name,(record,box) in owner['boxes'].items():
         base=name.split('_outline')[0];shadow='_outline' in name
@@ -182,11 +182,11 @@ def payloads(owner,events,metrics,music=None,colorblind=False):
         if slot<len(events):
             event=events[slot];prefix=event['kind']+' '
             text=prefix if kind=='prefix' else event['item'] if kind=='title' else ('to ' if event['kind']=='Sent' else 'from ')+event['player']
-            colour=int(item_colour(event.get('flags',0),colorblind)[1:]+'ff',16) if kind=='title' else 0xffffffff
+            colour=int(item_colour(event.get('flags',0),colorblind,luma)[1:]+'ff',16) if kind=='title' else 0xffffffff
             if event.get('own'):
                 prefix=''
                 text='Found your own' if kind=='prefix' else ' ' if kind=='title' else event['item']
-                colour=int(item_colour(event.get('flags',0),colorblind)[1:]+'ff',16) if kind=='subtitle' else 0xffffffff
+                colour=int(item_colour(event.get('flags',0),colorblind,luma)[1:]+'ff',16) if kind=='subtitle' else 0xffffffff
         else:text=' ';prefix='';colour=0xffffffff
         raw=ascii_text(text)
         # Use the full 400-pixel native text bounds, rather than the old narrow
@@ -301,7 +301,8 @@ def render(runtime,memory):
                     runtime._hud_connected=None
                     raise MemoryUnavailable('HUD publisher entry changed')
         writes=payloads(owner,events,state['metrics'],music,
-                        colorblind=bool(runtime.slot_data['options'].get('colorblind_mode',0)))
+                        colorblind=bool(runtime.slot_data['options'].get('colorblind_mode',0)),
+                        luma=bool(runtime.slot_data['options'].get('luma',0)))
         # One bounded data write per cast, preserving its relocated name.
         # Previously handle/text/colour each incurred separate pre/post owner
         # validation, tripling the initial publication's process round trips.

@@ -112,7 +112,7 @@ def test_palette_publication_requires_authenticated_seed_and_scouts():
 @pytest.mark.parametrize('color',range(8))
 @pytest.mark.parametrize('ring',range(5))
 @pytest.mark.parametrize('mission',('stg110','stg660'))
-def test_native_spawn_executes_before_return_preserving_registers(color,ring,mission,real_sdk=False,publish_race=False):
+def test_native_spawn_executes_before_return_preserving_registers(color,ring,mission,real_sdk=False,publish_race=False,luma=False):
     uc=pytest.importorskip('unicorn')
     from unicorn import ppc_const as reg
     machine=uc.Uc(uc.UC_ARCH_PPC,uc.UC_MODE_32|uc.UC_MODE_BIG_ENDIAN)
@@ -133,9 +133,9 @@ def test_native_spawn_executes_before_return_preserving_registers(color,ring,mis
         resource=brres.read_bytes()
         machine.mem_write(0x92000000,resource)
     colors={mission:['red']*5 for mission in spawn.missions()}
-    colors[mission][ring]=spawn.PALETTE[color]
-    for address,old,new in spawn.patches():
-        machine.mem_write(address,spawn.prefill(address,new,colors))
+    colors[mission][ring]=(spawn.LUMA_PALETTE if luma else spawn.PALETTE)[color]
+    for address,old,new in spawn.patches(luma=luma):
+        machine.mem_write(address,spawn.prefill(address,new,colors,luma=luma))
     def word(address,value):machine.mem_write(address,struct.pack('>I',value))
     actor,gfx,model,regs,stages,dirty,record,wrapper=(0x90001000,0x90002000,0x90003000,
         0x90003400,0x90003480,0x900033A0,0x90005000,0x90006000)
@@ -200,7 +200,7 @@ def test_native_spawn_executes_before_return_preserving_registers(color,ring,mis
         return
     if color:
         assert calls==[spawn.COPY_MATERIAL]
-        red,green,blue=spawn.RGB[color]
+        red,green,blue=(spawn.LUMA_RGB if luma else spawn.RGB)[color]
         expected=bytearray(initial_regs)
         for offset,value in ((68,red),(71,0x80|(green>>4)),(72,(green&15)<<4),(73,blue)):expected[offset]=value
         assert bytes(machine.mem_read(regs,128))==expected
