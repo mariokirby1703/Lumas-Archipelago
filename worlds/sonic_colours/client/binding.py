@@ -7,6 +7,7 @@ No guest padding, NAND file or unrelated save is modified to make a marker.
 from dataclasses import replace
 import json
 from copy import deepcopy
+from .memory import SAVE_SLOT_COUNT
 
 
 INTRO = ('stg110', 'stg130')
@@ -164,7 +165,7 @@ class SaveBinding:
         # bridge that gap; session-local observations cannot cross a reboot.
         old_verified_route = (same_intro_session and self.second_act_seen
                               and self.first_record == current[INTRO[0]])
-        if (index <= 2 and (old_verified_route or saved_matches_witnesses)
+        if (0 <= index < SAVE_SLOT_COUNT and (old_verified_route or saved_matches_witnesses)
                 and snapshot.scene in ('global_map', 'world_map') and snapshot.scene_verified
                 and snapshot.persisted_clears == frozenset(INTRO)
                 and 0 <= current[INTRO[1]]['raw_rank'] <= 4 and current[INTRO[1]]['time_raw'] > 0):

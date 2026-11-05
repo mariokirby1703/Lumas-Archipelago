@@ -82,7 +82,7 @@ def test_gameplay_c2_accepts_sentinel_but_rejects_other_bad_indexes(kind):
     backend.put(CONT,b'\x01')
     assert gameplay_controls.installed(mem,kind)==addr
 
-@pytest.mark.parametrize('native_index',[4,5,254,255])
+@pytest.mark.parametrize('native_index',[6,7,254,255])
 def test_capsule_gecko_accepts_real_native_presave_index_and_stale_after_selection(native_index):
     mem,backend=setup()
     backend.put(CONT,bytes([native_index]))
@@ -96,7 +96,7 @@ def test_capsule_gecko_accepts_real_native_presave_index_and_stale_after_selecti
     backend.put(addr,(0).to_bytes(4,'big'))
     assert capsule_refresh.installed_data(mem)==addr
 
-@pytest.mark.parametrize('native_index',[4,254])
+@pytest.mark.parametrize('native_index',[6,254])
 @pytest.mark.parametrize('kind',['boost_use','boost_query','boost_add','speed_get','speed_set','speed_ui'])
 def test_gameplay_gecko_accepts_native_presave_index(native_index,kind):
     mem,backend=setup()
@@ -113,13 +113,13 @@ def test_gameplay_gecko_accepts_native_presave_index(native_index,kind):
 
 def test_reject_live_unsaved_mismatched_index_or_container():
     mem,backend=setup()
-    backend.put(CONT,b'\x04')
+    backend.put(CONT,b'\x06')
     assert capsule_refresh.valid_native_control_index(mem,CONT,254)  # inert stale byte
     assert not capsule_refresh.valid_native_control_index(mem,CONT,256)
-    assert not capsule_refresh.valid_native_control_index(mem,CONT+4,4)
-    assert capsule_refresh.valid_native_control_index(mem,CONT,4)
+    assert not capsule_refresh.valid_native_control_index(mem,CONT+4,6)
+    assert capsule_refresh.valid_native_control_index(mem,CONT,6)
 
-@pytest.mark.parametrize('native_index',[4,254,255])
+@pytest.mark.parametrize('native_index',[6,254,255])
 def test_white_capsule_configure_disables_white_before_save_selected(native_index,monkeypatch):
     """A fake no-slot PAL intro actually publishes the three control words."""
     from collections import defaultdict

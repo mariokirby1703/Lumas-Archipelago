@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 import uuid
-from .memory import MemoryUnavailable
+from .memory import MemoryUnavailable, SAVE_SLOT_COUNT
 from .versions import VERSION
 
 
@@ -306,7 +306,7 @@ def live_control_profile(memory, snapshot, guard):
         # replace it with a guessed 0xFF and never interpret it as a save slot.
         # A second read must agree with the independent snapshot's chain trace
         # or this particular write is refused (scene/index transition).
-        if (not 4 <= index <= 0xFF or step.get('raw') != f'0x{index:02X}'
+        if (not SAVE_SLOT_COUNT <= index <= 0xFF or step.get('raw') != f'0x{index:02X}'
                 or trace.get('chain') is not None):
             raise MemoryUnavailable('WRITE_BLOCKED: no-slot native index changed')
         return (manager, container, index, None, None)

@@ -10,6 +10,9 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Protocol
 
+SAVE_SLOT_COUNT = 6
+SAVE_SLOT_STRIDE = 0x19608
+
 _BATCHED_CONTROLS=frozenset({'movement_controls','gameplay_controls','capsule_controls',
     'oxygen_controls','one_up_controls','egg_medal_controls','stunts','drill_turbo',
     'hover_ring_dash','assist_change','skydiving','quick_step','red_ring_spawn'})
@@ -482,13 +485,13 @@ class SonicMemory:
     def resolve_selected_slot(self, *, allow_working=False):
         manager, container = self.resolve_save_container()
         index = self.read_u8(container)
-        # 8015F9A4 initializes six records; 8015FA18 addresses the selected
-        # record with this exact stride. Index 3 is a native working record,
-        # never a fourth UI slot. Only read accessors may inspect it.
-        if index > (3 if allow_working else 2):
+        # 8015F9A4 initializes six records. 8015FA18 uses the selected byte
+        # with this stride for all six UI slots. Keep allow_working for API
+        # compatibility; it never permits an index outside that array.
+        if index >= SAVE_SLOT_COUNT:
             raise MemoryUnavailable('unknown_selected_slot')
-        selected = container + 8 + index * 0x19608
-        if not valid_range(selected, 0x19608):
+        selected = container + 8 + index * SAVE_SLOT_STRIDE
+        if not valid_range(selected, SAVE_SLOT_STRIDE):
             raise MemoryUnavailable('invalid_save_range')
         return manager, container, index, selected
 
@@ -526,11 +529,11 @@ class SonicMemory:
             manager = read('manager', VERSION['manager_global_candidate'], pointer_size=0x34)
             container = read('container', manager + 0x30, pointer_size=8)
             index = read('selected_index', container, 1)
-            if index > 3:
+            if index >= SAVE_SLOT_COUNT:
                 report['steps'][-1]['reason'] = 'index_out_of_range'
                 raise MemoryUnavailable('index_out_of_range')
-            selected = container + 8 + index * 0x19608
-            if not valid_range(selected, 0x19608):
+            selected = container + 8 + index * SAVE_SLOT_STRIDE
+            if not valid_range(selected, SAVE_SLOT_STRIDE):
                 report['steps'].append({'step': 'selected_save', 'address': f'0x{selected:08X}',
                                         'reason': 'outside_MEM1_MEM2'})
                 raise MemoryUnavailable('outside_MEM1_MEM2')

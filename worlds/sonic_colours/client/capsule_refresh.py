@@ -207,7 +207,7 @@ def payload_words(compact_abi=False, epilogue_abi=False, cache_permissions=False
 def valid_native_control_index(memory, owner, index):
     """Validate a Gecko mailbox index, NOT a native save-slot pointer.
 
-    Only 0..3 refer to native selected/working records.  A no-slot intro may
+    Only 0..5 refer to the six native save records.  A no-slot intro may
     expose *any* native out-of-range byte.  The C2 hook only compares this
     mailbox byte with the index byte in the current, pointer-checked native
     container, so an identical transient byte is safe for ephemeral control.
@@ -219,9 +219,10 @@ def valid_native_control_index(memory, owner, index):
     An owner of zero is an intentionally disarmed mailbox during multiword
     updates; it cannot enable the hook.
     """
-    if 0 <= index <= 3:
+    from .memory import SAVE_SLOT_COUNT
+    if 0 <= index < SAVE_SLOT_COUNT:
         return True
-    if not 4 <= index <= 0xFF:
+    if not SAVE_SLOT_COUNT <= index <= 0xFF:
         return False
     try:
         _, container = memory.resolve_save_container()

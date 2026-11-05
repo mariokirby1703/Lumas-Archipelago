@@ -137,7 +137,7 @@ def test_visual_refresh_defers_without_destroying_existing_model(monkeypatch,cas
     assert m.r[1]==m.before[1] and m.r[28:]==m.before[28:]
 
 
-@pytest.mark.parametrize('index',[0,1,2,3])
+@pytest.mark.parametrize('index',range(6))
 def test_colour_unlock_uses_actual_selected_save_flag_layout(monkeypatch,index):
     from ..client.memory import SonicMemory
     m,cap,prog=machine(monkeypatch,1,2,index=index)
@@ -153,8 +153,8 @@ def test_colour_unlock_uses_actual_selected_save_flag_layout(monkeypatch,index):
     m.put(prog,container);m.run();assert m.denied
 
 
-@pytest.mark.parametrize('index',[0,1,2,3])
+@pytest.mark.parametrize('index',range(6))
 def test_another_slots_flags_never_unlock_colour(monkeypatch,index):
     m,cap,prog=machine(monkeypatch,1,2,index=index)
-    m.put(prog,m.get(cap)+0x24+((index+1)%4)*0x19608)
+    m.put(prog,m.get(cap)+0x24+((index+1)%6)*0x19608)
     m.run();assert m.denied

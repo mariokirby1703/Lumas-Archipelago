@@ -82,7 +82,8 @@ def test_no_fabricated_intro_when_native_evidence_missing(monkeypatch,bad):
     assert not guard.can_send(snaps[-1])
 
 
-def test_unselected_intro_can_bind_after_two_native_result_witnesses(monkeypatch):
+@pytest.mark.parametrize('index',range(6))
+def test_unselected_intro_can_bind_after_two_native_result_witnesses(monkeypatch,index):
     journal,native,guard,snaps=initialize(monkeypatch)
     epoch=journal.data['bootstrap']['epoch']
     session=snaps[-1].session
@@ -91,7 +92,7 @@ def test_unselected_intro_can_bind_after_two_native_result_witnesses(monkeypatch
             score=score,grade=grade,session=session,playthrough_epoch=epoch,
             provenance='stage9C_native_UI_state7_grade124'))
     fake_saved={
-        'chain':(0x9000,0x9001,1,0x9003,0x9004),
+        'chain':(0x9000,0x9001,index,0x9003,0x9004),
         'profile_hex':'test_profile_03',
         'rank_records':{'stg110':{'raw_rank':2,'score':12300,'time_raw':140},
                         'stg130':{'raw_rank':1,'score':15500,'time_raw':155}}
@@ -104,7 +105,7 @@ def test_unselected_intro_can_bind_after_two_native_result_witnesses(monkeypatch
     guard.observe(bound)
     assert journal.data['save_identity']==epoch
     assert guard.can_send(bound)
-    assert journal.data['native_binding']['selected_index']==1
+    assert journal.data['native_binding']['selected_index']==index
 
 
 def test_old_save_cannot_bind_without_matching_live_results(monkeypatch):
@@ -155,7 +156,7 @@ def test_c2_no_slot_rejects_wrong_session_after_bootstrap(monkeypatch):
     with pytest.raises(MemoryUnavailable,match='no verified'):
         live_control_profile(ProfileMemory(),replace(snaps[-1],session='other-boot'),guard)
 
-@pytest.mark.parametrize('native_index',[4,5,254,255])
+@pytest.mark.parametrize('native_index',[6,7,254,255])
 def test_transient_gecko_controls_use_actual_pal_index(monkeypatch,native_index):
     """Do not assume the no-slot byte is exactly 0xFF."""
     from copy import deepcopy

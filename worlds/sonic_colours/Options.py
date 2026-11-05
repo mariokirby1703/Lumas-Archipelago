@@ -243,8 +243,8 @@ class SonicColoursOptions(PerGameCommonOptions):
     ring_loss_trap_weight: RingLossTrapWeight
     score_reset_trap_weight: ScoreResetTrapWeight
     dead_weight_trap_weight: DeadWeightTrapWeight
-    sixty_fps: SixtyFPS
     music_randomization: MusicRandomization
+    sixty_fps: SixtyFPS
     death_link: SonicDeathLink
     wisp_capsules: WispCapsules
     native_feature_tests: NativeFeatureTests

@@ -5,7 +5,7 @@ original restoration of nonvolatile GPRs/FPRs. No host actor/handle mutations.
 """
 from .capsule_refresh import PPC
 from .gecko import inspect_c2
-from .memory import MemoryUnavailable, valid_range
+from .memory import MemoryUnavailable, valid_range, SAVE_SLOT_COUNT
 
 HOOK = 0x80266410
 ORIGINAL = 0x396102E0
@@ -80,7 +80,7 @@ def installed_data(memory):
     data = result['target'] + offset
     actor, zone, owner, index = (memory.read_u32(data+i*4) for i in range(4))
     if (actor and (not valid_range(actor,0x1374) or not owner or not zone)
-            or owner and not valid_range(owner,1) or zone > 6 or index > 2):
+            or owner and not valid_range(owner,1) or zone > 6 or index >= SAVE_SLOT_COUNT):
         raise MemoryUnavailable('unknown_revision: invalid Grand World Map request')
     return data
 
