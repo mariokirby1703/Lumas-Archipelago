@@ -47,7 +47,7 @@ def test_default_wisps_shuffle_in_reachable_spheres_for_100_seeds():
 def test_removed_features_leave_holes_in_ids_and_options():
     from ..Options import SonicColoursOptions, RankChecks, Goal
     assert 'super_sonic_item' not in SonicColoursOptions.type_hints
-    assert 'd' not in RankChecks.options and 'super_sonic' not in Goal.options
+    assert 'D' not in RankChecks.valid_keys and 'super_sonic' not in Goal.options
     assert BASE_ID + 22 not in Items.BY_ID
     assert Items.ITEM_TABLE['Red Ring'] == BASE_ID + 23
     assert not any(name.endswith(' - D Rank') for name in Locations.LOCATION_TABLE)

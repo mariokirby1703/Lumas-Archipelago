@@ -29,7 +29,7 @@ Host your game on `archipelago.gg` and create a room. When the port appears, dow
 
 ## How to Play
 
-1. Make sure you have `Enable Cheats` enabled and `Memory Override` disabled in your Dolphin Settings.
+1. Make sure you have `Enable Cheats` enabled and `Memory Override` disabled in your Dolphin Settings. Please also check that no `Gecko Codes` or `AR Codes` are enabled.
 2. Open your `.apsoniccolours` patch using the **Sonic Colours (Wii)** Client in the Archipelago Launcher.
 3. When prompted, select your Dolphin executable and your original PAL or NTSC-U Rev0 ISO. The installer creates a separate patched ISO in the folder your patch file is located; your original ISO stays unchanged.
 4. Wait for the patching and verification to finish. Dolphin will start the patched ISO automatically.

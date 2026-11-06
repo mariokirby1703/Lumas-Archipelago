@@ -7,7 +7,7 @@ Sonic Colours (Wii):
   movement_unlocks: true
   super_sonic: false
   red_ring_checks: singles
-  rank_checks: 'off'
+  rank_checks: []
   one_up_sanity: false
   wisp_discovery_checks: true
   game_land_checks: true

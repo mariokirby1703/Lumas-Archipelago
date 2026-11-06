@@ -56,7 +56,7 @@ class Dol:
         self.sections.append((slot,offset,address,len(blob)))
 
 @lru_cache(maxsize=32)
-def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False):
+def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False,legacy_fps_word_write=False):
     """Rebuild every C2 payload as initialized native code, without C2 headers."""
     from .native_hook_table import hook_rows
     from .ap_hud_publisher import patches as hud
@@ -151,7 +151,7 @@ def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards
         patches.extend(boost_patches)
     if include_sixty_fps:
         from .sixty_fps import patches as fps_patches
-        patches.extend(fps_patches(patches))
+        patches.extend(fps_patches(patches,legacy_fps_word_write))
     ownership=[]
     for address,old,new in patches:
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')
@@ -185,7 +185,10 @@ def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
 @lru_cache(maxsize=16)
 def plan_for_digest(digest):
     for candidate in (plan(),plan(include_sixty_fps=True),plan(include_luma_colors=True),
-                      plan(include_luma_colors=True,include_sixty_fps=True),plan(include_accessible_colors=False),
+                      plan(include_luma_colors=True,include_sixty_fps=True),
+                      plan(include_sixty_fps=True,legacy_fps_word_write=True),
+                      plan(include_sixty_fps=True,include_luma_colors=True,legacy_fps_word_write=True),
+                      plan(include_accessible_colors=False),
                       plan(include_boot_guards=False,include_accessible_colors=False),
                       plan(include_ring_spawn=False,include_boot_guards=False,include_accessible_colors=False),
                       plan(include_ring_materials=False,include_boot_guards=False,include_accessible_colors=False)):

@@ -47,7 +47,7 @@ def validate_slot(data):
     if type(data.get('music_mapping_version',1)) is not int or data.get('music_mapping_version',1) not in (1,2):
         raise ValueError('unsupported music mapping version')
     revision=data.get('options_revision',0)
-    if type(revision) is not int or not 0<=revision<=14:raise ValueError('unsupported slot options revision')
+    if type(revision) is not int or not 0<=revision<=15:raise ValueError('unsupported slot options revision')
     options = data.get('options')
     # Old seeds have no physical 1-Up locations; adding the optional toggle
     # must not force regeneration or change their selected location set.
@@ -74,9 +74,17 @@ def validate_slot(data):
     resolved = {}
     for name in OPTION_NAMES:
         value = options[name]
+        cls = SonicColoursOptions.type_hints[name]
+        if name=='rank_checks':
+            if revision<15:
+                if type(value) is not int:raise ValueError('Legacy rank checks must be an integer')
+            elif (not isinstance(value,list) or any(type(rank) is not str or rank not in cls.valid_keys for rank in value)
+                  or len(value)!=len(set(value))):
+                raise ValueError('Rank checks must be unique C, B, A or S entries')
+            resolved[name]=cls.from_any(value)
+            continue
         if type(value) is not int:
             raise ValueError(f'slot option {name} must be resolved integer')
-        cls = SonicColoursOptions.type_hints[name]
         if name=='red_ring_checks' and value==0 and revision<10:
             resolved[name]=cls(0)
             continue

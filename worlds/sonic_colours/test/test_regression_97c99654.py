@@ -126,12 +126,13 @@ def test_optional_zero_hook_read_does_not_override_original_text_proof(tmp_path,
         assert m.read_u8(stage['actor_state']+0x90) == 2
 
 
+@pytest.mark.parametrize('index',[3,4,5])
 @pytest.mark.parametrize('patch', ['absent', 'valid'])
-def test_intro_working_record_and_cyan_permissions_without_persistent_writes(tmp_path, patch):
+def test_intro_later_slots_and_cyan_permissions_without_persistent_writes(tmp_path, patch,index):
     b = Overlay(PAIRS[0]); m = SonicMemory(b)
     manager, container, _, selected = m.resolve_selected_slot()
-    b.write_bytes(container + 8 + 3*0x19608, m.read_bytes(selected, 0x19608))
-    b.write_bytes(container, b'\x03')
+    b.write_bytes(container + 8 + index*0x19608, m.read_bytes(selected, 0x19608))
+    b.write_bytes(container, bytes([index]))
     if patch == 'valid':
         hook(b)
     with Journal(tmp_path, IDENTITY) as j:
@@ -141,10 +142,11 @@ def test_intro_working_record_and_cyan_permissions_without_persistent_writes(tmp
         for _ in range(3):
             r.poll(m, [], False)
         assert r.snapshot.new_game_verified and g.can_record_pickups(r.snapshot)
-        assert r.snapshot.evidence['internal_selected_index'] == 3
+        assert r.snapshot.evidence['internal_selected_index'] == index
         assert j.data['save_identity'] is None
-        with pytest.raises(MemoryUnavailable, match='unknown_selected_slot'):
-            m.resolve_flags_ptr()
+        assert m.resolve_flags_ptr()[2] == index
+        with pytest.raises(MemoryUnavailable, match='save_not_bound'):
+            g.check(r.snapshot)
         from ..Items import ITEM_TABLE
         owned = inventory([ITEM_TABLE['Cyan Laser Wisp']])
         r.project_permissions(m, owned)

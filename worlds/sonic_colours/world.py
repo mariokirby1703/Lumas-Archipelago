@@ -225,7 +225,7 @@ class SonicColoursWorld(World):
         return self.random.choices(Items.FILLER, weights=tuple(Items.FILLER_WEIGHTS.values()), k=1)[0]
 
     def fill_slot_data(self):
-        return {'schema_version': SCHEMA_VERSION, 'options_revision':14, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
+        return {'schema_version': SCHEMA_VERSION, 'options_revision':15, 'music_mapping_version':2, 'game': GAME, 'seed_name': self.multiworld.seed_name,
                 'music_seed': hashlib.sha256(json.dumps(['sonic-bgm-player-v1',self.multiworld.seed_name,self.player],separators=(',',':')).encode()).hexdigest(),
                 'starting_world': 0, 'game_land_gates': self.gates,
                 'game_land_speed_items': self.game_land_speed_items,

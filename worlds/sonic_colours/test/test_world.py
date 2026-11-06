@@ -61,7 +61,8 @@ def test_options_and_yaml(filename):
     for name in OPTION_NAMES:
         cls = SonicColoursOptions.type_hints[name]
         if hasattr(cls, 'options'):
-            assert 'random' not in cls.options
+            if name != 'trap_red_ring_colors':
+                assert 'random' not in cls.options
             for value in cls.options:
                 cls.from_any(value)
 

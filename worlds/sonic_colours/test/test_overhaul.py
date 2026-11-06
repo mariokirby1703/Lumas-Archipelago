@@ -19,7 +19,7 @@ from ..migration import migrate_yaml
 from .test_native_originals import PAIRS
 from .test_pickup_integration import Overlay
 from .test_runtime import IDENTITY,snapshot
-from . import generate
+from . import generate,legacy_rank_slot
 
 
 def test_schema_and_stable_emerald_ids():
@@ -82,6 +82,7 @@ def test_red_ring_goal_tracks_when_location_checks_are_off(tmp_path):
     data={**data,'options_revision':9,'options':{**data['options'],'red_ring_checks':0},
           'locations':{name:code for name,code in data['locations'].items()
                        if LOCATION_TABLE[name].kind not in ('ring','rings')}}
+    legacy_rank_slot(data)
     data=validate_slot(data)
     value=snapshot(save_identity=None,scene_verified=True,pickup_verified=True,stage_epoch='intro',actual_mission='stg110',
                    new_game_verified=True,fresh_fields=(True,True))

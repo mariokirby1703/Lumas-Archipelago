@@ -2,7 +2,7 @@ from collections import Counter
 import pytest
 from ..Items import ALL_WISP_ITEMS,GAME_LAND_SPEED,RING_VALUES
 from ..settings import SonicColoursSettings
-from . import generate
+from . import generate,legacy_rank_slot
 
 
 def test_empty_optional_paths_do_not_resolve_to_the_ap_directory():
@@ -82,6 +82,7 @@ def test_red_ring_modes_and_legacy_off_slots():
          'options':{**slot['options'],'red_ring_checks':0},
          'locations':{name:code for name,code in slot['locations'].items()
                       if LOCATION_TABLE[name].kind not in ('ring','rings')}}
+    legacy_rank_slot(old)
     assert validate_slot(old)['options']['red_ring_checks']==0
     with pytest.raises(ValueError):
         validate_slot({**old,'options_revision':10})

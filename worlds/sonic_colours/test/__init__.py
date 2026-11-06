@@ -25,3 +25,14 @@ def generate(options=None, seed=0, fill=False):
     if fill:
         distribute_items_restrictive(multiworld)
     return multiworld
+
+
+def legacy_rank_slot(data):
+    """Restore the integer rank choice in fixtures for pre-selection seeds."""
+    options=data.get('options',{})
+    value=options.get('rank_checks')
+    if data.get('options_revision',0)<15 and isinstance(value,list):
+        choices={frozenset():0,frozenset({'S'}):1,frozenset({'A'}):2,
+                 frozenset({'B'}):3,frozenset({'C'}):4,frozenset({'S','A','B','C'}):6}
+        data['options']={**options,'rank_checks':choices[frozenset(value)]}
+    return data

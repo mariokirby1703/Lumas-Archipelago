@@ -1,5 +1,5 @@
 import pytest
-from . import generate
+from . import generate,legacy_rank_slot
 from .. import Items,Locations
 from ..client.runtime import validate_slot
 
@@ -36,6 +36,7 @@ def test_older_seed_keeps_original_subchecks():
     data=generate(dict(game_land_checks=False)).worlds[1].fill_slot_data()
     from ..world_constants import game_land_gates
     data['options_revision']=5
+    legacy_rank_slot(data)
     data['game_land_gates']=game_land_gates(data['options']['game_land_requirement_reduction'])
     data['options']={**data['options'],'eggman_heart_sanity':1,'chaos_emerald_checks':1}
     options=SimpleNamespace(**{n:SonicColoursOptions.type_hints[n].from_any(v) for n,v in data['options'].items()})

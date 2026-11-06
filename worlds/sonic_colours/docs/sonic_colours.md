@@ -38,7 +38,7 @@ Sonic Colours is a Wii platformer in which Sonic explores Eggman's interstellar 
 ## Check Options
 
 - **Red Ring Checks:** individual rings or all five rings per Act
-- **Rank Checks:** choose which ranks gives a check
+- **Rank Checks:** select any combination of C, B, A and S. Better results also satisfy selected lower ranks. An empty selection disables rank checks. YAML example: `rank_checks: [C, A]`.
 - **1-Up Sanity:** add checks for 31 1-Up objects
 - **Wisp Discovery Checks:** add checks for discovering coloured Wisps
 - **Game Land Checks:** add stage-clear checks and enable AP Red Ring currency

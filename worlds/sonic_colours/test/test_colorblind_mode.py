@@ -14,7 +14,7 @@ from ..client.client import slot_identity_digest
 from ..client.runtime import validate_slot
 from ..client.native_dol import Dol,plan,ARENA,SIGNATURE,MAGIC,ABI
 from ..world_constants import load_data
-from . import generate
+from . import generate,legacy_rank_slot
 
 
 @pytest.mark.parametrize('flags,category,label',[
@@ -59,6 +59,7 @@ def test_item_hud_changes_only_the_item_color(flags,own):
 def test_existing_seed_identity_and_palette_are_preserved(revision):
     old=deepcopy(generate({'red_ring_item_colors':False}).worlds[1].fill_slot_data())
     old['options_revision']=revision
+    legacy_rank_slot(old)
     old['options'].pop('colorblind_mode')
     old['options'].pop('sixty_fps')
     old['options'].pop('luma')

@@ -17,7 +17,7 @@ from ..client.native_dol import Dol, patch_dol, plan
 from ..client.memory import SonicMemory, MemoryUnavailable
 from ..client.runtime import validate_slot
 from ..client.client import slot_identity_digest
-from . import generate
+from . import generate,legacy_rank_slot
 
 
 EXPECTED = {'progression':'#83D72F', 'useful':'#70218C',
@@ -88,6 +88,7 @@ def test_luma_overrides_all_ring_settings(own_mode,disguise,master):
 def test_legacy_seed_and_journal_identity(revision):
     old = deepcopy(generate().worlds[1].fill_slot_data())
     old['options_revision'] = revision
+    legacy_rank_slot(old)
     old['options'].pop('luma')
     if revision < 13: old['options'].pop('sixty_fps')
     if revision < 12: old['options'].pop('colorblind_mode')
@@ -201,7 +202,7 @@ def test_luma_publish_requires_matching_palette_and_scouts():
 
 def test_new_slot_requires_explicit_luma_and_rejects_invalid_values():
     data = generate().worlds[1].fill_slot_data()
-    assert data['options_revision'] == 14 and data['options']['luma'] == 0
+    assert data['options_revision'] == 15 and data['options']['luma'] == 0
     missing = deepcopy(data)
     missing['options'].pop('luma')
     with pytest.raises(ValueError): validate_slot(missing)

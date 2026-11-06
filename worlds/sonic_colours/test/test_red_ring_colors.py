@@ -10,7 +10,7 @@ from ..client.red_ring_colors import (COLORS, OPTION_DEFAULTS, RING_ITEM_IDS,
                                       RedRingColors, reward_color, trap_color)
 from ..client.runtime import validate_slot
 from ..client.client import SonicContext, slot_identity_digest
-from . import generate
+from . import generate,legacy_rank_slot
 
 
 @pytest.mark.parametrize('mode', [0, 1, 2])
@@ -112,6 +112,7 @@ def test_trap_hash_rejects_the_biased_tail(monkeypatch):
 def test_legacy_slot_and_journal_identity_remain_unchanged():
     old = deepcopy(data_for())
     old['options_revision'] = 10
+    legacy_rank_slot(old)
     old['options'].pop('sixty_fps')
     old['options'].pop('luma')
     for name in OPTION_DEFAULTS:
@@ -126,7 +127,7 @@ def test_legacy_slot_and_journal_identity_remain_unchanged():
 
 def test_new_slot_requires_valid_explicit_color_options():
     data = data_for()
-    assert data['options_revision'] == 14
+    assert data['options_revision'] == 15
     assert validate_slot(data) == data
     for name in OPTION_DEFAULTS:
         missing = deepcopy(data)
@@ -230,3 +231,18 @@ def test_pal_ring_resource_strings_and_lookup_pointers(pal_dol_bytes):
     assert image.read(0x801D6DFC, 8).hex() == '3ca0807738a5fab8'
     assert image.read(0x801D6E4C, 4).hex() == '90be0000'
     assert image.read(0x8076FAC0, 4).hex() == '801d6f00'
+
+
+
+def test_generated_template_has_only_named_trap_color_choices(tmp_path):
+    import yaml
+    from Options import generate_yaml_templates
+    from ..Options import TrapRedRingColors
+    assert TrapRedRingColors.options['random']==1
+    generate_yaml_templates(tmp_path,generate_hidden=False)
+    document=yaml.safe_load((tmp_path/'Sonic Colours (Wii).yaml').read_text(encoding='utf-8-sig'))
+    options=document['Sonic Colours (Wii)']
+    assert options['trap_red_ring_colors']=={'red':0,'random':50}
+    assert options['rank_checks']==[]
+    assert TrapRedRingColors.from_any('random').value==1
+    assert TrapRedRingColors.from_any('random_colors').value==1

@@ -16,8 +16,8 @@ Sonic Colours (Wii):
   # Checks
   # singles / per_level
   red_ring_checks: singles
-  # off / s / a / b / c / all
-  rank_checks: 'off'
+  # Select any combination, for example [C, A] or [B, A, S]. [] disables rank checks.
+  rank_checks: []
   one_up_sanity: false
   wisp_discovery_checks: true
 

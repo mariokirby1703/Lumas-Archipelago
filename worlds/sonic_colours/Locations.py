@@ -67,8 +67,7 @@ def enabled(data, options, respect_game_land=True):
     if data.kind == 'rank':
         if data.mission == 'stg720':
             return False  # Ending escape has no ordinary rank results screen.
-        value = options.rank_checks.value
-        return value == 6 or value == data.index + 1
+        return RANKS[data.index] in options.rank_checks.value
     if data.kind == 'emerald':
         return bool(options.chaos_emerald_checks and (options.game_land_checks or not respect_game_land))
     if data.kind == 'capsule':

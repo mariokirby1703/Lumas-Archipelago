@@ -6,7 +6,7 @@ from ..Items import ITEM_TABLE,ALL_WISP_ITEMS,RANDOM_CAPSULES
 from ..world_constants import load_data,BASE_ID,STAGES
 from ..wisps import required_wisp_items,project_inventory,wisp_level,all_wisps_owned
 from ..client.runtime import inventory,validate_slot
-from . import generate
+from . import generate,legacy_rank_slot
 
 @pytest.mark.parametrize('boost,movement,land,capsules',tuple(itertools.product((0,1),repeat=4)))
 def test_exact_option_pools_native_projection_and_complete_seed(boost,movement,land,capsules):
@@ -39,9 +39,10 @@ def test_normal_ids_are_append_only_and_legacy_progressive_ids_decode():
 
 def test_speed_pool_contract_preserves_old_seeds_and_rejects_wrong_new_pool():
     data=generate({'movement_unlocks':False,'game_land_checks':True}).worlds[1].fill_slot_data()
-    assert data['options_revision']==14 and not data['game_land_speed_items']
+    assert data['options_revision']==15 and not data['game_land_speed_items']
     assert validate_slot(data)['game_land_speed_items'] is False
     old={**data,'options_revision':8,'game_land_speed_items':True}
+    legacy_rank_slot(old)
     assert validate_slot(old)['game_land_speed_items'] is True
     with pytest.raises(ValueError,match='speed pool contract'):
         validate_slot({**data,'game_land_speed_items':True})
@@ -91,6 +92,7 @@ def test_legacy_slot_normalization_preserves_the_previous_journal_digest():
             'game_land_gates':game_land_gates(data['options']['game_land_requirement_reduction']),
             'options':{k:v for k,v in data['options'].items() if k not in
                        ('native_feature_tests', 'red_ring_item_colors', 'own_item_red_ring_colors', 'trap_red_ring_colors', 'colorblind_mode', 'sixty_fps', 'luma')}}
+    legacy_rank_slot(legacy)
     expected=hashlib.sha256(json.dumps(legacy,sort_keys=True).encode()).hexdigest()
     normalized=validate_slot(legacy)
     assert normalized['options']['native_feature_tests']==0

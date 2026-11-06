@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from Options import Choice, DefaultOnToggle, Toggle, Range, DeathLink, PerGameCommonOptions, OptionGroup, Visibility
+from Options import OptionSet, Choice, DefaultOnToggle, Toggle, Range, DeathLink, PerGameCommonOptions, OptionGroup, Visibility
 
 class Goal(Choice):
-    """Choose what you must complete to finish your run. Final Boss includes the escape in Terminal Velocity Act 2."""
+    """Choose what you must complete to finish your run. Nega Wisp Armor includes the escape in Terminal Velocity Act 2."""
     display_name = 'Goal'
     option_nega_wisp_armor = 0
     option_all_bosses = 1
@@ -29,18 +29,40 @@ class RedRingChecks(Choice):
         return super().from_any(data)
 
 
-class RankChecks(Choice):
-    """Choose the lowest rank that gives a check.
-    Better ranks also complete lower enabled ranks.
-    All adds S, A, B and C checks."""
+class RankChecks(OptionSet):
+    """Select any ranks that should have checks: C, B, A and S. Example: [B, S]
+    A better result also completes selected lower-rank checks.
+    Leave the selection empty to disable rank checks."""
     display_name = 'Rank Checks'
-    option_off = 0
-    option_s = 1
-    option_a = 2
-    option_b = 3
-    option_c = 4
-    option_all = 6
-    default = 0
+    valid_keys = {'C', 'B', 'A', 'S'}
+    default = frozenset()
+
+    @classmethod
+    def from_any(cls, data):
+        if isinstance(data, dict):
+            from Generate import get_choice
+            return cls.from_any(get_choice('rank_checks', {'rank_checks':data}, 'off'))
+        if type(data) is int:
+            legacy = {0:(), 1:('S',), 2:('A',), 3:('B',), 4:('C',), 6:('C','B','A','S')}
+            if data not in legacy:raise ValueError('Invalid legacy Rank Checks value')
+            return cls(legacy[data])
+        if data is None or data is False:return cls(())
+        if isinstance(data,str):return cls.from_text(data)
+        if not isinstance(data,(list,tuple,set,frozenset)):
+            raise ValueError('Rank Checks must be a selection of C, B, A and S')
+        if any(not isinstance(rank,str) for rank in data):raise ValueError('Invalid rank name')
+        option=cls([rank.strip().upper() for rank in data])
+        option.verify_keys()
+        return option
+
+    @classmethod
+    def from_text(cls, text):
+        text=text.strip()
+        if text.lower() in ('off','false','none',''):return cls(())
+        if text.lower()=='all':return cls(cls.valid_keys)
+        if text.isdigit():return cls.from_any(int(text))
+        if text.lower().startswith('random'):return super().from_text(text)
+        return cls.from_any([rank.strip() for rank in text.split(',')])
 
 
 class RingLossTrapWeight(Choice):
@@ -66,8 +88,8 @@ class ScoreResetTrapWeight(Choice):
 class SixtyFPS(Toggle):
     """Run the game at 60 FPS.
 
-    Known physics issues affect loops, springs and the final boss. Leave off
-    for the original gameplay behavior."""
+    Known physics issues affect loops, springs and the final boss. 
+    Leave off if you are unsure, but it would only require you to restart the act if you encounter issues."""
     display_name = "60 FPS"
 
 
@@ -221,6 +243,7 @@ class TrapRedRingColors(Choice):
         return super().from_text(text)
 
 
+TrapRedRingColors.options['random'] = TrapRedRingColors.option_random_colors
 TrapRedRingColors.name_lookup = {0: 'red', 1: 'random'}
 
 
