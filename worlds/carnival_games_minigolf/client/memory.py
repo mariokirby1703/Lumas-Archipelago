@@ -5,7 +5,10 @@ import os
 from dataclasses import dataclass
 from ctypes import wintypes
 
-from .constants import CODE_SIGNATURES, MANAGER_PTR, SUPPORTED_GAME_ID
+from .constants import (CODE_SIGNATURES, MANAGER_PTR, SUPPORTED_GAME_ID, RESULT_VTABLE,
+                        USA_GAME_ID, USA_MANAGER_PTR, USA_RESULT_VTABLE,
+                        USA_CODE_SIGNATURES, USA_MINIGAME_VTABLES)
+from ..data import MINIGAMES
 
 
 class MemoryUnavailable(RuntimeError):
@@ -25,10 +28,21 @@ class WindowsMEM2:
     def __init__(self):
         if os.name == "nt":
             kernel = ctypes.windll.kernel32
+            kernel.CreateToolhelp32Snapshot.argtypes = [wintypes.DWORD, wintypes.DWORD]
             kernel.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+            kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
             kernel.OpenProcess.restype = wintypes.HANDLE
+            kernel.ReadProcessMemory.argtypes = [wintypes.HANDLE, ctypes.c_void_p, ctypes.c_void_p,
+                                                ctypes.c_size_t, ctypes.POINTER(ctypes.c_size_t)]
             kernel.ReadProcessMemory.restype = wintypes.BOOL
+            kernel.VirtualQueryEx.argtypes = [wintypes.HANDLE, ctypes.c_void_p, ctypes.c_void_p,
+                                             ctypes.c_size_t]
             kernel.VirtualQueryEx.restype = ctypes.c_size_t
+            kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+            kernel.CloseHandle.restype = wintypes.BOOL
+            for function in (kernel.Process32FirstW, kernel.Process32NextW):
+                function.argtypes = [wintypes.HANDLE, ctypes.c_void_p]
+                function.restype = wintypes.BOOL
         self.session = None
         self.validation_session = None
         self.process = None
@@ -161,6 +175,21 @@ class Memory:
         self.backend = backend
         self.mem2_backend = mem2_backend if mem2_backend is not None else (WindowsMEM2() if os.name == "nt" else None)
         self.last_read_error = None
+        self.game_id = None
+
+    @property
+    def manager_ptr(self):
+        return USA_MANAGER_PTR if self.game_id == USA_GAME_ID else MANAGER_PTR
+
+    @property
+    def result_vtable(self):
+        return USA_RESULT_VTABLE if self.game_id == USA_GAME_ID else RESULT_VTABLE
+
+    @property
+    def minigame_vtables(self):
+        tables = (USA_MINIGAME_VTABLES if self.game_id == USA_GAME_ID
+                  else tuple(data['vtable'] for data in MINIGAMES))
+        return {address: index for index, address in enumerate(tables)}
 
     def read(self, address, size):
         if not (0x80000000 <= address <= 0x81800000 - size or
@@ -203,12 +232,19 @@ class Memory:
         self.write(address, value.to_bytes(size, 'big'))
 
     def verify_game(self):
-        return (self.read(0x80000000, 6) == SUPPORTED_GAME_ID and
-                all(hashlib.sha256(self.read(address, 64)).hexdigest() == digest
-                    for address, digest in CODE_SIGNATURES))
+        self.game_id = None
+        game_id = self.read(0x80000000, 6)
+        signatures = {SUPPORTED_GAME_ID: CODE_SIGNATURES, USA_GAME_ID: USA_CODE_SIGNATURES}.get(game_id)
+        if signatures is None:
+            return False
+        if not all(hashlib.sha256(self.read(address, 64)).hexdigest() == digest
+                   for address, digest in signatures):
+            return False
+        self.game_id = game_id
+        return True
 
     def resolve(self, local_player=0):
-        manager = self.pointer(MANAGER_PTR, 0x1A0)
+        manager = self.pointer(self.manager_ptr, 0x1A0)
         session = self.integer(manager + 0x114)
         if not valid_pointer(session, 0x2F4):
             session = None

@@ -1,5 +1,7 @@
-﻿import tempfile
+import tempfile
 import unittest
+import ctypes
+import os
 from pathlib import Path
 from unittest.mock import patch
 
@@ -30,6 +32,64 @@ class FakeDolphin:
 
 
 class TestRuntime(unittest.TestCase):
+    def test_usa_manager_minigames_and_late_result(self):
+        from ..client.constants import USA_GAME_ID, USA_MANAGER_PTR, USA_MINIGAME_VTABLES, USA_RESULT_VTABLE
+        self.memory.game_id = USA_GAME_ID
+        self.memory.put(USA_MANAGER_PTR, self.manager, 4)
+        self.memory.put(MANAGER_PTR, 0, 4)
+        self.assertEqual(self.memory.resolve().manager, self.manager)
+        array, popup = 0x80960000, 0x80970000
+        self.memory.put(self.manager+0x100, array, 4)
+        self.memory.put(array, popup, 4)
+        self.memory.put(popup+0x1C, USA_RESULT_VTABLE, 4)
+        self.memory.write(popup+0xC0, bytes([1, 1]))
+        for index, vtable in enumerate(USA_MINIGAME_VTABLES[:9]):
+            with self.subTest(minigame=index):
+                self.runtime = Runtime(self.slot, Journal())
+                self.memory.put(self.manager+0x114, self.session, 4)
+                self.memory.put(self.manager+0x104, 0, 4)
+                self.set_hole(index*3)
+                self.memory.put(self.controller+0x1C, vtable, 4)
+                self.poll()
+                self.memory.put(self.manager+0x114, 0, 4)
+                self.memory.put(self.manager+0x104, 1, 4)
+                checks = self.poll()
+                self.assertIn(self.runtime.lookup['win', index], checks)
+                self.assertIn(self.runtime.lookup['perfect', index], checks)
+        self.runtime = Runtime(self.slot, Journal())
+        self.memory.put(self.manager+0x114, self.session, 4)
+        self.memory.put(self.controller+0x1C, USA_MINIGAME_VTABLES[9], 4)
+        self.memory.write(self.controller+0x1FC, bytes([6])*11)
+        self.memory.put(self.manager+0x104, 0, 4)
+        self.assertIn(self.runtime.lookup['win', 9], self.poll())
+
+    def test_ra_hole_name_diagnostic_is_bounded_and_independent(self):
+        entry, name = 0x80980000, 0x80981000
+        self.memory.put(self.hole_def, entry, 4)
+        self.memory.put(entry, name, 4)
+        for index in (0, 9, 10, 26):
+            self.memory.write(name, f'HOLE_{index}_NAME'.encode().ljust(16, b'\0'))
+            self.assertEqual(Runtime.hole_name_id(self.memory, self.hole_def), index)
+        for text in (b'HOLE_27_NAME', b'HOLE_-1_NAME', b'HOLE_1_NAMEjunk', b'Other'):
+            self.memory.write(name, text.ljust(16, b'\0'))
+            self.assertIsNone(Runtime.hole_name_id(self.memory, self.hole_def))
+        self.memory.put(entry, 0, 4)
+        self.assertIsNone(Runtime.hole_name_id(self.memory, self.hole_def))
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows process memory API')
+    def test_mem2_process_reader_preserves_native_handles(self):
+        fallback = WindowsMEM2()
+        kernel = ctypes.windll.kernel32
+        process = kernel.OpenProcess(fallback.PROCESS_QUERY_INFORMATION | fallback.PROCESS_VM_READ,
+                                     False, os.getpid())
+        self.assertTrue(process)
+        try:
+            payload = ctypes.create_string_buffer(b'MiniGolf MEM2 handle test')
+            self.assertEqual(fallback._read_process(process, ctypes.addressof(payload), len(payload)),
+                             payload.raw)
+        finally:
+            self.assertTrue(kernel.CloseHandle(process))
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)

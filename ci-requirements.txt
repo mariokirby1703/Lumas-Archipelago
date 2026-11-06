@@ -1,2 +1,3 @@
 pytest>=9.0.1,<10  # this includes subtests support
 pytest-xdist>=3.8.0
+setuptools>=75,<81  # pkg_resources must normalize dotted wheel names (kivy-deps.glew).

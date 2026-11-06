@@ -46,7 +46,14 @@ class MiniGolfCommands(ClientCommandProcessor):
             if not emulation_active(dolphin):
                 logger.info("Dolphin is not actively emulating the game.")
                 return
-            state = self.ctx.runtime.debug_state(Memory(dolphin), self.ctx.local_player)
+            memory = Memory(dolphin)
+            if not memory.verify_game():
+                logger.info("Unsupported MiniGolf game or executable revision.")
+                return
+            logger.info("MiniGolf memory profile: %s", memory.game_id.decode('ascii'))
+            state = self.ctx.runtime.debug_state(memory, self.ctx.local_player)
+            logger.info("Hole localization key ID: %s | Table-derived hole ID: %s",
+                        state.get('hole_name_id'), state.get('derived_hole'))
             def address(value):
                 return f"{value:08X}" if isinstance(value, int) else str(value)
             hole = state['derived_hole']
@@ -227,7 +234,7 @@ async def dolphin_loop(ctx):
                     raise MemoryUnavailable(ctx.runtime_error)
                 if not memory.verify_game():
                     settled_context = None
-                    raise MemoryUnavailable("Waiting for Carnival Games MiniGolf RG9P54, supported executable revision.")
+                    raise MemoryUnavailable("Waiting for Carnival Games MiniGolf RG9P54/RG9E54, supported executable revision.")
                 snapshot = memory.resolve(ctx.local_player)
                 context = (snapshot.manager, snapshot.root, id(ctx.runtime))
                 if context != settled_context:
@@ -250,7 +257,8 @@ async def dolphin_loop(ctx):
                     ctx.finished_game = True
                     logger.info("Carnival Games MiniGolf goal complete!")
                 if ctx.history_ready:
-                    ctx.dolphin_status = "Dolphin connected; supported game verified; synchronization active."
+                    region = memory.game_id.decode('ascii')
+                    ctx.dolphin_status = f"Dolphin connected; {region} verified; synchronization active."
                 else:
                     ctx.dolphin_status = "Dolphin connected; game checks active; received item history loading."
             except MemoryUnavailable as error:

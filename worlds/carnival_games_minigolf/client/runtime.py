@@ -1,15 +1,15 @@
 """Polling and item effects, testable with an in-memory Dolphin substitute."""
 import struct
+import re
 from ..Items import (BARKER_COIN, COIN_BUNDLE_DATA, COIN_TRAP_DATA,
                      ITEM_TABLE, PAR_CLUB_PIECES, UNLOCKS)
 from ..Locations import LOCATION_TABLE
 from ..data import HOLES, MINIGAMES, PRIZES, WORLDS
-from .constants import (RESULT_VTABLE, ROOT_LOCKS, ROOT_SUB, SHOP_MANAGER_STATE,
+from .constants import (ROOT_LOCKS, ROOT_SUB, SHOP_MANAGER_STATE,
                         MANAGER_STATE_MENU, MANAGER_STATE_MINIGAME, MINIGAME_MENU_POLLS)
 from .memory import MemoryUnavailable, valid_pointer
 
 ID_TO_NAME = {code: name for name, code in ITEM_TABLE.items()}
-VTABLE_TO_MINIGAME = {data['vtable']: i for i, data in enumerate(MINIGAMES)}
 WORLD_COUNT = len(WORLDS)
 HOLE_COUNT = len(HOLES)
 CLUB_IDS = tuple(next(prize['id'] for prize in PRIZES if prize['kind'] == 'club' and prize['world'] == world)
@@ -87,7 +87,7 @@ class Runtime:
     def poll(self, memory, items, local_player=0, history_ready=True, checked_locations=()):
         if not memory.verify_game():
             self.reset_transient()
-            raise MemoryUnavailable("Waiting for supported Carnival Games MiniGolf (RG9P54, verified revision)")
+            raise MemoryUnavailable("Waiting for supported Carnival Games MiniGolf (RG9P54/RG9E54, verified revision)")
         cursor = self.journal.data['cursor']
         if history_ready and cursor > len(items):
             raise MemoryUnavailable("Waiting for complete AP received-item history")
@@ -216,6 +216,21 @@ class Runtime:
             index += 1
         return index if index >= 0 else None
 
+    @staticmethod
+    def hole_name_id(memory, hole_def):
+        """Read the RA-documented localization key as an independent diagnostic."""
+        try:
+            if not valid_pointer(hole_def, 4):
+                return None
+            entry = memory.pointer(hole_def)
+            name = memory.integer(entry)
+            text = memory.read(name, 16).split(b'\0', 1)[0]
+        except MemoryUnavailable:
+            return None
+        match = re.fullmatch(rb'HOLE_([0-9]{1,2})_NAME', text)
+        index = int(match[1]) if match else -1
+        return index if 0 <= index < HOLE_COUNT else None
+
     def add_hole_completion(self, memory, root, hole_def, hole, checks):
         strokes = memory.integer(root + 0x2DC)
         par = memory.integer(hole_def + 0x0C)
@@ -232,7 +247,7 @@ class Runtime:
             try:
                 controller = memory.integer(snapshot.session + 0xFC)
                 if valid_pointer(controller, 0x20):
-                    detected = VTABLE_TO_MINIGAME.get(memory.integer(controller + 0x1C))
+                    detected = memory.minigame_vtables.get(memory.integer(controller + 0x1C))
             except MemoryUnavailable:
                 pass  # Normal hole detection is independent of controller reads.
 
@@ -265,7 +280,7 @@ class Runtime:
                     pointers = struct.iter_unpack('>I', memory.read(array, count * 4))
                     for (obj,) in pointers:
                         try:
-                            if valid_pointer(obj, 0xC2) and memory.integer(obj + 0x1C) == RESULT_VTABLE:
+                            if valid_pointer(obj, 0xC2) and memory.integer(obj + 0x1C) == memory.result_vtable:
                                 results.append(memory.read(obj + 0xC0, 2))
                         except MemoryUnavailable:
                             continue
@@ -335,8 +350,8 @@ class Runtime:
             result["vtable"] = safe(result["controller"] + 0x1C,
                                      lambda: memory.integer(result["controller"] + 0x1C))
             if isinstance(result["vtable"], int):
-                result["minigame"] = VTABLE_TO_MINIGAME.get(result["vtable"], self.active_minigame)
-                if result["vtable"] == MINIGAMES[9]['vtable']:
+                result["minigame"] = memory.minigame_vtables.get(result["vtable"], self.active_minigame)
+                if memory.minigame_vtables.get(result["vtable"]) == 9:
                     result["spider_state"] = safe(result["controller"] + 0x212,
                                                    lambda: memory.integer(result["controller"] + 0x212, 1))
                     result["spider_objects"] = safe(result["controller"] + 0x1FC,
@@ -344,6 +359,7 @@ class Runtime:
                     result["spider_complete"] = result["spider_objects"] == bytes([6]) * 11
         if isinstance(result["hole_def"], int):
             result["derived_hole"] = self.derive_hole_id(memory, result["hole_def"])
+            result["hole_name_id"] = self.hole_name_id(memory, result["hole_def"])
             result["par"] = safe(result["hole_def"] + 0x0C,
                                  lambda: memory.integer(result["hole_def"] + 0x0C))
         if isinstance(result["hole_state"], int) and valid_pointer(result["hole_state"], 0x128):
@@ -357,7 +373,7 @@ class Runtime:
                            lambda i=index: memory.integer(result["object_array"] + i * 4))
                 if isinstance(obj, int) and valid_pointer(obj, 0xC2):
                     obj_vtable = safe(obj + 0x1C, lambda o=obj: memory.integer(o + 0x1C))
-                    if obj_vtable == RESULT_VTABLE:
+                    if obj_vtable == memory.result_vtable:
                         flags = safe(obj + 0xC0, lambda o=obj: memory.read(o + 0xC0, 2))
                         result["result_popup"] = obj
                         if isinstance(flags, bytes):
