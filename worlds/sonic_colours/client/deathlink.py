@@ -7,12 +7,28 @@ import hashlib
 import json
 
 
+def native_death_context(runtime):
+    snap=runtime.snapshot
+    bound=runtime.journal.data.get('save_identity')
+    if bound is not None:
+        context=((snap.session,'save',bound) if snap.save_identity_verified
+                 and snap.save_identity==bound else None)
+    else:
+        bootstrap=runtime.journal.data.get('bootstrap') or {}
+        context=((snap.session,'intro',bootstrap.get('epoch'))
+                 if bootstrap.get('epoch') and runtime.guard.can_record(snap) else None)
+    if getattr(runtime,'_death_stage_context',None)!=context:
+        runtime._death_stage_context=context
+        runtime._death_allowed_stages=set()
+    return context
+
+
 def native_death_trusted(runtime, native):
     snap=runtime.snapshot
+    context=native_death_context(runtime)
     stage=native.get('death_stage')
-    if not stage:return False
-    if (getattr(runtime,'_death_stage_session',None)==snap.session
-            and stage in getattr(runtime,'_death_allowed_stages',set())):
+    if context is None or not stage:return False
+    if stage in getattr(runtime,'_death_allowed_stages',set()):
         return True
     row=next(iter(snap.evidence.get('native_data',{}).get('stage_objects',[])),{})
     return (stage==row.get('stage') and snap.scene_verified

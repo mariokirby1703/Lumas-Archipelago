@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import pytest
 from ..client.deathlink import DeathLink
 
 
@@ -112,9 +113,10 @@ def test_remote_death_during_unsafe_transition_is_never_queued_as_local():
 
 def test_enemy_death_uses_attributed_native_stage_without_pickup_fields():
     from ..client.deathlink import native_death_trusted
-    snap=SimpleNamespace(session='game',scene='dying',scene_verified=True,
+    snap=SimpleNamespace(session='game',save_identity='bound',save_identity_verified=True,scene='dying',scene_verified=True,
         evidence={'native_data':{'stage_objects':[{'stage':0x90010000}]}})
-    runtime=SimpleNamespace(snapshot=snap,guard=SimpleNamespace(can_record=lambda s:True))
+    runtime=SimpleNamespace(snapshot=snap,journal=SimpleNamespace(data={'save_identity':'bound'}),
+        guard=SimpleNamespace(can_record=lambda s:True))
     assert native_death_trusted(runtime,{'death_stage':0x90010000})
     assert not native_death_trusted(runtime,{'death_stage':0x90020000})
     runtime.guard.can_record=lambda s:False
@@ -123,11 +125,12 @@ def test_enemy_death_uses_attributed_native_stage_without_pickup_fields():
 
 def test_paused_context_can_retain_only_previously_verified_stage_in_same_session():
     from ..client.deathlink import native_death_trusted
-    snap=SimpleNamespace(session='game',scene='paused',scene_verified=False,evidence={})
-    runtime=SimpleNamespace(snapshot=snap,_death_stage_session='game',
+    snap=SimpleNamespace(session='game',save_identity='bound',save_identity_verified=True,scene='paused',scene_verified=False,evidence={})
+    runtime=SimpleNamespace(snapshot=snap,journal=SimpleNamespace(data={'save_identity':'bound'}),
+        _death_stage_context=('game','save','bound'),
         _death_allowed_stages={0x90010000},guard=SimpleNamespace(can_record=lambda s:False))
     assert native_death_trusted(runtime,{'death_stage':0x90010000})
-    runtime._death_stage_session='previous-game'
+    runtime.snapshot.session='previous-game'
     assert not native_death_trusted(runtime,{'death_stage':0x90010000})
 
 
@@ -147,3 +150,57 @@ def test_two_fast_abyss_deaths_between_host_polls_each_send_once():
     assert poll(d,2,4,native_context='game',native_step=2)
     assert poll(d,3,4,native_context='game',native_step=2)
     assert not poll(d,4,4,native_context='game',native_step=2)
+
+
+def test_cached_stage_pointer_cannot_be_reused_by_another_save():
+    from ..client.deathlink import native_death_trusted,native_death_context
+    snap=SimpleNamespace(session='game',save_identity='bound',save_identity_verified=True,
+        scene='gameplay',scene_verified=True,
+        evidence={'native_data':{'stage_objects':[{'stage':0x90010000}]}})
+    runtime=SimpleNamespace(snapshot=snap,journal=SimpleNamespace(data={'save_identity':'bound'}),
+        guard=SimpleNamespace(can_record=lambda s:s.save_identity=='bound'))
+    context=native_death_context(runtime)
+    runtime._death_allowed_stages={0x90010000}
+    assert native_death_trusted(runtime,{'death_stage':0x90010000})
+    snap.save_identity='another-save'
+    assert not native_death_trusted(runtime,{'death_stage':0x90010000})
+    assert runtime._death_allowed_stages==set()
+    snap.save_identity='bound'
+    assert native_death_context(runtime)==context
+    # A first death in the newly attributed stage needs no cached allowlist.
+    assert native_death_trusted(runtime,{'death_stage':0x90010000})
+
+
+def test_pending_death_cannot_cross_save_contexts_in_same_emulation():
+    d=setup();a=('game','save','bound');b=None
+    poll(d,0,native_context=a)
+    assert not poll(d,1,2,safe=False,native_trusted=True,native_context=a)
+    assert d.pending_local_death
+    assert not poll(d,2,2,safe=False,native_trusted=False,native_context=b)
+    assert not d.pending_local_death
+    assert not poll(d,3,2,native_context=a)
+
+
+def test_intro_cache_is_separate_from_selected_save():
+    from ..client.deathlink import native_death_context
+    snap=SimpleNamespace(session='game',save_identity=None,save_identity_verified=False)
+    runtime=SimpleNamespace(snapshot=snap,journal=SimpleNamespace(data={
+        'save_identity':None,'bootstrap':{'epoch':'intro-one'}}),
+        guard=SimpleNamespace(can_record=lambda s:True))
+    assert native_death_context(runtime)==('game','intro','intro-one')
+    runtime._death_allowed_stages={123}
+    runtime.journal.data['save_identity']='bound';snap.save_identity='bound';snap.save_identity_verified=True
+    assert native_death_context(runtime)==('game','save','bound')
+    assert runtime._death_allowed_stages==set()
+
+
+@pytest.mark.parametrize('mission',['stg110','stg190','stg790','stgD10','stgG30'])
+def test_first_death_needs_no_stage_unlock_or_cached_pointer(mission):
+    from ..client.deathlink import native_death_trusted
+    snap=SimpleNamespace(session='game',save_identity='bound',save_identity_verified=True,
+        scene='dying',scene_verified=True,actual_mission=mission,
+        evidence={'native_data':{'stage_objects':[{'stage':0x90010000}]}})
+    runtime=SimpleNamespace(snapshot=snap,journal=SimpleNamespace(data={'save_identity':'bound'}),
+        guard=SimpleNamespace(can_record=lambda s:True))
+    assert native_death_trusted(runtime,{'death_stage':0x90010000})
+    assert not getattr(runtime,'_death_allowed_stages',set())

@@ -504,6 +504,8 @@ class Runtime:
         if self.red_ring_colors is not None:
             self.red_ring_colors.stage_colors(self.snapshot.actual_mission)
         self.guard.observe(self.snapshot)
+        from .deathlink import native_death_context
+        native_death_context(self)
         # Capture irreversible pickup/result evidence before slow permission
         # writes. Network clients can transmit this checkpoint and receive
         # acknowledgements before continuing the same synchronous poll.
@@ -612,9 +614,6 @@ class Runtime:
             self.native_event_status=configure_events(self,memory)
             self.temporary_trap_status={'name':'Dead Weight Trap','remaining':self.native_event_status['remaining'],
                                         'active':self.native_event_status['remaining']>0,'time_source':'native gameplay delta with real-time expiry'}
-            if getattr(self,'_death_stage_session',None)!=self.snapshot.session:
-                self._death_stage_session=self.snapshot.session
-                self._death_allowed_stages=set()
             self._death_allowed_stages=getattr(self,'_death_allowed_stages',set())
             if (getattr(self,'_event_owner',None) and self.snapshot.scene=='gameplay'
                     and self.guard.can_record_pickups(self.snapshot)):
