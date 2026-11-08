@@ -13,6 +13,15 @@ USA_CODE_SIGNATURES = CODE_SIGNATURES[:3] + [
     (0x800F7284, 'd6f0f1599c0dad359615c5b3ba867ba501f02e40d41dd88cea8681cf810a7f34')]
 USA_MINIGAME_VTABLES = (0x804F3020, 0x804FBBA0, 0x804EA8A0, 0x804F2780, 0x804F4B48,
                        0x804F8648, 0x804ECEA8, 0x804EB4C8, 0x804FB2DC, 0x804FB608)
+# Include SDA initialization and the result/spider readers in revision validation.
+CODE_SIGNATURES += [
+    (0x80004220, 'e0166a4fff60417085cb66a9b2c9ce97caf337a5d741e75b27c5445476d19f71'),
+    (0x800CB7C0, '27c0e03ba22505cf4cbbf3006c53368a5ae1b83771ee7a934d372a8a4d924808'),
+    (0x800EF3A0, 'd0f2e70ac3b69f3d2b9fc44addb24caf55ef561770b8576c3d8c79cb0fa126a0')]
+USA_CODE_SIGNATURES += [
+    (0x80004220, '6036334c97d654f9a371f9755dff85092f80d51b3f6eb9ed69b5feae550308dd'),
+    (0x800CB7C0, 'dc352cf5215271475143ab62ccd6d2440df1e4cfd826ddfff3ab8da528d8afa2'),
+    (0x800EF3A0, 'd0f2e70ac3b69f3d2b9fc44addb24caf55ef561770b8576c3d8c79cb0fa126a0')]
 SHOP_MANAGER_STATE = 3
 
 # State 3 remains a shop candidate, not a verified screen identity.

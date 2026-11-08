@@ -32,6 +32,33 @@ class FakeDolphin:
 
 
 class TestRuntime(unittest.TestCase):
+    def test_usa_normal_holes_currency_world_locks_and_shop(self):
+        from ..client.constants import USA_GAME_ID, USA_MANAGER_PTR
+        self.memory.game_id = USA_GAME_ID
+        self.memory.put(USA_MANAGER_PTR, self.manager, 4)
+        self.memory.put(MANAGER_PTR, 0, 4)
+        for hole in range(27):
+            with self.subTest(hole=hole):
+                self.runtime = Runtime(self.slot, Journal())
+                self.set_hole(hole)
+                self.memory.put(self.root+0x2DC, 1, 4)
+                self.memory.put(self.hole_state+0x127, 1)
+                checks = self.poll()
+                self.assertIn(self.runtime.lookup['complete', hole], checks)
+                self.assertIn(self.runtime.lookup['par', hole], checks)
+                if ('hio', hole) in self.runtime.lookup:
+                    self.assertIn(self.runtime.lookup['hio', hole], checks)
+        self.runtime = Runtime(self.slot, Journal())
+        self.enter_menu(state=3)
+        items = [ITEM_TABLE[coin_bundle_name(1, 500)], ITEM_TABLE[UNLOCKS[1]],
+                 ITEM_TABLE[PAR_CLUB_PIECES[1]]]
+        self.poll(items)
+        self.assertEqual(self.memory.integer(self.sub+0x5A, 2), 500)
+        self.assertEqual(self.memory.read(self.root+0x2CC, 9), bytes([0, 0]+[1]*7))
+        self.assertEqual(self.memory.read(self.sub+0x86+3, 3), bytes([1, 0, 0]))
+        self.memory.put(self.sub+48, 1)
+        self.assertIn(self.runtime.lookup['shop', 48], self.poll(items))
+
     def test_usa_manager_minigames_and_late_result(self):
         from ..client.constants import USA_GAME_ID, USA_MANAGER_PTR, USA_MINIGAME_VTABLES, USA_RESULT_VTABLE
         self.memory.game_id = USA_GAME_ID
@@ -75,6 +102,21 @@ class TestRuntime(unittest.TestCase):
             self.assertIsNone(Runtime.hole_name_id(self.memory, self.hole_def))
         self.memory.put(entry, 0, 4)
         self.assertIsNone(Runtime.hole_name_id(self.memory, self.hole_def))
+
+    def test_localization_key_identifies_holes_and_rejects_special_levels(self):
+        entry, name = 0x80980000, 0x80981000
+        self.memory.put(self.hole_def, entry, 4)
+        self.memory.put(entry, name, 4)
+        for index in range(38):
+            with self.subTest(level=index):
+                self.memory.write(name, f'HOLE_{index}_NAME'.encode().ljust(16, b'\0'))
+                self.assertEqual(Runtime.derive_hole_id(self.memory, self.hole_def),
+                                 index if index < 27 else None)
+        # A readable special-level key must never fall back to counting nearby records.
+        self.set_hole(3)
+        self.memory.put(self.hole_def, entry, 4)
+        self.memory.write(name, b'HOLE_37_NAME'.ljust(16, b'\0'))
+        self.assertIsNone(Runtime.derive_hole_id(self.memory, self.hole_def))
 
     @unittest.skipUnless(os.name == 'nt', 'Windows process memory API')
     def test_mem2_process_reader_preserves_native_handles(self):

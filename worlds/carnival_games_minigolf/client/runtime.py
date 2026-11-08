@@ -200,6 +200,10 @@ class Runtime:
 
     @classmethod
     def derive_hole_id(cls, memory, current):
+        named_index = cls.hole_key_index(memory, current)
+        if named_index is not None:
+            # gamelevels.ini includes 38 records: only 0..26 are AP holes.
+            return named_index if named_index < HOLE_COUNT else None
         # One bounded MEM1 read replaces up to 108 cross-process reads. The
         # course field is deliberately not trusted without a verified table base.
         if not valid_pointer(current, 16) or current >= 0x81800000:
@@ -217,8 +221,8 @@ class Runtime:
         return index if index >= 0 else None
 
     @staticmethod
-    def hole_name_id(memory, hole_def):
-        """Read the RA-documented localization key as an independent diagnostic."""
+    def hole_key_index(memory, hole_def):
+        """Read a complete gamelevels.ini localization key, including special levels."""
         try:
             if not valid_pointer(hole_def, 4):
                 return None
@@ -228,8 +232,12 @@ class Runtime:
         except MemoryUnavailable:
             return None
         match = re.fullmatch(rb'HOLE_([0-9]{1,2})_NAME', text)
-        index = int(match[1]) if match else -1
-        return index if 0 <= index < HOLE_COUNT else None
+        return int(match[1]) if match else None
+
+    @classmethod
+    def hole_name_id(cls, memory, hole_def):
+        index = cls.hole_key_index(memory, hole_def)
+        return index if index is not None and index < HOLE_COUNT else None
 
     def add_hole_completion(self, memory, root, hole_def, hole, checks):
         strokes = memory.integer(root + 0x2DC)
