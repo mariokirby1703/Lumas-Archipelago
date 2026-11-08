@@ -99,5 +99,7 @@ LIMITED_FILLER_ITEMS = (
 LIMITED_FILLER_ITEM_NAMES = frozenset(LIMITED_FILLER_ITEMS)
 
 GAME_ID_ADDRESS = 0x80000000
-SUPPORTED_GAME_IDS = (b"SECP69",)
-SUPPORTED_GAME_ID_LABEL = "SECP69"
+# PAL and NTSC-U build 525025 share code, symbols and RAM layout.
+# See docs/disc_audit.md and tools/create/disc_audit.py for binary evidence.
+SUPPORTED_GAME_IDS = (b"SECP69", b"SECE69")
+SUPPORTED_GAME_ID_LABEL = "PAL (SECP69) / NTSC-U (SECE69)"

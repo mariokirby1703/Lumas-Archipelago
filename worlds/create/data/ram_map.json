@@ -24,8 +24,8 @@
     "total_sparks": {
       "address": "0x8068CD88",
       "type": "u32_be",
-      "status": "confirmed_read_only_for_ap",
-      "notes": "Vanilla rebuilds/restores on Hub load; do not use AP writes."
+      "status": "ap_display_mirror",
+      "notes": "Vanilla rebuilds/restores on Hub load. With a positive AP Spark requirement, the client mirrors received AP Sparks (capped at 610) into this display counter; AP inventory remains authoritative."
     },
     "sparks_this_try": {
       "address": "0x8067BA03",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import asyncio
 import struct
 import types
 import unittest
@@ -199,6 +200,51 @@ class TestCreateClientObjectMemory(unittest.TestCase):
         self.assertFalse(mapped_ram(region, 0x4000000))
         region.kind, region.protect = 0x40000, 0x104
         self.assertFalse(mapped_ram(region, 0x4000000))
+
+    def test_windows_mem2_accepts_both_disc_ids_and_rejects_other_games(self) -> None:
+        from ..client import windows_mem2
+        for game_id in (b"SECP69", b"SECE69", b"SECJ69", b"WRONG!", b"SECE"):
+            with self.subTest(game_id=game_id):
+                kernel = Mock()
+                kernel.CreateToolhelp32Snapshot.return_value = 123
+                kernel.Process32FirstW.return_value = 0
+                engine = Mock()
+                engine.read_bytes.return_value = game_id
+                with patch.object(windows_mem2.c, "WinDLL", return_value=kernel, create=True):
+                    if game_id in (b"SECP69", b"SECE69"):
+                        # Reaching process discovery proves the region guard passed.
+                        with self.assertRaisesRegex(RuntimeError, "exactly one Dolphin"):
+                            windows_mem2.WindowsMEM2(engine)
+                        kernel.CloseHandle.assert_called_once_with(123)
+                    else:
+                        with self.assertRaisesRegex(RuntimeError, "requires Create"):
+                            windows_mem2.WindowsMEM2(engine)
+                        kernel.CreateToolhelp32Snapshot.assert_not_called()
+                engine.read_bytes.assert_called_once_with(client.GAME_ID_ADDRESS, 6)
+
+    def test_connector_accepts_both_regions_and_refuses_other_disc_ids(self) -> None:
+        for game_id in (b"SECP69", b"SECE69", b"SECJ69", b"WRONG!"):
+            with self.subTest(game_id=game_id):
+                stop = asyncio.Event()
+                engine = Mock()
+                engine.is_hooked.side_effect = [False, True, True]
+                engine.read_bytes.return_value = game_id
+                engine.un_hook.side_effect = stop.set
+                ctx = SimpleNamespace(exit_event=stop, watcher_event=asyncio.Event(),
+                                      dolphin_status=client.CONNECTION_INITIAL_STATUS,
+                                      start_ram_settle=Mock(side_effect=stop.set), _popup_runtime=Mock())
+                with patch.dict(sys.modules, {"dolphin_memory_engine": engine}):
+                    with patch.object(client, "reset_mem2_fallback"):
+                        asyncio.run(client.dolphin_sync_task(ctx))
+                expected = (client.CONNECTION_CONNECTED_STATUS if game_id in (b"SECP69", b"SECE69")
+                            else client.CONNECTION_REFUSED_GAME_STATUS)
+                self.assertEqual(expected, ctx.dolphin_status)
+                if game_id in (b"SECP69", b"SECE69"):
+                    engine.un_hook.assert_not_called()
+                    ctx.start_ram_settle.assert_called_once()
+                else:
+                    engine.un_hook.assert_called_once()
+                    ctx.start_ram_settle.assert_not_called()
 
     def test_mem2_mapping_bounds(self) -> None:
         from ..client.windows_mem2 import WindowsMEM2

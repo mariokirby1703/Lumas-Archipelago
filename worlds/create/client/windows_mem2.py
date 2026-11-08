@@ -9,6 +9,8 @@ import ctypes as c
 from ctypes import wintypes as w
 import os
 
+from ..world_constants import GAME_ID_ADDRESS, SUPPORTED_GAME_IDS, SUPPORTED_GAME_ID_LABEL
+
 
 class MemoryRegion(c.Structure):
     _fields_ = [
@@ -52,9 +54,9 @@ class WindowsMEM2:
             function.argtypes, function.restype = args, result
         # Only compare the immutable disc ID. The low-memory header also contains
         # live OS values (0xC0..0xE7) that change between two reads.
-        reference = engine.read_bytes(0x80000000, 6)
-        if reference[:6] != b"SECP69":
-            raise RuntimeError("MEM2 fallback requires Create SECP69.")
+        reference = engine.read_bytes(GAME_ID_ADDRESS, 6)
+        if reference not in SUPPORTED_GAME_IDS:
+            raise RuntimeError(f"MEM2 fallback requires Create {SUPPORTED_GAME_ID_LABEL}.")
         snapshot = k.CreateToolhelp32Snapshot(2, 0)
         if snapshot == c.c_void_p(-1).value:
             raise OSError(c.get_last_error(), "Cannot enumerate Dolphin")

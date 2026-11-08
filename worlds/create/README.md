@@ -1,6 +1,6 @@
 # Create for Archipelago
 
-An Archipelago integration for the PAL Wii version of Create (`SECP69`), using an external Dolphin client.
+An Archipelago integration for the PAL (`SECP69`) and NTSC-U (`SECE69`) Wii versions of Create, using an external Dolphin client.
 
 - [Game guide](docs/en_Create.md)
 - [Installation and setup](docs/setup_en.md)

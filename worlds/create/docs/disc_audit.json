@@ -1,0 +1,921 @@
+{
+  "elf_symbols": 40136,
+  "all_symbols_equal": true,
+  "elf_sha256": [
+    "712fc647e60037d780c193a6bdc29c090e5486df27f66b25ba1bb1a5e76fa6ac",
+    "bda0b75fc0a418f72beddcc755a1dadb8cd9c29e52142cfd733fda5b3b1dbb3a"
+  ],
+  "sections": [
+    {
+      "address": "0x80004000",
+      "size": 10476,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": true,
+      "different_bytes": [],
+      "pal_sha256": "8633ed583e328e3eee763a1e5e044676479f12fa6088227918ea4ea02bb37590",
+      "ntsc_u_sha256": "8633ed583e328e3eee763a1e5e044676479f12fa6088227918ea4ea02bb37590"
+    },
+    {
+      "address": "0x80006900",
+      "size": 6704,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": "080b365ce8bf1057b574f25e2cc56393bab8c159ba5eebc1f489d1979c44eefe",
+      "ntsc_u_sha256": "080b365ce8bf1057b574f25e2cc56393bab8c159ba5eebc1f489d1979c44eefe"
+    },
+    {
+      "address": "0x80008340",
+      "size": 1496,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": "a9e52bbeebdddc325f6ae8d5bc85573aa830071371201148fa2551ce34642f07",
+      "ntsc_u_sha256": "a9e52bbeebdddc325f6ae8d5bc85573aa830071371201148fa2551ce34642f07"
+    },
+    {
+      "address": "0x80008920",
+      "size": 6005188,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": true,
+      "different_bytes": [],
+      "pal_sha256": "43612b02eba5269448cb79408932a15377ff9b9cf402e8ea7601758726a8bca7",
+      "ntsc_u_sha256": "43612b02eba5269448cb79408932a15377ff9b9cf402e8ea7601758726a8bca7"
+    },
+    {
+      "address": "0x805C2B00",
+      "size": 316,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": "d8cc948c9fe05d09747c163c79d0c7d019ce1bea0e2b02a353f5968ef3659405",
+      "ntsc_u_sha256": "d8cc948c9fe05d09747c163c79d0c7d019ce1bea0e2b02a353f5968ef3659405"
+    },
+    {
+      "address": "0x805C2C40",
+      "size": 12,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": "8d139b908bab930c2924d7a3d06bc80f02d3691cf52b7899114c3744f541e055",
+      "ntsc_u_sha256": "8d139b908bab930c2924d7a3d06bc80f02d3691cf52b7899114c3744f541e055"
+    },
+    {
+      "address": "0x805C2C60",
+      "size": 125404,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": "5022f57f80cef861286ef98fa1a9de9ff817101985e09bdc3c95f7511f58d15a",
+      "ntsc_u_sha256": "5022f57f80cef861286ef98fa1a9de9ff817101985e09bdc3c95f7511f58d15a"
+    },
+    {
+      "address": "0x805E1680",
+      "size": 554392,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": false,
+      "different_bytes": [
+        "0x805F7409",
+        "0x805F740A",
+        "0x805F7438",
+        "0x805F743A",
+        "0x805F743B"
+      ],
+      "pal_sha256": "b43503f53286481d670444cabf01ebd12c41c8adbc7c1fa7f0b15fb961bc1d9e",
+      "ntsc_u_sha256": "13e95f59b67a6890878e69b4c0bbb08db793f0f5f46e1bec3d7844c2a08de0ba"
+    },
+    {
+      "address": "0x80668C20",
+      "size": 18192,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": "52f2f2ec705f12ba73236c5a2942ab46040dd7b3673ad103298074a4652d212a",
+      "ntsc_u_sha256": "52f2f2ec705f12ba73236c5a2942ab46040dd7b3673ad103298074a4652d212a"
+    },
+    {
+      "address": "0x8066D380",
+      "size": 8056,
+      "layout_equal": true,
+      "file_backed": false,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": null,
+      "ntsc_u_sha256": null
+    },
+    {
+      "address": "0x8066F300",
+      "size": 12452,
+      "layout_equal": true,
+      "file_backed": true,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": "eef526065a6202776e11eab38280f0c3e6a666537000594d7f1ae53de8cd8bb4",
+      "ntsc_u_sha256": "eef526065a6202776e11eab38280f0c3e6a666537000594d7f1ae53de8cd8bb4"
+    },
+    {
+      "address": "0x806723C0",
+      "size": 40,
+      "layout_equal": true,
+      "file_backed": false,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": null,
+      "ntsc_u_sha256": null
+    },
+    {
+      "address": "0x80674000",
+      "size": 3507456,
+      "layout_equal": true,
+      "file_backed": false,
+      "executable": false,
+      "different_bytes": [],
+      "pal_sha256": null,
+      "ntsc_u_sha256": null
+    }
+  ],
+  "ntsc_u_disc_id": "SECE69",
+  "ntsc_u_dol_sections": [
+    {
+      "address": "0x80004000",
+      "size": 10496,
+      "elf_payload_equal": true
+    },
+    {
+      "address": "0x80008920",
+      "size": 6005216,
+      "elf_payload_equal": true
+    },
+    {
+      "address": "0x80006900",
+      "size": 6720,
+      "elf_payload_equal": true
+    },
+    {
+      "address": "0x80008340",
+      "size": 1504,
+      "elf_payload_equal": true
+    },
+    {
+      "address": "0x805C2B00",
+      "size": 320,
+      "elf_payload_equal": true
+    },
+    {
+      "address": "0x805C2C40",
+      "size": 32,
+      "elf_payload_equal": true
+    },
+    {
+      "address": "0x805C2C60",
+      "size": 125408,
+      "elf_payload_equal": true
+    },
+    {
+      "address": "0x805E1680",
+      "size": 554400,
+      "elf_payload_equal": true
+    },
+    {
+      "address": "0x80668C20",
+      "size": 18208,
+      "elf_payload_equal": true
+    },
+    {
+      "address": "0x8066F300",
+      "size": 12480,
+      "elf_payload_equal": true
+    }
+  ],
+  "patch_originals_match_both_regions": {
+    "0x805E2C70": true,
+    "0x800325E4": true,
+    "0x8005C5B0": true,
+    "0x8000DB5C": true,
+    "0x80092184": true,
+    "0x8009240C": true,
+    "0x80092424": true,
+    "0x80091DBC": true,
+    "0x80091D0C": true,
+    "0x800921E0": true,
+    "0x800689A8": true
+  },
+  "patch_caves_zero_both_regions": {
+    "0x80006048": true,
+    "0x8062C100": true
+  },
+  "data_big_entries": {
+    "events/wii_strap_reminder_a/spanishus.rpk": "equal",
+    "events/wii_strap_reminder_b/spanishus.rpk": "equal",
+    "fingerpr.int": "equal",
+    "game.cfg": "equal",
+    "game.rpk": "different",
+    "game/localised/de-de.rpk": "region_only",
+    "game/localised/en-gb.rpk": "region_only",
+    "game/localised/en-us.rpk": "region_only",
+    "game/localised/es-es.rpk": "region_only",
+    "game/localised/es-mx.rpk": "region_only",
+    "game/localised/fr-ca.rpk": "region_only",
+    "game/localised/fr-fr.rpk": "region_only",
+    "game/localised/it-it.rpk": "region_only",
+    "game/localised/nl-nl.rpk": "region_only",
+    "levels/ancient_history.rpk": "equal",
+    "levels/bootflowde-de.rpk": "equal",
+    "levels/bootflowen-gb.rpk": "equal",
+    "levels/bootflowen-us.rpk": "equal",
+    "levels/bootflowes-es.rpk": "equal",
+    "levels/bootflowes-mx.rpk": "equal",
+    "levels/bootflowfr-ca.rpk": "equal",
+    "levels/bootflowfr-fr.rpk": "equal",
+    "levels/bootflowit-it.rpk": "equal",
+    "levels/bootflownl-nl.rpk": "equal",
+    "levels/family_home.rpk": "equal",
+    "levels/family_home_ii.rpk": "equal",
+    "levels/free_create.rpk": "equal",
+    "levels/future_world.rpk": "equal",
+    "levels/future_world_ii.rpk": "equal",
+    "levels/gothic.rpk": "equal",
+    "levels/home.rpk": "different",
+    "levels/landscape.rpk": "equal",
+    "levels/outsource_sandbox.rpk": "equal",
+    "levels/pirate.rpk": "equal",
+    "levels/skate.rpk": "equal",
+    "levels/space.rpk": "equal",
+    "levels/space_ii.rpk": "equal",
+    "levels/theme_park.rpk": "equal",
+    "levels/theme_park_ii.rpk": "equal",
+    "levels/transport.rpk": "equal"
+  },
+  "changed_data_big_entries_decompressed": {
+    "game.rpk": {
+      "pal_size": 8087084,
+      "ntsc_u_size": 8087084,
+      "different_byte_count": 71,
+      "first_difference": "0x3117",
+      "last_difference": "0x273237"
+    },
+    "levels/home.rpk": {
+      "pal_size": 1600800,
+      "ntsc_u_size": 1600800,
+      "different_byte_count": 150,
+      "first_difference": "0x8241",
+      "last_difference": "0xee199"
+    }
+  },
+  "files": [
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 29,
+          "different": 2,
+          "region_only": 9
+        },
+        "differences": {
+          "game.rpk": "different",
+          "game/localised/de-de.rpk": "region_only",
+          "game/localised/en-gb.rpk": "region_only",
+          "game/localised/en-us.rpk": "region_only",
+          "game/localised/es-es.rpk": "region_only",
+          "game/localised/es-mx.rpk": "region_only",
+          "game/localised/fr-ca.rpk": "region_only",
+          "game/localised/fr-fr.rpk": "region_only",
+          "game/localised/it-it.rpk": "region_only",
+          "game/localised/nl-nl.rpk": "region_only",
+          "levels/home.rpk": "different"
+        }
+      },
+      "path": "data.big",
+      "pal_size": 25936405,
+      "ntsc_u_size": 25248277,
+      "equal": false
+    },
+    {
+      "archive_entries": null,
+      "path": "hp_r.elf",
+      "pal_size": 9006688,
+      "ntsc_u_size": 9006688,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 680,
+          "different": 69,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/ac_laser_display1_4.tga": "different",
+          "bigfile/ac_laser_display1_6.tga": "different",
+          "bigfile/ac_laser_display1_8.tga": "different",
+          "bigfile/dec_brambles.tga": "different",
+          "bigfile/dec_deadplants.tga": "different",
+          "bigfile/dec_ferns.tga": "different",
+          "bigfile/dec_goth_flowers2.tga": "different",
+          "bigfile/dec_goth_flowers3.tga": "different",
+          "bigfile/dec_grassclump.tga": "different",
+          "bigfile/dec_grassclump_dead.tga": "different",
+          "bigfile/dec_nettles.tga": "different",
+          "bigfile/dec_pinkdaisies.tga": "different",
+          "bigfile/dec_tulips_orange.tga": "different",
+          "bigfile/dec_tulips_pink.tga": "different",
+          "bigfile/dec_tulips_purple.tga": "different",
+          "bigfile/dec_tulips_yellow.tga": "different",
+          "bigfile/dec_weeds.tga": "different",
+          "bigfile/et_create_blast.tga": "different",
+          "bigfile/st_fut_logo2.tga": "different",
+          "bigfile/st_fut_spaceshippanel_cm.tga": "different",
+          "bigfile/st_gth_crack2_cm.tga": "different",
+          "bigfile/st_gth_grunge1_cm.tga": "different",
+          "bigfile/st_his_birdman.tga": "different",
+          "bigfile/st_his_heiroglyphiclettera_cm.tga": "different",
+          "bigfile/st_his_heiroglyphiclettere_cm.tga": "different",
+          "bigfile/st_his_heiroglyphicletterh_cm.tga": "different",
+          "bigfile/st_his_heiroglyphiclettern_cm.tga": "different",
+          "bigfile/st_his_heiroglyphiclettero_cm.tga": "different",
+          "bigfile/st_his_romanshield_cm.tga": "different",
+          "bigfile/st_his_sand_stone_4.tga": "different",
+          "bigfile/st_his_scarab.tga": "different",
+          "bigfile/st_his_script1.tga": "different",
+          "bigfile/st_his_script4.tga": "different",
+          "bigfile/st_his_sunstone_cm.tga": "different",
+          "bigfile/st_his_templeart_cm.tga": "different",
+          "bigfile/st_lan_grassedge1_cm.tga": "different",
+          "bigfile/st_lan_snowedge1_cm.tga": "different",
+          "bigfile/st_lif_flowersblue.tga": "different",
+          "bigfile/st_lif_flowersyellow.tga": "different",
+          "bigfile/st_lif_window_curtains_1.tga": "different",
+          "bigfile/st_pir_treasuremap_cm.tga": "different",
+          "bigfile/st_pir_xmarksspot.tga": "different",
+          "bigfile/st_ska_badbunny_cm.tga": "different",
+          "bigfile/st_ska_chainlink_cm.tga": "different",
+          "bigfile/st_ska_crazymonkey_cm.tga": "different",
+          "bigfile/st_ska_crownstencil_cm.tga": "different",
+          "bigfile/st_ska_deadalien_cm.tga": "different",
+          "bigfile/st_ska_deaddemon_cm.tga": "different",
+          "bigfile/st_ska_fist_cm.tga": "different",
+          "bigfile/st_ska_graffiti01_cm.tga": "different",
+          "bigfile/st_ska_graffiti02_cm.tga": "different",
+          "bigfile/st_ska_grilledteeth_cm.tga": "different",
+          "bigfile/st_ska_lips_cm.tga": "different",
+          "bigfile/st_ska_plaster_cm.tga": "different",
+          "bigfile/st_ska_roadmarkings_cm.tga": "different",
+          "bigfile/st_ska_snakes_cm.tga": "different",
+          "bigfile/st_spa_airlock.tga": "different",
+          "bigfile/st_spa_number2.tga": "different",
+          "bigfile/st_the_bluebulbsanim.tga": "different",
+          "bigfile/st_the_graffiti_6_cm.tga": "different",
+          "bigfile/st_the_greenbulbsanim.tga": "different",
+          "bigfile/st_the_ribbon_2_cm.tga": "different",
+          "bigfile/st_the_ribbon_cm.tga": "different",
+          "bigfile/st_the_stars_several_cm.tga": "different",
+          "bigfile/st_the_yellowbulbsanim.tga": "different",
+          "bigfile/st_tra_planebaggagesign_cm.tga": "different",
+          "bigfile/st_tra_roadarrow_cm.tga": "different",
+          "bigfile/st_tra_roaddoublearrow_cm.tga": "different",
+          "bigfile/st_tra_roadrightarrow_cm.tga": "different"
+        }
+      },
+      "path": "levels/BigFile_AcetateTagSprites.big",
+      "pal_size": 37197696,
+      "ntsc_u_size": 37197696,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 172,
+          "different": 6,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_grit.tga": "different",
+          "bigfile/go_his_romanicaruswings_v0.wnk": "different",
+          "bigfile/sp_his_romantree_v0.wnk": "different",
+          "bigfile/sp_his_romantree_v1.wnk": "different",
+          "bigfile/tx_his_romantree_v1_cm.tga": "different"
+        }
+      },
+      "path": "levels/BigFile_Ancient_History.big",
+      "pal_size": 6302304,
+      "ntsc_u_size": 6302304,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 180,
+          "different": 50,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/ch_fut_robot_bindpose.wnk": "different",
+          "bigfile/ch_fut_robot_v1_bindpose.wnk": "different",
+          "bigfile/ch_fut_robot_v2_bindpose.wnk": "different",
+          "bigfile/ch_gth_wolf_bindpose.wnk": "different",
+          "bigfile/ch_gth_wolf_v1_bindpose.wnk": "different",
+          "bigfile/ch_his_anubis_bindpose.wnk": "different",
+          "bigfile/ch_his_camel_bindpose.wnk": "different",
+          "bigfile/ch_his_raptor_bindpose.wnk": "different",
+          "bigfile/ch_his_raptor_v1_bindpose.wnk": "different",
+          "bigfile/ch_his_raptor_v2_bindpose.wnk": "different",
+          "bigfile/ch_hl2_rabbit.wnk": "different",
+          "bigfile/ch_hl2_rabbit_v1_bindpose.wnk": "different",
+          "bigfile/ch_lan_crocodile_bindpose.wnk": "different",
+          "bigfile/ch_lan_elephant_ceremonial_bindpose.wnk": "different",
+          "bigfile/ch_lan_gorilla_bindpose.wnk": "different",
+          "bigfile/ch_lan_kangaroo_bindpose.wnk": "different",
+          "bigfile/ch_lan_leopard_bindpose.wnk": "different",
+          "bigfile/ch_lan_orangutan_bindpose.wnk": "different",
+          "bigfile/ch_lan_ostrich_bindpose.wnk": "different",
+          "bigfile/ch_lan_penguin_bindpose.wnk": "different",
+          "bigfile/ch_lan_polar_bear_bindpose.wnk": "different",
+          "bigfile/ch_lan_tiger.wnk": "different",
+          "bigfile/ch_lan_tiger_v1.wnk": "different",
+          "bigfile/ch_lan_tiger_v2_bindpose.wnk": "different",
+          "bigfile/ch_lif_cat_bindpose.wnk": "different",
+          "bigfile/ch_lif_cat_v1_bindpose.wnk": "different",
+          "bigfile/ch_lif_cat_v2_bindpose.wnk": "different",
+          "bigfile/ch_lif_dog_labrador.wnk": "different",
+          "bigfile/ch_ori_komodo_dragon_bindpose.wnk": "different",
+          "bigfile/ch_ori_monster.wnk": "different",
+          "bigfile/ch_ori_monster_v1_bindpose.wnk": "different",
+          "bigfile/ch_ori_panda_bindpose.wnk": "different",
+          "bigfile/ch_ori_robot.wnk": "different",
+          "bigfile/ch_ori_robot_v1_bindpose.wnk": "different",
+          "bigfile/ch_ori_robot_v2_bindpose.wnk": "different",
+          "bigfile/ch_sty_bear_bindpose.wnk": "different",
+          "bigfile/ch_sty_deer.wnk": "different",
+          "bigfile/ch_sty_dragon_bindpose.wnk": "different",
+          "bigfile/ch_sty_dragon_v1_bindpose.wnk": "different",
+          "bigfile/ch_sty_dragon_v2_bindpose.wnk": "different",
+          "bigfile/ch_sty_horse.wnk": "different",
+          "bigfile/ch_sty_horse_v1_bindpose.wnk": "different",
+          "bigfile/ch_sty_horse_v2_bindpose.wnk": "different",
+          "bigfile/ch_sty_horse_war_bindpose.wnk": "different",
+          "bigfile/ch_sty_troll_bindpose.wnk": "different",
+          "bigfile/ch_sty_unicorn_bindpose.wnk": "different",
+          "bigfile/sp_pir_squid_v0.wnk": "different",
+          "bigfile/sp_pir_squid_v1.wnk": "different",
+          "bigfile/tx_ch_lan_elephant_ceremonial_body01_cm.tga": "different",
+          "bigfile/tx_ch_sty_troll_cm.tga": "different"
+        }
+      },
+      "path": "levels/BigFile_Animals.big",
+      "pal_size": 11283040,
+      "ntsc_u_size": 11283040,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 163,
+          "different": 0,
+          "region_only": 0
+        },
+        "differences": {}
+      },
+      "path": "levels/BigFile_Audio.big",
+      "pal_size": 7869801,
+      "ntsc_u_size": 7869801,
+      "equal": true
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 220,
+          "different": 6,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/et_ash.tga": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_gas_burst.tga": "different",
+          "bigfile/et_smoke_02.tga": "different",
+          "bigfile/sp_lif_appletree_v0.wnk": "different",
+          "bigfile/sp_lif_appletree_v1.wnk": "different"
+        }
+      },
+      "path": "levels/BigFile_Family_Home.big",
+      "pal_size": 7689856,
+      "ntsc_u_size": 7689856,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 252,
+          "different": 18,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/et_blast.tga": "different",
+          "bigfile/et_create_blast.tga": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_glow_lamp.tga": "different",
+          "bigfile/et_glow_scythe.tga": "different",
+          "bigfile/sp_fut_dystopianfloater_v0.wnk": "different",
+          "bigfile/sp_fut_dystopianflyer_v0.wnk": "different",
+          "bigfile/sp_fut_dystopianhovercar_v0.wnk": "different",
+          "bigfile/sp_fut_dystopianmagcar_v0.wnk": "different",
+          "bigfile/sp_fut_metropoliscarrier_v0.wnk": "different",
+          "bigfile/sp_fut_metropolishovercar_v0.wnk": "different",
+          "bigfile/sp_fut_metropolisshuttle_v0.wnk": "different",
+          "bigfile/sp_fut_metropolistransporter_v0.wnk": "different",
+          "bigfile/sp_fut_utopiadisctower_v0.wnk": "different",
+          "bigfile/sp_fut_utopiaflyer_v0.wnk": "different",
+          "bigfile/sp_fut_utopialander_v0.wnk": "different",
+          "bigfile/sp_fut_utopiasportyflyer_v0.wnk": "different",
+          "bigfile/sp_fut_utopiavintagehovercar_v0.wnk": "different"
+        }
+      },
+      "path": "levels/BigFile_Future_World.big",
+      "pal_size": 9472752,
+      "ntsc_u_size": 9472752,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 317,
+          "different": 27,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/el_create_fireworks.lef": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_gas_burst.tga": "different",
+          "bigfile/et_create_glow_lamp.tga": "different",
+          "bigfile/et_dust_01.tga": "different",
+          "bigfile/et_dust_03.tga": "different",
+          "bigfile/et_fire_16f.tga": "different",
+          "bigfile/et_glow_lamp.tga": "different",
+          "bigfile/et_lightshaft_broad.tga": "different",
+          "bigfile/et_smoke_02.tga": "different",
+          "bigfile/et_targetzone_inner.tga": "different",
+          "bigfile/et_targetzone_outer.tga": "different",
+          "bigfile/sp_gth_scarecrow_v0_bindpose.wnk": "different",
+          "bigfile/sp_gth_scarecrow_v1_bindpose.wnk": "different",
+          "bigfile/sp_gth_scarecrow_v2_bindpose.wnk": "different",
+          "bigfile/sp_gth_scarytree_v0.wnk": "different",
+          "bigfile/sp_gth_scarytree_v1.wnk": "different",
+          "bigfile/sp_gth_windmill_v0.wnk": "different",
+          "bigfile/sp_gth_windmill_v1.wnk": "different",
+          "bigfile/tx_gth_deadtree_v0_cm.tga": "different",
+          "bigfile/tx_gth_foliage_v0_cm.tga": "different",
+          "bigfile/tx_gth_foliage_v1_cm.tga": "different",
+          "bigfile/tx_gth_foliage_v2_cm.tga": "different",
+          "bigfile/tx_gth_foliage_v3_cm.tga": "different",
+          "bigfile/tx_gth_rosebushes_v0_cm.tga": "different",
+          "bigfile/tx_gth_windmill_v0_cm.tga": "different",
+          "bigfile/tx_gth_wreath_v0_cm.tga": "different"
+        }
+      },
+      "path": "levels/BigFile_Gothic.big",
+      "pal_size": 12702336,
+      "ntsc_u_size": 12702336,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 256,
+          "different": 31,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/el_create_fireworks.lef": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_gas_burst.tga": "different",
+          "bigfile/et_create_glow_lamp.tga": "different",
+          "bigfile/et_targetzone_inner.tga": "different",
+          "bigfile/et_targetzone_outer.tga": "different",
+          "bigfile/sp_lan_firtree_v0.wnk": "different",
+          "bigfile/sp_lan_firtree_v1.wnk": "different",
+          "bigfile/sp_lan_firtree_v2.wnk": "different",
+          "bigfile/sp_lan_firtree_v3.wnk": "different",
+          "bigfile/sp_lan_joshuatree_v0.wnk": "different",
+          "bigfile/sp_lan_jungletree01_v0.wnk": "different",
+          "bigfile/sp_lan_jungletree01_v1.wnk": "different",
+          "bigfile/sp_lan_jungletree01_v2.wnk": "different",
+          "bigfile/sp_lan_jungletree02_v0.wnk": "different",
+          "bigfile/sp_lan_jungletree02_v1.wnk": "different",
+          "bigfile/sp_lan_snowfirtree_v0.wnk": "different",
+          "bigfile/sp_lan_snowfirtree_v1.wnk": "different",
+          "bigfile/sp_lan_snowfirtree_v2.wnk": "different",
+          "bigfile/sp_lan_snowfirtree_v3.wnk": "different",
+          "bigfile/sp_lan_windmill_v0.wnk": "different",
+          "bigfile/tx_gth_deadtree_v0_cm.tga": "different",
+          "bigfile/tx_lan_fern_v0_cm.tga": "different",
+          "bigfile/tx_lan_fern_v1_cm.tga": "different",
+          "bigfile/tx_lan_fern_v2_cm.tga": "different",
+          "bigfile/tx_lan_firtree_v1_cm.tga": "different",
+          "bigfile/tx_lan_jungletree01_v0_cm.tga": "different",
+          "bigfile/tx_lan_jungletree01_v1_cm.tga": "different",
+          "bigfile/tx_lan_jungletree01_v2_cm.tga": "different",
+          "bigfile/tx_lan_jungletree02_v1_cm.tga": "different",
+          "bigfile/tx_lan_snowfirtree_v0_cm.tga": "different"
+        }
+      },
+      "path": "levels/BigFile_Landscape.big",
+      "pal_size": 10128096,
+      "ntsc_u_size": 10128096,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 209,
+          "different": 22,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/el_create_fireworks.lef": "different",
+          "bigfile/et_bodobipbleu.tga": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_gas_burst.tga": "different",
+          "bigfile/et_create_glow_lamp.tga": "different",
+          "bigfile/et_create_teleport_centre.tga": "different",
+          "bigfile/et_create_teleport_off.tga": "different",
+          "bigfile/et_dh_lightningtree.tga": "different",
+          "bigfile/et_dh_mush_cloud.tga": "different",
+          "bigfile/et_flame_bunsen.tga": "different",
+          "bigfile/et_gas_burst.tga": "different",
+          "bigfile/et_glow_elec.tga": "different",
+          "bigfile/et_glow_lamp.tga": "different",
+          "bigfile/et_glow_scythe.tga": "different",
+          "bigfile/et_powder_disolve.tga": "different",
+          "bigfile/et_targetzone_inner.tga": "different",
+          "bigfile/et_targetzone_outer.tga": "different",
+          "bigfile/go_antigravity.wnk": "different",
+          "bigfile/go_button_fan.wnk": "different",
+          "bigfile/go_fan.wnk": "different",
+          "bigfile/sp_bubblemachine.wnk": "different",
+          "bigfile/tx_go_gen_balloondog_v0_cm.tga": "different"
+        }
+      },
+      "path": "levels/BigFile_Main.big",
+      "pal_size": 8063712,
+      "ntsc_u_size": 8063712,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 579,
+          "different": 0,
+          "region_only": 0
+        },
+        "differences": {}
+      },
+      "path": "levels/BigFile_Materials.big",
+      "pal_size": 19049056,
+      "ntsc_u_size": 19049056,
+      "equal": true
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 100,
+          "different": 7,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/et_create_blast.tga": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_dh_glacial_base.tga": "different",
+          "bigfile/et_dust_03.tga": "different",
+          "bigfile/et_floaty.tga": "different",
+          "bigfile/et_glow_lamp.tga": "different",
+          "bigfile/et_smoke_01_darkalpha.tga": "different"
+        }
+      },
+      "path": "levels/BigFile_Paint.big",
+      "pal_size": 9355872,
+      "ntsc_u_size": 9355872,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 226,
+          "different": 14,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/et_create_blast.tga": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_gas_burst.tga": "different",
+          "bigfile/et_create_glow_lamp.tga": "different",
+          "bigfile/et_create_smoke_puff_02.tga": "different",
+          "bigfile/et_create_star.tga": "different",
+          "bigfile/et_fire_liquid.tga": "different",
+          "bigfile/et_glow_lamp.tga": "different",
+          "bigfile/go_pir_squidtentacle_v1.wnk": "different",
+          "bigfile/sp_pir_beachpalmtree_v0.wnk": "different",
+          "bigfile/sp_pir_beachpalmtree_v1.wnk": "different",
+          "bigfile/sp_pir_beachpalmtree_v2.wnk": "different",
+          "bigfile/sp_pir_crowsnest_v0.wnk": "different",
+          "bigfile/sp_pir_crowsnest_v1.wnk": "different"
+        }
+      },
+      "path": "levels/BigFile_Pirate.big",
+      "pal_size": 8792672,
+      "ntsc_u_size": 8792672,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 336,
+          "different": 17,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/et_create_blast.tga": "different",
+          "bigfile/et_create_gas_burst.tga": "different",
+          "bigfile/et_create_glow_lamp.tga": "different",
+          "bigfile/sp_ska_banners_v0.wnk": "different",
+          "bigfile/sp_ska_banners_v1.wnk": "different",
+          "bigfile/sp_ska_banners_v2.wnk": "different",
+          "bigfile/sp_ska_banners_v3.wnk": "different",
+          "bigfile/sp_ska_banners_v4.wnk": "different",
+          "bigfile/sp_ska_flags_v0.wnk": "different",
+          "bigfile/sp_ska_flags_v1.wnk": "different",
+          "bigfile/sp_ska_flags_v2.wnk": "different",
+          "bigfile/sp_ska_flags_v3.wnk": "different",
+          "bigfile/sp_ska_lifeguard_v0.wnk": "different",
+          "bigfile/sp_ska_palmtree_v0.wnk": "different",
+          "bigfile/sp_ska_palmtree_v1.wnk": "different",
+          "bigfile/sp_ska_palmtree_v2.wnk": "different",
+          "bigfile/sp_ska_palmtree_v3.wnk": "different"
+        }
+      },
+      "path": "levels/BigFile_Skate.big",
+      "pal_size": 12626528,
+      "ntsc_u_size": 12626528,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 266,
+          "different": 24,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/et_bodobipbleu.tga": "different",
+          "bigfile/et_create_blast.tga": "different",
+          "bigfile/et_create_fire_mayan_16f.tga": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_gas_burst.tga": "different",
+          "bigfile/et_create_glow_lamp.tga": "different",
+          "bigfile/et_create_haloglow.tga": "different",
+          "bigfile/et_foam_disturb.tga": "different",
+          "bigfile/sp_spa_americanflag_v0.wnk": "different",
+          "bigfile/sp_spa_hubbletelescope_v0.wnk": "different",
+          "bigfile/sp_spa_observatory_v0.wnk": "different",
+          "bigfile/sp_spa_observatory_v1.wnk": "different",
+          "bigfile/sp_spa_probe_v0.wnk": "different",
+          "bigfile/sp_spa_probe_v1.wnk": "different",
+          "bigfile/sp_spa_probe_v2.wnk": "different",
+          "bigfile/sp_spa_probe_v3.wnk": "different",
+          "bigfile/sp_spa_robotarm_v0.wnk": "different",
+          "bigfile/sp_spa_robotarm_v1.wnk": "different",
+          "bigfile/sp_spa_robotarm_v2.wnk": "different",
+          "bigfile/sp_spa_spaceship01_v0.wnk": "different",
+          "bigfile/sp_spa_spaceship02_v0.wnk": "different",
+          "bigfile/sp_spa_spaceship03_v0.wnk": "different",
+          "bigfile/sp_spa_spaceship04_v0.wnk": "different",
+          "bigfile/sp_spa_spaceship05_v0.wnk": "different"
+        }
+      },
+      "path": "levels/BigFile_Space.big",
+      "pal_size": 10987616,
+      "ntsc_u_size": 10987616,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 298,
+          "different": 29,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/et_create_blast.tga": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_gas_burst.tga": "different",
+          "bigfile/et_create_glow_lamp.tga": "different",
+          "bigfile/et_dust_02.tga": "different",
+          "bigfile/et_glow_lamp.tga": "different",
+          "bigfile/sp_the_droptower_v0.wnk": "different",
+          "bigfile/sp_the_ferriswheel_v0.wnk": "different",
+          "bigfile/sp_the_flag_v0.wnk": "different",
+          "bigfile/sp_the_flag_v1.wnk": "different",
+          "bigfile/sp_the_flag_v2.wnk": "different",
+          "bigfile/sp_the_flag_v3.wnk": "different",
+          "bigfile/sp_the_rc_curved.wnk": "different",
+          "bigfile/sp_the_rc_loop.wnk": "different",
+          "bigfile/sp_the_rc_small.wnk": "different",
+          "bigfile/sp_the_spinningchairride_v0.wnk": "different",
+          "bigfile/sp_the_spinningride_v0.wnk": "different",
+          "bigfile/sp_the_unicycle_v0.wnk": "different",
+          "bigfile/sp_the_unicycle_v1.wnk": "different",
+          "bigfile/sp_the_unicycle_v2.wnk": "different",
+          "bigfile/sp_the_waltzer_v0.wnk": "different",
+          "bigfile/sp_the_waltzer_v1.wnk": "different",
+          "bigfile/tx_the_bushes_v0_cm.tga": "different",
+          "bigfile/tx_the_bushes_v1_cm.tga": "different",
+          "bigfile/tx_the_bushes_v2_cm.tga": "different",
+          "bigfile/tx_the_bushes_v3_cm.tga": "different",
+          "bigfile/tx_the_ferriswheel_v0_cm.tga": "different",
+          "bigfile/tx_the_spinningchairride_v0_cm.tga": "different",
+          "bigfile/tx_the_tincans_v0_cm.tga": "different"
+        }
+      },
+      "path": "levels/BigFile_Theme_Park.big",
+      "pal_size": 11938400,
+      "ntsc_u_size": 11938400,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 1791,
+          "different": 0,
+          "region_only": 0
+        },
+        "differences": {}
+      },
+      "path": "levels/BigFile_Thumbnails.big",
+      "pal_size": 58789060,
+      "ntsc_u_size": 58789060,
+      "equal": true
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 225,
+          "different": 12,
+          "region_only": 0
+        },
+        "differences": {
+          "bigfile/el_create_fireworks.lef": "different",
+          "bigfile/et_create_blast.tga": "different",
+          "bigfile/et_create_fizz_dust.tga": "different",
+          "bigfile/et_create_gas_burst.tga": "different",
+          "bigfile/et_create_glow_lamp.tga": "different",
+          "bigfile/et_glow_lamp.tga": "different",
+          "bigfile/et_smoke_01_darkalpha.tga": "different",
+          "bigfile/et_targetzone_inner.tga": "different",
+          "bigfile/sp_tra_helicopter_v0.wnk": "different",
+          "bigfile/sp_tra_propellerplane_v0.wnk": "different",
+          "bigfile/sp_tra_windsock_v0.wnk": "different",
+          "bigfile/sp_tra_windsock_v1.wnk": "different"
+        }
+      },
+      "path": "levels/BigFile_Transport.big",
+      "pal_size": 9046752,
+      "ntsc_u_size": 9046752,
+      "equal": false
+    },
+    {
+      "archive_entries": {
+        "counts": {
+          "equal": 4,
+          "different": 0,
+          "region_only": 0
+        },
+        "differences": {}
+      },
+      "path": "movies.big",
+      "pal_size": 9899188,
+      "ntsc_u_size": 9899188,
+      "equal": true
+    },
+    {
+      "archive_entries": null,
+      "path": "opening.bnr",
+      "pal_size": 318752,
+      "ntsc_u_size": 318752,
+      "equal": true
+    },
+    {
+      "archive_entries": null,
+      "path": "sound/Create.pck",
+      "pal_size": 536870912,
+      "ntsc_u_size": 1036026844,
+      "equal": false
+    }
+  ]
+}

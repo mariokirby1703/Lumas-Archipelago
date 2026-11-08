@@ -1,7 +1,6 @@
 # Create Archipelago World
 
-Create is a physics-based puzzle game about building contraptions. This Archipelago world targets the PAL Wii
-SECP69 release and uses an external Dolphin client.
+Create is a physics-based puzzle game about building contraptions. This Archipelago world targets the PAL (`SECP69`) and NTSC-U (`SECE69`) Wii releases and uses an external Dolphin client.
 
 ## Goals
 

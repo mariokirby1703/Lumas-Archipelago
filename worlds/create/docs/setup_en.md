@@ -4,11 +4,14 @@
 
 - [Archipelago 0.6.7](https://github.com/ArchipelagoMW/Archipelago/releases/latest) or newer
 - [Dolphin Emulator](https://dolphin-emu.org/download/)
-- A PAL Wii copy of Create, game ID `SECP69`
+- A PAL (`SECP69`) or NTSC-U (`SECE69`) Wii copy of Create
 - [The Create `.apworld` file](https://github.com/mariokirby1703/Lumas-Archipelago/releases)
 - [Universal Tracker](https://github.com/FarisTheAncient/Archipelago) (Highly suggested for keeping track!)
 
-This world is made for the PAL Wii version of the game. Other versions are not supported.
+PAL and NTSC-U build 525025 share the same client memory layout and popup runtime.
+The client detects the region automatically; the same generated seed works with either region.
+Other releases are not supported. NTSC-U has passed static disc verification; an in-game Dolphin
+playthrough is still required. See [disc verification](disc_audit.md).
 
 Universal Tracker does not need a separate Create integration for basic Archipelago tracking.
 Make sure to have your own .yaml file in your Players folder inside the Archipelago folder (most likely: C:\ProgramData\Archipelago\Players)
@@ -41,7 +44,7 @@ Generate the seed through the Archipelago Launcher or with Archipelago's normal 
 ## How to Play
 
 1. Open Dolphin.
-2. Start the PAL Wii version of Create.
+2. Start the PAL or NTSC-U Wii version of Create.
 3. **Always** play on Save Slot 3. Use a fresh save for each new seed. Deleting the save file before connecting is recommended.
 4. Open `Create Client` from the Archipelago Launcher.
 5. Connect to the Archipelago server using the address and port given by the host.
@@ -53,7 +56,7 @@ slots.
 
 ## Client Notes
 
-The client connects to a running Dolphin instance through Dolphin Memory Engine. It checks for the PAL game ID `SECP69`
+The client connects to a running Dolphin instance through Dolphin Memory Engine. It checks for game ID `SECP69` (PAL) or `SECE69` (NTSC-U)
 before reading locations or writing received unlocks.
 
 World and Object items unlock their corresponding content. Complete the Hub tutorial with the client connected so it can

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Enable NTSC-U (`SECE69`) using the disc-verified shared PAL/NTSC-U layout.
+- Fix the Windows MEM2 fallback rejecting NTSC-U after the main connector accepts it.
+- Add a reproducible local disc audit and region regression coverage.
+- Correct stale RAM-map metadata for the AP Total Sparks display.
+- NTSC-U still requires an in-game Dolphin verification pass.
+
 ## 0.1.0
 
 Initial release for Create on Wii (PAL, `SECP69`).
