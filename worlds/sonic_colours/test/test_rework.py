@@ -159,8 +159,8 @@ def test_new_game_prologue_any_slot_binding_resume_and_switch():
             assert len(runtime.poll(memory, [], True)[0]) == 2
             assert guard.state == PlaythroughState.RESUME
             hooks.value = replace(hooks.value, persisted_clears=frozenset({'stg110'}))
-            assert runtime.poll(memory, [], True) == (set(), False)
-            assert 'rollback' in guard.reason and not guard.armed
+            assert len(runtime.poll(memory, [], True)[0]) == 2
+            assert guard.armed and guard.can_send(hooks.value)
 
 
 def test_bootstrap_confirmation_cannot_claim_existing_save():

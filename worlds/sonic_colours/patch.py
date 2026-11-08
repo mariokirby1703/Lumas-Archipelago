@@ -54,6 +54,8 @@ UPGRADABLE_NATIVE_COMPONENTS.add('9956ab920740dbf7bf211703c52f762e17df18ccd1749a
 UPGRADABLE_NATIVE_COMPONENTS.add('ffec7ad5bfcee4c469a06adb86ca4eff8099ba9a5e17c781854510553115a1e4')
 UPGRADABLE_NATIVE_COMPONENTS.add('e0dfda06f09d2efc9a687d978f725babc3755871b839148571913db6e4c75c60')
 UPGRADABLE_RESOURCES.update({'d6500135d5b7a36c618d00961974c223b5d5ef9dff8488751693330c11aa0a08', 'ab0276016b694b38761ecc47aab8c2506086d2c7e9dd5bebff8ba0a3dbeeb0e9', 'a72d8cd9d9f2226092a3ce4cee0944e97cde8585bb6c2f0c57e5566778739521'})
+# Released 0.2.0 builder with CRLF source files; transforms are unchanged.
+UPGRADABLE_RESOURCES.add('c69e73601f7ebcec748133f004563da3d7e359b0f51b044eed331a5cd156b0f2')
 # Same resource layout; copy/hash publication is now combined into one pass.
 EQUIVALENT_RESOURCES={'26af2d039cd4a0fcb5e6c23a1021202afa31f1658371322f2fe2e4267fc49108',
                       'afc2af7ace43c78c67adb41bcdd4213c4ba144d7e391ca94e874c7e947e4ad07',
@@ -75,6 +77,14 @@ def resource_component_id():
                  'client/music_bank.py','data/bgm_cues.json','data/bgm_graphs.json'):
         digest.update(path.encode());digest.update(root.joinpath(*path.split('/')).read_bytes())
     return digest.hexdigest()
+
+def supported_native_component(digest):
+    if not isinstance(digest,str):return False
+    if digest in UPGRADABLE_NATIVE_COMPONENTS:return True
+    from .client.native_dol import plan_for_digest
+    try:plan_for_digest(digest)
+    except ValueError:return False
+    return True
 
 def canonical(value):return json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=True).encode()
 
@@ -139,11 +149,12 @@ class SonicColoursPatch(APAutoPatchInterface):
                 or len(supported)!=len(set(supported))
                 or any(disc not in DISC_IDS for disc in supported) or manifest.get('disc_id') not in supported):
             raise InvalidDataError('unsupported Sonic Colours source regions')
-        legacy=(manifest.get('native_abi') in (1,2) and manifest.get('native_component_sha256') in {plan()[2].hex(),*UPGRADABLE_NATIVE_COMPONENTS}
+        native_supported=supported_native_component(manifest.get('native_component_sha256'))
+        legacy=(manifest.get('native_abi') in (1,2) and native_supported
                 and manifest.get('resource_component_sha256') in UPGRADABLE_RESOURCES)
         if (manifest.get('game')!=GAME or manifest.get('sonic_patch_format')!=FORMAT
                 or not (manifest.get('native_abi')==ABI or legacy) or manifest.get('disc_id') not in DISC_IDS or manifest.get('revision')!=0
-                or manifest.get('native_component_sha256') not in {plan()[2].hex(),*UPGRADABLE_NATIVE_COMPONENTS}
+                or not native_supported
                 or manifest.get('resource_transform_version')!=1
                 or not (manifest.get('resource_component_sha256')==resource_component_id() or legacy)
                 or manifest.get('source_hashes')!={'main.dol':PAL_DOL_SHA256,'sonic2010_0.cpk':PAL_CPK_SHA256}):

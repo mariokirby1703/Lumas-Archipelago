@@ -85,6 +85,13 @@ def diagnostic(ctx, memory=None):
                        'persistent_save_bound': bool(runtime.journal.data.get('save_identity')),
                        'super_sonic_ap_permission': owned['super_sonic_allowed']})
         if runtime.snapshot:
+            previous = set(runtime.journal.data.get('native_monotonic_clears', ()))
+            current = set(runtime.snapshot.persisted_clears)
+            result['save_progress_comparison'] = {
+                'expected_clears': sorted(previous), 'observed_clears': sorted(current),
+                'missing_clears': sorted(previous-current),
+                'progress_verified': runtime.snapshot.progress_verified,
+            }
             # Expose the actual native byte for unsaved intro diagnosis.  This
             # is read-only evidence from the snapshot; it is never a save ID.
             trace = runtime.snapshot.evidence.get('save_chain_trace', {})

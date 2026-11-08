@@ -1,9 +1,10 @@
 import struct
+import time
 from . import native_events as n
 from .event_controls import write
 from .memory import MemoryUnavailable
 
-DURATION=15.
+DURATION=10.
 
 
 def deliver(runtime,memory,index,item):
@@ -25,7 +26,7 @@ def deliver(runtime,memory,index,item):
     request=(state['trap_request']+1)&0xffffffff or 1
     journal.prepare(index,item,[runtime.snapshot.session,runtime.snapshot.stage_epoch],0,DURATION)
     effect=journal.data['effects'][str(index)]
-    effect.update(family='dead_weight',native_request=request);journal.save()
+    effect.update(family='dead_weight',native_request=request,expires_at=time.time()+DURATION);journal.save()
     try:
         write(memory,runtime.snapshot,runtime.guard,{n.REMAINING:struct.pack('>f',DURATION)})
         write(memory,runtime.snapshot,runtime.guard,{n.TRAP_REQUEST:struct.pack('>I',request)})
@@ -41,4 +42,30 @@ def test_request(runtime,memory):
     request=(state['trap_request']+1)&0xffffffff or 1
     write(memory,runtime.snapshot,runtime.guard,{n.REMAINING:struct.pack('>f',DURATION)})
     write(memory,runtime.snapshot,runtime.guard,{n.TRAP_REQUEST:struct.pack('>I',request)})
+    runtime._dead_weight_test_clock=(request,time.time()+DURATION)
     return request
+
+
+def tick(runtime,memory):
+    state=n.status(memory)
+    if state['remaining']<=0:return
+    request=state['trap_request']
+    effect=next((e for e in runtime.journal.data['effects'].values()
+                 if e.get('family')=='dead_weight' and e.get('native_request')==request
+                 and e.get('state') in ('prepared','verifying','confirmed')),None)
+    if effect is None:
+        test=getattr(runtime,'_dead_weight_test_clock',None)
+        if not test or test[0]!=request:return
+        effect={'expires_at':test[1]}
+    if 'expires_at' not in effect:
+        effect['expires_at']=time.time()+min(DURATION,state['remaining'])
+        runtime.journal.save()
+    remaining=min(state['remaining'],max(0.,effect['expires_at']-time.time()))
+    if remaining>=state['remaining']:return
+    base=n.address(memory);address=base+n.REMAINING;raw=struct.pack('>f',remaining)
+    memory._event_transaction={'allowed':{address:4},'trap_clock':request,
+                              'values':{n.REMAINING:raw}}
+    try:
+        memory.write_bytes_verified(address,raw,expected=struct.pack('>f',state['remaining']),
+                                    operation='native_event_controls')
+    finally:memory._event_transaction=None

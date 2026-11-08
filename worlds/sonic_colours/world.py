@@ -29,6 +29,8 @@ class SonicColoursWorld(World):
                         'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS)}
 
     def generate_early(self):
+        if 'luma' in self.multiworld.get_player_name(self.player).casefold():
+            self.options.luma.value=1
         if self.options.luma:
             self.options.red_ring_item_colors.value=1
             self.options.own_item_red_ring_colors.value=2
@@ -128,7 +130,7 @@ class SonicColoursWorld(World):
             raise ValueError('Sonic Colours: enable more checks for mandatory progression.')
         weights = (0, 1, 3, 6)
         trap_weights = [weights[self.options.ring_loss_trap_weight.value], weights[self.options.score_reset_trap_weight.value],
-                        weights[self.options.dead_weight_trap_weight.value]]
+                        (0, 0.05, 3, 6)[self.options.dead_weight_trap_weight.value]]
         if self.options.trap_percentage.value and not any(trap_weights):
             logger.warning('Sonic Colours: all trap weights off; keeping ordinary filler.')
         trap_count = (filler_count * self.options.trap_percentage.value + 50) // 100 if any(trap_weights) else 0

@@ -52,3 +52,20 @@ def test_patch_endpoint_is_used_and_missing_address_never_reuses_last_room():
 @pytest.mark.parametrize('address',['archipelago.gg','http://example.org:80','host:0/no','user:password@host:38281'])
 def test_patch_requires_an_explicit_room_endpoint(address):
     with pytest.raises(ValueError):patch_server_address(SimpleNamespace(server=address),gui=False)
+
+
+@pytest.mark.parametrize('nogui',[False,True])
+def test_invalid_patch_reports_failure_before_patcher_start(monkeypatch,nogui,caplog):
+    import Utils
+    from .. import patch
+    from ..client.launch import launch_client
+    messages=[]
+    monkeypatch.setattr(Utils,'messagebox',lambda *a,**kw:messages.append((a,kw)))
+    def fail(path):raise ValueError('incompatible test patch')
+    monkeypatch.setattr(patch,'load_patch',fail)
+    arguments=['broken.apsoniccolours']
+    if nogui:arguments.append('--nogui')
+    launch_client(*arguments)
+    assert 'Could not open Sonic Colours player patch' in caplog.text
+    assert 'incompatible test patch' in caplog.text
+    assert bool(messages)==(not nogui)

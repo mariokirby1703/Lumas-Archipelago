@@ -10,7 +10,7 @@ HOOK=0x800D4CE8
 ORIGINAL=0x2C030000
 
 
-def program(capsule_control):
+def program(capsule_control,legacy_slots=False):
     a=PPC()
     a.d(11,0,3,0);a.branch('done',0x40820000)
     a.d(34,0,28,0x148);a.d(11,0,0,0);a.branch('done',0x40820000)
@@ -19,17 +19,17 @@ def program(capsule_control):
     a.d(15,12,0,capsule_control>>16);a.d(24,12,12,capsule_control&65535)
     a.d(32,5,12,0);a.d(11,0,5,0);a.branch('deny',0x41820000)
     a.d(34,0,5,0);a.d(32,6,12,4);a.emit(0x7C003000);a.branch('deny',0x40820000)
-    a.d(10,0,6,3);a.branch('deny',0x41810000)
+    a.d(10,0,6,3 if legacy_slots else 5);a.branch('deny',0x41810000)
     a.d(32,0,12,8);a.d(28,0,0,1);a.branch('done',0x40820000)
     a.label('deny');a.d(14,3,0,1)
     a.label('done');a.emit(ORIGINAL);a.emit(0)
     return a.finish()
 
 
-def patches(capsule_control,occupied):
+def patches(capsule_control,occupied,legacy_slots=False):
     from ..world_constants import load_data
     from .native_dol import branch
-    sites=load_data('white_capsule_open_sites.json');words=program(capsule_control)
+    sites=load_data('white_capsule_open_sites.json');words=program(capsule_control,legacy_slots)
     if len(words)!=len(sites):raise ValueError('White capsule opening layout differs')
     result=[]
     for i,word in enumerate(words):

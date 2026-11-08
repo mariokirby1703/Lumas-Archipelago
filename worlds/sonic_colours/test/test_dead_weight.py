@@ -37,7 +37,7 @@ def test_ack_required_receipt_dedup_and_conflicting_trap_defers(tmp_path,monkeyp
     try:
         item=ITEM_TABLE['Dead Weight Trap']
         dead_weight.deliver(runtime,m,0,item)
-        assert m.read_f32(base+n.REMAINING)==15.
+        assert m.read_f32(base+n.REMAINING)==10.
         assert runtime.journal.data['effects']['0']['state']=='verifying'
         request=m.read_u32(base+n.TRAP_REQUEST)
         dead_weight.deliver(runtime,m,0,item)
@@ -107,3 +107,47 @@ def test_item_id_and_weighted_pool_preserve_progression():
         assert any(i.name=='Dead Weight Trap' for i in multi.itempool)
         assert all(i.name=='Dead Weight Trap' for i in multi.itempool if i.trap)
         assert len(multi.itempool)==len(multi.worlds[1].active_locations)
+
+
+@pytest.mark.parametrize('scene',['paused','world_map','global_map','gameplay'])
+def test_timer_expires_in_pause_and_on_maps(tmp_path,monkeypatch,scene):
+    from dataclasses import replace
+    runtime,m,b,base=setup(tmp_path,monkeypatch)
+    now=[100.];monkeypatch.setattr(dead_weight.time,'time',lambda:now[0])
+    try:
+        dead_weight.deliver(runtime,m,0,ITEM_TABLE['Dead Weight Trap'])
+        request=m.read_u32(base+n.TRAP_REQUEST)
+        b.put(base+n.TRAP_ACK,request.to_bytes(4,'big'))
+        dead_weight.deliver(runtime,m,0,ITEM_TABLE['Dead Weight Trap'])
+        runtime.snapshot=replace(runtime.snapshot,scene=scene)
+        now[0]=104.;dead_weight.tick(runtime,m)
+        assert m.read_f32(base+n.REMAINING)==6.
+        now[0]=111.;dead_weight.tick(runtime,m)
+        assert m.read_f32(base+n.REMAINING)==0.
+        assert runtime.journal.data['effects']['0']['state']=='confirmed'
+    finally:runtime.journal.close()
+
+
+def test_low_dead_weight_is_twenty_times_less_likely_than_other_low_traps(monkeypatch):
+    import random
+    from ..Items import TRAPS
+    original=random.Random.choices;observed=[]
+    def choices(rng,population,weights=None,**kw):
+        if population==TRAPS:observed.append(weights)
+        return original(rng,population,weights=weights,**kw)
+    monkeypatch.setattr(random.Random,'choices',choices)
+    generate({'trap_percentage':100,'ring_loss_trap_weight':'low',
+              'score_reset_trap_weight':'low','dead_weight_trap_weight':'low'})
+    assert observed and observed[0]==[1,1,0.05]
+
+
+def test_expiration_cannot_increase_timer_or_touch_another_request(tmp_path,monkeypatch):
+    runtime,m,b,base=setup(tmp_path,monkeypatch)
+    try:
+        m._event_transaction={'allowed':{base+n.REMAINING:4},'trap_clock':99,
+                              'values':{n.REMAINING:struct.pack('>f',10.)}}
+        with pytest.raises(MemoryUnavailable):
+            m.write_bytes_verified(base+n.REMAINING,struct.pack('>f',10.),
+                                   expected=bytes(4),operation='native_event_controls')
+    finally:
+        m._event_transaction=None;runtime.journal.close()

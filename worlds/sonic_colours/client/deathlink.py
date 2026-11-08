@@ -7,6 +7,19 @@ import hashlib
 import json
 
 
+def native_death_trusted(runtime, native):
+    snap=runtime.snapshot
+    stage=native.get('death_stage')
+    if not stage:return False
+    if (getattr(runtime,'_death_stage_session',None)==snap.session
+            and stage in getattr(runtime,'_death_allowed_stages',set())):
+        return True
+    row=next(iter(snap.evidence.get('native_data',{}).get('stage_objects',[])),{})
+    return (stage==row.get('stage') and snap.scene_verified
+            and snap.scene in ('gameplay','dying','paused','respawning','results')
+            and runtime.guard.can_record(snap))
+
+
 class DeathLink:
     def __init__(self, journal):
         self.journal = journal
@@ -19,6 +32,8 @@ class DeathLink:
             self.state = 'RESPAWN_WAIT'
         self.alive_polls = 0
         self.sequence = None
+        self.native_context = None
+        self.pending_local_death = 0
         self.remote_request = journal.data.get('remote_request')
         self.remote_deadline = None
         self.last_action = 'idle'
@@ -39,10 +54,20 @@ class DeathLink:
         self.last_action = 'remote event queued'
         return True
 
-    def poll(self, *, safe, native_state, now, kill, native_sequence=None, remote_ack=None, cancel=None, kill_safe=True):
+    def poll(self, *, safe, native_state, now, kill, native_sequence=None, remote_ack=None, cancel=None, kill_safe=True, native_trusted=None, native_context=None, native_step=None):
         event=False
+        event_count=0
+        if native_context != self.native_context:
+            self.native_context = native_context
+            self.sequence = None
+            self.pending_local_death = 0
         if native_sequence is not None:
+            if self.sequence is not None and native_sequence < self.sequence:
+                self.pending_local_death = 0
             event=self.sequence is not None and native_sequence>self.sequence
+            if event:
+                event_count=(max(1,(native_sequence-self.sequence)//native_step)
+                             if native_step else 1)
             self.sequence=native_sequence
         if self.pending is not None and now >= self.pending:
             self.pending = None
@@ -65,10 +90,15 @@ class DeathLink:
             # The retained native counter is already a distinct death proof.
             # A fast respawn/death can happen before three living host samples;
             # do not discard that proof because the scene fallback is unarmed.
-            local_event=safe and not self.remote_cycle
+            trusted = safe if native_trusted is None else native_trusted
+            if trusted and not self.remote_cycle:
+                self.pending_local_death += event_count
             self.state='DEAD';self.alive_polls=0
             self.last_action='remote death witnessed' if self.remote_cycle else 'local death witnessed'
-            if local_event:return True
+        if safe and self.pending_local_death:
+            self.pending_local_death -= 1
+            self.last_action = 'local death sent'
+            return True
         if not safe:
             self.alive_polls = 0
             return False
@@ -140,5 +170,5 @@ class DeathLink:
 
     def status(self):
         return {'state':self.state,'pending_deadline':self.pending,'remote_cycle':self.remote_cycle,
-                'local_sequence':self.sequence,'remote_request':self.remote_request,
+                'local_sequence':self.sequence,'pending_local_death':self.pending_local_death,'remote_request':self.remote_request,
                 'remote_deadline':self.remote_deadline,'last_action':self.last_action,'last_error':self.last_error}

@@ -25,7 +25,7 @@ def machine(monkeypatch,colour,mask,index=0,hook=None):
 
 @pytest.mark.parametrize('colour',range(7))
 @pytest.mark.parametrize('owned',[False,True])
-@pytest.mark.parametrize('index',range(4))
+@pytest.mark.parametrize('index',range(6))
 def test_each_spawn_is_filtered_before_allocation(monkeypatch,colour,owned,index):
     m,cap,prog=machine(monkeypatch,colour,1<<colour if owned else 127^(1<<colour),index)
     m.run();assert m.spawned is owned

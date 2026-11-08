@@ -46,8 +46,7 @@ class SaveBinding:
                 if not binding or old.get('save_identity')!=binding['id']:continue
                 if (binding['profile_hex']!=saved['profile_hex']
                     or binding['selected_index']!=saved['chain'][2]
-                    or anchors(saved) not in binding['intro_record_witnesses']
-                    or not set(old.get('native_monotonic_clears',[]))<=snapshot.persisted_clears):continue
+                    or anchors(saved) not in binding['intro_record_witnesses']):continue
                 matches.append(old)
             except (OSError,ValueError,KeyError,TypeError):continue
         if len({old['native_binding']['id'] for old in matches})!=1:return
@@ -103,19 +102,17 @@ class SaveBinding:
                 changed = {mission for mission in INTRO if old[mission] != current[mission]}
                 # Native best rank, score and time are mutable records, not a
                 # save UUID. A legitimate replay can improve all three between
-                # polls (or while reconnecting). Retain the profile/slot and
-                # monotonic clear checks, and reject any record regression.
+                # polls (or while reconnecting). Keep the profile/slot proof
+                # and reject unrelated record changes.
                 record_improvement = (
                     snapshot.scene in ('gameplay','results','world_map','global_map')
                     and all(0<=current[m]['raw_rank']<=old[m]['raw_rank']<=4
                             and 0<current[m]['time_raw']<=old[m]['time_raw']
-                            and current[m]['score']>=old[m]['score'] for m in INTRO)
-                    and set(self.journal.data.get('native_monotonic_clears',[]))<=snapshot.persisted_clears)
+                            and current[m]['score']>=old[m]['score'] for m in INTRO))
                 legitimate_replay = record_improvement or (self.last_attributed_mission in changed and len(changed) == 1
                                      and (snapshot.scene == 'results' and snapshot.actual_mission == self.last_attributed_mission
                                           or snapshot.scene in ('world_map', 'global_map')
                                           and self.replay_result == self.last_attributed_mission)
-                                     and set(self.journal.data.get('native_monotonic_clears', [])) <= snapshot.persisted_clears
                                      and all(0 <= record['raw_rank'] <= 4 and record['time_raw'] > 0
                                              for record in current.values()))
                 if not legitimate_replay:

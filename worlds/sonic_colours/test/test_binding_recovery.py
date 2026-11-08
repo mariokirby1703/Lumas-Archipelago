@@ -17,8 +17,8 @@ def test_recovery_requires_exact_prior_seed_and_native_witness(tmp_path,mismatch
     journal=SimpleNamespace(path=tmp_path/'new.json',identity=identity,data=data,save=lambda:None)
     snapshot=SimpleNamespace(progress_verified=True,persisted_clears=frozenset() if mismatch=='rollback' else frozenset(['stg110']))
     SaveBinding(journal).recover_prior_binding(snapshot,saved)
-    assert (data['save_identity']=='witness')==(mismatch is None)
-    if mismatch is None:assert data['effects']['0']['state']=='confirmed'
+    assert (data['save_identity']=='witness')==(mismatch in (None,'rollback'))
+    if mismatch in (None,'rollback'):assert data['effects']['0']['state']=='confirmed'
 
 
 @pytest.mark.parametrize('recovered',[False,True])
@@ -48,4 +48,4 @@ def test_bound_resume_accepts_monotonic_record_improvements(change):
     if change=='rollback':saved['rank_records']['stg130']['score']=101
     snap=snapshot(progress_verified=True,persisted_clears=frozenset(['stg110'] if change=='rollback' else ['stg110','stg130']))
     result=SaveBinding(journal).attribute(snap,saved)
-    assert result.save_identity_verified==(change in ('score_up','rank','time_better'))
+    assert result.save_identity_verified==(change in ('score_up','rank','time_better','rollback'))

@@ -114,12 +114,9 @@ class SaveGuard:
                 self.reason = 'seed_save_identity_mismatch'
                 return
             previous = set(self.journal.data.get('native_monotonic_clears', []))
-            if snapshot.progress_verified and not previous <= snapshot.persisted_clears:
-                self.state = PlaythroughState.UNSAFE
-                self.reason = 'savestate_or_progress_rollback: writes and attribution paused; checks retained'
-                return
-            if snapshot.progress_verified and set(snapshot.persisted_clears) != previous:
-                self.journal.data['native_monotonic_clears'] = sorted(snapshot.persisted_clears)
+            current = set(snapshot.persisted_clears)
+            if snapshot.progress_verified and not current <= previous:
+                self.journal.data['native_monotonic_clears'] = sorted(previous | current)
                 self.journal.save()
             self.state = PlaythroughState.RESUME if self.session != snapshot.session else PlaythroughState.BOUND_PLAYTHROUGH
             self.session = snapshot.session
@@ -247,6 +244,14 @@ class SaveGuard:
             raise MemoryUnavailable('WRITE_BLOCKED: stats require a stable attributed living actor')
         return snapshot.session, snapshot.stage_epoch, snapshot.actual_mission, snapshot.rings_address, snapshot.lives_address
 
+    def check_owned_controls(self, snapshot):
+        token = self.check(snapshot)
+        if (not snapshot.progress_verified
+                or snapshot.scene not in ('gameplay','world_map','global_map','game_land_select')
+                or snapshot.scene == 'gameplay' and snapshot.death_state != 'alive'):
+            raise MemoryUnavailable('WRITE_BLOCKED: owned controls require a verified playable scene')
+        return token
+
     def check_visual(self, snapshot):
         if (not snapshot.scene_verified or snapshot.scene != 'gameplay'
                 or snapshot.death_state != 'alive' or not snapshot.stage_epoch
@@ -336,6 +341,15 @@ class WritePolicy:
             tx=getattr(self.memory,'_event_transaction',None)
             if not tx or tx['allowed'].get(address)!=size:
                 raise MemoryUnavailable('WRITE_BLOCKED: no native event transaction')
+            if tx.get('trap_clock') is not None:
+                import struct
+                value=struct.unpack('>f',tx['values'][events.REMAINING])[0]
+                before=self.memory.read_f32(base+events.REMAINING)
+                if (address!=base+events.REMAINING or size!=4
+                        or self.memory.read_u32(base+events.TRAP_REQUEST)!=tx['trap_clock']
+                        or not 0<=value<=before):
+                    raise MemoryUnavailable('WRITE_BLOCKED: trap clock can only reduce the current duration')
+                return ('trap_clock',base,tx['trap_clock'])
             if tx.get('music_loop'):
                 from .live_music import finite_loop_policy
                 if (address!=base+events.LOOP_CUE or size!=4
@@ -537,7 +551,7 @@ class WritePolicy:
                 if player is None:raise MemoryUnavailable('WRITE_BLOCKED: Stunts actor unavailable')
                 machine=observed(self.memory,player)['request_machine']
                 return ('verified ephemeral Stunts owner; no persistent save writes',snapshot.session,snapshot.stage_epoch,machine,base)
-            return self.guard.check(snapshot),base
+            return getattr(self.guard, 'check_owned_controls', self.guard.check)(snapshot),base
         if operation == 'wisp_inventory':
             from .wisp_inventory import owner
             tx=getattr(self.memory,'_wisp_inventory_transaction',None)
@@ -551,7 +565,7 @@ class WritePolicy:
             base=installed_data(self.memory)
             if base is None or size!=4 or address!=base:
                 raise MemoryUnavailable('WRITE_BLOCKED: unverified Assist Change data')
-            token=self.guard.check(snapshot)
+            token=getattr(self.guard, 'check_owned_controls', self.guard.check)(snapshot)
             return token,base
         if operation in ('movement_controls','skydiving','quick_step'):
             from .movement_gate import installed_data, observed
@@ -575,7 +589,7 @@ class WritePolicy:
                 # Actor-free permission words only. Persistent binding must
                 # match this snapshot; a cached save or unknown scene cannot
                 # authorize menu preloading. Guest verifies the next owner.
-                return self.guard.check(snapshot), snapshot.session, base
+                return getattr(self.guard, 'check_owned_controls', self.guard.check)(snapshot), snapshot.session, base
             if (snapshot.scene != 'gameplay' or snapshot.death_state != 'alive'
                     or not snapshot.scene_verified or snapshot.stable_polls < 1
                     or not (snapshot.progress_verified or self.guard.can_record_pickups(snapshot))):
@@ -586,7 +600,9 @@ class WritePolicy:
                 raise MemoryUnavailable('WRITE_BLOCKED: movement actor unavailable')
             ctrl = observed(self.memory, player)['request_machine']
             return ('verified ephemeral PAL Sonic movement owner; no persistent save writes', ctrl, base)
-        if operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls') and snapshot.save_identity is None:
+        if operation in ('progression_data','gameplay_controls','capsule_controls','colour_permissions') and snapshot.save_identity is not None:
+            token = getattr(self.guard, 'check_owned_controls', self.guard.check)(snapshot)
+        elif operation in ('progression_data','progression_reset','gameplay_controls','capsule_controls') and snapshot.save_identity is None:
             token = self.guard.check_stats(snapshot)
         else:
             token = self.guard.check_stats(snapshot) if operation in ('stats', 'boost_stats', 'colour_permissions') else self.guard.check(snapshot)

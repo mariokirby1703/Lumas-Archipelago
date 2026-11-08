@@ -18,7 +18,7 @@ def machine(monkeypatch,permission,index=0):
 
 
 @pytest.mark.parametrize('permission',range(4))
-@pytest.mark.parametrize('index',range(4))
+@pytest.mark.parametrize('index',range(6))
 def test_open_requires_white_permission_not_random_capsules(monkeypatch,permission,index):
     m,cap,actor=machine(monkeypatch,permission,index);m.run()
     assert m.r[3]==int(not permission&1)
@@ -32,7 +32,7 @@ def test_first_frame_and_profile_replacement_fail_closed(monkeypatch,failure):
     m,cap,actor=machine(monkeypatch,3)
     if failure=='unarmed':m.put(cap,0)
     elif failure=='different_slot':m.put(cap+4,1)
-    else:m.put(cap+4,4);m.b.put(0x900d0000,bytes([4]))
+    else:m.put(cap+4,6);m.b.put(0x900d0000,bytes([6]))
     m.run();assert m.r[3]==1
 
 

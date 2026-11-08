@@ -878,11 +878,15 @@ async def dolphin_loop(ctx):
                     native=getattr(ctx.runtime,'native_event_status',{})
                     if native.get('installed'):
                         from .event_controls import safe_kill,cancel_kill
+                        from .deathlink import native_death_trusted
+                        trusted_death=native_death_trusted(ctx.runtime,native)
                         local_death = ctx.deathlink.poll(
                             safe=bool(snap.scene_verified and (ctx.runtime.guard.can_record_pickups(snap) or
-                                      native['death_stage'] in getattr(ctx.runtime,'_death_allowed_stages',set()))),
+                                      trusted_death)),
                             native_state=snap.death_state, now=time.monotonic(),
                             native_sequence=native['death_sequence'],remote_ack=native['remote_ack'],
+                            native_context=snap.session,native_step=2,
+                            native_trusted=trusted_death,
                             kill_safe=safe_kill(snap),
                             cancel=lambda:cancel_kill(memory,snap,ctx.runtime.guard,ctx.deathlink.remote_request),
                             kill=lambda: ctx.runtime.hooks.kill(memory, snap))

@@ -117,7 +117,16 @@ def launch_client(*args):
     if parsed.patch_file:
         from ..patch import load_patch
         from .iso_patch import install,install_with_progress,settings_group
-        patch=load_patch(parsed.patch_file)
+        try:
+            patch=load_patch(parsed.patch_file)
+        except Exception as error:
+            logging.exception('Could not open Sonic Colours player patch: %s', parsed.patch_file)
+            if not getattr(parsed,'nogui',False):
+                import Utils
+                Utils.messagebox('Sonic Colours player patch',
+                    f'Could not open the selected player patch:\n{error}\n\n'
+                    'Please send the latest Launcher log from the Archipelago logs folder.',error=True)
+            return
         if not parsed.patch_only:
             try:
                 parsed.connect=patch_server_address(patch,parsed.connect,not getattr(parsed,'nogui',False))

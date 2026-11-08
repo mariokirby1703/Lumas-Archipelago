@@ -22,7 +22,7 @@ def setup_machine(monkeypatch,colour,mask,index):
 
 @pytest.mark.parametrize('colour',range(7))
 @pytest.mark.parametrize('owned',[False,True])
-@pytest.mark.parametrize('index',range(4))
+@pytest.mark.parametrize('index',range(6))
 def test_native_held_query_denies_unowned_without_waiting_for_inventory_clear(monkeypatch,colour,owned,index):
     m,cap,prog,model=setup_machine(monkeypatch,colour,1<<colour if owned else 127^(1<<colour),index)
     for _ in range(3):
@@ -74,3 +74,55 @@ def test_original_hook_and_padding_proof(pal_dol_bytes):
         assert im.read(a+12,4).hex()==site['after']
         assert not any(a+i in refs for i in range(12))
     patch_dol(raw,bytes(32))
+
+
+@pytest.mark.parametrize('index', range(6))
+def test_reopening_game_republishes_owned_permissions(monkeypatch,index):
+    m,cap,prog,model=setup_machine(monkeypatch,1,2,index)
+    m.run();assert m.r[3]==1
+    # A new emulation reloads the baked controls, then the client publishes
+    # the same received inventory for the selected save again.
+    m.put(cap,0);m.put(prog,0);m.put(prog+8,0)
+    m.put(cap,0x900d0000);m.put(cap+4,index)
+    m.put(prog,0x900d0000+0x24+index*0x19608);m.put(prog+8,2)
+    m.r[3]=model;m.run();assert m.r[3]==1
+    m.put(prog+8,0);m.r[3]=model;m.run();assert m.r[3]==0xffffffff
+
+
+@pytest.mark.parametrize('index',[6,7,255])
+def test_native_activation_rejects_invalid_save_index(monkeypatch,index):
+    m,cap,prog,model=setup_machine(monkeypatch,1,127,index)
+    m.run();assert m.r[3]==0xffffffff
+
+
+def test_previous_wisp_hook_signatures_remain_recognized():
+    from ..client.native_dol import plan_for_digest
+    for luma in (False,True):
+        for fps in (False,True):
+            old=plan(include_luma_colors=luma,include_sixty_fps=fps,legacy_wisp_slots=True)
+            assert plan_for_digest(old[2].hex())==old
+
+
+def test_running_client_restores_live_masks_after_game_restart(monkeypatch):
+    from ..client.hooks import NativeHooks
+    from ..client.memory import SonicMemory
+    from ..client.runtime import inventory
+    from ..Items import ITEM_TABLE
+    from ..world_constants import NATIVE_COLOURS
+    from .test_memory import FakeBackend
+    from .test_runtime import snapshot
+    from . import generate
+    monkeypatch.setattr(capsule_refresh,'inspect_installed',lambda memory:{'installed':False})
+    hooks=NativeHooks();backend=FakeBackend()
+    memory=SonicMemory(backend,lambda *args:'verified fixture')
+    stage=0x90010000;actor_state=0x90020000
+    state=snapshot(evidence={'native_data':{'stage_objects':[{'stage':stage,'actor_state':actor_state}]}})
+    slot=generate().worlds[1].fill_slot_data()
+    owned=inventory([ITEM_TABLE['Cyan Laser Wisp']])
+    expected=1<<NATIVE_COLOURS.index('Cyan Laser')
+    for boot in range(2):
+        for address in (stage+0x61,actor_state+0x90):backend.put(address,b'\0')
+        if boot:hooks.invalidate_session()
+        hooks.project_live_permissions(memory,state,owned,slot)
+        assert memory.read_u8(stage+0x61)==expected
+        assert memory.read_u8(actor_state+0x90)==expected

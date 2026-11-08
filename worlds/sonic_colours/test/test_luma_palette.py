@@ -115,7 +115,7 @@ def test_palette_does_not_change_generation_or_normal_colors(colorblind):
     disabled = {**options,'luma':0}
     for flags in range(8):
         assert reward_color(1,2,flags,1,options,'Seed',123) == reward_color(1,2,flags,1,disabled,'Seed',123)
-    assert plan()[2].hex() == 'c93c8e318a2b66d0f09716d0b9628d42027ebe94c733914dc348355b62c3cfa6'
+    assert plan(legacy_wisp_slots=True)[2].hex() == 'c93c8e318a2b66d0f09716d0b9628d42027ebe94c733914dc348355b62c3cfa6'
 
 
 @pytest.mark.parametrize('checks', ['singles','per_level'])
@@ -242,3 +242,49 @@ def test_luma_hud_changes_only_item_names(own):
     for address,value in luma.items():
         if address == target: assert value[4:] == plain[address][4:]
         else: assert value == plain[address]
+
+
+@pytest.mark.parametrize('name',['Luma','luma','LUMA','SuperLuMa64','Player_Luma_2','Plumage'])
+def test_player_name_automatically_enables_full_luma_override(name):
+    slot=generate({'luma':'off','red_ring_item_colors':False,'own_item_red_ring_colors':0,
+                   'trap_red_ring_colors':1,'colorblind_mode':True},player_name=name).worlds[1].fill_slot_data()
+    options=slot['options']
+    assert options['luma']==1 and options['red_ring_item_colors']==1
+    assert options['own_item_red_ring_colors']==2 and options['trap_red_ring_colors']==0
+    assert reward_color(ITEM_TABLE['Red Ring'],1,4,1,options,'Seed',100)=='luma_trap'
+    assert item_color(1,colorblind=True,luma=bool(options['luma']))=='#83D72F'
+
+
+@pytest.mark.parametrize('name',['SonicPlayer','Lumina','Lu_ma','Mario'])
+def test_other_player_names_keep_their_color_options(name):
+    options=generate({'red_ring_item_colors':False,'own_item_red_ring_colors':0,
+                      'trap_red_ring_colors':1},player_name=name).worlds[1].fill_slot_data()['options']
+    assert options['luma']==0 and options['red_ring_item_colors']==0
+    assert options['own_item_red_ring_colors']==0 and options['trap_red_ring_colors']==1
+
+
+def test_name_palette_is_baked_into_the_player_patch(tmp_path):
+    from ..patch import load_patch
+    multi=generate({'red_ring_item_colors':False},41,fill=True,player_name='SuperLuMa64')
+    multi.worlds[1].generate_output(tmp_path)
+    patch=load_patch(next(tmp_path.glob('*.apsoniccolours')))
+    assert patch.player_name=='SuperLuMa64' and patch.slot_data['options']['luma']==1
+    assert any(c.startswith('luma_') for row in patch.ring_colors.values() for c in row)
+
+
+def test_name_palette_stays_per_player():
+    from argparse import Namespace
+    from BaseClasses import MultiWorld,CollectionState
+    from ..Options import SonicColoursOptions
+    from ..world_constants import GAME
+    from worlds.AutoWorld import call_all
+    multi=MultiWorld(2);multi.set_seed(41);multi.seed_name='NamePaletteTest'
+    multi.player_name={1:'Luma',2:'Other'}
+    for player in multi.player_ids:multi.game[player]=GAME
+    args=Namespace()
+    for name,option in SonicColoursOptions.type_hints.items():
+        setattr(args,name,{player:option.from_any(option.default) for player in multi.player_ids})
+    multi.set_options(args);multi.state=CollectionState(multi)
+    call_all(multi,'generate_early')
+    assert multi.worlds[1].options.luma.value==1
+    assert multi.worlds[2].options.luma.value==0

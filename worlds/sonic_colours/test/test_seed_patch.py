@@ -173,3 +173,34 @@ def test_insufficient_space_fails_before_tool_or_source_mutation(tmp_path,monkey
     monkeypatch.setattr(iso_patch.shutil,'disk_usage',lambda p:SimpleNamespace(free=0))
     with pytest.raises(OSError,match='space'):install(patch,source,tmp_path/'out.iso')
     assert source.read_bytes()==header and not (tmp_path/'out.iso').exists()
+
+
+@pytest.mark.parametrize('luma',[False,True])
+@pytest.mark.parametrize('fps',[False,True])
+def test_previous_native_plan_player_patches_upgrade_safely(tmp_path,luma,fps):
+    path=tmp_path/'previous.apsoniccolours';original=make_patch(path)
+    with zipfile.ZipFile(path) as z:members={n:z.read(n) for n in z.namelist()}
+    manifest=json.loads(members['archipelago.json'])
+    manifest['native_component_sha256']=plan(include_luma_colors=luma,include_sixty_fps=fps,
+                                            legacy_wisp_slots=True)[2].hex()
+    members['archipelago.json']=json.dumps(manifest).encode()
+    with zipfile.ZipFile(path,'w') as z:
+        for name,data in members.items():z.writestr(name,data)
+    loaded=load_patch(path)
+    assert loaded.slot_data==original.slot_data and loaded.player==original.player
+
+
+def test_actual_released_020_generator_patch_loads_without_seed_changes(tmp_path):
+    from ..patch import canonical
+    fixture=json.loads((Path(__file__).parent/'fixtures/release_020_player_patch.json').read_text())
+    path=tmp_path/'released_020.apsoniccolours'
+    with zipfile.ZipFile(path,'w') as z:
+        for name,data in fixture.items():z.writestr(name,canonical(data))
+    loaded=load_patch(path)
+    assert loaded.player==1 and loaded.player_name=='LegacyPlayer'
+    assert loaded.slot_data['options_revision']==12
+    assert loaded.slot_data['options']['rank_checks']==0
+    assert loaded.slot_data['locations']==fixture['seed.json']['slot_data']['locations']
+    assert loaded.slot_data['seed_name']==fixture['seed.json']['slot_data']['seed_name']
+    from ..client.client import slot_identity_digest
+    assert slot_identity_digest(loaded.slot_data)==slot_identity_digest(fixture['seed.json']['slot_data'])

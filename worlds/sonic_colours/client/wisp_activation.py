@@ -12,7 +12,7 @@ HOOK=0x8020B48C
 ORIGINAL=0x80630018
 
 
-def program(capsule_control,progression_control):
+def program(capsule_control,progression_control,legacy_slots=False):
     a=PPC()
     def const(r,v):a.d(15,r,0,v>>16);a.d(24,r,r,v&65535)
     def eq(l,r):a.emit(0x7C000000|l<<16|r<<11)
@@ -22,7 +22,7 @@ def program(capsule_control,progression_control):
     const(12,capsule_control);a.d(32,5,12,0)
     a.d(11,0,5,0);a.branch('done',0x41820000)  # inactive AP policy
     a.d(34,0,5,0);a.d(32,6,12,4);eq(0,6);a.branch('deny',0x40820000)
-    a.d(10,0,6,3);a.branch('deny',0x41810000)
+    a.d(10,0,6,3 if legacy_slots else 5);a.branch('deny',0x41810000)
     const(12,0x19608);a.emit(0x7CC661D6)
     a.d(14,6,6,0x24);a.emit(0x7CA53214)
     const(12,progression_control);a.d(32,0,12,0);eq(0,5);a.branch('deny',0x40820000)
@@ -34,7 +34,7 @@ def program(capsule_control,progression_control):
     return a.finish()
 
 
-def patches(capsule_control,progression_control,occupied):
+def patches(capsule_control,progression_control,occupied,legacy_slots=False):
     from ..world_constants import load_data
     from .native_dol import branch
     from .native_events import scatter
@@ -43,7 +43,7 @@ def patches(capsule_control,progression_control,occupied):
         if any(s['address']<a+len(n) and a<s['address']+12 for a,o,n in occupied):
             raise ValueError('Wisp activation padding overlaps another hook')
     return [(HOOK,struct.pack('>I',ORIGINAL),struct.pack('>I',branch(HOOK,sites[0]['address']))),
-            *scatter(program(capsule_control,progression_control),sites,HOOK+4,compact=True)]
+            *scatter(program(capsule_control,progression_control,legacy_slots),sites,HOOK+4,compact=True)]
 
 
 def planned_patches():

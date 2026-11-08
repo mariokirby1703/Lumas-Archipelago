@@ -301,3 +301,13 @@ def test_successful_music_change_clears_previous_end_latch_in_guest():
     m=Machine('music');m.put(m.control+n.LOOP_CUE,0x10000|1002)
     m.run()
     assert m.get(m.control+n.LOOP_CUE)==1002
+
+
+@pytest.mark.parametrize('enabled',[0,1])
+def test_abyss_death_capture_does_not_require_living_input_or_enabled_requests(enabled):
+    m=Machine('death');m.put(m.control+n.ENABLE,enabled)
+    m.put(m.machine+0x1c,24)
+    m.put(m.player+0x88,0)
+    m.run()
+    assert m.get(m.control+n.DEATH_SEQ)==2
+    assert m.get(m.control+n.DEATH_STAGE)==m.stage

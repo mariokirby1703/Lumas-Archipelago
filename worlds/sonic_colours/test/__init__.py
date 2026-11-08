@@ -6,12 +6,12 @@ from worlds.AutoWorld import call_all
 from ..world import SonicColoursWorld
 
 
-def generate(options=None, seed=0, fill=False):
+def generate(options=None, seed=0, fill=False, player_name='SonicPlayer'):
     multiworld = MultiWorld(1)
     multiworld.set_seed(seed)
     multiworld.seed_name = f'SonicTest{seed}'
     multiworld.game[1] = SonicColoursWorld.game
-    multiworld.player_name = {1: 'SonicPlayer'}
+    multiworld.player_name = {1: player_name}
     args = Namespace()
     for name, option in SonicColoursWorld.options_dataclass.type_hints.items():
         # Native replay fixtures use the original starting world. Random Choice

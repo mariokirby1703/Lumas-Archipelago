@@ -99,7 +99,7 @@ class MusicRandomization(DefaultOnToggle):
 
 
 class DeadWeightTrapWeight(Choice):
-    """Relative frequency of Dead Weight Traps. Blocks jumping for 15 seconds of active stage gameplay. Deaths preserve the remaining time."""
+    """Relative frequency of Dead Weight Traps. Low makes them very rare compared with other enabled traps. Blocks jumping for 10 seconds; the timer continues during pauses and on maps."""
     display_name = 'Dead Weight Trap Weight'
     option_off = 0
     option_low = 1

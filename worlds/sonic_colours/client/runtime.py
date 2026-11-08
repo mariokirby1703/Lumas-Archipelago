@@ -607,9 +607,14 @@ class Runtime:
         yield set(),False  # publish HUD before lower-priority reconciliation
         try:
             from .event_controls import configure as configure_events
+            from .dead_weight import tick as tick_dead_weight
+            tick_dead_weight(self,memory)
             self.native_event_status=configure_events(self,memory)
             self.temporary_trap_status={'name':'Dead Weight Trap','remaining':self.native_event_status['remaining'],
-                                        'active':self.native_event_status['remaining']>0,'time_source':'native gameplay delta'}
+                                        'active':self.native_event_status['remaining']>0,'time_source':'native gameplay delta with real-time expiry'}
+            if getattr(self,'_death_stage_session',None)!=self.snapshot.session:
+                self._death_stage_session=self.snapshot.session
+                self._death_allowed_stages=set()
             self._death_allowed_stages=getattr(self,'_death_allowed_stages',set())
             if (getattr(self,'_event_owner',None) and self.snapshot.scene=='gameplay'
                     and self.guard.can_record_pickups(self.snapshot)):
@@ -900,7 +905,10 @@ class Runtime:
         try:
             self.guard.check(self.snapshot)
         except MemoryUnavailable:
-            self.guard.check_stats(self.snapshot)
+            try:
+                self.guard.check_stats(self.snapshot)
+            except MemoryUnavailable:
+                getattr(self.guard, 'check_owned_controls', self.guard.check)(self.snapshot)
             self.configure_native_hooks(memory, owned)
             self.hooks.project_live_permissions(memory, self.snapshot, owned, self.slot_data)
             return

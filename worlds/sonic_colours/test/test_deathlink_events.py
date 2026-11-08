@@ -76,3 +76,74 @@ def test_duplicate_and_restart_do_not_replay_pending_event():
     assert d.receive(event,0) and not d.receive(event,1)
     restarted=DeathLink(d.journal)
     assert restarted.pending is None and not restarted.receive(event,2)
+
+
+def test_verified_death_after_pause_waits_for_scene_and_sends_once():
+    d=setup();poll(d,0,native_context='game')
+    assert not poll(d,1,safe=False,native_state='paused',native_context='game')
+    assert not poll(d,2,2,safe=False,native_state='dying',native_trusted=True,native_context='game')
+    assert d.pending_local_death
+    assert poll(d,3,2,native_context='game')
+    assert not poll(d,4,2,native_context='game')
+
+
+def test_zero_ring_enemy_death_does_not_require_dying_or_respawn_samples():
+    d=setup();poll(d,0,native_context='game')
+    for seq in (2,4,6):
+        assert not poll(d,seq,seq,safe=False,native_state='unknown',native_trusted=True,native_context='game')
+        assert poll(d,seq+.01,seq,native_context='game')
+        assert not poll(d,seq+.02,seq,native_context='game')
+
+
+def test_deferred_event_cannot_cross_emulation_sessions():
+    d=setup();poll(d,0,native_context='old')
+    assert not poll(d,1,2,safe=False,native_trusted=True,native_context='old')
+    assert not poll(d,2,0,native_context='new')
+    assert not d.pending_local_death
+
+
+def test_remote_death_during_unsafe_transition_is_never_queued_as_local():
+    d=setup();poll(d,0);d.receive({'time':1,'source':'peer'},1)
+    assert not poll(d,1)
+    assert not poll(d,2,2,safe=False,native_trusted=True)
+    assert not d.pending_local_death
+    assert not poll(d,3,2)
+
+
+def test_enemy_death_uses_attributed_native_stage_without_pickup_fields():
+    from ..client.deathlink import native_death_trusted
+    snap=SimpleNamespace(session='game',scene='dying',scene_verified=True,
+        evidence={'native_data':{'stage_objects':[{'stage':0x90010000}]}})
+    runtime=SimpleNamespace(snapshot=snap,guard=SimpleNamespace(can_record=lambda s:True))
+    assert native_death_trusted(runtime,{'death_stage':0x90010000})
+    assert not native_death_trusted(runtime,{'death_stage':0x90020000})
+    runtime.guard.can_record=lambda s:False
+    assert not native_death_trusted(runtime,{'death_stage':0x90010000})
+
+
+def test_paused_context_can_retain_only_previously_verified_stage_in_same_session():
+    from ..client.deathlink import native_death_trusted
+    snap=SimpleNamespace(session='game',scene='paused',scene_verified=False,evidence={})
+    runtime=SimpleNamespace(snapshot=snap,_death_stage_session='game',
+        _death_allowed_stages={0x90010000},guard=SimpleNamespace(can_record=lambda s:False))
+    assert native_death_trusted(runtime,{'death_stage':0x90010000})
+    runtime._death_stage_session='previous-game'
+    assert not native_death_trusted(runtime,{'death_stage':0x90010000})
+
+
+def test_fast_abyss_death_survives_unclassified_transition_and_immediate_respawn():
+    d=setup();poll(d,0,native_context='game',native_step=2)
+    assert not poll(d,1,2,safe=False,native_state='unknown',native_trusted=True,
+                    native_context='game',native_step=2)
+    assert poll(d,2,2,native_state='alive',native_context='game',native_step=2)
+    assert not poll(d,3,2,native_context='game',native_step=2)
+
+
+def test_two_fast_abyss_deaths_between_host_polls_each_send_once():
+    d=setup();poll(d,0,native_context='game',native_step=2)
+    assert not poll(d,1,4,safe=False,native_state='unknown',native_trusted=True,
+                    native_context='game',native_step=2)
+    assert d.pending_local_death==2
+    assert poll(d,2,4,native_context='game',native_step=2)
+    assert poll(d,3,4,native_context='game',native_step=2)
+    assert not poll(d,4,4,native_context='game',native_step=2)

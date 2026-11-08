@@ -56,7 +56,7 @@ class Dol:
         self.sections.append((slot,offset,address,len(blob)))
 
 @lru_cache(maxsize=32)
-def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False,legacy_fps_word_write=False):
+def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False,legacy_fps_word_write=False,legacy_wisp_slots=False):
     """Rebuild every C2 payload as initialized native code, without C2 headers."""
     from .native_hook_table import hook_rows
     from .ap_hud_publisher import patches as hud
@@ -129,11 +129,11 @@ def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards
     drill=next(h for h in hooks if h['hook']==drill_turbo.HOOK)
     patches.extend(drill_turbo.water_patches(drill['target']+drill_turbo.payload()[1],patches))
     from . import wisp_activation
-    patches.extend(wisp_activation.patches(capsule_control,story_control,patches))
+    patches.extend(wisp_activation.patches(capsule_control,story_control,patches,legacy_slots=legacy_wisp_slots))
     from . import random_wisp_spawns
-    patches.extend(random_wisp_spawns.patches(capsule_control,story_control,patches))
+    patches.extend(random_wisp_spawns.patches(capsule_control,story_control,patches,legacy_slots=legacy_wisp_slots))
     from . import white_capsule_open
-    patches.extend(white_capsule_open.patches(capsule_control,patches))
+    patches.extend(white_capsule_open.patches(capsule_control,patches,legacy_slots=legacy_wisp_slots))
     from . import drift_input
     patches.extend(drift_input.patches(movement['target']+movement_gate.payload(gecko=True)[2],patches))
     if include_ring_materials:
@@ -184,15 +184,18 @@ def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
 
 @lru_cache(maxsize=16)
 def plan_for_digest(digest):
-    for candidate in (plan(),plan(include_sixty_fps=True),plan(include_luma_colors=True),
-                      plan(include_luma_colors=True,include_sixty_fps=True),
-                      plan(include_sixty_fps=True,legacy_fps_word_write=True),
-                      plan(include_sixty_fps=True,include_luma_colors=True,legacy_fps_word_write=True),
-                      plan(include_accessible_colors=False),
-                      plan(include_boot_guards=False,include_accessible_colors=False),
-                      plan(include_ring_spawn=False,include_boot_guards=False,include_accessible_colors=False),
-                      plan(include_ring_materials=False,include_boot_guards=False,include_accessible_colors=False)):
-        if candidate[2].hex()==digest:return candidate
+    variants = ({}, {'include_sixty_fps':True}, {'include_luma_colors':True},
+                {'include_luma_colors':True,'include_sixty_fps':True},
+                {'include_sixty_fps':True,'legacy_fps_word_write':True},
+                {'include_sixty_fps':True,'include_luma_colors':True,'legacy_fps_word_write':True},
+                {'include_accessible_colors':False},
+                {'include_boot_guards':False,'include_accessible_colors':False},
+                {'include_ring_spawn':False,'include_boot_guards':False,'include_accessible_colors':False},
+                {'include_ring_materials':False,'include_boot_guards':False,'include_accessible_colors':False})
+    for legacy in (False,True):
+        for options in variants:
+            candidate=plan(**options,legacy_wisp_slots=legacy)
+            if candidate[2].hex()==digest:return candidate
     raise ValueError('incompatible native AP hook ABI/signature')
 
 
