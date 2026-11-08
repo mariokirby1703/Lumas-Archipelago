@@ -23,6 +23,7 @@ from CommonClient import (
 from NetUtils import ClientStatus
 
 from ..Addresses import addresses as ram_addresses
+from ..Addresses.regions import GAME_IDS, PAL, NTSC_U, translate_address
 from ..Names import item_names, location_names
 from ..world_constants import (
     BONUS_WORLDS,
@@ -40,7 +41,7 @@ ModuleUpdate.update()
 CONNECTION_INITIAL_STATUS = "Dolphin connection has not been initiated."
 CONNECTION_CONNECTED_STATUS = "Dolphin connected successfully."
 CONNECTION_LOST_STATUS = "Dolphin connection was lost. Retrying..."
-CONNECTION_REFUSED_GAME_STATUS = "Dolphin connected, but RK6P18 is not running. Load Marbles! Balance Challenge PAL."
+CONNECTION_REFUSED_GAME_STATUS = "Dolphin disc does not match this slot. Select the matching PAL / NTSC-U disc and game_region."
 
 GAME_ID_ADDRESS = 0x80000000
 GAME_ID = b"RK6P18"
@@ -333,7 +334,7 @@ def reset_stage_detectors(ctx: MarbleBalanceContext, stage: dict[str, Any] | Non
     ctx._stage_entered_at = now
     ctx._goal_reached_latched = False
     ctx._goal_latched_stage = None
-    ctx._goal_armed = goal_active_count() <= GOAL_EXIT_THRESHOLD
+    ctx._goal_armed = goal_active_count(ctx.slot_data) <= GOAL_EXIT_THRESHOLD
     ctx._countdown_stage_identity = stage_identity(stage)
     ctx._countdown_next_value = 0
     ctx._countdown_ready = False
@@ -406,7 +407,7 @@ def write_collectible_save_flag(location: dict[str, Any]) -> None:
         write_u8_if_changed(address, 1)
 
 
-def write_stage_collectible_save_flag(difficulty: str, world: str, level: int, category: str) -> None:
+def write_stage_collectible_save_flag(slot_data: dict[str, Any], difficulty: str, world: str, level: int, category: str) -> None:
     if level > 10:
         return
     if world in NORMAL_WORLDS:
@@ -415,7 +416,7 @@ def write_stage_collectible_save_flag(difficulty: str, world: str, level: int, c
         record = ram_addresses.bonus_level_record(difficulty, world, level)
     else:
         return
-    address = record.get(category)
+    address = translate_address(record.get(category), slot_data.get("disc_region", PAL))
     if address is not None:
         write_u8_if_changed(address, 1)
 
@@ -424,11 +425,11 @@ def counter_overlay_addresses_and_count(ctx: MarbleBalanceContext) -> list[tuple
     received = received_item_names(ctx)
     return [
         (
-            STUMP_COUNTER_OVERLAY_ADDRESSES,
+            [translate_address(address, ctx.slot_data.get("disc_region", PAL)) for address in STUMP_COUNTER_OVERLAY_ADDRESSES],
             min(received.count(item_names.STUMP_TEMPLE_PIECE), len(STUMP_COUNTER_OVERLAY_ADDRESSES)),
         ),
         (
-            GREEN_GEM_COUNTER_OVERLAY_ADDRESSES,
+            [translate_address(address, ctx.slot_data.get("disc_region", PAL)) for address in GREEN_GEM_COUNTER_OVERLAY_ADDRESSES],
             min(received.count(item_names.GREEN_GEM), len(GREEN_GEM_COUNTER_OVERLAY_ADDRESSES)),
         ),
     ]
@@ -469,7 +470,7 @@ def goal_or_result_active(slot_data: dict[str, Any]) -> bool:
                 return True
         except Exception:
             pass
-    return goal_active_count() >= GOAL_ENTER_THRESHOLD
+    return goal_active_count(slot_data) >= GOAL_ENTER_THRESHOLD
 
 
 def level_countdown_ready(ctx: MarbleBalanceContext, stage: dict[str, Any] | None) -> bool:
@@ -485,6 +486,8 @@ def level_countdown_ready(ctx: MarbleBalanceContext, stage: dict[str, Any] | Non
         ctx._countdown_next_value = 0
         ctx._countdown_ready = False
 
+    if not ctx.slot_data.get("safety", {}).get("experimental_traps_supported", True):
+        return False
     try:
         countdown = read_u8(LEVEL_START_SEQUENCE_ADDRESS)
     except Exception:
@@ -517,7 +520,7 @@ def trap_safe_gameplay(ctx: MarbleBalanceContext, stage: dict[str, Any] | None) 
         and in_level_active(ctx.slot_data)
         and level_countdown_ready(ctx, stage)
         and not goal_or_result_active(ctx.slot_data)
-        and goal_active_count() < GOAL_ENTER_THRESHOLD
+        and goal_active_count(ctx.slot_data) < GOAL_ENTER_THRESHOLD
     )
 
 
@@ -560,7 +563,10 @@ def is_current_location(location: dict[str, Any], slot_data: dict[str, Any]) -> 
     )
 
 
-def goal_active_count() -> int:
+def goal_active_count(slot_data: dict[str, Any]) -> int:
+    if slot_data.get("disc_region", PAL) == NTSC_U:
+        address = slot_data.get("static_addresses", {}).get("stage_cleared_flag")
+        return GOAL_ENTER_THRESHOLD if address is not None and read_u8(address) in STAGE_CLEARED_VALUES else 0
     count = 0
     for address in GOAL_REACHED_CANDIDATES:
         try:
@@ -578,7 +584,7 @@ def update_goal_reached(ctx: MarbleBalanceContext, stage: dict[str, Any] | None,
         ctx._goal_latched_stage = None
         return False
 
-    count = goal_active_count()
+    count = goal_active_count(ctx.slot_data)
     if count <= GOAL_EXIT_THRESHOLD:
         ctx._goal_reached_latched = False
         ctx._goal_latched_stage = None
@@ -717,9 +723,9 @@ def poll_pickup_locations(  # noqa: C901
 
     if ctx._green_or_ant_pickup_armed and green_or_ant != 0 and level <= 10:
         if difficulty == "Normal" and world in NORMAL_WORLDS:
-            write_stage_collectible_save_flag(difficulty, world, level, "green_gem")
+            write_stage_collectible_save_flag(ctx.slot_data, difficulty, world, level, "green_gem")
         elif difficulty == "Hard":
-            write_stage_collectible_save_flag(difficulty, world, level, "ant")
+            write_stage_collectible_save_flag(ctx.slot_data, difficulty, world, level, "ant")
 
     if ctx._green_or_ant_pickup_armed and ctx._previous_green_or_ant == 0 and green_or_ant == 1 and level <= 10:
         if difficulty == "Normal" and world in NORMAL_WORLDS:
@@ -731,15 +737,15 @@ def poll_pickup_locations(  # noqa: C901
         if difficulty in {"Easy", "Normal"} and world in NORMAL_WORLDS[:6] and level <= 10:
             expected = NORMAL_WORLDS.index(world) * 10 + level
             if stump == expected:
-                write_stage_collectible_save_flag(difficulty, world, level, "stump_piece")
+                write_stage_collectible_save_flag(ctx.slot_data, difficulty, world, level, "stump_piece")
                 events.append(location_names.stump_piece_location_name(difficulty, world, level))
 
     if ctx._junk_pickup_armed and junk != 0 and level <= 10:
         if difficulty == "Hard" and world in NORMAL_WORLDS[:6]:
-            write_stage_collectible_save_flag(difficulty, world, level, "stump_piece")
+            write_stage_collectible_save_flag(ctx.slot_data, difficulty, world, level, "stump_piece")
             events.append(location_names.stump_piece_location_name(difficulty, world, level))
         elif world in BONUS_WORLDS:
-            write_stage_collectible_save_flag(difficulty, world, level, "stump_piece")
+            write_stage_collectible_save_flag(ctx.slot_data, difficulty, world, level, "stump_piece")
             events.append(location_names.stump_piece_location_name(difficulty, world, level))
 
     ctx._previous_green_or_ant = green_or_ant
@@ -1233,6 +1239,8 @@ def enforce_marble_access(ctx: MarbleBalanceContext) -> None:
 
 
 def handle_traps(ctx: MarbleBalanceContext) -> None:  # noqa: C901
+    if not ctx.slot_data.get("safety", {}).get("experimental_traps_supported", True):
+        return
     static = ctx.slot_data.get("static_addresses", {})
     now = time.monotonic()
     stage = current_stage(ctx.slot_data)
@@ -1590,6 +1598,35 @@ async def process_received_items(ctx: MarbleBalanceContext) -> None:
             apply_received_item(ctx, item_name)
 
 
+def disc_matches_slot(game_id: bytes, slot_data: dict[str, Any]) -> bool:
+    # Before Connected arrives, recognize both discs but never read/write game RAM.
+    if not slot_data:
+        return game_id in GAME_IDS.values()
+    expected = GAME_IDS.get(slot_data.get("disc_region", PAL))
+    return expected is not None and game_id == expected
+
+
+async def sync_game_state(ctx: MarbleBalanceContext) -> None:
+    if ctx.slot_data:
+        sync_save_slot_guard(ctx)
+    if ctx.slot_data and ctx.save_slot_ready:
+        apply_starting_access(ctx.slot_data)
+        sync_bonus_vehicle_gates(ctx)
+        await process_received_items(ctx)
+        sync_hard_mode_access(ctx)
+        sync_vehicle_access(ctx)
+        sync_normal_world_access(ctx)
+        suppress_l11_world_unlock_side_effects(ctx)
+        sync_bonus_vehicle_gates(ctx)
+        sync_bonus_level_access(ctx)
+        sync_mirror_trophies(ctx)
+        sync_junk_inventory(ctx)
+        sync_ap_counter_overlays(ctx)
+        enforce_marble_access(ctx)
+        handle_traps(ctx)
+        await check_locations(ctx)
+
+
 async def dolphin_sync_task(ctx: MarbleBalanceContext) -> None:
     import dolphin_memory_engine
 
@@ -1606,28 +1643,12 @@ async def dolphin_sync_task(ctx: MarbleBalanceContext) -> None:
 
         try:
             if dolphin_memory_engine.is_hooked() and ctx.dolphin_status == CONNECTION_CONNECTED_STATUS:
-                if dolphin_memory_engine.read_bytes(GAME_ID_ADDRESS, len(GAME_ID)) != GAME_ID:
+                if not disc_matches_slot(dolphin_memory_engine.read_bytes(GAME_ID_ADDRESS, len(GAME_ID)), ctx.slot_data):
                     dolphin_memory_engine.un_hook()
                     ctx.dolphin_status = CONNECTION_LOST_STATUS
                     sleep_time = 2
                     continue
-                if ctx.slot_data:
-                    apply_starting_access(ctx.slot_data)
-                    sync_bonus_vehicle_gates(ctx)
-                    await process_received_items(ctx)
-                    sync_hard_mode_access(ctx)
-                    sync_vehicle_access(ctx)
-                    sync_normal_world_access(ctx)
-                    suppress_l11_world_unlock_side_effects(ctx)
-                    sync_bonus_vehicle_gates(ctx)
-                    sync_bonus_level_access(ctx)
-                    sync_mirror_trophies(ctx)
-                    sync_junk_inventory(ctx)
-                    sync_ap_counter_overlays(ctx)
-                    enforce_marble_access(ctx)
-                    handle_traps(ctx)
-                    sync_save_slot_guard(ctx)
-                    await check_locations(ctx)
+                await sync_game_state(ctx)
                 sleep_time = 0.1
                 continue
 
@@ -1640,7 +1661,7 @@ async def dolphin_sync_task(ctx: MarbleBalanceContext) -> None:
                 sleep_time = 5
                 continue
 
-            if dolphin_memory_engine.read_bytes(GAME_ID_ADDRESS, len(GAME_ID)) != GAME_ID:
+            if not disc_matches_slot(dolphin_memory_engine.read_bytes(GAME_ID_ADDRESS, len(GAME_ID)), ctx.slot_data):
                 logger.info(CONNECTION_REFUSED_GAME_STATUS)
                 ctx.dolphin_status = CONNECTION_REFUSED_GAME_STATUS
                 dolphin_memory_engine.un_hook()

@@ -3,6 +3,17 @@ from dataclasses import dataclass
 from Options import Choice, DefaultOnToggle, OptionGroup, PerGameCommonOptions, Range, Toggle
 
 
+class GameRegion(Choice):
+    """Disc region. PAL: Marbles! Balance Challenge; NTSC-U: Marble Saga: Kororinpa.
+    Select this before generation: PAL has 100 Balance Board levels, NTSC-U has 30.
+    """
+
+    display_name = "Game Region"
+    option_pal = 0
+    option_ntsc_u = 1
+    default = option_pal
+
+
 class Goal(Choice):
     """Which stage completion should be required to finish the slot."""
 
@@ -101,13 +112,13 @@ class TutorialChecks(Toggle):
 
 
 class WiiBalanceBoardLevels(Toggle):
-    """Include Wii Balance Board Level 01 through Level 100 checks."""
+    """Include Wii Balance Board checks: 100 on PAL, 30 on NTSC-U."""
 
     display_name = "Wii Balance Board Levels"
 
 
 class TrapChance(Range):
-    """Percentage chance for filler to become one of the experimental traps."""
+    """Percentage chance for filler to become one of the experimental traps. Disabled on NTSC-U until its dynamic trap addresses are verified."""
 
     display_name = "Trap Chance"
     range_start = 0
@@ -163,6 +174,7 @@ class RandomStartingWorld(DefaultOnToggle):
 
 @dataclass
 class MarbleBalanceOptions(PerGameCommonOptions):
+    game_region: GameRegion
     goal: Goal
     included_difficulties: IncludedDifficulties
     green_gem_sanity: GreenGemSanity
@@ -188,6 +200,7 @@ option_groups = [
     OptionGroup(
         "Campaign",
         [
+            GameRegion,
             Goal,
             IncludedDifficulties,
             TutorialChecks,

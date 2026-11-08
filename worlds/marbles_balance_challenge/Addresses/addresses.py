@@ -95,6 +95,7 @@ def bonus_level_record(difficulty: str, world: str, level: int) -> dict[str, int
         "stump_piece": None,
         "ant": trophy - 0x05 if difficulty == "Hard" else None,
         "trophy": trophy,
+        "mirror_trophy": trophy + 0x50,
     }
 
 

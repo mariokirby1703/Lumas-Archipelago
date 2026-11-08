@@ -194,7 +194,7 @@ def enabled_location_names(world: MarbleBalanceWorld) -> list[str]:
             continue
 
         if data.category == "balance_board":
-            if world.options.wii_balance_board_levels:
+            if world.options.wii_balance_board_levels and data.level <= (30 if world.options.game_region.value == 1 else 100):
                 selected.append(name)
             continue
 

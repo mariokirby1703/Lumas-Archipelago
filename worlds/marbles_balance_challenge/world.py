@@ -10,6 +10,7 @@ from worlds.AutoWorld import World
 
 from . import Items, Locations, Regions, Rules, web_world
 from .Addresses import addresses
+from .Addresses.regions import apply_region_profile, region_for_options, NTSC_U
 from .Names import item_names, location_names, region_names
 from .Options import Goal, IncludedDifficulties, MarbleBalanceOptions, HardModeUnlock
 from .world_constants import (
@@ -57,6 +58,9 @@ class MarbleBalanceWorld(World):
 
     def generate_early(self) -> None:
         self._apply_ut_slot_data()
+        # US heap-based trap probes still need Dolphin verification.
+        if region_for_options(self.options) == NTSC_U:
+            self.options.trap_chance.value = 0
         self.starting_marble = getattr(self, "starting_marble", None) or self.random.choice(MARBLES)
         if self.options.included_difficulties == IncludedDifficulties.option_all:
             difficulties = list(DIFFICULTIES)
@@ -210,6 +214,7 @@ class MarbleBalanceWorld(World):
 
     def fill_slot_data(self) -> Mapping[str, Any]:
         option_data = self.options.as_dict(
+            "game_region",
             "goal",
             "included_difficulties",
             "random_starting_world",
@@ -238,7 +243,7 @@ class MarbleBalanceWorld(World):
             if name in Locations.LOCATION_TABLE
         }
 
-        return {
+        return apply_region_profile({
             "game": self.game,
             "seed_name": self.multiworld.seed_name,
             "player_name": self.multiworld.get_player_name(self.player),
@@ -282,7 +287,7 @@ class MarbleBalanceWorld(World):
                 "balance_board_world_or_mode_index": 14,
                 "stage_cleared_values": [94, 95],
             },
-        }
+        }, region_for_options(self.options))
 
     def _slot_location_data(self, name: str) -> dict[str, Any]:
         data = Locations.LOCATION_TABLE[name]

@@ -1,7 +1,9 @@
 # Marbles! Balance Challenge Archipelago World
 
-Marbles! Balance Challenge is the PAL version of Marble Saga: Kororinpa. This Archipelago world targets the PAL
-RK6P18 release and uses an external Dolphin client.
+Marbles! Balance Challenge (PAL, `RK6P18`) and Marble Saga: Kororinpa (NTSC-U, `RK6E18`)
+share this Archipelago world and its external Dolphin client. Select `game_region` before generation.
+The AP game name remains Marbles! Balance Challenge for both regions. NTSC-U support needs
+live Dolphin validation; experimental traps are disabled for that region.
 
 ## Goals
 
@@ -45,7 +47,8 @@ RK6P18 release and uses an external Dolphin client.
 
 - Random Starting World
 - Tutorial Checks, default off
-- Wii Balance Board Levels
+- Game Region: PAL or NTSC-U
+- Wii Balance Board Levels: 100 on PAL, 30 on NTSC-U
 
 ## Logic Options
 

@@ -4,11 +4,15 @@
 
 - [Archipelago 0.6.7](https://github.com/ArchipelagoMW/Archipelago/releases/latest) or newer
 - [Dolphin Emulator](https://dolphin-emu.org/download/)
-- A PAL copy of Marbles! Balance Challenge, game ID `RK6P18`
+- A PAL copy of Marbles! Balance Challenge (`RK6P18`) or NTSC-U Marble Saga: Kororinpa (`RK6E18`)
 - [The Marbles! Balance Challenge `.apworld` file](https://github.com/mariokirby1703/Lumas-Archipelago/releases)
 - [Universal Tracker](https://github.com/FarisTheAncient/Archipelago) (Optionally)
 
-This world is made for the PAL version of the game. Do not use Marble Saga: Kororinpa, the US version.
+Set `game_region: pal` or `game_region: ntsc_u` in your YAML before generating.
+The AP game name remains `Marbles! Balance Challenge` for both regions.
+Balance Board checks include 100 levels on PAL and 30 on NTSC-U.
+NTSC-U support is prepared from the supplied disc revision and needs live Dolphin validation;
+experimental traps are disabled and PAL-only MEM2 inventory probes are omitted.
 
 Universal Tracker does not need a separate Marbles! Balance Challenge integration for basic Archipelago tracking.
 Make sure to have your own .yaml file in your Players folder inside the Archipelago folder (mostlikely: C:\ProgramData\Archipelago\Players)
@@ -41,7 +45,7 @@ Generate the seed through the Archipelago Launcher or with Archipelago's normal 
 ## How to Play
 
 1. Open Dolphin.
-2. Start the PAL version of Marbles! Balance Challenge.
+2. Start the disc matching the `game_region` selected during generation.
 3. **Always** play on Save Slot 3.
 4. Open `Marbles! Balance Challenge Client` from the Archipelago Launcher.
 5. Connect to the Archipelago server using the address and port given by the host.
@@ -53,8 +57,9 @@ slots.
 
 ## Client Notes
 
-The client connects to a running Dolphin instance through Dolphin Memory Engine. It checks for the PAL game ID `RK6P18`
-before reading locations or writing received unlocks.
+The client connects to a running Dolphin instance through Dolphin Memory Engine. It checks the disc ID against the generated slot region
+before reading locations or writing received unlocks. Old slots without region data remain PAL.
+RAM synchronization and location sending require Save Slot 3.
 
 When you collect a Kororin Capsule, Green Gem, or Anthony in a level, the client immediately writes that collectible's save
 flag for the current level. This lets the level select screen show that the collectible was picked up even if you leave the
