@@ -33,10 +33,11 @@ def test_movement_routes_replace_not_and_normal_and_missing_inherit_normal():
     assert logic.check(world(False),State(['Blue Cube Wisp']),data,key)
     assert not logic.check(world(True),State(['Blue Cube Wisp']),data,key)
     assert logic.check(world(True),State(['Blue Cube Wisp','Homing Attack']),data,key)
-    # The underwater route needs both Breathing and Drill.
+    # The underwater route needs Breathing Lv2 and Drill.
     key=next(s['mission_id'] for s in STAGES if s['zone_index']==4 and s['slot']==1)+':ring:3'
     assert not logic.check(world(True),State(),data,key)
-    assert logic.check(world(True),State(['Progressive Breathing','Progressive Yellow Drill Wisp']),data,key)
+    assert not logic.check(world(True),State(['Progressive Breathing','Progressive Yellow Drill Wisp']),data,key)
+    assert logic.check(world(True),State(['Progressive Breathing','Progressive Breathing','Progressive Yellow Drill Wisp']),data,key)
 
 
 def test_seven_bosses_and_all_180_physical_rings_are_required():

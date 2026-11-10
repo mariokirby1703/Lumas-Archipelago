@@ -26,7 +26,10 @@ def test_sweet_mountain_1_keeps_old_requirement_and_adds_aerial_alternatives(key
 def test_sweet_mountain_1_ranks_share_the_clear_requirement(rank):
     base=('White Boost Wisp','Cyan Laser Wisp','Progressive Yellow Drill Wisp')
     assert not logic.check(world(),State(*base),MANIFEST,'stg210',rank)
-    assert logic.check(world(),State(*base,'Stomp'),MANIFEST,'stg210',rank)
+    rank_moves = [logic.MOVEMENTS[logic.token_parts(token)[0]]
+                  for token in logic.s_rank_movements(MANIFEST, 'stg210')
+                  for _ in range(logic.token_parts(token)[1])] if rank == 'S' else []
+    assert logic.check(world(),State(*base,'Stomp',*rank_moves),MANIFEST,'stg210',rank)
 
 
 @pytest.mark.parametrize('mission,alternatives',[

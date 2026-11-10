@@ -6406,6 +6406,11 @@
     ]
   },
   "rank_s_extra_movement": {
+    "stg140": [
+      [
+        "crouch:2"
+      ]
+    ],
     "stg340": [
       [
         "stomp"

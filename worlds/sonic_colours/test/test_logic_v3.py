@@ -167,7 +167,10 @@ def test_stage_wisp_requirements_are_mandatory_for_s_and_a_not_b_c():
 def test_s_rank_extra_movement_applies_only_with_ability_locks():
     assert MANIFEST['rank_s_extra_movement']['stg340'] == [['stomp']]
     assert not logic.check(world(), State(), MANIFEST, 'stg340', 'S')
-    assert logic.check(world(), State('Stomp'), MANIFEST, 'stg340', 'S')
+    moves = [logic.MOVEMENTS[logic.token_parts(token)[0]]
+             for token in logic.s_rank_movements(MANIFEST, 'stg340')
+             for _ in range(logic.token_parts(token)[1])]
+    assert logic.check(world(), State(*moves, 'Stomp'), MANIFEST, 'stg340', 'S')
     assert logic.check(world(movement=False), State(), MANIFEST, 'stg340', 'S')
 
 
@@ -194,3 +197,42 @@ def test_all_completed_main_routes_reachable_with_full_available_items(movement,
     for mission in MANIFEST['rank_wisps']:
         for rank in ('A','S'):
             assert logic.check(w, owned, MANIFEST, mission, rank), (mission, rank)
+
+
+def test_s_rank_movement_union_uses_highest_tier_and_only_regular_red_rings():
+    manifest = {'locations': {
+        'stage:ring:1': {'movement': [['crouch', 'swim'], ['crouch:2', 'drill:2']],
+                         'advanced_movement': [['stomp']]},
+        'stage:ring:2': {'movement': [['crouch:2', 'rail:3']]},
+        'stage:one_up': {'movement': [['double_jump']]},
+    }}
+    assert logic.s_rank_movements(manifest, 'stage') == ('crouch:2', 'rail:3', 'swim:1')
+
+
+def test_tropical_four_s_rank_requires_sliding_in_addition_to_ring_movements():
+    from ..Items import MOVEMENT_POOL
+    from ..wisps import required_wisp_items
+    w = world()
+    items = list(required_wisp_items(w.options)) + list(MOVEMENT_POOL)
+    items = [item for item in items if item != 'Progressive Crouch']
+    assert not logic.check(w, State(*items), MANIFEST, 'stg140', 'S')
+    assert not logic.check(w, State(*items, 'Progressive Crouch'), MANIFEST, 'stg140', 'S')
+    assert logic.check(w, State(*items, 'Progressive Crouch', 'Progressive Crouch'), MANIFEST, 'stg140', 'S')
+    assert logic.check(w, State(*items), MANIFEST, 'stg140', 'A')
+    w = world(movement=False)
+    assert logic.check(w, State(*required_wisp_items(w.options)), MANIFEST, 'stg140', 'S')
+
+
+@pytest.mark.parametrize('mission', [key for key in MANIFEST['locations'] if ':' not in key
+                                   and key + ':ring:1' in MANIFEST['locations']])
+def test_each_red_ring_movement_is_required_for_s_rank(mission):
+    from ..Items import MOVEMENT_POOL
+    from ..wisps import required_wisp_items
+    w = world()
+    full = list(required_wisp_items(w.options)) + list(MOVEMENT_POOL)
+    assert logic.check(w, State(*full), MANIFEST, mission, 'S')
+    for token in logic.s_rank_movements(MANIFEST, mission):
+        name, tier = logic.token_parts(token)
+        item = logic.MOVEMENTS[name]
+        missing = [owned for owned in full if owned != item] + [item] * (tier - 1)
+        assert not logic.check(w, State(*missing), MANIFEST, mission, 'S'), (mission, token)

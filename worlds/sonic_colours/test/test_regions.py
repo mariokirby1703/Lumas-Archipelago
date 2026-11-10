@@ -1,3 +1,4 @@
+from .dol_memory import read_dol_memory
 import hashlib
 import json
 from pathlib import Path
@@ -74,8 +75,7 @@ def test_original_and_patched_executable_validation_in_both_regions(disc):
             def read_bytes(self,address,size):
                 if address==0x80000000:return header(disc)[:size]
                 if address==0x80000007:return bytes(size)
-                try:return image.read(address,size)
-                except ValueError:return bytes(size)
+                return read_dol_memory(image, address, size)
         memory=SonicMemory(Backend());memory.verify_revision()
         assert memory.revision_observation['disc_id']==disc
         image.data[image.offset(0x80004000,4)]^=1

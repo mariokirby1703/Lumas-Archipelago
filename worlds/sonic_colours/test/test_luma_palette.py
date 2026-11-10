@@ -1,3 +1,4 @@
+from .dol_memory import read_dol_memory
 from copy import deepcopy
 import hashlib
 import json
@@ -157,8 +158,7 @@ def test_private_luma_dol_validation_and_tamper_rejection(sixty_fps):
         def read_bytes(self,address,size):
             if address == 0x80000000: return (b'SNCE8P'+bytes(26))[:size]
             if address == 0x80000007: return bytes(size)
-            try: return image.read(address,size)
-            except ValueError: return bytes(size)
+            return read_dol_memory(image, address, size)
     memory = SonicMemory(Backend())
     memory.verify_revision()
     assert memory.native_patch['luma_ring_colors']

@@ -1,4 +1,6 @@
 """Reproduce the exact entry-word damage captured in the Game Land crashes."""
+from .dol_memory import read_dol_memory
+
 import hashlib
 import pytest
 
@@ -21,10 +23,7 @@ def test_captured_low_memory_write_no_longer_replaces_a_stack_prologue():
                 return (b'SNCP8P'+bytes(2))[:size]
             if address == 0x80000007:
                 return bytes(1)
-            try:
-                return image.read(address, size)
-            except ValueError:
-                return bytes(size)
+            return read_dol_memory(image, address, size)
 
     memory = SonicMemory(Backend())
     memory.required_native_seed = 'ArenaRegression'

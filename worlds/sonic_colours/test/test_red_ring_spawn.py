@@ -1,3 +1,4 @@
+from .dol_memory import read_dol_memory
 import struct
 from pathlib import Path
 
@@ -50,8 +51,7 @@ def test_prefilled_dol_roundtrip_and_palette_integrity():
         def read_bytes(self,address,size):
             if address==0x80000000:return (b'SNCP8P\0\0'+bytes(24))[:size]
             if address==0x80000007:return bytes(size)
-            try:return dol.read(address,size)
-            except ValueError:return bytes(size)
+            return read_dol_memory(dol, address, size)
     memory=SonicMemory(Backend())
     memory.verify_revision()
     assert memory.native_patch['red_ring_spawn']

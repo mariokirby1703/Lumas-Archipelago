@@ -1,3 +1,4 @@
+from .dol_memory import read_dol_memory
 from pathlib import Path
 import struct
 
@@ -82,8 +83,7 @@ def test_boot_dol_passes_complete_revision_inspection():
         def read_bytes(self,address,size):
             if address==0x80000000:return (b'SNCP8P\0\0'+bytes(24))[:size]
             if address==0x80000007:return bytes(size)
-            try:return image.read(address,size)
-            except ValueError:return bytes(size)
+            return read_dol_memory(image, address, size)
     memory=SonicMemory(Backend());memory.verify_revision()
     assert memory.native_patch['white_capsule_spawn']
     assert registry['boot_permissions']

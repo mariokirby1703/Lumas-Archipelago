@@ -205,13 +205,14 @@ def test_ring_color_preparation_does_not_change_native_hook_payload():
     colors.receive([(ITEM_TABLE['Rings'], colors.locations['stg110', 1], 2, 1)])
     colors.stage_colors('stg110')
     assert plan() == before
-    legacy = plan(include_ring_materials=False,include_boot_guards=False,include_accessible_colors=False)
+    legacy = plan(include_ring_materials=False,include_boot_guards=False,include_accessible_colors=False,
+                  legacy_wisp_slots=True,include_physical_restore=False)
     assert legacy[2].hex() == 'd37b812a9e186695a45db4519ebada0f557e4523dc26dcea5098d95c6ddadc47'
     from ..client.red_ring_render_test import allocation_patches
     from ..client.red_ring_spawn import patches
-    ring_plan=plan(include_boot_guards=False)
+    ring_plan=plan(include_boot_guards=False,legacy_wisp_slots=True,include_physical_restore=False)
     assert ring_plan[0] == legacy[0] + allocation_patches() + patches()
-    assert len(before[1]) == len(legacy[1])
+    assert len(ring_plan[1]) == len(legacy[1])
     assert not colors.status('stg110')['native_rendering']
 
 

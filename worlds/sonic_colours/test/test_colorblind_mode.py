@@ -1,3 +1,4 @@
+from .dol_memory import read_dol_memory
 from copy import deepcopy
 from pathlib import Path
 import hashlib
@@ -99,8 +100,7 @@ def test_older_native_isos_pass_full_revision_validation(kwargs):
         def read_bytes(self,address,size):
             if address==0x80000000:return (b'SNCP8P\0\0'+bytes(24))[:size]
             if address==0x80000007:return bytes(size)
-            try:return image.read(address,size)
-            except ValueError:return bytes(size)
+            return read_dol_memory(image, address, size)
     from ..client.memory import SonicMemory
     memory=SonicMemory(Backend());memory.verify_revision()
     assert memory.native_patch['code_sha256']==digest.hex()

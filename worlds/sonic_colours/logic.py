@@ -77,6 +77,20 @@ def clear_route(world,state,manifest,mission):
     return matches(world,state,manifest['locations'][mission][route_type])
 
 
+def s_rank_movements(manifest, mission):
+    required = {}
+    for index in range(1, 6):
+        ring = manifest['locations'].get(f'{mission}:ring:{index}')
+        if ring is None:
+            continue
+        for route in ring['movement']:
+            for token in route:
+                name, tier = token_parts(token)
+                if name in MOVEMENTS:
+                    required[name] = max(required.get(name, 0), tier)
+    return tuple(f'{name}:{tier}' for name, tier in sorted(required.items()))
+
+
 def check(world, state, manifest, key, rank=None):
     # Later Acts also need the earlier clear routes.
     stage=BY_MISSION.get(key.split(':',1)[0])
@@ -99,6 +113,8 @@ def check(world, state, manifest, key, rank=None):
         if not all(available(world, state, wisp) for wisp in manifest['rank_wisps'].get(mission, [])):
             return False
         if rank == 'S' and selected(world, 'movement_unlocks'):
+            if not all(available(world, state, token) for token in s_rank_movements(manifest, mission)):
+                return False
             extra = manifest['rank_s_extra_movement'].get(mission)
             if extra is not None and not matches(world, state, extra):
                 return False
