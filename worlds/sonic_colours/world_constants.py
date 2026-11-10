@@ -1,13 +1,19 @@
 import json
 from importlib.resources import files
+from functools import lru_cache
 
 GAME = "Sonic Colours (Wii)"
 BASE_ID = 847000000
 SCHEMA_VERSION = 7
 
 
+@lru_cache(maxsize=None)
+def _data_text(name):
+    return files(__package__).joinpath('data', name).read_text(encoding='utf-8')
+
+
 def load_data(name):
-    return json.loads(files(__package__).joinpath('data', name).read_text(encoding='utf-8'))
+    return json.loads(_data_text(name))
 
 
 STAGES = load_data('stage_map.json')

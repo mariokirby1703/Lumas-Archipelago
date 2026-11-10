@@ -96,7 +96,8 @@ def test_private_original_interval_setter_computes_correct_gameplay_delta(enable
 
 
 @pytest.mark.parametrize('luma',[False,True])
-def test_private_legacy_fps_iso_passes_complete_revision_validation(luma):
+@pytest.mark.parametrize('restore',[False,True])
+def test_private_legacy_fps_iso_passes_complete_revision_validation(luma,restore):
     import hashlib
     from pathlib import Path
     from ..client.native_dol import Dol,ARENA,SIGNATURE,MAGIC,ABI
@@ -104,7 +105,7 @@ def test_private_legacy_fps_iso_passes_complete_revision_validation(luma):
     source=Path('build/sonic_colours_reference/memdumps_and_more/main.dol')
     if not source.exists():pytest.skip('private original main.dol absent')
     image=Dol(source.read_bytes())
-    patches,payload,digest,hooks=plan(include_sixty_fps=True,include_luma_colors=luma,legacy_fps_word_write=True)
+    patches,payload,digest,hooks=plan(include_sixty_fps=True,include_luma_colors=luma,legacy_fps_word_write=True,include_physical_restore=restore)
     for address,old,new in patches:image.replace(address,image.read(address,len(new)) if old is None else old,new)
     native=bytearray(SIGNATURE-ARENA+64);native[:len(payload)]=payload
     native[-64:]=MAGIC+struct.pack('>II',ABI,len(payload))+digest+hashlib.sha256(b'ExistingFPSSeed').digest()[:16]
@@ -114,7 +115,12 @@ def test_private_legacy_fps_iso_passes_complete_revision_validation(luma):
             if address==0x80000000:return (b'SNCE8P'+bytes(26))[:size]
             if address==0x80000007:return bytes(size)
             try:return image.read(address,size)
-            except ValueError:return bytes(size)
+            except ValueError:
+                result=bytearray(size)
+                for _,off,base,length in image.sections:
+                    start,end=max(address,base),min(address+size,base+length)
+                    if start<end:result[start-address:end-address]=image.read(start,end-start)
+                return bytes(result)
     memory=SonicMemory(Backend());memory.verify_revision()
     assert memory.native_patch['code_sha256']==digest.hex()
     assert memory.native_patch['luma_ring_colors']==luma

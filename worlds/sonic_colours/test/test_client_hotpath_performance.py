@@ -173,3 +173,65 @@ def test_batched_actor_walk_rejects_corrupt_ownership(failure):
     elif failure=='cycle':m.put(nodes[-1],nodes[0])
     else:m.put(0x90002000+20,4)
     with pytest.raises(MemoryUnavailable):read_actors(m,stage)
+
+
+def test_packaged_reference_text_is_read_once_without_sharing_mutable_data():
+    from ..world_constants import load_data,_data_text
+    _data_text.cache_clear()
+    first=load_data('physical_ring_restore_sites.json')
+    assert _data_text.cache_info().misses==1
+    address=first[0]['address'];first[0]['address']=0
+    second=load_data('physical_ring_restore_sites.json')
+    assert second[0]['address']==address
+    assert _data_text.cache_info().hits==1
+
+
+def test_effect_delivery_yields_before_mutating_next_receipt(monkeypatch):
+    from ..client.runtime import Runtime
+    from ..client import intro_box, dead_weight
+    from ..Items import ITEM_TABLE
+    monkeypatch.setattr(intro_box, 'apply', lambda *a: {})
+    applied = []
+    monkeypatch.setattr(dead_weight, 'deliver', lambda *a: applied.append(a[2]))
+    runtime = Runtime.__new__(Runtime)
+    runtime.snapshot = runtime.guard = None
+    runtime.slot_data = {}
+    runtime.inflight = {}
+    runtime.journal = SimpleNamespace(data={'effects': {'0': {'state': 'confirmed'}}})
+    runtime.settle_effects = lambda memory: None
+    item = ITEM_TABLE['Dead Weight Trap']
+    steps = runtime.apply_effect_steps(None, [item, item, item])
+    assert next(steps) == (set(), False)
+    assert applied == []
+    assert next(steps) == (set(), False)
+    assert applied == [1]
+    with pytest.raises(StopIteration):
+        next(steps)
+    assert applied == [1, 2]
+
+
+def test_stale_process_hook_is_released_with_bounded_retries(monkeypatch):
+    now = [10.0]
+    monkeypatch.setattr(memory_module.time, 'monotonic', lambda: now[0])
+    class Engine:
+        hooked = True
+        status = 'noEmu'
+        releases = 0
+        def is_hooked(self): return self.hooked
+        def get_status(self): return SimpleNamespace(name=self.status)
+        def un_hook(self):
+            self.releases += 1
+            self.hooked = False
+    engine = Engine()
+    backend = DMEBackend(engine)
+    assert backend.recover_inactive_attachment()
+    assert engine.releases == 1
+    engine.hooked = True
+    assert not backend.recover_inactive_attachment()
+    now[0] += 2
+    assert backend.recover_inactive_attachment()
+    engine.hooked = True
+    engine.status = 'hooked'
+    now[0] += 2
+    assert not backend.recover_inactive_attachment()
+    assert engine.releases == 2

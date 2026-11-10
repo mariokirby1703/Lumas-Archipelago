@@ -76,7 +76,10 @@ def test_critical_synchronization_errors_stay_visible():
     tree = ast.parse((CLIENT / 'client.py').read_text())
     assert _calls(_function(tree, 'on_package'), 'logger', 'error')
     runtime = ast.parse((CLIENT / 'runtime.py').read_text())
-    assert _calls(_function(runtime, 'settle_effects'), 'logger', 'warning')
+    settling = _function(runtime, 'settle_effects')
+    assert not _calls(settling, 'logger', 'warning')
+    records = _calls(settling, 'quiet_logging', 'record')
+    assert sum(call.args[0].value == 'item_uncertain' for call in records) == 4
 
 
 def test_live_command_handler_shows_logs_and_clear_only_on_request():

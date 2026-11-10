@@ -248,3 +248,25 @@ def test_new_slot_same_seed_room_change_isolated_but_reconnect_preserves_receipt
         assert ctx.runtime.journal.identity!=identity and not ctx.runtime.journal.data['receipts']
         ctx.release_runtime();await ctx.shutdown()
     asyncio.run(scenario())
+
+
+def test_unacknowledged_checks_retry_after_one_second(tmp_path,monkeypatch):
+    from ..client import client
+    async def scenario():
+        data=generate().worlds[1].fill_slot_data();ctx=SonicContext(journal_directory=tmp_path)
+        ctx.team,ctx.slot=0,1;ctx.on_package('RoomInfo',{'seed_name':data['seed_name']})
+        ctx.on_package('Connected',{'slot_data':data});ctx.server=object()
+        sent=[]
+        async def send(messages):sent.extend(messages)
+        ctx.send_msgs=send
+        now=[100.];monkeypatch.setattr(client.time,'monotonic',lambda:now[0])
+        try:
+            code=next(iter(data['locations'].values()));ctx.runtime.journal.add_checks({code})
+            await client.transmit_checks(ctx);assert len(sent)==1
+            now[0]+=.9;await client.transmit_checks(ctx);assert len(sent)==1
+            now[0]+=.2;await client.transmit_checks(ctx);assert len(sent)==2
+            ctx.checked_locations.add(code);now[0]+=2
+            await client.transmit_checks(ctx);assert len(sent)==2
+        finally:
+            ctx.server=None;ctx.release_runtime();await ctx.shutdown()
+    asyncio.run(scenario())

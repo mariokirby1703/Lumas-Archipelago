@@ -7,7 +7,7 @@ from ..client.native_dol import ARENA,SIGNATURE,plan
 
 
 def test_native_plan_preserves_all_installed_hooks_and_bytes():
-    _,payload,digest,hooks=plan(legacy_wisp_slots=True)
+    _,payload,digest,hooks=plan(legacy_wisp_slots=True,include_physical_restore=False)
     assert digest.hex()=='c93c8e318a2b66d0f09716d0b9628d42027ebe94c733914dc348355b62c3cfa6'
     assert ARENA+len(payload)<=SIGNATURE
     assert len({hook['hook'] for hook in hooks})==len(hooks)

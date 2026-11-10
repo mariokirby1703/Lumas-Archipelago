@@ -107,3 +107,22 @@ def test_starlight_four_b_rank_requires_frenzy_but_clear_and_c_do_not():
         assert logic.check(w,State(),MANIFEST,'stg350','C')
         assert not logic.check(w,State(),MANIFEST,'stg350','B')
         assert logic.check(w,State('Purple Frenzy Wisp'),MANIFEST,'stg350','B')
+
+
+@pytest.mark.parametrize('key', ['stg510:ring:2', 'stg510:ring:3', 'stg510:ring:5', 'stg510:one_up'])
+def test_aquarium_one_drill_pickups_require_breathing_two(key):
+    items = ('Progressive Yellow Drill Wisp',)
+    assert not logic.check(world(), State(*items, 'Progressive Breathing'), MANIFEST, key)
+    assert logic.check(world(), State(*items, 'Progressive Breathing', 'Progressive Breathing'), MANIFEST, key)
+
+
+def test_all_aquarium_one_breathing_routes_require_at_least_two():
+    for key, entry in MANIFEST['locations'].items():
+        if key.split(':', 1)[0] != 'stg510':
+            continue
+        for mode in ('normal', 'movement', 'advanced_normal', 'advanced_movement'):
+            for route in entry[mode]:
+                for token in route:
+                    name, count = logic.token_parts(token)
+                    if name == 'breathing':
+                        assert count >= 2, (key, mode, route)

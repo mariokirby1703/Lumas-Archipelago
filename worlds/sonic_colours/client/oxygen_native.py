@@ -85,10 +85,13 @@ def payload(start,control):
 
 
 def address(memory):
-    from .native_dol import plan,ARENA
+    from .native_dol import plan,plan_for_digest,ARENA
     from .native_events import SIZE as EVENT_SIZE
     if not getattr(memory,"native_patch",None):return None
-    base=ARENA+len(plan()[1])-EVENT_SIZE-SIZE
+    digest=memory.native_patch.get('code_sha256')
+    selected=plan_for_digest(digest) if digest else plan()
+    restore=12 if memory.native_patch.get('physical_ring_restore') else 0
+    base=ARENA+len(selected[1])-EVENT_SIZE-SIZE-restore
     if memory.read_u32(base)!=MAGIC:raise MemoryUnavailable('oxygen mailbox signature changed')
     size=len(payload(0x80002000,base)[0]);start=base-size
     expected,_=payload(start,base)

@@ -3467,7 +3467,7 @@
       ],
       "movement": [
         [
-          "breathing",
+          "breathing:2",
           "drill"
         ],
         [
@@ -3478,7 +3478,7 @@
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Breathing Lv1 + Drill Lv1 or Progressive Breathing Lv2 + Swim",
+      "raw_movement": "Progressive Breathing Lv2 + Drill Lv1 or Progressive Breathing Lv2 + Swim",
       "world": "Aquarium Park",
       "row": 6
     },
@@ -3490,14 +3490,14 @@
       ],
       "movement": [
         [
-          "breathing",
+          "breathing:2",
           "drill"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "Drill",
-      "raw_movement": "Progressive Breathing Lv1 + Drill Lv1  ",
+      "raw_movement": "Progressive Breathing Lv2 + Drill Lv1  ",
       "world": "Aquarium Park",
       "row": 7
     },
@@ -3515,14 +3515,14 @@
           "stomp"
         ],
         [
-          "breathing",
+          "breathing:2",
           "swim",
           "laser",
           "crouch:2",
           "stomp"
         ],
         [
-          "breathing",
+          "breathing:2",
           "drill",
           "laser",
           "crouch:2"
@@ -3537,7 +3537,7 @@
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "Laser",
-      "raw_movement": "Boost + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv1 + Swim + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv1 + Drill Lv1 + Laser + Progressive Crouch Lv2 or Progressive Breathing Lv2 + Swim + Laser + Progressive Crouch Lv2",
+      "raw_movement": "Boost + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv2 + Swim + Laser + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv2 + Drill Lv1 + Laser + Progressive Crouch Lv2 or Progressive Breathing Lv2 + Swim + Laser + Progressive Crouch Lv2",
       "world": "Aquarium Park",
       "row": 8
     },
@@ -3547,21 +3547,21 @@
       ],
       "movement": [
         [
-          "breathing",
+          "breathing:2",
           "swim",
           "crouch:2",
           "stomp",
           "double_jump"
         ],
         [
-          "breathing",
+          "breathing:2",
           "drill"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Breathing Lv1 + Swim + Progressive Crouch Lv2 + Stomp + Double Jump or Progressive Breathing Lv1 + Drill Lv1",
+      "raw_movement": "Progressive Breathing Lv2 + Swim + Progressive Crouch Lv2 + Stomp + Double Jump or Progressive Breathing Lv2 + Drill Lv1",
       "world": "Aquarium Park",
       "row": 9
     },
@@ -3571,20 +3571,20 @@
       ],
       "movement": [
         [
-          "breathing",
+          "breathing:2",
           "swim",
           "crouch:2",
           "stomp"
         ],
         [
-          "breathing",
+          "breathing:2",
           "drill"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Breathing Lv1 + Swim + Progressive Crouch Lv2 + Stomp  or Progressive Breathing Lv1 + Drill Lv1",
+      "raw_movement": "Progressive Breathing Lv2 + Swim + Progressive Crouch Lv2 + Stomp  or Progressive Breathing Lv2 + Drill Lv1",
       "world": "Aquarium Park",
       "row": 10
     },

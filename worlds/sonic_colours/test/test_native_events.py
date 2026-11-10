@@ -6,14 +6,14 @@ from .test_memory import FakeBackend
 
 
 class Machine:
-    def __init__(self,kind):
+    def __init__(self,kind,ring_restore=False,score_reset=False):
         self.b=FakeBackend();self.control=0x80002e00;self.kind=kind
         self.r=[0x80010000+i*0x100 for i in range(32)]
         self.r[0]=1;self.r[1]=0x90100000;self.r[2]=0x808fc5c0
         self.f=[float(i) for i in range(32)];self.lr=0x80001234;self.ctr=0x80005678;self.cr=0x12345678;self.cmp=0
         self.stage=0x90010000;self.player=0x90020000;self.machine=0x90030000;self.input=0x90040000;self.event=0x90050000
         self.calls=[];self.call_targets=[]
-        for a,o,b in n.patches(self.control):self.b.put(a,b)
+        for a,o,b in n.patches(self.control,ring_restore=self.control-12 if ring_restore or score_reset else None,score_reset=score_reset):self.b.put(a,b)
         self.b.put(self.control,bytes(n.SIZE));self.put(self.control,n.MAGIC)
         for i in range(4):self.put(self.control+n.JUMP_TABLE+i*4,sum(1<<(s%32) for s in n.JUMP_STATES if s//32==i))
         self.put(self.control+n.STAGE,self.stage);self.put(self.control+n.PLAYER,self.player)
@@ -21,6 +21,7 @@ class Machine:
         self.put(self.control+n.ENABLE,1)
         self.put(self.player,0x8075aef8);self.put(self.player+12,123)
         self.put(self.player+0x88,self.input)
+        self.put(self.stage+0x4c,0x90061000);self.b.put(0x90061000,b'stg110\0')
         self.put(self.stage+0x114,0x90060000);self.put(0x90060038,123)
         self.put(self.stage+0x44,0x8001cdb4);self.put(self.player+0x70,0x90070000)
         self.put(0x90070008,self.machine);self.put(self.machine,0x8075a0f8)
@@ -48,7 +49,10 @@ class Machine:
         for _ in range(4000):
             if pc in (n.HOOKS[self.kind][0]+4,0x80001234):return
             w=self.get(pc);next_pc=pc+4;op=w>>26;rt=w>>21&31;ra=w>>16&31;rb=w>>11&31;u=w&65535;imm=u-65536 if u&32768 else u
-            if op==14:self.r[rt]=((self.r[ra] if ra else 0)+imm)&0xffffffff
+            if op==7:
+                value=self.r[ra] if self.r[ra]<0x80000000 else self.r[ra]-0x100000000
+                self.r[rt]=(value*imm)&0xffffffff
+            elif op==14:self.r[rt]=((self.r[ra] if ra else 0)+imm)&0xffffffff
             elif op==15:self.r[rt]=(imm<<16)&0xffffffff
             elif op==24:self.r[ra]=self.r[rt]|u
             elif op==28:
@@ -110,7 +114,8 @@ class Machine:
             elif op==21:
                 sh=w>>11&31;mb=w>>6&31;me=w>>1&31;value=self.r[rt]
                 rotated=((value<<sh)|(value>>(32-sh if sh else 32)))&0xffffffff
-                mask=sum(1<<(31-i) for i in range(mb,me+1));self.r[ra]=rotated&mask
+                bits=range(mb,me+1) if mb<=me else list(range(mb,32))+list(range(me+1))
+                mask=sum(1<<(31-i) for i in bits);self.r[ra]=rotated&mask
             elif w in (0x60000000,0x7c0004ac):pass
             elif op==31 and w&0x7ff==0:self.cmp=(self.r[ra]>self.r[rb])-(self.r[ra]<self.r[rb])
             elif op==31 and w&0x7ff==0x378:self.r[ra]=self.r[rt]|self.r[rb]
@@ -311,3 +316,64 @@ def test_abyss_death_capture_does_not_require_living_input_or_enabled_requests(e
     m.run()
     assert m.get(m.control+n.DEATH_SEQ)==2
     assert m.get(m.control+n.DEATH_STAGE)==m.stage
+
+
+def test_game_thread_restore_preserves_simultaneous_new_ring_and_retains_it_after_death():
+    m=Machine('frame',ring_restore=True,score_reset=True);base=m.control-12;actor=0x90060000
+    m.put(m.control+n.INPUT,0)
+    m.put(base,123);m.put(base+4,actor);m.put(base+8,0x31313000|1)
+    m.put(actor,0x8075A228)
+    m.b.put(actor+0x91,b'\x82')  # new ring 2 while ring 1 is restored
+    m.run()
+    assert m.read(actor+0x91,1)==b'\x83'
+    assert m.get(base+8)==0x31313003
+    m.b.put(actor+0x91,b'\x80')  # death resets the live collection byte
+    m.run()
+    assert m.read(actor+0x91,1)==b'\x83' and m.get(base+8)==0x31313003
+    m.b.put(actor+0x91,b'\x84')  # another native pickup on a restoration frame
+    m.run()
+    assert m.read(actor+0x91,1)==b'\x87' and m.get(base+8)==0x31313007
+
+
+@pytest.mark.parametrize('field,value',[(0,999),(4,0x90070000)])
+def test_game_thread_ring_restore_rejects_changed_owner(field,value):
+    m=Machine('frame',ring_restore=True);base=m.control-12;actor=0x90060000
+    m.put(base,123);m.put(base+4,actor);m.put(base+8,0x31313000|1);m.put(actor,0x8075A228)
+    m.b.put(actor+0x91,b'\x82');m.put(base+field,value)
+    m.run();assert m.read(actor+0x91,1)==b'\x82'
+
+
+def test_ring_restore_rejects_another_mission_with_reused_actor_and_serial():
+    m=Machine('frame',ring_restore=True);base=m.control-12;actor=0x90060000
+    m.put(base,123);m.put(base+4,actor);m.put(base+8,0x31313001);m.put(actor,0x8075A228)
+    m.b.put(0x90061000,b'stg130\0');m.b.put(actor+0x91,b'\x80')
+    m.run()
+    assert m.read(actor+0x91,1)==b'\x80'
+    assert m.get(base+8)==0x31313001
+
+
+@pytest.mark.parametrize('mission',['stg110','stg190','stg790','stgD10','stgG30'])
+def test_score_reset_clears_sources_in_one_guest_callback_and_acknowledges_once(mission):
+    m=Machine('frame',score_reset=True)
+    m.put(m.control+n.INPUT,(7<<16)|6)
+    m.put(m.stage+0x80,600);m.put(m.stage+0x198,0x12345678)
+    for offset in range(0x19c,0x1f0,4):m.put(m.stage+offset,100)
+    m.b.put(0x90061000,mission.encode()+b'\0')
+    m.run()
+    assert m.get(m.stage+0x80)==0
+    assert m.read(m.stage+0x19c,84)==bytes(84)
+    assert m.get(m.stage+0x198)==0x12345678
+    assert m.get(m.control+n.INPUT)==(7<<16)|7
+    expected=m.before[:];expected[0]=m.get(m.stage+0xa4)
+    assert m.r==expected and m.f==m.before_f
+    assert m.lr==0x80001234 and m.ctr==0x80005678 and m.cr==0x12345678
+    m.put(m.stage+0x80,300);m.run()
+    assert m.get(m.stage+0x80)==300
+
+
+def test_native_score_reset_waits_for_points_before_consuming_request():
+    m=Machine('frame',score_reset=True);m.put(m.control+n.INPUT,1<<16)
+    m.run();assert m.get(m.control+n.INPUT)==1<<16
+    m.put(m.stage+0x19c,200);m.run()
+    assert m.get(m.control+n.INPUT)==(1<<16)|1
+    assert m.read(m.stage+0x19c,84)==bytes(84)

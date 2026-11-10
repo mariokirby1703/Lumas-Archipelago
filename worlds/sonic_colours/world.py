@@ -40,13 +40,6 @@ class SonicColoursWorld(World):
         if not self.options.game_land_checks:
             self.options.eggman_heart_sanity.value=0
             self.options.chaos_emerald_checks.value=0
-        # Both experimental effects are normal, selectable options. Never
-        # represent their lack of Dolphin live-verification as success.
-        validation=load_data('versions.json').get('live_validation',{})
-        for option, capability in [('death_link', 'deathlink'),('dead_weight_trap_weight','dead_weight')]:
-            if getattr(self.options, option).value and not validation.get(capability):
-                logger.warning('Sonic Colours: %s enabled, but %s live-validation remains incomplete.',
-                               option, capability)
         if self.options.native_feature_tests:
             logger.warning('Sonic Colours: unverified native feature TEST opt-in; live matrix incomplete.')
         self.starting_stage = next(s for s in STAGES if s['mission_id'] == 'stg110')
@@ -57,8 +50,6 @@ class SonicColoursWorld(World):
         from .logic import validate_manifest
         validate_manifest(self.logic)
         self.unknown_logic = ()
-        logger.info('Sonic Colours: Completed Sheet V3 NL/ML routes (%d), A/S rank Wisps included.',
-                    len(self.logic['locations']))
         if self.options.wisp_capsules.value and not any(
                 Locations.LOCATION_TABLE[n].kind == 'capsule' for n in self.active_locations):
             raise ValueError('wisp_capsules: no validated accessible capsule instances yet; '

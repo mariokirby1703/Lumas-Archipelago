@@ -124,14 +124,14 @@ def test_aquarium_park_1_red_ring_4_exactly_four_alternative_routes():
     assert len(routes) == 4
     assert routes == [
         ['boost','laser','crouch:2','stomp'],
-        ['breathing','swim','laser','crouch:2','stomp'],
-        ['breathing','drill','laser','crouch:2'],
+        ['breathing:2','swim','laser','crouch:2','stomp'],
+        ['breathing:2','drill','laser','crouch:2'],
         ['breathing:2','swim','laser','crouch:2'],
     ]
     inventories = (
         ('White Boost Wisp','Cyan Laser Wisp','Progressive Crouch','Progressive Crouch','Stomp'),
-        ('Progressive Breathing','Swim','Cyan Laser Wisp','Progressive Crouch','Progressive Crouch','Stomp'),
-        ('Progressive Breathing','Progressive Yellow Drill Wisp','Cyan Laser Wisp','Progressive Crouch','Progressive Crouch'),
+        ('Progressive Breathing','Progressive Breathing','Swim','Cyan Laser Wisp','Progressive Crouch','Progressive Crouch','Stomp'),
+        ('Progressive Breathing','Progressive Breathing','Progressive Yellow Drill Wisp','Cyan Laser Wisp','Progressive Crouch','Progressive Crouch'),
         ('Progressive Breathing','Progressive Breathing','Swim','Cyan Laser Wisp','Progressive Crouch','Progressive Crouch'),
     )
     for inv in inventories:

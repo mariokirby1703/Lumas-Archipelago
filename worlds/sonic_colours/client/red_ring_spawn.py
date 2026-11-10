@@ -165,7 +165,7 @@ def scatter(words, sites, return_address=None, exits=None):
 @lru_cache(maxsize=1)
 def layout():
     from .native_dol import plan
-    occupied=plan(include_ring_spawn=False,include_boot_guards=False,include_accessible_colors=False)[0]
+    occupied=plan(include_ring_spawn=False,include_boot_guards=False,include_accessible_colors=False,include_physical_restore=False)[0]
     sites=[s for s in load_data('red_ring_spawn_sites.json')
            if not any(a<s['address']+8 and s['address']<a+len(n) for a,o,n in occupied)]
     names=missions();header=sites[0]['address'];rows={name:sites[i+1]['address'] for i,name in enumerate(names)}

@@ -17,6 +17,7 @@ ARENA=0x80001800
 ARENA_PREFIX_SIZE=32
 SIGNATURE=0x80002fc0
 ABI=2
+_PLAN_FEATURES={}
 MAGIC=b'SCAPNAT1'
 
 def branch(source,target):
@@ -55,9 +56,10 @@ class Dol:
         for base,value in ((0,offset),(0x48,address),(0x90,len(blob))):struct.pack_into('>I',self.data,base+4*slot,value)
         self.sections.append((slot,offset,address,len(blob)))
 
-@lru_cache(maxsize=32)
-def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False,legacy_fps_word_write=False,legacy_wisp_slots=False):
+@lru_cache(maxsize=128)
+def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False,legacy_fps_word_write=False,legacy_wisp_slots=False,include_physical_restore=True,include_score_reset=True):
     """Rebuild every C2 payload as initialized native code, without C2 headers."""
+    include_score_reset=bool(include_score_reset and include_physical_restore)
     from .native_hook_table import hook_rows
     from .ap_hud_publisher import patches as hud
     from .rocket_skydiving import patches as rocket
@@ -102,7 +104,10 @@ def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards
         patches.append((hook,old.to_bytes(4,'big'),branch(hook,target).to_bytes(4,'big')))
     payload.extend(oxygen_code);cursor+=len(oxygen_code)
     payload.extend(struct.pack('>I',oxygen_native.MAGIC)+bytes(oxygen_native.SIZE-4));cursor+=oxygen_native.SIZE
-    patches.extend(native_events.patches(cursor))
+    ring_restore=cursor if include_physical_restore else None
+    if include_physical_restore:
+        payload.extend(bytes(12));cursor+=12
+    patches.extend(native_events.patches(cursor,ring_restore=ring_restore,score_reset=include_score_reset))
     mailbox=bytearray(native_events.SIZE);struct.pack_into('>I',mailbox,0,native_events.MAGIC)
     for state in native_events.JUMP_STATES:
         offset=native_events.JUMP_TABLE+(state//32)*4
@@ -157,6 +162,7 @@ def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')
         ownership.append((address,address+len(new)))
     digest=hashlib.sha256(bytes(payload)+b''.join(struct.pack('>I',a)+n for a,o,n in patches)).digest()
+    _PLAN_FEATURES[digest.hex()]={'physical_ring_restore':include_physical_restore,'native_score_reset':include_score_reset}
     return patches,bytes(payload),digest,hooks
 
 def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
@@ -182,8 +188,15 @@ def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
                             'source_sha256':PAL_DOL_SHA256,'seed_digest':identity.hex(),
                             'boot_permissions':boot}
 
-@lru_cache(maxsize=16)
+@lru_cache(maxsize=64)
 def plan_for_digest(digest):
+    released={
+        'c93c8e318a2b66d0f09716d0b9628d42027ebe94c733914dc348355b62c3cfa6':True,
+        'bfd736d810b914c5981f55ef34ecef905e4c349a1543331fd413a5228e5ca395':False,
+    }
+    if digest in released:
+        candidate=plan(include_physical_restore=False,legacy_wisp_slots=released[digest])
+        if candidate[2].hex()==digest:return candidate
     variants = ({}, {'include_sixty_fps':True}, {'include_luma_colors':True},
                 {'include_luma_colors':True,'include_sixty_fps':True},
                 {'include_sixty_fps':True,'legacy_fps_word_write':True},
@@ -192,10 +205,11 @@ def plan_for_digest(digest):
                 {'include_boot_guards':False,'include_accessible_colors':False},
                 {'include_ring_spawn':False,'include_boot_guards':False,'include_accessible_colors':False},
                 {'include_ring_materials':False,'include_boot_guards':False,'include_accessible_colors':False})
-    for legacy in (False,True):
-        for options in variants:
-            candidate=plan(**options,legacy_wisp_slots=legacy)
-            if candidate[2].hex()==digest:return candidate
+    for restore,score in ((True,True),(True,False),(False,False)):
+        for legacy in (False,True):
+            for options in variants:
+                candidate=plan(**options,legacy_wisp_slots=legacy,include_physical_restore=restore,include_score_reset=score)
+                if candidate[2].hex()==digest:return candidate
     raise ValueError('incompatible native AP hook ABI/signature')
 
 
@@ -263,6 +277,7 @@ def handshake(memory):
         raise memory.error('incomplete Red Ring material allocation patch; repatch ISO')
     return {'abi':ABI,'seed_digest':raw[48:].hex(),'code_sha256':digest.hex(),'gecko_required':False,
             'red_ring_materials':ring_materials,
+            **_PLAN_FEATURES[digest.hex()],
             'red_ring_spawn':has_spawn,
             'accessible_ring_colors':has_accessible,
             'luma_ring_colors':has_luma,

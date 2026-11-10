@@ -115,7 +115,7 @@ def test_palette_does_not_change_generation_or_normal_colors(colorblind):
     disabled = {**options,'luma':0}
     for flags in range(8):
         assert reward_color(1,2,flags,1,options,'Seed',123) == reward_color(1,2,flags,1,disabled,'Seed',123)
-    assert plan(legacy_wisp_slots=True)[2].hex() == 'c93c8e318a2b66d0f09716d0b9628d42027ebe94c733914dc348355b62c3cfa6'
+    assert plan(legacy_wisp_slots=True,include_physical_restore=False)[2].hex() == 'c93c8e318a2b66d0f09716d0b9628d42027ebe94c733914dc348355b62c3cfa6'
 
 
 @pytest.mark.parametrize('checks', ['singles','per_level'])

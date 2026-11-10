@@ -435,8 +435,8 @@ class Runtime:
             'provenance':'native_intro_act2_record_transition_v1'}],{},checks)
         quiet_logging.record('result','Missed intro result recovered from native Act 2 transition: %s',sorted(checks))
 
-    def observe_pickups(self):
-        snapshot = self.snapshot
+    def observe_pickups(self, snapshot=None):
+        snapshot = self.snapshot if snapshot is None else snapshot
         if not self.guard.can_record_pickups(snapshot):
             return
         mission = snapshot.actual_mission
@@ -465,7 +465,7 @@ class Runtime:
         added = mask & ~previous & ~physical_ever & ~excluded
         if not added:
             return
-        updated = ever | added
+        updated = ever | physical_ever | added
         events = [{'kind': 'red_ring', 'mission': mission, 'ring': ring,
                    'stage_epoch': epoch, 'playthrough_epoch': (self.journal.data.get('bootstrap', {}).get('epoch')
                        or (self.journal.data.get('native_binding') or {}).get('bootstrap_epoch')),
@@ -509,6 +509,9 @@ class Runtime:
         # Capture irreversible pickup/result evidence before slow permission
         # writes. Network clients can transmit this checkpoint and receive
         # acknowledgements before continuing the same synchronous poll.
+        if (getattr(memory,'native_patch',None) or {}).get('physical_ring_restore'):
+            from .physical_rings import observe_retained
+            observe_retained(self,memory)
         self.observe_pickups()
         self.observe_results()
         self.recover_intro_clear()
@@ -562,6 +565,7 @@ class Runtime:
                     temporary_boost=self.temporary_boost_allowed(memory),kinds=('boost_use','boost_query','boost_add')))):
             try:self.hooks.gameplay_controls_status[name]=action()
             except MemoryUnavailable as error:self.hooks.gameplay_controls_status[name]={'status':str(error)}
+            yield set(), False
         self.enforce_white_boost_gain_lock(memory,early_owned)
         from .wisp_inventory import apply as clear_unowned_wisp
         try:
@@ -622,9 +626,10 @@ class Runtime:
             self.native_event_status={'installed':False,'status':str(error)}
         try:
             from .physical_rings import apply as restore_physical_rings
-            self.physical_ring_status = restore_physical_rings(memory, self.snapshot, self.guard)
+            self.physical_ring_status = restore_physical_rings(memory, self.snapshot, self.guard, self)
         except MemoryUnavailable as error:
             self.physical_ring_status = {'status':str(error), 'nand_flush_verified':False}
+        yield set(), False
         if self.slot_data['options']['eggman_heart_sanity'] and self.guard.can_record(self.snapshot):
             try:
                 self.guard.check(self.snapshot)
@@ -707,12 +712,15 @@ class Runtime:
             # Native permissions and non-idempotent filler are independent. A
             # blocked query hook must not prevent separately verified stats writes.
             errors = []
-            for operation in (lambda: self.project_permissions(memory, owned),
-                              lambda: self.apply_effects(memory, item_ids)):
-                try:
-                    operation()
-                except MemoryUnavailable as error:
-                    errors.append(str(error))
+            try:
+                self.project_permissions(memory, owned)
+            except MemoryUnavailable as error:
+                errors.append(str(error))
+            yield set(), False
+            try:
+                yield from self.apply_effect_steps(memory, item_ids)
+            except MemoryUnavailable as error:
+                errors.append(str(error))
             if errors:
                 self.last_error = self.guard.reason + '; ' + '; '.join(dict.fromkeys(errors))
         elif not history_ready:
@@ -1054,7 +1062,7 @@ class Runtime:
                 effect.update(state='uncertain', reason='left living gameplay before verification completed')
                 self.journal.save()
                 del self.inflight[index]
-                logger.warning('Item uncertain: receipt %s left gameplay; no replay, later receipts continue', index)
+                quiet_logging.record('item_uncertain', 'Item uncertain: receipt %s left gameplay; no replay, later receipts continue', index)
                 continue
             try:
                 context = self.effect_context(memory, pending['family'])
@@ -1070,7 +1078,7 @@ class Runtime:
                 effect.update(state='uncertain', reason='actor/context changed before verification')
                 self.journal.save()
                 del self.inflight[index]
-                logger.warning('Item uncertain: receipt %s actor/context changed; no replay', index)
+                quiet_logging.record('item_uncertain', 'Item uncertain: receipt %s actor/context changed; no replay', index)
                 continue
             try:
                 values = [memory.read_u32(address) for address in pending['addresses']]
@@ -1078,7 +1086,7 @@ class Runtime:
                 effect.update(state='uncertain', reason=str(error))
                 self.journal.save()
                 del self.inflight[index]
-                logger.warning('Item uncertain: receipt %s verification read failed: %s', index, error)
+                quiet_logging.record('item_uncertain', 'Item uncertain: receipt %s verification read failed: %s', index, error)
                 continue
             correct = all(value == effect['after'] for value in values)
             if pending['family'] == 'boost':
@@ -1107,10 +1115,14 @@ class Runtime:
                 else:
                     effect.update(state='uncertain', reason='no later-frame effect witness or counter sources disagree')
                     self.journal.save()
-                    logger.warning('Item uncertain: receipt %s stable counters %s differ; no replay', index, values)
+                    quiet_logging.record('item_uncertain', 'Item uncertain: receipt %s stable counters %s differ; no replay', index, values)
                 del self.inflight[index]
 
     def apply_effects(self, memory, item_ids):
+        for _ in self.apply_effect_steps(memory, item_ids):
+            pass
+
+    def apply_effect_steps(self, memory, item_ids):
         try:
             from .intro_box import apply as apply_intro_box
             self.intro_box_status = apply_intro_box(memory,self.snapshot,self.guard,self.slot_data)
@@ -1123,6 +1135,9 @@ class Runtime:
             if name not in DELIVERY_ITEMS:
                 continue
             recorded = self.journal.data['effects'].get(str(index))
+            if recorded and recorded.get('state') in ('confirmed', 'skipped_by_operator'):
+                continue
+            yield set(), False
             if name=='Dead Weight Trap':
                 from .dead_weight import deliver
                 try:deliver(self,memory,index,item)
@@ -1139,7 +1154,7 @@ class Runtime:
                 continue
             if name=='Score Reset Trap':
                 effect=self.journal.data['effects'].get(str(index),{})
-                if effect.get('state') in ('confirmed','uncertain','prepared','verifying','skipped_by_operator'):continue
+                if effect.get('state') in ('confirmed','skipped_by_operator'):continue
                 from .score_reset import deliver
                 try:deliver(memory,self.snapshot,self.guard,self.journal,index,item)
                 except MemoryUnavailable as error:self.journal.defer(index,item,str(error))
@@ -1156,7 +1171,7 @@ class Runtime:
                         self.journal.save()
                     if index not in self.deferred:
                         self.deferred[index] = 'uncertain'
-                        logger.warning('Item uncertain: receipt %s (%s); no replay. Later receipts continue; /sonicitems and /sonicrecover skip %s', index, name, index)
+                        quiet_logging.record('item_uncertain', 'Item uncertain: receipt %s (%s); no replay. Later receipts continue; /sonicitems and /sonicrecover skip %s', index, name, index)
                 continue
             if self.clock() < self.retry_after.get(index, 0):
                 continue
@@ -1246,7 +1261,7 @@ class Runtime:
                     continue
                 self.journal.data['effects'][str(index)].update(state='uncertain', reason=str(error))
                 self.journal.save()
-                logger.warning('Item uncertain: receipt %s (%s): %s; later receipts remain eligible', index, name, error)
+                quiet_logging.record('item_uncertain', 'Item uncertain: receipt %s (%s): %s; later receipts remain eligible', index, name, error)
                 continue
             if family == 'boost':
                 self.journal.data['temporary_boost'] = {'context': grant_context, 'receipt': index,

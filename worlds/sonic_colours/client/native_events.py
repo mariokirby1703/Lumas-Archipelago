@@ -17,13 +17,14 @@ HOOKS={'frame':(0x8001CE60,0x800400A4),'death':(0x8001D2B8,0x2C1A0000),
 # ownership. Sequence/ack fields and remaining time are game-thread owned.
 ENABLE,STAGE,PLAYER,SERIAL,REQUEST,ACK,DEATH_SEQ,DEATH_STAGE,DEATH_COUNT=4,8,12,16,20,24,28,32,36
 REMAINING,TRAP_REQUEST,TRAP_ACK,INPUT,MUSIC_SEQ,CHANNEL,CUE,NAME=40,44,48,52,60,64,68,72
+SCORE_RESET=INPUT  # Packed 16-bit request/ACK in images with native Score Reset.
 JUMP_TABLE=112
 LOOP_CUE=104  # host-authenticated finite donor destination, zero disables
 FRAME_FENCE=56  # completed native frame callbacks, including disabled frames
 JUMP_STATES=(5,6,7,8,9,11,12,18,19,29,30,36,37,39,40,46,47,58,80,106,107,115)
 
 
-def program(kind,control):
+def program(kind,control,ring_restore=None,score_reset=False):
     a=PPC()
     def const(r,v):a.d(15,r,0,v>>16);a.d(24,r,r,v&65535)
     def cmp(r,v):a.d(11,0,r,v)
@@ -136,6 +137,38 @@ def program(kind,control):
         a.d(32,3,30,12);a.d(32,4,31,SERIAL);equal(3,4);br('done',0x40820000)
         a.d(32,4,29,0x114);cmp(4,0);br('done',0x41820000)
         a.d(32,4,4,0x38);equal(3,4);br('done',0x40820000)
+        if score_reset:
+            a.d(32,3,31,SCORE_RESET)
+            a.emit((21<<26)|(3<<21)|(5<<16)|(16<<11)|(16<<6)|(31<<1))
+            a.d(28,3,6,0xffff);equal(5,6);br('score_done',0x41820000)
+            a.d(32,7,29,0x80)
+            for offset in range(0x19c,0x1f0,4):
+                a.d(32,6,29,offset);a.emit((31<<26)|(7<<21)|(7<<16)|(6<<11)|(444<<1))
+            cmp(7,0);br('score_done',0x41820000)
+            a.d(14,6,0,0);a.d(36,6,29,0x80)
+            for offset in range(0x19c,0x1f0,4):a.d(36,6,29,offset)
+            a.emit((21<<26)|(5<<21)|(6<<16)|(16<<11)|(15<<1))
+            a.emit((31<<26)|(6<<21)|(6<<16)|(5<<11)|(444<<1))
+            a.emit(0x7C0004AC);a.d(36,6,31,SCORE_RESET)
+            a.label('score_done');a.d(32,3,30,12)
+        if ring_restore is not None:
+            # The game thread owns both bitmaps. Never let a host read/write
+            # overwrite a pickup made between its memory operations.
+            const(6,ring_restore);a.d(32,5,6,0);equal(5,3);br('ring_done',0x40820000)
+            a.d(32,5,6,4);a.d(32,4,29,0x114);equal(5,4);br('ring_done',0x40820000)
+            a.d(32,5,4,0);const(7,0x8075A228);equal(5,7);br('ring_done',0x40820000)
+            a.d(32,8,29,0x4c);cmp(8,0);br('ring_done',0x41820000)
+            a.d(34,5,8,3);a.d(7,5,5,256);a.d(34,7,8,4)
+            a.emit(0x7CA53A14);a.d(7,5,5,256);a.d(34,7,8,5)
+            a.emit(0x7CA53A14);a.d(7,5,5,256)
+            a.d(32,7,6,8);a.emit((21<<26)|(7<<21)|(8<<16)|(23<<1))
+            equal(5,8);br('ring_done',0x40820000)
+            a.d(34,5,4,0x91)
+            a.emit(0x7CA73B78)  # or r7,r5,r7
+            a.emit((21<<26)|(7<<21)|(5<<16)|(27<<6)|(23<<1))
+            a.d(36,5,6,8)
+            a.d(38,7,4,0x91)
+            a.label('ring_done')
         # Native frame delta; countdown never advances in menus/pause/loading.
         a.d(32,4,1,16+30*4)  # original r30 is the stage event, not player
         a.d(48,1,4,4);a.d(48,0,31,REMAINING);a.emit(0xEC000828)  # fsubs f0,f0,f1
@@ -222,31 +255,104 @@ def scatter(words,sites,return_to,compact=False):
     return result
 
 
-@lru_cache(maxsize=1)
-def patches(control):
+def scatter_mixed(words,sites,return_to,pool=False):
+    from .native_dol import branch
+    packets=[];addresses={};i=0;slot=0;available=list(sites)
+    while i<len(words):
+        conditional=words[i]>>26==16
+        if pool:
+            preferred=12 if conditional else 8
+            index=next((k for k,s in enumerate(available) if s.get('size',12)==preferred),None)
+            if index is None and not conditional and available:index=0
+            if index is None:raise ValueError('native event padding exhausted')
+            site=available.pop(index)
+        else:
+            while slot<len(sites) and conditional and sites[slot].get('size',12)<12:slot+=1
+            if slot>=len(sites):raise ValueError('native event padding exhausted')
+            site=sites[slot]
+        size=site.get('size',12)
+        pair=(size>=12 and i+1<len(words)-1 and words[i]>>26 not in (16,18)
+              and words[i+1]>>26 not in (16,18))
+        count=2 if pair else 1
+        packets.append((i,count,site))
+        for j in range(count):addresses[i+j]=site['address']+j*4
+        i+=count;slot+=1
+    result=[]
+    for k,(i,count,site) in enumerate(packets):
+        a=site['address'];size=site.get('size',12)
+        following=packets[k+1][2]['address'] if k+1<len(packets) else return_to
+        word=words[i];op=word>>26
+        if i==len(words)-1:chunk=[branch(a,return_to)]
+        elif op in (16,18):
+            mask,sign=(0xfffc,0x8000) if op==16 else (0x3fffffc,0x2000000)
+            delta=word&mask
+            if delta&sign:delta-=2*sign
+            target=addresses[i+delta//4]
+            chunk=([(word&0xffff0000)^0x01000000|8,branch(a+4,target),branch(a+8,following)]
+                   if op==16 else [branch(a,target)|(word&1)])
+        else:chunk=words[i:i+count]+[branch(a+count*4,following)]
+        chunk += [0x60000000]*(size//4-len(chunk))
+        result.append((a,bytes(size),struct.pack('>'+'I'*len(chunk),*chunk)))
+    return result,available if pool else slot
+
+
+@lru_cache(maxsize=8)
+def patches(control,ring_restore=None,score_reset=False):
     from ..world_constants import load_data
     from .native_dol import branch
     from .ap_hud_publisher import patches as hud_patches
     # The publisher may grow into previously unused audited padding. Keep
     # native event allocation disjoint rather than relying on old list order.
     occupied={address for address,_,_ in hud_patches(native_registry=True)}
-    sites=[s for s in load_data('native_event_sites.json') if s['address'] not in occupied]
+    if ring_restore is not None:
+        for name in ('active_movement_sites.json','rail_action_sites.json','water_drill_turbo_sites.json',
+                     'drift_input_sites.json','wisp_activation_sites.json','random_wisp_spawn_sites.json',
+                     'white_capsule_open_sites.json','wisp_hud_sites.json'):
+            for site in load_data(name):
+                occupied.update(range(site['address'],site['address']+site.get('size',12),4))
+    if score_reset:
+        from .native_dol import plan
+        from .sixty_fps import patches as fps_patches
+        for address,old,new in fps_patches(plan(include_physical_restore=False)[0]):
+            occupied.update(range(address,address+len(new),4))
+        from .native_dol import ARENA
+        for accessible in (True,False):
+            prior=plan(include_physical_restore=False,include_accessible_colors=accessible)
+            control_base=ARENA+len(prior[1])-SIZE
+            event_sites={a for a,o,n in patches(control_base)}
+            for address,old,new in prior[0]:
+                if address not in event_sites:
+                    occupied.update(range(address,address+len(new),4))
+    sites=[s for s in load_data('native_event_sites.json') if not any(
+        s['address']+offset in occupied for offset in (0,4,8))]
+    if ring_restore is not None:
+        extras=[s for s in load_data('physical_ring_restore_sites.json')
+                if not any(s['address']+i in occupied for i in range(0,s['size'],4))]
+        sites=sorted(sites+extras,key=lambda s:s['address'])
     result=[];used=0
     for kind,(hook,old) in HOOKS.items():
-        words=program(kind,control)
+        words=program(kind,control,ring_restore=ring_restore,score_reset=score_reset)
         selected=(load_data('native_music_loop_sites.json') if kind=='music_loop' else sites[used:])
         entry=selected[0]['address']
+        if score_reset and kind!='music_loop':
+            entry=next((s['address'] for s in selected if s.get('size',12)==8),entry)
         result.append((hook,old.to_bytes(4,'big'),branch(hook,entry).to_bytes(4,'big')))
-        chunks=scatter(words,selected,hook+4,compact=True)
+        if ring_restore is not None and kind!='music_loop':
+            chunks,consumed=scatter_mixed(words,selected,hook+4,pool=score_reset)
+            if score_reset:sites=consumed
+        else:
+            chunks=scatter(words,selected,hook+4,compact=True);consumed=len(chunks)
         result.extend(chunks)
-        if kind!='music_loop':used+=len(chunks)
+        if kind!='music_loop' and not score_reset:used+=consumed
     return result
 
 
 def address(memory):
-    from .native_dol import plan,ARENA
+    from .native_dol import plan,plan_for_digest,ARENA
     if not getattr(memory,'native_patch',None):raise MemoryUnavailable('Native event ISO required')
-    base=ARENA+len(plan()[1])-SIZE
+    digest=memory.native_patch.get('code_sha256')
+    selected=plan_for_digest(digest) if digest else plan()
+    base=ARENA+len(selected[1])-SIZE
     if memory.read_u32(base)!=MAGIC:raise MemoryUnavailable('Native event mailbox signature differs')
     expected=struct.pack('>4I',*(sum(1<<(s%32) for s in JUMP_STATES if s//32==i) for i in range(4)))
     if memory.read_bytes(base+JUMP_TABLE,16)!=expected:raise MemoryUnavailable('Native Jump policy table differs')
@@ -263,6 +369,8 @@ def status(memory):
     return {'installed':True,'address':base,'death_sequence':struct.unpack_from('>I',raw,DEATH_SEQ)[0],
             'death_stage':struct.unpack_from('>I',raw,DEATH_STAGE)[0],
             'death_count':struct.unpack_from('>I',raw,DEATH_COUNT)[0],
+            'score_request':struct.unpack_from('>I',raw,INPUT)[0]>>16,
+            'score_ack':struct.unpack_from('>I',raw,INPUT)[0]&0xffff,
             'remote_request':struct.unpack_from('>I',raw,REQUEST)[0],
             'remote_ack':struct.unpack_from('>I',raw,ACK)[0],
             'frame_fence':struct.unpack_from('>I',raw,FRAME_FENCE)[0],

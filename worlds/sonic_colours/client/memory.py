@@ -15,7 +15,7 @@ SAVE_SLOT_STRIDE = 0x19608
 
 _BATCHED_CONTROLS=frozenset({'movement_controls','gameplay_controls','capsule_controls',
     'oxygen_controls','one_up_controls','egg_medal_controls','stunts','drill_turbo',
-    'hover_ring_dash','assist_change','skydiving','quick_step','red_ring_spawn'})
+    'hover_ring_dash','assist_change','skydiving','quick_step','red_ring_spawn','physical_ring_restore'})
 
 class MemoryUnavailable(RuntimeError):
     pass
@@ -43,11 +43,27 @@ class DMEBackend:
         self.read_calls = 0
         self.write_calls = 0
         self.process_enumerations = 0
+        self._next_inactive_rehook = 0.0
         self._next_mem2_probe = 0
         self.mem2_mapping_status = {'backend':'DME','status':'not independently probed'}
 
     def active(self):
         return self.engine.is_hooked() and getattr(self.engine.get_status(), 'name', None) == 'hooked'
+
+    def recover_inactive_attachment(self):
+        if self.active():
+            return False
+        now = time.monotonic()
+        if now < self._next_inactive_rehook:
+            return False
+        self._next_inactive_rehook = now + 2.0
+        # DME can retain a process hook while its emulation mapping is gone.
+        # Drop that handle; the normal loop reattaches and verifies the image.
+        if not self.engine.is_hooked():
+            return False
+        self.close()
+        self.engine.un_hook()
+        return True
 
     def instance_info(self, *, fresh=False):
         status = self.engine.get_status()
@@ -389,6 +405,12 @@ class SonicMemory:
             before,after=self._game_land_notice_transaction[3][address]
             if expected!=before.to_bytes(4,'big') or data!=after.to_bytes(4,'big'):
                 raise MemoryUnavailable('WRITE_BLOCKED: Game Land notification value not in transaction')
+        if operation == 'physical_ring_restore':
+            context,base,mask=token
+            value=int.from_bytes(data,'big')
+            allowed={base:(0,context[4]),base+4:(context[5],),base+8:(mask,)}
+            if value not in allowed.get(address,()):
+                raise MemoryUnavailable('WRITE_BLOCKED: Red Ring restore value')
         if operation == 'physical_ring_collection':
             mask = token[1]
             old, new = int.from_bytes(expected,'big'), int.from_bytes(data,'big')
@@ -446,7 +468,13 @@ class SonicMemory:
                     and self.read_u32(actors[0]+0xb4+zone*8) == 0)
         oxygen_advanced = (operation=='breath_timer' and len(readback)==4
                            and struct.unpack('>f',data)[0]<=struct.unpack('>f',readback)[0]<=struct.unpack('>f',data)[0]+0.25)
-        if readback != data and not consumed and not oxygen_advanced:
+        score_acknowledged=False
+        if operation=='native_event_controls' and (getattr(self,'_event_transaction',None) or {}).get('score_reset'):
+            from .native_events import SCORE_RESET,address as event_address
+            request=int.from_bytes(data,'big')>>16
+            score_acknowledged=(len(data)==4 and request>0 and address==event_address(self)+SCORE_RESET
+                                and readback==((request<<16)|request).to_bytes(4,'big'))
+        if readback != data and not consumed and not oxygen_advanced and not score_acknowledged:
             raise MemoryUnavailable('WRITE_UNCERTAIN: readback_mismatch')
         try:
             final_token = self.write_guard(operation, address, len(data))

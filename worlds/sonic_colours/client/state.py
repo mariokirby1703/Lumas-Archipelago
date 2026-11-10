@@ -327,7 +327,7 @@ class WritePolicy:
         self.memory, self.guard, self.snapshot_reader = memory, guard, snapshot_reader
 
     def __call__(self, operation, address, size):
-        if not VERSION['capabilities'].get(operation, False) and operation not in ('ring_material_test', 'red_ring_material','red_ring_spawn'):
+        if not VERSION['capabilities'].get(operation, False) and operation not in ('ring_material_test', 'red_ring_material','red_ring_spawn','physical_ring_restore'):
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
         if operation=='red_ring_spawn':
             self.memory.verify_for_write(operation)
@@ -341,6 +341,13 @@ class WritePolicy:
             tx=getattr(self.memory,'_event_transaction',None)
             if not tx or tx['allowed'].get(address)!=size:
                 raise MemoryUnavailable('WRITE_BLOCKED: no native event transaction')
+            if tx.get('score_reset'):
+                raw=tx['values'].get(events.SCORE_RESET,b'')
+                packet=int.from_bytes(raw,'big')
+                if (not (getattr(self.memory,'native_patch',None) or {}).get('native_score_reset')
+                        or address!=base+events.SCORE_RESET or size!=4 or len(raw)!=4
+                        or not packet>>16 or packet>>16==packet&0xffff):
+                    raise MemoryUnavailable('WRITE_BLOCKED: invalid native Score Reset request')
             if tx.get('trap_clock') is not None:
                 import struct
                 value=struct.unpack('>f',tx['values'][events.REMAINING])[0]
@@ -484,6 +491,13 @@ class WritePolicy:
             if context!=tx[0] or self.memory.resolve_flags_ptr()!=tx[1] or count not in (tx[2],tx[2]+1):
                 raise MemoryUnavailable('WRITE_BLOCKED: Game Land event owner changed')
             return (context,tx[1],tx[2],tuple(tx[3].items()))
+        if operation == 'physical_ring_restore':
+            from .physical_rings import restore_base,restore_owner,witnessed,mission_tag
+            base=restore_base(self.memory)
+            context=restore_owner(self.memory,snapshot,self.guard)
+            if size!=4 or address not in (base,base+4,base+8):
+                raise MemoryUnavailable('WRITE_BLOCKED: Red Ring restore address')
+            return context,base,mission_tag(context[3])|witnessed(self.guard.journal).get(context[3],0)
         if operation == 'physical_ring_collection':
             from .physical_rings import targets
             allowed, context = targets(self.memory, snapshot, self.guard)

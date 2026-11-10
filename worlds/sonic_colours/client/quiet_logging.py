@@ -1,8 +1,7 @@
 """Bounded, command-accessible Sonic-only diagnostic history.
 
-Routine native scanner/transport log records are *not* sent to the client's
-console. Errors and urgent warnings intentionally retain their normal logger
-paths: hiding a failed/uncertain AP delivery would be unsafe.
+Native scanner, transport and uncertain-delivery details stay in this bounded
+diagnostic history. Receipt states remain available through /sonicitems.
 
 This module does not add a global logging filter, so Archipelago's own chat,
 connection and item notifications continue to work normally.

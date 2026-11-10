@@ -723,7 +723,7 @@ async def transmit_checks(ctx, checks=(), goal=False):
                    (*expected, actual, ctx.team, ctx.slot, ctx.server_seed))
         ctx.operation_status['ap_transport'] = message
         raise MemoryUnavailable(message)
-    if pending and (pending != ctx.last_pending or time.monotonic() - ctx.last_send >= 5):
+    if pending and (pending != ctx.last_pending or time.monotonic() - ctx.last_send >= 1):
         await ctx.send_msgs([{'cmd': 'LocationChecks', 'locations': sorted(pending)}])
         quiet_logging.record('transport', 'LocationChecks sent: %s', sorted(pending))
         ctx.last_pending, ctx.last_send = pending.copy(), time.monotonic()
@@ -756,12 +756,18 @@ async def poll_runtime(ctx,memory):
                     longest=max(longest,duration);phases+=1
                     blocking_ms.append(round(duration*1000,2))
             except StopIteration as done:return done.value
+            if ((getattr(memory,'native_patch',None) or {}).get('physical_ring_restore')
+                    and runtime.snapshot is not None
+                    and getattr(memory,'scene_read_verified',lambda:False)()):
+                from .physical_rings import observe_retained
+                try:observe_retained(runtime,memory)
+                except MemoryUnavailable:pass
             try:await transmit_checks(ctx,checks,goal)
             except (MemoryUnavailable,ConnectionClosed,OSError) as error:
                 ctx.operation_status['ap_transport']='Location transmission pending: '+str(error)
             # Let socket acknowledgements and inventory messages run before
             # expensive data projection; no concurrent native-memory worker.
-            await asyncio.sleep(0)
+            await asyncio.sleep(0.001)
             if ctx.runtime is not runtime or ctx.authenticated_identity!=expected:
                 return set(),False
             items[:]=[item.item for item in ctx.items_received]
@@ -813,6 +819,11 @@ async def dolphin_loop(ctx):
             checks, goal = set(), False
             started = time.monotonic()
             try:
+                if backend.recover_inactive_attachment():
+                    verified = False
+                    if ctx.runtime:
+                        ctx.runtime.guard.disarm()
+                        ctx.runtime.hooks.invalidate_session()
                 if not dolphin.is_hooked():
                     verified = False
                     backend.close()

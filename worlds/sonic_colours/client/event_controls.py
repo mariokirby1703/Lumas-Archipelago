@@ -13,7 +13,7 @@ def owner(snapshot):
     return row,player
 
 
-def write(memory,snapshot,guard,fields,disable=False,cancel=False):
+def write(memory,snapshot,guard,fields,disable=False,cancel=False,score_reset=False):
     base=n.address(memory)
     if not disable and not cancel:
         guard.check_stats(snapshot)
@@ -21,7 +21,7 @@ def write(memory,snapshot,guard,fields,disable=False,cancel=False):
         context=(snapshot.session,snapshot.stage_epoch,row['stage'],player['actor'],row['player_actor_id'])
     else:context=None
     allowed={base+off:len(raw) for off,raw in fields.items()}
-    memory._event_transaction={'allowed':allowed,'context':context,'disable':disable,'cancel':cancel,'values':fields}
+    memory._event_transaction={'allowed':allowed,'context':context,'disable':disable,'cancel':cancel,'values':fields,'score_reset':score_reset}
     try:
         for off,raw in fields.items():
             address=base+off;before=memory.read_bytes(address,len(raw))
@@ -42,8 +42,9 @@ def configure(runtime,memory):
         write(memory,snap,guard,{n.ENABLE:bytes(4)},disable=True)
         # A client restart/session change must never execute an old request.
         fields={n.STAGE:struct.pack('>III',row['stage'],player['actor'],row['player_actor_id']),
-                n.REQUEST:memory.read_bytes(base+n.ACK,4),
-                n.INPUT:memory.read_bytes(player['actor']+0x88,4)}
+                n.REQUEST:memory.read_bytes(base+n.ACK,4)}
+        if not (getattr(memory,'native_patch',None) or {}).get('native_score_reset'):
+            fields[n.INPUT]=memory.read_bytes(player['actor']+0x88,4)
         if getattr(runtime,'_event_owner',None) is None:
             request=memory.read_u32(base+n.TRAP_REQUEST)
             retained=any(e.get('family')=='dead_weight' and e.get('native_request')==request

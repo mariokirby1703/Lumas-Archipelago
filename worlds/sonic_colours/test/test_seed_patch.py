@@ -109,7 +109,8 @@ def original_dol():
         if p.exists():return p.read_bytes()
     pytest.skip('private original PAL DOL absent')
 
-def test_native_migration_full_revision_handshake_and_returns():
+@pytest.mark.parametrize('disc_id',['SNCP8P','SNCE8P'])
+def test_native_migration_full_revision_handshake_and_returns(disc_id):
     original=original_dol();patched,registry=patch_dol(original,'NativeTest')
     assert patched==patch_dol(original,'NativeTest')[0] and patched!=original
     image=Dol(patched)
@@ -119,10 +120,15 @@ def test_native_migration_full_revision_handshake_and_returns():
         assert image.read(hook['target']+hook['size']-4,4)==branch(hook['target']+hook['size']-4,hook['return']).to_bytes(4,'big')
     class Backend:
         def read_bytes(self,a,n):
-            if a==0x80000000:return (b'SNCP8P'+bytes(2))[:n]
+            if a==0x80000000:return (disc_id.encode()+bytes(2))[:n]
             if a==0x80000007:return bytes(1)
             try:return image.read(a,n)
-            except ValueError:return bytes(n)
+            except ValueError:
+                result=bytearray(n)
+                for _,off,base,size in image.sections:
+                    start,end=max(a,base),min(a+n,base+size)
+                    if start<end:result[start-a:end-a]=image.read(start,end-start)
+                return bytes(result)
     memory=SonicMemory(Backend());memory.required_native_seed='NativeTest'
     assert memory.verify_revision()==hashlib.sha256(original).hexdigest()
     assert not memory.native_patch['gecko_required']
