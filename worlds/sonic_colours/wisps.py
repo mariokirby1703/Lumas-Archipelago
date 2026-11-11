@@ -29,6 +29,8 @@ def all_wisps_owned(counts,options):
     return all(wisp_level(counts,colour,options)>0 for colour in WISPS)
 
 def project_inventory(owned,options):
+    from .Items import EMERALDS
     counts=Counter(owned['counts'])
     for colour in WISPS:counts[wisp_item(colour)]=wisp_level(owned['counts'],colour,options)
-    return {**owned,'counts':counts,'wisps':[wisp_item(c) for c in WISPS if counts[wisp_item(c)]]}
+    return {**owned,'counts':counts,'wisps':[wisp_item(c) for c in WISPS if counts[wisp_item(c)]],
+            'super_sonic_allowed':bool(all(counts[item] for item in EMERALDS) and option(options,'super_sonic'))}

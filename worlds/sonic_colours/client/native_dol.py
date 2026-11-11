@@ -57,9 +57,10 @@ class Dol:
         self.sections.append((slot,offset,address,len(blob)))
 
 @lru_cache(maxsize=128)
-def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False,legacy_fps_word_write=False,legacy_wisp_slots=False,include_physical_restore=True,include_score_reset=True):
+def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False,legacy_fps_word_write=False,legacy_wisp_slots=False,include_physical_restore=True,include_score_reset=True,include_super_guard=True):
     """Rebuild every C2 payload as initialized native code, without C2 headers."""
     include_score_reset=bool(include_score_reset and include_physical_restore)
+    include_super_guard=bool(include_super_guard and include_score_reset)
     from .native_hook_table import hook_rows
     from .ap_hud_publisher import patches as hud
     from .rocket_skydiving import patches as rocket
@@ -157,12 +158,15 @@ def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards
     if include_sixty_fps:
         from .sixty_fps import patches as fps_patches
         patches.extend(fps_patches(patches,legacy_fps_word_write))
+    if include_super_guard:
+        from .super_sonic import patches as super_patches
+        patches.extend(super_patches())
     ownership=[]
     for address,old,new in patches:
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')
         ownership.append((address,address+len(new)))
     digest=hashlib.sha256(bytes(payload)+b''.join(struct.pack('>I',a)+n for a,o,n in patches)).digest()
-    _PLAN_FEATURES[digest.hex()]={'physical_ring_restore':include_physical_restore,'native_score_reset':include_score_reset}
+    _PLAN_FEATURES[digest.hex()]={'physical_ring_restore':include_physical_restore,'native_score_reset':include_score_reset,'super_sonic_guard':include_super_guard}
     return patches,bytes(payload),digest,hooks
 
 def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
@@ -205,10 +209,10 @@ def plan_for_digest(digest):
                 {'include_boot_guards':False,'include_accessible_colors':False},
                 {'include_ring_spawn':False,'include_boot_guards':False,'include_accessible_colors':False},
                 {'include_ring_materials':False,'include_boot_guards':False,'include_accessible_colors':False})
-    for restore,score in ((True,True),(True,False),(False,False)):
+    for restore,score,super_guard in ((True,True,True),(True,True,False),(True,False,False),(False,False,False)):
         for legacy in (False,True):
             for options in variants:
-                candidate=plan(**options,legacy_wisp_slots=legacy,include_physical_restore=restore,include_score_reset=score)
+                candidate=plan(**options,legacy_wisp_slots=legacy,include_physical_restore=restore,include_score_reset=score,include_super_guard=super_guard)
                 if candidate[2].hex()==digest:return candidate
     raise ValueError('incompatible native AP hook ABI/signature')
 

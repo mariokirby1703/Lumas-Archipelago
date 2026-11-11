@@ -67,6 +67,8 @@ The New Game introduction still begins in Tropical Resort before save selection.
 
 Physical Red Ring checks are separate from AP Red Ring items used to unlock Game Land stages. Wisp discovery checks do not grant their corresponding Wisp items, and Chaos Emerald checks do not grant the matching Emerald items.
 
+Completing all Game Land stages does not unlock Super Sonic. It requires the Super Sonic option and all seven different AP Chaos Emerald items.
+
 Disabling Game Land Checks also disables its Eggman Heart and Chaos Emerald checks and removes its associated items from the pool.
 With Ability Locks enabled, Drill, Hover and Spikes use progressive unlocks; otherwise each has one complete unlock.
 
