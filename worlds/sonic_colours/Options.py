@@ -88,7 +88,7 @@ class ScoreResetTrapWeight(Choice):
 class SixtyFPS(Toggle):
     """Run the game at 60 FPS.
 
-    Known physics issues affect loops, springs and the final boss. 
+    Known physics issues affect loops and the final boss.
     Leave off if you are unsure, but it would only require you to restart the act if you encounter issues."""
     display_name = "60 FPS"
 
