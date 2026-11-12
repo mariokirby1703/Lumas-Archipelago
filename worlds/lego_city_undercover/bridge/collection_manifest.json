@@ -1,0 +1,3176 @@
+{
+  "defaults": [
+    {
+      "class_name": "generic",
+      "linked": false,
+      "model": "CIVILIAN_CHASEMCCAIN",
+      "player": 1
+    },
+    {
+      "class_name": "cop",
+      "linked": false,
+      "model": "COP",
+      "player": 1
+    },
+    {
+      "class_name": "robber",
+      "linked": false,
+      "model": "ROBBER",
+      "player": 1
+    },
+    {
+      "class_name": "miner",
+      "linked": false,
+      "model": "MINER",
+      "player": 1
+    },
+    {
+      "class_name": "astronaut",
+      "linked": false,
+      "model": "ASTRONAUT",
+      "player": 1
+    },
+    {
+      "class_name": "farmer",
+      "linked": false,
+      "model": "FARMER",
+      "player": 1
+    },
+    {
+      "class_name": "fireman",
+      "linked": false,
+      "model": "FIREMAN",
+      "player": 1
+    },
+    {
+      "class_name": "construction",
+      "linked": false,
+      "model": "CONSTRUCTION_LEGOCITYCONSTRUCTIONWORKER",
+      "player": 1
+    },
+    {
+      "class_name": "generic",
+      "linked": false,
+      "model": "CIVILIAN_CHASEMCCAIN_ALT",
+      "player": 2
+    },
+    {
+      "class_name": "cop",
+      "linked": false,
+      "model": "COP_CLASSIC",
+      "player": 2
+    },
+    {
+      "class_name": "robber",
+      "linked": false,
+      "model": "CHASE_P2_ROBBER",
+      "player": 2
+    },
+    {
+      "class_name": "miner",
+      "linked": false,
+      "model": "BUDDY_MINER",
+      "player": 2
+    },
+    {
+      "class_name": "astronaut",
+      "linked": false,
+      "model": "BUDDY_ASTRONAUT",
+      "player": 2
+    },
+    {
+      "class_name": "farmer",
+      "linked": false,
+      "model": "BUDDY_FARMER",
+      "player": 2
+    },
+    {
+      "class_name": "fireman",
+      "linked": false,
+      "model": "CHASE_P2_FIREMAN",
+      "player": 2
+    },
+    {
+      "class_name": "construction",
+      "linked": false,
+      "model": "BUDDY_CONSTRUCTION",
+      "player": 2
+    },
+    {
+      "class_name": "generic",
+      "linked": true,
+      "model": "COP_FEMALE_P2_CASUAL",
+      "player": null
+    },
+    {
+      "class_name": "cop",
+      "linked": true,
+      "model": "COP_FEMALE_P2",
+      "player": null
+    }
+  ],
+  "entries": {
+    "2016_CIVIC_SLOGGER": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "2016_MOTORCYCLES_NIPPER": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "2016_POLICE_DASHER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "2016_POLICE_DETAINER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "2016_POLICE_GUARDIAN": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "2016_POLICE_PURSUER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": false,
+      "kind": "vehicle"
+    },
+    "2016_POLICE_RESCUER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "2016_SPORTSCARS_REBELLION": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": false,
+      "kind": "vehicle"
+    },
+    "2016_SUV_GIANT": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "2016_VAN_HANKER": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "AIRCRAFT_CLOUD": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "AIRCRAFT_HERA": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "AIRCRAFT_JUPITER": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "AIRCRAFT_UFO": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "ASTRONAUT": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ASTRONAUT_EVILASTRONAUT": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ASTRONAUT_EVILASTRONAUT02": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ASTRONAUT_FORRESTBLACKWELL": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ASTRONAUT_HENRIKKOWALSKI": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ASTRONAUT_JETPACK": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ASTRONAUT_REXFURY": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ASTRONAUT_SCIENTIST": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "BUDDY_ASTRONAUT": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "BUDDY_CONSTRUCTION": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "BUDDY_FARMER": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "BUDDY_MINER": {
+      "categories": [
+        3
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "BUDDY_POLICEUNDERCOVER": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CHANS_DRAKONAS": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "CHANS_IRONBACK": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "CHASE_P2_FIREMAN": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CHASE_P2_ROBBER": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CHASE_P2_SUIT": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVIC_BRISTLER": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "CIVIC_EPONA": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "CIVIC_HAZARD": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "CIVIC_TAXICAB": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "CIVIC_TRASHER": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "CIVILIAN_AIRLINEHOST": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_AIRLINEHOSTESS": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_AIRLINEPILOT": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_BARRYSMITH": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_BEAHECKERSON": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_BOUNCER": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_CAPTAINBLUFFBEARD": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_CHASEMCCAIN": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_CHASEMCCAIN_ALT": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_CHEF": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_DOCKSCRANEDRIVER": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_DOCKSFOREMAN": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_GARAGEWORKER": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_GARBAGEMAN": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_HARBOURWORKER": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_MAILMAN": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_MAINTENANCEWORKER": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_MAYORGLEESON": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_NATALIAKOWALSKI": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_PETROLWORKER": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_STREETRACER": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CIVILIAN_TRAINDRIVER": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CLASS_POLICEUNDERCOVER": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-01_TRIBALHUNTER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-02_CHEERLEADER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-03_CAVEMAN": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-04_CIRCUSCLOWN": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-05_ZOMBIE": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-06_SKATER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-07_ROBOT": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-08_DEMOLITIONDUMMY": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-09_MAGICIAN": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-10_SUPERWRESTLER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-11_NURSE": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-12_NINJA": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-13_SPACEMAN": {
+      "categories": [
+        8,
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-14_FORESTMAN": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-15_DEEPSEADIVER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_1-16_COWBOY": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-01_WEIGHTLIFTER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-02_MARACAMAN": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-03_POPSTAR": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-04_SKIER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-05_DISCODUDE": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-06_KARATEMASTER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-07_SURFER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-08_PHARAOH": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-09_SPARTANWARRIOR": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-10_RINGMASTER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-11_VAMPIRE": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-12_TRAFFICCOP": {
+      "categories": [
+        8,
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-13_EXPLORER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-14_LIFEGUARD": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_2-15_MIME": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-01_TRIBALCHIEF": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-02_SAMURAIWARRIOR": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-03_PILOT": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-04_FISHERMAN": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-05_SPACEVILLAIN": {
+      "categories": [
+        8,
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-06_SNOWBOARDER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-07_HULADANCER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-08_RACECARDRIVER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-09_RAPPER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-10_ELF": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-11_SUMOWRESTLER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-12_ALIEN": {
+      "categories": [
+        8,
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-13_MUMMY": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-14_TENNISPLAYER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-15_BASEBALLPLAYER": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_3-16_GORILLASUITGUY": {
+      "categories": [
+        8
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-01_VIKING": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-02_HOCKEYPLAYER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-03_WEREWOLF": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-04_ARTIST": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-05_SURFERGIRL": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-06_STREETSKATER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-07_SOCCERPLAYER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-08_CRAZYSCIENTIST": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-09_SAILOR": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-10_MUSKETEER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-11_THEMONSTER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-12_ICESKATER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-13_HAZMATGUY": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_4-14_PUNKROCKER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-02_BOXER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-03_CAVEWOMAN": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-04_FITNESSDANCER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-05_DETECTIVE": {
+      "categories": [
+        9,
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-06_DINOSAURSUITMAN": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-07_ESKIMO": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-08_GANGSTER": {
+      "categories": [
+        9,
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-09_GRENADIERGUARD": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-10_LUMBERJACK": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-11_MALESNOWBOARDER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-12_MURMILLO": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-13_UNIVERSITYGRADUATE": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_5-14_ZOOKEEPER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-01_GREYALIEN": {
+      "categories": [
+        9,
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-02_BANDIT": {
+      "categories": [
+        9,
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-03_BUTCHER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-05_GALAXY": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-07_HIGHLANDER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-09_MECHANIC": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-10_MINOTAUR": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-11_ROBOT": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-12_ROMAN": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-13_FEMALESKATER": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-14_SLEEPY": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COLLECT_6-16_SURGEON": {
+      "categories": [
+        9
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CONSTRUCTION_ALBRECHTSPINDLEROUTER": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CONSTRUCTION_CONSTRUCTIONFOREMAN": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CONSTRUCTION_LEGOCITYCONSTRUCTIONWORKER": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CONSTRUCTION_WORKER01": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CONSTRUCTION_WORKER02": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CONSTRUCTION_WORKER03": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CONSTRUCTION_WORKER04": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_BLUBS": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_BRICKETT": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_CACEY": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_CHUCK": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_CLASSIC": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_CLUTCH": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_DAMUMBO": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_DIRTYBARRY": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_DOORLOCKHOMES": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_DRWHATSIT": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_DUKEHUCKLEBERRY": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_ELLIEPHILLIPS": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_FEMALE_P2": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_FEMALE_P2_CASUAL": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_FEMALE_P2_UNDERCOVER": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_FORESTRANGER": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_FRANKHONEY": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_FRANKHONEY_SPEEDO": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_HORACECONE": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_LAGNEY": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_LEGOCITYCOPFEMALE": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_LEGOCITYCOPMALE": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_MARIONDUNBY": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_POLICEOFFICER_NEW": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_PRISONGUARD": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "COP_STUDSKI": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "CUSTOM_01": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": false,
+      "kind": "character"
+    },
+    "CUSTOM_02": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": false,
+      "kind": "character"
+    },
+    "CUSTOM_03": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": false,
+      "kind": "character"
+    },
+    "CUSTOM_04": {
+      "categories": [
+        3
+      ],
+      "counts_for_progress": false,
+      "kind": "character"
+    },
+    "CUSTOM_05": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": false,
+      "kind": "character"
+    },
+    "CUSTOM_06": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": false,
+      "kind": "character"
+    },
+    "CUSTOM_07": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": false,
+      "kind": "character"
+    },
+    "CUSTOM_08": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": false,
+      "kind": "character"
+    },
+    "CUSTOM_DUMMY": {
+      "categories": [
+        null
+      ],
+      "counts_for_progress": false,
+      "kind": "character"
+    },
+    "FARMER": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "FARMER_FARMWORKER": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "FARMER_HILLBILLY": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "FARMER_JETHROHAYES": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "FARM_ARMADILLO": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "FIREMAN": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "FIREMAN_CORNELIUSBURNS": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "FIREMAN_FOREST": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "FIREMAN_LEGOCITYFIREMAN": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "FIREMAN_RAMONGUTIERREZ-DELGARDO": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "FIRE_CAMEL": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "FIRE_DOUSER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "FIRE_EXTENDER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "FIRE_INFERNO": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "FIRE_TRACKER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "HELICOPTERPILOT_NEW": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "HOSPITAL_PANACEA": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "HOSPITAL_SWOOPER": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_ATLAS": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_BRAWN": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_DRAGGER": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_DUMPER": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_FOUNDATION": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_PAYLOAD": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_PKML": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_PROTECTOR": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_RELOCATOR": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_ROLLER": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_SHIFTER": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_SLICKER": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "INDUSTRIAL_STEADFAST": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MINER": {
+      "categories": [
+        3
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MINER_CLOCKWATCHER": {
+      "categories": [
+        3
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MINER_MANAGER": {
+      "categories": [
+        3
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MINER_MINER01": {
+      "categories": [
+        3
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MINER_MININGTECHNICIAN": {
+      "categories": [
+        3
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MISSION_PAPPERAZZI": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MISSION_PARAMEDIC": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MISSION_PIZZADELIVERYBOY": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MISSION_TAXIDRIVER": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MISSION_TOWTRUCKDRIVER": {
+      "categories": [
+        7
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "MOTORCYCLES_BUZZER": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MOTORCYCLES_GROUNDDOG": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MOTORCYCLES_HAIRDRYER": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MOTORCYCLES_REDEEMER": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MOTORCYCLES_REVOLVER": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MOTORCYCLES_ROAMER": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MOTORCYCLES_SWEETIE": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MOTORCYCLES_VOR": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MUSCLECARS_ATHENA": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MUSCLECARS_BEARER": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MUSCLECARS_ENBERG": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MUSCLECARS_FALCHIONGT": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MUSCLECARS_NARYM": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MUSCLECARS_SILVERSMITH": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MUSCLECARS_SPHINX": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "MUSCLECARS_TIGERELLA": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "NOVELTY_WASHWAGON": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "NPC_ACTIVIST01": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_ACTIVIST02": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_ACTIVIST03": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_AIRPORTSTAFF02": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_AIRPORTSTAFF04": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_ANCHORMAN": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_ASTRONAUT02": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_BANKMANAGER": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_BARRYSMITH_NOTROUSERS": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_BUSDRIVER01": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CARLOJEROME": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CARLOJEROMECONE": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CHANGANG01": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CHANGANG02": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CHASEHBEAR": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENFEMALE01": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENFEMALE02": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENFEMALE03": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENFEMALE04": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENFEMALE05": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENFEMALE06": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENFEMALE07": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENFEMALE08": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENFEMALE_NEW_01": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE01": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE02": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE03": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE04": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE05": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE06": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE07": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE08": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE_NEW_01": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CITIZENMALE_NEW_02": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CLEANER01": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CLOWNROBBER01": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CLOWNROBBER02": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_COASTGUARD01": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_CONRADPETERS": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_COP05": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_COPCLEANER": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_COPTRAINING01": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_COPTRAINING02": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_DAVE": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_DOCTOR01": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_DOCTOR03": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FARMER01": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FARMER02": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FARMER03": {
+      "categories": [
+        5
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FILMSTAR": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FIREMAN01": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FIREMAN02": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FIREMAN03": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FIREMAN04": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FIREMAN05": {
+      "categories": [
+        6
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_FORESTRANGER01": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_GEORGE": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_HENRIKKOWALSKI": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_KARATESTRONG": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_KARATEWEAK": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_KATE": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_KEVINJACOBS": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_LEONARDO": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_LIBERACE": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_MIKEYSPOILERS": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_MINER01": {
+      "categories": [
+        3
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_MINER02": {
+      "categories": [
+        3
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_MISSIONCONTROLLER01": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_MISSIONCONTROLLER02": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_NATALIADISGUISE": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_OLDQIANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_PAJAMESCURRY": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_PATPATTERSON": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_PRESSPHOTOGRAPHER01": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_RADIODJ01": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_RADIODJ02": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_RADIONEWSREADER": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_RADIOSKY": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_REXGANG01": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_REXGANG02": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_ROBBER01": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_ROBBER02": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_ROBBER04": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_ROBBERYFRONTS": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_ROBBERYFRONTS2": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_SALVATORECALZONE": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_SCIENTIST01": {
+      "categories": [
+        4
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_SECURITYBLACKWELL02": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_SECURITYGUARD01": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_SECURITYGUARD02": {
+      "categories": [
+        1
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_SUBMARINECAPTAIN": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_SURFERDUDE": {
+      "categories": [
+        0
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_TRAINDRIVER01": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_TVREPORTER": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "NPC_WAITRESS": {
+      "categories": [
+        10
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "POLICE_BASTION": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_CHASER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_CHOPPER": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_DUNBYPATROLLO": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_HERO": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_IMPRISONER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_JUSTICE": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_MOV_CAB": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_RESPONDER": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_RINO": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_SKYBRINGER": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_SQUADDIE": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_TRACKER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_TREV": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_TROOPER": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "POLICE_VIGILANT": {
+      "categories": [
+        12
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "ROBBER": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_BLACKWELLHENCHMAN": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_BLACKWELLSECURITYGUARD": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_BLUEWHITTAKER": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_BUCKYBUTLER": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_CHANCHUANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_CHANGANGSTRONG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_CLOWNROBBER": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_EDDIEJOJOREXGANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_FENGCHANGANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_FORRESTBLACKWELL": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_FORRESTBLACKWELLFORMAL": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_FORRESTBLACKWELLTUXEDO": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_FUCHANGANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_GOVERNORSTONEWALL": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_JIMMYGROSSMANREXGANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_LICHANGANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_LUCKYPETEVINNIEGANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_MOEDELUCA": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_NEW": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_PAULIEBLINDFOLDSVINNIEGANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_PRISONER": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_REXFURY": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_REXFURYSHIRT": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_SNAKESSQUEALER": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_SPIKEYDONREXGANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_STRONG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_TONYONETIMEVINNIEGANG": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_VINNIEPAPPALARDO": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_VINNIEPAPPALARDOTRACKSUIT": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "ROBBER_VINNIEPAPPALARDO_CLOWN": {
+      "categories": [
+        2
+      ],
+      "counts_for_progress": true,
+      "kind": "character"
+    },
+    "SALOONCARS_ANCESTOR": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SALOONCARS_ARBALEST": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SALOONCARS_CABRAKAN": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SALOONCARS_DOWNFORCE": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SALOONCARS_FLARE": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SALOONCARS_HESTIA": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SALOONCARS_INDULGA": {
+      "categories": [
+        13
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SALOONCARS_JALOPY": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SALOONCARS_SCHMOOZER": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SMALLCARS_ACESO": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SMALLCARS_CRATER": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SMALLCARS_EARWIG": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SMALLCARS_GRASSMAN": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SMALLCARS_PUMPKIN": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SMALLCARS_SEVILA": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SMALLCARS_SMALLISIMO": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SMALLCARS_SQUEAKY": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SMALLCARS_TALOS": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPACE_COCOON": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPACE_LERV": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_CETAN": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_DRAKONAS": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_DULLAHAN": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_GERSEMI": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_LANTOS": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_LUSCA": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_ROAR": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_SCOUT": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_SPIRIT": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_VALKYRIE": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SPORTSCARS_WRATH": {
+      "categories": [
+        16
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SUV_GALLEON": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SUV_IRONBACK": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SUV_RUGGED": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SUV_TORSION": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "SUV_TRANSTER": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "UBER_BRUTE": {
+      "categories": [
+        17
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "UBER_GALICAN": {
+      "categories": [
+        14
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "UBER_RIOT": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "UBER_TEMPEST": {
+      "categories": [
+        18
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "VAN_BROADCASTER": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "VAN_GARRANO": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "VAN_GOTLAND": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "VAN_MUNCHER": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "VAN_OLDSTER": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "VAN_SQUADMOBILE": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    },
+    "VAN_WANDERER": {
+      "categories": [
+        15
+      ],
+      "counts_for_progress": true,
+      "kind": "vehicle"
+    }
+  },
+  "format_version": 1,
+  "source_sha256": "dcc09872eaef8213e523bdb4c8b3f4bd1c7b90e505b0f31406eb7847dd50b7da"
+}

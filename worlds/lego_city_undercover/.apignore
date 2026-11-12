@@ -1,0 +1,10 @@
+notes/
+build/
+dist/
+tests/
+tools/
+**/__pycache__/
+*.DAT
+*.exe
+*.dll
+*.sav
