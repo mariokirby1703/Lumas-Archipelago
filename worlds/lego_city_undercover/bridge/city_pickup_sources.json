@@ -1,0 +1,2357 @@
+[
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1222/br_brooklyn_bridge_1222.giz:641:1",
+    "name": "P_pup",
+    "tile_name": "br_brooklyn_bridge_1222"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1222/br_brooklyn_bridge_1222.giz:641:2",
+    "name": "j_pup",
+    "tile_name": "br_brooklyn_bridge_1222"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1321/br_brooklyn_bridge_1321.giz:100:0",
+    "name": "P_pup",
+    "tile_name": "br_brooklyn_bridge_1321"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1322/br_brooklyn_bridge_1322_tech.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "br_brooklyn_bridge_1322"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1322/br_brooklyn_bridge_1322_tech.giz:27:2",
+    "name": "P_pup1",
+    "tile_name": "br_brooklyn_bridge_1322"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1521/br_brooklyn_bridge_1521.giz:100:1",
+    "name": "j_pup",
+    "tile_name": "br_brooklyn_bridge_1521"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1521/br_brooklyn_bridge_1521.giz:100:2",
+    "name": "P_pup",
+    "tile_name": "br_brooklyn_bridge_1521"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1621/br_brooklyn_bridge_1621.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "br_brooklyn_bridge_1621"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0614/br_golden_gate_0614.giz:204:0",
+    "name": "P_pup",
+    "tile_name": "br_golden_gate_0614"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0711/br_golden_gate_0711.giz:489:0",
+    "name": "j_pup",
+    "tile_name": "br_golden_gate_0711"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0714/br_golden_gate_0714.giz:1849:0",
+    "name": "P_pup",
+    "tile_name": "br_golden_gate_0714"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0714/br_golden_gate_0714.giz:1849:3",
+    "name": "P_pup1",
+    "tile_name": "br_golden_gate_0714"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_twin_bridge/br_twin_bridge_1202/br_twin_bridge_1202.giz:257:0",
+    "name": "P_pup",
+    "tile_name": "br_twin_bridge_1202"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_twin_bridge/br_twin_bridge_1404/br_twin_bridge_1404.giz:100:0",
+    "name": "P_pup1",
+    "tile_name": "br_twin_bridge_1404"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1425/is_prison_island_1425.giz:287:2",
+    "name": "P_pup",
+    "tile_name": "is_prison_island_1425"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1425/is_prison_island_1425.giz:287:3",
+    "name": "Rainbow_Brick_DSpot",
+    "tile_name": "is_prison_island_1425"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1426/is_prison_island_1426.giz:108:2",
+    "name": "j_pup",
+    "tile_name": "is_prison_island_1426"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1525/is_prison_island_1525.giz:1438:1",
+    "name": "P_pup",
+    "tile_name": "is_prison_island_1525"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1525/is_prison_island_1525.giz:1438:5",
+    "name": "P_pup1",
+    "tile_name": "is_prison_island_1525"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1525/is_prison_island_1525.giz:1438:6",
+    "name": "P_pup2",
+    "tile_name": "is_prison_island_1525"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1525/is_prison_island_1525.giz:1438:7",
+    "name": "Boulder_Brick",
+    "tile_name": "is_prison_island_1525"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1526/is_prison_island_1526.giz:835:3",
+    "name": "P_pup",
+    "tile_name": "is_prison_island_1526"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1526/is_prison_island_1526.giz:835:7",
+    "name": "P_pup1",
+    "tile_name": "is_prison_island_1526"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1526/is_prison_island_1526.giz:835:8",
+    "name": "j_pup",
+    "tile_name": "is_prison_island_1526"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1526/is_prison_island_1526.giz:835:9",
+    "name": "Crate_Pickup",
+    "tile_name": "is_prison_island_1526"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1526/is_prison_island_1526.giz:835:10",
+    "name": "j_pup1",
+    "tile_name": "is_prison_island_1526"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3022/is_space_centre_3022_tech.giz:692:0",
+    "name": "P_pup",
+    "tile_name": "is_space_centre_3022"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3322/is_space_centre_3322.giz:100:1",
+    "name": "j_pup1",
+    "tile_name": "is_space_centre_3322"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3322/is_space_centre_3322.giz:100:2",
+    "name": "j_pup",
+    "tile_name": "is_space_centre_3322"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3322/is_space_centre_3322.giz:100:3",
+    "name": "j_pup2",
+    "tile_name": "is_space_centre_3322"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3322/is_space_centre_3322.giz:100:4",
+    "name": "j_pup3",
+    "tile_name": "is_space_centre_3322"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3322/is_space_centre_3322.giz:100:5",
+    "name": "Beam_Down_Brick",
+    "tile_name": "is_space_centre_3322"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3324/is_space_centre_3324.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "is_space_centre_3324"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3324/is_space_centre_3324.giz:27:2",
+    "name": "P_pup2",
+    "tile_name": "is_space_centre_3324"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3324/is_space_centre_3324.giz:27:3",
+    "name": "P_pup3",
+    "tile_name": "is_space_centre_3324"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3324/is_space_centre_3324.giz:27:4",
+    "name": "P_pup4",
+    "tile_name": "is_space_centre_3324"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3422/is_space_centre_3422.giz:1972:38",
+    "name": "Easy_BB_Brick",
+    "tile_name": "is_space_centre_3422"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3422/is_space_centre_3422.giz:1972:39",
+    "name": "Medium_BB_Brick",
+    "tile_name": "is_space_centre_3422"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3422/is_space_centre_3422.giz:1972:40",
+    "name": "Hard_BB_Brick",
+    "tile_name": "is_space_centre_3422"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3422/is_space_centre_3422.giz:1972:41",
+    "name": "Bounce_Brick",
+    "tile_name": "is_space_centre_3422"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3422/is_space_centre_3422.giz:1972:42",
+    "name": "Highstriker_Brick",
+    "tile_name": "is_space_centre_3422"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3422/is_space_centre_3422.giz:1972:43",
+    "name": "Coconut_Brick",
+    "tile_name": "is_space_centre_3422"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_1904/ny_airport_1904.giz:27:2",
+    "name": "P_pup",
+    "tile_name": "ny_airport_1904"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_1904/ny_airport_1904.giz:27:3",
+    "name": "P_pup1",
+    "tile_name": "ny_airport_1904"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_1904/ny_airport_1904.giz:27:4",
+    "name": "P_pup2",
+    "tile_name": "ny_airport_1904"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_1904/ny_airport_1904.giz:27:5",
+    "name": "P_pup3",
+    "tile_name": "ny_airport_1904"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2003/ny_airport_2003.giz:452:1",
+    "name": "j_pup",
+    "tile_name": "ny_airport_2003"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2003/ny_airport_2003.giz:452:2",
+    "name": "P_pup2",
+    "tile_name": "ny_airport_2003"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2003/ny_airport_2003.giz:452:3",
+    "name": "P_pup3",
+    "tile_name": "ny_airport_2003"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2003/ny_airport_2003.giz:452:4",
+    "name": "P_pup",
+    "tile_name": "ny_airport_2003"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2003/ny_airport_2003.giz:452:5",
+    "name": "P_pup1",
+    "tile_name": "ny_airport_2003"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:4",
+    "name": "j_pup",
+    "tile_name": "ny_airport_2004"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:5",
+    "name": "P_pup",
+    "tile_name": "ny_airport_2004"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:6",
+    "name": "P_pup1",
+    "tile_name": "ny_airport_2004"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:7",
+    "name": "P_pup2",
+    "tile_name": "ny_airport_2004"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:8",
+    "name": "P_pup3",
+    "tile_name": "ny_airport_2004"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:9",
+    "name": "P_pup4",
+    "tile_name": "ny_airport_2004"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:10",
+    "name": "P_pup5",
+    "tile_name": "ny_airport_2004"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:11",
+    "name": "P_pup6",
+    "tile_name": "ny_airport_2004"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2005/ny_airport_2005.giz:27:0",
+    "name": "j_pup",
+    "tile_name": "ny_airport_2005"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2005/ny_airport_2005.giz:27:1",
+    "name": "j_pup1",
+    "tile_name": "ny_airport_2005"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2104/ny_airport_2104.giz:214:0",
+    "name": "P_pup1",
+    "tile_name": "ny_airport_2104"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2104/ny_airport_2104.giz:214:1",
+    "name": "P_pup2",
+    "tile_name": "ny_airport_2104"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2104/ny_airport_2104.giz:214:2",
+    "name": "P_pup3",
+    "tile_name": "ny_airport_2104"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2105/ny_airport_2105_tech.giz:2540:1",
+    "name": "Safe_Brick",
+    "tile_name": "ny_airport_2105"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2105/ny_airport_2105_tech.giz:2540:2",
+    "name": "P_pup",
+    "tile_name": "ny_airport_2105"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2105/ny_airport_2105_tech.giz:2540:3",
+    "name": "P_pup1",
+    "tile_name": "ny_airport_2105"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2105/ny_airport_2105_tech.giz:2540:4",
+    "name": "j_pup",
+    "tile_name": "ny_airport_2105"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2105/ny_airport_2105_tech.giz:2540:5",
+    "name": "P_pup2",
+    "tile_name": "ny_airport_2105"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2105/ny_airport_2105_tech.giz:2540:6",
+    "name": "P_pup3",
+    "tile_name": "ny_airport_2105"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2210/ny_beach_2210.giz:1113:59",
+    "name": "P_pup",
+    "tile_name": "ny_beach_2210"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2211/ny_beach_2211.giz:1558:1",
+    "name": "j_pup",
+    "tile_name": "ny_beach_2211"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2310/ny_beach_2310.giz:3770:1",
+    "name": "j_pup",
+    "tile_name": "ny_beach_2310"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2310/ny_beach_2310.giz:3770:2",
+    "name": "j_pup1",
+    "tile_name": "ny_beach_2310"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2310/ny_beach_2310.giz:3770:3",
+    "name": "Umbrella_Brick",
+    "tile_name": "ny_beach_2310"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2310/ny_beach_2310.giz:3770:4",
+    "name": "P_pup",
+    "tile_name": "ny_beach_2310"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2310/ny_beach_2310.giz:3770:5",
+    "name": "P_pup1",
+    "tile_name": "ny_beach_2310"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2311/ny_beach_2311.giz:1353:0",
+    "name": "P_pup",
+    "tile_name": "ny_beach_2311"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2311/ny_beach_2311.giz:1353:1",
+    "name": "j_pup",
+    "tile_name": "ny_beach_2311"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2312/ny_beach_2312.giz:2255:1",
+    "name": "P_pup",
+    "tile_name": "ny_beach_2312"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2506/ny_beach_2506.giz:27:1",
+    "name": "j_pup",
+    "tile_name": "ny_beach_2506"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_1917/ny_canal_1917.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_canal_1917"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2017/ny_canal_2017.giz:152:2",
+    "name": "P_pup",
+    "tile_name": "ny_canal_2017"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2017/ny_canal_2017.giz:152:3",
+    "name": "P_pup1",
+    "tile_name": "ny_canal_2017"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2017/ny_canal_2017.giz:152:4",
+    "name": "P_pup2",
+    "tile_name": "ny_canal_2017"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2017/ny_canal_2017.giz:152:5",
+    "name": "P_pup3",
+    "tile_name": "ny_canal_2017"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2117/ny_canal_2117.giz:100:0",
+    "name": "P_pup",
+    "tile_name": "ny_canal_2117"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2117/ny_canal_2117.giz:100:1",
+    "name": "P_pup3",
+    "tile_name": "ny_canal_2117"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2117/ny_canal_2117.giz:100:2",
+    "name": "P_pup1",
+    "tile_name": "ny_canal_2117"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2117/ny_canal_2117.giz:100:3",
+    "name": "P_pup2",
+    "tile_name": "ny_canal_2117"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1509/ny_central_park_1509.giz:247:0",
+    "name": "P_pup",
+    "tile_name": "ny_central_park_1509"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1607/ny_central_park_1607.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "ny_central_park_1607"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1607/ny_central_park_1607.giz:27:2",
+    "name": "P_pup1",
+    "tile_name": "ny_central_park_1607"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1609/ny_central_park_1609_tech.giz:27:2",
+    "name": "P_pup",
+    "tile_name": "ny_central_park_1609"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1610/ny_central_park_1610.giz:27:2",
+    "name": "P_pup",
+    "tile_name": "ny_central_park_1610"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1610/ny_central_park_1610.giz:27:3",
+    "name": "P_pup1",
+    "tile_name": "ny_central_park_1610"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1707/ny_central_park_1707.giz:375:0",
+    "name": "P_pup",
+    "tile_name": "ny_central_park_1707"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1709/ny_central_park_1709.giz:27:0",
+    "name": "iDETECTIVE_1709_REWARD",
+    "tile_name": "ny_central_park_1709"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1710/ny_central_park_1710_tech.giz:27:4",
+    "name": "P_pup",
+    "tile_name": "ny_central_park_1710"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1710/ny_central_park_1710_tech.giz:27:5",
+    "name": "P_pup1",
+    "tile_name": "ny_central_park_1710"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1711/ny_central_park_1711.giz:152:1",
+    "name": "P_pup",
+    "tile_name": "ny_central_park_1711"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1711/ny_central_park_1711.giz:152:2",
+    "name": "P_pup1",
+    "tile_name": "ny_central_park_1711"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1711/ny_central_park_1711.giz:152:3",
+    "name": "iDETECTIVE_1711_REWARD",
+    "tile_name": "ny_central_park_1711"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1711/ny_central_park_1711.giz:152:4",
+    "name": "P_pup2",
+    "tile_name": "ny_central_park_1711"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1711/ny_central_park_1711.giz:152:5",
+    "name": "P_pup3",
+    "tile_name": "ny_central_park_1711"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1615/ny_chinatown_1615.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "ny_chinatown_1615"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1615/ny_chinatown_1615.giz:27:2",
+    "name": "P_pup1",
+    "tile_name": "ny_chinatown_1615"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1715/ny_chinatown_1715.giz:694:1",
+    "name": "P_pup",
+    "tile_name": "ny_chinatown_1715"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1715/ny_chinatown_1715.giz:694:2",
+    "name": "P_pup1",
+    "tile_name": "ny_chinatown_1715"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1715/ny_chinatown_1715.giz:694:3",
+    "name": "P_pup2",
+    "tile_name": "ny_chinatown_1715"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1716/ny_chinatown_1716.giz:1678:2",
+    "name": "P_pup",
+    "tile_name": "ny_chinatown_1716"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1716/ny_chinatown_1716.giz:1678:3",
+    "name": "P_pup1",
+    "tile_name": "ny_chinatown_1716"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1716/ny_chinatown_1716.giz:1678:4",
+    "name": "j_pup",
+    "tile_name": "ny_chinatown_1716"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1717/ny_chinatown_1717.giz:844:1",
+    "name": "P_pup",
+    "tile_name": "ny_chinatown_1717"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1717/ny_chinatown_1717.giz:844:2",
+    "name": "P_pup1",
+    "tile_name": "ny_chinatown_1717"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1815/ny_chinatown_1815.giz:666:0",
+    "name": "j_pup",
+    "tile_name": "ny_chinatown_1815"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1815/ny_chinatown_1815.giz:666:1",
+    "name": "P_pup",
+    "tile_name": "ny_chinatown_1815"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1815/ny_chinatown_1815.giz:666:2",
+    "name": "P_pup1",
+    "tile_name": "ny_chinatown_1815"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1815/ny_chinatown_1815.giz:666:3",
+    "name": "P_pup2",
+    "tile_name": "ny_chinatown_1815"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1815/ny_chinatown_1815.giz:666:4",
+    "name": "P_pup3",
+    "tile_name": "ny_chinatown_1815"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1817/ny_chinatown_1817.giz:2211:3",
+    "name": "j_pup",
+    "tile_name": "ny_chinatown_1817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1817/ny_chinatown_1817.giz:2211:4",
+    "name": "j_pup1",
+    "tile_name": "ny_chinatown_1817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1817/ny_chinatown_1817.giz:2211:5",
+    "name": "P_pup",
+    "tile_name": "ny_chinatown_1817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1817/ny_chinatown_1817.giz:2211:6",
+    "name": "P_pup1",
+    "tile_name": "ny_chinatown_1817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1817/ny_chinatown_1817.giz:2211:7",
+    "name": "P_pup2",
+    "tile_name": "ny_chinatown_1817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1817/ny_chinatown_1817.giz:2211:8",
+    "name": "P_pup3",
+    "tile_name": "ny_chinatown_1817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1818/ny_chinatown_1818.giz:742:2",
+    "name": "P_pup",
+    "tile_name": "ny_chinatown_1818"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1818/ny_chinatown_1818.giz:742:3",
+    "name": "P_pup1",
+    "tile_name": "ny_chinatown_1818"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1818/ny_chinatown_1818.giz:742:4",
+    "name": "j_pup",
+    "tile_name": "ny_chinatown_1818"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_1924/ny_downtown_1924.giz:2780:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_1924"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_1924/ny_downtown_1924.giz:2780:3",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_1924"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_1924/ny_downtown_1924.giz:2780:4",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_1924"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_1925/ny_downtown_1925.giz:100:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_1925"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2023/ny_downtown_2023.giz:448:2",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_2023"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_downtown_2024.giz:256:3",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_2024"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_downtown_2024.giz:256:4",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_2024"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_downtown_2024.giz:256:5",
+    "name": "P_pup2",
+    "tile_name": "ny_downtown_2024"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_downtown_2024.giz:256:6",
+    "name": "P_pup3",
+    "tile_name": "ny_downtown_2024"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2025/ny_downtown_2025.giz:508:1",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_2025"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2025/ny_downtown_2025.giz:508:2",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_2025"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2123/ny_downtown_2123.giz:216:1",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_2123"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2123/ny_downtown_2123.giz:216:2",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_2123"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2123/ny_downtown_2123.giz:216:3",
+    "name": "P_pup2",
+    "tile_name": "ny_downtown_2123"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2123/ny_downtown_2123.giz:216:4",
+    "name": "P_pup3",
+    "tile_name": "ny_downtown_2123"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2123/ny_downtown_2123.giz:216:5",
+    "name": "P_pup4",
+    "tile_name": "ny_downtown_2123"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:1",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_2124"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:2",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_2124"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:3",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_2124"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:4",
+    "name": "P_pup2",
+    "tile_name": "ny_downtown_2124"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:5",
+    "name": "P_pup3",
+    "tile_name": "ny_downtown_2124"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2125/ny_downtown_2125.giz:100:1",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_2125"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2125/ny_downtown_2125.giz:100:2",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_2125"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2125/ny_downtown_2125.giz:100:3",
+    "name": "Detective_Brick_2125",
+    "tile_name": "ny_downtown_2125"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2126/ny_downtown_2126.giz:375:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_2126"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2223/ny_downtown_2223.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_2223"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2223/ny_downtown_2223.giz:27:2",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_2223"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2120/ny_downtown_east_2120.giz:530:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_east_2120"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2120/ny_downtown_east_2120.giz:530:1",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_east_2120"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2121/ny_downtown_east_2121.giz:781:3",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_east_2121"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2121/ny_downtown_east_2121.giz:781:4",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_east_2121"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2122/ny_downtown_east_2122.giz:100:0",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_east_2122"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2122/ny_downtown_east_2122.giz:100:1",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_east_2122"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2122/ny_downtown_east_2122.giz:100:2",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_east_2122"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2122/ny_downtown_east_2122.giz:100:3",
+    "name": "j_pup1",
+    "tile_name": "ny_downtown_east_2122"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2122/ny_downtown_east_2122.giz:100:4",
+    "name": "P_pup2",
+    "tile_name": "ny_downtown_east_2122"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2219/ny_downtown_east_2219.giz:27:0",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_east_2219"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:2",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_east_2220"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:3",
+    "name": "j_pup1",
+    "tile_name": "ny_downtown_east_2220"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:4",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_east_2220"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:5",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_east_2220"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:6",
+    "name": "P_pup2",
+    "tile_name": "ny_downtown_east_2220"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:7",
+    "name": "P_pup3",
+    "tile_name": "ny_downtown_east_2220"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:8",
+    "name": "P_pup4",
+    "tile_name": "ny_downtown_east_2220"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:9",
+    "name": "P_pup5",
+    "tile_name": "ny_downtown_east_2220"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2222/ny_downtown_east_2222.giz:168:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_east_2222"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2320/ny_downtown_east_2320.giz:340:3",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_east_2320"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2320/ny_downtown_east_2320.giz:340:4",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_east_2320"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2320/ny_downtown_east_2320.giz:340:5",
+    "name": "P_pup2",
+    "tile_name": "ny_downtown_east_2320"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2320/ny_downtown_east_2320.giz:340:6",
+    "name": "P_pup3",
+    "tile_name": "ny_downtown_east_2320"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1719/ny_downtown_west_1719.giz:420:2",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_west_1719"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1719/ny_downtown_west_1719.giz:420:3",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_west_1719"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1720/ny_downtown_west_1720.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_west_1720"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1720/ny_downtown_west_1720.giz:27:1",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_west_1720"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1721/ny_downtown_west_1721.giz:939:1",
+    "name": "P_pup7",
+    "tile_name": "ny_downtown_west_1721"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1721/ny_downtown_west_1721.giz:939:2",
+    "name": "j_pup1",
+    "tile_name": "ny_downtown_west_1721"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1721/ny_downtown_west_1721.giz:939:3",
+    "name": "j_pup2",
+    "tile_name": "ny_downtown_west_1721"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1722/ny_downtown_west_1722.giz:27:0",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_west_1722"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1819/ny_downtown_west_1819.giz:279:2",
+    "name": "Machine_Reward",
+    "tile_name": "ny_downtown_west_1819"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1820/ny_downtown_west_1820.giz:389:2",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_west_1820"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1820/ny_downtown_west_1820.giz:389:3",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_west_1820"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1820/ny_downtown_west_1820.giz:389:4",
+    "name": "BBall_Superbrick",
+    "tile_name": "ny_downtown_west_1820"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1820/ny_downtown_west_1820.giz:389:5",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_west_1820"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1821/ny_downtown_west_1821.giz:1919:1",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_west_1821"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1821/ny_downtown_west_1821.giz:1919:2",
+    "name": "j_pup1",
+    "tile_name": "ny_downtown_west_1821"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1821/ny_downtown_west_1821.giz:1919:3",
+    "name": "Ice_Box_Token",
+    "tile_name": "ny_downtown_west_1821"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1919/ny_downtown_west_1919.giz:342:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_west_1919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1919/ny_downtown_west_1919.giz:342:1",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_west_1919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1919/ny_downtown_west_1919.giz:342:2",
+    "name": "j_pup1",
+    "tile_name": "ny_downtown_west_1919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1919/ny_downtown_west_1919.giz:342:3",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_west_1919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1920/ny_downtown_west_1920.giz:895:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_west_1920"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1920/ny_downtown_west_1920.giz:895:3",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_west_1920"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1920/ny_downtown_west_1920.giz:895:5",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_west_1920"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1921/ny_downtown_west_1921.giz:100:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_west_1921"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1921/ny_downtown_west_1921.giz:100:1",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_west_1921"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1921/ny_downtown_west_1921.giz:100:2",
+    "name": "P_pup2",
+    "tile_name": "ny_downtown_west_1921"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1921/ny_downtown_west_1921.giz:100:3",
+    "name": "Drillspot_Brick",
+    "tile_name": "ny_downtown_west_1921"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1921/ny_downtown_west_1921.giz:100:4",
+    "name": "P_pup3",
+    "tile_name": "ny_downtown_west_1921"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1921/ny_downtown_west_1921.giz:100:5",
+    "name": "P_pup4",
+    "tile_name": "ny_downtown_west_1921"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1922/ny_downtown_west_1922.giz:27:0",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_west_1922"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_2020/ny_downtown_west_2020.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_west_2020"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_2020/ny_downtown_west_2020.giz:27:1",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_west_2020"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_2021/ny_downtown_west_2021_tech.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "ny_downtown_west_2021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_2021/ny_downtown_west_2021_tech.giz:27:2",
+    "name": "P_pup1",
+    "tile_name": "ny_downtown_west_2021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_2021/ny_downtown_west_2021_tech.giz:27:3",
+    "name": "j_pup",
+    "tile_name": "ny_downtown_west_2021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_2021/ny_downtown_west_2021_tech.giz:27:4",
+    "name": "j_pup1",
+    "tile_name": "ny_downtown_west_2021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2315/ny_little_italy_2315.giz:215:1",
+    "name": "P_pup",
+    "tile_name": "ny_little_italy_2315"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2315/ny_little_italy_2315.giz:215:2",
+    "name": "P_pup1",
+    "tile_name": "ny_little_italy_2315"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2316/ny_little_italy_2316.giz:789:2",
+    "name": "P_pup",
+    "tile_name": "ny_little_italy_2316"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2316/ny_little_italy_2316.giz:789:3",
+    "name": "P_pup1",
+    "tile_name": "ny_little_italy_2316"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2316/ny_little_italy_2316.giz:789:4",
+    "name": "P_pup3",
+    "tile_name": "ny_little_italy_2316"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2316/ny_little_italy_2316.giz:789:5",
+    "name": "P_pup2",
+    "tile_name": "ny_little_italy_2316"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2316/ny_little_italy_2316.giz:789:6",
+    "name": "P_pup4",
+    "tile_name": "ny_little_italy_2316"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2316/ny_little_italy_2316.giz:789:7",
+    "name": "P_pup5",
+    "tile_name": "ny_little_italy_2316"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2316/ny_little_italy_2316.giz:789:8",
+    "name": "j_pup",
+    "tile_name": "ny_little_italy_2316"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2317/ny_little_italy_2317.giz:527:2",
+    "name": "P_pup",
+    "tile_name": "ny_little_italy_2317"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2317/ny_little_italy_2317.giz:527:3",
+    "name": "P_pup1",
+    "tile_name": "ny_little_italy_2317"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2318/ny_little_italy_2318.giz:363:1",
+    "name": "P_pup",
+    "tile_name": "ny_little_italy_2318"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ny_little_italy_2415.giz:1401:0",
+    "name": "P_pup1",
+    "tile_name": "ny_little_italy_2415"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ny_little_italy_2415.giz:1401:1",
+    "name": "P_pup2",
+    "tile_name": "ny_little_italy_2415"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ny_little_italy_2415.giz:1401:2",
+    "name": "P_pup4",
+    "tile_name": "ny_little_italy_2415"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ny_little_italy_2415.giz:1401:3",
+    "name": "P_pup3",
+    "tile_name": "ny_little_italy_2415"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ny_little_italy_2415.giz:1401:4",
+    "name": "P_pup",
+    "tile_name": "ny_little_italy_2415"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ny_little_italy_2415.giz:1401:5",
+    "name": "P_pup6",
+    "tile_name": "ny_little_italy_2415"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ny_little_italy_2415.giz:1401:6",
+    "name": "P_pup7",
+    "tile_name": "ny_little_italy_2415"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ny_little_italy_2415.giz:1401:7",
+    "name": "j_pup",
+    "tile_name": "ny_little_italy_2415"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2416/ny_little_italy_2416.giz:1208:2",
+    "name": "j_pup",
+    "tile_name": "ny_little_italy_2416"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2417/ny_little_italy_2417.giz:443:1",
+    "name": "P_pup",
+    "tile_name": "ny_little_italy_2417"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2417/ny_little_italy_2417.giz:443:3",
+    "name": "P_pup1",
+    "tile_name": "ny_little_italy_2417"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2417/ny_little_italy_2417.giz:443:4",
+    "name": "P_pup2",
+    "tile_name": "ny_little_italy_2417"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2418/ny_little_italy_2418.giz:606:0",
+    "name": "P_pup",
+    "tile_name": "ny_little_italy_2418"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2418/ny_little_italy_2418.giz:606:1",
+    "name": "P_pup1",
+    "tile_name": "ny_little_italy_2418"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_monaco_tunnel/ny_monaco_tunnel_2314/ny_monaco_tunnel_2314.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_monaco_tunnel_2314"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_monaco_tunnel/ny_monaco_tunnel_2314/ny_monaco_tunnel_2314.giz:27:1",
+    "name": "P_pup1",
+    "tile_name": "ny_monaco_tunnel_2314"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_monaco_tunnel/ny_monaco_tunnel_2413/ny_monaco_tunnel_2413.giz:607:1",
+    "name": "P_pup",
+    "tile_name": "ny_monaco_tunnel_2413"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_monaco_tunnel/ny_monaco_tunnel_2413/ny_monaco_tunnel_2413.giz:607:2",
+    "name": "P_pup1",
+    "tile_name": "ny_monaco_tunnel_2413"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_monaco_tunnel/ny_monaco_tunnel_2413/ny_monaco_tunnel_2413.giz:607:3",
+    "name": "P_pup2",
+    "tile_name": "ny_monaco_tunnel_2413"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_monaco_tunnel/ny_monaco_tunnel_2414/ny_monaco_tunnel_2414.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_monaco_tunnel_2414"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_monaco_tunnel/ny_monaco_tunnel_2414/ny_monaco_tunnel_2414.giz:27:1",
+    "name": "P_pup1",
+    "tile_name": "ny_monaco_tunnel_2414"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1611/ny_times_square_1611.giz:240:1",
+    "name": "P_pup",
+    "tile_name": "ny_times_square_1611"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1612/ny_times_square_1612.giz:1544:1",
+    "name": "P_pup",
+    "tile_name": "ny_times_square_1612"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1612/ny_times_square_1612.giz:1544:2",
+    "name": "P_pup1",
+    "tile_name": "ny_times_square_1612"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1612/ny_times_square_1612.giz:1544:3",
+    "name": "P_pup2",
+    "tile_name": "ny_times_square_1612"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1612/ny_times_square_1612.giz:1544:4",
+    "name": "P_pup3",
+    "tile_name": "ny_times_square_1612"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1612/ny_times_square_1612.giz:1544:5",
+    "name": "P_pup4",
+    "tile_name": "ny_times_square_1612"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1612/ny_times_square_1612.giz:1544:6",
+    "name": "P_pup5",
+    "tile_name": "ny_times_square_1612"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1613/ny_times_square_1613.giz:953:5",
+    "name": "P_pup",
+    "tile_name": "ny_times_square_1613"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1614/ny_times_square_1614.giz:100:1",
+    "name": "P_pup",
+    "tile_name": "ny_times_square_1614"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1614/ny_times_square_1614.giz:100:2",
+    "name": "j_pup",
+    "tile_name": "ny_times_square_1614"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1614/ny_times_square_1614.giz:100:3",
+    "name": "P_pup1",
+    "tile_name": "ny_times_square_1614"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1614/ny_times_square_1614.giz:100:4",
+    "name": "P_pup2",
+    "tile_name": "ny_times_square_1614"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1712/ny_times_square_1712_tech.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "ny_times_square_1712"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1712/ny_times_square_1712_tech.giz:27:3",
+    "name": "P_pup1",
+    "tile_name": "ny_times_square_1712"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1713/ny_times_square_1713.giz:3407:4",
+    "name": "P_pup",
+    "tile_name": "ny_times_square_1713"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1713/ny_times_square_1713.giz:3407:5",
+    "name": "P_pup3",
+    "tile_name": "ny_times_square_1713"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1713/ny_times_square_1713.giz:3407:6",
+    "name": "P_pup4",
+    "tile_name": "ny_times_square_1713"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1713/ny_times_square_1713.giz:3407:7",
+    "name": "j_pup",
+    "tile_name": "ny_times_square_1713"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1714/ny_times_square_1714.giz:373:2",
+    "name": "P_pup",
+    "tile_name": "ny_times_square_1714"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1714/ny_times_square_1714.giz:373:3",
+    "name": "P_pup1",
+    "tile_name": "ny_times_square_1714"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_1812/ny_tunnel_1812.giz:100:0",
+    "name": "P_pup",
+    "tile_name": "ny_tunnel_1812"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_1812/ny_tunnel_1812.giz:100:1",
+    "name": "P_pup1",
+    "tile_name": "ny_tunnel_1812"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_1813/ny_tunnel_1813.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_tunnel_1813"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_1911/ny_tunnel_1911.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_tunnel_1911"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_1911/ny_tunnel_1911.giz:27:1",
+    "name": "P_pup1",
+    "tile_name": "ny_tunnel_1911"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_1911/ny_tunnel_1911.giz:27:2",
+    "name": "P_pup2",
+    "tile_name": "ny_tunnel_1911"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_1912/ny_tunnel_1912.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_tunnel_1912"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_1912/ny_tunnel_1912.giz:27:1",
+    "name": "P_pup1",
+    "tile_name": "ny_tunnel_1912"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_2010/ny_tunnel_2010.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "ny_tunnel_2010"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_2010/ny_tunnel_2010.giz:27:2",
+    "name": "P_pup1",
+    "tile_name": "ny_tunnel_2010"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_2011/ny_tunnel_2011.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "ny_tunnel_2011"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_2011/ny_tunnel_2011.giz:27:2",
+    "name": "P_pup1",
+    "tile_name": "ny_tunnel_2011"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1503/ny_uptown_1503.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_uptown_1503"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1505/ny_uptown_1505.giz:100:1",
+    "name": "j_pup",
+    "tile_name": "ny_uptown_1505"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1505/ny_uptown_1505.giz:100:2",
+    "name": "P_pup",
+    "tile_name": "ny_uptown_1505"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1604/ny_uptown_1604.giz:1066:2",
+    "name": "P_pup",
+    "tile_name": "ny_uptown_1604"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1604/ny_uptown_1604.giz:1066:4",
+    "name": "P_pup1",
+    "tile_name": "ny_uptown_1604"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1604/ny_uptown_1604.giz:1066:5",
+    "name": "P_pup2",
+    "tile_name": "ny_uptown_1604"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1605/ny_uptown_1605.giz:830:1",
+    "name": "P_pup",
+    "tile_name": "ny_uptown_1605"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1605/ny_uptown_1605.giz:830:3",
+    "name": "j_pup",
+    "tile_name": "ny_uptown_1605"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1605/ny_uptown_1605.giz:830:4",
+    "name": "P_pup1",
+    "tile_name": "ny_uptown_1605"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1605/ny_uptown_1605.giz:830:5",
+    "name": "P_pup2",
+    "tile_name": "ny_uptown_1605"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1606/ny_uptown_1606.giz:100:0",
+    "name": "P_pup",
+    "tile_name": "ny_uptown_1606"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1703/ny_uptown_1703.giz:212:0",
+    "name": "P_pup",
+    "tile_name": "ny_uptown_1703"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1703/ny_uptown_1703.giz:212:1",
+    "name": "P_pup1",
+    "tile_name": "ny_uptown_1703"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1704/ny_uptown_1704.giz:27:2",
+    "name": "j_pup",
+    "tile_name": "ny_uptown_1704"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1803/ny_uptown_1803.giz:208:0",
+    "name": "P_pup",
+    "tile_name": "ny_uptown_1803"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1806/ny_uptown_1806.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "ny_uptown_1806"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:5",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0715"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:6",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_0715"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:7",
+    "name": "P_pup2",
+    "tile_name": "sf_docks_0715"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:8",
+    "name": "j_pup",
+    "tile_name": "sf_docks_0715"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:9",
+    "name": "P_pup3",
+    "tile_name": "sf_docks_0715"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:10",
+    "name": "P_pup4",
+    "tile_name": "sf_docks_0715"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0716/sf_docks_0716.giz:318:0",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0716"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0716/sf_docks_0716.giz:318:1",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_0716"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0717/sf_docks_0717.giz:217:0",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0717"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0718/sf_docks_0718.giz:363:0",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0718"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0718/sf_docks_0718.giz:363:1",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_0718"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0718/sf_docks_0718.giz:363:2",
+    "name": "P_pup2",
+    "tile_name": "sf_docks_0718"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:1",
+    "name": "0815_RAINBOWBRICK",
+    "tile_name": "sf_docks_0815"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:2",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_0815"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:4",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0815"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:7",
+    "name": "j_pup",
+    "tile_name": "sf_docks_0815"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz:1009:3",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0816"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz:1009:4",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_0816"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz:1009:5",
+    "name": "P_pup2",
+    "tile_name": "sf_docks_0816"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:0",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:2",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_0817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:3",
+    "name": "P_pup2",
+    "tile_name": "sf_docks_0817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:4",
+    "name": "P_pup3",
+    "tile_name": "sf_docks_0817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:5",
+    "name": "P_pup4",
+    "tile_name": "sf_docks_0817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:6",
+    "name": "P_pup5",
+    "tile_name": "sf_docks_0817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:7",
+    "name": "j_pup",
+    "tile_name": "sf_docks_0817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:8",
+    "name": "Safe_Brick",
+    "tile_name": "sf_docks_0817"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:4",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0818"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:6",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_0818"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:7",
+    "name": "P_pup2",
+    "tile_name": "sf_docks_0818"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:8",
+    "name": "RC_Pickup",
+    "tile_name": "sf_docks_0818"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:10",
+    "name": "j_pup",
+    "tile_name": "sf_docks_0818"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0914/sf_docks_0914.giz:502:0",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0914"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0915/sf_docks_0915.giz:11605:1",
+    "name": "j_pup",
+    "tile_name": "sf_docks_0915"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:3",
+    "name": "j_pup",
+    "tile_name": "sf_docks_0916"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:4",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0916"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:5",
+    "name": "j_pup1",
+    "tile_name": "sf_docks_0916"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:1",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_0917"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:6",
+    "name": "j_pup",
+    "tile_name": "sf_docks_0917"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:7",
+    "name": "P_pup",
+    "tile_name": "sf_docks_0917"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:8",
+    "name": "P_pup2",
+    "tile_name": "sf_docks_0917"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:10",
+    "name": "P_pup3",
+    "tile_name": "sf_docks_0917"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0918/sf_docks_0918.giz:152:0",
+    "name": "j_pup",
+    "tile_name": "sf_docks_0918"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1016/sf_docks_1016.giz:333:1",
+    "name": "P_pup",
+    "tile_name": "sf_docks_1016"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1017/sf_docks_1017.giz:1057:0",
+    "name": "P_pup",
+    "tile_name": "sf_docks_1017"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1017/sf_docks_1017.giz:1057:1",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_1017"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz:722:0",
+    "name": "P_pup",
+    "tile_name": "sf_docks_1018"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz:722:1",
+    "name": "P_pup1",
+    "tile_name": "sf_docks_1018"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz:722:3",
+    "name": "P_pup2",
+    "tile_name": "sf_docks_1018"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0720/sf_residential_0720.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "sf_residential_0720"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0720/sf_residential_0720.giz:27:1",
+    "name": "P_pup1",
+    "tile_name": "sf_residential_0720"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0819/sf_residential_0819.giz:675:0",
+    "name": "P_pup1",
+    "tile_name": "sf_residential_0819"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0819/sf_residential_0819.giz:675:1",
+    "name": "Pool_Brick",
+    "tile_name": "sf_residential_0819"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0820/sf_residential_0820.giz:27:1",
+    "name": "P_pup",
+    "tile_name": "sf_residential_0820"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0820/sf_residential_0820.giz:27:2",
+    "name": "P_pup1",
+    "tile_name": "sf_residential_0820"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0821/sf_residential_0821.giz:463:0",
+    "name": "superbrick",
+    "tile_name": "sf_residential_0821"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0821/sf_residential_0821.giz:463:1",
+    "name": "Park_SuperBrick",
+    "tile_name": "sf_residential_0821"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:0",
+    "name": "P_pup2",
+    "tile_name": "sf_residential_0822"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:17",
+    "name": "Brick2",
+    "tile_name": "sf_residential_0822"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:18",
+    "name": "Brick1",
+    "tile_name": "sf_residential_0822"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:19",
+    "name": "P_pup3",
+    "tile_name": "sf_residential_0822"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:20",
+    "name": "Brick3",
+    "tile_name": "sf_residential_0822"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:22",
+    "name": "P_pup1",
+    "tile_name": "sf_residential_0822"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:26",
+    "name": "P_pup",
+    "tile_name": "sf_residential_0822"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:27",
+    "name": "P_pup4",
+    "tile_name": "sf_residential_0822"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919.giz:208:2",
+    "name": "j_pup",
+    "tile_name": "sf_residential_0919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919.giz:208:3",
+    "name": "P_pup",
+    "tile_name": "sf_residential_0919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919.giz:208:5",
+    "name": "j_pup1",
+    "tile_name": "sf_residential_0919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919_tech.giz:236:8",
+    "name": "P_pup",
+    "tile_name": "sf_residential_0919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919_tech.giz:236:9",
+    "name": "P_pup1",
+    "tile_name": "sf_residential_0919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919_tech.giz:236:10",
+    "name": "Pool_Superbrick",
+    "tile_name": "sf_residential_0919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919_tech.giz:236:11",
+    "name": "P_pup2",
+    "tile_name": "sf_residential_0919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919_tech.giz:236:12",
+    "name": "Satellite_Brick",
+    "tile_name": "sf_residential_0919"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0921/sf_residential_0921.giz:9409:15",
+    "name": "P_pup",
+    "tile_name": "sf_residential_0921"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz:454:28",
+    "name": "Groom_Brick",
+    "tile_name": "sf_residential_0922"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz:454:30",
+    "name": "P_pup",
+    "tile_name": "sf_residential_0922"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1019/sf_residential_1019.giz:213:5",
+    "name": "j_pup",
+    "tile_name": "sf_residential_1019"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1019/sf_residential_1019.giz:213:6",
+    "name": "j_pup1",
+    "tile_name": "sf_residential_1019"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1020/sf_residential_1020.giz:2305:3",
+    "name": "P_pup",
+    "tile_name": "sf_residential_1020"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1020/sf_residential_1020.giz:2305:4",
+    "name": "P_pup1",
+    "tile_name": "sf_residential_1020"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:2",
+    "name": "P_pup",
+    "tile_name": "sf_residential_1021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:3",
+    "name": "j_pup",
+    "tile_name": "sf_residential_1021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:4",
+    "name": "P_pup1",
+    "tile_name": "sf_residential_1021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:5",
+    "name": "P_pup2",
+    "tile_name": "sf_residential_1021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:6",
+    "name": "j_pup1",
+    "tile_name": "sf_residential_1021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:7",
+    "name": "j_pup2",
+    "tile_name": "sf_residential_1021"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:0",
+    "name": "SuperBrick_2",
+    "tile_name": "sf_residential_1022"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:2",
+    "name": "P_pup",
+    "tile_name": "sf_residential_1022"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:4",
+    "name": "P_pup1",
+    "tile_name": "sf_residential_1022"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1023/sf_residential_1023_tech.giz:27:0",
+    "name": "Icebox_Brick",
+    "tile_name": "sf_residential_1023"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1121/sf_residential_1121.giz:27:1",
+    "name": "j_pup",
+    "tile_name": "sf_residential_1121"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1122/sf_residential_1122.giz:519:2",
+    "name": "P_pup",
+    "tile_name": "sf_residential_1122"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1122/sf_residential_1122.giz:519:3",
+    "name": "P_pup1",
+    "tile_name": "sf_residential_1122"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0505/wi_farmlands_0505.giz:392:1",
+    "name": "P_pup",
+    "tile_name": "wi_farmlands_0505"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0505/wi_farmlands_0505.giz:392:2",
+    "name": "P_pup1",
+    "tile_name": "wi_farmlands_0505"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0506/wi_farmlands_0506.giz:1074:1",
+    "name": "P_pup",
+    "tile_name": "wi_farmlands_0506"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0507/wi_farmlands_0507.giz:27:16",
+    "name": "j_pup",
+    "tile_name": "wi_farmlands_0507"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0508/wi_farmlands_0508_tech.giz:261:0",
+    "name": "P_pup",
+    "tile_name": "wi_farmlands_0508"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:46",
+    "name": "safebrick",
+    "tile_name": "wi_farmlands_0607"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:47",
+    "name": "station_brick2",
+    "tile_name": "wi_farmlands_0607"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:48",
+    "name": "station_brick1",
+    "tile_name": "wi_farmlands_0607"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:2",
+    "name": "P_pup",
+    "tile_name": "wi_farmlands_0705"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:3",
+    "name": "P_pup1",
+    "tile_name": "wi_farmlands_0705"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:4",
+    "name": "j_pup",
+    "tile_name": "wi_farmlands_0705"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0706/wi_farmlands_0706_tech.giz:213:1",
+    "name": "P_pup",
+    "tile_name": "wi_farmlands_0706"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0707/wi_farmlands_0707.giz:27:15",
+    "name": "Diner_2x2_PU",
+    "tile_name": "wi_farmlands_0707"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0707/wi_farmlands_0707.giz:27:16",
+    "name": "P_pup",
+    "tile_name": "wi_farmlands_0707"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz:486:34",
+    "name": "Diner_2x2_01_PU",
+    "tile_name": "wi_farmlands_0708"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz:486:35",
+    "name": "Diner_2x2_02_PU",
+    "tile_name": "wi_farmlands_0708"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz:486:36",
+    "name": "j_pup",
+    "tile_name": "wi_farmlands_0708"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz:486:37",
+    "name": "Brickup_01",
+    "tile_name": "wi_farmlands_0708"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0709/wi_farmlands_0709.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "wi_farmlands_0709"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0805/wi_farmlands_0805.giz:234:10",
+    "name": "P_pup",
+    "tile_name": "wi_farmlands_0805"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0806/wi_farmlands_0806.giz:1522:1",
+    "name": "j_pup",
+    "tile_name": "wi_farmlands_0806"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0807/wi_farmlands_0807.giz:3047:12",
+    "name": "j_pup",
+    "tile_name": "wi_farmlands_0807"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0502/wi_forest_0502.giz:584:1",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0502"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0601/wi_forest_0601.giz:27:2",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0601"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0602/wi_forest_0602.giz:9827:14",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0602"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0602/wi_forest_0602.giz:9827:15",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0602"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0603/wi_forest_0603.giz:27:0",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0603"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:0",
+    "name": "SILVER_BOULDER_PU",
+    "tile_name": "wi_forest_0701"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:3",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0701"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:4",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0701"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:5",
+    "name": "P_pup1",
+    "tile_name": "wi_forest_0701"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:6",
+    "name": "j_pup1",
+    "tile_name": "wi_forest_0701"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:7",
+    "name": "P_pup2",
+    "tile_name": "wi_forest_0701"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:8",
+    "name": "P_pup3",
+    "tile_name": "wi_forest_0701"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:9",
+    "name": "P_pup4",
+    "tile_name": "wi_forest_0701"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:1",
+    "name": "P_pup2",
+    "tile_name": "wi_forest_0702"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:2",
+    "name": "P_pup3",
+    "tile_name": "wi_forest_0702"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:3",
+    "name": "P_pup4",
+    "tile_name": "wi_forest_0702"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:4",
+    "name": "P_pup5",
+    "tile_name": "wi_forest_0702"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:5",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0702"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:7",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0702"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:8",
+    "name": "P_pup1",
+    "tile_name": "wi_forest_0702"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0703/wi_forest_0703.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0703"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0703/wi_forest_0703.giz:27:1",
+    "name": "P_pup1",
+    "tile_name": "wi_forest_0703"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0703/wi_forest_0703.giz:27:2",
+    "name": "P_pup2",
+    "tile_name": "wi_forest_0703"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz:27:1",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0704"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz:27:2",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0704"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:0",
+    "name": "j_pup1",
+    "tile_name": "wi_forest_0801"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:1",
+    "name": "CHERRYTREE01_PU",
+    "tile_name": "wi_forest_0801"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:2",
+    "name": "BOULDER_01_PU",
+    "tile_name": "wi_forest_0801"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:3",
+    "name": "P_pup1",
+    "tile_name": "wi_forest_0801"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:4",
+    "name": "P_pup3",
+    "tile_name": "wi_forest_0801"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:5",
+    "name": "P_pup4",
+    "tile_name": "wi_forest_0801"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:6",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0801"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:7",
+    "name": "P_pup2",
+    "tile_name": "wi_forest_0801"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0802/wi_forest_0802.giz:980:9",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0802"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0803/wi_forest_0803.giz:208:2",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0803"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0804/wi_forest_0804.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0804"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:0",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0901"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:2",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0901"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:3",
+    "name": "P_pup1",
+    "tile_name": "wi_forest_0901"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:4",
+    "name": "P_pup4",
+    "tile_name": "wi_forest_0901"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:5",
+    "name": "P_pup2",
+    "tile_name": "wi_forest_0901"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:6",
+    "name": "P_pup5",
+    "tile_name": "wi_forest_0901"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:7",
+    "name": "P_pup3",
+    "tile_name": "wi_forest_0901"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:0",
+    "name": "CAFE_CRABNET_01_PU",
+    "tile_name": "wi_forest_0902"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:1",
+    "name": "BIN_4x2_SBRICK_PU",
+    "tile_name": "wi_forest_0902"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:3",
+    "name": "P_pup",
+    "tile_name": "wi_forest_0902"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:4",
+    "name": "CAFE_SBRICK_01_PU",
+    "tile_name": "wi_forest_0902"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:5",
+    "name": "CAFE_LIFE_PRES_SBRICK_PU",
+    "tile_name": "wi_forest_0902"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:6",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0902"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:7",
+    "name": "j_pup1",
+    "tile_name": "wi_forest_0902"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:8",
+    "name": "P_pup1",
+    "tile_name": "wi_forest_0902"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:1",
+    "name": "P_pup1",
+    "tile_name": "wi_forest_0903"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:2",
+    "name": "P_pup2",
+    "tile_name": "wi_forest_0903"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:3",
+    "name": "P_pup3",
+    "tile_name": "wi_forest_0903"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:4",
+    "name": "P_pup5",
+    "tile_name": "wi_forest_0903"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:5",
+    "name": "P_pup6",
+    "tile_name": "wi_forest_0903"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:6",
+    "name": "P_pup4",
+    "tile_name": "wi_forest_0903"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:7",
+    "name": "j_pup",
+    "tile_name": "wi_forest_0903"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1002/wi_forest_1002.giz:27:0",
+    "name": "P_pup",
+    "tile_name": "wi_forest_1002"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1002/wi_forest_1002.giz:27:2",
+    "name": "P_pup1",
+    "tile_name": "wi_forest_1002"
+  }
+]

@@ -1,0 +1,362 @@
+{
+  "6768": {
+    "bit": 6768,
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:0",
+    "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz",
+    "name": "SuperBrick_2",
+    "position": [
+      -119.98702239990234,
+      3.5612833499908447,
+      -234.46206665039062
+    ],
+    "local_index": 0,
+    "tile_xy": [
+      10,
+      22
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "6769": {
+    "bit": 6769,
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:2",
+    "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz",
+    "name": "P_pup",
+    "position": [
+      -135.86500549316406,
+      8.02035140991211,
+      -215.0189971923828
+    ],
+    "local_index": 1,
+    "tile_xy": [
+      10,
+      22
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "6770": {
+    "bit": 6770,
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:4",
+    "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz",
+    "name": "P_pup1",
+    "position": [
+      -142.27072143554688,
+      8.535954475402832,
+      -212.638427734375
+    ],
+    "local_index": 2,
+    "tile_xy": [
+      10,
+      22
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "7072": {
+    "bit": 7072,
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1023/sf_residential_1023_tech.giz:27:0",
+    "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1023/sf_residential_1023_tech.giz",
+    "name": "Icebox_Brick",
+    "position": [
+      -140.99481201171875,
+      3.4971024990081787,
+      -241.36660766601562
+    ],
+    "local_index": 0,
+    "tile_xy": [
+      10,
+      23
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "1576": {
+    "bit": 1576,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:2",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz",
+    "name": "P_pup",
+    "position": [
+      -231.03756713867188,
+      10.321624755859375,
+      286.26971435546875
+    ],
+    "local_index": 0,
+    "tile_xy": [
+      7,
+      5
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "1577": {
+    "bit": 1577,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:3",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz",
+    "name": "P_pup1",
+    "position": [
+      -225.810302734375,
+      15.373730659484863,
+      277.429443359375
+    ],
+    "local_index": 1,
+    "tile_xy": [
+      7,
+      5
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "1578": {
+    "bit": 1578,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:4",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz",
+    "name": "j_pup",
+    "position": [
+      -224.357421875,
+      24.877275466918945,
+      281.4776916503906
+    ],
+    "local_index": 2,
+    "tile_xy": [
+      7,
+      5
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "1880": {
+    "bit": 1880,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0706/wi_farmlands_0706_tech.giz:213:1",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0706/wi_farmlands_0706_tech.giz",
+    "name": "P_pup",
+    "position": [
+      -238.67068481445312,
+      12.194172859191895,
+      246.96226501464844
+    ],
+    "local_index": 0,
+    "tile_xy": [
+      7,
+      6
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "1584": {
+    "bit": 1584,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0805/wi_farmlands_0805.giz:234:10",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0805/wi_farmlands_0805.giz",
+    "name": "P_pup",
+    "position": [
+      -194.17636108398438,
+      4.8171916007995605,
+      297.65283203125
+    ],
+    "local_index": 0,
+    "tile_xy": [
+      8,
+      5
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "1888": {
+    "bit": 1888,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0806/wi_farmlands_0806.giz:1522:1",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0806/wi_farmlands_0806.giz",
+    "name": "j_pup",
+    "position": [
+      -190.7375030517578,
+      1.4301506280899048,
+      264.9366149902344
+    ],
+    "local_index": 0,
+    "tile_xy": [
+      8,
+      6
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "664": {
+    "bit": 664,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:1",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+    "name": "P_pup2",
+    "position": [
+      -232.76914978027344,
+      17.264511108398438,
+      366.18328857421875
+    ],
+    "local_index": 0,
+    "tile_xy": [
+      7,
+      2
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "665": {
+    "bit": 665,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:2",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+    "name": "P_pup3",
+    "position": [
+      -236.1157989501953,
+      17.264511108398438,
+      366.188232421875
+    ],
+    "local_index": 1,
+    "tile_xy": [
+      7,
+      2
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "666": {
+    "bit": 666,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:3",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+    "name": "P_pup4",
+    "position": [
+      -232.76731872558594,
+      17.264511108398438,
+      373.0409851074219
+    ],
+    "local_index": 2,
+    "tile_xy": [
+      7,
+      2
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "667": {
+    "bit": 667,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:4",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+    "name": "P_pup5",
+    "position": [
+      -236.1205291748047,
+      17.264511108398438,
+      373.0451965332031
+    ],
+    "local_index": 3,
+    "tile_xy": [
+      7,
+      2
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "668": {
+    "bit": 668,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:5",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+    "name": "j_pup",
+    "position": [
+      -211.93869018554688,
+      14.000617980957031,
+      381.2435302734375
+    ],
+    "local_index": 4,
+    "tile_xy": [
+      7,
+      2
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "669": {
+    "bit": 669,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:7",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+    "name": "P_pup",
+    "position": [
+      -213.02658081054688,
+      13.973145484924316,
+      385.66595458984375
+    ],
+    "local_index": 5,
+    "tile_xy": [
+      7,
+      2
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "670": {
+    "bit": 670,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:8",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+    "name": "P_pup1",
+    "position": [
+      -214.72320556640625,
+      13.977147102355957,
+      376.73583984375
+    ],
+    "local_index": 6,
+    "tile_xy": [
+      7,
+      2
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "1272": {
+    "bit": 1272,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz:27:1",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz",
+    "name": "j_pup",
+    "position": [
+      -227.12928771972656,
+      13.536705017089844,
+      318.0722961425781
+    ],
+    "local_index": 0,
+    "tile_xy": [
+      7,
+      4
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "1273": {
+    "bit": 1273,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz:27:2",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz",
+    "name": "P_pup",
+    "position": [
+      -216.2124481201172,
+      11.306183815002441,
+      329.006591796875
+    ],
+    "local_index": 1,
+    "tile_xy": [
+      7,
+      4
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  },
+  "1280": {
+    "bit": 1280,
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0804/wi_forest_0804.giz:27:0",
+    "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0804/wi_forest_0804.giz",
+    "name": "P_pup",
+    "position": [
+      -188.17901611328125,
+      10.411574363708496,
+      315.5793762207031
+    ],
+    "local_index": 0,
+    "tile_xy": [
+      8,
+      4
+    ],
+    "evidence": "live_instance_match",
+    "status": "candidate"
+  }
+}

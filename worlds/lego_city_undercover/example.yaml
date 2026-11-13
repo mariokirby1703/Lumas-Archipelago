@@ -1,0 +1,25 @@
+name: LCU_Test
+game: LEGO City Undercover
+description: Experimental catalogue/manual checks; native grants and locks unavailable
+LEGO City Undercover:
+  progression_balancing: 0
+  accessibility: minimal
+  story_mode: linear
+  super_bricks: true
+  super_builds: true
+  disguise_booths: true
+  atms: true
+  train_stations: true
+  city_activities: true
+  story_missions: true
+  red_bricks: true
+  city_hero: true
+  police_shields: quarters
+  include_unverified: false
+  goal_tokens: 20
+  character_items: true
+  vehicle_items: true
+  ability_items: true
+  area_pass_items: false
+  story_access_items: false
+  cutscene_skip: true

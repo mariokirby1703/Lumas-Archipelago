@@ -1,0 +1,5455 @@
+{
+  "objectives": {
+    "611040355": {
+      "instanceName": "SF_RD_1020_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "SF_Residential"
+    },
+    "463943954": {
+      "instanceName": "SF_DO_0717_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "SF_Docks"
+    },
+    "2914054487": {
+      "instanceName": "NY_CT_1717_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "1793231955": {
+      "instanceName": "WI_FO_0902_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "WI_Forest"
+    },
+    "2977250469": {
+      "instanceName": "NY_UT_1605_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Uptown"
+    },
+    "2730945101": {
+      "instanceName": "WI_FL_0505_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "3245084611": {
+      "instanceName": "NY_DTW_1821_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "3035456546": {
+      "instanceName": "NY_TS_1714_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "1764265124": {
+      "instanceName": "NY_CP_1710_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "1552755615": {
+      "instanceName": "NY_LCX_1904_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Airport"
+    },
+    "3397240065": {
+      "instanceName": "NY_BE_2309_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Beach"
+    },
+    "4227730281": {
+      "instanceName": "NY_LI_2417_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2544968363": {
+      "instanceName": "NY_DTE_2220_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "212270653": {
+      "instanceName": "NY_DT_2025_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "NY_Downtown"
+    },
+    "2741476391": {
+      "instanceName": "IS_AI_1526_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "261803355": {
+      "instanceName": "IS_SC_3322_Gangfight",
+      "objectiveTypeId": "COP_AudioScan",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "1855308779": {
+      "instanceName": "SF_RD_0920_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "SF_Residential"
+    },
+    "3519639376": {
+      "instanceName": "SF_DO_0917_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "SF_Docks"
+    },
+    "2585900370": {
+      "instanceName": "WI_FO_0802_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "WI_Forest"
+    },
+    "3665863165": {
+      "instanceName": "NY_CT_1717_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "517809566": {
+      "instanceName": "NY_DT_2123_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "NY_Downtown"
+    },
+    "2749296014": {
+      "instanceName": "NY_LI_2418_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2120299580": {
+      "instanceName": "NY_UT_1604_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "NY_Uptown"
+    },
+    "3979965615": {
+      "instanceName": "NY_TS_1612_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "1973756628": {
+      "instanceName": "NY_DTE_2120_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "3515275863": {
+      "instanceName": "NY_DTW_1720_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "2684820849": {
+      "instanceName": "NY_LCX_2105_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "NY_Airport"
+    },
+    "2336092047": {
+      "instanceName": "NY_BE_2309_RobberGarage",
+      "objectiveTypeId": "COP_CriminalScan",
+      "cityDistrict": "NY_Beach"
+    },
+    "2521164258": {
+      "instanceName": "NY_DT_1924_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Downtown"
+    },
+    "2343698979": {
+      "instanceName": "NY_DTW_1821_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "3217702272": {
+      "instanceName": "NY_DTE_2319_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "650227468": {
+      "instanceName": "NY_LI_2418_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "1703185403": {
+      "instanceName": "NY_BE_2310_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Beach"
+    },
+    "188076026": {
+      "instanceName": "NY_LCX_1903_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Airport"
+    },
+    "4120164094": {
+      "instanceName": "NY_UT_1604_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Uptown"
+    },
+    "590134849": {
+      "instanceName": "NY_CP_1711_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "644966242": {
+      "instanceName": "NY_TS_1613_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "2427803335": {
+      "instanceName": "NY_CT_1818_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "2097109519": {
+      "instanceName": "SF_DO_0918_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "SF_Docks"
+    },
+    "2628834743": {
+      "instanceName": "SF_RD_1121_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "SF_Residential"
+    },
+    "3999107336": {
+      "instanceName": "SF_DO_0717_CarTheft",
+      "objectiveTypeId": "ROBBER_CarTheft",
+      "cityDistrict": "SF_Docks"
+    },
+    "3373779374": {
+      "instanceName": "WI_FO_0803_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "WI_Forest"
+    },
+    "4247804008": {
+      "instanceName": "NY_DT_2124_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Downtown"
+    },
+    "1850348027": {
+      "instanceName": "NY_DTE_2122_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "811845418": {
+      "instanceName": "NY_DTW_1920_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "4263719999": {
+      "instanceName": "NY_CT_1815_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "1435552643": {
+      "instanceName": "NY_LI_2317_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "367250266": {
+      "instanceName": "NY_TS_1614_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "801195031": {
+      "instanceName": "NY_BE_2311_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Beach"
+    },
+    "2539593173": {
+      "instanceName": "NY_CP_1710_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "3145844724": {
+      "instanceName": "NY_UT_1704_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Uptown"
+    },
+    "3283766122": {
+      "instanceName": "IS_AI_1526_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "3655536718": {
+      "instanceName": "SF_DO_0716_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "SF_Docks"
+    },
+    "3261835791": {
+      "instanceName": "WI_FL_0708_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "1122213324": {
+      "instanceName": "IS_LI_1213_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "2079036694": {
+      "instanceName": "NY_LCX_2004_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Airport"
+    },
+    "2924962402": {
+      "instanceName": "SF_RD_0922_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "SF_Residential"
+    },
+    "2350586622": {
+      "instanceName": "NY_DTW_1919_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "1493764148": {
+      "instanceName": "NY_TS_1713_ATM",
+      "objectiveTypeId": "ROBBER_ATMSmash",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "141140425": {
+      "instanceName": "WI_FO_0602_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "WI_Forest"
+    },
+    "3426047937": {
+      "instanceName": "WI_FL_0706_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "1468917174": {
+      "instanceName": "NT_DTE_2221_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "1820929200": {
+      "instanceName": "NY_DT_2023_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Downtown"
+    },
+    "3226950160": {
+      "instanceName": "NY_DTW_1722_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "3316237525": {
+      "instanceName": "NY_CT_1817_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "2766617088": {
+      "instanceName": "NY_LI_2415_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "3752105330": {
+      "instanceName": "NY_TS_1713_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "2759272007": {
+      "instanceName": "NY_CP_1507_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "1752946420": {
+      "instanceName": "NY_BE_2408_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Beach"
+    },
+    "3822603995": {
+      "instanceName": "NY_LCX_1905_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Airport"
+    },
+    "3646895612": {
+      "instanceName": "IS_AI_1526_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "1299485162": {
+      "instanceName": "NY_UT_1605_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Uptown"
+    },
+    "2927538865": {
+      "instanceName": "IS_SC_3523_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "3085650256": {
+      "instanceName": "SF_DO_0716_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "SF_Docks"
+    },
+    "2977871626": {
+      "instanceName": "IS_LI_1213_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "2640193496": {
+      "instanceName": "SF_RD_0720_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "SF_Residential"
+    },
+    "3144781294": {
+      "instanceName": "BR_GG_0714_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "BR_Golden_Gate"
+    },
+    "2297955946": {
+      "instanceName": "WI_FO_0904_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "WI_Forest"
+    },
+    "2299999262": {
+      "instanceName": "NY_LI_2318_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "4216268787": {
+      "instanceName": "NY_CA_2017_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "NY_Canal"
+    },
+    "2817796371": {
+      "instanceName": "BR_TB_1303_Boulders",
+      "objectiveTypeId": "MINER_BoulderSmash",
+      "cityDistrict": "BR_Twin_Bridge"
+    },
+    "2554314784": {
+      "instanceName": "WI_FO_0701_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "WI_Forest"
+    },
+    "3347804025": {
+      "instanceName": "NY_DTE_2220_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "287913891": {
+      "instanceName": "NY_DT_1925_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "NY_Downtown"
+    },
+    "282474335": {
+      "instanceName": "BR_BB_1621_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "BR_Brooklyn_Bridge"
+    },
+    "3360034952": {
+      "instanceName": "NY_CT_1716_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "1155983474": {
+      "instanceName": "NY_LI_2315_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "3219904447": {
+      "instanceName": "NY_TS_1713_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "2187323822": {
+      "instanceName": "NY_BE_2308_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "NY_Beach"
+    },
+    "1671978182": {
+      "instanceName": "NY_LCX_1903_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "NY_Airport"
+    },
+    "1426401332": {
+      "instanceName": "IS_AI_1426_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "3285231746": {
+      "instanceName": "NY_UT_1604_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "NY_Uptown"
+    },
+    "2195893510": {
+      "instanceName": "IS_SC_3422_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "2764033500": {
+      "instanceName": "SF_DO_0717_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "SF_Docks"
+    },
+    "1273025385": {
+      "instanceName": "WI_FL_0608_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "1271698695": {
+      "instanceName": "IS_LI_1213_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "561262796": {
+      "instanceName": "SF_RD_1119_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "SF_Residential"
+    },
+    "4056050325": {
+      "instanceName": "NY_CP_1708_Statues",
+      "objectiveTypeId": "MINER_StatueSmash",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "953395597": {
+      "instanceName": "WI_FO_0502_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "WI_Forest"
+    },
+    "495752828": {
+      "instanceName": "NY_DTE_2320_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "2099393118": {
+      "instanceName": "NY_DT_2024_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Downtown"
+    },
+    "2914627401": {
+      "instanceName": "NY_LI_2415_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2937978314": {
+      "instanceName": "NY_DTW_1721_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "807715970": {
+      "instanceName": "NY_CT_1817_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "734839827": {
+      "instanceName": "NY_TS_1612_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "466861327": {
+      "instanceName": "NY_CP_1711_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "740365851": {
+      "instanceName": "NY_BE_2312_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Beach"
+    },
+    "2394855921": {
+      "instanceName": "NY_LCX_2004_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Airport"
+    },
+    "2650638378": {
+      "instanceName": "NY_UT_1503_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "NY_Uptown"
+    },
+    "405095435": {
+      "instanceName": "IS_SC_3423_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "175110621": {
+      "instanceName": "SF_DO_0815_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "SF_Docks"
+    },
+    "3983432661": {
+      "instanceName": "IS_AI_1526_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "1020862975": {
+      "instanceName": "WI_FL_0707_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "1920337079": {
+      "instanceName": "IS_LI_1213_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "1978626981": {
+      "instanceName": "SF_RD_1019_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "SF_Residential"
+    },
+    "3717288077": {
+      "instanceName": "BR_TB_1203_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "BR_Twin_Bridge"
+    },
+    "2988438475": {
+      "instanceName": "BR_GG_0714_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "BR_Golden_Gate"
+    },
+    "1428064702": {
+      "instanceName": "BR_BB_1321_Conquer",
+      "objectiveTypeId": "ASTRO_Conquer",
+      "cityDistrict": "BR_Brooklyn_Bridge"
+    },
+    "1561071621": {
+      "instanceName": "NY_DT_2124_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Downtown"
+    },
+    "4168219672": {
+      "instanceName": "NY_DTW_1721_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "18409078": {
+      "instanceName": "NY_DTE_2320_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "3839484651": {
+      "instanceName": "NY_LI_2316_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "3399860800": {
+      "instanceName": "NY_BE_2308_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Beach"
+    },
+    "3421333708": {
+      "instanceName": "NY_LCX_2003_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Airport"
+    },
+    "517148385": {
+      "instanceName": "NY_UT_1605_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Uptown"
+    },
+    "3623716454": {
+      "instanceName": "NY_CP_1709_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "481929760": {
+      "instanceName": "NY_TS_1613_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "4041894144": {
+      "instanceName": "NY_CT_1817_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "1427563776": {
+      "instanceName": "WI_FO_0901_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "WI_Forest"
+    },
+    "1082503794": {
+      "instanceName": "WI_FL_0807_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "3148298574": {
+      "instanceName": "SF_RD_1120_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "SF_Residential"
+    },
+    "3344436098": {
+      "instanceName": "SF_DO_0717_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "SF_Docks"
+    },
+    "1600682664": {
+      "instanceName": "IS_SC_3422_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "2315297594": {
+      "instanceName": "IS_PI_1526_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "1398027457": {
+      "instanceName": "IS_LI_1213_Alien",
+      "objectiveTypeId": "ASTRO_CatchAliens",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "1730106276": {
+      "instanceName": "WI_FO_0801_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "WI_Forest"
+    },
+    "484261469": {
+      "instanceName": "WI_FL_0405_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "3241273407": {
+      "instanceName": "NY_DT_2123_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Downtown"
+    },
+    "996937888": {
+      "instanceName": "NY_DTE_2121_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "4251446911": {
+      "instanceName": "NY_DTW_2021_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "637215002": {
+      "instanceName": "NY_CT_1717_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "2604741738": {
+      "instanceName": "NY_LI_2316_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2343364000": {
+      "instanceName": "NY_TS_1713_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "365060764": {
+      "instanceName": "NY_BE_2309_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Beach"
+    },
+    "1414768933": {
+      "instanceName": "NY_CP_1710_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "2567732206": {
+      "instanceName": "NY_LCX_2004_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Airport"
+    },
+    "1818668496": {
+      "instanceName": "NY_UT_1803_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Airport"
+    },
+    "4236842617": {
+      "instanceName": "IS_SC_3422_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "3216705779": {
+      "instanceName": "SF_DO_0818_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "SF_Docks"
+    },
+    "3658794675": {
+      "instanceName": "IS_AI_1426_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "1590117192": {
+      "instanceName": "IS_LI_1213_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "366047984": {
+      "instanceName": "SF_RD_0919_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "SF_Residential"
+    },
+    "1431896517": {
+      "instanceName": "SF_DO_0816_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "SF_Docks"
+    },
+    "494332741": {
+      "instanceName": "NY_TS_1712_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "1881001037": {
+      "instanceName": "NY_BE_2212_Flowers",
+      "objectiveTypeId": "FARMER_Flowers",
+      "cityDistrict": "NY_Beach"
+    },
+    "876306044": {
+      "instanceName": "SF_RD_1022_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "SF_Residential"
+    },
+    "2659648805": {
+      "instanceName": "SF_DO_0816_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "SF_Docks"
+    },
+    "3007792108": {
+      "instanceName": "NY_CT_1816_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "213548866": {
+      "instanceName": "WI_FO_0502_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "WI_Forest"
+    },
+    "2428385885": {
+      "instanceName": "NY_UT_1604_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Uptown"
+    },
+    "2359775361": {
+      "instanceName": "NY_TS_1613_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "2744893750": {
+      "instanceName": "NY_BE_2310_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Beach"
+    },
+    "222090217": {
+      "instanceName": "NY_LCX_1903_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Airport"
+    },
+    "700065880": {
+      "instanceName": "IS_LI_1213_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "1926857052": {
+      "instanceName": "IS_PI_1525_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "921862187": {
+      "instanceName": "BR_BB_1521_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "BR_Brooklyn_Bridge"
+    },
+    "2697681122": {
+      "instanceName": "IS_SC_3223_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "2118373797": {
+      "instanceName": "NY_DTE_2120_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "2733661606": {
+      "instanceName": "NY_DTW_1919_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "3801128143": {
+      "instanceName": "NY_DT_2123_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Downtown"
+    },
+    "444019796": {
+      "instanceName": "NY_LI_2417_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "4274639790": {
+      "instanceName": "SF_RD_1020_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "SF_Residential"
+    },
+    "2900562955": {
+      "instanceName": "NY_DTE_2221_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "3787636688": {
+      "instanceName": "NY_DT_2025_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Downtown"
+    },
+    "3553477464": {
+      "instanceName": "NY_CT_1715_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "598294460": {
+      "instanceName": "NY_CP_1607_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "2068212195": {
+      "instanceName": "WI_FL_0708_Pig",
+      "objectiveTypeId": "FARMER_Pigs",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "1513833608": {
+      "instanceName": "WI_FO_0901_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "WI_Forest"
+    },
+    "4190468489": {
+      "instanceName": "WI_FL_0505_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "2242180603": {
+      "instanceName": "NY_DTE_2220_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "4132764813": {
+      "instanceName": "NY_DT_1925_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Downtown"
+    },
+    "1937065874": {
+      "instanceName": "NY_DTW_1819_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "618277000": {
+      "instanceName": "NY_CT_1817_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "2675748167": {
+      "instanceName": "NY_LI_2316_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2433458025": {
+      "instanceName": "NY_TS_1713_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "925326448": {
+      "instanceName": "NY_BE_2209_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Beach"
+    },
+    "75922621": {
+      "instanceName": "NY_CP_1607_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "3707272108": {
+      "instanceName": "NY_LCX_2003_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Airport"
+    },
+    "939181808": {
+      "instanceName": "NY_UT_1806_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "NY_Airport"
+    },
+    "1609901088": {
+      "instanceName": "IS_SC_3422_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "2992569609": {
+      "instanceName": "SF_DO_1018_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "SF_Docks"
+    },
+    "1841117718": {
+      "instanceName": "IS_AI_1426_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "1525023153": {
+      "instanceName": "IS_LI_1213_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "3545474468": {
+      "instanceName": "SF_RD_0921_BBQ",
+      "objectiveTypeId": "FIREMAN_BBQ",
+      "cityDistrict": "SF_Residential"
+    },
+    "333132057": {
+      "instanceName": "SF_RD_0820_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "SF_Residential"
+    },
+    "1923336672": {
+      "instanceName": "SF_DO_0817_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "SF_Docks"
+    },
+    "1411153845": {
+      "instanceName": "WI_FL_0607_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "1098532226": {
+      "instanceName": "NY_CT_1717_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "1452609549": {
+      "instanceName": "NY_UT_1705_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Uptown"
+    },
+    "2824107660": {
+      "instanceName": "NY_TS_1612_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "2733069766": {
+      "instanceName": "NY_LCX_2004_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Airport"
+    },
+    "2144348671": {
+      "instanceName": "IS_LI_1113_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "3235622195": {
+      "instanceName": "IS_PI_1526_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "955426849": {
+      "instanceName": "IS_SC_3422_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "2243298317": {
+      "instanceName": "NY_DTE_2119_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "1331554386": {
+      "instanceName": "NY_DTW_1920_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "3400583743": {
+      "instanceName": "NY_DT_2123_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Downtown"
+    },
+    "672272001": {
+      "instanceName": "NY_LI_2416_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2619290482": {
+      "instanceName": "NY_CP_1708_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "1857917626": {
+      "instanceName": "NY_BE_2408_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "NY_Beach"
+    },
+    "3113726101": {
+      "instanceName": "WI_FO_0602_Cat",
+      "objectiveTypeId": "FIREMAN_Cats",
+      "cityDistrict": "WI_Forest"
+    },
+    "2404252439": {
+      "instanceName": "WI_FO_0701_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "WI_Forest"
+    },
+    "2594758921": {
+      "instanceName": "NY_DT_1924_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Downtown"
+    },
+    "145525976": {
+      "instanceName": "NY_DTE_2121_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "4280372363": {
+      "instanceName": "NY_DTW_1820_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "3943238098": {
+      "instanceName": "NY_CT_1717_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "2337271780": {
+      "instanceName": "NY_LI_2318_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "1168065810": {
+      "instanceName": "NY_TS_1614_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "1561232694": {
+      "instanceName": "NY_BE_2310_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Beach"
+    },
+    "1221524549": {
+      "instanceName": "NY_CP_1710_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "3256916350": {
+      "instanceName": "NY_LCX_2004_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Airport"
+    },
+    "1735797686": {
+      "instanceName": "NY_UT_1805_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Uptown"
+    },
+    "301044823": {
+      "instanceName": "IS_SC_3424_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "1513759832": {
+      "instanceName": "SF_DO_0817_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "SF_Docks"
+    },
+    "2559929269": {
+      "instanceName": "WI_FL_0706_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "43983469": {
+      "instanceName": "IS_AI_1525_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "1687125040": {
+      "instanceName": "IS_LI_1213_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "3481391561": {
+      "instanceName": "SF_RD_0819_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "SF_Residential"
+    },
+    "3628638170": {
+      "instanceName": "WI_FL_0507_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "4143625295": {
+      "instanceName": "NY_CA_2017_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "NY_Canal"
+    },
+    "311296049": {
+      "instanceName": "IS_SC_3422_HotDrinks",
+      "objectiveTypeId": "CONSTRUCT_Brew",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "961814011": {
+      "instanceName": "NY_DTE_2222_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "3222456641": {
+      "instanceName": "NY_UT_1504_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Uptown"
+    },
+    "2051344905": {
+      "instanceName": "WI_FO_0601_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "WI_Forest"
+    },
+    "553101898": {
+      "instanceName": "WI_FL_0706_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "3652458185": {
+      "instanceName": "NY_CT_1717_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "304348016": {
+      "instanceName": "IS_PI_1526_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "3755348751": {
+      "instanceName": "IS_LI_1213_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "1478323609": {
+      "instanceName": "NY_LI_2316_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "440858918": {
+      "instanceName": "SF_RD_0820_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "SF_Residential"
+    },
+    "253634891": {
+      "instanceName": "IS_SC_3423_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "2388575767": {
+      "instanceName": "NY_CP_1711_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "3421235805": {
+      "instanceName": "NY_LCX_2004_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Airport"
+    },
+    "3705455381": {
+      "instanceName": "NY_DT_2023_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Downtown"
+    },
+    "1460967345": {
+      "instanceName": "NY_BE_2408_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Beach"
+    },
+    "1406671854": {
+      "instanceName": "NY_DTW_1721_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "2777380992": {
+      "instanceName": "SF_DO_0818_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "SF_Docks"
+    },
+    "415055459": {
+      "instanceName": "NY_TS_1612_Drill",
+      "objectiveTypeId": "CONSTRUCT_Drill",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "2252952384": {
+      "instanceName": "SF_RD_0919_House",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Residential"
+    },
+    "810900609": {
+      "instanceName": "SF_RD_0923_Fountain",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Residential"
+    },
+    "9070206": {
+      "instanceName": "SF_RD_0823_Ferry",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Residential"
+    },
+    "240571709": {
+      "instanceName": "BR_BB_1222_Statue",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "BR_Brooklyn_Bridge"
+    },
+    "3288749368": {
+      "instanceName": "SF_RD_0922_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Residential"
+    },
+    "93162432": {
+      "instanceName": "SF_RD_0822_HeliPad",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Residential"
+    },
+    "1964491576": {
+      "instanceName": "SF_DO_0818_Fan",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Docks"
+    },
+    "3639933937": {
+      "instanceName": "SF_DO_0916_Chimney",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Docks"
+    },
+    "2249550522": {
+      "instanceName": "SF_DO_0918_Ramp",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Docks"
+    },
+    "3706375360": {
+      "instanceName": "SF_DO_0918_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Docks"
+    },
+    "1565163224": {
+      "instanceName": "SF_DO_0815_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Docks"
+    },
+    "679747538": {
+      "instanceName": "SF_DO_0917_HeliPad",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Docks"
+    },
+    "2093637182": {
+      "instanceName": "WI_FL_0607_Cabin",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "1101997822": {
+      "instanceName": "WI_FL_0608_Station",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "3450423592": {
+      "instanceName": "WI_FL_0705_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "1924796939": {
+      "instanceName": "WI_FL_0608_CrashMat",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "4150355697": {
+      "instanceName": "WI_FL_0708_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "3313764415": {
+      "instanceName": "WI_FO_1002_Bridge",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Forest"
+    },
+    "1830281985": {
+      "instanceName": "WI_FO_0802_Tree",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Forest"
+    },
+    "3914376380": {
+      "instanceName": "WI_FO_0902_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Forest"
+    },
+    "4179856021": {
+      "instanceName": "WI_FO_0803_HeliPad",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Forest"
+    },
+    "1596875910": {
+      "instanceName": "WI_FO_0902_Ramp",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "WI_Forest"
+    },
+    "2100374537": {
+      "instanceName": "IS_PI_1426_HeliPad",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "947806944": {
+      "instanceName": "NY_DTW_1819_DropRide",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "2685743441": {
+      "instanceName": "NY_DTW_1820_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "2390357621": {
+      "instanceName": "NY_DTW_1722_HeliPad",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "3664180372": {
+      "instanceName": "NY_CT_1716_Arch01",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "3664180375": {
+      "instanceName": "NY_CT_1716_Arch02",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "2340313984": {
+      "instanceName": "NY_CT_1717_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "2734217135": {
+      "instanceName": "NY_CT_1718_Ramp",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "172887003": {
+      "instanceName": "NY_TS_1712_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "3581779285": {
+      "instanceName": "NY_UT_1606_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Uptown"
+    },
+    "1159820167": {
+      "instanceName": "NY_UT_1503_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Uptown"
+    },
+    "2347508481": {
+      "instanceName": "NY_DT_2125_FerrisWheel",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Downtown"
+    },
+    "2871340543": {
+      "instanceName": "NY_DT_1924_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Downtown"
+    },
+    "3239499610": {
+      "instanceName": "NY_DT_2124_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Downtown"
+    },
+    "1354255264": {
+      "instanceName": "NY_DTE_2321_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "760042601": {
+      "instanceName": "NY_DTE_2121_CrashMat",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "3431762755": {
+      "instanceName": "NY_DTE_2320_Ferry",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "3554373842": {
+      "instanceName": "NY_LI_2318_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "1541834707": {
+      "instanceName": "NY_LI_2315_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2477514046": {
+      "instanceName": "NY_LI_2415_Ramp",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "821752472": {
+      "instanceName": "SF_RD_0916_CrashMat",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "SF_Residential"
+    },
+    "799764184": {
+      "instanceName": "NY_DTW_1819_Octopus",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "1600401220": {
+      "instanceName": "NY_BE_2408_RollerCoast",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Beach"
+    },
+    "3236487255": {
+      "instanceName": "NY_BE_2506_Lighthouse",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Beach"
+    },
+    "3040773645": {
+      "instanceName": "NY_BE_2410_SandCastle",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Beach"
+    },
+    "4232361128": {
+      "instanceName": "NY_BE_2310_SwimPool",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Beach"
+    },
+    "862479066": {
+      "instanceName": "NY_BE_2309_Loop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Beach"
+    },
+    "1473813168": {
+      "instanceName": "NY_BE_2312_Ramp",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Beach"
+    },
+    "569375716": {
+      "instanceName": "NY_BE_2310_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Beach"
+    },
+    "1128248329": {
+      "instanceName": "NY_LCX_2004_Tower",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Airport"
+    },
+    "2685289900": {
+      "instanceName": "NY_LCX_2004_Loop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Airport"
+    },
+    "2920499464": {
+      "instanceName": "NY_LCX_1803_Ramp",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Airport"
+    },
+    "2732814400": {
+      "instanceName": "NY_LCX_1805_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Airport"
+    },
+    "2005715462": {
+      "instanceName": "NY_LCX_2103_Vehdrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Airport"
+    },
+    "2044757202": {
+      "instanceName": "NY_LCX_1903_HeliPad",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "NY_Airport"
+    },
+    "1721670140": {
+      "instanceName": "IS_SC_3323_SpaceShuttle",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "3465515640": {
+      "instanceName": "IS_SC_3422_ShuttleRide",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "1198404986": {
+      "instanceName": "IS_SC_3321_Satellite",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "3326672823": {
+      "instanceName": "IS_SC_3323_Loop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "1910521248": {
+      "instanceName": "IS_SC_3423_Ramp",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "3257140861": {
+      "instanceName": "IS_SC_3222_VehDrop",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "1539906471": {
+      "instanceName": "IS_SC_3423_HeliPad",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "635756211": {
+      "instanceName": "IS_LI_1113_Ferry",
+      "objectiveTypeId": "SuperBuild",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "286030908": {
+      "instanceName": "Mine_CableCar",
+      "objectiveTypeId": "SuperBuild_Level",
+      "cityDistrict": ""
+    },
+    "1141054756": {
+      "instanceName": "Temple_Dragon",
+      "objectiveTypeId": "SuperBuild_Level",
+      "cityDistrict": ""
+    },
+    "4046723827": {
+      "instanceName": "Bank_Truck",
+      "objectiveTypeId": "SuperBuild_Level",
+      "cityDistrict": ""
+    },
+    "3407997413": {
+      "instanceName": "Scrapyard_Crusher",
+      "objectiveTypeId": "SuperBuild_Level",
+      "cityDistrict": ""
+    },
+    "2638364354": {
+      "instanceName": "Museum_Plane",
+      "objectiveTypeId": "SuperBuild_Level",
+      "cityDistrict": ""
+    },
+    "3179529221": {
+      "instanceName": "Museum_Dinosaur",
+      "objectiveTypeId": "SuperBuild_Level",
+      "cityDistrict": ""
+    },
+    "617365364": {
+      "instanceName": "Construction_Crane",
+      "objectiveTypeId": "SuperBuild_Level",
+      "cityDistrict": ""
+    },
+    "1038579083": {
+      "instanceName": "DisguiseBooth_SF_RD_1022",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "SF_Residential"
+    },
+    "2104704297": {
+      "instanceName": "DisguiseBooth_SF_DO_0918",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "SF_Docks"
+    },
+    "1611409467": {
+      "instanceName": "DisguiseBooth_WI_FL_0707",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "366507937": {
+      "instanceName": "DisguiseBooth_WI_FO_0803",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "WI_Forest"
+    },
+    "482193575": {
+      "instanceName": "DisguiseBooth_NY_DT_2025",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Downtown"
+    },
+    "2202017361": {
+      "instanceName": "DisguiseBooth_NY_DTE_2321",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "2665095546": {
+      "instanceName": "DisguiseBooth_NY_LI_2416",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2523327001": {
+      "instanceName": "DisguiseBooth_NY_BE_2310",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Beach"
+    },
+    "668940392": {
+      "instanceName": "DisguiseBooth_NY_LCX_2005",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Airport"
+    },
+    "2336443779": {
+      "instanceName": "DisguiseBooth_NY_UT_1605",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Uptown"
+    },
+    "1402649654": {
+      "instanceName": "DisguiseBooth_NY_CP_1710",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "3012711316": {
+      "instanceName": "DisguiseBooth_NY_TS_1714",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "1197727901": {
+      "instanceName": "DisguiseBooth_NY_CT_1818",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "638261039": {
+      "instanceName": "DisguiseBooth_NY_DTW_1922",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "3013056135": {
+      "instanceName": "DisguiseBooth_IS_LI_1213",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "4137397346": {
+      "instanceName": "DisguiseBooth_IS_SC_3022",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "1955820719": {
+      "instanceName": "DisguiseBooth_IS_PI_1525",
+      "objectiveTypeId": "DisguiseBooth",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "1746941394": {
+      "instanceName": "NY_LI_2418_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2874267907": {
+      "instanceName": "WI_FL_0505_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "656519363": {
+      "instanceName": "WI_FO_0702_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "WI_Forest"
+    },
+    "1587670385": {
+      "instanceName": "NY_LCX_2004_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "NY_Airport"
+    },
+    "375852120": {
+      "instanceName": "NY_DTE_2120_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "1661598527": {
+      "instanceName": "IS_SC_3122_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "3186542779": {
+      "instanceName": "IS_LI_1213_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "2751480649": {
+      "instanceName": "BR_GG_0709_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "BR_Golden_Gate"
+    },
+    "3525124088": {
+      "instanceName": "BR_TB_1002_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "WI_Forest"
+    },
+    "324014887": {
+      "instanceName": "NY_DT_2124_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "NY_Downtown"
+    },
+    "593674750": {
+      "instanceName": "SF_RD_0822_Race",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "SF_Residential"
+    },
+    "724345132": {
+      "instanceName": "NY_LI_2418_BoatRace",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "2156354656": {
+      "instanceName": "WI_FO_0802_BoatRace",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "WI_Forest"
+    },
+    "556437354": {
+      "instanceName": "IS_SC_3022_BoatRace",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "1981831539": {
+      "instanceName": "SF_DO_1016_BoatRace",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "SF_Docks"
+    },
+    "509433852": {
+      "instanceName": "NY_BE_2412_BoatRace",
+      "objectiveTypeId": "Race",
+      "cityDistrict": "NY_Beach"
+    },
+    "3431361634": {
+      "instanceName": "Act2_BikeRace",
+      "objectiveTypeId": "Race",
+      "cityDistrict": ""
+    },
+    "3822418244": {
+      "instanceName": "SF_RD_0922_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "SF_Residential"
+    },
+    "699077946": {
+      "instanceName": "SF_DO_0916_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "SF_Docks"
+    },
+    "4010262156": {
+      "instanceName": "NY_CT_1717_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "1636628895": {
+      "instanceName": "WI_FO_0602_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "WI_Forest"
+    },
+    "1692994501": {
+      "instanceName": "NY_DTE_2320_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "3420150729": {
+      "instanceName": "BR_BB_1521_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "BR_Brooklyn_Bridge"
+    },
+    "514410161": {
+      "instanceName": "NY_DTW_1820_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "4293619851": {
+      "instanceName": "NY_DT_1924_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Downtown"
+    },
+    "2857764707": {
+      "instanceName": "IS_SC_3422_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "IS_Space_Centre"
+    },
+    "1450321958": {
+      "instanceName": "IS_LI_1213_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "IS_Liberty_Island"
+    },
+    "2801841470": {
+      "instanceName": "NY_TS_1713_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "2735885619": {
+      "instanceName": "NY_CP_1707_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "2881200724": {
+      "instanceName": "WI_FL_0705_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "2601219910": {
+      "instanceName": "NY_UT_1605_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Uptown"
+    },
+    "3038170168": {
+      "instanceName": "NY_LCX_2004_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Airport"
+    },
+    "904023386": {
+      "instanceName": "NY_LI_2417_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "428204458": {
+      "instanceName": "NY_BE_2312_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "NY_Beach"
+    },
+    "3181201073": {
+      "instanceName": "IS_PI_1526_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "IS_Prison_Island"
+    },
+    "1456654906": {
+      "instanceName": "BR_GG_0714_Parkour",
+      "objectiveTypeId": "ParkourChallenge",
+      "cityDistrict": "BR_Golden_Gate"
+    },
+    "2006177370": {
+      "instanceName": "SF_RD_1022_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "SF_Residential"
+    },
+    "3230836416": {
+      "instanceName": "SF_DO_0716_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "SF_Docks"
+    },
+    "3428851492": {
+      "instanceName": "NY_DTW_1920_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Downtown_West"
+    },
+    "2046857697": {
+      "instanceName": "NY_CT_1817_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Chinatown"
+    },
+    "657233738": {
+      "instanceName": "NY_TS_1612_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Times_Square"
+    },
+    "1178316169": {
+      "instanceName": "NY_CP_1707_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Central_Park"
+    },
+    "2898370168": {
+      "instanceName": "NY_UT_1603_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Uptown"
+    },
+    "2039319564": {
+      "instanceName": "NY_LCX_1904_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Airport"
+    },
+    "3589964087": {
+      "instanceName": "NY_BE_2311_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Beach"
+    },
+    "305636953": {
+      "instanceName": "NY_LI_2416_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Little_Italy"
+    },
+    "1216105044": {
+      "instanceName": "NY_DTE_2321_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Downtown_East"
+    },
+    "3848193329": {
+      "instanceName": "NY_DT_2125_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "NY_Downtown"
+    },
+    "1312091837": {
+      "instanceName": "WI_FL_0607_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "WI_Farmlands"
+    },
+    "1176907742": {
+      "instanceName": "WI_FO_0702_TrainStation",
+      "objectiveTypeId": "TicketMachine",
+      "cityDistrict": "WI_Forest"
+    },
+    "4210069834": {
+      "instanceName": "NY_CT_1716_Pool01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4210069833": {
+      "instanceName": "NY_CT_1716_Pool02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2806351316": {
+      "instanceName": "NY_CT_1815_Pool03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3133818270": {
+      "instanceName": "NY_CT_1715_Bell01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3133818269": {
+      "instanceName": "NY_CT_1715_Bell02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2163801416": {
+      "instanceName": "NY_CT_1816_Bell03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "582638959": {
+      "instanceName": "NY_CT_1816_Bell03_Colour",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2567906720": {
+      "instanceName": "WI_FO_0802_Fire01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3622858986": {
+      "instanceName": "WI_FO_0904_Fire02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1036815288": {
+      "instanceName": "WI_FO_0804_Fire03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1161650415": {
+      "instanceName": "WI_FO_0703_Fire04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4273686011": {
+      "instanceName": "WI_FO_0704_Fire05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3289611290": {
+      "instanceName": "WI_FO_0704_Chevron01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4247707420": {
+      "instanceName": "WI_FO_0903_Chevron02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "249691317": {
+      "instanceName": "WI_FO_0802_Chevron03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3150230587": {
+      "instanceName": "SF_RD_1121_PostBox_01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3951655882": {
+      "instanceName": "SF_RD_0821_PostBox_02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "551083205": {
+      "instanceName": "SF_RD_1020_PostBox_03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "319591698": {
+      "instanceName": "WI_FL_0507_Haybail_01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3961738377": {
+      "instanceName": "WI_FL_0406_Haybail_02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1110216169": {
+      "instanceName": "WI_FL_0405_Haybail_03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2427595312": {
+      "instanceName": "NY_CP_1609_FlowerRed",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1937611151": {
+      "instanceName": "NY_CP_1609_FlowerYellow",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3440336731": {
+      "instanceName": "NY_CP_1609_FlowerBlue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "146070699": {
+      "instanceName": "NY_CP_1609_FlowerPink",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "346728009": {
+      "instanceName": "IS_SC_3423_SatDish01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1200052766": {
+      "instanceName": "IS_SC_3324_SatDish02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2748364998": {
+      "instanceName": "IS_SC_3321_SatDish03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1074733869": {
+      "instanceName": "IS_LI_1213_Tree01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1074733870": {
+      "instanceName": "IS_LI_1213_Tree02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1074733871": {
+      "instanceName": "IS_LI_1213_Tree03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1074733864": {
+      "instanceName": "IS_LI_1213_Tree04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2076255053": {
+      "instanceName": "IS_LI_1213_Binocs01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2076255054": {
+      "instanceName": "IS_LI_1213_Binocs02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2076255055": {
+      "instanceName": "IS_LI_1213_Binocs03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2076255048": {
+      "instanceName": "IS_LI_1213_Binocs04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2076255049": {
+      "instanceName": "IS_LI_1213_Binocs05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "707503291": {
+      "instanceName": "IS_SC_3022_GreySkip_01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1334606158": {
+      "instanceName": "IS_SC_3424_GreySkip_02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "207133989": {
+      "instanceName": "IS_SC_3422_GreySkip_03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3158431604": {
+      "instanceName": "IS_SC_3323_GreySkip_04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3588567267": {
+      "instanceName": "IS_PI_1525_SandCastle01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3588567264": {
+      "instanceName": "IS_PI_1525_SandCastle02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3572714083": {
+      "instanceName": "IS_PI_1426_SandCastle03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2330692224": {
+      "instanceName": "IS_PI_1425_Punchbag01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3067601229": {
+      "instanceName": "IS_PI_1526_Punchbag02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3067601228": {
+      "instanceName": "IS_PI_1526_Punchbag03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1736800916": {
+      "instanceName": "NY_DT_1924_Bollard01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4022151673": {
+      "instanceName": "NY_DT_2123_Bollard02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3310314447": {
+      "instanceName": "NY_DT_2025_Bollard03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1081695320": {
+      "instanceName": "NY_UT_1505_Gumball01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2165102865": {
+      "instanceName": "NY_UT_1705_Gumball02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1151268609": {
+      "instanceName": "NY_UT_1704_Gumball03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3276275958": {
+      "instanceName": "NY_UT_1803_Gumball04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3023489373": {
+      "instanceName": "NY_DTW_1719_ClockFace",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3557991561": {
+      "instanceName": "NY_TS_1613_WaterDisp01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1500300944": {
+      "instanceName": "NY_TS_1714_WaterDisp02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1730227255": {
+      "instanceName": "NY_TS_1712_WaterDisp03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1542952625": {
+      "instanceName": "NY_TS_1713_WaterDisp04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1542952624": {
+      "instanceName": "NY_TS_1713_WaterDisp05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2745045026": {
+      "instanceName": "WI_FL_0507_Scarecrow01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2273409417": {
+      "instanceName": "WI_FL_0406_Scarecrow02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2637060426": {
+      "instanceName": "WI_FL_0606_Scarecrow03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "81416697": {
+      "instanceName": "NY_UT_1805_RedBush",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3693172216": {
+      "instanceName": "NY_UT_1805_YellowBush",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "122772684": {
+      "instanceName": "NY_UT_1805_PinkBush",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "417377768": {
+      "instanceName": "NY_UT_1805_BlueBush",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1561987566": {
+      "instanceName": "NY_TS_1611_HotelSign",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1241009952": {
+      "instanceName": "NY_BE_2311_JukeBox01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1241009955": {
+      "instanceName": "NY_BE_2311_JukeBox02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4222910379": {
+      "instanceName": "NY_BE_2310_JukeBox03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "9166535": {
+      "instanceName": "NY_DTE_2121_BrickStatue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2937345255": {
+      "instanceName": "NY_DTE_2121_BrickStatue_Red",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2863050738": {
+      "instanceName": "NY_DTE_2121_BrickStatue_Yellow",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2426909810": {
+      "instanceName": "NY_DTE_2121_BrickStatue_Blue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2917190509": {
+      "instanceName": "NY_BE_2209_BlueBush",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2074762237": {
+      "instanceName": "NY_BE_2209_PinkBush",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1637019302": {
+      "instanceName": "NY_BE_2209_RedBush",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3219541785": {
+      "instanceName": "NY_BE_2209_YellowBush",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2232202352": {
+      "instanceName": "NY_LCX_2004_PhoneBox01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "293944682": {
+      "instanceName": "NY_LCX_2003_PhoneBox02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "617978109": {
+      "instanceName": "NY_LCX_2104_PhoneBox03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "555348193": {
+      "instanceName": "NY_LCX_1904_PhoneBox04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3076896250": {
+      "instanceName": "NY_CP_1507_SandCastle01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3927770752": {
+      "instanceName": "NY_CP_1607_SandCastle02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3927770753": {
+      "instanceName": "NY_CP_1607_SandCastle03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "366952125": {
+      "instanceName": "NY_DTE_2222_PhoneBooth01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "195420007": {
+      "instanceName": "NY_DTE_2319_PhoneBooth02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2253287771": {
+      "instanceName": "NY_DTE_2121_PhoneBooth03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1047186682": {
+      "instanceName": "NY_DTE_2321_PhoneBooth04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1432492835": {
+      "instanceName": "SF_DO_0817_Cherrys01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3429894757": {
+      "instanceName": "SF_DO_0917_Cherrys02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1910015728": {
+      "instanceName": "SF_DO_0816_Cherrys03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1414265933": {
+      "instanceName": "SF_DO_0815_BoxBananas",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3480747954": {
+      "instanceName": "SF_DO_0915_BoxBananas",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1884254248": {
+      "instanceName": "SF_DO_0715_BoxBananas",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3543859986": {
+      "instanceName": "SF_RD_0821_Swing_BI",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "616632632": {
+      "instanceName": "SF_RD_0821_SeeSaw_BI",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2101346109": {
+      "instanceName": "SF_RD_0821_Slide_BI",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "132643829": {
+      "instanceName": "SF_RD_0821_MerryGoRound_BI",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4166312812": {
+      "instanceName": "SF_RD_0821_BarHop_BI",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4184132246": {
+      "instanceName": "SF_DO_1018_Buoy01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3998885864": {
+      "instanceName": "SF_DO_1017_Buoy02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3998885865": {
+      "instanceName": "SF_DO_1017_Buoy03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2245051569": {
+      "instanceName": "SF_DO_1016_Buoy04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2245051568": {
+      "instanceName": "SF_DO_1016_Buoy05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "77413039": {
+      "instanceName": "NY_CT_1818_Lantern01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "77413036": {
+      "instanceName": "NY_CT_1818_Lantern02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "77413037": {
+      "instanceName": "NY_CT_1818_Lantern03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "77413034": {
+      "instanceName": "NY_CT_1818_Lantern04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1977672816": {
+      "instanceName": "NY_DT_2025_BobPortrait",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2655957260": {
+      "instanceName": "NY_DT_2025_BobPortrait_Red",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1713324763": {
+      "instanceName": "NY_DT_2025_BobPortrait_Yellow",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2026251550": {
+      "instanceName": "NY_TS_1714_Vendor01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2433810607": {
+      "instanceName": "NY_TS_1613_Vendor02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1985703405": {
+      "instanceName": "NY_TS_1713_Vendor03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3248552221": {
+      "instanceName": "NY_UT_1604_Knight01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4143961719": {
+      "instanceName": "NY_UT_1603_Knight02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2836877844": {
+      "instanceName": "NY_CP_1608_LifeRing01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2836877847": {
+      "instanceName": "NY_CP_1608_LifeRing02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2836877846": {
+      "instanceName": "NY_CP_1608_LifeRing03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3037151424": {
+      "instanceName": "SF_RD_0919_DogKennel01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3037151427": {
+      "instanceName": "SF_RD_0919_DogKennel02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1780262406": {
+      "instanceName": "SF_RD_0821_DogKennel03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3788616782": {
+      "instanceName": "SF_RD_1122_Tree01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3788616781": {
+      "instanceName": "SF_RD_1122_Tree02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3788616780": {
+      "instanceName": "SF_RD_1122_Tree03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3841797529": {
+      "instanceName": "WI_FL_0505_WheelBarrow01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1219344443": {
+      "instanceName": "WI_FL_0508_WheelBarrow02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "886842469": {
+      "instanceName": "WI_FL_0705_WheelBarrow03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4076140861": {
+      "instanceName": "WI_FO_0802_Satellite01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4076140862": {
+      "instanceName": "WI_FO_0802_Satellite02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3446673011": {
+      "instanceName": "SF_RD_0820_Satellite01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3809437501": {
+      "instanceName": "SF_RD_0919_Satellite02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3809437500": {
+      "instanceName": "SF_RD_0919_Satellite03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2775080710": {
+      "instanceName": "SF_RD_0819_Satellite04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "903247862": {
+      "instanceName": "SF_RD_1022_BGum01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "903247861": {
+      "instanceName": "SF_RD_1022_BGum02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "903247860": {
+      "instanceName": "SF_RD_1022_BGum03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4198620988": {
+      "instanceName": "SF_RD_1023_BGum04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1479167923": {
+      "instanceName": "SF_RD_0923_BGum05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3697616875": {
+      "instanceName": "NY_CP_1608_CheepCheep",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1710460537": {
+      "instanceName": "SF_RD_0922_Furniture01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1710460538": {
+      "instanceName": "SF_RD_0922_Furniture02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1257335344": {
+      "instanceName": "SF_RD_0919_Dspot",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "920016214": {
+      "instanceName": "SF_RD_1019_Dspot",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3990423428": {
+      "instanceName": "SF_RD_1023_Safe",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1650358612": {
+      "instanceName": "SF_RD_1121_DaveGet",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1103133407": {
+      "instanceName": "SF_RD_0920_DrillSpot",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "144224619": {
+      "instanceName": "SF_DO_0916_Bananas01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "144224616": {
+      "instanceName": "SF_DO_0916_Bananas02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "144224617": {
+      "instanceName": "SF_DO_0916_Bananas03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1738911490": {
+      "instanceName": "NY_BE_2309_Flamingo01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1738911489": {
+      "instanceName": "NY_BE_2309_Flamingo02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1738911488": {
+      "instanceName": "NY_BE_2309_Flamingo03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3647978738": {
+      "instanceName": "NY_BE_2209_PalmTree01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2173703417": {
+      "instanceName": "NY_BE_2308_PalmTree02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3682769036": {
+      "instanceName": "NY_BE_2212_PalmTree03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3001582365": {
+      "instanceName": "NY_BE_2309_SurfBoard01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1715450120": {
+      "instanceName": "NY_BE_2310_SurfBoard02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2874801364": {
+      "instanceName": "NY_BE_2311_SurfBoard03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "388157414": {
+      "instanceName": "NY_TS_1713_Store01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "388157413": {
+      "instanceName": "NY_TS_1713_Store02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "388157412": {
+      "instanceName": "NY_TS_1713_Store03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "456531547": {
+      "instanceName": "NY_TS_1713_StoreDoor",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1871622806": {
+      "instanceName": "NY_TS_1713_HotelDoor",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1351448725": {
+      "instanceName": "NY_LCX_2104_Bin01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3712018843": {
+      "instanceName": "NY_LCX_2105_Bin02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "328717937": {
+      "instanceName": "NY_LCX_2003_Bin03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "128698785": {
+      "instanceName": "NY_LI_2315_StatueBall01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "883905063": {
+      "instanceName": "NY_LI_2415_FootBall02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2205153282": {
+      "instanceName": "NY_LI_2317_AstroBall03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "373473464": {
+      "instanceName": "NY_DTW_1719_BasketBall01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3128890966": {
+      "instanceName": "NY_DTW_1819_BasketBall02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "161223220": {
+      "instanceName": "NY_DTW_1920_BasketBall03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "153169891": {
+      "instanceName": "NY_DTW_1719_BBallEasy",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3137959037": {
+      "instanceName": "NY_DTW_1719_BBallMed",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "236372625": {
+      "instanceName": "NY_DTW_1719_BBallHrd",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3095713768": {
+      "instanceName": "NY_DTW_1819_BBallEasy",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3400155080": {
+      "instanceName": "NY_DTW_1819_BBallMed",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "665947644": {
+      "instanceName": "NY_DTW_1819_BBallHrd",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3488031753": {
+      "instanceName": "NY_DTW_1920_BBallEasy",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2876039027": {
+      "instanceName": "NY_DTW_1920_BBallMed",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4067985323": {
+      "instanceName": "NY_DTW_1920_BBallHrd",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3754132809": {
+      "instanceName": "NY_DTW_1819_StrongMan01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3754132810": {
+      "instanceName": "NY_DTW_1819_StrongMan02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3265247023": {
+      "instanceName": "NY_DTW_1820_StrongMan03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "123553192": {
+      "instanceName": "NY_CP_1509_Bollard01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "123553195": {
+      "instanceName": "NY_CP_1509_Bollard02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3218470912": {
+      "instanceName": "NY_CP_1608_Bollard03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1452928282": {
+      "instanceName": "NY_CP_1609_Bollard04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1260603385": {
+      "instanceName": "NY_CT_1816_Lampost01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1260603386": {
+      "instanceName": "NY_CT_1816_Lampost02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1260603387": {
+      "instanceName": "NY_CT_1816_Lampost03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1719919414": {
+      "instanceName": "NY_CP_1708_Balloon01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1719919413": {
+      "instanceName": "NY_CP_1708_Balloon02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1719919412": {
+      "instanceName": "NY_CP_1708_Balloon03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3911733245": {
+      "instanceName": "NY_DT_2025_Portrait",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "754245412": {
+      "instanceName": "SF_DO_1018_Beach01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "754245415": {
+      "instanceName": "SF_DO_1018_Beach02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "754245414": {
+      "instanceName": "SF_DO_1018_Beach03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2699929318": {
+      "instanceName": "SF_DO_1017_Beach04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2699929319": {
+      "instanceName": "SF_DO_1017_Beach05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1697307227": {
+      "instanceName": "SF_DO_0815_StudRun",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3002784872": {
+      "instanceName": "WI_FO_0601_BirdHse01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2716076957": {
+      "instanceName": "WI_FO_0702_BirdHse02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1665480099": {
+      "instanceName": "WI_FO_0802_BirdHse03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3335503546": {
+      "instanceName": "WI_FO_0702_BearPuzzle",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1481470662": {
+      "instanceName": "WI_FO_0702_Tent01_BI",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1214631686": {
+      "instanceName": "WI_FO_0702_Tent01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1214631685": {
+      "instanceName": "WI_FO_0702_Tent02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2585758605": {
+      "instanceName": "WI_FO_1003_Gong01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2631551519": {
+      "instanceName": "WI_FO_1004_Gong02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2631551518": {
+      "instanceName": "WI_FO_1004_Gong03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2706343096": {
+      "instanceName": "NY_CT_1717_Bonzai01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3593753140": {
+      "instanceName": "NY_CT_1716_Bonzai02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2972819411": {
+      "instanceName": "NY_CT_1817_Bonzai03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2723251128": {
+      "instanceName": "NY_DT_2024_Bull",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4255675405": {
+      "instanceName": "NY_CT_1717_Post01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4255675406": {
+      "instanceName": "NY_CT_1717_Post02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2230713348": {
+      "instanceName": "NY_CT_1716_Post03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3264731658": {
+      "instanceName": "NY_CT_1816_Post04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1581978628": {
+      "instanceName": "NY_CT_1719_BballCol01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1416970833": {
+      "instanceName": "NY_CT_1920_BballCol02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1172002255": {
+      "instanceName": "NY_CT_1819_BballCol03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "454728166": {
+      "instanceName": "NY_CT_1719_Baloon01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "454728165": {
+      "instanceName": "NY_CT_1719_Baloon02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3429244101": {
+      "instanceName": "NY_CT_1820_Baloon03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3429244098": {
+      "instanceName": "NY_CT_1820_Baloon04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2193002613": {
+      "instanceName": "NY_CT_1819_Bouncy",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3000523841": {
+      "instanceName": "NY_BE_2410_CastleBI01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3000523842": {
+      "instanceName": "NY_BE_2410_CastleBI02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3000523843": {
+      "instanceName": "NY_BE_2410_CastleBI03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1947455814": {
+      "instanceName": "NY_DTE_2221_BulletBill",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3896257151": {
+      "instanceName": "NY_LI_2416_BrownScoop",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "547452061": {
+      "instanceName": "NY_LI_2416_PinkScoop",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "880467483": {
+      "instanceName": "WI_FO_0502_CameoBox01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4081946798": {
+      "instanceName": "NY_LCX_2006_CameoBox02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2340984659": {
+      "instanceName": "IS_SC_3324_CameoBox03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2057751543": {
+      "instanceName": "NY_CT_1718_CameoBox04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1642269414": {
+      "instanceName": "SF_DO_0715_CameoBox05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1959525987": {
+      "instanceName": "NY_LI_2415_MarioStar01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4165292798": {
+      "instanceName": "NY_TS_1612_MarioStar02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1997067267": {
+      "instanceName": "NY_UT_1506_MarioStar03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2409861838": {
+      "instanceName": "SF_RD_1020_MarioStar04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1491853499": {
+      "instanceName": "NY_BE_2408_MarioStar05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3099182776": {
+      "instanceName": "NY_CP_1708_BirdHouse01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3746997760": {
+      "instanceName": "NY_CP_1707_BirdHouse02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3369602744": {
+      "instanceName": "NY_CP_1711_BirdHouse03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "987215655": {
+      "instanceName": "NY_UT_1505_FishRod01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "987215652": {
+      "instanceName": "NY_UT_1505_FishRod02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "987215653": {
+      "instanceName": "NY_UT_1505_FishRod03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1315936017": {
+      "instanceName": "NY_LI_2317_Catapult",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4287615578": {
+      "instanceName": "IS_PI_1525_RockToken",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3162138611": {
+      "instanceName": "IS_PI_1426_PalletToken",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4113847571": {
+      "instanceName": "NY_BE_2212_RockToken",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1005290152": {
+      "instanceName": "NY_MT_2413_RockToken",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1779771315": {
+      "instanceName": "NY_TS_1614_PalletToken",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2296157820": {
+      "instanceName": "WI_FL_0806_RockToken",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3783114387": {
+      "instanceName": "NY_CP_1710_ShipWheel01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3783114384": {
+      "instanceName": "NY_CP_1710_ShipWheel02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1658346283": {
+      "instanceName": "NY_CP_1608_ShipWheel03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3558998266": {
+      "instanceName": "WI_FO_1004_PiranhaPlant",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3600351817": {
+      "instanceName": "SF_DO_0817_Water",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2292276191": {
+      "instanceName": "NY_BE_2211_Water",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2714144212": {
+      "instanceName": "NT_DT_2025_CameoPipe",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3925933023": {
+      "instanceName": "IS_SC_3321_Keypad",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "106771877": {
+      "instanceName": "NY_DT_2024_AstroCrate",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1375908051": {
+      "instanceName": "WI_FO_0701_SilverCrate",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2438119146": {
+      "instanceName": "NY_UT_1604_Pharoah",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "319982098": {
+      "instanceName": "NY_LCX_2104_GarageDoor",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3800822973": {
+      "instanceName": "SF_DO_0918_DSPot_RedBrick",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2403728762": {
+      "instanceName": "IS_PI_1426_SecretDoor",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2296546205": {
+      "instanceName": "IS_PI_1526_Teleporter",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2466378889": {
+      "instanceName": "WI_FL_0807_DynamitePuzzle01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1955383621": {
+      "instanceName": "WI_FL_0806_DynamitePuzzle02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1955383620": {
+      "instanceName": "WI_FL_0806_DynamitePuzzle03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1966746919": {
+      "instanceName": "SF_DO_0916_PKR_Gate",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3887604342": {
+      "instanceName": "SF_DO_0916_PKR_FireDoor",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "574448553": {
+      "instanceName": "SF_DO_0916_PKR_Garage",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1181341686": {
+      "instanceName": "SF_DO_0916_PKR_FireExt01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3903262529": {
+      "instanceName": "SF_DO_0916_PKR_Sunflower",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3872687340": {
+      "instanceName": "WI_FO_0602_PKR_Vines",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3856802482": {
+      "instanceName": "WI_FO_0602_PKR_WallKicks",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2485519055": {
+      "instanceName": "WI_FO_0602_PKR_Boulders",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2975355837": {
+      "instanceName": "WI_FO_0602_PKR_FCPanels",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4007553426": {
+      "instanceName": "BR_BB_1521_PKR_DrillSpot",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2303779857": {
+      "instanceName": "NY_DTW_1820_PKR_Tramp",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "709306456": {
+      "instanceName": "NY_DT_1924_PKR_WallRun",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2220551516": {
+      "instanceName": "IS_SC_3422_PKR_Flower",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "87572206": {
+      "instanceName": "NY_TS_1713_PKR_Tramp",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "895882723": {
+      "instanceName": "WI_FL_0705_PKR_Vines",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "551272808": {
+      "instanceName": "NY_LCX_2004_PKR_Tramp",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "730638754": {
+      "instanceName": "NY_LI_2417_PKR_Flower01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "285468972": {
+      "instanceName": "NY_LI_2418_PKR_Flower02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3422996434": {
+      "instanceName": "IS_PI_1526_PKR_Flower",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1254984508": {
+      "instanceName": "IS_PI_1526_PKR_BnEDoor",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1560277179": {
+      "instanceName": "NY_DTW_1820_PKR_Tramp02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "434770686": {
+      "instanceName": "NY_DTW_1820_PKR_Vines",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2808074253": {
+      "instanceName": "SF_RD_0822_Pallet_DetSpot",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1202895009": {
+      "instanceName": "SF_RD_0822_Bin_Buildits",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2494053560": {
+      "instanceName": "SF_RD_0822_Hop_Buildit",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1155487379": {
+      "instanceName": "WI_FO_0701_Brick_RockClue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2360533919": {
+      "instanceName": "WI_FO_0702_Brick_RockClue01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2360533916": {
+      "instanceName": "WI_FO_0702_Brick_RockClue02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3640887243": {
+      "instanceName": "WI_FO_0801_Brick_RockClue01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3640887240": {
+      "instanceName": "WI_FO_0801_Brick_RockClue02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3640887241": {
+      "instanceName": "WI_FO_0801_Brick_RockClue03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3902281181": {
+      "instanceName": "WI_FO_0801_Brick_TreeClue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2316711172": {
+      "instanceName": "WI_FO_0901_Brick_RockClue01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2316711175": {
+      "instanceName": "WI_FO_0901_Brick_RockClue02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2316711174": {
+      "instanceName": "WI_FO_0901_Brick_RockClue03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3414614532": {
+      "instanceName": "WI_FO_0902_Brick_RockClue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "655959850": {
+      "instanceName": "WI_FO_0902_Brick_ShrineClue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "747415705": {
+      "instanceName": "WI_FO_0902_Brick_CrabClue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3569924369": {
+      "instanceName": "WI_FO_0902_Brick_PreserverClue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "712151869": {
+      "instanceName": "WI_FO_0902_Brick_DumpsterClue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1506378842": {
+      "instanceName": "WI_FO_1002_Brick_RockClue",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3203690692": {
+      "instanceName": "IS_PI_1225_PrisonGates",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "171791440": {
+      "instanceName": "LCU_FLOW_8_2_PigLoc01",
+      "objectiveTypeId": "FARMER_Pigs_FLOW",
+      "cityDistrict": ""
+    },
+    "171791443": {
+      "instanceName": "LCU_FLOW_8_2_PigLoc02",
+      "objectiveTypeId": "FARMER_Pigs_FLOW",
+      "cityDistrict": ""
+    },
+    "171791442": {
+      "instanceName": "LCU_FLOW_8_2_PigLoc03",
+      "objectiveTypeId": "FARMER_Pigs_FLOW",
+      "cityDistrict": ""
+    },
+    "2397727022": {
+      "instanceName": "LCPD_Lobby_Portrait01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2397727021": {
+      "instanceName": "LCPD_Lobby_Portrait02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2397727020": {
+      "instanceName": "LCPD_Lobby_Portrait03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2397727019": {
+      "instanceName": "LCPD_Lobby_Portrait04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "854462382": {
+      "instanceName": "LCPD_Lobby_RideOn01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "854462381": {
+      "instanceName": "LCPD_Lobby_RideOn02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2192322583": {
+      "instanceName": "LCPD_Lobby_Dynamite",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "753712927": {
+      "instanceName": "LCPD_BR_PopCorn",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "551317876": {
+      "instanceName": "LCPD_BR_Donut",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "906457982": {
+      "instanceName": "LCPD_BM_GB_VehShop",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3748795937": {
+      "instanceName": "LCPD_BM_GB_RBShop",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2847110150": {
+      "instanceName": "LCPD_BM_GB_GBShop",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "360236537": {
+      "instanceName": "LCPD_BM_GB_FireDoor",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "856694842": {
+      "instanceName": "LCPD_BM_Safe",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1765162174": {
+      "instanceName": "LCPD_BM_GBShopDoor",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1611827794": {
+      "instanceName": "LCPD_BM_ShaftBrick",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2298972408": {
+      "instanceName": "LCPD_LU_GB_Crate",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1438676959": {
+      "instanceName": "SF_ROOF_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1438676956": {
+      "instanceName": "SF_ROOF_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1438676957": {
+      "instanceName": "SF_ROOF_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1438676954": {
+      "instanceName": "SF_ROOF_BR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1438676955": {
+      "instanceName": "SF_ROOF_BR05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "814759477": {
+      "instanceName": "SF_ROOF_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "814759478": {
+      "instanceName": "SF_ROOF_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "814759479": {
+      "instanceName": "SF_ROOF_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3250954001": {
+      "instanceName": "SF_ROOF_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3250954002": {
+      "instanceName": "SF_ROOF_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3250954003": {
+      "instanceName": "SF_ROOF_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2209435685": {
+      "instanceName": "SF_ROOF_BRICK",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4248388962": {
+      "instanceName": "SF_ROOF_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4248388961": {
+      "instanceName": "SF_ROOF_BRICK_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4248388960": {
+      "instanceName": "SF_ROOF_BRICK_CLUE03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2947205650": {
+      "instanceName": "SF_ROOF_CT01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2947205649": {
+      "instanceName": "SF_ROOF_CT02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "27778630": {
+      "instanceName": "SF_ROOF_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "27778629": {
+      "instanceName": "SF_ROOF_CT02_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1456558357": {
+      "instanceName": "SF_ROOF_VT01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2492183026": {
+      "instanceName": "SF_ROOF_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1456558358": {
+      "instanceName": "SF_ROOF_VT02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2554284859": {
+      "instanceName": "SF_ROOF_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2554284856": {
+      "instanceName": "SF_ROOF_VT02_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "528735468": {
+      "instanceName": "PRISON_CELLS_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "528735471": {
+      "instanceName": "PRISON_CELLS_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "528735470": {
+      "instanceName": "PRISON_CELLS_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "528735465": {
+      "instanceName": "PRISON_CELLS_TL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "528735464": {
+      "instanceName": "PRISON_CELLS_TL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2548866440": {
+      "instanceName": "PRISON_REX_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2548866443": {
+      "instanceName": "PRISON_REX_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2412184095": {
+      "instanceName": "PRISON_WARD_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3345307190": {
+      "instanceName": "PRISON_HOS_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3345307191": {
+      "instanceName": "PRISON_HOS_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3345307184": {
+      "instanceName": "PRISON_HOS_BL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3345307185": {
+      "instanceName": "PRISON_HOS_BL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3345307186": {
+      "instanceName": "PRISON_HOS_BL06",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2596494644": {
+      "instanceName": "PRISON_CELLS_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2596494647": {
+      "instanceName": "PRISON_CELLS_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2596494646": {
+      "instanceName": "PRISON_CELLS_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2596494641": {
+      "instanceName": "PRISON_CELLS_BR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2672318974": {
+      "instanceName": "PRISON_CELLS_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2672318973": {
+      "instanceName": "PRISON_CELLS_CT01_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2139157532": {
+      "instanceName": "PRISON_WARD_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "338634627": {
+      "instanceName": "PRISON_CELLS_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1333775384": {
+      "instanceName": "PRISON_WORK_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1333775387": {
+      "instanceName": "PRISON_WORK_VT02_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2205288859": {
+      "instanceName": "PRISON_WORK_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2205288856": {
+      "instanceName": "PRISON_WORK_BRICK_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3283244166": {
+      "instanceName": "MINE_CRATE_FLIP",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2753852062": {
+      "instanceName": "MINE_TUN_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2753852061": {
+      "instanceName": "MINE_TUN_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2753852060": {
+      "instanceName": "MINE_TUN_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2753852059": {
+      "instanceName": "MINE_TUN_TL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2753852058": {
+      "instanceName": "MINE_TUN_TL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "810605440": {
+      "instanceName": "MINE_TUN_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2860750717": {
+      "instanceName": "MINE_CAV_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2860750718": {
+      "instanceName": "MINE_CAV_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2860750719": {
+      "instanceName": "MINE_CAV_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "776191987": {
+      "instanceName": "MINE_CAV_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "776191984": {
+      "instanceName": "MINE_CAV_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "776191985": {
+      "instanceName": "MINE_CAV_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "776191990": {
+      "instanceName": "MINE_CAV_BR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "776191991": {
+      "instanceName": "MINE_CAV_BR05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2455648008": {
+      "instanceName": "MINE_TUN_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "361298885": {
+      "instanceName": "MINE_TUN_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1656641173": {
+      "instanceName": "MINE_TUN_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1656641174": {
+      "instanceName": "MINE_TUN_VT01_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4293523031": {
+      "instanceName": "MINE_CAV_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2359821361": {
+      "instanceName": "MINE_CAV_BRICK",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "427811728": {
+      "instanceName": "TEM_DOJO_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "427811731": {
+      "instanceName": "TEM_DOJO_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "427811730": {
+      "instanceName": "TEM_DOJO_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "427811733": {
+      "instanceName": "TEM_DOJO_TL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3979286385": {
+      "instanceName": "TEM_COUR_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3979286386": {
+      "instanceName": "TEM_COUR_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3979286387": {
+      "instanceName": "TEM_COUR_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1566108678": {
+      "instanceName": "TEM_DOJO_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1566108677": {
+      "instanceName": "TEM_DOJO_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1566108676": {
+      "instanceName": "TEM_DOJO_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1566108675": {
+      "instanceName": "TEM_DOJO_BL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1566108674": {
+      "instanceName": "TEM_DOJO_BL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1566108673": {
+      "instanceName": "TEM_DOJO_BL06",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "472409027": {
+      "instanceName": "TEM_COUR_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "472409024": {
+      "instanceName": "TEM_COUR_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "472409025": {
+      "instanceName": "TEM_COUR_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "472409030": {
+      "instanceName": "TEM_COUR_BR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "472409031": {
+      "instanceName": "TEM_COUR_BR05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "169117363": {
+      "instanceName": "TEM_COUR_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2775081995": {
+      "instanceName": "TEM_DOJO_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2775081992": {
+      "instanceName": "TEM_DOJO_CT02_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "713204046": {
+      "instanceName": "TEM_COUR_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2092371382": {
+      "instanceName": "TEM_DOJO_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2092371381": {
+      "instanceName": "TEM_DOJO_VT02_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "428455829": {
+      "instanceName": "TEM_DOJO_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "428455830": {
+      "instanceName": "TEM_DOJO_BRICK_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "428455831": {
+      "instanceName": "TEM_DOJO_BRICK_CLUE03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "428455824": {
+      "instanceName": "TEM_DOJO_BRICK_CLUE04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "443251735": {
+      "instanceName": "BAN_SEW1_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1957638952": {
+      "instanceName": "BAN_SEW2_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1957638955": {
+      "instanceName": "BAN_SEW2_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1957638954": {
+      "instanceName": "BAN_SEW2_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1957638957": {
+      "instanceName": "BAN_SEW2_TR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1941449495": {
+      "instanceName": "BAN_VAU_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1941449492": {
+      "instanceName": "BAN_VAU_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1941449493": {
+      "instanceName": "BAN_VAU_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1941449490": {
+      "instanceName": "BAN_VAU_BL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3330227812": {
+      "instanceName": "BAN_INT_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3330227815": {
+      "instanceName": "BAN_INT_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3330227814": {
+      "instanceName": "BAN_INT_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3330227809": {
+      "instanceName": "BAN_INT_BR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3330227808": {
+      "instanceName": "BAN_INT_BR05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1524770374": {
+      "instanceName": "BAN_SEW_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2542015421": {
+      "instanceName": "BAN_SEW2_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "103659408": {
+      "instanceName": "BAN_CON_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2008420641": {
+      "instanceName": "BAN_INT_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1763948594": {
+      "instanceName": "SPA_CON_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1763948593": {
+      "instanceName": "SPA_CON_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1763948592": {
+      "instanceName": "SPA_CON_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "82641068": {
+      "instanceName": "SPA_CON_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "82641071": {
+      "instanceName": "SPA_CON_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "82641070": {
+      "instanceName": "SPA_CON_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "82641065": {
+      "instanceName": "SPA_CON_TR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1433088194": {
+      "instanceName": "SPA_SHU_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1433088193": {
+      "instanceName": "SPA_SHU_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1433088192": {
+      "instanceName": "SPA_SHU_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1433088199": {
+      "instanceName": "SPA_SHU_BL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1433088198": {
+      "instanceName": "SPA_SHU_BL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4051970908": {
+      "instanceName": "SPA_SHU_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4104165500": {
+      "instanceName": "SPA_CON_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3027626873": {
+      "instanceName": "SPA_CON_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2266528027": {
+      "instanceName": "SPA_SHU_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2865729618": {
+      "instanceName": "SPA_SHU_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "981244793": {
+      "instanceName": "SPA_SHU_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "981244794": {
+      "instanceName": "SPA_SHU_BRICK_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "981244795": {
+      "instanceName": "SPA_SHU_BRICK_CLUE03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2182146613": {
+      "instanceName": "SCR_ENT_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2182146614": {
+      "instanceName": "SCR_ENT_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2182146615": {
+      "instanceName": "SCR_ENT_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2182146608": {
+      "instanceName": "SCR_ENT_TL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "100147675": {
+      "instanceName": "SCR_ENT_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1538186896": {
+      "instanceName": "SCR_ARE_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1538186899": {
+      "instanceName": "SCR_ARE_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1538186898": {
+      "instanceName": "SCR_ARE_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1538186901": {
+      "instanceName": "SCR_ARE_BL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1339121102": {
+      "instanceName": "SCR_ARE_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1339121101": {
+      "instanceName": "SCR_ARE_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1339121100": {
+      "instanceName": "SCR_ARE_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1339121099": {
+      "instanceName": "SCR_ARE_BR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1339121098": {
+      "instanceName": "SCR_ARE_BR05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1339121097": {
+      "instanceName": "SCR_ARE_BR06",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2930092193": {
+      "instanceName": "SCR_ENT_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1431919405": {
+      "instanceName": "SCR_ARE_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "424786412": {
+      "instanceName": "SCR_ENT_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4248829344": {
+      "instanceName": "SCR_ARE_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4248829347": {
+      "instanceName": "SCR_ARE_VT02_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3563342748": {
+      "instanceName": "SCR_ENT_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3704646662": {
+      "instanceName": "MUS_01_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3704646661": {
+      "instanceName": "MUS_01_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3704646660": {
+      "instanceName": "MUS_01_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3704646659": {
+      "instanceName": "MUS_01_TL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3704646658": {
+      "instanceName": "MUS_01_TL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1221956440": {
+      "instanceName": "MUS_01_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1221956443": {
+      "instanceName": "MUS_01_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1221956442": {
+      "instanceName": "MUS_01_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1221956445": {
+      "instanceName": "MUS_01_TR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1221956444": {
+      "instanceName": "MUS_01_TR05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4176705717": {
+      "instanceName": "MUS_02_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4176705718": {
+      "instanceName": "MUS_02_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4176705719": {
+      "instanceName": "MUS_02_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4176705712": {
+      "instanceName": "MUS_02_BL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2094706779": {
+      "instanceName": "MUS_02_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2094706776": {
+      "instanceName": "MUS_02_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "343999888": {
+      "instanceName": "MUS_01_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "605288914": {
+      "instanceName": "MUS_02_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3996688662": {
+      "instanceName": "MUS_02_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3996688661": {
+      "instanceName": "MUS_02_VT01_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1277584544": {
+      "instanceName": "MUS_01_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1951994190": {
+      "instanceName": "MUS_02_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1951994189": {
+      "instanceName": "MUS_02_BRICK_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1951994188": {
+      "instanceName": "MUS_02_BRICK_CLUE03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "185456162": {
+      "instanceName": "SEC_LAB_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "185456161": {
+      "instanceName": "SEC_LAB_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "185456160": {
+      "instanceName": "SEC_LAB_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "185456167": {
+      "instanceName": "SEC_LAB_TL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "185456166": {
+      "instanceName": "SEC_LAB_TL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "199052674": {
+      "instanceName": "SEC_ENT_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "199052673": {
+      "instanceName": "SEC_ENT_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "199052672": {
+      "instanceName": "SEC_ENT_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3310883450": {
+      "instanceName": "SEC_ENT_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4091925466": {
+      "instanceName": "SEC_LAB_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4091925465": {
+      "instanceName": "SEC_LAB_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4091925464": {
+      "instanceName": "SEC_LAB_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4091925471": {
+      "instanceName": "SEC_LAB_BR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4091925470": {
+      "instanceName": "SEC_LAB_BR05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2443988494": {
+      "instanceName": "SEC_ENT_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1436648801": {
+      "instanceName": "SEC_HAN_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1367341583": {
+      "instanceName": "SEC_LAB_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "227471201": {
+      "instanceName": "MOO_CRA_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "227471202": {
+      "instanceName": "MOO_CRA_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "227471203": {
+      "instanceName": "MOO_CRA_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "227471204": {
+      "instanceName": "MOO_CRA_TL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "567849039": {
+      "instanceName": "MOO_CRA_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "567849036": {
+      "instanceName": "MOO_CRA_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "567849037": {
+      "instanceName": "MOO_CRA_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3273219127": {
+      "instanceName": "MOO_ROC_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3273219124": {
+      "instanceName": "MOO_ROC_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "891738128": {
+      "instanceName": "MOO_FIN_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "891738131": {
+      "instanceName": "MOO_FIN_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "891738130": {
+      "instanceName": "MOO_FIN_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "491392989": {
+      "instanceName": "MOO_CRA_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "491392990": {
+      "instanceName": "MOO_CRA_CT01_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "491392991": {
+      "instanceName": "MOO_CRA_CT01_CLUE03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2513475292": {
+      "instanceName": "MOO_ROC_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "235333374": {
+      "instanceName": "MOO_FIN_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "181014440": {
+      "instanceName": "MOO_CRA_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "181014443": {
+      "instanceName": "MOO_CRA_BRICK_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "31401": {
+      "instanceName": "CON_CS01_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "31402": {
+      "instanceName": "CON_CS01_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "31403": {
+      "instanceName": "CON_CS01_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1948500807": {
+      "instanceName": "CON_CS01_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1948500804": {
+      "instanceName": "CON_CS01_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1948500805": {
+      "instanceName": "CON_CS01_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1948500802": {
+      "instanceName": "CON_CS01_TR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1948500803": {
+      "instanceName": "CON_CS01_TR05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3415402514": {
+      "instanceName": "CON_CS02_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3415402513": {
+      "instanceName": "CON_CS02_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3415402512": {
+      "instanceName": "CON_CS02_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3415402519": {
+      "instanceName": "CON_CS02_BL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3415402518": {
+      "instanceName": "CON_CS02_BL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1734094988": {
+      "instanceName": "CON_CS02_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1734094991": {
+      "instanceName": "CON_CS02_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1734094990": {
+      "instanceName": "CON_CS02_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "372897446": {
+      "instanceName": "CON_CS02_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3953179688": {
+      "instanceName": "CON_CS01_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3114575160": {
+      "instanceName": "CON_CS01_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "349971010": {
+      "instanceName": "CON_CS02_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1648951776": {
+      "instanceName": "CON_CS01_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3541206100": {
+      "instanceName": "ICE_PAR_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3541206103": {
+      "instanceName": "ICE_PAR_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3541206102": {
+      "instanceName": "ICE_PAR_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3609302282": {
+      "instanceName": "ICE_PAR_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3609302281": {
+      "instanceName": "ICE_PAR_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3609302280": {
+      "instanceName": "ICE_PAR_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3609302287": {
+      "instanceName": "ICE_PAR_TR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "76414252": {
+      "instanceName": "ICE_OFF_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "76414255": {
+      "instanceName": "ICE_OFF_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "76414254": {
+      "instanceName": "ICE_OFF_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "76414249": {
+      "instanceName": "ICE_OFF_BL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "76414248": {
+      "instanceName": "ICE_OFF_BL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "76414251": {
+      "instanceName": "ICE_OFF_BL06",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "76414250": {
+      "instanceName": "ICE_OFF_BL07",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "76414245": {
+      "instanceName": "ICE_OFF_BL08",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1604368261": {
+      "instanceName": "ICE_FAC_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1604368262": {
+      "instanceName": "ICE_FAC_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1604368263": {
+      "instanceName": "ICE_FAC_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1786736614": {
+      "instanceName": "ICE_PAR_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1786736613": {
+      "instanceName": "ICE_PAR_CT01_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "650070207": {
+      "instanceName": "ICE_PAR_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2912116107": {
+      "instanceName": "ICE_PAR_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2912116104": {
+      "instanceName": "ICE_PAR_VT01_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1257894892": {
+      "instanceName": "ICE_OFF_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4216431721": {
+      "instanceName": "ICE_PAR_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4216431722": {
+      "instanceName": "ICE_PAR_BRICK_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4216431723": {
+      "instanceName": "ICE_PAR_BRICK_CLUE03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1360558212": {
+      "instanceName": "FIR_INT_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1360558215": {
+      "instanceName": "FIR_INT_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1360558214": {
+      "instanceName": "FIR_INT_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1360558209": {
+      "instanceName": "FIR_INT_TL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1360558208": {
+      "instanceName": "FIR_INT_TL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2340219449": {
+      "instanceName": "FIR_BOA_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1393957669": {
+      "instanceName": "FIR_BOA_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1393957670": {
+      "instanceName": "FIR_BOA_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1393957671": {
+      "instanceName": "FIR_BOA_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2585521772": {
+      "instanceName": "FIR_TRA_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2585521775": {
+      "instanceName": "FIR_TRA_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2585521774": {
+      "instanceName": "FIR_TRA_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2585521769": {
+      "instanceName": "FIR_TRA_BR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2585521768": {
+      "instanceName": "FIR_TRA_BR05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "160352758": {
+      "instanceName": "FIR_INT_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3756932383": {
+      "instanceName": "FIR_TRA_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "744023275": {
+      "instanceName": "FIR_TRA_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1414191202": {
+      "instanceName": "FIR_TRA_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4033997977": {
+      "instanceName": "FIR_INT_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3548288611": {
+      "instanceName": "BLA_CAV_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3548288608": {
+      "instanceName": "BLA_CAV_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3548288609": {
+      "instanceName": "BLA_CAV_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3480192333": {
+      "instanceName": "BLA_CAV_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3480192334": {
+      "instanceName": "BLA_CAV_TR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3480192335": {
+      "instanceName": "BLA_CAV_TR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3480192328": {
+      "instanceName": "BLA_CAV_TR04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1488937023": {
+      "instanceName": "BLA_LOU_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1153678833": {
+      "instanceName": "BLA_LOU_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "542627719": {
+      "instanceName": "BLA_CAV_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "542627716": {
+      "instanceName": "BLA_CAV_CT01_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2959076220": {
+      "instanceName": "BLA_LOU_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2399452890": {
+      "instanceName": "BLA_CAV_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1185553249": {
+      "instanceName": "BLA_LOU_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1702413658": {
+      "instanceName": "BLA_CAV_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1376307874": {
+      "instanceName": "BLA_EXT_TL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1376307873": {
+      "instanceName": "BLA_EXT_TL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "1376307872": {
+      "instanceName": "BLA_EXT_TL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2506385157": {
+      "instanceName": "BLA_STU_TR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "924936516": {
+      "instanceName": "BLA_EXT_BL01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "924936519": {
+      "instanceName": "BLA_EXT_BL02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "924936518": {
+      "instanceName": "BLA_EXT_BL03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "924936513": {
+      "instanceName": "BLA_EXT_BL04",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "924936512": {
+      "instanceName": "BLA_EXT_BL05",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "924936515": {
+      "instanceName": "BLA_EXT_BL06",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "987809882": {
+      "instanceName": "BLA_EXT_BR01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "987809881": {
+      "instanceName": "BLA_EXT_BR02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "987809880": {
+      "instanceName": "BLA_EXT_BR03",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3263401612": {
+      "instanceName": "BLA_EXT_CT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3263401615": {
+      "instanceName": "BLA_EXT_CT01_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "952174793": {
+      "instanceName": "BLA_EXT_CT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4132391746": {
+      "instanceName": "BLA_EXT_VT01_CLUE02",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4132391745": {
+      "instanceName": "BLA_EXT_VT01_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3731675460": {
+      "instanceName": "BLA_EXT_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "3172269711": {
+      "instanceName": "BLA_EXT_BRICK_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2229241828": {
+      "instanceName": "SEC_HAN_VT02_CLUE01",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "4058279356": {
+      "instanceName": "LEGO_BONUS_VTA",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2922844528": {
+      "instanceName": "LEGO_BONUS_THEFT",
+      "objectiveTypeId": "Clue",
+      "cityDistrict": ""
+    },
+    "2871866533": {
+      "instanceName": "SwapRed",
+      "objectiveTypeId": "CSwap_RED",
+      "cityDistrict": ""
+    },
+    "2917638102": {
+      "instanceName": "SwapOrange",
+      "objectiveTypeId": "CSwap_ORANGE",
+      "cityDistrict": ""
+    },
+    "127411760": {
+      "instanceName": "SwapYellow",
+      "objectiveTypeId": "CSwap_YELLOW",
+      "cityDistrict": ""
+    },
+    "1207519977": {
+      "instanceName": "SwapGreen",
+      "objectiveTypeId": "CSwap_GREEN",
+      "cityDistrict": ""
+    },
+    "3216771372": {
+      "instanceName": "SwapBlue",
+      "objectiveTypeId": "CSwap_BLUE",
+      "cityDistrict": ""
+    },
+    "3795787814": {
+      "instanceName": "SwapPurple",
+      "objectiveTypeId": "CSwap_PURPLE",
+      "cityDistrict": ""
+    },
+    "223516860": {
+      "instanceName": "SwapPink",
+      "objectiveTypeId": "CSwap_PINK",
+      "cityDistrict": ""
+    },
+    "329245068": {
+      "instanceName": "SwapBrown",
+      "objectiveTypeId": "CSwap_BROWN",
+      "cityDistrict": ""
+    },
+    "390067802": {
+      "instanceName": "SwapGold",
+      "objectiveTypeId": "CSwap_GOLD",
+      "cityDistrict": ""
+    },
+    "3501377827": {
+      "instanceName": "SwapSilver",
+      "objectiveTypeId": "CSwap_SILVER",
+      "cityDistrict": ""
+    }
+  },
+  "superbricks": {
+    "2490": {
+      "resource": "wi_farmlands_0708.giz",
+      "index": 36,
+      "name": "j_pup"
+    },
+    "2488": {
+      "resource": "wi_farmlands_0708.giz",
+      "index": 34,
+      "name": "Diner_2x2_01_PU"
+    },
+    "2489": {
+      "resource": "wi_farmlands_0708.giz",
+      "index": 35,
+      "name": "Diner_2x2_02_PU"
+    },
+    "2491": {
+      "resource": "wi_farmlands_0708.giz",
+      "index": 37,
+      "name": "Brickup_01"
+    },
+    "7072": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1023/sf_residential_1023_tech.giz",
+      "name": "Icebox_Brick",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1023/sf_residential_1023_tech.giz:27:0",
+      "evidence": "live_instance_match"
+    },
+    "968": {
+      "resource": "wi_forest_0703.giz",
+      "index": 0,
+      "name": "P_pup"
+    },
+    "6768": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz",
+      "name": "SuperBrick_2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:0",
+      "evidence": "live_instance_match"
+    },
+    "6769": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:2",
+      "evidence": "live_instance_match"
+    },
+    "6770": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:4",
+      "evidence": "live_instance_match"
+    },
+    "1576": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:2",
+      "evidence": "live_instance_match"
+    },
+    "1577": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:3",
+      "evidence": "live_instance_match"
+    },
+    "1578": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:4",
+      "evidence": "live_instance_match"
+    },
+    "1880": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0706/wi_farmlands_0706_tech.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0706/wi_farmlands_0706_tech.giz:213:1",
+      "evidence": "live_instance_match"
+    },
+    "1584": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0805/wi_farmlands_0805.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0805/wi_farmlands_0805.giz:234:10",
+      "evidence": "live_instance_match"
+    },
+    "1888": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0806/wi_farmlands_0806.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0806/wi_farmlands_0806.giz:1522:1",
+      "evidence": "live_instance_match"
+    },
+    "664": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:1",
+      "evidence": "live_instance_match"
+    },
+    "665": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+      "name": "P_pup3",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:2",
+      "evidence": "live_instance_match"
+    },
+    "666": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+      "name": "P_pup4",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:3",
+      "evidence": "live_instance_match"
+    },
+    "667": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+      "name": "P_pup5",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:4",
+      "evidence": "live_instance_match"
+    },
+    "668": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:5",
+      "evidence": "live_instance_match"
+    },
+    "669": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:7",
+      "evidence": "live_instance_match"
+    },
+    "670": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:8",
+      "evidence": "live_instance_match"
+    },
+    "1272": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz:27:1",
+      "evidence": "live_instance_match"
+    },
+    "1273": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz:27:2",
+      "evidence": "live_instance_match"
+    },
+    "1280": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0804/wi_forest_0804.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0804/wi_forest_0804.giz:27:0",
+      "evidence": "live_instance_match"
+    }
+  },
+  "models": {
+    "387": {
+      "display_name": "Sam Penn",
+      "evidence": "user-confirmed display name"
+    },
+    "704": {
+      "display_name": "Rob Shepherd",
+      "evidence": "user-confirmed display name"
+    },
+    "409": {
+      "display_name": "Häftling",
+      "evidence": "user-confirmed display name"
+    }
+  }
+}
