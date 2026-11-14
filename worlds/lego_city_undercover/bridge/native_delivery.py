@@ -25,16 +25,16 @@ class NativeDeliveryEngine:
         logging.info('Native autosave requested for AP receipt %s',index)
         return True
 
-    async def poll(self,session,snapshot,journal,effects=(),received=(),options=None):
+    async def poll(self,session,snapshot,journal,effects=(),received=(),options=None,overrides=None):
         try:
-            return await self._poll(session,snapshot,journal,effects,received,options)
+            return await self._poll(session,snapshot,journal,effects,received,options,overrides)
         except NativePlayerBusy:
             # A snapshot can become stale while the user starts an interaction.
             # This is a deferred command, not a failed reader: preserve the
             # session, previous check snapshot and durable delivery queue.
             logging.debug('Native delivery deferred until ordinary gameplay')
 
-    async def _poll(self,session,snapshot,journal,effects=(),received=(),options=None):
+    async def _poll(self,session,snapshot,journal,effects=(),received=(),options=None,overrides=None):
         context=snapshot['actor'].get('context',{}).get('index')
         if context not in PASSIVE_CONTEXTS:return
         identity=(session.pid,journal.binding_token,pointer(session.read,session.base+0x1c7f160))
@@ -64,6 +64,9 @@ class NativeDeliveryEngine:
             if problem!=self.last_problem:logging.error(problem);self.last_problem=problem
             return
         masks=reward_masks(effects,received,self.models,snapshot.get('cheats',{}).get('records',[]),options or {})
+        if overrides and context==46:
+            if not await overrides.apply(session,snapshot,self.models,received,self.dll):return
+            masks=overrides.policy(masks,self.models,snapshot.get('cheats',{}).get('records',[]))
         policy=encode_policy(session.pid,journal.binding_token,masks)
         # Do not revoke equipped models, tools or cheats while driving/riding.
         enforced=(await asyncio.to_thread(enforce_rewards,session.pid,policy,journal.binding_token,self.dll)
@@ -81,6 +84,7 @@ class NativeDeliveryEngine:
         deliveries=journal.reconciliation_deliveries()
         for delivery in deliveries:
             index=delivery['index'];plan=delivery['plan'];kind=plan['kind']
+            if overrides and overrides.blocks(plan):continue
             if kind in ('add_studs','add_bricks'):
                 if receipt_saved(marker,journal.binding_token,index) and receipt_saved(marker_from_save(data),journal.binding_token,index):
                     if delivery['state']!='applied':journal.record_saved(index,save_evidence(self.path,data))

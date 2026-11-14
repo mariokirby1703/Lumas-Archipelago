@@ -12,6 +12,7 @@ from research_profile import symbol_hash
 JOB_MANAGER_RVA = 0x17ECA08
 VALUE_VTABLES = {0xC46B38: "Int", 0xC46BB8: "Bool"}
 QUERIES = {
+    "PDA": {"acquired": "Bool", "synchronised": "Bool"},
     "Flow_Setup": {"Flow_Act": "Int", "Flow_Start": "Int", "DialogueStoryStage": "Int"},
     "Flow_Setup.Act_1": {"Act1_Mission": "Int", "Act1_Stage": "Int"},
     "Flow_Setup.Act_2": {"Act2_Mission": "Int", "Act2_Stage": "Int"},

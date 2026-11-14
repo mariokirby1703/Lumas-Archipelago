@@ -61,7 +61,8 @@ def can_resume_first_lobby(story):
     jobs=story.get('jobs',{})
     act=jobs.get('Flow_Setup.Act_1',{})
     lobby=jobs.get('Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby',{})
-    return (jobs.get('Flow_Setup',{}).get('Flow_Act')==1 and
+    return (jobs.get('PDA',{}).get('acquired') is False and
+            jobs.get('Flow_Setup',{}).get('Flow_Act')==1 and
             act.get('Act1_Mission')==1 and act.get('Act1_Stage')==2 and
             type(lobby.get('LCPD_MainframeActive')) is bool and
             type(lobby.get('LCPD_LobbyEntered')) is int and

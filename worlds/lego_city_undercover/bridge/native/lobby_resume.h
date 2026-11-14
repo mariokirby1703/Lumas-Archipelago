@@ -25,6 +25,10 @@ static std::uintptr_t LobbyField(std::uintptr_t base,const char* job,const char*
     return result;
 }
 static int* EarlyLobbyResumeCounter(std::uintptr_t base) {
+    // After Ellie's actual basement completion the next visit MUST use
+    // LobbySecond. Never reset its selector back to LobbyFirst again.
+    auto acquired=LobbyField(base,"PDA","acquired",0xc46bb8);
+    if(!acquired || *reinterpret_cast<unsigned char*>(acquired+16)!=0)return nullptr;
     auto act=LobbyField(base,"Flow_Setup","Flow_Act",0xc46b38);
     auto mission=LobbyField(base,"Flow_Setup.Act_1","Act1_Mission",0xc46b38);
     auto stage=LobbyField(base,"Flow_Setup.Act_1","Act1_Stage",0xc46b38);

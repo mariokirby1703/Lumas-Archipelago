@@ -21,6 +21,17 @@ def grant_model(pid,model,name,dll):
     return _command(pid,model,name,dll,1)
 
 
+def test_remove(pid,kind,index,name,dll):
+    if kind not in ('model_unlock','ability_unlock','cheat_unlock'):raise ValueError('Unsupported test removal')
+    return _command(pid,index,name,dll,18,{'model_unlock':1,'ability_unlock':2,'cheat_unlock':3}[kind])
+
+
+def test_currency(pid,kind,amount,enabled,dll):
+    if kind not in ('add_studs','add_bricks'):raise ValueError('Unsupported test currency')
+    name='TEST_'+('ADD_' if enabled else 'REMOVE_')+('STUDS' if kind=='add_studs' else 'BRICKS')
+    return _command(pid,amount,name,dll,17)
+
+
 def request_save(pid,dll):
     result=_command(pid,0,'AUTOSAVE',dll,5)
     return dict(requested=bool(result['found']),save_confirmed=False)
@@ -170,7 +181,8 @@ def _command(pid,model,name,dll,opcode,receipt_index=0,binding=bytes(16)):
                         6:'command identity mismatch',7:'native effect verification failed',8:'native call faulted; inspect outcome before retry',
                         9:'unbound index or package',10:'unexpected booth navigation code',11:'native autosave is disabled',
                         12:'currency balance would overflow',13:'native save belongs to another AP binding',
-                        14:'native autosave is busy',15:'reward policy mapping unavailable',16:'police lobby re-entry phase is unsupported; exit not triggered'}
+                        14:'native autosave is busy',15:'reward policy mapping unavailable',16:'police lobby re-entry phase is unsupported; exit not triggered',
+                        19:'Select a different outfit before removing this model; starting civilians cannot be removed'}
                     raise RuntimeError(f"Native command rejected ({result[6]}): {reasons.get(result[6],'unknown native error')}")
                 return dict(model=model,found=result[9],owned=result[10],verified=bool(result[10]),save_confirmed=False)
             time.sleep(.01)
@@ -191,3 +203,18 @@ def trigger_station_exit(pid,dll):
 def open_lobby_lift(pid,dll):
     """Open the existing arrival lift animation in the first lobby visit only."""
     return bool(_command(pid,0,'OPEN_LOBBY_LIFT',dll,13)['found'])
+
+
+def relax_tutorial_fields(pid,dll):
+    """Relax two scoped pads and the garage outfit lesson after genuine prerequisites."""
+    return _command(pid,0,'TUTORIAL_FIELDS',dll,14)['found']
+
+
+def unlock_chief_key(pid,dll):
+    """Reveal the original key only at the scoped chief-office tutorial stage."""
+    return bool(_command(pid,0,'CHIEF_KEY',dll,15)['found'])
+
+
+def reveal_chief_radio(pid,dll):
+    """Enable the original radio parts in the waiting-for-build tutorial stage."""
+    return bool(_command(pid,0,'CHIEF_RADIO',dll,16)['found'])

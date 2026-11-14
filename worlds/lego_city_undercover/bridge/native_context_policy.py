@@ -1,5 +1,5 @@
 """Pinned native command eligibility; vehicle grants never revoke actors."""
-NATIVE_OPCODES=frozenset((*range(1,11),12,13))
+NATIVE_OPCODES=frozenset((*range(1,11),12,13,14,15,16,17,18))
 PASSIVE_CONTEXTS=frozenset((27,46,157)) # DropPoint, Default, RideObject
 PASSIVE_OPCODES=frozenset((1,2,3,6,7,10))
 READ_OR_SAVE_OPCODES=frozenset((4,5,9))

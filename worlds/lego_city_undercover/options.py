@@ -3,8 +3,9 @@ from Options import Choice, Toggle, DefaultOnToggle, Range, PerGameCommonOptions
 
 
 class StoryMode(Choice):
-    """Requested native story layout. Experimental client does not yet enforce this setting."""
-    display_name='Story Mode (native setup not implemented)'
+    """Linear guarantees Police on a known opening check and gates remaining experimental checks behind it.
+    Open world keeps the experimental unrestricted catalogue. Other ability logic and native open-world setup are incomplete."""
+    display_name='Story Mode (partial opening logic)'
     option_linear=0
     option_open_world=1
     default=0
@@ -62,7 +63,7 @@ class CityActivities(DefaultOnToggle):
 
 
 class StoryMissions(DefaultOnToggle):
-    """Include experimental story completion candidates without automatic native binding."""
+    """Include story mission completions and the three opening clown-robber arrests."""
     display_name='Story Missions'
 
 

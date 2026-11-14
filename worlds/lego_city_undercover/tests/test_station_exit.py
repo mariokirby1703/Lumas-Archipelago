@@ -37,7 +37,7 @@ class StationExitGateTests(unittest.TestCase):
     def test_only_verified_first_lobby_resume_phase_is_eligible(self):
         from station_exit import can_resume_first_lobby
         lobby={'LCPD_MainframeActive':False,'LCPD_LobbyEntered':2}
-        story={'jobs':{'Flow_Setup':{'Flow_Act':1},
+        story={'jobs':{'PDA':{'acquired':False},'Flow_Setup':{'Flow_Act':1},
                        'Flow_Setup.Act_1':{'Act1_Mission':1,'Act1_Stage':2},
                        'Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby':lobby}}
         self.assertTrue(can_resume_first_lobby(story))
@@ -45,4 +45,8 @@ class StationExitGateTests(unittest.TestCase):
         self.assertFalse(can_resume_first_lobby(story))
         lobby['LCPD_LobbyEntered']=1
         self.assertTrue(can_resume_first_lobby(story))
+        story['jobs']['PDA']['acquired']=True
+        self.assertFalse(can_resume_first_lobby(story))
+        del story['jobs']['PDA']
+        self.assertFalse(can_resume_first_lobby(story))
         self.assertFalse(can_resume_first_lobby({}))

@@ -14,6 +14,8 @@ WORLD = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(WORLD/'bridge'))
 from red_bricks import redbrick_location_key
 from activity_rewards import ACTIVITY_REWARDS
+from story_arrests import ARRESTS
+from opening_logic import NO_POLICE_KEYS
 
 
 def ident(key, base):
@@ -130,6 +132,11 @@ def main():
             source=reward['source_key'],native_type='Activity reward',
             runtime=dict(kind='activity_reward',reward_key=reward['key']),status='verified_activity_reward',
             evidence=reward['evidence'])
+    for arrest in ARRESTS:
+        locations[arrest['key']]=dict(name=arrest['name'],category='story_missions',district=None,
+            coordinates=None,coordinate_space=None,source=arrest['job']+'.'+arrest['field'],
+            native_type='Story arrest',runtime=dict(kind='story_arrest',job=arrest['job'],field=arrest['field']),
+            status='native_story_flag',evidence='Original arrest scripts set individual completion flags and request autosave')
     items={}
     for name,row in roster['entries'].items():
         if not row['counts_for_progress']:continue
@@ -156,7 +163,10 @@ def main():
     for amount in (100,250,1000,10000):
         items[f'Super Bricks {amount:,}']=dict(category='building_bricks' if amount>=1000 else 'filler',
             classification='useful' if amount>=1000 else 'filler',effect='add_bricks',amount=amount)
-    for k,r in locations.items():r['id']=ident(k,1_000_000_000)
+    for k,r in locations.items():
+        r['id']=ident(k,1_000_000_000)
+        if k in NO_POLICE_KEYS:
+            r['opening_logic']=dict(requires_police=False,observed_before_police=True,other_requirements_incomplete=True)
     for k,r in items.items():r['id']=ident(k,2_000_000_000)
     for table in (locations,items):
         if len({r['id'] for r in table.values()})!=len(table):raise ValueError('ID collision')

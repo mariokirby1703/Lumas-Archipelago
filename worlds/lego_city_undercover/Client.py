@@ -9,6 +9,7 @@ import logging
 import json
 from pathlib import Path
 import sys
+import queue
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT))
@@ -25,8 +26,11 @@ from item_delivery import register_delivery
 from native_delivery import NativeDeliveryEngine
 from native_bridge_path import bridge_path
 from station_exit import StationExitGate,read_station_exit,can_resume_first_lobby,read_lobby_lift
-from native_model_transport import trigger_station_exit,open_lobby_lift
+from native_model_transport import trigger_station_exit,open_lobby_lift,relax_tutorial_fields,unlock_chief_key,reveal_chief_radio
 from activity_rewards import completed_activity_rewards
+from tutorial_field_timing import TutorialFieldTiming
+from story_arrests import ARRESTS,completed_story_arrests
+from test_overrides import TestOverrides
 
 
 class Commands(ClientCommandProcessor):
@@ -58,6 +62,8 @@ class Context(CommonContext):
         self.skip_slot=False
         self.model_labels=json.loads((Path(__file__).parent/"bridge/monitor_labels.json").read_text(encoding="utf-8")).get("models",{})
         self.journal=None
+        self.test_overrides=TestOverrides()
+        self.ui_events=getattr(args,'ui_events',None)
         catalogue=json.loads((Path(__file__).parent/'catalogue.json').read_text(encoding='utf-8'))
         self.item_effects={str(r['id']):dict(name=n,**r) for n,r in catalogue['items'].items()}
         self.state_dir=Path(__file__).parent/'notes/client_journal'
@@ -93,8 +99,8 @@ class Context(CommonContext):
 
 async def watcher(ctx):
     native_delivery=NativeDeliveryEngine(bridge_path(ROOT),ctx.native_save_file)
-    exit_gate=StationExitGate();opened_lift=None
-    session=None;previous=None;binding=None;journal_binding=None;seen_models=set();model_ids=None;skip_pid=None
+    exit_gate=StationExitGate();opened_lift=None;tutorial_timing=TutorialFieldTiming()
+    session=None;previous=None;binding=None;journal_binding=None;seen_models=set();seen_arrests=set();model_ids=None;skip_pid=None
     try:
         while not ctx.exit_event.is_set():
             try:
@@ -112,7 +118,8 @@ async def watcher(ctx):
                 if ctx.slot is not None and ctx.catalogue and ctx.seed_name:
                     current_binding=(ctx.seed_name,ctx.team,ctx.slot)
                     if current_binding!=binding:
-                        previous=None;binding=current_binding;seen_models.clear()
+                        previous=None;binding=current_binding;seen_models.clear();seen_arrests.clear()
+                        ctx.test_overrides=TestOverrides()
                         if session:session.close()
                         session=None;model_ids=None
                     if ctx.journal is None or current_binding!=journal_binding:
@@ -214,12 +221,30 @@ async def watcher(ctx):
                         logging.info('FOUND %s: %s | model %s | found=%s pending=%s owned=%s | %s',
                             row['group'],row['internal_name'],row['model_id'],row.get('found_bit'),row.get('pending_grant'),row.get('owned_byte'),
                             'experimental token binding' if bound else 'no token location in this seed')
-                    checks,previous=changed_checks(ctx.catalogue,previous,snapshot,
+                    arrests=completed_story_arrests(snapshot.get('story',{}))
+                    active_keys={row.get('key') for row in ctx.catalogue.values()}
+                    for arrest in ARRESTS:
+                        if arrest['key'] in arrests-seen_arrests:
+                            logging.info('STORY arrest completed: %s | %s | %s',arrest['name'],
+                                arrest['job']+'.'+arrest['field'],
+                                'check location active' if arrest['key'] in active_keys else 'location absent from current seed; enable story_missions in a newly generated seed')
+                    seen_arrests.update(arrests)
+                    checks,previous=changed_checks(ctx.catalogue,previous,ctx.test_overrides.mask_snapshot(snapshot),
                         set(ctx.checked_locations) | set(ctx.journal.pending()))
                     if checks:await ctx.report_checks(checks)
                     if ctx.enable_native_models:
                         received=[ctx.item_effects[str(item.item)] for item in ctx.items_received if str(item.item) in ctx.item_effects]
-                        await native_delivery.poll(session,snapshot,ctx.journal,ctx.item_effects.values(),received,ctx.slot_options)
+                        await native_delivery.poll(session,snapshot,ctx.journal,ctx.item_effects.values(),received,ctx.slot_options,ctx.test_overrides)
+                        if ctx.ui_events:ctx.ui_events.put(('game','Spiel verbunden · '+snapshot['actor'].get('equipped_internal_name','')))
+                        fields_ready=tutorial_timing.ready(session.pid,snapshot.get('scene_fields',{}))
+                        if fields_ready and snapshot['actor'].get('context',{}).get('index')==46:
+                            changed=await asyncio.to_thread(relax_tutorial_fields,session.pid,native_delivery.dll)
+                            if changed:logging.info('Station tutorial: %s scoped pad/lesson changes after genuine prerequisite',changed)
+                            if await asyncio.to_thread(unlock_chief_key,session.pid,native_delivery.dll):
+                                logging.info('Chief office tutorial: original key revealed; pick it up and use the lock normally')
+                            if await asyncio.to_thread(reveal_chief_radio,session.pid,native_delivery.dll):
+                                logging.info('Chief office tutorial: original radio build parts activated; assemble normally')
+
                         # Only the verified first-visit/rescue phase can use the AP
                         # escape. Native code prepares its next first-visit entry
                         # before invoking the existing exterior door transition.
@@ -246,6 +271,7 @@ async def watcher(ctx):
                 logging.warning('Reader waiting: %s',error)
                 if session:session.close()
                 session=None;previous=None;model_ids=None
+                tutorial_timing=TutorialFieldTiming()
                 await asyncio.sleep(2)
     finally:
         if session:session.close()
@@ -255,11 +281,35 @@ async def watcher(ctx):
 async def _run_client(args):
     ctx=Context(args)
     ctx.server_task=asyncio.create_task(server_loop(ctx))
-    ctx.run_cli()
+    gui=getattr(args,'ui_controls',None)
+    if gui is None:ctx.run_cli()
+    async def controls():
+        while not ctx.exit_event.is_set():
+            try:
+                action,payload=gui.get_nowait()
+                if action=='disconnect':ctx.exit_event.set()
+                elif ctx.journal is None:logging.error('TEST: Erst AP und Spiel verbinden lassen.')
+                elif action=='reset':
+                    ctx.test_overrides.reset();logging.info('TEST: Rückkehr zum AP-Zustand angefordert (Währungsbuchungen bleiben bestehen).')
+                elif action in ('give','remove'):
+                    matches=[e for e in ctx.item_effects.values() if e['name']==payload]
+                    if not matches:raise ValueError('Unbekanntes Item: '+payload)
+                    ctx.test_overrides.set(matches[0],action=='give')
+                    logging.info('TEST angefordert: %s · %s',action,payload)
+            except queue.Empty:pass
+            except (ValueError,RuntimeError) as error:logging.error('TEST: %s',error)
+            if ctx.ui_events:
+                connected=bool(ctx.server and ctx.slot is not None)
+                ctx.ui_events.put(('ap',('AP verbunden · '+str(ctx.auth)) if connected else 'AP: Verbindung wird hergestellt …'))
+                ctx.ui_events.put(('overrides',[e['name']+(' → geben' if value else ' → AP' if value is None else ' → entfernen')
+                                               for e,value in ctx.test_overrides.entries.values()]))
+            await asyncio.sleep(.25)
+    control_task=asyncio.create_task(controls()) if gui is not None else None
     task=asyncio.create_task(watcher(ctx))
     await ctx.exit_event.wait()
     await task
     await ctx.shutdown()
+    if control_task:await control_task
 
 
 async def main(args):

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "evidence": "Observed in the fresh no-Police test save; first clown explicitly confirmed by the user. Other item requirements remain incompletely modeled.",
+  "no_police_location_keys": [
+    "objective:DisguiseBooth_SF_DO_0918",
+    "objective:DisguiseBooth_SF_RD_1022",
+    "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:7",
+    "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:4",
+    "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:5",
+    "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:6",
+    "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz:722:3",
+    "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0820/sf_residential_0820.giz:27:2",
+    "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz:454:28",
+    "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:0",
+    "source_pickup:GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:42",
+    "story_arrest:clown_1",
+    "story_disguise:COP"
+  ]
+}

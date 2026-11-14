@@ -163,3 +163,231 @@ New opcode 13 OPEN_LOBBY_LIFT is admitted by the shared packet dispatcher. Its n
 Two native fixture tests verify the actual helper calls both animation setters with the correct values, preserves visit counter and does not trigger a level load, plus wrong scene/distance/visit rejection. Packet admission tests now include opcode 13. Full suite: 176 passing. Build LCUItemBridgeLiftArrival.dll.
 
 A guarded one-shot live command was executed at the user's trapped position: distance squared 0.02450, Default, eligible phase. The native command returned lift_open_requested=true. This verifies dispatch and native setter invocation, not yet the user's ability to walk through the opened doors. User confirmation remains pending. Source client must be restarted for automatic handling of future arrivals.
+
+## Two early station pads without Police (2026-11-14)
+
+Opcode 14 clears only the Police requirement mask of the uniquely identified
+Garage Cop_UseKeypad_SW instance at (5.5669465,-0.178157,-3.9803517), after the
+genuine COP discovery bit. The lobby MF_Switch additionally requires the typed
+PDA.acquired flag; the original garage script sets this at ActivateLiftDoors
+following the Ellie sequence. No other interaction requirements are removed.
+
+Live testing confirmed the generic garage pad could be used, but it remained
+repeatable without advancing. The running lcpd_garage script was still in
+LoopChangeClothesHint, whose condition requires an equipped COP model. The bridge
+now schedules ShowCostumeWheelHint using the same native 0x653b60 operation as
+SAction_GotoState and restores the original successful condition's P1 swap flag.
+It validates the owner, ScriptJobComponent manager/contexts, exact current state,
+target state kind and zero scope-pop count, and requires the garage script's
+ActivateLiftDoors state. Other states and pending transitions remain untouched.
+ShowCostumeWheelHint and FrankMoveToShop still test the real complex keypad
+GetOutput(0). Neither keypad completion nor PDA.acquired is synthesized. The
+already used pad may need using again because its prior output was not consumed
+while the script was waiting for an equipped Police character.
+
+Live: garage mask changed 0x10100000 -> 0x100000; user confirmed usability.
+The user confirmed the lesson correction advances the Frank/Ellie sequence.
+A subsequent read found the original script in CutsceneEnded with no pending
+goto. Lobby pad end-to-end test is still pending.
+182 tests pass, including native synthetic-memory tests for source gating,
+PDA gating, preserving outputs/other fields/class ownership, exact lesson-state
+selection, pending/nested/other-state rejection and native signature/list-cycle
+rejection. Build: LCUItemBridgeTutorialFlow.dll. Restart the source client for
+automatic maintenance and the later lobby patch; same seed and save remain valid.
+
+## Completed-basement exit regression (2026-11-14)
+
+User reported that returning with the temporary garage exit replayed Frank's
+first lobby setup. Live read confirmed PDA.acquired=true, LobbyEntered=1 and
+LobbyFirst's LobbyInstruction running. The early exit reset did not previously
+check PDA.acquired; this was a bridge bug. Both host eligibility and the native
+EarlyLobbyResumeCounter now require a present, typed, false PDA.acquired value.
+After actual basement completion, the temporary exit and its counter reset are
+disabled. Missing/invalid PDA state also rejects the temporary route. The normal
+garage ReturnToLobby/ToFadeLobby script owns the transition thereafter. Mainframe
+pad relaxation still requires PDA.acquired=true, independently of this exit gate.
+
+183 tests pass. Regression tests cover both exit routes after PDA acquisition,
+verify no trigger and no selector reset, and cover host missing/true PDA values.
+New selected build: LCUItemBridgeCompletedBasement.dll. A running old client must
+be restarted. The already loaded first lobby is not retroactively replaced by
+this guard; its correct second-visit setup needs a scene reload. No mission,
+PDA, entitlement or active lobby job is rewritten by the fix.
+
+## Tutorial floor-symbol correction (2026-11-14)
+
+Removing the Police requirement also removed the branch that selects the central
+floor sprite, leaving only the rotating ring. The two scoped tutorial pads now
+use the native custom-sprite bit 0x80000000 and signed-short sprite ID 632 at
++0x3fa. RVA 0x800a0 selects this sprite independently of Police class availability;
+the artwork remains the original unlocked police-pad symbol. No Police permission
+bits are restored. Garage flags become 0x80100000; lobby flags 0x80000000, only
+after their existing COP-discovery/PDA gates. Activation and output state remain
+untouched. Native permission code 0x7f3f0 does not use bit 31 as a class requirement.
+
+184 tests pass, including custom marker selection with Police unavailable and
+idempotent application. LCUItemBridgeTutorialIcons.dll was built and one scoped
+change applied live; rendered appearance awaits user confirmation. Client restart
+selects the new bridge for future scene loads. The completed-basement exit guard
+from the preceding build remains included.
+
+## Center icon: previous sprite-only fix was incomplete
+
+The user confirmed that the sprite-only change above did NOT restore the visible
+center. Readback showed +0x3fa=632 but +0x3fc=-1. Static inspection located the
+independent action-icon selection routine at 0x466f0: its custom branch reads
++0x3fc (0x469fa), while 0x800a0 reads +0x3fa. The native original Cop center-icon
+resource is resolved through the int at RVA 0x1176600 (0x46b94), currently 580.
+The correction now sets both values after the same exact pad/source gates,
+validates that the runtime center icon is in signed-short range, and preserves
+activation/outputs and the removed Police requirements. No broad marker reset,
+resource reload or story transition is used.
+
+185 tests pass. New build LCUItemBridgeTutorialCenterIcon.dll was applied live;
+readback confirmed garage flags 0x80100000 and marker pair (632,580). Rendered
+appearance is pending the user's second test; memory readback alone is not
+visual confirmation. The previous sprite-only build is superseded.
+
+
+The second visual test also FAILED, including after walking 5 m away and back.
+Read-only revalidation found the exact modified keypad in the engine selection
+slot, with player distance 0.00518 m and matching native distance squared. This
+confirms the interaction target strongly, but does not identify the renderer of
+the visible rotating ring. Neither custom-marker change is a verified visual
+fix. See notes/analysis/tutorial_pad_visual_failure.json.
+
+## Screenshot-confirmed floor-ring failure; return to original generic-pad policy
+
+The user supplied screenshots of both the garage keypad and lobby mainframe:
+rotating floor arcs remain visible but their center graphics are absent. They
+also reported that the first late-applied generic-pad change displayed correctly
+before returning to the main menu. The custom marker-ID experiments are therefore
+not a verified fix and are superseded. The scoped helper again clears only the
+Police requirements (Garage 0x100000, lobby 0), also clearing our custom bit/known
+injected marker values when present. Story gates and the completed-basement exit
+regression fix remain intact.
+
+A host-side timing mitigation waits for eight seconds of a stable readable scene
+before requesting the pad change. It resets on scene identity changes, reader
+failure/reconnection, and process changes. This tests the hypothesis that early
+patching interferes with the native floor marker's initial creation; it is NOT
+an observed engine-ready signal or a proven rendering fix. Native permission and
+story predicates still validate independently at dispatch. No native graphics
+reset, arbitrary object hiding or story completion is performed.
+
+187 tests pass, including failed-custom-value cleanup without output changes and
+timing tests for normal polling, scene/process changes and unresolved scenes.
+Build: LCUItemBridgeTutorialSettled.dll. The source client must restart to select
+this build and timing policy. Visual restoration remains pending a live test.
+
+## Chief-office key without Detective Scan
+
+The user requested access to Dunby's office without obtaining Detective Scan.
+Live state was Act 1 mission 1/stage 2, PDA acquired and synchronised, LobbySecond
+in DetectiveHint and the dedicated detective job in FirstJunction. The player
+stood 0.326 m from Story_02_LobbyLock. The original M02_Dspot_key_item already
+existed in LegoCityItemManager (slot 5, manager vtable 0xc2b878, item 0xd748c8),
+but was inactive/hidden (flags 0x1000) at (3.4789503,1.6134267,2.1848316).
+
+Bound opcode 15 CHIEF_KEY requires those typed PDA/story predicates, the actual
+Police_Station_Lobby scene, exact owner-validated item/lock objects, and player
+within 1.5 m of the chief lock. Both original script transition plans are fully
+validated before mutation: DetectiveHint or WaitForDspot -> WaitForChiefLock in
+LobbySecond (signature ChiefAwakesMinicut); FirstJunction -> Ended in the detective
+job (signature Key_PickedUp). It uses native SetActive on the existing item's
+flow interface and native script GotoState scheduling. No new item is allocated,
+no key is attached directly, no scan ability, scan objective, AP receipt, mission
+completion or door-open output is fabricated. The player still collects the
+physical key and uses the original Techno lock. Pending transitions and later
+story states reject repeat application.
+
+190 tests pass, including activation plus both state requests exactly once,
+before-sync/distance rejection, invalid state scope/native signature rejection,
+and real hook admission for opcode 15. LCUItemBridgeChiefKey.dll applied live:
+readback showed original key flags 0x1003 (active/visible), detective job Ended,
+and normal lobby flow subsequently at WaitForRadioBuildit. User pickup/door test
+is pending. Source client restart enables the same behavior on future relevant
+visits; same save and seed remain valid.
+
+## Chief radio parts after scan-free key access
+
+User confirmed the original key could be picked up and the chief-office door
+opened. They then reported missing music-system parts. Live inspection found
+RadioBuildit (GizmoSpellIt manager slot 3/vtable 0xd769c8; object 0xd76478) at
+(-3.1311347,1.7847353,2.4298434), flags 0x1000: present but inactive/hidden.
+Radio_temp and RadioTable_TEMP were also hidden, as expected until assembly.
+
+Opcode 16 CHIEF_RADIO requires synchronised PDA, actual lobby scene, exact
+owner-validated RadioBuildit and the original LobbySecond WaitForRadioBuildit
+state (with ChiefAwakesMinicut and WaitForChiefLock signature states). Within
+2 m it activates/shows only the existing build object using native SetActive.
+It does not complete the build, open another door, grant an ability or schedule
+a story transition. Already active/visible objects and other story states are
+no-ops. Client maintenance includes the helper after the scene settle gate.
+
+192 tests pass, including one-shot activation without build completion/state
+advance and rejection of wrong state/distant player. Build selected:
+LCUItemBridgeChiefRadio.dll. Live activation changed RadioBuildit to 0x1003;
+user confirmed the pieces are visible AND can be assembled. Key pickup/door
+opening and radio visibility/build interaction are now live confirmed. The later
+wake-up cutscene/story completion is still handled by the original script.
+
+## Three opening clown arrests as individual locations
+
+The user requested one check per opening-story clown arrest and had just caught
+the first with no AP check. Live read confirmed Act_1_CatchRobber_1=true and the
+other two false under Flow_Setup.Flow_Completed. The original scripts
+chase_bank_robber.sf, scan_first_robber.sf and search_areas_for_robbers.sf set their
+respective flags, then autosave. These sources are independent of character
+unlocks, gold-brick totals, later story advancement and player equipment.
+
+New catalogue keys (category story_missions, existing YAML option):
+- story_arrest:clown_1 / 1265827268 / Story Arrest: Clown Robber 1
+- story_arrest:clown_2 / 1866262459 / Story Arrest: Clown Robber 2
+- story_arrest:clown_3 / 1595482323 / Story Arrest: Clown Robber 3
+
+story_arrests.py accepts only explicitly true typed flags from a readable story
+snapshot. The reconciler includes completed arrests on first connection and after
+offline progress, excluding acknowledged/pending checks through the existing
+journal/server path. Client logging also names completed arrests whose locations
+are absent from the current server seed, rather than silently appearing to miss
+them. No arbitrary existing location is substituted for a newly added check.
+Existing generated seeds do not contain the new locations; generating a seed
+with the updated APWorld and story_missions enabled includes them.
+
+196 tests pass, including individual flags, offline reconciliation, acknowledgement
+filtering, invalid/missing values, absent current-seed locations and catalogue
+bindings. A read-only live run of the actual reconciler recognized exactly Story
+Arrest: Clown Robber 1. No check was sent by this diagnostic. APWorld rebuilt;
+no native DLL changes were needed for these existing readable story values.
+
+## Opening logic and guaranteed early Police in linear seeds
+
+User requested all checks reached in the fresh test so far, plus the green clown,
+as accessible without Police. They explicitly confirmed green means arrest 1.
+opening_no_police.json records the 11 acknowledged keys from the current Slot 2
+test journal plus the separately observed lobby toy-car reward and clown arrest 1
+(13 source keys total). These are observations about Police requirements, not a
+claim that all other item/area/resource requirements have been fully modeled.
+The catalogue annotates those exact keys; stable location IDs are unchanged.
+
+For story_mode=linear, generation puts enabled observed opening locations in an
+ungated opening region. Other experimental checks are provisionally placed in a
+region requiring Ability: Police OR Character: COP. pre_fill reserves one actual
+local Police item from the existing pool on an enabled non-excluded opening
+location, preferring Ability: Police and accepting Character: COP when ability
+items are disabled. Both native delivery plans unlock the same COP model. This
+ensures Police can be obtained by the first/green clown checkpoint without
+placing it behind its own entrance rule. There is no additional/duplicated item.
+Already precollected Police satisfies the guarantee. Missing Police items, no
+valid opening locations, and all Police alternatives forced non-local produce
+clear generation errors rather than silently overriding settings or making an
+unbeatable opening. Open-world mode retains the prior unrestricted catalogue.
+
+202 tests pass, including actual restrictive fill/beatability, no-Police opening
+reachability, reachability after either Police receipt, local early placement,
+character-only item pools, excluded locations, no eligible checks/items, non-local
+conflicts and unchanged open-world behavior. Slot data exposes partial opening
+logic and the selected early Police location. This changes newly generated
+seeds; the existing hosted seed's item placement is not rewritten. No live game
+memory or AP receipt was modified for this logic task.

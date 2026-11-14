@@ -6,6 +6,7 @@ from pathlib import Path
 from BaseClasses import Item, ItemClassification, Location, Region, Tutorial
 from worlds.AutoWorld import World, WebWorld
 from .options import LCUOptions, enabled_categories
+from .bridge.opening_logic import NO_POLICE_KEYS,POLICE_ITEMS,has_police
 
 CATALOGUE=json.loads(pkgutil.get_data(__name__,'catalogue.json'))
 TOKEN='City Completion Token'
@@ -45,8 +46,16 @@ class LCUWorld(World):
     def create_regions(self):
         menu=Region('Menu',self.player,self.multiworld)
         city=Region('Experimental checks',self.player,self.multiworld)
-        self.multiworld.regions.extend((menu,city));menu.connect(city)
-        city.locations.extend(LCULocation(self.player,r['name'],r['id'],city) for r in self.active_catalogue.values())
+        self.multiworld.regions.extend((menu,city))
+        linear=self.options.story_mode.value==0
+        opening=Region('Opening before Police',self.player,self.multiworld) if linear else city
+        if linear:
+            self.multiworld.regions.append(opening);menu.connect(opening)
+            opening.connect(city,rule=lambda state:has_police(state,self.player))
+        else:menu.connect(city)
+        for key,row in self.active_catalogue.items():
+            parent=opening if linear and key in NO_POLICE_KEYS else city
+            parent.locations.append(LCULocation(self.player,row['name'],row['id'],parent))
         self.multiworld.completion_condition[self.player]=lambda state:state.has(TOKEN,self.player,self.options.goal_tokens.value)
 
     def create_item(self,name):
@@ -55,6 +64,28 @@ class LCUWorld(World):
         return LCUItem(name,classification,self.item_name_to_id[name],self.player)
 
     def get_filler_item_name(self):return 'Studs 1,000'
+
+    def pre_fill(self):
+        self.early_police_location=None
+        if self.options.story_mode.value!=0:return
+        # Start-inventory Police already satisfies the opening requirement.
+        if any(item.name in POLICE_ITEMS for item in self.multiworld.precollected_items[self.player]):return
+        items=[item for item in self.multiworld.itempool if item.player==self.player and item.name in POLICE_ITEMS]
+        if not items:
+            raise ValueError('LCU linear story requires Police: enable ability_items or character_items, or start with Police')
+        candidates=[item for item in items if item.name not in self.options.non_local_items.value]
+        if not candidates:
+            raise ValueError('LCU linear story needs a local opening Police item; remove Police from non_local_items')
+        item=next((item for item in candidates if item.name=='Ability: Police'),candidates[0])
+        excluded=self.options.exclude_locations.value
+        locations=[self.multiworld.get_location(row['name'],self.player)
+                   for key,row in self.active_catalogue.items() if key in NO_POLICE_KEYS and row['name'] not in excluded]
+        locations=[loc for loc in locations if loc.item is None and loc.can_fill(self.multiworld.state,item,check_access=False)]
+        if not locations:
+            raise ValueError('LCU linear story has no enabled opening location for Police; enable opening checks or remove their exclusions')
+        location=self.random.choice(locations)
+        location.place_locked_item(item);self.multiworld.itempool.remove(item)
+        self.early_police_location=location.name
 
     def create_items(self):
         allowed={'character':self.options.character_items.value,'vehicle':self.options.vehicle_items.value,
@@ -81,6 +112,8 @@ class LCUWorld(World):
                              if k in LCUOptions.__annotations__},
                     locations={str(r['id']):dict(key=k,name=r['name'],runtime=r['runtime'],status=r['status'])
                                for k,r in self.active_catalogue.items()},
+                    opening_logic=dict(partial=True,early_police_location=getattr(self,'early_police_location',None),
+                        no_police_keys=sorted(k for k in self.active_catalogue if k in NO_POLICE_KEYS)),
                     native_grants=True,native_locks=False,native_open_world_setup=False,
                     native_reward_suppression='poll_after_checks',native_save_verification='model_ability_cheat_and_currency_marker',
                     item_effects={str(r['id']):dict(name=n,**r) for n,r in CATALOGUE['items'].items()},

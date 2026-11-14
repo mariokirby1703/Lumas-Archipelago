@@ -3,6 +3,7 @@ from research_profile import symbol_hash
 from activity_rewards import completed_activity_rewards
 from level_progress import completed_level_keys
 from red_bricks import redbrick_location_key
+from story_arrests import completed_story_arrests
 
 # These source tiles alias the same native bits. Block them before either tile
 # has been observed; runtime conflict detection alone is too late.
@@ -44,12 +45,15 @@ def changed_checks(catalogue,previous,snapshot,checked_locations=()):
     checks=[]
     persistent_keys=completed_level_keys(snapshot.get('level_progress',{}))
     persistent_keys.update(red_brick_missions)
+    arrests=completed_story_arrests(snapshot.get('story',{}))
     found_models={r['internal_name'].upper() for r in snapshot.get('characters',[])
                   if (r.get('found_bit') or r.get('pending_grant')) and r.get('group') in ('character','vehicle')}
     if snapshot.get('mission_tokens',{}).get('status')=='read':
         found_models.update(r['internal_name'].upper() for r in snapshot['mission_tokens']['records'])
     for key,row in catalogue.items():
         if row.get('key') in persistent_keys:checks.append(int(key))
+        if ((row.get('runtime') or {}).get('kind')=='story_arrest' and row.get('key') in arrests):
+            checks.append(int(key))
         runtime=row.get('runtime') or {}
         hero=snapshot.get('mission_hero',{})
         if (hero.get('status')=='read' and hero.get('complete') and hero.get('mission')

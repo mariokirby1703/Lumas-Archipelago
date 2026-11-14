@@ -28,3 +28,24 @@ extern "C" __declspec(dllexport) DWORD TestLobbyLift(std::uintptr_t base,std::ui
     Command c{};c.name_hash=Hash("OPEN_LOBBY_LIFT");
     DWORD result=OpenLobbyLift(base,actor,&c);*opened=c.found;return result;
 }
+#include "../../bridge/native/tutorial_fields.h"
+#include "../../bridge/native/chief_key.h"
+#include "../../bridge/native/test_items.h"
+extern "C" __declspec(dllexport) DWORD TestLocalCurrency(std::uintptr_t base,unsigned amount,unsigned hash) {
+    Command c{};c.model=amount;c.name_hash=hash;return TestCurrency(base,&c);
+}
+extern "C" __declspec(dllexport) DWORD TestLocalRemove(std::uintptr_t base,std::uintptr_t actor,unsigned kind,unsigned index,unsigned hash) {
+    Command c{};c.receipt=kind;c.model=index;c.name_hash=hash;return TestRemove(base,actor,&c);
+}
+extern "C" __declspec(dllexport) DWORD TestChiefRadio(std::uintptr_t base,std::uintptr_t actor,std::uint32_t* changed) {
+    Command c{};c.name_hash=Hash("CHIEF_RADIO");
+    DWORD result=RevealChiefRadio(base,actor,&c);*changed=c.found;return result;
+}
+extern "C" __declspec(dllexport) DWORD TestChiefKey(std::uintptr_t base,std::uintptr_t actor,std::uint32_t* changed) {
+    Command c{};c.name_hash=Hash("CHIEF_KEY");
+    DWORD result=UnlockChiefKey(base,actor,&c);*changed=c.found;return result;
+}
+extern "C" __declspec(dllexport) DWORD TestTutorialFields(std::uintptr_t base,std::uintptr_t actor,std::uint32_t* changed) {
+    Command c{};c.name_hash=Hash("TUTORIAL_FIELDS");
+    DWORD result=RelaxTutorialFields(base,actor,&c);*changed=c.found;return result;
+}

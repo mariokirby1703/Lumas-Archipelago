@@ -7012,6 +7012,11 @@
       "id": 1128381259,
       "name": "DisguiseBooth: DisguiseBooth_SF_DO_0918",
       "native_type": "DisguiseBooth",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": {
         "kind": "objective",
         "name": "DisguiseBooth_SF_DO_0918"
@@ -7034,6 +7039,11 @@
       "id": 1847448060,
       "name": "DisguiseBooth: DisguiseBooth_SF_RD_1022",
       "native_type": "DisguiseBooth",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": {
         "kind": "objective",
         "name": "DisguiseBooth_SF_RD_1022"
@@ -42186,6 +42196,11 @@
       "id": 1104358288,
       "name": "Gold Plate: GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:7",
       "native_type": "Gold Plate",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": null,
       "source": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz",
       "source_index": 7,
@@ -42694,6 +42709,11 @@
       "id": 1216256784,
       "name": "Gold Plate: GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:4",
       "native_type": "Gold Plate",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": null,
       "source": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
       "source_index": 4,
@@ -42711,6 +42731,11 @@
       "id": 1628837274,
       "name": "Gold Plate: GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:5",
       "native_type": "Gold Plate",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": null,
       "source": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
       "source_index": 5,
@@ -42728,6 +42753,11 @@
       "id": 1657155452,
       "name": "Gold Plate: GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:6",
       "native_type": "Gold Plate",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": null,
       "source": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
       "source_index": 6,
@@ -43529,6 +43559,11 @@
       "id": 1580895997,
       "name": "Gold Plate: GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz:722:3",
       "native_type": "Gold Plate",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": null,
       "source": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz",
       "source_index": 3,
@@ -43767,6 +43802,11 @@
       "id": 1575537494,
       "name": "Gold Plate: GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0820/sf_residential_0820.giz:27:2",
       "native_type": "Gold Plate",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": null,
       "source": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0820/sf_residential_0820.giz",
       "source_index": 2,
@@ -45528,6 +45568,11 @@
       "id": 1866384776,
       "name": "SuperBrick4X2: GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz:454:28",
       "native_type": "SuperBrick4X2",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": null,
       "source": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz",
       "source_index": 28,
@@ -114580,6 +114625,11 @@
       "id": 1000355890,
       "name": "Character Token: cop (GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:0)",
       "native_type": "PickupType122",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": {
         "kind": "model_found",
         "native_name": "COP"
@@ -116590,6 +116640,11 @@
       "id": 1726626538,
       "name": "Police Station Lobby: Toy Police Car Ride",
       "native_type": "Activity reward",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": {
         "kind": "activity_reward",
         "reward_key": "police_station_lobby:toy_vehicle_ride"
@@ -157109,6 +157164,62 @@
       "source_index": 99,
       "status": "static_candidate_unbound"
     },
+    "story_arrest:clown_1": {
+      "category": "story_missions",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "evidence": "Original arrest scripts set individual completion flags and request autosave",
+      "id": 1265827268,
+      "name": "Story Arrest: Clown Robber 1",
+      "native_type": "Story arrest",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
+      "runtime": {
+        "field": "Act_1_CatchRobber_1",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_arrest"
+      },
+      "source": "Flow_Setup.Flow_Completed.Act_1_CatchRobber_1",
+      "status": "native_story_flag"
+    },
+    "story_arrest:clown_2": {
+      "category": "story_missions",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "evidence": "Original arrest scripts set individual completion flags and request autosave",
+      "id": 1866262459,
+      "name": "Story Arrest: Clown Robber 2",
+      "native_type": "Story arrest",
+      "runtime": {
+        "field": "Act_1_CatchRobber_2",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_arrest"
+      },
+      "source": "Flow_Setup.Flow_Completed.Act_1_CatchRobber_2",
+      "status": "native_story_flag"
+    },
+    "story_arrest:clown_3": {
+      "category": "story_missions",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "evidence": "Original arrest scripts set individual completion flags and request autosave",
+      "id": 1595482323,
+      "name": "Story Arrest: Clown Robber 3",
+      "native_type": "Story arrest",
+      "runtime": {
+        "field": "Act_1_CatchRobber_3",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_arrest"
+      },
+      "source": "Flow_Setup.Flow_Completed.Act_1_CatchRobber_3",
+      "status": "native_story_flag"
+    },
     "story_disguise:ASTRONAUT": {
       "category": "character_tokens",
       "coordinate_space": null,
@@ -157144,6 +157255,11 @@
       "district": null,
       "id": 1481056630,
       "name": "Story Disguise: cop (COP)",
+      "opening_logic": {
+        "observed_before_police": true,
+        "other_requirements_incomplete": true,
+        "requires_police": false
+      },
       "runtime": {
         "kind": "model_found",
         "native_name": "COP"
