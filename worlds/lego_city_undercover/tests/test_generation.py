@@ -6,6 +6,38 @@ from Fill import distribute_items_restrictive
 
 
 class GenerationTests(unittest.TestCase):
+    def test_chronological_test_yaml_places_criminal_scan_before_police_gate(self):
+        import yaml
+        from pathlib import Path
+        config=yaml.safe_load((Path(__file__).resolve().parents[1]/'docs/LCU_Chronological_Test.yaml').read_text())
+        multi,world=self.build(config[LCUWorld.game])
+        distribute_items_restrictive(multi)
+        scanner=[loc for loc in multi.get_locations(1) if loc.item and loc.item.name=='Ability: Scanner']
+        self.assertEqual(len(scanner),1)
+        self.assertTrue(scanner[0].can_reach(CollectionState(multi)))
+        self.assertEqual(scanner[0].parent_region.name,'Opening before Police')
+        detective=[loc for loc in multi.get_locations(1) if loc.item and loc.item.name=='Ability: Detective Scan']
+        self.assertEqual(len(detective),1)
+        self.assertTrue(detective[0].can_reach(CollectionState(multi)))
+        self.assertEqual(detective[0].parent_region.name,'Opening before Police')
+        self.assertIsNotNone(world.early_police_location)
+        self.assertTrue(multi.can_beat_game())
+
+    def test_disabled_detective_lock_does_not_add_a_dead_item(self):
+        multi,_=self.build({'detective_scan_lock':False})
+        self.assertFalse(any(item.name=='Ability: Detective Scan' for item in multi.itempool))
+
+    def test_early_criminal_scan_rejects_missing_pool_or_insufficient_opening_checks(self):
+        with self.assertRaisesRegex(ValueError,'requires ability_items'):
+            self.build({'early_criminal_scan':True,'ability_items':False})
+        with self.assertRaisesRegex(ValueError,'local Scanner'):
+            self.build({'early_criminal_scan':True,'non_local_items':{'Ability: Scanner'}})
+        from worlds.lego_city_undercover.bridge.opening_logic import NO_POLICE_KEYS
+        names={r['name'] for k,r in CATALOGUE['locations'].items() if k in NO_POLICE_KEYS}
+        target=CATALOGUE['locations']['story_arrest:clown_1']['name']
+        with self.assertRaisesRegex(ValueError,'both Police and Scanner'):
+            self.build({'early_criminal_scan':True,'exclude_locations':names-{target}})
+
     def test_requested_packages_and_skin_classification(self):
         from BaseClasses import ItemClassification
         multi,world=self.build()

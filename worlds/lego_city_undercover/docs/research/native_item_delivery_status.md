@@ -391,3 +391,46 @@ conflicts and unchanged open-world behavior. Slot data exposes partial opening
 logic and the selected early Police location. This changes newly generated
 seeds; the existing hosted seed's item placement is not rewritten. No live game
 memory or AP receipt was modified for this logic task.
+
+## Native UI completion: item catalogue, disk flags, history
+
+Preserved the user's GUI lifecycle fixes, exact-DLL source/hash integrity checks,
+reviewed cheat-ownership alternative and sparse-roster handling for previously
+unfound disguises. The source patcher initially refused the current source blob;
+the unique old cheat span and its surrounding count/name guards were manually
+reviewed, then only that span was replaced by the supplied ownership-mask fix.
+The rebuild helper subsequently verified the new versioned DLL successfully.
+No signature guard was disabled and no live game mutation was performed here.
+
+The local test catalogue includes every classified native character and vehicle
+in collection_manifest: 314 character models and 122 vehicle models, including
+9/2 models excluded from the normal AP progression roster. These extra test models
+do not become AP items or locations. Unsupported/unbound catalogue entries remain
+explicitly unavailable. All 40 Red Brick cheat ownership bits use the validated
+serialized mask. Discovery, ownership and current Extras activation are displayed
+separately; granting ownership does not synthesize a pickup or force its effect on.
+
+Local grants/removals now request a native autosave after RAM readback and verify
+the bound disk file's model/cheat/ability ownership flags against the requested
+boolean. Neither an RPC return nor RAM alone is called disk success. Per-operation
+proof exports include native ID, expected/observed ownership, file and serialized
+offset/bit. Source-discovery bits are independently readable and never set by the
+test tool. Currency entries record command confirmation and request autosave, but
+are explicitly marked as lacking individual currency-transaction disk proof.
+
+UI: separate item-selection, active-rule, history and raw-log tabs; tokenized
+case-insensitive searching across native names; German class search aliases;
+native-only/missing-only filters; selection does not collapse the result list;
+selected-item RAM/save/discovery/pending/Extras flags. History has time, action,
+item, RAM, save and detail columns, updates rows instead of duplicating them,
+persists the last 1000 operations across connections/restarts in
+build/lego_city_undercover/native_test_history.json, and exports JSON evidence.
+Passwords are neither stored in settings/history nor exposed by the log handler.
+
+Final full suite: 238 run, 237 passed, 1 host-compiler syntax check skipped.
+Real Tk construction/selection/history tests passed with Tcl/Tk access. Synthetic
+native tests do not open the game. Save tests exercise all 40 cheat bits, both
+skin grant/removal, no false disk confirmations and one autosave per pending batch.
+The final save-proof-only follow-up also passes after adding exported offsets.
+The new UI/native cheat path still needs the user's actual in-game selection and
+Extras behavior test; this is not claimed from synthetic tests alone.

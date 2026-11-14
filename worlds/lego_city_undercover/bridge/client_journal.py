@@ -23,7 +23,16 @@ class Journal:
                 native_state TEXT NOT NULL DEFAULT 'not_applied');
             CREATE TABLE IF NOT EXISTS deliveries (server_index INTEGER PRIMARY KEY REFERENCES receipts(server_index),
                 plan TEXT NOT NULL, state TEXT NOT NULL DEFAULT 'waiting_native_backend', evidence TEXT);
+            CREATE TABLE IF NOT EXISTS item_popups (server_index INTEGER PRIMARY KEY,
+                text TEXT NOT NULL, progression INTEGER NOT NULL, state TEXT NOT NULL DEFAULT 'queued');
+            CREATE TABLE IF NOT EXISTS sent_popups (event_key TEXT PRIMARY KEY,
+                text TEXT NOT NULL, classification TEXT NOT NULL, state TEXT NOT NULL DEFAULT 'queued');
         ''')
+        columns={row[1] for row in self.db.execute('PRAGMA table_info(item_popups)')}
+        if 'classification' not in columns:
+            with self.db:
+                self.db.execute("ALTER TABLE item_popups ADD COLUMN classification TEXT NOT NULL DEFAULT 'filler'")
+                self.db.execute("UPDATE item_popups SET classification='progression' WHERE progression=1")
         with self.db:
             self.db.execute('INSERT OR IGNORE INTO metadata VALUES (?,?)', ('binding',encoded))
             self.db.execute('INSERT OR IGNORE INTO metadata VALUES (?,?)', ('native_save_identity','unverified'))
@@ -50,6 +59,49 @@ class Journal:
 
     def close(self):
         self.db.close()
+
+    def queue_popup(self,index,effect,text=None):
+        # Existing saved receipts are history, not a new flood on first upgrade.
+        # Already queued notifications survive reconnects and process restarts.
+        row=self.db.execute('SELECT state FROM deliveries WHERE server_index=?',(index,)).fetchone()
+        if not row:return
+        name=effect.get('name','AP Item')
+        classification=effect.get('classification','filler')
+        if classification=='progression_skip_balancing':classification='progression'
+        if classification not in ('progression','useful','filler','trap'):classification='filler'
+        with self.db:
+            if row[0]!='applied':
+                self.db.execute('INSERT OR IGNORE INTO item_popups(server_index,text,progression,classification) VALUES (?,?,?,?)',
+                    (index,text or name+' erhalten',int(classification=='progression'),classification))
+            # Upgrade still-waiting v1 notifications without replaying old displays.
+            self.db.execute("UPDATE item_popups SET classification=? WHERE server_index=? AND state='queued'",
+                            (classification,index))
+            if text:
+                self.db.execute("UPDATE item_popups SET text=? WHERE server_index=? AND state='queued'",(text,index))
+
+    def queue_sent_popup(self,event):
+        with self.db:
+            self.db.execute('INSERT OR IGNORE INTO sent_popups(event_key,text,classification) VALUES (?,?,?)',
+                (event['key'],event['text'],event['classification']))
+
+    def next_popup(self):
+        sent=self.db.execute("SELECT event_key,text,classification FROM sent_popups WHERE state='queued' ORDER BY rowid LIMIT 1").fetchone()
+        if sent:return dict(index=sent[0],text=sent[1],classification=sent[2],progression=sent[2]=='progression')
+        # "You received" confirms the AP receipt, not a native grant or autosave.
+        # Native delivery can wait for a safe context/save without blocking text.
+        row=self.db.execute("""SELECT p.server_index,p.text,p.classification FROM item_popups p
+            JOIN deliveries d ON d.server_index=p.server_index
+            WHERE p.state='queued'
+            ORDER BY p.server_index LIMIT 1""").fetchone()
+        return dict(index=row[0],text=row[1],classification=row[2],progression=row[2]=='progression') if row else None
+
+    def popup_state(self,index,state):
+        if state not in ('queued','dispatching','submitted','uncertain'):
+            raise ValueError('Invalid popup state')
+        with self.db:
+            if isinstance(index,str):
+                self.db.execute('UPDATE sent_popups SET state=? WHERE event_key=?',(state,index))
+            else:self.db.execute('UPDATE item_popups SET state=? WHERE server_index=?',(state,index))
 
     def plan_delivery(self,index,plan):
         if not self.db.execute('SELECT 1 FROM receipts WHERE server_index=?',(index,)).fetchone():
@@ -91,3 +143,11 @@ class Journal:
             self.db.execute("UPDATE deliveries SET state='memory_verified',evidence=? WHERE server_index=?",
                             (json.dumps(evidence,sort_keys=True),index))
             self.db.execute("UPDATE receipts SET native_state='not_applied' WHERE server_index=?",(index,))
+
+    def record_runtime_verification(self,index,evidence):
+        if not evidence.get('verified') or evidence.get('native_save_flag') is not False:
+            raise ValueError('Verified runtime gate evidence required')
+        with self.db:
+            self.db.execute("UPDATE deliveries SET state='runtime_verified',evidence=? WHERE server_index=?",
+                            (json.dumps(evidence,sort_keys=True),index))
+            self.db.execute("UPDATE receipts SET native_state='runtime_verified' WHERE server_index=?",(index,))

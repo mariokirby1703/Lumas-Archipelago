@@ -4,7 +4,7 @@ import logging
 from delivery_marker import MARKER_OFFSET,MARKER_SIZE,parse_marker,receipt_saved,marker_from_save
 from inventory_reader import pointer,read_model_ids
 from model_selection import ownership_selection_supported,model_delivery_ready
-from native_model_transport import NativePlayerBusy,grant_model,grant_ability,grant_cheat,grant_currency_batch,request_save,enforce_rewards
+from native_model_transport import NativePlayerBusy,grant_model,grant_ability,grant_cheat,grant_currency_batch,request_save,enforce_rewards,configure_detective_scan
 from reward_policy import reward_masks,encode_policy
 from native_save import resolve_save,read_save,model_saved,cheat_saved,ability_saved,save_evidence,ensure_backup
 from research_profile import ABILITY_NAMES
@@ -16,6 +16,8 @@ class NativeDeliveryEngine:
     def __init__(self,dll,save_file=None):
         self.dll=dll;self.explicit_save=save_file;self.identity=None
         self.path=None;self.models=None;self.requested=set();self.last_problem=None;self.unbound=set()
+        self.last_save_data=None
+        self.runtime_states={}
 
     async def _save(self,session,index):
         status=read_save_controller(session.read,session.base)
@@ -40,6 +42,8 @@ class NativeDeliveryEngine:
         identity=(session.pid,journal.binding_token,pointer(session.read,session.base+0x1c7f160))
         if identity!=self.identity:
             self.identity=identity;self.path=None;self.models=None;self.requested.clear()
+            self.last_save_data=None
+            self.runtime_states={}
         if self.path is None:
             try:
                 path=await asyncio.to_thread(resolve_save,session.read,session.base,self.explicit_save)
@@ -53,7 +57,9 @@ class NativeDeliveryEngine:
                 return
             logging.info('Native save bound for disk verification: %s',self.path)
             self.last_problem=None
-        try:data=await asyncio.to_thread(read_save,self.path)
+        try:
+            data=await asyncio.to_thread(read_save,self.path)
+            self.last_save_data=data
         except (OSError,ValueError,RuntimeError):return  # Native writer may be replacing the file.
         if self.models is None:self.models=await asyncio.to_thread(read_model_ids,session.read,session.base)
         bank=pointer(session.read,session.base+0x1c7cbb8)
@@ -66,11 +72,16 @@ class NativeDeliveryEngine:
         masks=reward_masks(effects,received,self.models,snapshot.get('cheats',{}).get('records',[]),options or {})
         if overrides and context==46:
             if not await overrides.apply(session,snapshot,self.models,received,self.dll):return
+            await overrides.verify_save(session,self.path,self.dll)
             masks=overrides.policy(masks,self.models,snapshot.get('cheats',{}).get('records',[]))
         policy=encode_policy(session.pid,journal.binding_token,masks)
         # Do not revoke equipped models, tools or cheats while driving/riding.
         enforced=(await asyncio.to_thread(enforce_rewards,session.pid,policy,journal.binding_token,self.dll)
                   if context==46 else dict(changes=0,switch_requested=False))
+        if context==46 and 0 in masks.get('managed_runtime',()):
+            self.runtime_states['DetectiveScan']=0 in masks.get('entitled_runtime',())
+        elif context==46:
+            self.runtime_states.pop('DetectiveScan',None)
         if enforced['switch_requested']:
             if self.last_problem!='equipped-unreceived':
                 logging.warning('Select an AP-owned or starting civilian outfit to finish deferred reward locking')
@@ -85,6 +96,16 @@ class NativeDeliveryEngine:
         for delivery in deliveries:
             index=delivery['index'];plan=delivery['plan'];kind=plan['kind']
             if overrides and overrides.blocks(plan):continue
+            if kind=='runtime_unlock' and plan['ability']=='DetectiveScan':
+                if context!=46:continue
+                # The policy call above installed/read back the gate. The durable
+                # entitlement is the AP journal, not an invented native save bit.
+                if delivery['state']!='runtime_verified' or not self.runtime_states.get('DetectiveScan'):
+                    evidence=await asyncio.to_thread(configure_detective_scan,session.pid,True,self.dll)
+                    self.runtime_states['DetectiveScan']=True
+                    journal.record_runtime_verification(index,evidence)
+                    logging.info('Detective Scan gate verified; entitlement persisted in AP receipt journal (%s)',index)
+                continue
             if kind in ('add_studs','add_bricks'):
                 if receipt_saved(marker,journal.binding_token,index) and receipt_saved(marker_from_save(data),journal.binding_token,index):
                     if delivery['state']!='applied':journal.record_saved(index,save_evidence(self.path,data))

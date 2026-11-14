@@ -18,7 +18,7 @@ class NativeStationExitTests(unittest.TestCase):
         (out/'native_context_policy.h').write_text(header(),encoding='utf-8')
         dll=out/'StationExitTest.dll'
         result=subprocess.run([sys.executable,'-m','ziglang','c++','-target','x86_64-windows-gnu',
-            '-shared','-O2','-I',str(out),str(Path(__file__).parent/'native/station_exit_fixture.cpp'),'-o',str(dll)],
+            '-shared','-O2','-fms-extensions','-I',str(out),str(Path(__file__).parent/'native/station_exit_fixture.cpp'),'-o',str(dll),'-luser32'],
             capture_output=True,text=True,env=dict(os.environ,ZIG_GLOBAL_CACHE_DIR=str(out/'zig-cache'),ZIG_LOCAL_CACHE_DIR=str(out/'zig-local-cache')))
         if result.returncode:raise RuntimeError(result.stderr)
         cls.dll=ctypes.WinDLL(str(dll));cls.invoke=cls.dll.TestStationExit
@@ -39,6 +39,50 @@ class NativeStationExitTests(unittest.TestCase):
         cls.claim=cls.dll.ClaimPacket
         cls.claim.argtypes=[ctypes.c_void_p,ctypes.c_uint32,ctypes.c_uint32]
         cls.claim.restype=ctypes.c_uint32
+        cls.popup_tint=cls.dll.TestPopupTint
+        cls.popup_tint.argtypes=[ctypes.c_size_t,ctypes.c_uint32,ctypes.c_uint32]
+        cls.popup_tint.restype=ctypes.c_uint32
+        cls.popup_position=cls.dll.TestPopupPosition
+        cls.popup_position.argtypes=[ctypes.c_size_t,ctypes.c_uint32,ctypes.POINTER(ctypes.c_float)]
+        cls.popup_position.restype=ctypes.c_uint32
+        cls.detective_gate=cls.dll.TestDetectiveGate
+        cls.detective_gate.argtypes=[ctypes.c_size_t,ctypes.c_uint32]
+        cls.detective_gate.restype=ctypes.c_uint32
+        cls.popup_screen=cls.dll.TestPopupScreen
+        cls.popup_screen.argtypes=[ctypes.c_size_t,ctypes.c_uint32]
+        cls.popup_screen.restype=ctypes.c_uint32
+
+    def test_popup_waits_for_available_screen_instead_of_losing_text_to_modal_save(self):
+        self.assertEqual(self.popup_screen(self.base,0),1)
+        self.assertEqual(self.popup_screen(self.base,1),0)
+        self.assertEqual(self.popup_screen(self.base,2),0)
+        self.assertEqual(self.popup_screen(self.base,3),0)
+        self.assertEqual(self.popup_screen(self.base,4),1)
+
+    def test_detective_gate_blocks_story_grant_until_separate_entitlement(self):
+        self.assertEqual(self.detective_gate(self.base,0),0)
+        self.assertEqual(self.detective_gate(self.base,1),1)
+        self.assertEqual(self.detective_gate(self.base,2),0,'AP grant must not override native aura=false')
+        self.assertEqual(self.detective_gate(self.base,3),1,'Vanilla mode restores original setter semantics')
+        self.assertEqual(self.detective_gate(self.base,4),101,'Unexpected game code must not be patched')
+
+    def test_popup_position_restores_layout_but_respects_new_native_position(self):
+        result=(ctypes.c_float*2)()
+        self.assertEqual(self.popup_position(self.base,0,result),2)
+        self.assertEqual(list(result),[240,241])
+        self.popup_position(self.base,1,result)
+        self.assertEqual(list(result),[12,241])
+        self.popup_position(self.base,2,result)
+        self.assertEqual(list(result),[480,481])
+
+    def test_popup_tints_restore_original_rgb_without_changing_fade_alpha(self):
+        for classification in range(4):
+            self.assertEqual(self.popup_tint(self.base,0,classification),0x55ffad4a)
+            self.assertEqual(self.popup_tint(self.base,3,classification),0x55ffad4a)
+
+    def test_popup_tint_does_not_overwrite_new_native_style_or_replaced_object(self):
+        self.assertEqual(self.popup_tint(self.base,1,2),0xaa123456)
+        self.assertEqual(self.popup_tint(self.base,2,2),0x55ef99af)
     def setUp(self):
         self.k=ctypes.WinDLL('kernel32',use_last_error=True)
         self.k.VirtualAlloc.argtypes=[ctypes.c_void_p,ctypes.c_size_t,ctypes.c_ulong,ctypes.c_ulong]

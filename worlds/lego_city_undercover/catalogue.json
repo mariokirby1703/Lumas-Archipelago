@@ -26,6 +26,11 @@
       "classification": "progression",
       "id": 2010966013
     },
+    "Ability: Detective Scan": {
+      "category": "ability",
+      "classification": "progression",
+      "id": 2213734077
+    },
     "Ability: EnergyGun": {
       "category": "ability",
       "classification": "progression",
@@ -10027,26 +10032,6 @@
         "instanceName": "LCPD_BR_Donut",
         "lockName": "robber",
         "lockType": "Class",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
-    "objective:LCPD_BR_PopCorn": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1528925582,
-      "name": "Clue: LCPD_BR_PopCorn",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_BR_PopCorn"
-      },
-      "source": "LCPD_BR_PopCorn",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_BR_PopCorn",
         "objectiveTypeId": "Clue"
       },
       "status": "unverified_prerequisite"
@@ -114410,7 +114395,7 @@
       "status": "static_candidate_unbound"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:42": {
-      "category": "unverified_pickups",
+      "category": "city_activities",
       "coordinate_space": "resource; transforms may apply",
       "coordinates": [
         3.034475564956665,
@@ -114418,13 +114403,16 @@
         1.3053439855575562
       ],
       "district": null,
+      "evidence": "User ate popcorn; GB_Popcorn collected and LCPD_BR_PopCorn hash 753712927 bit 716 became complete compared with the preceding live snapshot; total gold bricks rose from four to five",
       "id": 1627984646,
-      "name": "PickupType71: GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:42",
-      "native_type": "PickupType71",
-      "runtime": null,
-      "source": "GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz",
-      "source_index": 42,
-      "status": "static_candidate_unbound"
+      "name": "Police Station Briefing Room: Eat Popcorn",
+      "native_type": "Activity reward",
+      "runtime": {
+        "kind": "activity_reward",
+        "reward_key": "police_station_briefingroom:popcorn"
+      },
+      "source": "GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:42",
+      "status": "verified_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:43": {
       "category": "unverified_pickups",
@@ -114622,8 +114610,10 @@
         -6.171182155609131
       ],
       "district": null,
+      "evidence": "collection.txt default linked class cop; original wardrobe also grants COP_FEMALE_P2; recovery after PDA.acquired",
       "id": 1000355890,
-      "name": "Character Token: cop (GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:0)",
+      "linked_story_reward": "COP",
+      "name": "Story Character: Grace Makepiece (COP_FEMALE_P2)",
       "native_type": "PickupType122",
       "opening_logic": {
         "observed_before_police": true,
@@ -114632,7 +114622,7 @@
       },
       "runtime": {
         "kind": "model_found",
-        "native_name": "COP"
+        "native_name": "COP_FEMALE_P2"
       },
       "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz",
       "source_index": 0,
@@ -115982,7 +115972,7 @@
       "status": "static_candidate_unbound"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_line_up_room/police_station_line_up_room.giz:27:1": {
-      "category": "unverified_pickups",
+      "category": "city_activities",
       "coordinate_space": "resource; transforms may apply",
       "coordinates": [
         0.17062804102897644,
@@ -115990,13 +115980,16 @@
         0.08027924597263336
       ],
       "district": null,
+      "evidence": "User reported a gold brick inside the station room; live snapshot GB_LineUp in Police_Station_Line_Up_Room native_type 11 native_collected true; name and coordinates match the unique static type-71 source",
       "id": 1297348804,
-      "name": "PickupType71: GAME7/levels/standalones/police_station/police_station_line_up_room/police_station_line_up_room.giz:27:1",
-      "native_type": "PickupType71",
-      "runtime": null,
-      "source": "GAME7/levels/standalones/police_station/police_station_line_up_room/police_station_line_up_room.giz",
-      "source_index": 1,
-      "status": "static_candidate_unbound"
+      "name": "Police Station: Line-Up Room Hidden Gold Brick",
+      "native_type": "Activity reward",
+      "runtime": {
+        "kind": "activity_reward",
+        "reward_key": "police_station_line_up_room:hidden_gold_brick"
+      },
+      "source": "GAME7/levels/standalones/police_station/police_station_line_up_room/police_station_line_up_room.giz:27:1",
+      "status": "verified_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:0": {
       "category": "unverified_pickups",

@@ -16,6 +16,7 @@ from red_bricks import redbrick_location_key
 from activity_rewards import ACTIVITY_REWARDS
 from story_arrests import ARRESTS
 from opening_logic import NO_POLICE_KEYS
+from station_rewards import GRACE_REWARD_KEY,grace_reward_metadata
 
 
 def ident(key, base):
@@ -92,6 +93,10 @@ def main():
                     runtime=dict(kind='model_found',native_name=native_name) if token_counts[native_name]==1 else None,
                     status='experimental_model_found' if token_counts[native_name]==1 else 'ambiguous_model_source')
     # Primary story disguises are grants, not type-122 pickup source records.
+    if GRACE_REWARD_KEY in locations:
+        # The wardrobe's primary COP reward already has story_disguise:COP.
+        # Use the second check for its linked Grace reward, retaining existing IDs.
+        locations[GRACE_REWARD_KEY].update(grace_reward_metadata())
     for default in roster['defaults']:
         if default['player']!=1 or default['class_name']=='generic':continue
         name=default['model'];key='story_disguise:'+name
@@ -145,7 +150,7 @@ def main():
         items[f'{prefix}: {name}']=dict(category=row['kind'],classification='progression' if name in primary else 'useful' if row['kind']=='character' else 'filler',native_name=name)
     for tool in ('Police','Robber','Miner','Astronaut','Farmer','Firefighter','Construction Worker',
                  'Rex Fury','Stethoscope','Crowbar','GrappleGun','EnergyGun','Scanner','Surveillance',
-                 'Wiretap','Jetpack','FireAxe','SuperBuild','Parkour','Fishing','Carry Objects','Climbing'):
+                 'Wiretap','Jetpack','FireAxe','SuperBuild','Parkour','Fishing','Carry Objects','Climbing','Detective Scan'):
         items[f'Ability: {tool}']=dict(category='ability',classification='progression')
     cheat_names={r['native_name'] for r in json.loads((WORLD/'bridge/cheat_manifest.json').read_text())}
     for name in sorted(cheat_names):

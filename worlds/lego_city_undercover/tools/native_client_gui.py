@@ -17,6 +17,7 @@ import queue
 import sys
 import threading
 import tkinter as tk
+from datetime import datetime
 from tkinter import filedialog, messagebox, ttk
 from urllib.parse import urlsplit
 
@@ -26,7 +27,9 @@ SETTINGS = ROOT / 'build/lego_city_undercover/native_client_ui.json'
 SAVE_SUFFIX = '.legocityundercoversavegamedata'
 sys.path.insert(0, str(WORLD / 'bridge'))
 from native_bridge_path import bridge_path
+from native_build_integrity import bridge_health
 from test_overrides import supported
+from test_catalogue import test_catalogue,normalize_search
 
 
 def connection_address(address: str, port: str | int) -> str:
@@ -120,6 +123,13 @@ class App:
         self.game_connected = False
         self.native_ready = False
         self.tests_confirmed = False
+        self.item_states={};self.history_rows=[];self._selecting=False
+        self.history_session=datetime.now().isoformat(timespec='microseconds')
+        self.history_path=ROOT/'build/lego_city_undercover/native_test_history.json'
+        self.only_missing=tk.BooleanVar(value=False)
+        self.show_popups=tk.BooleanVar(value=True)
+        self.only_supported=tk.BooleanVar(value=True)
+        self.result_count=tk.StringVar()
         self.settings_path = SETTINGS
 
         settings = load_settings(self.settings_path)
@@ -141,6 +151,7 @@ class App:
         self.use_native = tk.BooleanVar(value=settings['native'])
         self.cutscene_skip = tk.BooleanVar(value=settings['cutscene_skip'])
         self.item = tk.StringVar()
+        self.item_category = tk.StringVar(value='Alle Item-Kategorien')
         self.ap_status = tk.StringVar(value='Archipelago: Nicht verbunden')
         self.game_status = tk.StringVar(value='Spiel: Nicht geladen')
         self.save_status = tk.StringVar(value='Save: Nicht gebunden')
@@ -148,12 +159,12 @@ class App:
         self.item_info = tk.StringVar(value='Item suchen oder auswählen.')
 
         catalogue = json.loads((WORLD / 'catalogue.json').read_text(encoding='utf-8'))
-        self.effects = {name: dict(row, name=name) for name, row in catalogue['items'].items()}
+        self.effects = test_catalogue(catalogue,json.loads((WORLD/'bridge/collection_manifest.json').read_text(encoding='utf-8')))
         self.names = sorted(self.effects, key=str.casefold)
 
         root.title('LEGO City Undercover | Archipelago Client')
-        root.geometry('1160x790')
-        root.minsize(910, 620)
+        root.geometry('1380x920')
+        root.minsize(1080, 780)
         style = ttk.Style()
         if 'clam' in style.theme_names():
             style.theme_use('clam')
@@ -193,6 +204,9 @@ class App:
                         variable=self.use_native, command=self.update_buttons).pack(side='left', padx=(0, 20))
         ttk.Checkbutton(switches, text='Cutscene-Skip (nur bei aktiviertem Seed)',
                         variable=self.cutscene_skip).pack(side='left')
+        ttk.Checkbutton(switches, text='Item-Popups im Spiel',
+                        variable=self.show_popups,
+                        command=lambda: self.commands.put(('popups_enabled',self.show_popups.get()))).pack(side='left', padx=15)
 
         status = ttk.LabelFrame(main, text='Live-Status', padding=9)
         status.pack(fill='x', pady=10)
@@ -207,15 +221,45 @@ class App:
 
         panes = ttk.Panedwindow(main, orient='horizontal')
         panes.pack(fill='both', expand=True)
-        tests = ttk.LabelFrame(panes, text='Lokale Item-Tests (keine AP-Items!)', padding=10)
-        logs = ttk.LabelFrame(panes, text='Client-Log und Fehler', padding=8)
-        panes.add(tests, weight=2)
+        test_pages=ttk.Notebook(panes)
+        tests = ttk.Frame(test_pages,padding=10)
+        rules=ttk.Frame(test_pages,padding=10)
+        test_pages.add(tests,text='Item-Auswahl');test_pages.add(rules,text='Aktive Testregeln')
+        logs = ttk.Notebook(panes)
+        history_page=ttk.Frame(logs,padding=8)
+        log_page=ttk.Frame(logs,padding=8)
+        logs.add(history_page,text='Test-Historie');logs.add(log_page,text='Client-Log und Fehler')
+        filters=ttk.Frame(history_page);filters.pack(fill='x',pady=(0,8))
+        ttk.Label(filters,text='Anforderung → Spiel-RAM → Save-Datei').pack(side='left')
+        ttk.Button(filters,text='Historie exportieren',command=self.export_history).pack(side='right')
+        columns=('time','action','item','ram','save','detail')
+        self.history_view=ttk.Treeview(history_page,columns=columns,show='headings',selectmode='browse')
+        for key,label,width in (('time','Zeit',75),('action','Aktion',65),('item','Item',270),('ram','Spiel-RAM',120),('save','Save-Datei',120),('detail','Details',250)):
+            self.history_view.heading(key,text=label);self.history_view.column(key,width=width,minwidth=60,stretch=key in ('item','detail'))
+        hscroll=ttk.Scrollbar(history_page,orient='horizontal',command=self.history_view.xview)
+        vscroll=ttk.Scrollbar(history_page,orient='vertical',command=self.history_view.yview)
+        self.history_view.configure(xscrollcommand=hscroll.set,yscrollcommand=vscroll.set)
+        hscroll.pack(side='bottom',fill='x');vscroll.pack(side='right',fill='y');self.history_view.pack(fill='both',expand=True)
+        self.history_view.tag_configure('saved',foreground='#187044');self.history_view.tag_configure('error',foreground='#ad3025')
+        panes.add(test_pages, weight=2)
         panes.add(logs, weight=3)
+        self.category_combo = ttk.Combobox(tests, textvariable=self.item_category, state='readonly',
+            values=('Alle Item-Kategorien', 'Rote Steine / Cheats', 'Fähigkeiten', 'Charaktere', 'Fahrzeuge', 'Währungen'), height=7)
+        self.category_combo.pack(fill='x', pady=(0, 6))
+        self.item_category.trace_add('write', self.filter_items)
         self.combo = ttk.Combobox(tests, textvariable=self.item, values=self.names, state='normal')
         self.combo.pack(fill='x')
+        self.combo.bind('<<ComboboxSelected>>',lambda _:self.show_item_info())
         self.item.trace_add('write', self.filter_items)
-        self.matches = tk.Listbox(tests, height=8, exportselection=False, font=('Segoe UI', 10))
-        self.matches.pack(fill='x', pady=7)
+        search_options=ttk.Frame(tests);search_options.pack(fill='x',pady=(5,0))
+        ttk.Checkbutton(search_options,text='Nur native Items',variable=self.only_supported,command=self.filter_items).pack(side='left')
+        ttk.Checkbutton(search_options,text='Nur fehlende',variable=self.only_missing,command=self.filter_items).pack(side='left',padx=8)
+        ttk.Button(search_options,text='Suche leeren',command=lambda:self.item.set('')).pack(side='right')
+        ttk.Label(tests,textvariable=self.result_count).pack(anchor='w',pady=(4,0))
+        results=ttk.Frame(tests);results.pack(fill='both',expand=True,pady=7)
+        self.matches = tk.Listbox(results, height=10, exportselection=False, font=('Segoe UI', 10))
+        rscroll=ttk.Scrollbar(results,command=self.matches.yview);self.matches.configure(yscrollcommand=rscroll.set)
+        rscroll.pack(side='right',fill='y');self.matches.pack(fill='both',expand=True)
         self.matches.bind('<<ListboxSelect>>', self.select_item)
         ttk.Label(tests, textvariable=self.item_info, wraplength=320).pack(fill='x', pady=(0, 8))
         buttons = ttk.Frame(tests)
@@ -227,15 +271,23 @@ class App:
         self.reset_button = ttk.Button(tests, text='Testfreigaben auf AP-Zustand zurücksetzen',
                                        state='disabled', command=self.reset_tests)
         self.reset_button.pack(fill='x', pady=8)
+        popup_buttons=ttk.LabelFrame(tests,text='HUD-Vorschau (ohne Item-Vergabe)',padding=5)
+        popup_buttons.pack(fill='x',pady=(0,8))
+        self.popup_buttons=[]
+        for label,kind in (('Progression','progression'),('Useful','useful'),('Filler','filler')):
+            button=ttk.Button(popup_buttons,text=label,state='disabled',
+                command=lambda value=kind: self.commands.put(('popup',value)))
+            button.pack(side='left',fill='x',expand=True)
+            self.popup_buttons.append(button)
         ttk.Label(tests, wraplength=330, text=(
             'Achtung: Native Tests ändern deinen geladenen Spielstand. Autosaves können diese Änderungen '
             'dauerhaft speichern. Der Reset stellt AP-Freigaben wieder her, aber macht '
             'Währungstests nicht rückgängig. Benutze einen gesicherten Test-Slot!'
         )).pack(fill='x', pady=(0, 8))
-        ttk.Label(tests, text='Aktive Testregeln').pack(anchor='w')
-        self.overrides = tk.Listbox(tests, height=5, font=('Segoe UI', 9))
+        ttk.Label(rules, text='Gewünschte Testfreigaben und Prüfergebnisse').pack(anchor='w')
+        self.overrides = tk.Listbox(rules, height=5, font=('Segoe UI', 9))
         self.overrides.pack(fill='both', expand=True, pady=(4, 0))
-        log_frame = ttk.Frame(logs)
+        log_frame = ttk.Frame(log_page)
         log_frame.pack(fill='both', expand=True)
         self.log = tk.Text(log_frame, wrap='word', state='disabled', font=('Consolas', 9),
                            bg='#12202e', fg='#e5edf5', insertbackground='white')
@@ -249,6 +301,11 @@ class App:
         bottom_buttons.pack(fill='x', pady=(8, 0))
         ttk.Button(bottom_buttons, text='Log kopieren', command=self.copy_log).pack(side='right')
         ttk.Button(bottom_buttons, text='Log leeren', command=self.clear_log).pack(side='right', padx=8)
+        try:
+            previous=json.loads(self.history_path.read_text(encoding='utf-8'))
+            if isinstance(previous,list):self.history_rows=[row for row in previous if isinstance(row,dict) and 'ui_id' in row][-1000:]
+            self.update_history([])
+        except (OSError,ValueError,KeyError,TypeError):pass
         self.filter_items()
         root.protocol('WM_DELETE_WINDOW', self.close)
         root.after(100, self.pump)
@@ -260,24 +317,97 @@ class App:
             self.save_file.set(selected)
 
     def filter_items(self, *_):
-        query = self.item.get().casefold()
-        values = [name for name in self.names if query in name.casefold()]
-        self.combo.configure(values=values[:400])
+        if self._selecting or (self.item.get() in self.effects and _ and _[0]==str(self.item)):
+            self.show_item_info();return
+        query = '' if self.item.get() in self.effects else normalize_search(self.item.get().strip())
+        query={'detektivscan':'detective scan','kriminellenscan':'scanner','personenscan':'scanner'}.get(query,query)
+        query={'polizei':'police','polizist':'police','minenarbeiter':'miner','r?uber':'robber','feuerwehr':'firefighter','bauarbeiter':'construction'}.get(query,query)
+        if query in ('red bricks', 'redbrick', 'rote steine', 'rotsteine', 'rote steinchen'):
+            query = 'red brick'
+        selected = self.item_category.get()
+        def category_matches(name):
+            item = self.effects[name]
+            kind = item.get('category')
+            if selected == 'Rote Steine / Cheats': return kind == 'cheat'
+            if selected == 'Fähigkeiten': return kind == 'ability'
+            if selected == 'Charaktere': return kind == 'character'
+            if selected == 'Fahrzeuge': return kind == 'vehicle'
+            if selected == 'Währungen': return item.get('effect') in ('add_studs', 'add_bricks')
+            return True
+        values = [name for name in self.names if all(word in normalize_search(name) for word in query.split()) and category_matches(name)
+                  and (not self.only_supported.get() or supported(self.effects[name]))
+                  and (not self.only_missing.get() or self.item_states.get(name,{}).get('owned') is False)]
+        self.combo.configure(values=values)
+        self.result_count.set(f'{len(values)} von {len(self.names)} Items ? Auswahl bleibt beim Anklicken erhalten')
         self.matches.delete(0, 'end')
-        for name in values[:250]:
+        for name in values:
             self.matches.insert('end', name)
         effect = self.effects.get(self.item.get())
         if effect:
             info = 'Native Test-Anbindung vorhanden.' if supported(effect) else 'Noch keine native Test-Anbindung.'
+            if effect.get('category') == 'cheat':
+                info += ' Freischalten ist nicht gleich sichtbar aktivieren; ggf. Extras im Spiel prüfen.'
+            if self.item.get() in ('Ability: Police', 'Character: COP'):
+                info += ' Police wird freigeschaltet, nicht automatisch angezogen.'
         else:
             info = f'{len(values)} passende Items' + (' (Liste auf 250 begrenzt)' if len(values) > 250 else '')
+            if selected == 'Rote Steine / Cheats':
+                info += ' · Das sind Cheat-Freischaltungen, keine Fundort-Checks.'
         self.item_info.set(info)
         self.update_buttons()
 
     def select_item(self, _):
         indices = self.matches.curselection()
         if indices:
-            self.item.set(self.matches.get(indices[0]))
+            self._selecting=True
+            try:self.item.set(self.matches.get(indices[0]))
+            finally:self._selecting=False
+            self.show_item_info()
+
+    def show_item_info(self):
+        name=self.item.get();effect=self.effects.get(name)
+        if effect is None:return
+        state=self.item_states.get(name,{})
+        flag=lambda value:'Ja' if value is True else 'Nein' if value is False else 'Noch nicht gelesen'
+        lines=[name,'Native Anbindung: '+('Verfügbar' if supported(effect) else 'Nicht implementiert'),
+               'Freigeschaltet im Spiel: '+flag(state.get('owned')),
+               'Freigeschaltet im Save: '+flag(state.get('saved'))]
+        if name=='Ability: Detective Scan':
+            lines[-1]='Persistenz: AP-Empfangsjournal; kein natives Save-Flag'
+            lines.append('Nach Geben die Detektiv-Aura einmal verlassen und erneut betreten.')
+        if state.get('index') is not None:lines.append('Native ID: '+str(state['index']))
+        if state.get('found') is not None:lines.append('Originalfund registriert: '+flag(state['found']))
+        if state.get('saved_found') is not None:lines.append('Originalfund im Save: '+flag(state['saved_found']))
+        if state.get('pending') is not None:lines.append('Native Freigabe ausstehend: '+flag(state['pending']))
+        if state.get('active') is not None:lines.append('Cheat im Extras-Menü aktiv: '+flag(state['active']))
+        if effect.get('test_only'):lines.append('Zusätzliches natives Testmodell, kein AP-Pool-Item.')
+        self.item_info.set('\n'.join(lines));self.update_buttons()
+
+    def update_history(self,rows):
+        stored={row['ui_id']:row for row in self.history_rows}
+        for row in rows:
+            row=dict(row,ui_id=self.history_session+':'+str(row['id']))
+            stored[row['ui_id']]=row
+        self.history_rows=list(stored.values())[-1000:]
+        visible={row['ui_id'] for row in self.history_rows}
+        for ident in self.history_view.get_children():
+            if ident not in visible:self.history_view.delete(ident)
+        for row in self.history_rows:
+            ident=row['ui_id'];values=tuple(row.get(key,'') for key in ('time','action','item','ram','save','detail'))
+            tags=('error',) if 'Fehler' in row.get('ram','') else ('saved',) if row.get('save')=='Bestätigt' else ()
+            if self.history_view.exists(ident):self.history_view.item(ident,values=values,tags=tags)
+            else:self.history_view.insert('',0,iid=ident,values=values,tags=tags)
+        try:
+            self.history_path.parent.mkdir(parents=True,exist_ok=True)
+            temporary=self.history_path.with_suffix('.tmp')
+            temporary.write_text(json.dumps(self.history_rows,ensure_ascii=False,indent=2),encoding='utf-8');temporary.replace(self.history_path)
+        except OSError as error:self.append_log('WARNING: Historie konnte nicht gespeichert werden: '+str(error))
+
+    def export_history(self):
+        path=filedialog.asksaveasfilename(parent=self.root,title='Test-Historie exportieren',defaultextension='.json',filetypes=[('JSON','*.json')])
+        if path:
+            try:Path(path).write_text(json.dumps(dict(format='LCU local test history',version=1,operations=self.history_rows),indent=2,ensure_ascii=False),encoding='utf-8')
+            except OSError as error:self.append_log('ERROR: Historie konnte nicht exportiert werden: '+str(error))
 
     def update_buttons(self):
         running = bool(self.worker and self.worker.is_alive() and not self.stopping)
@@ -290,6 +420,9 @@ class App:
                             ('CIVILIAN_CHASEMCCAIN', 'CIVILIAN_CHASEMCCAIN_ALT'))
         self.remove_button.configure(state='normal' if allowed and not locked_start else 'disabled')
         self.reset_button.configure(state='normal' if ready else 'disabled')
+        for button in self.popup_buttons:
+            button.configure(state='normal' if running and self.use_native.get() and
+                             self.ap_connected and self.game_connected else 'disabled')
 
     def append_log(self, line: str):
         self.log.configure(state='normal')
@@ -314,6 +447,10 @@ class App:
             if not slot:
                 raise ValueError('Bitte den Slotnamen aus dem Archipelago-Raum eingeben.')
             save = validate_start(self.use_native.get(), self.save_file.get().strip())
+            if self.use_native.get():
+                problem = bridge_health(ROOT)
+                if problem:
+                    raise ValueError(problem)
         except (ValueError, TypeError, OSError) as error:
             self.append_log('ERROR: ' + str(error))
             return
@@ -327,12 +464,14 @@ class App:
             self.append_log('WARNING: Einstellungen konnten nicht gespeichert werden: ' + str(error))
 
         self.commands = queue.Queue()
+        self.history_session=datetime.now().isoformat(timespec='microseconds')
         self.ap_connected = self.game_connected = self.native_ready = False
         self.tests_confirmed = False
         self.stopping = False
         password = self.password.get()
         args = argparse.Namespace(connect=server, name=slot, password=password,
             native_save_file=save, enable_cutscene_skip=self.cutscene_skip.get(),
+            disable_item_popups=not self.show_popups.get(),
             enable_native_models=self.use_native.get(), ui_controls=self.commands, ui_events=self.events)
 
         def worker():
@@ -391,7 +530,7 @@ class App:
                 return
             self.tests_confirmed = True
         self.commands.put((action, name))
-        self.append_log(f'INFO: Lokaler Test angefordert: {action} · {name}')
+        self.append_log(f'INFO: Lokaler Test angefordert: {action} · {name} (noch NICHT bestätigt)')
 
     def reset_tests(self):
         if self.reset_button.instate(['disabled']):
@@ -440,6 +579,9 @@ class App:
                 self.overrides.delete(0, 'end')
                 for row in value:
                     self.overrides.insert('end', row)
+            elif kind=='history':self.update_history(value)
+            elif kind=='item_states':
+                self.item_states=value;self.show_item_info()
             elif kind == 'stopped':
                 self.worker = None
                 self.stopping = False

@@ -7,6 +7,27 @@ from activity_rewards import ACTIVITY_REWARDS,completed_activity_rewards
 from client_checks import changed_checks
 
 class ActivityRewardTests(unittest.TestCase):
+    def test_popcorn_action_has_one_check_and_survives_room_unload(self):
+        from research_profile import symbol_hash
+        reward=next(r for r in ACTIVITY_REWARDS if r['pickup_name']=='GB_Popcorn')
+        snapshot=dict(objectives=dict(status='read',records=[dict(name_hash=symbol_hash('LCPD_BR_PopCorn'),candidate_complete=True)]),
+                      pickup_bits=[],native_pickups=dict(status='not_initialized'))
+        catalogue={'7':dict(key='source_pickup:'+reward['source_key'],runtime=dict(kind='activity_reward',reward_key=reward['key']))}
+        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[7])
+        self.assertEqual(changed_checks(catalogue,None,snapshot,{7})[0],[])
+        snapshot['objectives']['records'][0]['candidate_complete']=False
+        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[])
+
+    def test_line_up_room_hidden_brick_uses_exact_pickup_not_gold_total(self):
+        reward=next(r for r in ACTIVITY_REWARDS if r['pickup_name']=='GB_LineUp')
+        snapshot=dict(objectives=dict(status='read',records=[]),pickup_bits=[],stats=dict(gold_bricks=4),
+            native_pickups=dict(status='read',objects=[dict(tile_name=reward['scene'],name='GB_LineUp',native_type=11,native_collected=True)]))
+        catalogue={'1297348804':dict(key='source_pickup:'+reward['source_key'],runtime=dict(kind='activity_reward',reward_key=reward['key']))}
+        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[1297348804])
+        snapshot['native_pickups']['objects'][0]['native_collected']=False
+        snapshot['stats']['gold_bricks']=450
+        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[])
+
     def snapshot(self,**changes):
         reward=ACTIVITY_REWARDS[0]
         row=dict(tile_name=reward['scene'],name=reward['pickup_name'],native_type=11,native_collected=True)

@@ -1,0 +1,33 @@
+name: Luma
+game: LEGO City Undercover
+description: Chronological integration test with an early criminal scan. Partial logic only.
+LEGO City Undercover:
+  story_mode: linear
+  # Police is guaranteed by the world on an observed opening check.
+  # Scanner means criminal/person scan, not detective scan.
+  early_criminal_scan: true
+  detective_scan_lock: true
+  early_detective_scan: true
+  ability_items: true
+  character_items: true
+  vehicle_items: true
+  cheat_items: true
+  area_pass_items: false
+  story_access_items: false
+  cutscene_skip: true
+  super_bricks: true
+  super_builds: true
+  disguise_booths: true
+  atms: true
+  train_stations: true
+  city_activities: true
+  story_missions: true
+  character_tokens: true
+  vehicle_tokens: true
+  red_bricks: true
+  city_hero: true
+  police_shields: quarters
+  include_unverified: false
+  goal_tokens: 20
+  super_brick_1000_count: 20
+  super_brick_10000_count: 5

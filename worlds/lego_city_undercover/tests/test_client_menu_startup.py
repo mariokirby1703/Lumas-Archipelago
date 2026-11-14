@@ -8,9 +8,14 @@ from unittest.mock import AsyncMock,Mock,patch
 spec=importlib.util.spec_from_file_location('lcu_menu_client',Path(__file__).resolve().parents[1]/'Client.py')
 client=importlib.util.module_from_spec(spec);spec.loader.exec_module(client)
 
+def make_context(**kwargs):
+    defaults=dict(notify=Mock(),ui_events=None,native_ready=False,game_loaded=False,pending_sent_popups=[])
+    defaults.update(kwargs)
+    return SimpleNamespace(**defaults)
+
 class MenuStartupTests(unittest.IsolatedAsyncioTestCase):
     async def test_skip_runs_before_save_or_player_is_available(self):
-        ctx=SimpleNamespace(native_save_file=None,enable_skip=True,skip_slot=True,
+        ctx=make_context(native_save_file=None,enable_skip=True,skip_slot=True,
                             slot=None,journal=None,exit_event=asyncio.Event())
         async def stop(_):ctx.exit_event.set()
         with patch.object(client,'enable_cutscene_skip',return_value={'before':0,'pid':123}) as skip, \
@@ -19,7 +24,7 @@ class MenuStartupTests(unittest.IsolatedAsyncioTestCase):
             skip.assert_called_once();session.assert_not_called()
     async def test_menu_profile_cannot_report_checks_or_deliver_items(self):
         journal=Mock();journal.pending.return_value=[]
-        ctx=SimpleNamespace(native_save_file=None,enable_skip=True,skip_slot=True,
+        ctx=make_context(native_save_file=None,enable_skip=True,skip_slot=True,
             slot=1,team=0,seed_name='fresh-slot2-seed',catalogue={'1':{}},journal=None,
             state_dir=Path('unused'),items_received=[],checked_locations=set(),
             finished_game=True,exit_event=asyncio.Event(),report_checks=AsyncMock(),
@@ -38,7 +43,7 @@ class MenuStartupTests(unittest.IsolatedAsyncioTestCase):
             delivery.return_value.poll.assert_not_called();ctx.report_checks.assert_not_called()
             session.close.assert_called_once()
     async def test_seed_option_still_controls_skip(self):
-        ctx=SimpleNamespace(native_save_file=None,enable_skip=True,skip_slot=False,
+        ctx=make_context(native_save_file=None,enable_skip=True,skip_slot=False,
                             slot=None,journal=None,exit_event=asyncio.Event())
         async def stop(_):ctx.exit_event.set()
         with patch.object(client,'enable_cutscene_skip') as skip, \
@@ -47,7 +52,7 @@ class MenuStartupTests(unittest.IsolatedAsyncioTestCase):
             skip.assert_not_called()
     async def test_vehicle_check_is_queued_and_sent_before_native_delivery(self):
         journal=Mock();journal.pending.return_value=[]
-        ctx=SimpleNamespace(native_save_file=None,enable_skip=False,skip_slot=False,
+        ctx=make_context(native_save_file=None,enable_skip=False,skip_slot=False,
             slot=1,team=0,seed_name='vehicle-seed',catalogue={'123':{'name':'Vehicle pickup'}},
             journal=None,state_dir=Path('unused'),items_received=[],checked_locations=set(),
             finished_game=True,exit_event=asyncio.Event(),send_msgs=AsyncMock(),

@@ -21,6 +21,13 @@ def grant_model(pid,model,name,dll):
     return _command(pid,model,name,dll,1)
 
 
+def configure_detective_scan(pid,enabled,dll):
+    result=_command(pid,int(bool(enabled)),'DETECTIVE_SCAN_POLICY',dll,20)
+    if not result['found'] or bool(result['owned'])!=bool(enabled):
+        raise RuntimeError('Detective scan policy readback failed')
+    return dict(verified=True,enabled=bool(enabled),persistence='AP receipt journal',native_save_flag=False)
+
+
 def test_remove(pid,kind,index,name,dll):
     if kind not in ('model_unlock','ability_unlock','cheat_unlock'):raise ValueError('Unsupported test removal')
     return _command(pid,index,name,dll,18,{'model_unlock':1,'ability_unlock':2,'cheat_unlock':3}[kind])
@@ -86,8 +93,11 @@ def _policy_command(pid,policy,binding,dll,opcode):
         view=kernel.MapViewOfFile(mapping,0xf001f,0,0,len(policy))
         if not view:raise ctypes.WinError(ctypes.get_last_error())
         ctypes.memmove(view,policy,len(policy))
-        result=_command(pid,0,'CURRENCY_BATCH' if opcode==10 else 'ENFORCE_POLICY',dll,opcode,0,binding)
-        return dict(changes=result['found'],switch_requested=result['owned']==2,dry_run=opcode==9,save_confirmed=False)
+        name={10:'CURRENCY_BATCH',19:'ITEM_POPUP'}.get(opcode,'ENFORCE_POLICY')
+        result=_command(pid,0,name,dll,opcode,0,binding)
+        reply=dict(changes=result['found'],switch_requested=result['owned']==2,dry_run=opcode==9,save_confirmed=False)
+        if opcode==19:reply['tinted']=result['owned']==1
+        return reply
     finally:
         if view:kernel.UnmapViewOfFile(view)
         if mapping:kernel.CloseHandle(mapping)
@@ -175,7 +185,8 @@ def _command(pid,model,name,dll,opcode,receipt_index=0,binding=bytes(16)):
             result=PACKET.unpack(ctypes.string_at(view,PACKET.size))
             if result[2] in (3,4):
                 if result[2]!=3:
-                    if result[6]==3:raise NativePlayerBusy('player is busy or not alive')
+                    if result[6]==3 or (opcode==19 and result[6] in (2,4)):
+                        raise NativePlayerBusy('player/HUD temporarily unavailable; command not displayed')
                     reasons={1:'native signature mismatch',2:'player is not loaded',3:'player is busy or not alive',
                         4:'native managers are not initialized',5:'unsupported native table/profile layout',
                         6:'command identity mismatch',7:'native effect verification failed',8:'native call faulted; inspect outcome before retry',

@@ -19,7 +19,7 @@ static DWORD EnforceRewards(std::uintptr_t base,std::uintptr_t actor,Command* c,
     auto view=MapViewOfFile(mapping,FILE_MAP_READ,0,0,sizeof(RewardPolicy));
     if(!view) { CloseHandle(mapping);return 15; }
     RewardPolicy p{};std::memcpy(&p,view,sizeof(p));UnmapViewOfFile(view);CloseHandle(mapping);
-    if(p.magic!=0x4c435550 || p.version!=1 || p.pid!=GetCurrentProcessId() || p.reserved ||
+    if(p.magic!=0x4c435550 || p.version!=1 || p.pid!=GetCurrentProcessId() || (p.reserved&~3u) || p.reserved==2 ||
        std::memcmp(p.binding,c->binding,16))return 6;
     for(unsigned i=0;i<32;++i)
         if(p.entitled_models[i]&~p.managed_models[i])return 9;
@@ -71,6 +71,8 @@ static DWORD EnforceRewards(std::uintptr_t base,std::uintptr_t actor,Command* c,
             if(Denies(p,i) && *reinterpret_cast<unsigned char*>(bank+0x80+i))++changes;
         c->found=changes;c->owned=Denies(p,current) ? 2 : 0;return 0;
     }
+    auto detective_result=ConfigureDetectiveGate(base,actor,p.reserved);
+    if(detective_result)return detective_result;
     if(!InstallShopGuards(base,p.managed_models) || !InstallCategoryGuard(base))return 1;
     if(Denies(p,current)) {
         // Never replace or revoke the actor underneath an active interaction.

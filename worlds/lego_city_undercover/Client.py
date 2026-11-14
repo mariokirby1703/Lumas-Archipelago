@@ -25,6 +25,8 @@ from level_progress import completed_level_keys
 from red_bricks import redbrick_location_key
 from item_delivery import register_delivery
 from native_delivery import NativeDeliveryEngine
+from item_popups import ItemPopupQueue
+from notification_messages import receipt_message, sent_message
 from native_bridge_path import bridge_path
 from station_exit import StationExitGate, read_station_exit, can_resume_first_lobby, read_lobby_lift
 from native_model_transport import (trigger_station_exit, open_lobby_lift,
@@ -33,6 +35,8 @@ from activity_rewards import completed_activity_rewards
 from tutorial_field_timing import TutorialFieldTiming
 from story_arrests import ARRESTS, completed_story_arrests
 from test_overrides import TestOverrides
+from test_catalogue import test_catalogue,item_states
+from native_model_transport import NativePlayerBusy
 
 
 class Commands(ClientCommandProcessor):
@@ -72,10 +76,14 @@ class Context(CommonContext):
         self.test_overrides = TestOverrides()
         self.ui_events = getattr(args, 'ui_events', None)
         self.native_ready = False
+        self.item_popups = ItemPopupQueue()
+        self.pending_sent_popups = []
+        self.enable_item_popups = not getattr(args, 'disable_item_popups', False)
         self.game_loaded = False
         catalogue = json.loads((Path(__file__).parent / 'catalogue.json').read_text(encoding='utf-8'))
         self.item_effects = {str(row['id']): dict(name=name, **row)
                              for name, row in catalogue['items'].items()}
+        self.test_effects=test_catalogue(catalogue,json.loads((Path(__file__).parent/'bridge/collection_manifest.json').read_text()))
         self.state_dir = Path(__file__).parent / 'notes/client_journal'
 
     def notify(self, kind, value):
@@ -102,6 +110,10 @@ class Context(CommonContext):
         await self.send_connect()
 
     def on_package(self, cmd, args):
+        if cmd == 'PrintJSON' and self.slot is not None:
+            event = sent_message(args, self.slot, self.item_names, self.player_names)
+            if event:
+                self.pending_sent_popups.append(((self.seed_name,self.team,self.slot),event))
         if cmd == 'RoomInfo':
             self.seed_name = args['seed_name']
         if cmd == 'Connected':
@@ -110,6 +122,9 @@ class Context(CommonContext):
             self.catalogue = args.get('slot_data', {}).get('locations', {})
             self.goal_count = args.get('slot_data', {}).get('goal_tokens', 20)
             self.skip_slot = bool(self.slot_options.get('cutscene_skip', False))
+            if 'detective_scan_lock' not in self.slot_options:
+                logging.info('Legacy seed has no Detective Scan item: automatic detective locking stays disabled. '
+                             'Use Ability: Detective Scan in the test UI or generate a new seed for AP delivery.')
             logging.warning('Native grants, autosave and reward suppression: %s. '
                             'Story/area entrance gates remain unavailable.',
                             'EXPERIMENTAL, enabled' if self.enable_native_models else 'disabled')
@@ -156,6 +171,7 @@ async def watcher(ctx):
                         seen_models.clear()
                         seen_arrests.clear()
                         ctx.test_overrides = TestOverrides()
+                        ctx.item_popups = ItemPopupQueue()
                         ctx.native_ready = False
                         ctx.notify('ready', False)
                         if session:
@@ -172,6 +188,11 @@ async def watcher(ctx):
                         effect = ctx.item_effects.get(str(item.item))
                         if effect:
                             register_delivery(ctx.journal, i, effect)
+                            ctx.journal.queue_popup(i, effect,
+                                receipt_message(effect['name'],item.player,ctx.slot,ctx.player_names))
+                    while ctx.pending_sent_popups:
+                        event_binding,event=ctx.pending_sent_popups.pop(0)
+                        if event_binding==current_binding:ctx.journal.queue_sent_popup(event)
                     ctx.journal.acknowledge(ctx.checked_locations)
                     pending = ctx.journal.pending()
                     if pending:
@@ -302,6 +323,12 @@ async def watcher(ctx):
                                     if str(item.item) in ctx.item_effects]
                         await native_delivery.poll(session, snapshot, ctx.journal,
                             ctx.item_effects.values(), received, ctx.slot_options, ctx.test_overrides)
+                        if not (native_delivery.last_problem or '').startswith(
+                                'Loaded native save is bound'):
+                            await ctx.item_popups.poll(session, snapshot, ctx.journal,
+                                native_delivery.dll, ctx.enable_item_popups)
+                        if ctx.ui_events is not None and native_delivery.models:
+                            ctx.notify('item_states',item_states(ctx.test_effects,snapshot,native_delivery.models,native_delivery.last_save_data,native_delivery.runtime_states))
                         # The binding is a prerequisite for any local test button.
                         # A binding error or an unavailable game context must disable it.
                         bound = native_delivery.path is not None
@@ -350,7 +377,20 @@ async def watcher(ctx):
                 else:
                     notify_game(ctx, False)
                 await asyncio.sleep(1)
+            except NativePlayerBusy:
+                # Busy is normal during animations or interactions. The process
+                # and save identity are not invalidated by this safe rejection.
+                ctx.native_ready = False
+                ctx.notify('ready', False)
+                await asyncio.sleep(.5)
             except (OSError, RuntimeError, ValueError) as error:
+                if str(error) == 'player is busy or not alive':
+                    # Transient gameplay/interaction states are not a broken
+                    # process binding. Never use a stale snapshot for checks.
+                    ctx.native_ready = False
+                    ctx.notify('ready', False)
+                    await asyncio.sleep(.5)
+                    continue
                 logging.warning('Reader waiting: %s', error)
                 ctx.native_ready = False
                 ctx.notify('ready', False)
@@ -384,15 +424,24 @@ async def _run_client(args):
                 action, payload = gui.get_nowait()
                 if action == 'disconnect':
                     ctx.exit_event.set()
+                elif action == 'popups_enabled':
+                    ctx.enable_item_popups = bool(payload)
                 elif ctx.journal is None:
                     logging.error('TEST: Erst AP und Spiel verbinden lassen.')
                 elif action == 'reset':
                     ctx.test_overrides.reset()
                     logging.info('TEST: Rückkehr zum AP-Zustand angefordert (Währungsbuchungen bleiben bestehen).')
+                elif action == 'popup':
+                    if not ctx.game_loaded or not ctx.enable_native_models:
+                        raise ValueError('Popup-Test braucht ein verbundenes, geladenes Spiel.')
+                    if not ctx.enable_item_popups:
+                        raise ValueError('Bitte zuerst „Item-Popups im Spiel“ aktivieren.')
+                    ctx.item_popups.preview(payload)
+                    logging.info('HUD-Test eingereiht; verändert keine Items oder Save-Flags.')
                 elif action in ('give', 'remove'):
                     if not ctx.native_ready or not ctx.enable_native_models:
                         raise ValueError('Native Test-Items sind erst mit gebundenem Save und normaler Spielfigur verfügbar.')
-                    matches = [e for e in ctx.item_effects.values() if e['name'] == payload]
+                    matches = [e for e in ctx.test_effects.values() if e['name'] == payload]
                     if len(matches) != 1:
                         raise ValueError('Unbekanntes oder mehrdeutiges Item: ' + str(payload))
                     ctx.test_overrides.set(matches[0], action == 'give')
@@ -404,18 +453,18 @@ async def _run_client(args):
             except (ValueError, RuntimeError) as error:
                 logging.error('TEST: %s', error)
             connected = bool(ctx.server and ctx.slot is not None)
-            override_signature = tuple(sorted((str(key), value[1])
-                for key, value in ctx.test_overrides.entries.items()))
+            override_lines = ctx.test_overrides.status_rows()
+            history=ctx.test_overrides.history_rows()
+            override_signature = tuple(override_lines)
             status = (connected, ctx.native_ready, len(ctx.checked_locations),
-                      len(ctx.items_received), str(ctx.auth), override_signature)
+                      len(ctx.items_received), str(ctx.auth), override_signature,str(history))
             if ctx.ui_events is not None and status != last_status:
                 ctx.notify('connection', connected)
                 ctx.notify('ap', ('Archipelago: Verbunden · ' + str(ctx.auth)) if connected else
                            'Archipelago: Warte auf Verbindung …')
                 ctx.notify('progress', f'Checks: {len(ctx.checked_locations)} · AP-Items: {len(ctx.items_received)}')
-                ctx.notify('overrides', [e['name'] + (' → geben' if value else
-                    ' → AP' if value is None else ' → entfernen')
-                    for e, value in ctx.test_overrides.entries.values()])
+                ctx.notify('overrides', override_lines)
+                ctx.notify('history',history)
                 last_status = status
             await asyncio.sleep(.25)
 
@@ -433,6 +482,11 @@ async def _run_client(args):
 
 async def main(args):
     if args.enable_native_models:
+        from native_build_integrity import bridge_health
+        problem = bridge_health(ROOT)
+        if problem:
+            logging.error('Native DLL nicht aktuell oder nicht verifiziert: %s', problem)
+            return
         from native_client_lock import NativeClientLock
         try:
             with NativeClientLock():
@@ -451,6 +505,7 @@ if __name__ == '__main__':
     parser.add_argument('--native-save-file', type=Path,
         help='Loaded slot gameN.legocityundercoversavegamedata, or auto-detect a unique matching save')
     parser.add_argument('--enable-cutscene-skip', action='store_true')
+    parser.add_argument('--disable-item-popups', action='store_true')
     parser.add_argument('--enable-native-items', '--enable-native-models',
         dest='enable_native_models', action='store_true')
     logging.basicConfig(level=logging.INFO)

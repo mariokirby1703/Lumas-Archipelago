@@ -20,6 +20,23 @@ class ShieldChecks(Choice):
     default=2
 
 
+class EarlyCriminalScan(Toggle):
+    """In linear mode, place Scanner (criminal/person scan) locally on an opening check.
+    This is a test safeguard, not a complete chronological story logic or a detective-scan item."""
+    display_name='Early Criminal Scan (linear test safeguard)'
+
+
+class DetectiveScanLock(DefaultOnToggle):
+    """Police alone does not enable detective scan. Requires the separate Detective Scan item.
+    Runtime permission is restored from AP receipts, not a native 51-entry ability flag."""
+    display_name='Separate Detective Scan Item'
+
+
+class EarlyDetectiveScan(Toggle):
+    """Place Detective Scan locally on an observed opening check in linear mode."""
+    display_name='Early Detective Scan (linear test safeguard)'
+
+
 class GoalTokens(Range):
     """Number of City Completion Tokens to receive to finish the experimental seed."""
     range_start=1
@@ -140,6 +157,9 @@ class SuperBrick10000Count(Range):
 
 @dataclass
 class LCUOptions(PerGameCommonOptions):
+    detective_scan_lock: DetectiveScanLock
+    early_detective_scan: EarlyDetectiveScan
+    early_criminal_scan: EarlyCriminalScan
     cheat_items: CheatItems
     super_brick_1000_count: SuperBrick1000Count
     super_brick_10000_count: SuperBrick10000Count

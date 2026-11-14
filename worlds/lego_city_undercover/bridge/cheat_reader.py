@@ -15,7 +15,7 @@ def read_cheats(read,base):
     for index in range(count):
         data=read(table+index*32,32);name=cstring(read,pointer(read,struct.unpack_from('<Q',data)[0]))
         rows.append(dict(index=index,native_name=name,found=bool(found_bits&(1<<index)),
-                         effect_flag=bool(effect_bits&(1<<index))))
+                         effect_flag=bool(effect_bits&(1<<index)),active=bool(data[0x1a])))
     if (pointer(read,base+0x11755F8)!=manager or pointer(read,manager)!=table or
         read(found_bank,8)!=found or read(effect_bank,8)!=effects):raise RuntimeError('Cheat state changed')
     return dict(status='read',records=rows,evidence='native table; 0x7f18c0 discovery + 0x7f19a0 effect')

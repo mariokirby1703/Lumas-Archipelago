@@ -41,6 +41,11 @@ class LCUWorld(World):
         self.active_catalogue={k:r for k,r in CATALOGUE['locations'].items() if r['category'] in categories}
         if len(self.active_catalogue)<self.options.goal_tokens.value:
             raise ValueError('LCU: selected location count is below goal_tokens')
+        if self.options.story_mode.value==0:
+            for option,name in self._early_scans():
+                if name in self.options.non_local_items.value:
+                    raise ValueError(f'LCU {option} needs a local {name.removeprefix("Ability: ")}; remove it from non_local_items')
+                self.multiworld.local_early_items[self.player][name]=1
         logging.warning('LCU experimental: native delivery requires opt-in; story/area entrance locks and open-world setup remain unavailable.')
 
     def create_regions(self):
@@ -65,9 +70,33 @@ class LCUWorld(World):
 
     def get_filler_item_name(self):return 'Studs 1,000'
 
+    def _early_scans(self):
+        scans=[]
+        if self.options.early_criminal_scan.value:scans.append(('early_criminal_scan','Ability: Scanner'))
+        if self.options.early_detective_scan.value and self.options.detective_scan_lock.value:
+            scans.append(('early_detective_scan','Ability: Detective Scan'))
+        return scans
+
     def pre_fill(self):
         self.early_police_location=None
         if self.options.story_mode.value!=0:return
+        owned={item.name for item in self.multiworld.precollected_items[self.player]}
+        early_scans=[(option,name) for option,name in self._early_scans() if name not in owned]
+        for option,scanner in self._early_scans():
+            if scanner in owned:
+                self.multiworld.local_early_items[self.player].pop(scanner,None)
+            else:
+                if scanner in self.options.non_local_items.value:
+                    raise ValueError(f'LCU {option} needs a local {scanner}; remove it from non_local_items')
+                items=[item for item in self.multiworld.itempool if item.player==self.player and item.name==scanner]
+                if not items:raise ValueError(f'LCU {option} requires ability_items or a starting {scanner}')
+                available=[self.multiworld.get_location(row['name'],self.player)
+                    for key,row in self.active_catalogue.items()
+                    if key in NO_POLICE_KEYS and row['name'] not in self.options.exclude_locations.value]
+                available=[loc for loc in available if loc.item is None and loc.can_fill(self.multiworld.state,items[0],check_access=False)]
+                needed=len(early_scans)+(0 if owned.intersection(POLICE_ITEMS) else 1)
+                if len(available)<needed:
+                    raise ValueError('LCU early scans need enough enabled opening checks for both Police and Scanner / Detective Scan')
         # Start-inventory Police already satisfies the opening requirement.
         if any(item.name in POLICE_ITEMS for item in self.multiworld.precollected_items[self.player]):return
         items=[item for item in self.multiworld.itempool if item.player==self.player and item.name in POLICE_ITEMS]
@@ -93,6 +122,8 @@ class LCUWorld(World):
                  'story_access':self.options.story_access_items.value,'cheat':self.options.cheat_items.value}
         names=[TOKEN]*self.options.goal_tokens.value
         candidates=[n for n,r in CATALOGUE['items'].items() if allowed.get(r['category'],False)]
+        if not self.options.detective_scan_lock.value:
+            candidates=[n for n in candidates if n!='Ability: Detective Scan']
         candidates+=['Super Bricks 1,000']*self.options.super_brick_1000_count.value
         candidates+=['Super Bricks 10,000']*self.options.super_brick_10000_count.value
         required=[n for n in candidates if CATALOGUE['items'][n]['classification']=='progression']
@@ -115,6 +146,7 @@ class LCUWorld(World):
                     opening_logic=dict(partial=True,early_police_location=getattr(self,'early_police_location',None),
                         no_police_keys=sorted(k for k in self.active_catalogue if k in NO_POLICE_KEYS)),
                     native_grants=True,native_locks=False,native_open_world_setup=False,
+                    native_detective_scan_lock=bool(self.options.detective_scan_lock.value and self.options.ability_items.value),
                     native_reward_suppression='poll_after_checks',native_save_verification='model_ability_cheat_and_currency_marker',
                     item_effects={str(r['id']):dict(name=n,**r) for n,r in CATALOGUE['items'].items()},
                     received_items_require_manual_testing=True)

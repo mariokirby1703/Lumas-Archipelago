@@ -27,6 +27,7 @@ static std::uint32_t Hash(const char* value) {
     return 0;
 }
 #include "purchase_gate.h"
+#include "detective_gate.h"
 #include "reward_enforcement.h"
 #include "currency_batch.h"
 #include "station_exit.h"
@@ -34,6 +35,7 @@ static std::uint32_t Hash(const char* value) {
 #include "tutorial_fields.h"
 #include "chief_key.h"
 #include "test_items.h"
+#include "item_popups.h"
 static bool WriteCode(unsigned char* code,const unsigned char* replacement,std::size_t size) {
     if(!std::memcmp(code,replacement,size))return true;
     DWORD previous=0;
@@ -86,6 +88,8 @@ static DWORD Execute(Command* c) {
         if(c->opcode==16)return RevealChiefRadio(base,actor,c);
         if(c->opcode==17)return TestCurrency(base,c);
         if(c->opcode==18)return TestRemove(base,actor,c);
+        if(c->opcode==19)return ShowItemPopup(base,c);
+        if(c->opcode==20)return DetectiveGateCommand(base,actor,c);
         if(c->opcode==13)return OpenLobbyLift(base,actor,c);
         if(c->opcode==12)return TriggerStationExit(base,actor,c);
         if(c->opcode==8 || c->opcode==9)return EnforceRewards(base,actor,c,c->opcode==9);
@@ -175,13 +179,20 @@ static DWORD Execute(Command* c) {
             auto effect=*reinterpret_cast<std::uint64_t**>(base+0x1c7e850);
             if(!found || !effect)return 4;
             const auto mask=std::uint64_t(1)<<c->model;
-            const unsigned char prefix[]={0x57,0x48,0x83,0xec,0x50};
-            if(std::memcmp(reinterpret_cast<void*>(base+0x7f19a0),prefix,sizeof(prefix)))return 1;
-            if(!(*effect&mask)) {
-                // edx=0 skips the original pickup's mission/reward bookkeeping.
-                using Unlock=void(*)(int,int,bool);
-                reinterpret_cast<Unlock>(base+0x7f19a0)(c->model,0,false);
-            }
+            // LCU_CHEAT_SERIALIZED_OWNERSHIP_V1
+            // 0x7f19a0 is not callable using the pinned prologue: the live
+            // signature check rejects it. Instead, modify ONLY the already
+            // verified serialized cheat-ownership mask, never the native
+            // Red Brick discovery flags, story or runtime activation bytes.
+            // The source reader/save verifier use the same exact layout.
+            auto profile=*reinterpret_cast<std::uintptr_t*>(base+0x1c7f160);
+            if(!profile || count!=40 ||
+               reinterpret_cast<std::uintptr_t>(found)!=profile+0xfa70 ||
+               reinterpret_cast<std::uintptr_t>(effect)!=profile+0xfa80)return 5;
+            const auto found_before=*found;
+            *effect|=mask;
+            // Preserve the genuine Red Brick source-discovery bank verbatim.
+            if(*found!=found_before)return 7;
             c->found=!!(*found&mask);c->owned=!!(*effect&mask);
             return c->owned ? 0 : 7;
         }

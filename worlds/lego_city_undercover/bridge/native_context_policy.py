@@ -1,11 +1,12 @@
 """Pinned native command eligibility; vehicle grants never revoke actors."""
-NATIVE_OPCODES=frozenset((*range(1,11),12,13,14,15,16,17,18))
+NATIVE_OPCODES=frozenset((*range(1,11),12,13,14,15,16,17,18,19,20))
 PASSIVE_CONTEXTS=frozenset((27,46,157)) # DropPoint, Default, RideObject
 PASSIVE_OPCODES=frozenset((1,2,3,6,7,10))
 READ_OR_SAVE_OPCODES=frozenset((4,5,9))
+POPUP_CONTEXTS=frozenset((11,27,46,157)) # Cosmetic only: RideAlong, DropPoint, Default, RideObject.
 
 def allows_native_command(context,opcode,alive=True):
-    return bool(alive and opcode in NATIVE_OPCODES and (opcode in READ_OR_SAVE_OPCODES or context==46 or
+    return bool(alive and opcode in NATIVE_OPCODES and ((opcode==19 and context in POPUP_CONTEXTS) or opcode in READ_OR_SAVE_OPCODES or context==46 or
                           (context in PASSIVE_CONTEXTS and opcode in PASSIVE_OPCODES)))
 
 def header():
@@ -13,8 +14,9 @@ def header():
     opcodes=' || '.join(f'opcode=={n}' for n in sorted(PASSIVE_OPCODES))
     exempt=' || '.join(f'opcode=={n}' for n in sorted(READ_OR_SAVE_OPCODES))
     known=' || '.join(f'opcode=={n}' for n in sorted(NATIVE_OPCODES))
+    popup=' || '.join(f'context=={n}' for n in sorted(POPUP_CONTEXTS))
     return ('// Generated from native_context_policy.py.\n'
             f'static bool IsKnownNativeOpcode(unsigned opcode) {{ return {known}; }}\n'
             'static bool AllowsNativeCommand(int context,unsigned opcode,bool alive) {\n'
-            f'    return alive && IsKnownNativeOpcode(opcode) && (({exempt}) || context==46 ||\n'
+            f'    return alive && IsKnownNativeOpcode(opcode) && ((opcode==19 && ({popup})) || ({exempt}) || context==46 ||\n'
             f'        (({contexts}) && ({opcodes})));\n'+'}\n')

@@ -15,11 +15,16 @@ TOOL_ABILITIES=frozenset(('GrappleGun','EnergyGun','SuperBuild','Parkour','Grab'
 def reward_masks(effects,received,models,cheats,options):
     managed_models=set();entitled_models=set();managed_abilities=set();entitled_abilities=set()
     managed_cheats=set();entitled_cheats=set()
+    managed_runtime=set();entitled_runtime=set()
     cheat_ids={r['native_name']:r['index'] for r in cheats}
     def add(effect,entitled):
         category=effect.get('category')
         if not entitled and not options.get({'character':'character_items','vehicle':'vehicle_items','ability':'ability_items','cheat':'cheat_items'}.get(category,''),False):return
         plan=effect_plan(effect)
+        if plan['kind']=='runtime_unlock' and plan['ability']=='DetectiveScan':
+            if options.get('detective_scan_lock',False):
+                (entitled_runtime if entitled else managed_runtime).add(0)
+            return
         if plan['kind']=='model_unlock':
             name=plan['native_name']
             if name in STARTING_MODELS or name not in models:return
@@ -32,7 +37,8 @@ def reward_masks(effects,received,models,cheats,options):
     for effect in received:add(effect,True)
     return dict(managed_models=managed_models,entitled_models=entitled_models&managed_models,
                 managed_abilities=managed_abilities,entitled_abilities=entitled_abilities&managed_abilities,
-                managed_cheats=managed_cheats,entitled_cheats=entitled_cheats&managed_cheats)
+                managed_cheats=managed_cheats,entitled_cheats=entitled_cheats&managed_cheats,
+                managed_runtime=managed_runtime,entitled_runtime=entitled_runtime&managed_runtime)
 
 
 def encode_policy(pid,binding,masks):
@@ -46,6 +52,7 @@ def encode_policy(pid,binding,masks):
         if any(type(v) is not int or not 0<=v<limit for v in values):raise ValueError('Policy index outside table')
         return sum(1<<v for v in values)
     if len(binding)!=16:raise ValueError('Invalid policy binding')
-    return POLICY.pack(0x4c435550,1,pid,0,*words(masks['managed_models']),*words(masks['entitled_models']),
+    runtime=(1 if 0 in masks.get('managed_runtime',()) else 0)|(2 if 0 in masks.get('entitled_runtime',()) else 0)
+    return POLICY.pack(0x4c435550,1,pid,runtime,*words(masks['managed_models']),*words(masks['entitled_models']),
         bits(masks['managed_abilities'],51),bits(masks['entitled_abilities'],51),
         bits(masks['managed_cheats'],40),bits(masks['entitled_cheats'],40),*struct.unpack('<4I',binding))

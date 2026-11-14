@@ -15,6 +15,7 @@ def effect_plan(item):
         return dict(kind='model_unlock',native_name=item['native_name'].upper())
     if category=='ability':
         name=item['name'].removeprefix('Ability: ')
+        if name=='Detective Scan':return dict(kind='runtime_unlock',ability='DetectiveScan')
         if name in CLASS_MODELS:return dict(kind='model_unlock',native_name=CLASS_MODELS[name])
         return dict(kind='ability_unlock',ability=name)
     if category=='cheat':return dict(kind='cheat_unlock',native_name=item.get('native_name'),

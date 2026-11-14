@@ -19,5 +19,34 @@
       "LCPD_Lobby_RideOn02"
     ],
     "evidence": "User completed police toy-car ride; associated GB_RideOn native collected flag observed; reward source identity scoped to lobby"
+  },
+  {
+    "key": "police_station_line_up_room:hidden_gold_brick",
+    "name": "Police Station: Line-Up Room Hidden Gold Brick",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_line_up_room/police_station_line_up_room.giz:27:1",
+    "scene": "Police_Station_Line_Up_Room",
+    "pickup_name": "GB_LineUp",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [0.17062804102897644, 0.1599980890750885, 0.08027924597263336],
+    "category": "city_activities",
+    "prerequisite_objectives": [],
+    "evidence": "User reported a gold brick inside the station room; live snapshot GB_LineUp in Police_Station_Line_Up_Room native_type 11 native_collected true; name and coordinates match the unique static type-71 source"
+  },
+  {
+    "key": "police_station_briefingroom:popcorn",
+    "name": "Police Station Briefing Room: Eat Popcorn",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:42",
+    "scene": "Police_Station_BriefingRoom",
+    "pickup_name": "GB_Popcorn",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [3.034475564956665, 0.3020786643028259, 1.3053439855575562],
+    "category": "city_activities",
+    "prerequisite_objectives": ["LCPD_BR_PopCorn"],
+    "completion_objective": "LCPD_BR_PopCorn",
+    "evidence": "User ate popcorn; GB_Popcorn collected and LCPD_BR_PopCorn hash 753712927 bit 716 became complete compared with the preceding live snapshot; total gold bricks rose from four to five"
   }
 ]

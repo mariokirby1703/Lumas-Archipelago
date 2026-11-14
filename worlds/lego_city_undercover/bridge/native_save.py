@@ -63,6 +63,18 @@ def cheat_saved(data,index):
     return bool(int.from_bytes(data[offset:offset+8],'little')&(1<<index))
 
 
+def model_save_flags(data,model):
+    owned=model_saved(data,model)
+    found=bool(data[CHARACTER_SAVE_OFFSET+model//8]&(1<<(model%8)))
+    return dict(found=found,owned=owned)
+
+
+def cheat_save_flags(data,index):
+    owned=cheat_saved(data,index)
+    offset=CHARACTER_SAVE_OFFSET-0x122e0+0xfa70
+    return dict(found=bool(int.from_bytes(data[offset:offset+8],'little')&(1<<index)),owned=owned)
+
+
 ABILITY_CHUNK=bytes.fromhex('3d4f6d43 12000000 33')
 
 
