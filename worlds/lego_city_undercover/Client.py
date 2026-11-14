@@ -22,10 +22,13 @@ from cutscene_skip import enable_cutscene_skip
 from NetUtils import ClientStatus
 from client_checks import changed_checks
 from level_progress import completed_level_keys
+from goals import native_goal_complete
+from delivery_marker import check_snapshot_binding
 from red_bricks import redbrick_location_key
 from item_delivery import register_delivery
 from native_delivery import NativeDeliveryEngine
 from item_popups import ItemPopupQueue
+from progressive_items import resolve_receipts
 from notification_messages import receipt_message, sent_message
 from native_bridge_path import bridge_path
 from station_exit import StationExitGate, read_station_exit, can_resume_first_lobby, read_lobby_lift
@@ -183,13 +186,16 @@ async def watcher(ctx):
                         ctx.journal = Journal(ctx.state_dir, dict(seed=ctx.seed_name, team=ctx.team,
                             slot=ctx.slot, catalogue=ctx.catalogue, detection_policy=2))
                         journal_binding = current_binding
+                    resolved=resolve_receipts(ctx.items_received,getattr(ctx,'item_effects',{}))
+                    resolved_by_index={i:effect for i,_,effect in resolved}
+                    ctx.resolved_received_effects=[effect for _,_,effect in resolved]
                     for i, item in enumerate(ctx.items_received):
                         ctx.journal.receipt(i, item)
-                        effect = ctx.item_effects.get(str(item.item))
+                        effect = resolved_by_index.get(i)
                         if effect:
                             register_delivery(ctx.journal, i, effect)
                             ctx.journal.queue_popup(i, effect,
-                                receipt_message(effect['name'],item.player,ctx.slot,ctx.player_names))
+                                receipt_message(effect.get('display_name',effect['name']),item.player,ctx.slot,ctx.player_names))
                     while ctx.pending_sent_popups:
                         event_binding,event=ctx.pending_sent_popups.pop(0)
                         if event_binding==current_binding:ctx.journal.queue_sent_popup(event)
@@ -197,7 +203,7 @@ async def watcher(ctx):
                     pending = ctx.journal.pending()
                     if pending:
                         await ctx.send_msgs([dict(cmd='LocationChecks', locations=pending)])
-                    if (not ctx.finished_game and
+                    if (not ctx.finished_game and getattr(ctx,'slot_options',{}).get('goal',2)==2 and
                             sum(x.item == 2_999_999_999 for x in ctx.items_received) >= ctx.goal_count):
                         await ctx.send_msgs([dict(cmd='StatusUpdate', status=ClientStatus.CLIENT_GOAL)])
                         ctx.finished_game = True
@@ -212,6 +218,10 @@ async def watcher(ctx):
                         await asyncio.sleep(1)
                         continue
                     notify_game(ctx, True, snapshot['actor'].get('equipped_internal_name', 'Spieler geladen'))
+                    check_snapshot_binding(snapshot,ctx.journal.binding_token)
+                    if not ctx.finished_game and native_goal_complete(snapshot,getattr(ctx,'slot_options',{}).get('goal',2)):
+                        await ctx.send_msgs([dict(cmd='StatusUpdate',status=ClientStatus.CLIENT_GOAL)])
+                        ctx.finished_game=True
 
                     for row in snapshot.get('native_pickups', {}).get('objects', []):
                         if row.get('native_type') != 7 or not row.get('native_collected'):
@@ -319,8 +329,7 @@ async def watcher(ctx):
                     if checks:
                         await ctx.report_checks(checks)
                     if ctx.enable_native_models:
-                        received = [ctx.item_effects[str(item.item)] for item in ctx.items_received
-                                    if str(item.item) in ctx.item_effects]
+                        received = ctx.resolved_received_effects
                         await native_delivery.poll(session, snapshot, ctx.journal,
                             ctx.item_effects.values(), received, ctx.slot_options, ctx.test_overrides)
                         if not (native_delivery.last_problem or '').startswith(

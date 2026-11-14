@@ -1,5 +1,7 @@
 # Chronological restart test
 
+**Superseded on 2026-11-14:** see implementation_audit.md for the current source-based regions, explicit early scan placements, Progressive Astronaut and native goal modes. The historical Police-only region model described below is no longer the implementation. Native open-world setup and complete traversal remain unfinished.
+
 The overlay now shifts 280 logical units below its original position, 40 more than
 the user-confirmed previous version. All three real notification variants are
 connected: indexed receipts with source slot, own receipts, and server-confirmed

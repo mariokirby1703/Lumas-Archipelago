@@ -3,9 +3,9 @@ from Options import Choice, Toggle, DefaultOnToggle, Range, PerGameCommonOptions
 
 
 class StoryMode(Choice):
-    """Linear guarantees Police on a known opening check and gates remaining experimental checks behind it.
-    Open world keeps the experimental unrestricted catalogue. Other ability logic and native open-world setup are incomplete."""
-    display_name='Story Mode (partial opening logic)'
+    """Linear uses the assignment sequence and source lock requirements. Open world removes
+    assignment ordering in AP logic only; it does not bootstrap a postgame native save."""
+    display_name='Story Order (native open-world setup unavailable)'
     option_linear=0
     option_open_world=1
     default=0
@@ -18,6 +18,21 @@ class ShieldChecks(Choice):
     option_whole=1
     option_quarters=2
     default=2
+
+
+class ExperimentalItems(Toggle):
+    """Include symbolic items without a supported native effect. Off keeps them out of normal pools."""
+    display_name='Experimental Unbound Items'
+
+
+class ProgressiveAstronaut(DefaultOnToggle):
+    """Two Progressive Astronaut items unlock the class and then Jetpack. Legacy IDs remain supported."""
+    display_name='Progressive Astronaut'
+
+
+class SeparateClassUnlocks(DefaultOnToggle):
+    """Hold class-specific cosmetic skins until their main class is received. Special civilian categories are unaffected."""
+    display_name='Separate Class and Cosmetic Unlocks'
 
 
 class EarlyCriminalScan(Toggle):
@@ -42,6 +57,15 @@ class GoalTokens(Range):
     range_start=1
     range_end=500
     default=20
+
+
+class Goal(Choice):
+    """Native final assignment or all 15 assignments. Tokens are a legacy/debug goal only."""
+    display_name='Goal'
+    option_final_assignment=0
+    option_all_assignments=1
+    option_debug_tokens=2
+    default=0
 
 
 class UnsafeCandidates(Toggle):
@@ -157,6 +181,10 @@ class SuperBrick10000Count(Range):
 
 @dataclass
 class LCUOptions(PerGameCommonOptions):
+    goal: Goal
+    experimental_items: ExperimentalItems
+    progressive_astronaut: ProgressiveAstronaut
+    separate_class_unlocks: SeparateClassUnlocks
     detective_scan_lock: DetectiveScanLock
     early_detective_scan: EarlyDetectiveScan
     early_criminal_scan: EarlyCriminalScan

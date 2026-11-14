@@ -77,24 +77,30 @@ class GenerationTests(unittest.TestCase):
 
     def test_unverified_opt_in_and_ids(self):
         _,world=self.build({'include_unverified':True})
-        self.assertEqual(len(world.active_catalogue),len(CATALOGUE['locations'])-len(CATALOGUE['levels']))
+        expected={k for k,r in CATALOGUE['locations'].items() if r['category']!='whole_shields' and not r.get('legacy_aggregate')}
+        self.assertEqual(set(world.active_catalogue),expected)
         self.assertEqual(len(LCUWorld.item_name_to_id),len(set(LCUWorld.item_name_to_id.values())))
     def test_linear_police_is_guaranteed_on_an_opening_check(self):
         from worlds.lego_city_undercover.bridge.opening_logic import NO_POLICE_KEYS,POLICE_ITEMS
         multi,world=self.build()
         state=CollectionState(multi)
         for key,row in world.active_catalogue.items():
-            self.assertEqual(multi.get_location(row['name'],1).can_reach(state),key in NO_POLICE_KEYS)
+            if key in NO_POLICE_KEYS:self.assertTrue(multi.get_location(row['name'],1).can_reach(state))
         location=multi.get_location(world.early_police_location,1)
         self.assertTrue(location.locked)
         self.assertIn(location.item.name,POLICE_ITEMS)
         self.assertTrue(location.can_reach(state))
         state.collect(location.item,True)
+        self.assertFalse(multi.get_region('Assignment 1: rooftops',1).can_reach(state))
+        for item in multi.itempool:
+            if item.advancement:state.collect(item,True)
         self.assertTrue(all(loc.can_reach(state) for loc in multi.get_locations(1)))
-    def test_open_world_keeps_unrestricted_checks_without_local_police_placement(self):
+    def test_open_world_keeps_source_requirements_without_local_police_placement(self):
         multi,world=self.build({'story_mode':'open_world'})
         self.assertIsNone(world.early_police_location)
-        self.assertTrue(all(loc.can_reach(CollectionState(multi)) for loc in multi.get_locations(1)))
+        state=CollectionState(multi)
+        self.assertTrue(multi.get_region('LEGO City',1).can_reach(state))
+        self.assertFalse(multi.get_region('Assignment 1: rooftops',1).can_reach(state))
     def test_character_only_pool_can_supply_opening_police(self):
         multi,world=self.build({'ability_items':False})
         self.assertEqual(multi.get_location(world.early_police_location,1).item.name,'Character: COP')

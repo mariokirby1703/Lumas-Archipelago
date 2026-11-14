@@ -1,0 +1,51 @@
+# Changed source and derived research files
+
+Relative to the working tree baseline/HEAD; build artifacts are listed separately in master_task_report.md.
+
+- worlds/lego_city_undercover/Client.py
+- worlds/lego_city_undercover/README.md
+- worlds/lego_city_undercover/__init__.py
+- worlds/lego_city_undercover/archipelago.json
+- worlds/lego_city_undercover/bridge/capabilities.py
+- worlds/lego_city_undercover/bridge/class_entitlements.py
+- worlds/lego_city_undercover/bridge/client_journal.py
+- worlds/lego_city_undercover/bridge/delivery_marker.py
+- worlds/lego_city_undercover/bridge/diagnose.py
+- worlds/lego_city_undercover/bridge/file_identity.py
+- worlds/lego_city_undercover/bridge/goals.py
+- worlds/lego_city_undercover/bridge/hook_ownership.py
+- worlds/lego_city_undercover/bridge/item_delivery.py
+- worlds/lego_city_undercover/bridge/level_progress.py
+- worlds/lego_city_undercover/bridge/live_monitor.py
+- worlds/lego_city_undercover/bridge/native_delivery.py
+- worlds/lego_city_undercover/bridge/native_model_transport.py
+- worlds/lego_city_undercover/bridge/progressive_items.py
+- worlds/lego_city_undercover/bridge/reward_policy.py
+- worlds/lego_city_undercover/bridge/source_logic.py
+- worlds/lego_city_undercover/catalogue.json
+- worlds/lego_city_undercover/docs/LCU_Chronological_Test.yaml
+- worlds/lego_city_undercover/docs/Windows_Playtest.md
+- worlds/lego_city_undercover/docs/research/changed_files.md
+- worlds/lego_city_undercover/docs/research/cheat_matrix.csv
+- worlds/lego_city_undercover/docs/research/chronological_test_status.md
+- worlds/lego_city_undercover/docs/research/coverage_summary.json
+- worlds/lego_city_undercover/docs/research/duplicate_bindings.json
+- worlds/lego_city_undercover/docs/research/feature_matrix.csv
+- worlds/lego_city_undercover/docs/research/implementation_audit.md
+- worlds/lego_city_undercover/docs/research/item_effect_coverage.csv
+- worlds/lego_city_undercover/docs/research/location_coverage.csv
+- worlds/lego_city_undercover/docs/research/master_task_report.md
+- worlds/lego_city_undercover/docs/research/story_graph.json
+- worlds/lego_city_undercover/options.py
+- worlds/lego_city_undercover/regions.py
+- worlds/lego_city_undercover/tests/test_generation.py
+- worlds/lego_city_undercover/tests/test_goals_and_source_logic.py
+- worlds/lego_city_undercover/tests/test_native_item_fix_round2.py
+- worlds/lego_city_undercover/tests/test_progressive_items.py
+- worlds/lego_city_undercover/tests/test_runtime_integrity.py
+- worlds/lego_city_undercover/tools/audit_implementation.py
+- worlds/lego_city_undercover/tools/build_ap_catalogue.py
+- worlds/lego_city_undercover/tools/package_apworld.py
+- worlds/lego_city_undercover/tools/rebuild_native_bridge.py
+- worlds/lego_city_undercover/tools/simulate_generation.py
+- worlds/lego_city_undercover/tools/smoke_apworld.py

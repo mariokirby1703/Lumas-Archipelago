@@ -62,6 +62,8 @@ class Session:
         return diagnose.read_memory(self.kernel, self.handle, address, size)
 
     def snapshot(self):
+        from delivery_marker import read_marker
+        native_binding=read_marker(self.read,self.base)
         objectives = read_objectives(self.read, self.base)
         stats = read_stats(self.read, self.base)
         inventory = read_characters(self.read, self.base)
@@ -114,7 +116,9 @@ class Session:
         try:mission_hero=read_mission_hero(self.read,self.base,mission_shield)
         except (OSError,ValueError,RuntimeError,struct.error) as error:
             mission_hero=dict(status='unresolved',reason=str(error),complete=False)
-        return dict(objectives=objectives, stats=stats, location=location, interaction=interaction,
+        if read_marker(self.read,self.base)!=native_binding:
+            raise RuntimeError('Native save binding changed during snapshot')
+        return dict(native_binding=native_binding,objectives=objectives, stats=stats, location=location, interaction=interaction,
                     mission_tokens=read_mission_tokens(self.read,self.base),
                     mission_shield=mission_shield,mission_hero=mission_hero,superbuilds=superbuilds,
                     level_progress=level_progress,cheats=cheats,
@@ -139,6 +143,7 @@ def main():
         try:
             snapshot = session.snapshot()
             report = json.dumps(dict(pid=session.pid, stats=snapshot['stats'], pickup_bits=snapshot['pickup_bits'],
+                                    native_binding=snapshot['native_binding'],level_progress=snapshot['level_progress'],
                                     objectives=len(snapshot['objectives']['records']),
                                     interaction=snapshot['interaction'], scene_fields=snapshot['scene_fields'],
                                     auras=snapshot['auras'],native_pickups=snapshot['native_pickups'],

@@ -1,5 +1,9 @@
 # LEGO City Undercover experimental APWorld
 
+Current status (2026-11-14): new seeds use native final-assignment completion, Progressive Astronaut and source-based district/assignment/section regions. Class-specific cosmetic skins can wait for their base class. Normal pools exclude unbound symbolic effects. Existing receipt IDs and legacy token-goal seeds remain supported.
+
+See the [implementation audit](docs/research/implementation_audit.md), [feature matrix](docs/research/feature_matrix.csv), and [Windows playtest](docs/Windows_Playtest.md). Install only one of the two equivalent APWorld filenames.
+
 Experimental Steam/Windows DX11 integration for Archipelago 0.6.8. The source client detects city and mission checks and can apply native AP items with explicit opt-in. Story/area entrance gates, open-world initialization and complete access logic remain unfinished.
 
 Native delivery now includes character/disguise/vehicle ownership, bound abilities, Red Brick cheat ownership, Studs packages and building-brick packages. AP models do not require purchasing and do not consume their original world token. The user confirmed Magician selection after the booth navigation correction. Currency and reward suppression are built and await their first live effect tests.
@@ -12,8 +16,8 @@ With native items enabled, check detection and durable queuing precede suppressi
 
 Current artifacts:
 
-- build/lego_city_undercover/lego_city_undercover_experimental.apworld
-- build/lego_city_undercover/LCUItemBridge.dll
+- build/lego_city_undercover/lego_city_undercover.apworld (experimental filename is an equivalent compatibility package)
+- Versioned DLL selected and verified by build/lego_city_undercover/native_items_build.json
 - build/lego_city_undercover/StartLCUNativeClient.cmd (local Luma test starter)
 
 From the repository root:
@@ -42,9 +46,9 @@ Native bindings do not yet cover every symbolic ability. Carry Objects, Climbing
 
 Supported offline progress is reconciled with the AP server and outgoing checks persist until acknowledged. Character token collection differs from ownership; purchasing or equipping creates no token check. Mission checks include completion, shields/quarters, Hero, red bricks, bound pickups and the researched native superbuild path. Ambiguous pickup identities remain excluded. include_unverified opts into additional candidates that are not all proven independent checks.
 
-All generated locations are connected in the experimental region graph. This does not establish that native gameplay can reach them with the generated item placement. The current goal is receipt of City Completion Tokens.
+Locations use source-based regions and known class/tool locks. This does not establish that native gameplay can reach them with the generated item placement. The default goal is native final-assignment completion; City Completion Tokens are a legacy/debug option.
 
-131 tests pass. The latest read-only native preview preserved inventory/ability bytes and verified all 51 serialized ability bits against the running game. See [native delivery status](docs/research/native_item_delivery_status.md) for implementation evidence, live test boundaries and exact persistence bindings.
+See the current audit and test artifacts for validation counts. Historical [native delivery status](docs/research/native_item_delivery_status.md) records earlier implementation evidence and exact persistence bindings; its older test/logic summaries are superseded by the audit.
 
 Research assets and gamefiles stay in ignored notes/. They are not packaged into the APWorld.
 

@@ -6,6 +6,7 @@ CLASS_MODELS={'Police':'COP','Robber':'ROBBER','Miner':'MINER','Astronaut':'ASTR
 
 
 def effect_plan(item):
+    if item.get('effect')=='progressive_complete':return dict(kind='noop',reason='Progressive stages already entitled')
     category=item.get('category')
     if item.get('effect') in ('add_studs','add_bricks'):
         amount=item.get('amount')
@@ -16,6 +17,8 @@ def effect_plan(item):
     if category=='ability':
         name=item['name'].removeprefix('Ability: ')
         if name=='Detective Scan':return dict(kind='runtime_unlock',ability='DetectiveScan')
+        if name=='Color Gun':return dict(kind='ability_unlock',ability='EnergyGun')
+        if name=='Rex Fury':return dict(kind='model_unlock',native_name='ROBBER_REXFURY')
         if name in CLASS_MODELS:return dict(kind='model_unlock',native_name=CLASS_MODELS[name])
         return dict(kind='ability_unlock',ability=name)
     if category=='cheat':return dict(kind='cheat_unlock',native_name=item.get('native_name'),

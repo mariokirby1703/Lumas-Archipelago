@@ -107,7 +107,7 @@ def main():
     # Per-mission categories are synthetic completion candidates, not native IDs.
     levels=sorted({p['resource'].split('/levels/standalones/')[1].split('/')[0] for p in pickups
                    if '/levels/standalones/' in p['resource'] and 'gamemechanicstestarea' not in p['resource']})
-    for level in levels:
+    for level in levels+['blackwells_mansion_1','blackwells_mansion_2']:
         for category, suffixes in (('story_missions',['Complete']),('red_bricks',['Red Brick']),
                                    ('city_hero',['LEGO City Hero']),('shield_quarters',['TL','TR','BL','BR']),
                                    ('whole_shields',['Police Shield'])):
@@ -115,7 +115,8 @@ def main():
                 if category=='red_bricks':continue
                 key=f'mission:{level}:{suffix}'
                 locations[key]=dict(name=f'{level}: {suffix}',category=category,district=None,coordinates=None,
-                                    coordinate_space=None,source=level,runtime=None,status='synthetic_unbound')
+                                    coordinate_space=None,source=level,runtime=dict(kind='level_progress',mission=level,reward=suffix),
+                                    status='native_level_progress',legacy_aggregate=level=='blackwells_mansion')
     # Red Brick locations are backed by actual source records, never one synthetic
     # entry per resource (Police Station contains no Red Brick pickup).
     red_groups={}
@@ -153,6 +154,7 @@ def main():
                  'Rex Fury','Stethoscope','Crowbar','GrappleGun','EnergyGun','Scanner','Surveillance',
                  'Wiretap','Jetpack','FireAxe','SuperBuild','Parkour','Fishing','Carry Objects','Climbing','Detective Scan'):
         items[f'Ability: {tool}']=dict(category='ability',classification='progression')
+    items['Progressive Astronaut']=dict(category='progressive',classification='progression')
     cheat_names={r['native_name'] for r in json.loads((WORLD/'bridge/cheat_manifest.json').read_text())}
     for name in sorted(cheat_names):
         if name.startswith('CHEAT_SCOREX'):continue

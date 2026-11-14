@@ -1,0 +1,558 @@
+﻿name,id,category,classification,supported
+Ability: Astronaut,2209631047,ability,progression,True
+Ability: Carry Objects,2543849170,ability,progression,False
+Ability: Climbing,2370905134,ability,progression,False
+Ability: Construction Worker,2400677615,ability,progression,True
+Ability: Crowbar,2010966013,ability,progression,False
+Ability: Detective Scan,2213734077,ability,progression,True
+Ability: EnergyGun,2696931570,ability,progression,True
+Ability: Farmer,2542587847,ability,progression,True
+Ability: FireAxe,2645419976,ability,progression,True
+Ability: Firefighter,2344518089,ability,progression,True
+Ability: Fishing,2663135840,ability,progression,False
+Ability: GrappleGun,2811423916,ability,progression,True
+Ability: Jetpack,2348385789,ability,progression,True
+Ability: Miner,2744023631,ability,progression,True
+Ability: Parkour,2092072332,ability,progression,True
+Ability: Police,2768515136,ability,progression,True
+Ability: Rex Fury,2690181496,ability,progression,True
+Ability: Robber,2832663916,ability,progression,True
+Ability: Scanner,2612587341,ability,progression,True
+Ability: Stethoscope,2518449893,ability,progression,False
+Ability: SuperBuild,2394569658,ability,progression,True
+Ability: Surveillance,2741622670,ability,progression,True
+Ability: Wiretap,2631676997,ability,progression,True
+Area Pass: BR_Brooklyn_Bridge,2244500755,area_pass,useful,False
+Area Pass: BR_Golden_Gate,2432056555,area_pass,useful,False
+Area Pass: BR_Twin_Bridge,2173288961,area_pass,useful,False
+Area Pass: IS_Liberty_Island,2508367308,area_pass,useful,False
+Area Pass: IS_Prison_Island,2607450696,area_pass,useful,False
+Area Pass: IS_Space_Centre,2460366008,area_pass,useful,False
+Area Pass: NY_Airport,2720114095,area_pass,useful,False
+Area Pass: NY_Beach,2145489923,area_pass,useful,False
+Area Pass: NY_Canal,2199890616,area_pass,useful,False
+Area Pass: NY_Central_Park,2394020588,area_pass,useful,False
+Area Pass: NY_Chinatown,2481545356,area_pass,useful,False
+Area Pass: NY_Downtown,2404820081,area_pass,useful,False
+Area Pass: NY_Downtown_East,2878227559,area_pass,useful,False
+Area Pass: NY_Downtown_West,2769171571,area_pass,useful,False
+Area Pass: NY_Little_Italy,2221667105,area_pass,useful,False
+Area Pass: NY_Times_Square,2500872388,area_pass,useful,False
+Area Pass: NY_Uptown,2475270065,area_pass,useful,False
+Area Pass: SF_Docks,2887904380,area_pass,useful,False
+Area Pass: SF_Residential,2753147341,area_pass,useful,False
+Area Pass: WI_Farmlands,2407514406,area_pass,useful,False
+Area Pass: WI_Forest,2128792755,area_pass,useful,False
+Area Pass: br_brooklyn_bridge,2859023232,area_pass,useful,False
+Area Pass: br_golden_gate,2818560421,area_pass,useful,False
+Area Pass: br_twin_bridge,2724174855,area_pass,useful,False
+Area Pass: is_liberty_island,2730560299,area_pass,useful,False
+Area Pass: is_prison_island,2883293495,area_pass,useful,False
+Area Pass: is_space_centre,2063849614,area_pass,useful,False
+Area Pass: lego_city.giz,2061621855,area_pass,useful,False
+Area Pass: ny_airport,2723947142,area_pass,useful,False
+Area Pass: ny_beach,2868267873,area_pass,useful,False
+Area Pass: ny_canal,2188432061,area_pass,useful,False
+Area Pass: ny_central_park,2626416689,area_pass,useful,False
+Area Pass: ny_chinatown,2579051918,area_pass,useful,False
+Area Pass: ny_downtown,2521635911,area_pass,useful,False
+Area Pass: ny_downtown_east,2412640591,area_pass,useful,False
+Area Pass: ny_downtown_west,2293232145,area_pass,useful,False
+Area Pass: ny_little_italy,2320493766,area_pass,useful,False
+Area Pass: ny_monaco_tunnel,2532743736,area_pass,useful,False
+Area Pass: ny_times_square,2272265077,area_pass,useful,False
+Area Pass: ny_tunnel,2143251365,area_pass,useful,False
+Area Pass: ny_uptown,2346010954,area_pass,useful,False
+Area Pass: plantpot,2658813815,area_pass,useful,False
+Area Pass: sf_docks,2157053844,area_pass,useful,False
+Area Pass: sf_residential,2004656387,area_pass,useful,False
+Area Pass: wi_farmlands,2763263940,area_pass,useful,False
+Area Pass: wi_forest,2215967871,area_pass,useful,False
+Character: ASTRONAUT,2647902853,character,progression,True
+Character: ASTRONAUT_EVILASTRONAUT,2780523224,character,useful,True
+Character: ASTRONAUT_EVILASTRONAUT02,2280287888,character,useful,True
+Character: ASTRONAUT_FORRESTBLACKWELL,2329566947,character,useful,True
+Character: ASTRONAUT_HENRIKKOWALSKI,2614544516,character,useful,True
+Character: ASTRONAUT_JETPACK,2322975658,character,useful,True
+Character: ASTRONAUT_REXFURY,2415495563,character,useful,True
+Character: ASTRONAUT_SCIENTIST,2291093581,character,useful,True
+Character: BUDDY_ASTRONAUT,2244923401,character,useful,True
+Character: BUDDY_CONSTRUCTION,2240900296,character,useful,True
+Character: BUDDY_FARMER,2066240023,character,useful,True
+Character: BUDDY_MINER,2127216271,character,useful,True
+Character: BUDDY_POLICEUNDERCOVER,2472504616,character,useful,True
+Character: CHASE_P2_FIREMAN,2377653636,character,useful,True
+Character: CHASE_P2_ROBBER,2036745253,character,useful,True
+Character: CHASE_P2_SUIT,2426807765,character,useful,True
+Character: CIVILIAN_AIRLINEHOST,2070068523,character,useful,True
+Character: CIVILIAN_AIRLINEHOSTESS,2251996610,character,useful,True
+Character: CIVILIAN_AIRLINEPILOT,2260798766,character,useful,True
+Character: CIVILIAN_BARRYSMITH,2099580360,character,useful,True
+Character: CIVILIAN_BEAHECKERSON,2105854385,character,useful,True
+Character: CIVILIAN_BOUNCER,2376071499,character,useful,True
+Character: CIVILIAN_CAPTAINBLUFFBEARD,2276580461,character,useful,True
+Character: CIVILIAN_CHASEMCCAIN,2696115675,character,useful,True
+Character: CIVILIAN_CHASEMCCAIN_ALT,2512607060,character,useful,True
+Character: CIVILIAN_CHEF,2057612915,character,useful,True
+Character: CIVILIAN_DOCKSCRANEDRIVER,2238497791,character,useful,True
+Character: CIVILIAN_DOCKSFOREMAN,2807372634,character,useful,True
+Character: CIVILIAN_GARAGEWORKER,2555093278,character,useful,True
+Character: CIVILIAN_GARBAGEMAN,2792379647,character,useful,True
+Character: CIVILIAN_HARBOURWORKER,2407350052,character,useful,True
+Character: CIVILIAN_MAILMAN,2740877177,character,useful,True
+Character: CIVILIAN_MAINTENANCEWORKER,2145228450,character,useful,True
+Character: CIVILIAN_MAYORGLEESON,2895085391,character,useful,True
+Character: CIVILIAN_NATALIAKOWALSKI,2875003441,character,useful,True
+Character: CIVILIAN_PETROLWORKER,2797763263,character,useful,True
+Character: CIVILIAN_STREETRACER,2068586646,character,useful,True
+Character: CIVILIAN_TRAINDRIVER,2734583955,character,useful,True
+Character: CLASS_POLICEUNDERCOVER,2680567275,character,useful,True
+Character: COLLECT_1-01_TRIBALHUNTER,2346530756,character,useful,True
+Character: COLLECT_1-02_CHEERLEADER,2332491165,character,useful,True
+Character: COLLECT_1-03_CAVEMAN,2419758325,character,useful,True
+Character: COLLECT_1-04_CIRCUSCLOWN,2643985065,character,useful,True
+Character: COLLECT_1-05_ZOMBIE,2523411567,character,useful,True
+Character: COLLECT_1-06_SKATER,2067197535,character,useful,True
+Character: COLLECT_1-07_ROBOT,2465147108,character,useful,True
+Character: COLLECT_1-08_DEMOLITIONDUMMY,2033816703,character,useful,True
+Character: COLLECT_1-09_MAGICIAN,2427482237,character,useful,True
+Character: COLLECT_1-10_SUPERWRESTLER,2332125032,character,useful,True
+Character: COLLECT_1-11_NURSE,2264531751,character,useful,True
+Character: COLLECT_1-12_NINJA,2788319987,character,useful,True
+Character: COLLECT_1-13_SPACEMAN,2234818918,character,useful,True
+Character: COLLECT_1-14_FORESTMAN,2470919006,character,useful,True
+Character: COLLECT_1-15_DEEPSEADIVER,2757433980,character,useful,True
+Character: COLLECT_1-16_COWBOY,2248091802,character,useful,True
+Character: COLLECT_2-01_WEIGHTLIFTER,2136665228,character,useful,True
+Character: COLLECT_2-02_MARACAMAN,2117339780,character,useful,True
+Character: COLLECT_2-03_POPSTAR,2292849473,character,useful,True
+Character: COLLECT_2-04_SKIER,2412655260,character,useful,True
+Character: COLLECT_2-05_DISCODUDE,2730482298,character,useful,True
+Character: COLLECT_2-06_KARATEMASTER,2158622133,character,useful,True
+Character: COLLECT_2-07_SURFER,2797247710,character,useful,True
+Character: COLLECT_2-08_PHARAOH,2058670918,character,useful,True
+Character: COLLECT_2-09_SPARTANWARRIOR,2641333558,character,useful,True
+Character: COLLECT_2-10_RINGMASTER,2890783985,character,useful,True
+Character: COLLECT_2-11_VAMPIRE,2637824925,character,useful,True
+Character: COLLECT_2-12_TRAFFICCOP,2899226377,character,useful,True
+Character: COLLECT_2-13_EXPLORER,2531348316,character,useful,True
+Character: COLLECT_2-14_LIFEGUARD,2796888257,character,useful,True
+Character: COLLECT_2-15_MIME,2468004279,character,useful,True
+Character: COLLECT_3-01_TRIBALCHIEF,2696627090,character,useful,True
+Character: COLLECT_3-02_SAMURAIWARRIOR,2701654319,character,useful,True
+Character: COLLECT_3-03_PILOT,2643042144,character,useful,True
+Character: COLLECT_3-04_FISHERMAN,2227420943,character,useful,True
+Character: COLLECT_3-05_SPACEVILLAIN,2794416922,character,useful,True
+Character: COLLECT_3-06_SNOWBOARDER,2125383674,character,useful,True
+Character: COLLECT_3-07_HULADANCER,2847098682,character,useful,True
+Character: COLLECT_3-08_RACECARDRIVER,2184425414,character,useful,True
+Character: COLLECT_3-09_RAPPER,2754762976,character,useful,True
+Character: COLLECT_3-10_ELF,2603375897,character,useful,True
+Character: COLLECT_3-11_SUMOWRESTLER,2602922465,character,useful,True
+Character: COLLECT_3-12_ALIEN,2312062994,character,useful,True
+Character: COLLECT_3-13_MUMMY,2250083704,character,useful,True
+Character: COLLECT_3-14_TENNISPLAYER,2395616127,character,useful,True
+Character: COLLECT_3-15_BASEBALLPLAYER,2423049200,character,useful,True
+Character: COLLECT_3-16_GORILLASUITGUY,2312611766,character,useful,True
+Character: COLLECT_4-01_VIKING,2125181793,character,useful,True
+Character: COLLECT_4-02_HOCKEYPLAYER,2253371847,character,useful,True
+Character: COLLECT_4-03_WEREWOLF,2255762690,character,useful,True
+Character: COLLECT_4-04_ARTIST,2515719817,character,useful,True
+Character: COLLECT_4-05_SURFERGIRL,2441862545,character,useful,True
+Character: COLLECT_4-06_STREETSKATER,2803320337,character,useful,True
+Character: COLLECT_4-07_SOCCERPLAYER,2554744566,character,useful,True
+Character: COLLECT_4-08_CRAZYSCIENTIST,2130703975,character,useful,True
+Character: COLLECT_4-09_SAILOR,2083512527,character,useful,True
+Character: COLLECT_4-10_MUSKETEER,2773008729,character,useful,True
+Character: COLLECT_4-11_THEMONSTER,2039462152,character,useful,True
+Character: COLLECT_4-12_ICESKATER,2350069639,character,useful,True
+Character: COLLECT_4-13_HAZMATGUY,2032541587,character,useful,True
+Character: COLLECT_4-14_PUNKROCKER,2036232007,character,useful,True
+Character: COLLECT_5-02_BOXER,2325177430,character,useful,True
+Character: COLLECT_5-03_CAVEWOMAN,2001514859,character,useful,True
+Character: COLLECT_5-04_FITNESSDANCER,2837705923,character,useful,True
+Character: COLLECT_5-05_DETECTIVE,2782855993,character,useful,True
+Character: COLLECT_5-06_DINOSAURSUITMAN,2421892890,character,useful,True
+Character: COLLECT_5-07_ESKIMO,2585415726,character,useful,True
+Character: COLLECT_5-08_GANGSTER,2834980170,character,useful,True
+Character: COLLECT_5-09_GRENADIERGUARD,2693586776,character,useful,True
+Character: COLLECT_5-10_LUMBERJACK,2866611373,character,useful,True
+Character: COLLECT_5-11_MALESNOWBOARDER,2035678373,character,useful,True
+Character: COLLECT_5-12_MURMILLO,2885216867,character,useful,True
+Character: COLLECT_5-13_UNIVERSITYGRADUATE,2669595017,character,useful,True
+Character: COLLECT_5-14_ZOOKEEPER,2318660654,character,useful,True
+Character: COLLECT_6-01_GREYALIEN,2092139440,character,useful,True
+Character: COLLECT_6-02_BANDIT,2193501772,character,useful,True
+Character: COLLECT_6-03_BUTCHER,2280673161,character,useful,True
+Character: COLLECT_6-05_GALAXY,2743354456,character,useful,True
+Character: COLLECT_6-07_HIGHLANDER,2654977594,character,useful,True
+Character: COLLECT_6-09_MECHANIC,2772712698,character,useful,True
+Character: COLLECT_6-10_MINOTAUR,2125460174,character,useful,True
+Character: COLLECT_6-11_ROBOT,2208522488,character,useful,True
+Character: COLLECT_6-12_ROMAN,2591010522,character,useful,True
+Character: COLLECT_6-13_FEMALESKATER,2208812449,character,useful,True
+Character: COLLECT_6-14_SLEEPY,2050986438,character,useful,True
+Character: COLLECT_6-16_SURGEON,2350390450,character,useful,True
+Character: CONSTRUCTION_ALBRECHTSPINDLEROUTER,2352113604,character,useful,True
+Character: CONSTRUCTION_CONSTRUCTIONFOREMAN,2795030344,character,useful,True
+Character: CONSTRUCTION_LEGOCITYCONSTRUCTIONWORKER,2444310043,character,progression,True
+Character: CONSTRUCTION_WORKER01,2591070601,character,useful,True
+Character: CONSTRUCTION_WORKER02,2195539888,character,useful,True
+Character: CONSTRUCTION_WORKER03,2668080858,character,useful,True
+Character: CONSTRUCTION_WORKER04,2809851625,character,useful,True
+Character: COP,2675223897,character,progression,True
+Character: COP_BLUBS,2638246587,character,useful,True
+Character: COP_BRICKETT,2056084163,character,useful,True
+Character: COP_CACEY,2022176911,character,useful,True
+Character: COP_CHUCK,2480945360,character,useful,True
+Character: COP_CLASSIC,2337981380,character,useful,True
+Character: COP_CLUTCH,2221914552,character,useful,True
+Character: COP_DAMUMBO,2462078234,character,useful,True
+Character: COP_DIRTYBARRY,2044953491,character,useful,True
+Character: COP_DOORLOCKHOMES,2132214001,character,useful,True
+Character: COP_DRWHATSIT,2894793161,character,useful,True
+Character: COP_DUKEHUCKLEBERRY,2765769746,character,useful,True
+Character: COP_ELLIEPHILLIPS,2131923355,character,useful,True
+Character: COP_FEMALE_P2,2109253133,character,useful,True
+Character: COP_FEMALE_P2_CASUAL,2050026687,character,useful,True
+Character: COP_FEMALE_P2_UNDERCOVER,2042049521,character,useful,True
+Character: COP_FORESTRANGER,2337191320,character,useful,True
+Character: COP_FRANKHONEY,2724276770,character,useful,True
+Character: COP_FRANKHONEY_SPEEDO,2241488630,character,useful,True
+Character: COP_HORACECONE,2648088529,character,useful,True
+Character: COP_LAGNEY,2246922406,character,useful,True
+Character: COP_LEGOCITYCOPFEMALE,2157389368,character,useful,True
+Character: COP_LEGOCITYCOPMALE,2744098859,character,useful,True
+Character: COP_MARIONDUNBY,2200476078,character,useful,True
+Character: COP_POLICEOFFICER_NEW,2674729791,character,useful,True
+Character: COP_PRISONGUARD,2073674380,character,useful,True
+Character: COP_STUDSKI,2702372208,character,useful,True
+Character: FARMER,2866493505,character,progression,True
+Character: FARMER_FARMWORKER,2359324372,character,useful,True
+Character: FARMER_HILLBILLY,2031224334,character,useful,True
+Character: FARMER_JETHROHAYES,2635745943,character,useful,True
+Character: FIREMAN,2080955888,character,progression,True
+Character: FIREMAN_CORNELIUSBURNS,2041225848,character,useful,True
+Character: FIREMAN_FOREST,2745730266,character,useful,True
+Character: FIREMAN_LEGOCITYFIREMAN,2170904171,character,useful,True
+Character: FIREMAN_RAMONGUTIERREZ-DELGARDO,2399463125,character,useful,True
+Character: HELICOPTERPILOT_NEW,2161104798,character,useful,True
+Character: MINER,2399127950,character,progression,True
+Character: MINER_CLOCKWATCHER,2391106121,character,useful,True
+Character: MINER_MANAGER,2211383575,character,useful,True
+Character: MINER_MINER01,2238316569,character,useful,True
+Character: MINER_MININGTECHNICIAN,2633781802,character,useful,True
+Character: MISSION_PAPPERAZZI,2423894789,character,useful,True
+Character: MISSION_PARAMEDIC,2565769617,character,useful,True
+Character: MISSION_PIZZADELIVERYBOY,2325095090,character,useful,True
+Character: MISSION_TAXIDRIVER,2864048415,character,useful,True
+Character: MISSION_TOWTRUCKDRIVER,2888890198,character,useful,True
+Character: NPC_ACTIVIST01,2894879920,character,useful,True
+Character: NPC_ACTIVIST02,2577278338,character,useful,True
+Character: NPC_ACTIVIST03,2371529999,character,useful,True
+Character: NPC_AIRPORTSTAFF02,2166676268,character,useful,True
+Character: NPC_AIRPORTSTAFF04,2202843110,character,useful,True
+Character: NPC_ANCHORMAN,2339638380,character,useful,True
+Character: NPC_ASTRONAUT02,2071056326,character,useful,True
+Character: NPC_BANKMANAGER,2382153163,character,useful,True
+Character: NPC_BARRYSMITH_NOTROUSERS,2740864088,character,useful,True
+Character: NPC_BUSDRIVER01,2302668055,character,useful,True
+Character: NPC_CARLOJEROME,2080962378,character,useful,True
+Character: NPC_CARLOJEROMECONE,2555649097,character,useful,True
+Character: NPC_CHANGANG01,2138474584,character,useful,True
+Character: NPC_CHANGANG02,2392110428,character,useful,True
+Character: NPC_CHASEHBEAR,2876063196,character,useful,True
+Character: NPC_CITIZENFEMALE01,2259258276,character,useful,True
+Character: NPC_CITIZENFEMALE02,2683564213,character,useful,True
+Character: NPC_CITIZENFEMALE03,2777875008,character,useful,True
+Character: NPC_CITIZENFEMALE04,2688739475,character,useful,True
+Character: NPC_CITIZENFEMALE05,2850564964,character,useful,True
+Character: NPC_CITIZENFEMALE06,2035496411,character,useful,True
+Character: NPC_CITIZENFEMALE07,2398795241,character,useful,True
+Character: NPC_CITIZENFEMALE08,2502920521,character,useful,True
+Character: NPC_CITIZENFEMALE_NEW_01,2573061445,character,useful,True
+Character: NPC_CITIZENMALE01,2727748192,character,useful,True
+Character: NPC_CITIZENMALE02,2817722014,character,useful,True
+Character: NPC_CITIZENMALE03,2673303112,character,useful,True
+Character: NPC_CITIZENMALE04,2623652441,character,useful,True
+Character: NPC_CITIZENMALE05,2530107236,character,useful,True
+Character: NPC_CITIZENMALE06,2565961410,character,useful,True
+Character: NPC_CITIZENMALE07,2678769843,character,useful,True
+Character: NPC_CITIZENMALE08,2000278965,character,useful,True
+Character: NPC_CITIZENMALE_NEW_01,2280926134,character,useful,True
+Character: NPC_CITIZENMALE_NEW_02,2238395169,character,useful,True
+Character: NPC_CLEANER01,2084145170,character,useful,True
+Character: NPC_CLOWNROBBER01,2599653851,character,useful,True
+Character: NPC_CLOWNROBBER02,2880857689,character,useful,True
+Character: NPC_COASTGUARD01,2373976741,character,useful,True
+Character: NPC_CONRADPETERS,2856468111,character,useful,True
+Character: NPC_COP05,2846884848,character,useful,True
+Character: NPC_COPCLEANER,2623109764,character,useful,True
+Character: NPC_COPTRAINING01,2139983151,character,useful,True
+Character: NPC_COPTRAINING02,2544638169,character,useful,True
+Character: NPC_DAVE,2685025481,character,useful,True
+Character: NPC_DOCTOR01,2418460417,character,useful,True
+Character: NPC_DOCTOR03,2700149339,character,useful,True
+Character: NPC_FARMER01,2375813729,character,useful,True
+Character: NPC_FARMER02,2788335339,character,useful,True
+Character: NPC_FARMER03,2630059872,character,useful,True
+Character: NPC_FILMSTAR,2195810762,character,useful,True
+Character: NPC_FIREMAN01,2778695543,character,useful,True
+Character: NPC_FIREMAN02,2084697970,character,useful,True
+Character: NPC_FIREMAN03,2802101579,character,useful,True
+Character: NPC_FIREMAN04,2492956107,character,useful,True
+Character: NPC_FIREMAN05,2362185106,character,useful,True
+Character: NPC_FORESTRANGER01,2705912604,character,useful,True
+Character: NPC_GEORGE,2056499027,character,useful,True
+Character: NPC_HENRIKKOWALSKI,2266372535,character,useful,True
+Character: NPC_KARATESTRONG,2731056119,character,useful,True
+Character: NPC_KARATEWEAK,2570318059,character,useful,True
+Character: NPC_KATE,2597519003,character,useful,True
+Character: NPC_KEVINJACOBS,2559373882,character,useful,True
+Character: NPC_LEONARDO,2663057675,character,useful,True
+Character: NPC_LIBERACE,2609733131,character,useful,True
+Character: NPC_MIKEYSPOILERS,2249702870,character,useful,True
+Character: NPC_MINER01,2113475366,character,useful,True
+Character: NPC_MINER02,2641432149,character,useful,True
+Character: NPC_MISSIONCONTROLLER01,2800343029,character,useful,True
+Character: NPC_MISSIONCONTROLLER02,2881267922,character,useful,True
+Character: NPC_NATALIADISGUISE,2333129380,character,useful,True
+Character: NPC_OLDQIANG,2218312295,character,useful,True
+Character: NPC_PAJAMESCURRY,2234222586,character,useful,True
+Character: NPC_PATPATTERSON,2469388055,character,useful,True
+Character: NPC_PRESSPHOTOGRAPHER01,2125576259,character,useful,True
+Character: NPC_RADIODJ01,2461602611,character,useful,True
+Character: NPC_RADIODJ02,2525479169,character,useful,True
+Character: NPC_RADIONEWSREADER,2333768563,character,useful,True
+Character: NPC_RADIOSKY,2785689286,character,useful,True
+Character: NPC_REXGANG01,2746772796,character,useful,True
+Character: NPC_REXGANG02,2629818537,character,useful,True
+Character: NPC_ROBBER01,2400622616,character,useful,True
+Character: NPC_ROBBER02,2755249643,character,useful,True
+Character: NPC_ROBBER04,2288237266,character,useful,True
+Character: NPC_ROBBERYFRONTS,2562258201,character,useful,True
+Character: NPC_ROBBERYFRONTS2,2085148827,character,useful,True
+Character: NPC_SALVATORECALZONE,2450978632,character,useful,True
+Character: NPC_SCIENTIST01,2634640728,character,useful,True
+Character: NPC_SECURITYBLACKWELL02,2230679229,character,useful,True
+Character: NPC_SECURITYGUARD01,2182413527,character,useful,True
+Character: NPC_SECURITYGUARD02,2201204765,character,useful,True
+Character: NPC_SUBMARINECAPTAIN,2346908676,character,useful,True
+Character: NPC_SURFERDUDE,2280010753,character,useful,True
+Character: NPC_TRAINDRIVER01,2804465494,character,useful,True
+Character: NPC_TVREPORTER,2591410539,character,useful,True
+Character: NPC_WAITRESS,2782688565,character,useful,True
+Character: ROBBER,2688565580,character,progression,True
+Character: ROBBER_BLACKWELLHENCHMAN,2422790683,character,useful,True
+Character: ROBBER_BLACKWELLSECURITYGUARD,2310472639,character,useful,True
+Character: ROBBER_BLUEWHITTAKER,2496521565,character,useful,True
+Character: ROBBER_BUCKYBUTLER,2688368295,character,useful,True
+Character: ROBBER_CHANCHUANG,2047540865,character,useful,True
+Character: ROBBER_CHANGANGSTRONG,2219701837,character,useful,True
+Character: ROBBER_CLOWNROBBER,2126794071,character,useful,True
+Character: ROBBER_EDDIEJOJOREXGANG,2009744607,character,useful,True
+Character: ROBBER_FENGCHANGANG,2120637131,character,useful,True
+Character: ROBBER_FORRESTBLACKWELL,2386067278,character,useful,True
+Character: ROBBER_FORRESTBLACKWELLFORMAL,2589089526,character,useful,True
+Character: ROBBER_FORRESTBLACKWELLTUXEDO,2845466425,character,useful,True
+Character: ROBBER_FUCHANGANG,2500570074,character,useful,True
+Character: ROBBER_GOVERNORSTONEWALL,2321323946,character,useful,True
+Character: ROBBER_JIMMYGROSSMANREXGANG,2499973439,character,useful,True
+Character: ROBBER_LICHANGANG,2301288407,character,useful,True
+Character: ROBBER_LUCKYPETEVINNIEGANG,2394266345,character,useful,True
+Character: ROBBER_MOEDELUCA,2155106024,character,useful,True
+Character: ROBBER_NEW,2513129880,character,useful,True
+Character: ROBBER_PAULIEBLINDFOLDSVINNIEGANG,2066725140,character,useful,True
+Character: ROBBER_PRISONER,2287005754,character,useful,True
+Character: ROBBER_REXFURY,2110353265,character,useful,True
+Character: ROBBER_REXFURYSHIRT,2431690921,character,useful,True
+Character: ROBBER_SNAKESSQUEALER,2552400114,character,useful,True
+Character: ROBBER_SPIKEYDONREXGANG,2057821095,character,useful,True
+Character: ROBBER_STRONG,2248101778,character,useful,True
+Character: ROBBER_TONYONETIMEVINNIEGANG,2503844520,character,useful,True
+Character: ROBBER_VINNIEPAPPALARDO,2550435308,character,useful,True
+Character: ROBBER_VINNIEPAPPALARDOTRACKSUIT,2389904098,character,useful,True
+Character: ROBBER_VINNIEPAPPALARDO_CLOWN,2053954312,character,useful,True
+Progressive Astronaut,2821594283,progressive,progression,True
+Red Brick Cheat: CHEAT_BOOST,2807458702,cheat,useful,True
+Red Brick Cheat: CHEAT_BRICK_MAGNET,2230097685,cheat,useful,True
+Red Brick Cheat: CHEAT_COLLECTGHOSTSTUDS,2818198648,cheat,useful,True
+Red Brick Cheat: CHEAT_EXTRAHEARTS,2581482657,cheat,useful,True
+Red Brick Cheat: CHEAT_FALL_RESCUE,2505289190,cheat,useful,True
+Red Brick Cheat: CHEAT_FANCYDRESS,2070444553,cheat,useful,True
+Red Brick Cheat: CHEAT_FASTBUILD,2054498825,cheat,useful,True
+Red Brick Cheat: CHEAT_FASTFAST_TRAVEL,2578311093,cheat,useful,True
+Red Brick Cheat: CHEAT_FAST_ASTROCRATE,2614281554,cheat,useful,True
+Red Brick Cheat: CHEAT_FAST_AXESMASH,2268947209,cheat,useful,True
+Red Brick Cheat: CHEAT_FAST_BREAKENTER,2765767093,cheat,useful,True
+Red Brick Cheat: CHEAT_FAST_DRILL,2374805171,cheat,useful,True
+Red Brick Cheat: CHEAT_FAST_SAFECRACK,2369490211,cheat,useful,True
+Red Brick Cheat: CHEAT_GAME_COMPLETE,2036737602,cheat,useful,True
+Red Brick Cheat: CHEAT_INVINCIBILITY,2421878824,cheat,useful,True
+Red Brick Cheat: CHEAT_RINGTONE_BURP,2097693145,cheat,useful,True
+Red Brick Cheat: CHEAT_RINGTONE_DONKEY,2561445995,cheat,useful,True
+Red Brick Cheat: CHEAT_RINGTONE_FART,2467542240,cheat,useful,True
+Red Brick Cheat: CHEAT_RINGTONE_HONK,2841637517,cheat,useful,True
+Red Brick Cheat: CHEAT_RINGTONE_MARIO,2835503165,cheat,useful,True
+Red Brick Cheat: CHEAT_SCAN_CHAR_CHALLENGE,2439321687,cheat,useful,True
+Red Brick Cheat: CHEAT_SCAN_CITY_CHALLENGE,2444303586,cheat,useful,True
+Red Brick Cheat: CHEAT_SCAN_POINT_OF_INTEREST,2190503315,cheat,useful,True
+Red Brick Cheat: CHEAT_SCAN_REDBRICKS,2881067391,cheat,useful,True
+Red Brick Cheat: CHEAT_SCAN_TOKENS,2461035240,cheat,useful,True
+Red Brick Cheat: CHEAT_SIREN_HAT,2649022772,cheat,useful,True
+Red Brick Cheat: CHEAT_SPAWN_VEHICLES,2186070758,cheat,useful,True
+Red Brick Cheat: CHEAT_STUD_MAGNET,2231905593,cheat,useful,True
+Red Brick Cheat: CHEAT_SUPERBLASTERS,2424872378,cheat,useful,True
+Red Brick Cheat: CHEAT_SUPER_COLOUR_GUN,2267190557,cheat,useful,True
+Red Brick Cheat: CHEAT_SUPER_THROW,2071824876,cheat,useful,True
+Red Brick Cheat: CHEAT_UNLIMITED_DYNAMITE,2204327784,cheat,useful,True
+Red Brick Cheat: CHEAT_VEHICLE_NITROS,2604657969,cheat,useful,True
+Red Brick Cheat: CHEAT_VEHICLE_RAM,2302797098,cheat,useful,True
+Red Brick Cheat: CHEAT_WONDER_WHISTLE,2568808760,cheat,useful,True
+Red Brick Cheat: Studs x10,2019309425,cheat,useful,True
+Red Brick Cheat: Studs x2,2278150014,cheat,useful,True
+Red Brick Cheat: Studs x4,2504504617,cheat,useful,True
+Red Brick Cheat: Studs x6,2327749044,cheat,useful,True
+Red Brick Cheat: Studs x8,2450545974,cheat,useful,True
+Story Access: bank,2823182811,story_access,useful,False
+Story Access: blackwells_mansion,2634161188,story_access,useful,False
+Story Access: construction_site,2315385203,story_access,useful,False
+Story Access: fire_station,2891620837,story_access,useful,False
+Story Access: icecream_parlour,2109969856,story_access,useful,False
+Story Access: mine,2611965081,story_access,useful,False
+Story Access: moon_base,2447119911,story_access,useful,False
+Story Access: museum,2771649259,story_access,useful,False
+Story Access: police_station,2094398090,story_access,useful,False
+Story Access: prison,2620961407,story_access,useful,False
+Story Access: rooftops,2259863054,story_access,useful,False
+Story Access: scrapyard,2457886018,story_access,useful,False
+Story Access: secretbase,2866353202,story_access,useful,False
+Story Access: space_centre,2767560360,story_access,useful,False
+Story Access: temple,2372895932,story_access,useful,False
+"Studs 1,000",2798428686,filler,filler,True
+"Studs 10,000",2838869604,filler,filler,True
+"Studs 100,000",2688319017,filler,filler,True
+"Super Bricks 1,000",2800689226,building_bricks,useful,True
+"Super Bricks 10,000",2619432125,building_bricks,useful,True
+Super Bricks 100,2477929046,filler,filler,True
+Super Bricks 250,2424631513,filler,filler,True
+Vehicle: 2016_CIVIC_SLOGGER,2226124373,vehicle,filler,True
+Vehicle: 2016_MOTORCYCLES_NIPPER,2129718793,vehicle,filler,True
+Vehicle: 2016_POLICE_DASHER,2639847757,vehicle,filler,True
+Vehicle: 2016_POLICE_DETAINER,2126161252,vehicle,filler,True
+Vehicle: 2016_POLICE_GUARDIAN,2889998890,vehicle,filler,True
+Vehicle: 2016_POLICE_RESCUER,2627105794,vehicle,filler,True
+Vehicle: 2016_SUV_GIANT,2643686030,vehicle,filler,True
+Vehicle: 2016_VAN_HANKER,2149885202,vehicle,filler,True
+Vehicle: AIRCRAFT_CLOUD,2481049601,vehicle,filler,True
+Vehicle: AIRCRAFT_HERA,2715711658,vehicle,filler,True
+Vehicle: AIRCRAFT_JUPITER,2099365566,vehicle,filler,True
+Vehicle: AIRCRAFT_UFO,2449021842,vehicle,filler,True
+Vehicle: CHANS_DRAKONAS,2825122284,vehicle,filler,True
+Vehicle: CHANS_IRONBACK,2647209830,vehicle,filler,True
+Vehicle: CIVIC_BRISTLER,2733636461,vehicle,filler,True
+Vehicle: CIVIC_EPONA,2631567374,vehicle,filler,True
+Vehicle: CIVIC_HAZARD,2524859409,vehicle,filler,True
+Vehicle: CIVIC_TAXICAB,2445129795,vehicle,filler,True
+Vehicle: CIVIC_TRASHER,2247975942,vehicle,filler,True
+Vehicle: FARM_ARMADILLO,2113969948,vehicle,filler,True
+Vehicle: FIRE_CAMEL,2005402316,vehicle,filler,True
+Vehicle: FIRE_DOUSER,2209182665,vehicle,filler,True
+Vehicle: FIRE_EXTENDER,2744871428,vehicle,filler,True
+Vehicle: FIRE_INFERNO,2367503994,vehicle,filler,True
+Vehicle: FIRE_TRACKER,2724635604,vehicle,filler,True
+Vehicle: HOSPITAL_PANACEA,2121752129,vehicle,filler,True
+Vehicle: HOSPITAL_SWOOPER,2282249709,vehicle,filler,True
+Vehicle: INDUSTRIAL_ATLAS,2368097594,vehicle,filler,True
+Vehicle: INDUSTRIAL_BRAWN,2470464053,vehicle,filler,True
+Vehicle: INDUSTRIAL_DRAGGER,2471159548,vehicle,filler,True
+Vehicle: INDUSTRIAL_DUMPER,2895424320,vehicle,filler,True
+Vehicle: INDUSTRIAL_FOUNDATION,2256077016,vehicle,filler,True
+Vehicle: INDUSTRIAL_PAYLOAD,2864755089,vehicle,filler,True
+Vehicle: INDUSTRIAL_PKML,2135032097,vehicle,filler,True
+Vehicle: INDUSTRIAL_PROTECTOR,2532703707,vehicle,filler,True
+Vehicle: INDUSTRIAL_RELOCATOR,2162557817,vehicle,filler,True
+Vehicle: INDUSTRIAL_ROLLER,2860480470,vehicle,filler,True
+Vehicle: INDUSTRIAL_SHIFTER,2378536841,vehicle,filler,True
+Vehicle: INDUSTRIAL_SLICKER,2876395928,vehicle,filler,True
+Vehicle: INDUSTRIAL_STEADFAST,2389478676,vehicle,filler,True
+Vehicle: MOTORCYCLES_BUZZER,2170700143,vehicle,filler,True
+Vehicle: MOTORCYCLES_GROUNDDOG,2007226462,vehicle,filler,True
+Vehicle: MOTORCYCLES_HAIRDRYER,2494096757,vehicle,filler,True
+Vehicle: MOTORCYCLES_REDEEMER,2602309174,vehicle,filler,True
+Vehicle: MOTORCYCLES_REVOLVER,2183835274,vehicle,filler,True
+Vehicle: MOTORCYCLES_ROAMER,2305040434,vehicle,filler,True
+Vehicle: MOTORCYCLES_SWEETIE,2364909020,vehicle,filler,True
+Vehicle: MOTORCYCLES_VOR,2647704975,vehicle,filler,True
+Vehicle: MUSCLECARS_ATHENA,2318925660,vehicle,filler,True
+Vehicle: MUSCLECARS_BEARER,2544431208,vehicle,filler,True
+Vehicle: MUSCLECARS_ENBERG,2254053847,vehicle,filler,True
+Vehicle: MUSCLECARS_FALCHIONGT,2581596544,vehicle,filler,True
+Vehicle: MUSCLECARS_NARYM,2231525644,vehicle,filler,True
+Vehicle: MUSCLECARS_SILVERSMITH,2151284879,vehicle,filler,True
+Vehicle: MUSCLECARS_SPHINX,2060501536,vehicle,filler,True
+Vehicle: MUSCLECARS_TIGERELLA,2588026552,vehicle,filler,True
+Vehicle: NOVELTY_WASHWAGON,2091472158,vehicle,filler,True
+Vehicle: POLICE_BASTION,2361132245,vehicle,filler,True
+Vehicle: POLICE_CHASER,2801043339,vehicle,filler,True
+Vehicle: POLICE_CHOPPER,2694487067,vehicle,filler,True
+Vehicle: POLICE_DUNBYPATROLLO,2004116714,vehicle,filler,True
+Vehicle: POLICE_HERO,2268409433,vehicle,filler,True
+Vehicle: POLICE_IMPRISONER,2792008430,vehicle,filler,True
+Vehicle: POLICE_JUSTICE,2089309752,vehicle,filler,True
+Vehicle: POLICE_MOV_CAB,2385415215,vehicle,filler,True
+Vehicle: POLICE_RESPONDER,2877222703,vehicle,filler,True
+Vehicle: POLICE_RINO,2087966331,vehicle,filler,True
+Vehicle: POLICE_SKYBRINGER,2317559298,vehicle,filler,True
+Vehicle: POLICE_SQUADDIE,2387775384,vehicle,filler,True
+Vehicle: POLICE_TRACKER,2469825597,vehicle,filler,True
+Vehicle: POLICE_TREV,2574581810,vehicle,filler,True
+Vehicle: POLICE_TROOPER,2566009331,vehicle,filler,True
+Vehicle: POLICE_VIGILANT,2144802934,vehicle,filler,True
+Vehicle: SALOONCARS_ANCESTOR,2351437514,vehicle,filler,True
+Vehicle: SALOONCARS_ARBALEST,2157594842,vehicle,filler,True
+Vehicle: SALOONCARS_CABRAKAN,2779295326,vehicle,filler,True
+Vehicle: SALOONCARS_DOWNFORCE,2731137411,vehicle,filler,True
+Vehicle: SALOONCARS_FLARE,2124749202,vehicle,filler,True
+Vehicle: SALOONCARS_HESTIA,2567132232,vehicle,filler,True
+Vehicle: SALOONCARS_INDULGA,2742348899,vehicle,filler,True
+Vehicle: SALOONCARS_JALOPY,2071495557,vehicle,filler,True
+Vehicle: SALOONCARS_SCHMOOZER,2095264587,vehicle,filler,True
+Vehicle: SMALLCARS_ACESO,2333545105,vehicle,filler,True
+Vehicle: SMALLCARS_CRATER,2547392148,vehicle,filler,True
+Vehicle: SMALLCARS_EARWIG,2382886453,vehicle,filler,True
+Vehicle: SMALLCARS_GRASSMAN,2509430013,vehicle,filler,True
+Vehicle: SMALLCARS_PUMPKIN,2460476278,vehicle,filler,True
+Vehicle: SMALLCARS_SEVILA,2556431093,vehicle,filler,True
+Vehicle: SMALLCARS_SMALLISIMO,2135399571,vehicle,filler,True
+Vehicle: SMALLCARS_SQUEAKY,2065739564,vehicle,filler,True
+Vehicle: SMALLCARS_TALOS,2633285854,vehicle,filler,True
+Vehicle: SPACE_COCOON,2045667527,vehicle,filler,True
+Vehicle: SPACE_LERV,2765885543,vehicle,filler,True
+Vehicle: SPORTSCARS_CETAN,2884700368,vehicle,filler,True
+Vehicle: SPORTSCARS_DRAKONAS,2429050304,vehicle,filler,True
+Vehicle: SPORTSCARS_DULLAHAN,2017589869,vehicle,filler,True
+Vehicle: SPORTSCARS_GERSEMI,2799674135,vehicle,filler,True
+Vehicle: SPORTSCARS_LANTOS,2094600787,vehicle,filler,True
+Vehicle: SPORTSCARS_LUSCA,2351229186,vehicle,filler,True
+Vehicle: SPORTSCARS_ROAR,2557686484,vehicle,filler,True
+Vehicle: SPORTSCARS_SCOUT,2575945584,vehicle,filler,True
+Vehicle: SPORTSCARS_SPIRIT,2117149423,vehicle,filler,True
+Vehicle: SPORTSCARS_VALKYRIE,2384718035,vehicle,filler,True
+Vehicle: SPORTSCARS_WRATH,2573493146,vehicle,filler,True
+Vehicle: SUV_GALLEON,2328643866,vehicle,filler,True
+Vehicle: SUV_IRONBACK,2424009033,vehicle,filler,True
+Vehicle: SUV_RUGGED,2657399966,vehicle,filler,True
+Vehicle: SUV_TORSION,2019164913,vehicle,filler,True
+Vehicle: SUV_TRANSTER,2223679383,vehicle,filler,True
+Vehicle: UBER_BRUTE,2129716904,vehicle,filler,True
+Vehicle: UBER_GALICAN,2031242771,vehicle,filler,True
+Vehicle: UBER_RIOT,2394360024,vehicle,filler,True
+Vehicle: UBER_TEMPEST,2735903254,vehicle,filler,True
+Vehicle: VAN_BROADCASTER,2393415018,vehicle,filler,True
+Vehicle: VAN_GARRANO,2293686683,vehicle,filler,True
+Vehicle: VAN_GOTLAND,2226639618,vehicle,filler,True
+Vehicle: VAN_MUNCHER,2341214456,vehicle,filler,True
+Vehicle: VAN_OLDSTER,2844354240,vehicle,filler,True
+Vehicle: VAN_SQUADMOBILE,2328976542,vehicle,filler,True
+Vehicle: VAN_WANDERER,2731456575,vehicle,filler,True

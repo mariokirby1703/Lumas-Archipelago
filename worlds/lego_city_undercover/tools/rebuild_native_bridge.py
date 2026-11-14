@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / 'worlds/lego_city_undercover/bridge'))
@@ -24,6 +25,16 @@ def rebuild(root=ROOT, python=sys.executable):
     digest_before = source_digest(root)
     filename = 'LCUItemBridgeTests_' + digest_before[:16] + '.dll'
     output = build / filename
+    if output.exists():
+        manifest=build/'native_items_build.json'
+        try:record=json.loads(manifest.read_text(encoding='utf-8'))
+        except (OSError,ValueError):record={}
+        if record.get('dll_filename')==filename and bridge_health(root) is None:
+            print('OK: current sources already have a verified versioned DLL:',output,flush=True)
+            return output
+        # Never overwrite an existing DLL, including an unverified/in-use one.
+        filename='LCUItemBridgeTests_'+digest_before[:16]+'_'+str(time.time_ns())+'.dll'
+        output=build/filename
     print('LCU Native Bridge: building', filename, flush=True)
     builder = root / 'worlds/lego_city_undercover/tools/build_item_bridge.py'
     subprocess.run([str(python), str(builder), '--output', str(output)], cwd=root, check=True)

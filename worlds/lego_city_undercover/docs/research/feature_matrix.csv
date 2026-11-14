@@ -1,0 +1,25 @@
+feature,status,evidence,remaining
+Character ownership and selection,Teilweise implementiert,User confirmed classes and skins before this task; native save readback tests,Fresh run with all classes and new cosmetic holding policy
+Vehicle ownership and shop blocking,Teilweise implementiert,Existing guarded native purchase path and synthetic tests,Full vehicle/flight/menu live regression
+Currency durability,Teilweise implementiert,Persisted binding/watermark and batch tests,Crash/reconnect live regression with current build
+Progressive Astronaut,Implementiert aber nur synthetisch getestet,Receipt-order and legacy-start-inventory tests,Live first-stage and Jetpack test
+Default pool capability filtering,Implementiert aber nur synthetisch getestet,Pool tests and 120 generation fills,Ingame traversal coverage
+Class-specific cosmetic holding,Implementiert aber nur synthetisch getestet,Manifest categories and entitlement-mask tests,Receive cosmetic before class then receive class
+Native class alias compatibility,Implementiert aber nur synthetisch getestet,Stable IDs and shared effect planner,Old seed/reconnect live regression
+Native district identification,Teilweise implementiert,Existing native tile reader and user observations,All district boundaries and vehicle transitions
+AP district/assignment/section regions,Teilweise implementiert,Source regions and restrictive-fill simulations,Complete per-location traversal requirements
+Native mission tickets,Fehlend,Native transition invite/door scripts indexed,Safe entry-point binding plus replay and rearming coverage
+Native district rollback,Fehlend,Position/area reads exist,Safe player transform write and vehicle handling
+Native open-world initialization,Nur theoretisch recherchiert,Debug presets expose coupled story/objective initialization,Validated transaction and rollback on disposable save
+Detective Scan setter gate,Implementiert aber nur synthetisch getestet,Exact signature detour and native fixtures,Live aura deny/grant/reload including second player
+Red Brick ownership,Teilweise implementiert,All 40 mask indices and serialized-bit tests,Per-effect live Extras validation
+Red Brick automatic activation,Fehlend,Runtime activation is independently readable,Reviewed effect-specific native setter semantics
+Offline check recovery,Teilweise implementiert,Existing journal and persistent completion reconciliation tests,Missing individual source bindings
+Blackwell split completions,Implementiert aber nur synthetisch getestet,Descriptor-name based split and legacy aggregate tests,Both assignments live
+Native final/all-assignment goals,Implementiert aber nur synthetisch getestet,Persistent record predicates and generation goal tests,Real endgame completion and server goal event
+Cross-seed native marker fence,Implementiert aber nur synthetisch getestet,Stable marker reads and mismatched-binding rejection tests,Live switch between differently bound slots
+Item send/receive overlay,Teilweise implementiert,User confirmed native text/color placement before this task,Vehicle and concurrent native popup live regression
+Hook version ownership preflight,Implementiert aber nur synthetisch getestet,Reviewed jump decoding and mismatched-module rejection tests,Live old-DLL/new-client restart message
+Executable hashing cache,Implementiert aber nur synthetisch getestet,TTL and changed-file tests,Long-running live performance trace
+Safe versioned DLL rebuild,Implementiert aber nur synthetisch getestet,Verified existing DLL and non-overwrite selection,Rebuild while older bridge is pinned
+Full chronological playthrough,Fehlend,Generation model passes but traversal is incomplete,Complete fresh-save run without debug grants

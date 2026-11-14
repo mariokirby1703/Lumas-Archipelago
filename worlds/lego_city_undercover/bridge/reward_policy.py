@@ -2,6 +2,8 @@
 import struct
 from item_delivery import effect_plan
 from research_profile import ABILITY_NAMES
+from progressive_items import managed_effects
+from class_entitlements import model_class_ready
 
 POLICY=struct.Struct('<4I32I32I4Q4I')
 assert POLICY.size==320
@@ -13,13 +15,14 @@ TOOL_ABILITIES=frozenset(('GrappleGun','EnergyGun','SuperBuild','Parkour','Grab'
 
 
 def reward_masks(effects,received,models,cheats,options):
+    received=list(received)
     managed_models=set();entitled_models=set();managed_abilities=set();entitled_abilities=set()
     managed_cheats=set();entitled_cheats=set()
     managed_runtime=set();entitled_runtime=set()
     cheat_ids={r['native_name']:r['index'] for r in cheats}
     def add(effect,entitled):
         category=effect.get('category')
-        if not entitled and not options.get({'character':'character_items','vehicle':'vehicle_items','ability':'ability_items','cheat':'cheat_items'}.get(category,''),False):return
+        if not entitled and not options.get({'character':'character_items','vehicle':'vehicle_items','ability':'ability_items','progressive':'ability_items','cheat':'cheat_items'}.get(category,''),False):return
         plan=effect_plan(effect)
         if plan['kind']=='runtime_unlock' and plan['ability']=='DetectiveScan':
             if options.get('detective_scan_lock',False):
@@ -28,12 +31,14 @@ def reward_masks(effects,received,models,cheats,options):
         if plan['kind']=='model_unlock':
             name=plan['native_name']
             if name in STARTING_MODELS or name not in models:return
+            if entitled and not model_class_ready(name,received,options):return
             (entitled_models if entitled else managed_models).add(models[name])
         elif plan['kind']=='ability_unlock' and plan['ability'] in TOOL_ABILITIES:
             (entitled_abilities if entitled else managed_abilities).add(ABILITY_NAMES.index(plan['ability']))
         elif plan['kind']=='cheat_unlock' and plan.get('native_name') in cheat_ids:
             (entitled_cheats if entitled else managed_cheats).add(cheat_ids[plan['native_name']])
-    for effect in effects:add(effect,False)
+    for effect in effects:
+        for stage in managed_effects(effect):add(stage,False)
     for effect in received:add(effect,True)
     return dict(managed_models=managed_models,entitled_models=entitled_models&managed_models,
                 managed_abilities=managed_abilities,entitled_abilities=entitled_abilities&managed_abilities,

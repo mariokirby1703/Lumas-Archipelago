@@ -1,0 +1,7959 @@
+{
+  "version": 1,
+  "provenance": "native developer presets and transition scripts; not a write recipe",
+  "native_entry_gate_implemented": false,
+  "presets": [
+    {
+      "id": 0,
+      "name": "Main Menu",
+      "level": null,
+      "door": null,
+      "variables": []
+    },
+    {
+      "id": 1,
+      "name": "01 - City - Go to LEGO City Police Department",
+      "level": "Lego_City",
+      "door": null,
+      "variables": []
+    },
+    {
+      "id": 2,
+      "name": "02a - LEVEL - Police Dept Lobby 01",
+      "level": "Police_Station_Lobby",
+      "door": null,
+      "variables": []
+    },
+    {
+      "id": 3,
+      "name": "02b - LEVEL - Police Dept Garage",
+      "level": "Police_Station_Garage",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "02c - LEVEL - Police Dept Lobby 02",
+      "level": "Police_Station_Lobby",
+      "door": null,
+      "variables": [
+        {
+          "variable": "LCPD_MainframeActive",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "true"
+        },
+        {
+          "variable": "LCPD_LobbyEntered",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "03 - City - Go to Cherry Tree Bank",
+      "level": "Lego_City",
+      "door": "POLICE_LOBBY_EXTERNAL_DOOR",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "3"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "04 - City - Go to Red Cafe",
+      "level": "Lego_City",
+      "door": "POLICE_LOBBY_EXTERNAL_DOOR",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "2"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "3"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "numRobbersCaught",
+          "job": "Flow_Setup.Act_1.Catch_Bank_Robbers",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "HUB_Unlocked",
+          "job": "HUB_LCPD",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "05 - City - Go to the Docks",
+      "level": "Lego_City",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "2"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "numRobbersCaught",
+          "job": "Flow_Setup.Act_1.Catch_Bank_Robbers",
+          "value": "2"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "06 - City - Go to the Road Block",
+      "level": "Lego_City",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "3"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "07 - City - Build the Vehicle Call In Point",
+      "level": "Lego_City",
+      "door": "Flow_1.5_NatalyaChase",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "4"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "08 - City - Go to the Forest Dept",
+      "level": "Lego_City",
+      "door": "WI_Forest",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "5"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "09 - City - Go to the Burger Bar",
+      "level": "Lego_City",
+      "door": "POLICE_LOBBY_EXTERNAL_DOOR",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "6"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "09a - LEVEL - Rooftops",
+      "level": "SF_Rooftop",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "7"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "10 - City - Build the Prison Ferry",
+      "level": "Lego_City",
+      "door": "SF_ROOFTOPS_DOOR",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "11 - City - Meet Blue at the Prison",
+      "level": "Lego_City",
+      "door": "POLICE_LOBBY_EXTERNAL_DOOR",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "3"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "nState",
+          "job": "SuperBuild_Saves.SF_Residential.0823_Ferry",
+          "value": "2"
+        },
+        {
+          "variable": "bUnlocked_0823",
+          "job": "City_Setup.General.Tile_FastTravel_Ferry",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "12a - LEVEL - Prison Cell Block",
+      "level": "Prison_MainCells",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "4"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "12b - LEVEL - Wardens Office",
+      "level": "Prison_Wardens_Office",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "5"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "12c - LEVEL - Rexs Cell",
+      "level": "Prison_Rex_Furys_Cell",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "5"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "12d - Prison Workshop",
+      "level": "Prison_Workshop",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "5"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "name": "12e - Prison Hospital",
+      "level": "Prison_Hospital",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "5"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "13 - City - Go to Bluebell Mine",
+      "level": "Lego_City",
+      "door": "Door_IS_Prison",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "9"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bUnlocked_0823",
+          "job": "City_Setup.General.Tile_FastTravel_Ferry",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "name": "14a - LEVEL - Mine Entrance",
+      "level": "Mine_Tunnel",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "9"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "2"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "14b - LEVEL - Mine freefall",
+      "level": "Mine_freefall",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "9"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "2"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "name": "14c - LEVEL - Mine Cavern",
+      "level": "Mine_Cavern",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "9"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "2"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "name": "15 \u2013 City \u2013 Go to the Temple",
+      "level": "Lego_City",
+      "door": "Temple",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "10"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "name": "16a \u2013 LEVEL \u2013 Temple Courtyard",
+      "level": "Temple_Courtyard",
+      "door": null,
+      "variables": [
+        {
+          "variable": "LCPD_MainframeActive",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "true"
+        },
+        {
+          "variable": "LCPD_LobbyEntered",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "10"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "2"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "name": "16b \u2013 LEVEL \u2013 Temple Dojo",
+      "level": "Temple_Dojo",
+      "door": null,
+      "variables": [
+        {
+          "variable": "LCPD_MainframeActive",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "true"
+        },
+        {
+          "variable": "LCPD_LobbyEntered",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "10"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "2"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "name": "17 \u2013 City \u2013 Go to Crabby Bottom Bay",
+      "level": "Lego_City",
+      "door": "Flow5.1_Forest_Door",
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "11"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "name": "01 - City - Go to Scan Chan",
+      "level": "Police_Station_Garage",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "JustStartedGame",
+          "job": "Flow_Setup",
+          "value": "false"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "name": "02 - City - The Lazy Worker",
+      "level": "Lego_City",
+      "door": "NY_Chinatown_Flow_5.33_Start",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "name": "03 - City - Old Quaing's Limo Job",
+      "level": "Lego_City",
+      "door": "NY_Chinatown",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "3"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "name": "04 - City - Steal A Car",
+      "level": "Lego_City",
+      "door": "NY_TimesSquare",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "name": "05 - City - Investigate Intruder @ Chans Limos",
+      "level": "Lego_City",
+      "door": "NY_Chinatown",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "5"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "name": "06 - City - Prison Truck",
+      "level": "Lego_City",
+      "door": "POLICE_LOBBY_EXTERNAL_DOOR",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "6"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "name": "06a - City - Prison Truck - Race Stage",
+      "level": "Lego_City",
+      "door": "POLICE_LOBBY_EXTERNAL_DOOR",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "6"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "2"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "name": "06.a.b. - City - Prison Truck - GetTruck",
+      "level": "Lego_City",
+      "door": "POLICE_LOBBY_EXTERNAL_DOOR",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "6"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "3"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "PrisonTruckRaceStage",
+          "job": "Flow_Saves.Act_2.Prison_Truck_Race",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "name": "07a - City - Goto Airport Pursue Truck",
+      "level": "Lego_City",
+      "door": "NY_Airport",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "7"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "name": "07b - City - Drop Off Truck To Vinnie",
+      "level": "Lego_City",
+      "door": "DEBUG_Flow_2.7",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "7"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "Stage",
+          "job": "Flow_Setup.Act_2.Pursue_Delivery_Truck",
+          "value": "3"
+        },
+        {
+          "variable": "DEBUG_Start",
+          "job": "Flow_Setup.Act_2.Pursue_Delivery_Truck.Papparlardos_Dropoff",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "name": "08 - City - Go to Bank",
+      "level": "Lego_City",
+      "door": "Bank_Mission",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "name": "09a - LEVEL - Bank Sewer",
+      "level": "Bank_Sewer",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "name": "09b - LEVEL - Bank Sewer 02",
+      "level": "Bank_Sewer_02",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "name": "09c - LEVEL - Bank Connection",
+      "level": "Bank_Connection",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "name": "09d - LEVEL - Bank Vault",
+      "level": "Bank_Vault",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "name": "09e - LEVEL - Bank Interior",
+      "level": "Bank_Interior",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "name": "10 - City - DropOffEmerald",
+      "level": "LEGO_City",
+      "door": "Down_Town",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "10"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "name": "11 - City - Photograph Chans Men",
+      "level": "Lego_City",
+      "door": "NY_Chinatown",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "11"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "name": "12a - City - Go To Space Island",
+      "level": "Lego_City",
+      "door": "NY_Chinatown",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "12"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "name": "12b - City - Enter Space Center",
+      "level": "Lego_City",
+      "door": "Flow6.4_Start",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "12"
+        },
+        {
+          "variable": "nStage",
+          "job": "Flow_Setup.Act_2.Space_Island_Intro",
+          "value": "2"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "name": "13a - LEVEL - SpaceCentre_Control",
+      "level": "SpaceCentre_ControlRoom",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "13"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "name": "13b - LEVEL - SpaceCentre_Hangar",
+      "level": "SpaceCentre_ShuttleHangar",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "13"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "name": "14 - City - Escape Space Island",
+      "level": "Lego_City",
+      "door": "Hangar_to_Island",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "14"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "name": "15 - City - Save Forest Blackwell",
+      "level": "Lego_City",
+      "door": "Down_Town_East",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "15"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "name": "16 - City - SaveNatalya",
+      "level": "Lego_City",
+      "door": "Down_Town",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "16"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "name": "17a - LEVEL - Scrapyard_Entrance",
+      "level": "Scrapyard_Entrance",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "16"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "2"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "name": "17b - LEVEL - Scrapyard_Arena",
+      "level": "Scrapyard_Arena",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "16"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "2"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "name": "01 - City - Go To Sherriff Huckleberry",
+      "level": "Lego_City",
+      "door": "Flow7.5_CityToScrapyard",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "name": "02 - City - Round Up The Pigs",
+      "level": "Lego_City",
+      "door": "POLICE_LOBBY_EXTERNAL_DOOR",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "2"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "name": "02b - City - Find Pigs",
+      "level": "Lego_City",
+      "door": "WI_Farmlands",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "2"
+        },
+        {
+          "variable": "Stage",
+          "job": "Flow_Setup.Act_3.Round_Up_The_Pigs",
+          "value": "2"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bSpawnFarmer",
+          "job": "Flow_Setup.Act_3.Round_Up_The_Pigs.Control_Farmer",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "name": "03a - City - Go to Art Gallery",
+      "level": "Lego_City",
+      "door": "WI_Farmlands",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "name": "03b - City - Enter Museum",
+      "level": "Lego_City",
+      "door": "Flow_8.3_Door",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "2"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "name": "04a - LEVEL - Museum Room01",
+      "level": "Museum_Room01",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "4"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "name": "04b - LEVEL - Museum Room02",
+      "level": "Museum_Room02",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "4"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "name": "05 - City - TREX_Chase",
+      "level": "Lego_City",
+      "door": "Museum_Room02",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "5"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "name": "06 - City - Go to Firestation",
+      "level": "Lego_City",
+      "door": "Flow_9.2_GotoFirestation",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "6"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "name": "07a - LEVEL - FireStation Training Area",
+      "level": "Fire_Station_Training_Area",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "name": "07b - LEVEL - FireStation Interior",
+      "level": "Fire_Station_Interior",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "name": "07c - LEVEL - FireStation Boathouse",
+      "level": "Fire_Station_Boathouse",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "name": "08 - City - Drop Off Fireboat",
+      "level": "Lego_City",
+      "door": "Flow10.1_FireBoat_Door",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "8"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "name": "09a - City - Go to Hospital",
+      "level": "Lego_City",
+      "door": "Flow_10.2_Door",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "9"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "name": "10 - City - Fly To Ellie",
+      "level": "Lego_City",
+      "door": "Flow_10.4_Door",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "10"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "Shortcut",
+          "job": "Flow_Setup.Act_3.Fly_To_Ellie",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "name": "11 - City -Go to Pappalardos",
+      "level": "Lego_City",
+      "door": "Flow_10.5_GoTo_Pappalardos",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "11"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "name": "12 - City -Go to Honey Hotel",
+      "level": "Lego_City",
+      "door": "NY_LittleItaly_Door",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "12"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "name": "13 - City -Go to Blackwell Tunnel",
+      "level": "Lego_City",
+      "door": "NY_Beach",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "13"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "name": "14a - LEVEL - Blackwell01 Cave Tunnel",
+      "level": "Mansion1_CaveTunnel",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "14"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "name": "14b - LEVEL - Blackwell01 Cave",
+      "level": "Mansion1_Cave",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "14"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "name": "14c - LEVEL - Blackwell01 Lounge",
+      "level": "Mansion1_Lounge",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "14"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "name": "15 - City -Esacape Blackwell's Mansion",
+      "level": "Lego_City",
+      "door": "DOOR_Mansion01_To_City",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "15"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "name": "16a - City - Go to IceCream Parlour",
+      "level": "Lego_City",
+      "door": "Down_Town",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "16"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "name": "17a - LEVEL - IceCream Parlour",
+      "level": "Icecream01_Parlour",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "17"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "name": "17b - LEVEL - IceCream Office",
+      "level": "Icecream_Office",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "17"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "name": "17c - LEVEL - IceCream Factory",
+      "level": "Icecream02_Factory",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "17"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "name": "01 - City - Go To Construction Site",
+      "level": "Lego_City",
+      "door": "Icecream_Bar",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "name": "02a - LEVEL - ConstructionSite_01",
+      "level": "Construction_Site_01",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "2"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "name": "02b - LEVEL - ConstructionSite_02",
+      "level": "Construction_Site_02",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "2"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "name": "03a - City - Go To Observatory",
+      "level": "Lego_City",
+      "door": "Flow_12.1_ConstructionSite",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "3"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "name": "03b - City - Steal the Telescope",
+      "level": "Lego_City",
+      "door": "Flow_13.1_Observatory",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "3"
+        },
+        {
+          "variable": "InternalStage",
+          "job": "Flow_Setup.Act_4.GoTo_Observatory",
+          "value": "2"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 86,
+      "name": "03c - City -Deliver the Telescope",
+      "level": "Lego_City",
+      "door": "Flow_13.1_Observatory",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "3"
+        },
+        {
+          "variable": "InternalStage",
+          "job": "Flow_Setup.Act_4.GoTo_Observatory",
+          "value": "3"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "name": "06a - LEVEL - SecretBase Entrance",
+      "level": "SecretBase01a_Entrance",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "6"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "name": "06b - LEVEL - SecretBase Laboratory",
+      "level": "SecretBase02_Laboratory",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "6"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "name": "06c - LEVEL - SecretBase Hangar",
+      "level": "SecretBase03_Hangar",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "6"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "name": "07a - City - Fly_To_Blackwells02",
+      "level": "Lego_City",
+      "door": "SBHangar_To_City",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "7"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "name": "08a - LEVEL - Blackwell02 Exterior",
+      "level": "Mansion2_Exterior",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "8"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 92,
+      "name": "08b - LEVEL - Blackwell02 Study",
+      "level": "Mansion2_Study",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "8"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 93,
+      "name": "09 - City - Go To Kowalski Lab",
+      "level": "Lego_City",
+      "door": "StudyToCity",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "9"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "name": "10a - City - Go To Blackwell Tower",
+      "level": "Lego_City",
+      "door": "Flow_15.2_Door",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "10"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "name": "11a - City - Go To ShuttlePad",
+      "level": "Lego_City",
+      "door": "FastTravel_Boat_IS_SPACE",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "11"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 96,
+      "name": "11b - City - Build Shuttle",
+      "level": "Lego_City",
+      "door": "Flow_15.3_SpaceIsland",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "11"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "2"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 97,
+      "name": "12a - LEVEL - Moon Base Crater",
+      "level": "MoonBase1_Crater",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "12"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 98,
+      "name": "12b - LEVEL - Moon Base Cockpit",
+      "level": "MoonBase2_RocketCockpit",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "12"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "name": "12c - LEVEL - Moon Base Loading Bay",
+      "level": "MoonBase3_RocketLoadingBay",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "12"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 100,
+      "name": "12d - LEVEL - Moon Base Final Battle",
+      "level": "MoonBase_FinalBattle",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "12"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 101,
+      "name": "12e - LEVEL - Moon Base Space Dive",
+      "level": "MoonBase_SpaceDive",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "12"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "bReturnToStandalone",
+          "job": "Flow_Setup.Returned_To_City",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "name": "Post Act 4",
+      "level": "Lego_City",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "name": "NY_Downtown",
+      "level": "Lego_City",
+      "door": "Down_Town",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "name": "NY_Downtown_West",
+      "level": "Lego_City",
+      "door": "NY_Downtown_West",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 105,
+      "name": "NY_Downtown_East",
+      "level": "Lego_City",
+      "door": "Down_Town_East",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 106,
+      "name": "NY_Little_Italy",
+      "level": "Lego_City",
+      "door": "NY_LittleItaly_Door",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 107,
+      "name": "SF_Docks",
+      "level": "Lego_City",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 108,
+      "name": "SF_Residential",
+      "level": "Lego_City",
+      "door": "POLICE_LOBBY_EXTERNAL_DOOR",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 109,
+      "name": "WI_Farmlands_Beach",
+      "level": "Lego_City",
+      "door": "Crabby_Bottom_Bay",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 110,
+      "name": "WI_Farmlands_Farm",
+      "level": "Lego_City",
+      "door": "WI_Farmlands",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 111,
+      "name": "NY_Chinatown",
+      "level": "Lego_City",
+      "door": "NY_Chinatown",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 112,
+      "name": "NY_Times_Square",
+      "level": "Lego_City",
+      "door": "NY_TimesSquare",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 113,
+      "name": "NY_Beach",
+      "level": "Lego_City",
+      "door": "NY_Beach",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 114,
+      "name": "IS_Prison_Island",
+      "level": "Lego_City",
+      "door": "IS_Prison_Island",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 115,
+      "name": "IS_Space_Centre",
+      "level": "Lego_City",
+      "door": "Hangar_to_Island",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 116,
+      "name": "NY_Uptown",
+      "level": "Lego_City",
+      "door": "NY_Uptown",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 117,
+      "name": "WI_Forest",
+      "level": "Lego_City",
+      "door": "WI_Forest",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 118,
+      "name": "NY_Airport",
+      "level": "Lego_City",
+      "door": "NY_Airport",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 119,
+      "name": "IS_Liberty_Island",
+      "level": "Lego_City",
+      "door": "IS_Liberty_Island",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 120,
+      "name": "NY_CentralPark",
+      "level": "Lego_City",
+      "door": "FastTravel_Boat_NY_CentralPark",
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "4"
+        },
+        {
+          "variable": "Act4_Mission",
+          "job": "Flow_Setup.Act_4",
+          "value": "14"
+        },
+        {
+          "variable": "Act4_Stage",
+          "job": "Flow_Setup.Act_4",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 121,
+      "name": "#1a - Police Dept Lobby 01",
+      "level": "Police_Station_Lobby",
+      "door": null,
+      "variables": []
+    },
+    {
+      "id": 122,
+      "name": "#1b - Police Dept Garage",
+      "level": "Police_Station_Garage",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 123,
+      "name": "#1c - Police Dept Lobby 02",
+      "level": "Police_Station_Lobby",
+      "door": null,
+      "variables": [
+        {
+          "variable": "LCPD_MainframeActive",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "true"
+        },
+        {
+          "variable": "LCPD_LobbyEntered",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": 124,
+      "name": "#1d - Police Dept Lobby - HUB",
+      "level": "Police_Station_Lobby",
+      "door": null,
+      "variables": [
+        {
+          "variable": "HubActive",
+          "job": "HUB_LCPD",
+          "value": "true"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "id": 125,
+      "name": "#1d - Police Line Up Room: CUSTOMISER",
+      "level": "Police_Station_Line_Up_Room",
+      "door": null,
+      "variables": [
+        {
+          "variable": "HubActive",
+          "job": "HUB_LCPD",
+          "value": "true"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "id": 126,
+      "name": "#2 - Rooftops",
+      "level": "SF_Rooftop",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "7"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 127,
+      "name": "#3a - Prison Cell Block",
+      "level": "Prison_MainCells",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "4"
+        }
+      ]
+    },
+    {
+      "id": 128,
+      "name": "#3b - Wardens Office",
+      "level": "Prison_Wardens_Office",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "5"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 129,
+      "name": "#3c - Rexs Cell",
+      "level": "Prison_Rex_Furys_Cell",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "5"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 130,
+      "name": "#3d - Workshop",
+      "level": "Prison_Workshop",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "5"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 131,
+      "name": "#3e - Hospital",
+      "level": "Prison_Hospital",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "8"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "5"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 132,
+      "name": "#4a - Mine Entrance",
+      "level": "Mine_Tunnel",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "9"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 133,
+      "name": "#4b - Mine freefall",
+      "level": "Mine_freefall",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "9"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "4"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 134,
+      "name": "#4c - Mine Cavern",
+      "level": "Mine_Cavern",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "9"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "4"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 135,
+      "name": "#5a \u2013 Temple Courtyard",
+      "level": "Temple_Courtyard",
+      "door": null,
+      "variables": [
+        {
+          "variable": "LCPD_MainframeActive",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "true"
+        },
+        {
+          "variable": "LCPD_LobbyEntered",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "10"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "2"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 136,
+      "name": "#5b \u2013 Temple Dojo",
+      "level": "Temple_Dojo",
+      "door": null,
+      "variables": [
+        {
+          "variable": "LCPD_MainframeActive",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "true"
+        },
+        {
+          "variable": "LCPD_LobbyEntered",
+          "job": "Flow_Setup.Act_1.LCPD.LCPD_Level.LCPD_Lobby",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Act1_Mission",
+          "job": "Flow_Setup.Act_1",
+          "value": "10"
+        },
+        {
+          "variable": "Act1_Stage",
+          "job": "Flow_Setup.Act_1",
+          "value": "2"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 137,
+      "name": "#6a - Bank Sewer",
+      "level": "Bank_Sewer",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 138,
+      "name": "#6b - Bank Sewer 02",
+      "level": "Bank_Sewer_02",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 139,
+      "name": "#6c - Bank Connection",
+      "level": "Bank_Connection",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 140,
+      "name": "#6d - Bank Vault",
+      "level": "Bank_Vault",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 141,
+      "name": "#6e - Bank Interior",
+      "level": "Bank_Interior",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "8"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "4"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 142,
+      "name": "#7a - Space Centre Control",
+      "level": "SpaceCentre_ControlRoom",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "13"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 143,
+      "name": "#7b - SpaceCentre_Hangar",
+      "level": "SpaceCentre_ShuttleHangar",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "13"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 144,
+      "name": "#8a - Scrapyard_Entrance",
+      "level": "Scrapyard_Entrance",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "17"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 145,
+      "name": "#8b - Scrapyard_Arena",
+      "level": "Scrapyard_Arena",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "2"
+        },
+        {
+          "variable": "Act2_Mission",
+          "job": "Flow_Setup.Act_2",
+          "value": "17"
+        },
+        {
+          "variable": "Act2_Stage",
+          "job": "Flow_Setup.Act_2",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 146,
+      "name": "#9 Museum2",
+      "level": "Museum_Room02",
+      "door": null,
+      "variables": []
+    },
+    {
+      "id": 147,
+      "name": "#9a - Museum Room01",
+      "level": "Museum_Room01",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "4"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 148,
+      "name": "#9b - Museum Room02",
+      "level": "Museum_Room02",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "4"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 149,
+      "name": "#10a - FireStation Training Area",
+      "level": "Fire_Station_Training_Area",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 150,
+      "name": "#10b - FireStation Interior",
+      "level": "Fire_Station_Interior",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 151,
+      "name": "#10c - FireStation Boathouse",
+      "level": "Fire_Station_Boathouse",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 152,
+      "name": "#11a - Blackwell's Mansion #1 - Fire Boat",
+      "level": "Mansion1_CaveTunnel",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 153,
+      "name": "#11b - Blackwell's Mansion #1 - Cave",
+      "level": "Mansion1_Cave",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 154,
+      "name": "#11c - Blackwell's Mansion #1 - Lounge",
+      "level": "Mansion1_Lounge",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 155,
+      "name": "#12a - Ice Cream Parlour (Parlour)",
+      "level": "IceCream01_Parlour",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 156,
+      "name": "#12b - Ice Cream Parlour Office",
+      "level": "IceCream_Office",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 157,
+      "name": "#12c - Ice Cream Parlour Factory",
+      "level": "IceCream02_Factory",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 158,
+      "name": "#13a - Construction Site 01",
+      "level": "Construction_Site_01",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 159,
+      "name": "#13b - Construction Site 02",
+      "level": "Construction_Site_02",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 160,
+      "name": "#14a - Secret Base Entrance",
+      "level": "SecretBase01a_Entrance",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 161,
+      "name": "#14b - Secret Base Laboratory",
+      "level": "SecretBase02_Laboratory",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 162,
+      "name": "#14c - Secret Base Hangar",
+      "level": "SecretBase03_Hangar",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 163,
+      "name": "#15a - Blackwell's Mansion #2 - Exterior",
+      "level": "Mansion2_Exterior",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 164,
+      "name": "#15b - Blackwell's Mansion #2 - Study",
+      "level": "Mansion2_Study",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 165,
+      "name": "#16a - Moon Base Crater",
+      "level": "MoonBase1_Crater",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 166,
+      "name": "#16b - Rocket Loading Bay",
+      "level": "MoonBase3_RocketLoadingBay",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 167,
+      "name": "#16c - Final Battle",
+      "level": "MoonBase_FinalBattle",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 168,
+      "name": "#16d - Space Dive",
+      "level": "MoonBase_SpaceDive",
+      "door": null,
+      "variables": [
+        {
+          "variable": "Flow_Act",
+          "job": "Flow_Setup",
+          "value": "3"
+        },
+        {
+          "variable": "Act3_Mission",
+          "job": "Flow_Setup.Act_3",
+          "value": "7"
+        },
+        {
+          "variable": "Act3_Stage",
+          "job": "Flow_Setup.Act_3",
+          "value": "1"
+        },
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 169,
+      "name": "NY_Chinatown_1717",
+      "level": "NY_Chinatown_1717",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 170,
+      "name": "NY_Chinatown_1718",
+      "level": "NY_Chinatown_1718",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 171,
+      "name": "NY_Chinatown_1816",
+      "level": "NY_Chinatown_1816",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 172,
+      "name": "NY_Chinatown_1817",
+      "level": "NY_Chinatown_1817",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 173,
+      "name": "NY_Chinatown_1818",
+      "level": "NY_Chinatown_1818",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 174,
+      "name": "SF_Residential_0820",
+      "level": "SF_Residential_0820",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 175,
+      "name": "SF_Residential_0821",
+      "level": "SF_Residential_0821",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 176,
+      "name": "SF_Residential_0822 - Police Station",
+      "level": "SF_Residential_0822",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 177,
+      "name": "SF_Residential_0823 - Police Dock",
+      "level": "SF_Residential_0823",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 178,
+      "name": "SF_Residential_0919 - Street to SF_Docks",
+      "level": "SF_Residential_0919",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 179,
+      "name": "SF_Residential_0920 - Lombard Street",
+      "level": "SF_Residential_0920",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 180,
+      "name": "SF_Residential_0921 - Residential Gardens",
+      "level": "SF_Residential_0921",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 181,
+      "name": "SF_Residential_0922 - Emporium",
+      "level": "SF_Residential_0922",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 182,
+      "name": "SF_Residential_0923 - Fountain",
+      "level": "SF_Residential_0923",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 183,
+      "name": "SF_Docksl_0815",
+      "level": "SF_Docks_0815",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 184,
+      "name": "SF_Docksl_0915",
+      "level": "SF_Docks_0915",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 185,
+      "name": "NY_Times_Square_1611",
+      "level": "NY_Times_Square_1611",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 186,
+      "name": "NY_Times_Square_1612",
+      "level": "NY_Times_Square_1612",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 187,
+      "name": "NY_Times_Square_1613",
+      "level": "NY_Times_Square_1613",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 188,
+      "name": "NY_Times_Square_1614",
+      "level": "NY_Times_Square_1614",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 189,
+      "name": "NY_Times_Square_1712",
+      "level": "NY_Times_Square_1712",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 190,
+      "name": "NY_Times_Square_1713",
+      "level": "NY_Times_Square_1713",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 191,
+      "name": "NY_Times_Square_1714",
+      "level": "NY_Times_Square_1714",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 192,
+      "name": "NY_Beach_2208",
+      "level": "NY_Beach_2208",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 193,
+      "name": "NY_Beach_2210",
+      "level": "NY_Beach_2210",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 194,
+      "name": "NY_Beach_2211",
+      "level": "NY_Beach_2211",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 195,
+      "name": "NY_Beach_2308",
+      "level": "NY_Beach_2308",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 196,
+      "name": "NY_Beach_2309",
+      "level": "NY_Beach_2309",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 197,
+      "name": "NY_Beach_2310",
+      "level": "NY_Beach_2310",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 198,
+      "name": "NY_Beach_2311",
+      "level": "NY_Beach_2311",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 199,
+      "name": "NY_Beach_2312 - Honey Hotel Front",
+      "level": "NY_Beach_2312",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 200,
+      "name": "NY_Beach_2408",
+      "level": "NY_Beach_2408",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 201,
+      "name": "IS_Space_Centre_3022",
+      "level": "IS_Space_Centre_3022",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 202,
+      "name": "IS_Space_Centre_3422",
+      "level": "IS_Space_Centre_3422",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 203,
+      "name": "NY_Downtown_East_2320",
+      "level": "NY_Downtown_East_2320",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 204,
+      "name": "NY_Central_Park_1608",
+      "level": "NY_Central_Park_1608",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 205,
+      "name": "NY_Downtown_1924",
+      "level": "NY_Downtown_1924",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 206,
+      "name": "WI_Forest_1002",
+      "level": "WI_Forest_1002",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 207,
+      "name": "WI_Farmlands_0505",
+      "level": "WI_Farmlands_0505",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 208,
+      "name": "Wi_Farmlands_0705 - Castle",
+      "level": "Wi_Farmlands_0705",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 209,
+      "name": "BR_Twin_Bridge_1403",
+      "level": "BR_Twin_Bridge_1403",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 210,
+      "name": "BR_Brooklyn_Bridge_1521",
+      "level": "BR_Brooklyn_Bridge_1521",
+      "door": "door",
+      "variables": []
+    },
+    {
+      "id": 211,
+      "name": "GameMechanicsTestArea",
+      "level": "GameMechanicsTestArea",
+      "door": null,
+      "variables": [
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": 212,
+      "name": "Parkour Test Playground",
+      "level": "ParkourTestPlayground_Exterior",
+      "door": null,
+      "variables": [
+        {
+          "variable": "acquired",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "synchronised",
+          "job": "PDA",
+          "value": "true"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse",
+          "value": "1"
+        },
+        {
+          "variable": "Activate",
+          "job": "Flow_Setup.DebugUse.Unlocks",
+          "value": "1"
+        }
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/bank.sf",
+      "sha256": "99ce5fef8ffc15658b24dae7b3e0dcf45d3dc643c4c6f2883d30536bc939b77f",
+      "hotspots": [
+        "Standalone_BANK_FreeplayEntrance"
+      ],
+      "doors": [
+        "DOOR_DT_BANK"
+      ],
+      "locators": [
+        "Standalone_BANK"
+      ],
+      "jobs": [
+        "Flow_Setup.Act_2.Downtown_Bank"
+      ],
+      "states": [
+        "JobStart",
+        "EnableHotspot",
+        "WaitForTrigger",
+        "TriggerDoor",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "EnableHotspot",
+          "target": "WaitForTrigger"
+        },
+        {
+          "source": "WaitForTrigger",
+          "target": "TriggerDoor"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/generic_inviteotherplayer.sf",
+      "sha256": "1a65ab30e68f630c20fcc0b21d74c6fdc9a4951c49549a67512aa6c2391d4bd0",
+      "hotspots": [],
+      "doors": [],
+      "locators": [],
+      "jobs": [],
+      "states": [
+        "JobStart",
+        "Init",
+        "ShowSummaryScreen",
+        "PromptOtherPlayer",
+        "AcceptedMission",
+        "RejectedMission",
+        "StartLevel",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "Init"
+        },
+        {
+          "source": "Init",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "Init",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "StartLevel"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "Init"
+        },
+        {
+          "source": "PromptOtherPlayer",
+          "target": "StartLevel"
+        },
+        {
+          "source": "PromptOtherPlayer",
+          "target": "RejectedMission"
+        },
+        {
+          "source": "RejectedMission",
+          "target": "Init"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/hub.sf",
+      "sha256": "2af522f3ea8166abb889ed42bb81266c1a6a2222fc73bd6a299b9a58c1ea5f37",
+      "hotspots": [],
+      "doors": [],
+      "locators": [],
+      "jobs": [
+        "Flow_Setup.Returned_To_City",
+        "Flow_Setup"
+      ],
+      "states": [
+        "JobStart",
+        "AwaitCity",
+        "DetermineUnlockState",
+        "ShowSummaryScreen",
+        "ClearToShowScreen",
+        "WaitBuffer",
+        "StartLevel",
+        "AwaitPDAFree",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "AwaitCity",
+          "target": "DetermineUnlockState"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "AwaitPDAFree"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "ClearToShowScreen"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "ClearToShowScreen"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "StartLevel"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "WaitBuffer",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "AwaitPDAFree",
+          "target": "DetermineUnlockState"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/hub_transition.sf",
+      "sha256": "9891ed9854fc9b1690e8fc068197f74da59046b323e2ad2ef462cfa2bc1ccc11",
+      "hotspots": [],
+      "doors": [],
+      "locators": [],
+      "jobs": [],
+      "states": [
+        "JobStart",
+        "Init",
+        "ShowSummaryScreen",
+        "StartLevel",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "Init"
+        },
+        {
+          "source": "Init",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "Init",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "Init",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "StartLevel"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "Init"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/level_transitions.sf",
+      "sha256": "f316a757a5a7b3eaf1566e00ca91bc535d8b564d9debf1101ebcb9afa434d9b3",
+      "hotspots": [],
+      "doors": [],
+      "locators": [],
+      "jobs": [
+        "Flow_Setup",
+        "Flow_Setup"
+      ],
+      "states": [
+        "JobStart",
+        "AwaitCity",
+        "DetermineUnlockState",
+        "ShowSummaryScreen",
+        "ClearToShowScreen",
+        "WaitBuffer",
+        "StartLevel",
+        "WaitForDisguiseWheel",
+        "AwaitPDAFree",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "AwaitCity",
+          "target": "DetermineUnlockState"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "AwaitPDAFree"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "DetermineUnlockState",
+          "target": "ShowSummaryScreen"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "ClearToShowScreen"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ShowSummaryScreen",
+          "target": "ClearToShowScreen"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "StartLevel"
+        },
+        {
+          "source": "ClearToShowScreen",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "WaitBuffer",
+          "target": "AwaitCity"
+        },
+        {
+          "source": "StartLevel",
+          "target": "WaitForDisguiseWheel"
+        },
+        {
+          "source": "WaitForDisguiseWheel",
+          "target": "WaitBuffer"
+        },
+        {
+          "source": "AwaitPDAFree",
+          "target": "DetermineUnlockState"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/mine.sf",
+      "sha256": "dbe0e6d8fd37c5cde0b10a8550cc9baa97f9d9e8a1aff643eb10b40554c5b437",
+      "hotspots": [
+        "Story_A1_M9_S1_EnterMine"
+      ],
+      "doors": [
+        "WI_MINE_DOOR"
+      ],
+      "locators": [
+        "Standalone_MINE"
+      ],
+      "jobs": [
+        "Flow_Setup.Act_1.To_The_Mine"
+      ],
+      "states": [
+        "JobStart",
+        "EnableHotspot",
+        "WaitForTrigger",
+        "TriggerDoor",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "EnableHotspot",
+          "target": "WaitForTrigger"
+        },
+        {
+          "source": "WaitForTrigger",
+          "target": "TriggerDoor"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/prison.sf",
+      "sha256": "112f6a397eeabeaeb016859739ec4d0889418d6a003d56df0800beb1e996b6b4",
+      "hotspots": [
+        "2.1_Prison_Entrance"
+      ],
+      "doors": [
+        "Flow5.2_Prison_MainCells"
+      ],
+      "locators": [
+        "Standalone_PRISON"
+      ],
+      "jobs": [
+        "Flow_Setup.Act_1.Find_Ferry"
+      ],
+      "states": [
+        "JobStart",
+        "EnableHotspot",
+        "WaitForTrigger",
+        "TriggerDoor",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "EnableHotspot",
+          "target": "WaitForTrigger"
+        },
+        {
+          "source": "WaitForTrigger",
+          "target": "TriggerDoor"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/scrapyard.sf",
+      "sha256": "d2a28718f18b3c61556da320529d8be34f259c18b6efddbdf10c8d1a5054ede3",
+      "hotspots": [
+        "Standalone_SCRAPYARD_Start"
+      ],
+      "doors": [
+        "Flow7.5_CityToScrapyard"
+      ],
+      "locators": [
+        "Standalone_SCRAPYARD"
+      ],
+      "jobs": [
+        "Flow_Setup.Act_4.GoTo_ConstructionSite"
+      ],
+      "states": [
+        "JobStart",
+        "EnableHotspot",
+        "WaitForTrigger",
+        "TriggerDoor",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "EnableHotspot",
+          "target": "WaitForTrigger"
+        },
+        {
+          "source": "WaitForTrigger",
+          "target": "TriggerDoor"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/sf_rooftop.sf",
+      "sha256": "d1540cb48ee49aa5e0d76188c0392f625e3f6a076a971f78171e4a33240bfc98",
+      "hotspots": [
+        "Story_A1_M6_S2_TVBuilding"
+      ],
+      "doors": [
+        "SF_ROOFTOPS_DOOR"
+      ],
+      "locators": [
+        "Standalone_ROOFTOPS"
+      ],
+      "jobs": [
+        "Flow_Setup.Act_1.TV_Building"
+      ],
+      "states": [
+        "JobStart",
+        "EnableHotspot",
+        "WaitForTrigger",
+        "TriggerDoor",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "EnableHotspot",
+          "target": "WaitForTrigger"
+        },
+        {
+          "source": "WaitForTrigger",
+          "target": "TriggerDoor"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/space_centre.sf",
+      "sha256": "bb54c9e248b88bfba628d3b992d69a1b5df6e03d2c32e17775b46c924f521c61",
+      "hotspots": [
+        "Standalone_SPACECENTRE_Entrance"
+      ],
+      "doors": [
+        "DOOR_SPACE_CENTRE_CONTROL"
+      ],
+      "locators": [
+        "Standalone_SPACECENTRE"
+      ],
+      "jobs": [
+        "Flow_Setup.Act_2.Space_Island_Intro"
+      ],
+      "states": [
+        "JobStart",
+        "EnableHotspot",
+        "WaitForTrigger",
+        "TriggerDoor",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "EnableHotspot",
+          "target": "WaitForTrigger"
+        },
+        {
+          "source": "WaitForTrigger",
+          "target": "TriggerDoor"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/level_transitions/temple.sf",
+      "sha256": "1d6e4ccf0d2fee6d7d6f3e228f1208c5beea07773fa2a17b97ff50a9d03c90aa",
+      "hotspots": [
+        "Story_09_Start"
+      ],
+      "doors": [
+        "WI_TEMPLE_DOOR"
+      ],
+      "locators": [
+        "Standalone_TEMPLE"
+      ],
+      "jobs": [
+        "Flow_Setup.Act_1.To_The_Temple"
+      ],
+      "states": [
+        "JobStart",
+        "EnableHotspot",
+        "WaitForTrigger",
+        "TriggerDoor",
+        "JobStop"
+      ],
+      "edges": [
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "JobStart",
+          "target": "EnableHotspot"
+        },
+        {
+          "source": "EnableHotspot",
+          "target": "WaitForTrigger"
+        },
+        {
+          "source": "WaitForTrigger",
+          "target": "TriggerDoor"
+        }
+      ]
+    }
+  ]
+}

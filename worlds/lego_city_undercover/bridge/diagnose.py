@@ -17,6 +17,8 @@ from objective_reader import read_objectives
 from inventory_reader import read_stats, read_characters
 from actor_reader import read_actor
 from story_reader import read_story
+from file_identity import file_digest
+from hook_ownership import detective_owner
 
 EXE = "LEGOLCUR_DX11.exe"
 RESEARCH_HASH = "624fed07274bbd105d1d571ecb97a290df6f6f0aff76898c516890da6d136f76"
@@ -138,8 +140,7 @@ def diagnose(include_research_state: bool = False, include_objectives: bool = Fa
             if not kernel.QueryFullProcessImageNameW(handle, 0, buffer, ctypes.byref(length)):
                 raise ctypes.WinError(ctypes.get_last_error())
             path = Path(buffer.value)
-            with path.open("rb") as stream:
-                digest = hashlib.file_digest(stream, "sha256").hexdigest()
+            digest = file_digest(path)
             if digest != RESEARCH_HASH:
                 results.append(dict(pid=pid, path=str(path), sha256=digest, status="unknown_executable"))
                 continue
@@ -155,6 +156,8 @@ def diagnose(include_research_state: bool = False, include_objectives: bool = Fa
                 raise RuntimeError("Unexpected live module header")
             result = dict(pid=pid, path=str(path), sha256=digest, status="module_header_read",
                           module_base=hex(main.modBaseAddr), module_size=main.modBaseSize)
+            result['detective_hook']=detective_owner(read_memory(kernel,handle,main.modBaseAddr+0x649a0,15),
+                [dict(base=m.modBaseAddr,size=m.modBaseSize,path=m.szExePath) for m in modules])
             if include_research_state:
                 result["research_state"] = research_state(kernel, handle, main.modBaseAddr)
             if include_objectives:

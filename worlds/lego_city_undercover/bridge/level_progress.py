@@ -14,7 +14,7 @@ def parse_level_progress(descriptor,record,index):
     red_mission=segments[1]
     if red_mission=='blackwells_mansion':
         red_mission=native_name if native_name in ('blackwells_mansion_1','blackwells_mansion_2') else None
-    return dict(mission=segments[1],level_index=index,complete=bool(record[10]&0x10),
+    return dict(mission=segments[1],assignment=red_mission or segments[1],level_index=index,complete=bool(record[10]&0x10),
                 hero_complete=bool(record[4] or record[5]),shield_parts=decode_shield_mask(record[10]&15),
                 red_brick=bool(record[9]&2),red_brick_mission=red_mission,
                 raw_record=record.hex(),source_path=path)
@@ -46,6 +46,13 @@ def completed_level_keys(state):
     keys=set()
     for mission,rows in groups.items():
         for row in rows:
+            assignment=row.get('assignment',mission)
+            if assignment!=mission:
+                prefix='mission:'+assignment+':'
+                if row['complete']:keys.add(prefix+'Complete')
+                if row['hero_complete']:keys.add(prefix+'LEGO City Hero')
+                keys.update(prefix+part for part in row['shield_parts'])
+                if set(row['shield_parts'])=={'TL','TR','BL','BR'}:keys.add(prefix+'Police Shield')
             red_mission=row.get('red_brick_mission',mission)
             if row.get('red_brick') and red_mission:keys.add('mission:'+red_mission+':Red Brick')
         if all(r['complete'] for r in rows):keys.add('mission:'+mission+':Complete')

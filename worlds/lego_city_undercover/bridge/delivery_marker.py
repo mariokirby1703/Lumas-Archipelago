@@ -38,3 +38,19 @@ def marker_from_save(data):
         raise ValueError('Unsupported native save layout')
     offset=CHARACTER_SAVE_OFFSET+MARKER_OFFSET
     return data[offset:offset+MARKER_SIZE]
+
+
+def read_marker(read,base):
+    bank=struct.unpack('<Q',read(base+0x1c7cbb8,8))[0]
+    if not bank:raise RuntimeError('Native inventory bank is not initialized')
+    raw=read(bank+MARKER_OFFSET,MARKER_SIZE)
+    parsed=parse_marker(raw)
+    if struct.unpack('<Q',read(base+0x1c7cbb8,8))[0]!=bank or read(bank+MARKER_OFFSET,MARKER_SIZE)!=raw:
+        raise RuntimeError('Native save binding changed during snapshot')
+    return dict(status='bound' if parsed else 'unbound',bank=hex(bank),marker=parsed)
+
+
+def check_snapshot_binding(snapshot,token):
+    state=snapshot.get('native_binding')
+    if state and state.get('status')=='bound' and state['marker']['binding']!=token.hex():
+        raise RuntimeError('Loaded native save is bound to another AP seed/slot; checks, goals and native delivery stopped')

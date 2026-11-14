@@ -10,6 +10,7 @@ from native_save import resolve_save,read_save,model_saved,cheat_saved,ability_s
 from research_profile import ABILITY_NAMES
 from save_reader import read_save_controller
 from native_context_policy import PASSIVE_CONTEXTS
+from class_entitlements import model_class_ready
 
 
 class NativeDeliveryEngine:
@@ -96,6 +97,10 @@ class NativeDeliveryEngine:
         for delivery in deliveries:
             index=delivery['index'];plan=delivery['plan'];kind=plan['kind']
             if overrides and overrides.blocks(plan):continue
+            if kind=='noop':
+                if delivery['state']!='runtime_verified':journal.record_runtime_verification(index,
+                    dict(verified=True,native_save_flag=False,reason=plan['reason']))
+                continue
             if kind=='runtime_unlock' and plan['ability']=='DetectiveScan':
                 if context!=46:continue
                 # The policy call above installed/read back the gate. The durable
@@ -127,6 +132,7 @@ class NativeDeliveryEngine:
                 return
             if kind=='model_unlock':
                 name=plan['native_name'];model=self.models.get(name)
+                if not model_class_ready(name,received,options or {}):continue
                 if model is None:
                     key=(journal.binding_token,index)
                     if key not in self.unbound:

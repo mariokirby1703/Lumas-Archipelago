@@ -2176,6 +2176,11 @@
       "id": 2053954312,
       "native_name": "ROBBER_VINNIEPAPPALARDO_CLOWN"
     },
+    "Progressive Astronaut": {
+      "category": "progressive",
+      "classification": "progression",
+      "id": 2821594283
+    },
     "Red Brick Cheat: CHEAT_BOOST": {
       "category": "cheat",
       "classification": "useful",
@@ -3295,10 +3300,15 @@
       "coordinates": null,
       "district": null,
       "id": 1204795242,
+      "legacy_aggregate": false,
       "name": "bank: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "bank",
+        "reward": "BL"
+      },
       "source": "bank",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:bank:BR": {
       "category": "shield_quarters",
@@ -3306,10 +3316,15 @@
       "coordinates": null,
       "district": null,
       "id": 1635695612,
+      "legacy_aggregate": false,
       "name": "bank: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "bank",
+        "reward": "BR"
+      },
       "source": "bank",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:bank:Complete": {
       "category": "story_missions",
@@ -3317,10 +3332,15 @@
       "coordinates": null,
       "district": null,
       "id": 1677748414,
+      "legacy_aggregate": false,
       "name": "bank: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "bank",
+        "reward": "Complete"
+      },
       "source": "bank",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:bank:LEGO City Hero": {
       "category": "city_hero",
@@ -3328,10 +3348,15 @@
       "coordinates": null,
       "district": null,
       "id": 1343319874,
+      "legacy_aggregate": false,
       "name": "bank: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "bank",
+        "reward": "LEGO City Hero"
+      },
       "source": "bank",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:bank:Police Shield": {
       "category": "whole_shields",
@@ -3339,10 +3364,15 @@
       "coordinates": null,
       "district": null,
       "id": 1223301346,
+      "legacy_aggregate": false,
       "name": "bank: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "bank",
+        "reward": "Police Shield"
+      },
       "source": "bank",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:bank:Red Brick": {
       "category": "red_bricks",
@@ -3371,10 +3401,15 @@
       "coordinates": null,
       "district": null,
       "id": 1443137753,
+      "legacy_aggregate": false,
       "name": "bank: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "bank",
+        "reward": "TL"
+      },
       "source": "bank",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:bank:TR": {
       "category": "shield_quarters",
@@ -3382,10 +3417,15 @@
       "coordinates": null,
       "district": null,
       "id": 1732888721,
+      "legacy_aggregate": false,
       "name": "bank: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "bank",
+        "reward": "TR"
+      },
       "source": "bank",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:blackwells_mansion:BL": {
       "category": "shield_quarters",
@@ -3393,10 +3433,15 @@
       "coordinates": null,
       "district": null,
       "id": 1191033125,
+      "legacy_aggregate": true,
       "name": "blackwells_mansion: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion",
+        "reward": "BL"
+      },
       "source": "blackwells_mansion",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:blackwells_mansion:BR": {
       "category": "shield_quarters",
@@ -3404,10 +3449,15 @@
       "coordinates": null,
       "district": null,
       "id": 1032553867,
+      "legacy_aggregate": true,
       "name": "blackwells_mansion: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion",
+        "reward": "BR"
+      },
       "source": "blackwells_mansion",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:blackwells_mansion:Complete": {
       "category": "story_missions",
@@ -3415,10 +3465,15 @@
       "coordinates": null,
       "district": null,
       "id": 1709224427,
+      "legacy_aggregate": true,
       "name": "blackwells_mansion: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion",
+        "reward": "Complete"
+      },
       "source": "blackwells_mansion",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:blackwells_mansion:LEGO City Hero": {
       "category": "city_hero",
@@ -3426,10 +3481,15 @@
       "coordinates": null,
       "district": null,
       "id": 1053758990,
+      "legacy_aggregate": true,
       "name": "blackwells_mansion: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion",
+        "reward": "LEGO City Hero"
+      },
       "source": "blackwells_mansion",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:blackwells_mansion:Police Shield": {
       "category": "whole_shields",
@@ -3437,10 +3497,15 @@
       "coordinates": null,
       "district": null,
       "id": 1676166855,
+      "legacy_aggregate": true,
       "name": "blackwells_mansion: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion",
+        "reward": "Police Shield"
+      },
       "source": "blackwells_mansion",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:blackwells_mansion:TL": {
       "category": "shield_quarters",
@@ -3448,10 +3513,15 @@
       "coordinates": null,
       "district": null,
       "id": 1278318570,
+      "legacy_aggregate": true,
       "name": "blackwells_mansion: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion",
+        "reward": "TL"
+      },
       "source": "blackwells_mansion",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:blackwells_mansion:TR": {
       "category": "shield_quarters",
@@ -3459,10 +3529,95 @@
       "coordinates": null,
       "district": null,
       "id": 1443947859,
+      "legacy_aggregate": true,
       "name": "blackwells_mansion: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion",
+        "reward": "TR"
+      },
       "source": "blackwells_mansion",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_1:BL": {
+      "category": "shield_quarters",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1445514163,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_1: BL",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_1",
+        "reward": "BL"
+      },
+      "source": "blackwells_mansion_1",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_1:BR": {
+      "category": "shield_quarters",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1382995135,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_1: BR",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_1",
+        "reward": "BR"
+      },
+      "source": "blackwells_mansion_1",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_1:Complete": {
+      "category": "story_missions",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1124820047,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_1: Complete",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_1",
+        "reward": "Complete"
+      },
+      "source": "blackwells_mansion_1",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_1:LEGO City Hero": {
+      "category": "city_hero",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1473040396,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_1: LEGO City Hero",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_1",
+        "reward": "LEGO City Hero"
+      },
+      "source": "blackwells_mansion_1",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_1:Police Shield": {
+      "category": "whole_shields",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1024383843,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_1: Police Shield",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_1",
+        "reward": "Police Shield"
+      },
+      "source": "blackwells_mansion_1",
+      "status": "native_level_progress"
     },
     "mission:blackwells_mansion_1:Red Brick": {
       "category": "red_bricks",
@@ -3485,6 +3640,118 @@
       ],
       "status": "experimental_red_brick"
     },
+    "mission:blackwells_mansion_1:TL": {
+      "category": "shield_quarters",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1874895890,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_1: TL",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_1",
+        "reward": "TL"
+      },
+      "source": "blackwells_mansion_1",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_1:TR": {
+      "category": "shield_quarters",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1391442641,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_1: TR",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_1",
+        "reward": "TR"
+      },
+      "source": "blackwells_mansion_1",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_2:BL": {
+      "category": "shield_quarters",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1835533611,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_2: BL",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_2",
+        "reward": "BL"
+      },
+      "source": "blackwells_mansion_2",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_2:BR": {
+      "category": "shield_quarters",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1453244011,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_2: BR",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_2",
+        "reward": "BR"
+      },
+      "source": "blackwells_mansion_2",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_2:Complete": {
+      "category": "story_missions",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1362888159,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_2: Complete",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_2",
+        "reward": "Complete"
+      },
+      "source": "blackwells_mansion_2",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_2:LEGO City Hero": {
+      "category": "city_hero",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1541529525,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_2: LEGO City Hero",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_2",
+        "reward": "LEGO City Hero"
+      },
+      "source": "blackwells_mansion_2",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_2:Police Shield": {
+      "category": "whole_shields",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1102002420,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_2: Police Shield",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_2",
+        "reward": "Police Shield"
+      },
+      "source": "blackwells_mansion_2",
+      "status": "native_level_progress"
+    },
     "mission:blackwells_mansion_2:Red Brick": {
       "category": "red_bricks",
       "coordinate_space": "resource; transforms may apply",
@@ -3506,16 +3773,53 @@
       ],
       "status": "experimental_red_brick"
     },
+    "mission:blackwells_mansion_2:TL": {
+      "category": "shield_quarters",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1691611471,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_2: TL",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_2",
+        "reward": "TL"
+      },
+      "source": "blackwells_mansion_2",
+      "status": "native_level_progress"
+    },
+    "mission:blackwells_mansion_2:TR": {
+      "category": "shield_quarters",
+      "coordinate_space": null,
+      "coordinates": null,
+      "district": null,
+      "id": 1771186189,
+      "legacy_aggregate": false,
+      "name": "blackwells_mansion_2: TR",
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "blackwells_mansion_2",
+        "reward": "TR"
+      },
+      "source": "blackwells_mansion_2",
+      "status": "native_level_progress"
+    },
     "mission:construction_site:BL": {
       "category": "shield_quarters",
       "coordinate_space": null,
       "coordinates": null,
       "district": null,
       "id": 1304463857,
+      "legacy_aggregate": false,
       "name": "construction_site: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "construction_site",
+        "reward": "BL"
+      },
       "source": "construction_site",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:construction_site:BR": {
       "category": "shield_quarters",
@@ -3523,10 +3827,15 @@
       "coordinates": null,
       "district": null,
       "id": 1536944050,
+      "legacy_aggregate": false,
       "name": "construction_site: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "construction_site",
+        "reward": "BR"
+      },
       "source": "construction_site",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:construction_site:Complete": {
       "category": "story_missions",
@@ -3534,10 +3843,15 @@
       "coordinates": null,
       "district": null,
       "id": 1191062841,
+      "legacy_aggregate": false,
       "name": "construction_site: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "construction_site",
+        "reward": "Complete"
+      },
       "source": "construction_site",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:construction_site:LEGO City Hero": {
       "category": "city_hero",
@@ -3545,10 +3859,15 @@
       "coordinates": null,
       "district": null,
       "id": 1529126020,
+      "legacy_aggregate": false,
       "name": "construction_site: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "construction_site",
+        "reward": "LEGO City Hero"
+      },
       "source": "construction_site",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:construction_site:Police Shield": {
       "category": "whole_shields",
@@ -3556,10 +3875,15 @@
       "coordinates": null,
       "district": null,
       "id": 1498822624,
+      "legacy_aggregate": false,
       "name": "construction_site: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "construction_site",
+        "reward": "Police Shield"
+      },
       "source": "construction_site",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:construction_site:Red Brick": {
       "category": "red_bricks",
@@ -3588,10 +3912,15 @@
       "coordinates": null,
       "district": null,
       "id": 1667828086,
+      "legacy_aggregate": false,
       "name": "construction_site: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "construction_site",
+        "reward": "TL"
+      },
       "source": "construction_site",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:construction_site:TR": {
       "category": "shield_quarters",
@@ -3599,10 +3928,15 @@
       "coordinates": null,
       "district": null,
       "id": 1124670609,
+      "legacy_aggregate": false,
       "name": "construction_site: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "construction_site",
+        "reward": "TR"
+      },
       "source": "construction_site",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:fire_station:BL": {
       "category": "shield_quarters",
@@ -3610,10 +3944,15 @@
       "coordinates": null,
       "district": null,
       "id": 1256880043,
+      "legacy_aggregate": false,
       "name": "fire_station: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "fire_station",
+        "reward": "BL"
+      },
       "source": "fire_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:fire_station:BR": {
       "category": "shield_quarters",
@@ -3621,10 +3960,15 @@
       "coordinates": null,
       "district": null,
       "id": 1466380286,
+      "legacy_aggregate": false,
       "name": "fire_station: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "fire_station",
+        "reward": "BR"
+      },
       "source": "fire_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:fire_station:Complete": {
       "category": "story_missions",
@@ -3632,10 +3976,15 @@
       "coordinates": null,
       "district": null,
       "id": 1452832848,
+      "legacy_aggregate": false,
       "name": "fire_station: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "fire_station",
+        "reward": "Complete"
+      },
       "source": "fire_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:fire_station:LEGO City Hero": {
       "category": "city_hero",
@@ -3643,10 +3992,15 @@
       "coordinates": null,
       "district": null,
       "id": 1540050939,
+      "legacy_aggregate": false,
       "name": "fire_station: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "fire_station",
+        "reward": "LEGO City Hero"
+      },
       "source": "fire_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:fire_station:Police Shield": {
       "category": "whole_shields",
@@ -3654,10 +4008,15 @@
       "coordinates": null,
       "district": null,
       "id": 1203300443,
+      "legacy_aggregate": false,
       "name": "fire_station: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "fire_station",
+        "reward": "Police Shield"
+      },
       "source": "fire_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:fire_station:Red Brick": {
       "category": "red_bricks",
@@ -3686,10 +4045,15 @@
       "coordinates": null,
       "district": null,
       "id": 1479064465,
+      "legacy_aggregate": false,
       "name": "fire_station: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "fire_station",
+        "reward": "TL"
+      },
       "source": "fire_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:fire_station:TR": {
       "category": "shield_quarters",
@@ -3697,10 +4061,15 @@
       "coordinates": null,
       "district": null,
       "id": 1794461177,
+      "legacy_aggregate": false,
       "name": "fire_station: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "fire_station",
+        "reward": "TR"
+      },
       "source": "fire_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:icecream_parlour:BL": {
       "category": "shield_quarters",
@@ -3708,10 +4077,15 @@
       "coordinates": null,
       "district": null,
       "id": 1167682708,
+      "legacy_aggregate": false,
       "name": "icecream_parlour: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "icecream_parlour",
+        "reward": "BL"
+      },
       "source": "icecream_parlour",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:icecream_parlour:BR": {
       "category": "shield_quarters",
@@ -3719,10 +4093,15 @@
       "coordinates": null,
       "district": null,
       "id": 1556913794,
+      "legacy_aggregate": false,
       "name": "icecream_parlour: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "icecream_parlour",
+        "reward": "BR"
+      },
       "source": "icecream_parlour",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:icecream_parlour:Complete": {
       "category": "story_missions",
@@ -3730,10 +4109,15 @@
       "coordinates": null,
       "district": null,
       "id": 1478871484,
+      "legacy_aggregate": false,
       "name": "icecream_parlour: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "icecream_parlour",
+        "reward": "Complete"
+      },
       "source": "icecream_parlour",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:icecream_parlour:LEGO City Hero": {
       "category": "city_hero",
@@ -3741,10 +4125,15 @@
       "coordinates": null,
       "district": null,
       "id": 1679928257,
+      "legacy_aggregate": false,
       "name": "icecream_parlour: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "icecream_parlour",
+        "reward": "LEGO City Hero"
+      },
       "source": "icecream_parlour",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:icecream_parlour:Police Shield": {
       "category": "whole_shields",
@@ -3752,10 +4141,15 @@
       "coordinates": null,
       "district": null,
       "id": 1463654589,
+      "legacy_aggregate": false,
       "name": "icecream_parlour: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "icecream_parlour",
+        "reward": "Police Shield"
+      },
       "source": "icecream_parlour",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:icecream_parlour:Red Brick": {
       "category": "red_bricks",
@@ -3784,10 +4178,15 @@
       "coordinates": null,
       "district": null,
       "id": 1206726819,
+      "legacy_aggregate": false,
       "name": "icecream_parlour: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "icecream_parlour",
+        "reward": "TL"
+      },
       "source": "icecream_parlour",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:icecream_parlour:TR": {
       "category": "shield_quarters",
@@ -3795,10 +4194,15 @@
       "coordinates": null,
       "district": null,
       "id": 1134005666,
+      "legacy_aggregate": false,
       "name": "icecream_parlour: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "icecream_parlour",
+        "reward": "TR"
+      },
       "source": "icecream_parlour",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:mine:BL": {
       "category": "shield_quarters",
@@ -3806,10 +4210,15 @@
       "coordinates": null,
       "district": null,
       "id": 1020560835,
+      "legacy_aggregate": false,
       "name": "mine: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "mine",
+        "reward": "BL"
+      },
       "source": "mine",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:mine:BR": {
       "category": "shield_quarters",
@@ -3817,10 +4226,15 @@
       "coordinates": null,
       "district": null,
       "id": 1350076629,
+      "legacy_aggregate": false,
       "name": "mine: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "mine",
+        "reward": "BR"
+      },
       "source": "mine",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:mine:Complete": {
       "category": "story_missions",
@@ -3828,10 +4242,15 @@
       "coordinates": null,
       "district": null,
       "id": 1122314298,
+      "legacy_aggregate": false,
       "name": "mine: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "mine",
+        "reward": "Complete"
+      },
       "source": "mine",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:mine:LEGO City Hero": {
       "category": "city_hero",
@@ -3839,10 +4258,15 @@
       "coordinates": null,
       "district": null,
       "id": 1866425495,
+      "legacy_aggregate": false,
       "name": "mine: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "mine",
+        "reward": "LEGO City Hero"
+      },
       "source": "mine",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:mine:Police Shield": {
       "category": "whole_shields",
@@ -3850,10 +4274,15 @@
       "coordinates": null,
       "district": null,
       "id": 1781173634,
+      "legacy_aggregate": false,
       "name": "mine: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "mine",
+        "reward": "Police Shield"
+      },
       "source": "mine",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:mine:Red Brick": {
       "category": "red_bricks",
@@ -3882,10 +4311,15 @@
       "coordinates": null,
       "district": null,
       "id": 1532589493,
+      "legacy_aggregate": false,
       "name": "mine: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "mine",
+        "reward": "TL"
+      },
       "source": "mine",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:mine:TR": {
       "category": "shield_quarters",
@@ -3893,10 +4327,15 @@
       "coordinates": null,
       "district": null,
       "id": 1313869694,
+      "legacy_aggregate": false,
       "name": "mine: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "mine",
+        "reward": "TR"
+      },
       "source": "mine",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:moon_base:BL": {
       "category": "shield_quarters",
@@ -3904,10 +4343,15 @@
       "coordinates": null,
       "district": null,
       "id": 1436685912,
+      "legacy_aggregate": false,
       "name": "moon_base: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "moon_base",
+        "reward": "BL"
+      },
       "source": "moon_base",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:moon_base:BR": {
       "category": "shield_quarters",
@@ -3915,10 +4359,15 @@
       "coordinates": null,
       "district": null,
       "id": 1204170408,
+      "legacy_aggregate": false,
       "name": "moon_base: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "moon_base",
+        "reward": "BR"
+      },
       "source": "moon_base",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:moon_base:Complete": {
       "category": "story_missions",
@@ -3926,10 +4375,15 @@
       "coordinates": null,
       "district": null,
       "id": 1239170767,
+      "legacy_aggregate": false,
       "name": "moon_base: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "moon_base",
+        "reward": "Complete"
+      },
       "source": "moon_base",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:moon_base:LEGO City Hero": {
       "category": "city_hero",
@@ -3937,10 +4391,15 @@
       "coordinates": null,
       "district": null,
       "id": 1040984123,
+      "legacy_aggregate": false,
       "name": "moon_base: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "moon_base",
+        "reward": "LEGO City Hero"
+      },
       "source": "moon_base",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:moon_base:Police Shield": {
       "category": "whole_shields",
@@ -3948,10 +4407,15 @@
       "coordinates": null,
       "district": null,
       "id": 1809073710,
+      "legacy_aggregate": false,
       "name": "moon_base: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "moon_base",
+        "reward": "Police Shield"
+      },
       "source": "moon_base",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:moon_base:Red Brick": {
       "category": "red_bricks",
@@ -3980,10 +4444,15 @@
       "coordinates": null,
       "district": null,
       "id": 1757646135,
+      "legacy_aggregate": false,
       "name": "moon_base: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "moon_base",
+        "reward": "TL"
+      },
       "source": "moon_base",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:moon_base:TR": {
       "category": "shield_quarters",
@@ -3991,10 +4460,15 @@
       "coordinates": null,
       "district": null,
       "id": 1037577868,
+      "legacy_aggregate": false,
       "name": "moon_base: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "moon_base",
+        "reward": "TR"
+      },
       "source": "moon_base",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:museum:BL": {
       "category": "shield_quarters",
@@ -4002,10 +4476,15 @@
       "coordinates": null,
       "district": null,
       "id": 1275539273,
+      "legacy_aggregate": false,
       "name": "museum: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "museum",
+        "reward": "BL"
+      },
       "source": "museum",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:museum:BR": {
       "category": "shield_quarters",
@@ -4013,10 +4492,15 @@
       "coordinates": null,
       "district": null,
       "id": 1428355517,
+      "legacy_aggregate": false,
       "name": "museum: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "museum",
+        "reward": "BR"
+      },
       "source": "museum",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:museum:Complete": {
       "category": "story_missions",
@@ -4024,10 +4508,15 @@
       "coordinates": null,
       "district": null,
       "id": 1516047104,
+      "legacy_aggregate": false,
       "name": "museum: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "museum",
+        "reward": "Complete"
+      },
       "source": "museum",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:museum:LEGO City Hero": {
       "category": "city_hero",
@@ -4035,10 +4524,15 @@
       "coordinates": null,
       "district": null,
       "id": 1416059084,
+      "legacy_aggregate": false,
       "name": "museum: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "museum",
+        "reward": "LEGO City Hero"
+      },
       "source": "museum",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:museum:Police Shield": {
       "category": "whole_shields",
@@ -4046,10 +4540,15 @@
       "coordinates": null,
       "district": null,
       "id": 1508652568,
+      "legacy_aggregate": false,
       "name": "museum: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "museum",
+        "reward": "Police Shield"
+      },
       "source": "museum",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:museum:Red Brick": {
       "category": "red_bricks",
@@ -4078,10 +4577,15 @@
       "coordinates": null,
       "district": null,
       "id": 1171480519,
+      "legacy_aggregate": false,
       "name": "museum: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "museum",
+        "reward": "TL"
+      },
       "source": "museum",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:museum:TR": {
       "category": "shield_quarters",
@@ -4089,10 +4593,15 @@
       "coordinates": null,
       "district": null,
       "id": 1387455339,
+      "legacy_aggregate": false,
       "name": "museum: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "museum",
+        "reward": "TR"
+      },
       "source": "museum",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:police_station:BL": {
       "category": "shield_quarters",
@@ -4100,10 +4609,15 @@
       "coordinates": null,
       "district": null,
       "id": 1183840586,
+      "legacy_aggregate": false,
       "name": "police_station: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "police_station",
+        "reward": "BL"
+      },
       "source": "police_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:police_station:BR": {
       "category": "shield_quarters",
@@ -4111,10 +4625,15 @@
       "coordinates": null,
       "district": null,
       "id": 1056833188,
+      "legacy_aggregate": false,
       "name": "police_station: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "police_station",
+        "reward": "BR"
+      },
       "source": "police_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:police_station:Complete": {
       "category": "story_missions",
@@ -4122,10 +4641,15 @@
       "coordinates": null,
       "district": null,
       "id": 1164875902,
+      "legacy_aggregate": false,
       "name": "police_station: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "police_station",
+        "reward": "Complete"
+      },
       "source": "police_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:police_station:LEGO City Hero": {
       "category": "city_hero",
@@ -4133,10 +4657,15 @@
       "coordinates": null,
       "district": null,
       "id": 1840914479,
+      "legacy_aggregate": false,
       "name": "police_station: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "police_station",
+        "reward": "LEGO City Hero"
+      },
       "source": "police_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:police_station:Police Shield": {
       "category": "whole_shields",
@@ -4144,10 +4673,15 @@
       "coordinates": null,
       "district": null,
       "id": 1240489104,
+      "legacy_aggregate": false,
       "name": "police_station: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "police_station",
+        "reward": "Police Shield"
+      },
       "source": "police_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:police_station:TL": {
       "category": "shield_quarters",
@@ -4155,10 +4689,15 @@
       "coordinates": null,
       "district": null,
       "id": 1700471369,
+      "legacy_aggregate": false,
       "name": "police_station: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "police_station",
+        "reward": "TL"
+      },
       "source": "police_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:police_station:TR": {
       "category": "shield_quarters",
@@ -4166,10 +4705,15 @@
       "coordinates": null,
       "district": null,
       "id": 1629156381,
+      "legacy_aggregate": false,
       "name": "police_station: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "police_station",
+        "reward": "TR"
+      },
       "source": "police_station",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:prison:BL": {
       "category": "shield_quarters",
@@ -4177,10 +4721,15 @@
       "coordinates": null,
       "district": null,
       "id": 1590454676,
+      "legacy_aggregate": false,
       "name": "prison: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "prison",
+        "reward": "BL"
+      },
       "source": "prison",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:prison:BR": {
       "category": "shield_quarters",
@@ -4188,10 +4737,15 @@
       "coordinates": null,
       "district": null,
       "id": 1733133747,
+      "legacy_aggregate": false,
       "name": "prison: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "prison",
+        "reward": "BR"
+      },
       "source": "prison",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:prison:Complete": {
       "category": "story_missions",
@@ -4199,10 +4753,15 @@
       "coordinates": null,
       "district": null,
       "id": 1235689301,
+      "legacy_aggregate": false,
       "name": "prison: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "prison",
+        "reward": "Complete"
+      },
       "source": "prison",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:prison:LEGO City Hero": {
       "category": "city_hero",
@@ -4210,10 +4769,15 @@
       "coordinates": null,
       "district": null,
       "id": 1406775512,
+      "legacy_aggregate": false,
       "name": "prison: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "prison",
+        "reward": "LEGO City Hero"
+      },
       "source": "prison",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:prison:Police Shield": {
       "category": "whole_shields",
@@ -4221,10 +4785,15 @@
       "coordinates": null,
       "district": null,
       "id": 1625733592,
+      "legacy_aggregate": false,
       "name": "prison: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "prison",
+        "reward": "Police Shield"
+      },
       "source": "prison",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:prison:Red Brick": {
       "category": "red_bricks",
@@ -4250,10 +4819,15 @@
       "coordinates": null,
       "district": null,
       "id": 1812626302,
+      "legacy_aggregate": false,
       "name": "prison: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "prison",
+        "reward": "TL"
+      },
       "source": "prison",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:prison:TR": {
       "category": "shield_quarters",
@@ -4261,10 +4835,15 @@
       "coordinates": null,
       "district": null,
       "id": 1672180417,
+      "legacy_aggregate": false,
       "name": "prison: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "prison",
+        "reward": "TR"
+      },
       "source": "prison",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:rooftops:BL": {
       "category": "shield_quarters",
@@ -4272,10 +4851,15 @@
       "coordinates": null,
       "district": null,
       "id": 1259767333,
+      "legacy_aggregate": false,
       "name": "rooftops: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "rooftops",
+        "reward": "BL"
+      },
       "source": "rooftops",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:rooftops:BR": {
       "category": "shield_quarters",
@@ -4283,10 +4867,15 @@
       "coordinates": null,
       "district": null,
       "id": 1826529172,
+      "legacy_aggregate": false,
       "name": "rooftops: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "rooftops",
+        "reward": "BR"
+      },
       "source": "rooftops",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:rooftops:Complete": {
       "category": "story_missions",
@@ -4294,10 +4883,15 @@
       "coordinates": null,
       "district": null,
       "id": 1252965969,
+      "legacy_aggregate": false,
       "name": "rooftops: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "rooftops",
+        "reward": "Complete"
+      },
       "source": "rooftops",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:rooftops:LEGO City Hero": {
       "category": "city_hero",
@@ -4305,10 +4899,15 @@
       "coordinates": null,
       "district": null,
       "id": 1212869290,
+      "legacy_aggregate": false,
       "name": "rooftops: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "rooftops",
+        "reward": "LEGO City Hero"
+      },
       "source": "rooftops",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:rooftops:Police Shield": {
       "category": "whole_shields",
@@ -4316,10 +4915,15 @@
       "coordinates": null,
       "district": null,
       "id": 1137149799,
+      "legacy_aggregate": false,
       "name": "rooftops: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "rooftops",
+        "reward": "Police Shield"
+      },
       "source": "rooftops",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:rooftops:Red Brick": {
       "category": "red_bricks",
@@ -4348,10 +4952,15 @@
       "coordinates": null,
       "district": null,
       "id": 1829018327,
+      "legacy_aggregate": false,
       "name": "rooftops: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "rooftops",
+        "reward": "TL"
+      },
       "source": "rooftops",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:rooftops:TR": {
       "category": "shield_quarters",
@@ -4359,10 +4968,15 @@
       "coordinates": null,
       "district": null,
       "id": 1104260119,
+      "legacy_aggregate": false,
       "name": "rooftops: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "rooftops",
+        "reward": "TR"
+      },
       "source": "rooftops",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:scrapyard:BL": {
       "category": "shield_quarters",
@@ -4370,10 +4984,15 @@
       "coordinates": null,
       "district": null,
       "id": 1836624243,
+      "legacy_aggregate": false,
       "name": "scrapyard: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "scrapyard",
+        "reward": "BL"
+      },
       "source": "scrapyard",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:scrapyard:BR": {
       "category": "shield_quarters",
@@ -4381,10 +5000,15 @@
       "coordinates": null,
       "district": null,
       "id": 1492954515,
+      "legacy_aggregate": false,
       "name": "scrapyard: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "scrapyard",
+        "reward": "BR"
+      },
       "source": "scrapyard",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:scrapyard:Complete": {
       "category": "story_missions",
@@ -4392,10 +5016,15 @@
       "coordinates": null,
       "district": null,
       "id": 1472464820,
+      "legacy_aggregate": false,
       "name": "scrapyard: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "scrapyard",
+        "reward": "Complete"
+      },
       "source": "scrapyard",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:scrapyard:LEGO City Hero": {
       "category": "city_hero",
@@ -4403,10 +5032,15 @@
       "coordinates": null,
       "district": null,
       "id": 1360516159,
+      "legacy_aggregate": false,
       "name": "scrapyard: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "scrapyard",
+        "reward": "LEGO City Hero"
+      },
       "source": "scrapyard",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:scrapyard:Police Shield": {
       "category": "whole_shields",
@@ -4414,10 +5048,15 @@
       "coordinates": null,
       "district": null,
       "id": 1343615131,
+      "legacy_aggregate": false,
       "name": "scrapyard: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "scrapyard",
+        "reward": "Police Shield"
+      },
       "source": "scrapyard",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:scrapyard:Red Brick": {
       "category": "red_bricks",
@@ -4446,10 +5085,15 @@
       "coordinates": null,
       "district": null,
       "id": 1121447658,
+      "legacy_aggregate": false,
       "name": "scrapyard: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "scrapyard",
+        "reward": "TL"
+      },
       "source": "scrapyard",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:scrapyard:TR": {
       "category": "shield_quarters",
@@ -4457,10 +5101,15 @@
       "coordinates": null,
       "district": null,
       "id": 1631230053,
+      "legacy_aggregate": false,
       "name": "scrapyard: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "scrapyard",
+        "reward": "TR"
+      },
       "source": "scrapyard",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:secretbase:BL": {
       "category": "shield_quarters",
@@ -4468,10 +5117,15 @@
       "coordinates": null,
       "district": null,
       "id": 1602399706,
+      "legacy_aggregate": false,
       "name": "secretbase: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "secretbase",
+        "reward": "BL"
+      },
       "source": "secretbase",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:secretbase:BR": {
       "category": "shield_quarters",
@@ -4479,10 +5133,15 @@
       "coordinates": null,
       "district": null,
       "id": 1533108646,
+      "legacy_aggregate": false,
       "name": "secretbase: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "secretbase",
+        "reward": "BR"
+      },
       "source": "secretbase",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:secretbase:Complete": {
       "category": "story_missions",
@@ -4490,10 +5149,15 @@
       "coordinates": null,
       "district": null,
       "id": 1075903247,
+      "legacy_aggregate": false,
       "name": "secretbase: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "secretbase",
+        "reward": "Complete"
+      },
       "source": "secretbase",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:secretbase:LEGO City Hero": {
       "category": "city_hero",
@@ -4501,10 +5165,15 @@
       "coordinates": null,
       "district": null,
       "id": 1234259806,
+      "legacy_aggregate": false,
       "name": "secretbase: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "secretbase",
+        "reward": "LEGO City Hero"
+      },
       "source": "secretbase",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:secretbase:Police Shield": {
       "category": "whole_shields",
@@ -4512,10 +5181,15 @@
       "coordinates": null,
       "district": null,
       "id": 1123163740,
+      "legacy_aggregate": false,
       "name": "secretbase: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "secretbase",
+        "reward": "Police Shield"
+      },
       "source": "secretbase",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:secretbase:Red Brick": {
       "category": "red_bricks",
@@ -4544,10 +5218,15 @@
       "coordinates": null,
       "district": null,
       "id": 1369115580,
+      "legacy_aggregate": false,
       "name": "secretbase: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "secretbase",
+        "reward": "TL"
+      },
       "source": "secretbase",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:secretbase:TR": {
       "category": "shield_quarters",
@@ -4555,10 +5234,15 @@
       "coordinates": null,
       "district": null,
       "id": 1099371778,
+      "legacy_aggregate": false,
       "name": "secretbase: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "secretbase",
+        "reward": "TR"
+      },
       "source": "secretbase",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:space_centre:BL": {
       "category": "shield_quarters",
@@ -4566,10 +5250,15 @@
       "coordinates": null,
       "district": null,
       "id": 1465689591,
+      "legacy_aggregate": false,
       "name": "space_centre: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "space_centre",
+        "reward": "BL"
+      },
       "source": "space_centre",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:space_centre:BR": {
       "category": "shield_quarters",
@@ -4577,10 +5266,15 @@
       "coordinates": null,
       "district": null,
       "id": 1128596078,
+      "legacy_aggregate": false,
       "name": "space_centre: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "space_centre",
+        "reward": "BR"
+      },
       "source": "space_centre",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:space_centre:Complete": {
       "category": "story_missions",
@@ -4588,10 +5282,15 @@
       "coordinates": null,
       "district": null,
       "id": 1525010037,
+      "legacy_aggregate": false,
       "name": "space_centre: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "space_centre",
+        "reward": "Complete"
+      },
       "source": "space_centre",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:space_centre:LEGO City Hero": {
       "category": "city_hero",
@@ -4599,10 +5298,15 @@
       "coordinates": null,
       "district": null,
       "id": 1635284924,
+      "legacy_aggregate": false,
       "name": "space_centre: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "space_centre",
+        "reward": "LEGO City Hero"
+      },
       "source": "space_centre",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:space_centre:Police Shield": {
       "category": "whole_shields",
@@ -4610,10 +5314,15 @@
       "coordinates": null,
       "district": null,
       "id": 1122024832,
+      "legacy_aggregate": false,
       "name": "space_centre: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "space_centre",
+        "reward": "Police Shield"
+      },
       "source": "space_centre",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:space_centre:Red Brick": {
       "category": "red_bricks",
@@ -4642,10 +5351,15 @@
       "coordinates": null,
       "district": null,
       "id": 1731258909,
+      "legacy_aggregate": false,
       "name": "space_centre: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "space_centre",
+        "reward": "TL"
+      },
       "source": "space_centre",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:space_centre:TR": {
       "category": "shield_quarters",
@@ -4653,10 +5367,15 @@
       "coordinates": null,
       "district": null,
       "id": 1277735859,
+      "legacy_aggregate": false,
       "name": "space_centre: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "space_centre",
+        "reward": "TR"
+      },
       "source": "space_centre",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:temple:BL": {
       "category": "shield_quarters",
@@ -4664,10 +5383,15 @@
       "coordinates": null,
       "district": null,
       "id": 1736588966,
+      "legacy_aggregate": false,
       "name": "temple: BL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "temple",
+        "reward": "BL"
+      },
       "source": "temple",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:temple:BR": {
       "category": "shield_quarters",
@@ -4675,10 +5399,15 @@
       "coordinates": null,
       "district": null,
       "id": 1343284454,
+      "legacy_aggregate": false,
       "name": "temple: BR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "temple",
+        "reward": "BR"
+      },
       "source": "temple",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:temple:Complete": {
       "category": "story_missions",
@@ -4686,10 +5415,15 @@
       "coordinates": null,
       "district": null,
       "id": 1093070681,
+      "legacy_aggregate": false,
       "name": "temple: Complete",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "temple",
+        "reward": "Complete"
+      },
       "source": "temple",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:temple:LEGO City Hero": {
       "category": "city_hero",
@@ -4697,10 +5431,15 @@
       "coordinates": null,
       "district": null,
       "id": 1593471441,
+      "legacy_aggregate": false,
       "name": "temple: LEGO City Hero",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "temple",
+        "reward": "LEGO City Hero"
+      },
       "source": "temple",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:temple:Police Shield": {
       "category": "whole_shields",
@@ -4708,10 +5447,15 @@
       "coordinates": null,
       "district": null,
       "id": 1851886302,
+      "legacy_aggregate": false,
       "name": "temple: Police Shield",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "temple",
+        "reward": "Police Shield"
+      },
       "source": "temple",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:temple:Red Brick": {
       "category": "red_bricks",
@@ -4740,10 +5484,15 @@
       "coordinates": null,
       "district": null,
       "id": 1507240307,
+      "legacy_aggregate": false,
       "name": "temple: TL",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "temple",
+        "reward": "TL"
+      },
       "source": "temple",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "mission:temple:TR": {
       "category": "shield_quarters",
@@ -4751,10 +5500,15 @@
       "coordinates": null,
       "district": null,
       "id": 1888562167,
+      "legacy_aggregate": false,
       "name": "temple: TR",
-      "runtime": null,
+      "runtime": {
+        "kind": "level_progress",
+        "mission": "temple",
+        "reward": "TR"
+      },
       "source": "temple",
-      "status": "synthetic_unbound"
+      "status": "native_level_progress"
     },
     "objective:Act2_BikeRace": {
       "activity_metadata": {
@@ -114226,8 +114980,7 @@
           "lockType": "Class"
         }
       ],
-      "source": "GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz",
-      "source_index": 43,
+      "source": "GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:43",
       "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:44": {
@@ -115403,8 +116156,7 @@
           "lockType": "Class"
         }
       ],
-      "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz",
-      "source_index": 60,
+      "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:60",
       "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:61": {
@@ -115431,8 +116183,7 @@
           "lockType": "Class"
         }
       ],
-      "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz",
-      "source_index": 61,
+      "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:61",
       "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:62": {
@@ -115459,8 +116210,7 @@
           "lockType": "Ability"
         }
       ],
-      "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz",
-      "source_index": 62,
+      "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:62",
       "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:63": {
@@ -115487,8 +116237,7 @@
           "lockType": "Class"
         }
       ],
-      "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz",
-      "source_index": 63,
+      "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:63",
       "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:64": {
@@ -116505,8 +117254,7 @@
         "kind": "activity_reward",
         "reward_key": "police_station_lobby:portraits"
       },
-      "source": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz",
-      "source_index": 43,
+      "source": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:43",
       "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:44": {
@@ -116533,8 +117281,7 @@
           "lockType": "Class"
         }
       ],
-      "source": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz",
-      "source_index": 44,
+      "source": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:44",
       "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:45": {

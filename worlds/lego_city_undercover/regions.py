@@ -1,0 +1,88 @@
+"""Explicit source regions and conservative assignment sequence.
+
+Source lock requirements are exact metadata; traversal within city tiles is still
+incomplete. Region topology does not claim native entrance interception.
+"""
+from BaseClasses import Region, ItemClassification
+import json
+import pkgutil
+from pathlib import PurePosixPath
+from .bridge.goals import ASSIGNMENTS
+from .bridge.capabilities import has_capability
+from .bridge.opening_logic import NO_POLICE_KEYS
+from .bridge.source_logic import source_rule
+from .bridge.research_profile import ABILITY_NAMES
+
+STORY_TOOLS=(('Police','Scanner','Detective Scan','GrappleGun','SuperBuild'),('Parkour',),('Robber','Miner'),(),
+             (),('Astronaut',),('Color Gun',),(),('Farmer','Firefighter','FireAxe'),(),(),
+             ('Construction Worker',),(),(),('Jetpack',))
+VICTORY='LCU Story Complete'
+
+
+def district_name(value):
+    aliases={name.casefold():name for name in ABILITY_NAMES if name.startswith(('SF_','WI_','NY_','IS_','BR_'))}
+    aliases['ny_monaco_tunnel']='NY_Tunnel'
+    return aliases.get(str(value).casefold())
+
+
+def create_regions(world,location_type,item_type):
+    player=world.player;multi=world.multiworld;regions={}
+    def region(name):
+        if name not in regions:
+            regions[name]=Region(name,player,multi);multi.regions.append(regions[name])
+        return regions[name]
+    menu=region('Menu');opening=region('Opening before Police');city=region('LEGO City')
+    menu.connect(opening);opening.connect(city)
+    station=region('Police Station');city.connect(station)
+    for name in ABILITY_NAMES:
+        if district_name(name)==name:city.connect(region('District: '+name))
+    requirements=[];prior=city
+    for index,assignment in enumerate(ASSIGNMENTS):
+        target=region(f'Assignment {index+1}: {assignment}')
+        requirements.extend(STORY_TOOLS[index])
+        needed=tuple(name for name in requirements if name!='Detective Scan' or world.options.detective_scan_lock.value)
+        linear=world.options.story_mode.value==0
+        # Tools supplied by vanilla when their AP pool is disabled must not
+        # become requirements for absent items. Class aliases remain usable.
+        enabled=bool(world.options.ability_items.value)
+        (prior if linear else city).connect(target,rule=lambda state,needed=needed,enabled=enabled:
+            not enabled or all(has_capability(state,player,name) for name in needed))
+        prior=target
+    scenes=json.loads(pkgutil.get_data(__package__,'bridge/mission_scene_names.json'))
+    sections={}
+    for scene,mission in scenes.items():
+        if mission=='blackwells_mansion':mission='blackwells_mansion_1' if scene.startswith('mansion1_') else 'blackwells_mansion_2'
+        parent=station if mission=='police_station' else next((r for name,r in regions.items() if name.endswith(': '+mission)),None)
+        if parent is not None:
+            section=region('Section: '+scene);parent.connect(section);sections[scene]=section
+    for key,row in world.active_catalogue.items():
+        if key in NO_POLICE_KEYS:parent=opening
+        elif key.startswith('mission:'):
+            mission=key.split(':')[1]
+            if mission=='police_station':parent=station
+            elif mission=='blackwells_mansion':parent=region('Assignment 14: blackwells_mansion_2')
+            else:parent=next((r for name,r in regions.items() if name.endswith(': '+mission)),city)
+        else:
+            source=str(row.get('source','')).replace('\\','/').lower()
+            if '/police_station/' in source:parent=station
+            elif '/standalones/' in source:
+                mission=source.split('/standalones/')[1].split('/')[0]
+                scene=PurePosixPath(source).stem.removesuffix('_tech')
+                parent=sections.get(scene,next((r for name,r in regions.items() if name.endswith(': '+mission)),city))
+            elif district:=district_name(row.get('district')):
+                name='District: '+district
+                if name not in regions:city.connect(region(name))
+                parent=region(name)
+            else:parent=region('City: unresolved source')
+        if parent.name=='City: unresolved source' and not parent.entrances:city.connect(parent)
+        location=location_type(player,row['name'],row['id'],parent)
+        location.access_rule=source_rule(row,player,bool(world.options.ability_items.value) and key not in NO_POLICE_KEYS)
+        parent.locations.append(location)
+    if world.options.goal.value==2:
+        from . import TOKEN
+        multi.completion_condition[player]=lambda state:state.has(TOKEN,player,world.options.goal_tokens.value)
+    else:
+        goal=location_type(player,'Story goal: final assignment',None,prior)
+        prior.locations.append(goal)
+        goal.place_locked_item(item_type(VICTORY,ItemClassification.progression,None,player))
+        multi.completion_condition[player]=lambda state:state.has(VICTORY,player)

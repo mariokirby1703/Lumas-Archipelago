@@ -4,6 +4,7 @@ No running game or native save is touched.
 """
 import asyncio
 import importlib.util
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -113,7 +114,9 @@ class NativeCheatPatchTests(unittest.TestCase):
 
     def test_cpp_statement_compiles_syntactically_if_compiler_available(self):
         compiler = shutil.which('g++') or shutil.which('clang++')
-        if not compiler:
+        command=([compiler] if compiler else [sys.executable,'-m','ziglang','c++','-target','x86_64-windows-gnu']
+                 if importlib.util.find_spec('ziglang') else None)
+        if not command:
             self.skipTest('No host C++ compiler')
         snippet = '''#include <cstdint>
 struct Command {unsigned model; unsigned found; unsigned owned;};
@@ -130,7 +133,10 @@ unsigned Test(std::uintptr_t base, Command* c) {
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'cheat_patch.cpp'
             path.write_text(snippet, encoding='utf-8')
-            subprocess.run([compiler, '-std=c++17', '-fsyntax-only', str(path)], check=True, capture_output=True)
+            flags=['-fsyntax-only'] if compiler else ['-c','-o',str(Path(tmp)/'cheat_patch.obj')]
+            result=subprocess.run([*command, '-std=c++17', *flags, str(path)],capture_output=True,text=True,
+                env=dict(os.environ,ZIG_GLOBAL_CACHE_DIR=str(Path(tmp)/'zig-global'),ZIG_LOCAL_CACHE_DIR=str(Path(tmp)/'zig-local')))
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
 
 
 if __name__ == '__main__':

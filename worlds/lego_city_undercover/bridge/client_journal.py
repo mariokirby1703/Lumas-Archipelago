@@ -107,8 +107,14 @@ class Journal:
         if not self.db.execute('SELECT 1 FROM receipts WHERE server_index=?',(index,)).fetchone():
             raise ValueError('Cannot deliver an unrecorded receipt')
         payload=json.dumps(plan,sort_keys=True)
-        prior=self.db.execute('SELECT plan FROM deliveries WHERE server_index=?',(index,)).fetchone()
-        if prior and prior[0]!=payload:raise ValueError('Delivery plan changed for an existing receipt')
+        prior=self.db.execute('SELECT plan,state FROM deliveries WHERE server_index=?',(index,)).fetchone()
+        if prior and prior[0]!=payload:
+            old=json.loads(prior[0])
+            safe_rex_migration=(old==dict(kind='ability_unlock',ability='Rex Fury') and
+                plan==dict(kind='model_unlock',native_name='ROBBER_REXFURY') and prior[1]=='waiting_native_backend')
+            if not safe_rex_migration:raise ValueError('Delivery plan changed for an existing receipt')
+            with self.db:self.db.execute('UPDATE deliveries SET plan=? WHERE server_index=?',(payload,index))
+            logging.info('Migrated unbound Rex Fury receipt %s to roster-backed model grant',index)
         if not prior:
             with self.db:self.db.execute('INSERT INTO deliveries(server_index,plan) VALUES (?,?)',(index,payload))
 

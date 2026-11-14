@@ -130,6 +130,8 @@ def _command(pid,model,name,dll,opcode,receipt_index=0,binding=bytes(16)):
     if len(valid)!=1:raise RuntimeError('Pinned process identity no longer valid')
     dll=Path(dll).resolve()
     if not dll.is_file():raise RuntimeError('Build LCUItemBridge.dll first')
+    from hook_ownership import require_current_owner
+    if 'detective_hook' in valid[0]:require_current_owner(valid[0]['detective_hook'],dll)
     kernel=ctypes.WinDLL('kernel32',use_last_error=True)
     user=ctypes.WinDLL('user32',use_last_error=True)
     callback_type=ctypes.WINFUNCTYPE(wintypes.BOOL,wintypes.HWND,wintypes.LPARAM)

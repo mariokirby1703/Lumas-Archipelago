@@ -1,0 +1,38 @@
+{
+  "locations": 8753,
+  "items": 557,
+  "categories": {
+    "shield_quarters": 68,
+    "story_missions": 20,
+    "city_hero": 17,
+    "whole_shields": 17,
+    "red_bricks": 37,
+    "city_activities": 289,
+    "unverified_clues": 645,
+    "super_builds": 72,
+    "disguise_booths": 17,
+    "atms": 18,
+    "train_stations": 14,
+    "character_tokens": 233,
+    "super_bricks": 512,
+    "unverified_pickups": 6747,
+    "vehicle_tokens": 47
+  },
+  "source_status": {
+    "native_level_progress": 119,
+    "experimental_red_brick": 15,
+    "native_objective": 400,
+    "unverified_prerequisite": 645,
+    "experimental_model_found": 267,
+    "static_candidate_unbound": 7261,
+    "ambiguous_model_source": 13,
+    "native_pickup": 20,
+    "verified_activity_reward": 3,
+    "static_activity_reward": 7,
+    "native_story_flag": 3
+  },
+  "supported_items": 491,
+  "source_requirements": 685,
+  "presets": 213,
+  "transition_scripts": 11
+}
