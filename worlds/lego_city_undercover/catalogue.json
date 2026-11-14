@@ -9885,94 +9885,6 @@
       },
       "status": "unverified_prerequisite"
     },
-    "objective:LCPD_BM_GB_FireDoor": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1446936248,
-      "name": "Clue: LCPD_BM_GB_FireDoor",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_BM_GB_FireDoor"
-      },
-      "source": "LCPD_BM_GB_FireDoor",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_BM_GB_FireDoor",
-        "lockName": "fireman",
-        "lockType": "Class",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
-    "objective:LCPD_BM_GB_GBShop": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1436805072,
-      "name": "Clue: LCPD_BM_GB_GBShop",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_BM_GB_GBShop"
-      },
-      "source": "LCPD_BM_GB_GBShop",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_BM_GB_GBShop",
-        "lockName": "construction",
-        "lockType": "Class",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
-    "objective:LCPD_BM_GB_RBShop": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1017412479,
-      "name": "Clue: LCPD_BM_GB_RBShop",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_BM_GB_RBShop"
-      },
-      "source": "LCPD_BM_GB_RBShop",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_BM_GB_RBShop",
-        "lockName": "robber",
-        "lockType": "Class",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
-    "objective:LCPD_BM_GB_VehShop": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1298464045,
-      "name": "Clue: LCPD_BM_GB_VehShop",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_BM_GB_VehShop"
-      },
-      "source": "LCPD_BM_GB_VehShop",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_BM_GB_VehShop",
-        "lockName": "Parkour",
-        "lockType": "Ability",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
     "objective:LCPD_BM_Safe": {
       "category": "unverified_clues",
       "coordinate_space": null,
@@ -10014,28 +9926,6 @@
       },
       "status": "unverified_prerequisite"
     },
-    "objective:LCPD_BR_Donut": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1172009564,
-      "name": "Clue: LCPD_BR_Donut",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_BR_Donut"
-      },
-      "source": "LCPD_BR_Donut",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_BR_Donut",
-        "lockName": "robber",
-        "lockType": "Class",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
     "objective:LCPD_LU_GB_Crate": {
       "category": "unverified_clues",
       "coordinate_space": null,
@@ -10052,108 +9942,6 @@
       "source_requirements": {
         "Notes": "Levels",
         "instanceName": "LCPD_LU_GB_Crate",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
-    "objective:LCPD_Lobby_Dynamite": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1406529808,
-      "name": "Clue: LCPD_Lobby_Dynamite",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_Lobby_Dynamite"
-      },
-      "source": "LCPD_Lobby_Dynamite",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_Lobby_Dynamite",
-        "lockName": "miner",
-        "lockType": "Class",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
-    "objective:LCPD_Lobby_Portrait01": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1681681361,
-      "name": "Clue: LCPD_Lobby_Portrait01",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_Lobby_Portrait01"
-      },
-      "source": "LCPD_Lobby_Portrait01",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_Lobby_Portrait01",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
-    "objective:LCPD_Lobby_Portrait02": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1600301991,
-      "name": "Clue: LCPD_Lobby_Portrait02",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_Lobby_Portrait02"
-      },
-      "source": "LCPD_Lobby_Portrait02",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_Lobby_Portrait02",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
-    "objective:LCPD_Lobby_Portrait03": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1213470611,
-      "name": "Clue: LCPD_Lobby_Portrait03",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_Lobby_Portrait03"
-      },
-      "source": "LCPD_Lobby_Portrait03",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_Lobby_Portrait03",
-        "objectiveTypeId": "Clue"
-      },
-      "status": "unverified_prerequisite"
-    },
-    "objective:LCPD_Lobby_Portrait04": {
-      "category": "unverified_clues",
-      "coordinate_space": null,
-      "coordinates": null,
-      "district": null,
-      "id": 1656176659,
-      "name": "Clue: LCPD_Lobby_Portrait04",
-      "native_type": "Clue",
-      "runtime": {
-        "kind": "objective",
-        "name": "LCPD_Lobby_Portrait04"
-      },
-      "source": "LCPD_Lobby_Portrait04",
-      "source_requirements": {
-        "Notes": "Levels",
-        "instanceName": "LCPD_Lobby_Portrait04",
         "objectiveTypeId": "Clue"
       },
       "status": "unverified_prerequisite"
@@ -114415,7 +114203,7 @@
       "status": "verified_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:43": {
-      "category": "unverified_pickups",
+      "category": "city_activities",
       "coordinate_space": "resource; transforms may apply",
       "coordinates": [
         -1.5833882093429565,
@@ -114423,13 +114211,24 @@
         1.2757331132888794
       ],
       "district": null,
+      "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested",
       "id": 1011978792,
-      "name": "PickupType71: GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:43",
-      "native_type": "PickupType71",
-      "runtime": null,
+      "name": "Police Station Briefing Room: Donut Task",
+      "native_type": "Activity reward",
+      "runtime": {
+        "kind": "activity_reward",
+        "reward_key": "police_station_briefingroom:donut"
+      },
+      "scanner_locks": [
+        {
+          "instanceName": "LCPD_BR_Donut",
+          "lockName": "robber",
+          "lockType": "Class"
+        }
+      ],
       "source": "GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz",
       "source_index": 43,
-      "status": "static_candidate_unbound"
+      "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:44": {
       "category": "unverified_pickups",
@@ -115581,7 +115380,7 @@
       "status": "static_candidate_unbound"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:60": {
-      "category": "unverified_pickups",
+      "category": "city_activities",
       "coordinate_space": "resource; transforms may apply",
       "coordinates": [
         6.989445209503174,
@@ -115589,16 +115388,27 @@
         -1.1010233163833618
       ],
       "district": null,
+      "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested",
       "id": 1243866740,
-      "name": "PickupType71: GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:60",
-      "native_type": "PickupType71",
-      "runtime": null,
+      "name": "Police Station Basement: Gold Brick Shop Hidden Brick",
+      "native_type": "Activity reward",
+      "runtime": {
+        "kind": "activity_reward",
+        "reward_key": "police_station_garage:gold_brick_shop"
+      },
+      "scanner_locks": [
+        {
+          "instanceName": "LCPD_BM_GB_GBShop",
+          "lockName": "construction",
+          "lockType": "Class"
+        }
+      ],
       "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz",
       "source_index": 60,
-      "status": "static_candidate_unbound"
+      "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:61": {
-      "category": "unverified_pickups",
+      "category": "city_activities",
       "coordinate_space": "resource; transforms may apply",
       "coordinates": [
         11.551582336425781,
@@ -115606,16 +115416,27 @@
         -6.2812371253967285
       ],
       "district": null,
+      "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested",
       "id": 1053947373,
-      "name": "PickupType71: GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:61",
-      "native_type": "PickupType71",
-      "runtime": null,
+      "name": "Police Station Basement: Red Brick Shop Hidden Brick",
+      "native_type": "Activity reward",
+      "runtime": {
+        "kind": "activity_reward",
+        "reward_key": "police_station_garage:red_brick_shop"
+      },
+      "scanner_locks": [
+        {
+          "instanceName": "LCPD_BM_GB_RBShop",
+          "lockName": "robber",
+          "lockType": "Class"
+        }
+      ],
       "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz",
       "source_index": 61,
-      "status": "static_candidate_unbound"
+      "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:62": {
-      "category": "unverified_pickups",
+      "category": "city_activities",
       "coordinate_space": "resource; transforms may apply",
       "coordinates": [
         10.578857421875,
@@ -115623,16 +115444,27 @@
         -7.292695045471191
       ],
       "district": null,
+      "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested",
       "id": 1651701910,
-      "name": "PickupType71: GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:62",
-      "native_type": "PickupType71",
-      "runtime": null,
+      "name": "Police Station Basement: Vehicle Shop Hidden Brick",
+      "native_type": "Activity reward",
+      "runtime": {
+        "kind": "activity_reward",
+        "reward_key": "police_station_garage:vehicle_shop"
+      },
+      "scanner_locks": [
+        {
+          "instanceName": "LCPD_BM_GB_VehShop",
+          "lockName": "Parkour",
+          "lockType": "Ability"
+        }
+      ],
       "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz",
       "source_index": 62,
-      "status": "static_candidate_unbound"
+      "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:63": {
-      "category": "unverified_pickups",
+      "category": "city_activities",
       "coordinate_space": "resource; transforms may apply",
       "coordinates": [
         3.4729244709014893,
@@ -115640,13 +115472,24 @@
         -3.0858664512634277
       ],
       "district": null,
+      "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested",
       "id": 1179061094,
-      "name": "PickupType71: GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:63",
-      "native_type": "PickupType71",
-      "runtime": null,
+      "name": "Police Station Basement: Fire Door",
+      "native_type": "Activity reward",
+      "runtime": {
+        "kind": "activity_reward",
+        "reward_key": "police_station_garage:fire_door"
+      },
+      "scanner_locks": [
+        {
+          "instanceName": "LCPD_BM_GB_FireDoor",
+          "lockName": "fireman",
+          "lockType": "Class"
+        }
+      ],
       "source": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz",
       "source_index": 63,
-      "status": "static_candidate_unbound"
+      "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:64": {
       "category": "super_bricks",
@@ -116646,7 +116489,7 @@
       "status": "verified_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:43": {
-      "category": "unverified_pickups",
+      "category": "city_activities",
       "coordinate_space": "resource; transforms may apply",
       "coordinates": [
         0.006413189694285393,
@@ -116654,16 +116497,20 @@
         0.7672561407089233
       ],
       "district": null,
+      "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested",
       "id": 1898528277,
-      "name": "PickupType71: GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:43",
-      "native_type": "PickupType71",
-      "runtime": null,
+      "name": "Police Station Lobby: Four Portraits",
+      "native_type": "Activity reward",
+      "runtime": {
+        "kind": "activity_reward",
+        "reward_key": "police_station_lobby:portraits"
+      },
       "source": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz",
       "source_index": 43,
-      "status": "static_candidate_unbound"
+      "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:44": {
-      "category": "unverified_pickups",
+      "category": "city_activities",
       "coordinate_space": "resource; transforms may apply",
       "coordinates": [
         1.6545907258987427,
@@ -116671,13 +116518,24 @@
         3.2032735347747803
       ],
       "district": null,
+      "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested",
       "id": 1079846440,
-      "name": "PickupType71: GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:44",
-      "native_type": "PickupType71",
-      "runtime": null,
+      "name": "Police Station Lobby: Silver Filing Cabinet",
+      "native_type": "Activity reward",
+      "runtime": {
+        "kind": "activity_reward",
+        "reward_key": "police_station_lobby:silver_filing_cabinet"
+      },
+      "scanner_locks": [
+        {
+          "instanceName": "LCPD_Lobby_Dynamite",
+          "lockName": "miner",
+          "lockType": "Class"
+        }
+      ],
       "source": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz",
       "source_index": 44,
-      "status": "static_candidate_unbound"
+      "status": "static_activity_reward"
     },
     "source_pickup:GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:45": {
       "category": "unverified_pickups",

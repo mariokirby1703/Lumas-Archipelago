@@ -29,7 +29,11 @@
     "native_type": 11,
     "static_type": 71,
     "district": null,
-    "coordinates": [0.17062804102897644, 0.1599980890750885, 0.08027924597263336],
+    "coordinates": [
+      0.17062804102897644,
+      0.1599980890750885,
+      0.08027924597263336
+    ],
     "category": "city_activities",
     "prerequisite_objectives": [],
     "evidence": "User reported a gold brick inside the station room; live snapshot GB_LineUp in Police_Station_Line_Up_Room native_type 11 native_collected true; name and coordinates match the unique static type-71 source"
@@ -43,10 +47,209 @@
     "native_type": 11,
     "static_type": 71,
     "district": null,
-    "coordinates": [3.034475564956665, 0.3020786643028259, 1.3053439855575562],
+    "coordinates": [
+      3.034475564956665,
+      0.3020786643028259,
+      1.3053439855575562
+    ],
     "category": "city_activities",
-    "prerequisite_objectives": ["LCPD_BR_PopCorn"],
+    "prerequisite_objectives": [
+      "LCPD_BR_PopCorn"
+    ],
     "completion_objective": "LCPD_BR_PopCorn",
     "evidence": "User ate popcorn; GB_Popcorn collected and LCPD_BR_PopCorn hash 753712927 bit 716 became complete compared with the preceding live snapshot; total gold bricks rose from four to five"
+  },
+  {
+    "key": "police_station_briefingroom:donut",
+    "name": "Police Station Briefing Room: Donut Task",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_briefingroom/police_station_briefingroom.giz:735:43",
+    "scene": "police_station_briefingroom",
+    "pickup_name": "GB_Donut",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [
+      -1.5833882093429565,
+      0.42030826210975647,
+      1.2757331132888794
+    ],
+    "category": "city_activities",
+    "prerequisite_objectives": [
+      "LCPD_BR_Donut"
+    ],
+    "status": "static_activity_reward",
+    "scanner_locks": [
+      {
+        "instanceName": "LCPD_BR_Donut",
+        "lockType": "Class",
+        "lockName": "robber"
+      }
+    ],
+    "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested"
+  },
+  {
+    "key": "police_station_garage:gold_brick_shop",
+    "name": "Police Station Basement: Gold Brick Shop Hidden Brick",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:60",
+    "scene": "police_station_garage",
+    "pickup_name": "GB_GoldBrickShop",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [
+      6.989445209503174,
+      1.0824557542800903,
+      -1.1010233163833618
+    ],
+    "category": "city_activities",
+    "prerequisite_objectives": [
+      "LCPD_BM_GB_GBShop"
+    ],
+    "status": "static_activity_reward",
+    "scanner_locks": [
+      {
+        "instanceName": "LCPD_BM_GB_GBShop",
+        "lockType": "Class",
+        "lockName": "construction"
+      }
+    ],
+    "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested"
+  },
+  {
+    "key": "police_station_garage:red_brick_shop",
+    "name": "Police Station Basement: Red Brick Shop Hidden Brick",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:61",
+    "scene": "police_station_garage",
+    "pickup_name": "GB_RedBrickShop",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [
+      11.551582336425781,
+      1.0820142030715942,
+      -6.2812371253967285
+    ],
+    "category": "city_activities",
+    "prerequisite_objectives": [
+      "LCPD_BM_GB_RBShop"
+    ],
+    "status": "static_activity_reward",
+    "scanner_locks": [
+      {
+        "instanceName": "LCPD_BM_GB_RBShop",
+        "lockType": "Class",
+        "lockName": "robber"
+      }
+    ],
+    "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested"
+  },
+  {
+    "key": "police_station_garage:vehicle_shop",
+    "name": "Police Station Basement: Vehicle Shop Hidden Brick",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:62",
+    "scene": "police_station_garage",
+    "pickup_name": "GB_VehShop",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [
+      10.578857421875,
+      0.16158977150917053,
+      -7.292695045471191
+    ],
+    "category": "city_activities",
+    "prerequisite_objectives": [
+      "LCPD_BM_GB_VehShop"
+    ],
+    "status": "static_activity_reward",
+    "scanner_locks": [
+      {
+        "instanceName": "LCPD_BM_GB_VehShop",
+        "lockType": "Ability",
+        "lockName": "Parkour"
+      }
+    ],
+    "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested"
+  },
+  {
+    "key": "police_station_garage:fire_door",
+    "name": "Police Station Basement: Fire Door",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:63",
+    "scene": "police_station_garage",
+    "pickup_name": "GB_FireDoor",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [
+      3.4729244709014893,
+      -0.02315600961446762,
+      -3.0858664512634277
+    ],
+    "category": "city_activities",
+    "prerequisite_objectives": [
+      "LCPD_BM_GB_FireDoor"
+    ],
+    "status": "static_activity_reward",
+    "scanner_locks": [
+      {
+        "instanceName": "LCPD_BM_GB_FireDoor",
+        "lockType": "Class",
+        "lockName": "fireman"
+      }
+    ],
+    "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested"
+  },
+  {
+    "key": "police_station_lobby:portraits",
+    "name": "Police Station Lobby: Four Portraits",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:43",
+    "scene": "police_station_lobby",
+    "pickup_name": "GB_Portraits",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [
+      0.006413189694285393,
+      0.492437481880188,
+      0.7672561407089233
+    ],
+    "category": "city_activities",
+    "prerequisite_objectives": [
+      "LCPD_Lobby_Portrait01",
+      "LCPD_Lobby_Portrait02",
+      "LCPD_Lobby_Portrait03",
+      "LCPD_Lobby_Portrait04"
+    ],
+    "status": "static_activity_reward",
+    "scanner_locks": [],
+    "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested"
+  },
+  {
+    "key": "police_station_lobby:silver_filing_cabinet",
+    "name": "Police Station Lobby: Silver Filing Cabinet",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:44",
+    "scene": "police_station_lobby",
+    "pickup_name": "GB_FilingCabinet",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [
+      1.6545907258987427,
+      0.42106935381889343,
+      3.2032735347747803
+    ],
+    "category": "city_activities",
+    "prerequisite_objectives": [
+      "LCPD_Lobby_Dynamite"
+    ],
+    "status": "static_activity_reward",
+    "scanner_locks": [
+      {
+        "instanceName": "LCPD_Lobby_Dynamite",
+        "lockType": "Class",
+        "lockName": "miner"
+      }
+    ],
+    "evidence": "Unique static type-71 station reward; exact scene/name reader; collection not yet live tested"
   }
 ]

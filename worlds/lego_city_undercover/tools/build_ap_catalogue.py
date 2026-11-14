@@ -135,8 +135,9 @@ def main():
         locations[key]=dict(name=reward['name'],category=reward['category'],district=reward['district'],
             coordinates=reward['coordinates'],coordinate_space='resource; transforms may apply',
             source=reward['source_key'],native_type='Activity reward',
-            runtime=dict(kind='activity_reward',reward_key=reward['key']),status='verified_activity_reward',
+            runtime=dict(kind='activity_reward',reward_key=reward['key']),status=reward.get('status','verified_activity_reward'),
             evidence=reward['evidence'])
+        if reward.get('scanner_locks'):locations[key]['scanner_locks']=reward['scanner_locks']
     for arrest in ARRESTS:
         locations[arrest['key']]=dict(name=arrest['name'],category='story_missions',district=None,
             coordinates=None,coordinate_space=None,source=arrest['job']+'.'+arrest['field'],
