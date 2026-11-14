@@ -6,6 +6,18 @@ from Fill import distribute_items_restrictive
 
 
 class GenerationTests(unittest.TestCase):
+    def test_requested_packages_and_skin_classification(self):
+        from BaseClasses import ItemClassification
+        multi,world=self.build()
+        names=[item.name for item in multi.itempool]
+        self.assertEqual(names.count('Super Bricks 10,000'),5)
+        self.assertEqual(names.count('Super Bricks 1,000'),20)
+        self.assertEqual(world.create_item('Super Bricks 10,000').classification,ItemClassification.useful)
+        self.assertEqual(world.create_item('Character: MINER').classification,ItemClassification.progression)
+        for name in ('Studs 1,000','Studs 10,000','Studs 100,000','Super Bricks 100','Super Bricks 250'):
+            self.assertEqual(world.create_item(name).classification,ItemClassification.filler)
+        self.assertEqual(len(names),len(multi.get_unfilled_locations()))
+
     def build(self,changes=None):
         multi=MultiWorld(1);multi.game[1]=LCUWorld.game;multi.player_name={1:'LCUTest'};multi.set_seed(1234)
         args=Namespace()
@@ -20,7 +32,9 @@ class GenerationTests(unittest.TestCase):
         self.assertEqual(len(multi.itempool),len(multi.get_unfilled_locations()))
         distribute_items_restrictive(multi)
         self.assertTrue(multi.can_beat_game())
-        self.assertFalse(world.fill_slot_data()['native_grants'])
+        self.assertTrue(world.fill_slot_data()['native_grants'])
+        self.assertFalse(world.fill_slot_data()['native_locks'])
+        self.assertEqual(world.fill_slot_data()['native_reward_suppression'],'poll_after_checks')
         self.assertNotIn('unverified_clues',{r['category'] for r in world.active_catalogue.values()})
 
     def test_whole_and_quarters_are_exclusive(self):

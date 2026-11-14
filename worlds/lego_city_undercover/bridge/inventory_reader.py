@@ -16,6 +16,68 @@ PROFILE_RVA = 0x1C7F160
 MODELS_RVA = 0x17EBD38
 CONTROLLER_RVA = 0x17EBE20
 CHARACTER_STATE_RVA = 0x1C7CBB8
+MISSION_TOKENS_RVA = 0x11754B0
+
+
+def read_model_ids(read,base):
+    models=pointer(read,base+MODELS_RVA)
+    count=struct.unpack('<I',read(models+0xE0,4))[0]
+    table=pointer(read,models+0x118)
+    if not 0<count<=1024:raise ValueError('Unsupported model count')
+    result={};ambiguous=set();primary_exact={}
+    primary={'COP','ROBBER','MINER','ASTRONAUT','FARMER','FIREMAN','CONSTRUCTION_LEGOCITYCONSTRUCTIONWORKER'}
+    for index in range(count):
+        record=pointer(read,table+index*8)
+        if not record:continue
+        name_pointer=pointer(read,record+0x30)
+        if not name_pointer:continue
+        raw_name=cstring(read,name_pointer);name=raw_name.upper()
+        if raw_name in primary:primary_exact.setdefault(raw_name,[]).append(index)
+        if not name or name in ambiguous:continue
+        if name in result:
+            ambiguous.add(name);del result[name];continue
+        result[name]=index
+    # COP and the unrelated resource name Cop collide only after uppercasing.
+    # Keep the exact canonical name even after a player changes the class skin.
+    result.update({name:ids[0] for name,ids in primary_exact.items() if len(ids)==1})
+    # Native names can collide (COP/Cop). Primary class defaults are explicit
+    # model IDs and disambiguate those seven progression disguises.
+    controller=pointer(read,base+CONTROLLER_RVA)
+    defaults=struct.unpack('<8h',read(controller+0x148,16))
+    for index in defaults:
+        if not 0<=index<count:continue
+        record=pointer(read,table+index*8)
+        if not record:continue
+        name=cstring(read,pointer(read,record+0x30)).upper()
+        result[name]=primary_exact[name][0] if name in primary_exact and len(primary_exact[name])==1 else index
+    if pointer(read,base+MODELS_RVA)!=models or pointer(read,models+0x118)!=table:
+        raise RuntimeError('Model table changed')
+    return result
+
+
+def parse_mission_token_ids(data: bytes) -> list[int]:
+    """0x6a6f0 appends int16 model IDs at +0x52; +0x5a is the count."""
+    if len(data)!=9 or data[8]>4:raise ValueError('Invalid mission token queue')
+    ids=list(struct.unpack('<4h',data[:8]))[:data[8]]
+    if any(not 0<=i<1024 for i in ids):raise ValueError('Invalid mission token model')
+    return ids
+
+
+def read_mission_tokens(read: Read, base: int) -> dict:
+    manager=pointer(read,base+MISSION_TOKENS_RVA)
+    if not manager:return dict(status='not_initialized',records=[])
+    raw=read(manager+0x52,9);ids=parse_mission_token_ids(raw)
+    models=pointer(read,base+MODELS_RVA)
+    count=struct.unpack('<I',read(models+0xE0,4))[0]
+    if not 0<count<=1024 or any(i>=count for i in ids):raise ValueError('Mission model outside table')
+    table=pointer(read,models+0x118);rows=[]
+    for model in ids:
+        record=pointer(read,table+model*8)
+        name=cstring(read,pointer(read,record+0x30))
+        rows.append(dict(model_id=model,internal_name=name,evidence='native mission pickup queue'))
+    if pointer(read,base+MISSION_TOKENS_RVA)!=manager or read(manager+0x52,9)!=raw:
+        raise RuntimeError('Mission tokens changed during snapshot')
+    return dict(status='read',records=rows,evidence='0x6a6f0; one live model 386 validation')
 
 
 def pointer(read: Read, address: int) -> int:

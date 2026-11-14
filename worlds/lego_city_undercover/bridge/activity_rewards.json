@@ -1,0 +1,23 @@
+[
+  {
+    "key": "police_station_lobby:toy_vehicle_ride",
+    "name": "Police Station Lobby: Toy Police Car Ride",
+    "source_key": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:42",
+    "scene": "Police_Station_Lobby",
+    "pickup_name": "GB_RideOn",
+    "native_type": 11,
+    "static_type": 71,
+    "district": null,
+    "coordinates": [
+      2.9475979804992676,
+      0.8266140222549438,
+      -2.2694485187530518
+    ],
+    "category": "city_activities",
+    "prerequisite_objectives": [
+      "LCPD_Lobby_RideOn01",
+      "LCPD_Lobby_RideOn02"
+    ],
+    "evidence": "User completed police toy-car ride; associated GB_RideOn native collected flag observed; reward source identity scoped to lobby"
+  }
+]

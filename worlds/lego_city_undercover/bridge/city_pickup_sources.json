@@ -2353,5 +2353,551 @@
     "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1002/wi_forest_1002.giz:27:2",
     "name": "P_pup1",
     "tile_name": "wi_forest_1002"
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1621/br_brooklyn_bridge_1621.giz:27:0",
+    "name": "CHEAT_COLLECTGHOSTSTUDS",
+    "tile_name": "br_brooklyn_bridge_1621",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0714/br_golden_gate_0714.giz:1849:4",
+    "name": "CHEAT_SCAN_REDBRICKS",
+    "tile_name": "br_golden_gate_0714",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/br_twin_bridge/br_twin_bridge_1303/br_twin_bridge_1303.giz:412:0",
+    "name": "CHEAT_VEHICLE_NITROS",
+    "tile_name": "br_twin_bridge_1303",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1526/is_prison_island_1526.giz:835:5",
+    "name": "CHEAT_SIREN_HAT",
+    "tile_name": "is_prison_island_1526",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3523/is_space_centre_3523.giz:101:0",
+    "name": "CHEAT_SUPERBLASTERS",
+    "tile_name": "is_space_centre_3523",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2105/ny_airport_2105_tech.giz:2540:0",
+    "name": "CHEAT_FASTFAST_TRAVEL",
+    "tile_name": "ny_airport_2105",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2308/ny_beach_2308.giz:286:0",
+    "name": "CHEAT_RINGTONE_FART",
+    "tile_name": "ny_beach_2308",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2017/ny_canal_2017.giz:152:1",
+    "name": "CHEAT_RINGTONE_MARIO",
+    "tile_name": "ny_canal_2017",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1610/ny_central_park_1610.giz:27:0",
+    "name": "CHEAT_VEHICLE_RAM",
+    "tile_name": "ny_central_park_1610",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1817/ny_chinatown_1817.giz:2211:1",
+    "name": "CHEAT_FAST_AXESMASH",
+    "tile_name": "ny_chinatown_1817",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2123/ny_downtown_2123.giz:216:0",
+    "name": "CHEAT_WONDER_WHISTLE",
+    "tile_name": "ny_downtown_2123",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2320/ny_downtown_east_2320.giz:340:1",
+    "name": "CHEAT_INVINCIBILITY",
+    "tile_name": "ny_downtown_east_2320",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1920/ny_downtown_west_1920.giz:895:1",
+    "name": "CHEAT_BOOST",
+    "tile_name": "ny_downtown_west_1920",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2316/ny_little_italy_2316.giz:789:1",
+    "name": "CHEAT_FALL_RESCUE",
+    "tile_name": "ny_little_italy_2316",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1712/ny_times_square_1712_tech.giz:27:0",
+    "name": "CHEAT_SPAWN_VEHICLES",
+    "tile_name": "ny_times_square_1712",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_2011/ny_tunnel_2011.giz:27:0",
+    "name": "CHEAT_FAST_DRILL",
+    "tile_name": "ny_tunnel_2011",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1705/ny_uptown_1705.giz:877:1",
+    "name": "CHEAT_SUPER_COLOUR_GUN",
+    "tile_name": "ny_uptown_1705",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0918/sf_docks_0918.giz:152:1",
+    "name": "CHEAT_SCAN_CHAR_CHALLENGE",
+    "tile_name": "sf_docks_0918",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:25",
+    "name": "CHEAT_SCAN_CITY_CHALLENGE",
+    "tile_name": "sf_residential_0822",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:0",
+    "name": "r_pup",
+    "tile_name": "sf_residential_1021",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0807/wi_farmlands_0807.giz:3047:11",
+    "name": "CHEAT_SCAN_TOKENS",
+    "tile_name": "wi_farmlands_0807",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:2",
+    "name": "CHEAT_SCAN_POINT_OF_INTEREST",
+    "tile_name": "wi_forest_0701",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/bank/bank_interior/bank_interior_tech.giz:5389:55",
+    "name": "j_pup",
+    "tile_name": "bank_interior",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/bank/bank_interior/bank_interior_tech.giz:5389:56",
+    "name": "P_pup2",
+    "tile_name": "bank_interior",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/bank/bank_interior/bank_interior_tech.giz:5389:166",
+    "name": "j_pup1",
+    "tile_name": "bank_interior",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/bank/bank_sewer_02/bank_sewer_02_tech.giz:5151:173",
+    "name": "r_pup",
+    "tile_name": "bank_sewer_02",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/blackwells_mansion/mansion1_cave/mansion1_cave_tech.giz:9747:8",
+    "name": "r_pup1",
+    "tile_name": "mansion1_cave",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/blackwells_mansion/mansion2_exterior/mansion2_exterior_tech.giz:5941:359",
+    "name": "r_pup",
+    "tile_name": "mansion2_exterior",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/construction_site/construction_site_01/construction_site_01.giz:6213:16",
+    "name": "Red_Brick",
+    "tile_name": "construction_site_01",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02_tech.giz:2176:71",
+    "name": "j_pup",
+    "tile_name": "construction_site_02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02_tech.giz:2176:72",
+    "name": "Rainbow_Brick_Drill",
+    "tile_name": "construction_site_02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02_tech.giz:2176:73",
+    "name": "Brick_Drill_Prize",
+    "tile_name": "construction_site_02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02_tech.giz:2176:74",
+    "name": "RainbowReward1",
+    "tile_name": "construction_site_02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02_tech.giz:2176:75",
+    "name": "RainbowReward",
+    "tile_name": "construction_site_02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02_tech.giz:2176:76",
+    "name": "RainbowReward3",
+    "tile_name": "construction_site_02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02_tech.giz:2176:77",
+    "name": "RainbowReward2",
+    "tile_name": "construction_site_02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/fire_station/fire_station_interior/fire_station_interior_tech.giz:1087:125",
+    "name": "r_pup",
+    "tile_name": "fire_station_interior",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/gamemechanicstestarea/gamemechanicstestarea.giz:1415:4",
+    "name": "DETECTIVE_PU",
+    "tile_name": "gamemechanicstestarea",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/gamemechanicstestarea/gamemechanicstestarea.giz:1415:12",
+    "name": "TELEPORT_PU",
+    "tile_name": "gamemechanicstestarea",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/gamemechanicstestarea/gamemechanicstestarea.giz:1415:13",
+    "name": "r_pup1",
+    "tile_name": "gamemechanicstestarea",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/gamemechanicstestarea/gamemechanicstestarea.giz:1415:14",
+    "name": "P_pup5",
+    "tile_name": "gamemechanicstestarea",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME6/levels/standalones/gamemechanicstestarea/gamemechanicstestarea.giz:1415:15",
+    "name": "RCCar_Reward",
+    "tile_name": "gamemechanicstestarea",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/gamemechanicstestarea/gamemechanicstestarea.giz:1415:16",
+    "name": "r_pup",
+    "tile_name": "gamemechanicstestarea",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/gamemechanicstestarea/gamemechanicstestarea.giz:1415:17",
+    "name": "r_pup2",
+    "tile_name": "gamemechanicstestarea",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/gamemechanicstestarea/gamemechanicstestarea.giz:1415:18",
+    "name": "r_pup3",
+    "tile_name": "gamemechanicstestarea",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/gamemechanicstestarea/gamemechanicstestarea.giz:1415:20",
+    "name": "j_pup",
+    "tile_name": "gamemechanicstestarea",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/icecream_parlour/icecream01_parlour/icecream01_parlour.giz:11387:135",
+    "name": "r_pup",
+    "tile_name": "icecream01_parlour",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz:20544:35",
+    "name": "Brick_2",
+    "tile_name": "mine_cavern",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz:20544:44",
+    "name": "Brick_1",
+    "tile_name": "mine_cavern",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz:20544:60",
+    "name": "r_pup1",
+    "tile_name": "mine_cavern",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz:20544:100",
+    "name": "P_pup1",
+    "tile_name": "mine_cavern",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz:20544:101",
+    "name": "P_pup2",
+    "tile_name": "mine_cavern",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz:20544:102",
+    "name": "p_pup",
+    "tile_name": "mine_cavern",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz:20544:103",
+    "name": "j_pup",
+    "tile_name": "mine_cavern",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME6/levels/standalones/mine/mine_freefall/mine_freefall_tech.giz:772:21",
+    "name": "P_pup",
+    "tile_name": "mine_freefall",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME6/levels/standalones/mine/mine_freefall/mine_freefall_tech.giz:772:28",
+    "name": "P_pup1",
+    "tile_name": "mine_freefall",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME6/levels/standalones/moon_base/moonbase1_crater/moonbase1_crater.giz:8582:123",
+    "name": "r_pup",
+    "tile_name": "moonbase1_crater",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/standalones/museum/museum_room01/museum_room01_tech.giz:12726:29",
+    "name": "Sub_Pickup",
+    "tile_name": "museum_room01",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME7/levels/standalones/museum/museum_room01/museum_room01_tech.giz:12726:60",
+    "name": "j_pup",
+    "tile_name": "museum_room01",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/museum/museum_room01/museum_room01_tech.giz:12726:124",
+    "name": "j_pup1",
+    "tile_name": "museum_room01",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/museum/museum_room02/museum_room02_tech.giz:10506:120",
+    "name": "Egypt_Rainbow",
+    "tile_name": "museum_room02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/museum/museum_room02/museum_room02_tech.giz:10506:121",
+    "name": "Na_Pickup",
+    "tile_name": "museum_room02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/museum/museum_room02/museum_room02_tech.giz:10506:122",
+    "name": "Robin_Brick",
+    "tile_name": "museum_room02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/museum/museum_room02/museum_room02_tech.giz:10506:123",
+    "name": "Cave_Brick",
+    "tile_name": "museum_room02",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/museum/museum_room02/museum_room02_tech.giz:10506:183",
+    "name": "r_pup",
+    "tile_name": "museum_room02",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:64",
+    "name": "SupBrick_Shaft",
+    "tile_name": "police_station_garage",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_hospital/prison_hospital.giz:1701:31",
+    "name": "Shield_Bl03",
+    "tile_name": "prison_hospital",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_hospital/prison_hospital.giz:1701:32",
+    "name": "Shield_BL06",
+    "tile_name": "prison_hospital",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_hospital/prison_hospital.giz:1701:33",
+    "name": "Shield_BL04",
+    "tile_name": "prison_hospital",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_hospital/prison_hospital.giz:1701:34",
+    "name": "Shield_BL01",
+    "tile_name": "prison_hospital",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_hospital/prison_hospital.giz:1701:35",
+    "name": "Shield_BL02",
+    "tile_name": "prison_hospital",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_hospital/prison_hospital.giz:1701:36",
+    "name": "Shield_BL05",
+    "tile_name": "prison_hospital",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_hospital/prison_hospital.giz:1701:37",
+    "name": "P_pup1",
+    "tile_name": "prison_hospital",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_hospital/prison_hospital.giz:1701:38",
+    "name": "P_pup",
+    "tile_name": "prison_hospital",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_maincells/prison_maincells.giz:5246:185",
+    "name": "r_pup",
+    "tile_name": "prison_maincells",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/standalones/prison/prison_workshop/prison_workshop_tech.giz:920:0",
+    "name": "r_pup",
+    "tile_name": "prison_workshop",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/standalones/rooftops/sf_rooftop.giz:7793:114",
+    "name": "r_pup",
+    "tile_name": "sf_rooftop",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/standalones/scrapyard/scrapyard_entrance/scrapyard_entrance_tech.giz:15266:47",
+    "name": "P_pup",
+    "tile_name": "scrapyard_entrance",
+    "native_type": 12
+  },
+  {
+    "source_key": "GAME7/levels/standalones/scrapyard/scrapyard_entrance/scrapyard_entrance_tech.giz:15266:55",
+    "name": "RainbowBrick_Pipe",
+    "tile_name": "scrapyard_entrance",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/scrapyard/scrapyard_entrance/scrapyard_entrance_tech.giz:15266:56",
+    "name": "j_pup",
+    "tile_name": "scrapyard_entrance",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/scrapyard/scrapyard_entrance/scrapyard_entrance_tech.giz:15266:159",
+    "name": "r_pup",
+    "tile_name": "scrapyard_entrance",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/standalones/secretbase/secretbase02_laboratory/secretbase02_laboratory_tech.giz:11719:213",
+    "name": "r_pup",
+    "tile_name": "secretbase02_laboratory",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/standalones/space_centre/spacecentre_shuttlehangar/spacecentre_shuttlehangar_tech.giz:7084:114",
+    "name": "r_pup",
+    "tile_name": "spacecentre_shuttlehangar",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/standalones/temple/temple_courtyard/temple_courtyard.giz:8390:69",
+    "name": "Rainbow_Brick01",
+    "tile_name": "temple_courtyard",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/temple/temple_courtyard/temple_courtyard.giz:8390:70",
+    "name": "Rainbow_Brick04",
+    "tile_name": "temple_courtyard",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/temple/temple_courtyard/temple_courtyard.giz:8390:71",
+    "name": "Rainbow_Brick03",
+    "tile_name": "temple_courtyard",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/temple/temple_courtyard/temple_courtyard.giz:8390:72",
+    "name": "Rainbow_Brick02",
+    "tile_name": "temple_courtyard",
+    "native_type": 29
+  },
+  {
+    "source_key": "GAME7/levels/standalones/temple/temple_dojo/temple_dojo.giz:245:24",
+    "name": "r_pup",
+    "tile_name": "temple_dojo",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/testarea/parkour_blockouts/parkour_blockouts.giz:152:28",
+    "name": "r_pup",
+    "tile_name": "parkour_blockouts",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/testarea/parkour_blockouts/parkour_blockouts.giz:152:29",
+    "name": "r_pup1",
+    "tile_name": "parkour_blockouts",
+    "native_type": 7
+  },
+  {
+    "source_key": "GAME7/levels/standalones/police_station/police_station_lobby/police_station_lobby.giz:16117:42",
+    "name": "GB_RideOn",
+    "tile_name": "police_station_lobby",
+    "native_type": 11
   }
 ]

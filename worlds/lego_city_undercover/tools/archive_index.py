@@ -133,7 +133,7 @@ def extract(archive: Path, entry: dict, limit: int = 16 * 1024 * 1024) -> bytes:
 
 def safe_target(root: Path, name: str) -> Path:
     path = PureWindowsPath(name)
-    if path.is_absolute() or path.drive or any(part in ("..", ".") or ":" in part for part in path.parts):
+    if not name or path.root or path.drive or any(part in ("..", ".") or ":" in part for part in path.parts):
         raise ValueError("Unsafe archive path")
     target = root.joinpath(*path.parts).resolve()
     if not target.is_relative_to(root.resolve()):

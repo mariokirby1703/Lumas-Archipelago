@@ -21,17 +21,20 @@ def parse_pickups(data: bytes) -> list[dict]:
     if len(data) < 36:
         raise ValueError("Truncated pickup header")
     version, count = struct.unpack_from("<II", data)
-    if version != 14 or count > 100000:
+    if version not in (13,14) or count > 100000:
         raise ValueError("Unsupported pickup header")
     offset = 36
     rows = []
+    type_size=4 if version==14 else 3
+    prefix_size=type_size+7
     for index in range(count):
-        if offset + 11 > len(data):
+        if offset + prefix_size > len(data):
             raise ValueError("Truncated pickup prefix")
         start = offset
-        type_word, reference, flags = struct.unpack_from("<IhI", data, offset)
-        length = data[offset + 10]
-        offset += 11
+        type_word=int.from_bytes(data[offset:offset+type_size],'little')
+        reference,flags=struct.unpack_from('<hI',data,offset+type_size)
+        length = data[offset + prefix_size-1]
+        offset += prefix_size
         if not length or offset + length + 22 > len(data):
             raise ValueError("Invalid pickup name bounds")
         raw = data[offset:offset + length]
@@ -44,10 +47,23 @@ def parse_pickups(data: bytes) -> list[dict]:
         offset += 12
         tail = data[offset:offset + 10]
         offset += 10
+        parent=None
+        if tail[8]==1:
+            size=tail[9]
+            if not size or offset+size+13>len(data):raise ValueError('Invalid pickup parent bounds')
+            parent_raw=data[offset:offset+size]
+            if parent_raw[-1]!=0 or any(c<32 or c>126 for c in parent_raw[:-1]):
+                raise ValueError('Invalid pickup parent name')
+            local_xyz=struct.unpack_from('<3f',data,offset+size)
+            if not all(math.isfinite(v) for v in local_xyz):raise ValueError('Invalid parent coordinates')
+            parent=dict(name=parent_raw[:-1].decode('ascii'),local_xyz=list(local_xyz),
+                        trailing_byte=data[offset+size+12])
+            offset+=size+13
+        elif tail[8] or tail[9]:raise ValueError('Unrecognized pickup parent extension')
         rows.append(dict(index=index, section_offset=start, type_word=type_word,
                          type_code=type_word & 255, reference=reference, flags=flags,
                          name=raw[:-1].decode("ascii"), resource_xyz=list(xyz),
-                         opaque_tail=tail.hex()))
+                         opaque_tail=tail.hex(),parent=parent))
     if offset != len(data):
         raise ValueError("Unrecognized pickup record extension")
     return rows

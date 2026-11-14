@@ -8,6 +8,18 @@ from monitor_report import event_evidence
 
 
 class PickupMemoryTests(unittest.TestCase):
+    def test_story_superbrick_uses_native_collected_bit_without_city_bit(self):
+        source='GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz:20544:101'
+        catalogue={'12':dict(key='source_pickup:'+source,status='static_candidate_unbound',runtime=None)}
+        row=dict(source_key=source,native_type=12,native_collected=False)
+        snapshot=dict(objectives=dict(records=[]),pickup_bits=[],native_pickups=dict(status='read',objects=[row]))
+        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[])
+        row['native_collected']=True
+        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[12])
+        self.assertEqual(changed_checks(catalogue,None,snapshot,{12})[0],[])
+        row['source_key']=None
+        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[])
+
     def row(self):
         return dict(collection_bit=1577,name='P_pup1',tile_name='WI_Farmlands_0705',
                     position=[1.,2.,3.],address='0x1234')
@@ -23,7 +35,7 @@ class PickupMemoryTests(unittest.TestCase):
         catalogue={'77':dict(key='source_pickup:source',runtime=None,status='static_candidate_unbound')}
         checks,_=changed_checks(catalogue,dict(objectives=set(),pickups=set()),snapshot)
         self.assertEqual(checks,[77])
-        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[])
+        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[77])
         result=event_evidence(dict(identity='pickup:1577',text='unknown',kind='superbrick'),{},snapshot)
         self.assertIn('P_pup1',result['text'])
         self.assertEqual(result['evidence']['cached_object_observations'][0]['source_key'],'source')

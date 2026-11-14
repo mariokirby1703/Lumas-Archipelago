@@ -1,5 +1,7 @@
 # Native pickup identity and character commit paths
 
+Historical read-only research notes. Current native implementation and validation are documented in [native item delivery status](native_item_delivery_status.md).
+
 ## Pickup writer: exact code path
 
 Collection function RVA 0x9a68d0 receives a pickup in r8 (copied to rdi).

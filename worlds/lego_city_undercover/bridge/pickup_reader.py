@@ -29,6 +29,9 @@ def read_loaded_pickups(read,base,scene=None):
     width=struct.unpack('<I',read(base+0x1165910,4))[0]
     definitions=pointer(read,pointer(read,base+0x1C9DF10))
     head=pointer(read,component+0xE0)
+    level_owner=pointer(read,component+0x20)
+    tile=pointer(read,level_owner+0xB18)
+    scene_name=cstring(read,pointer(read,tile+0x68))
     node=head;rows=[];seen=set();links=[]
     while node:
         if node in seen or len(seen)>=4096:raise ValueError('Invalid pickup list')
@@ -42,9 +45,11 @@ def read_loaded_pickups(read,base,scene=None):
         if not all(math.isfinite(v) for v in position):raise ValueError('Invalid pickup position')
         kind=data[0x193];flags=struct.unpack('<I',read(definitions+kind*128+0x18,4))[0]
         object_flags=struct.unpack_from('<H',data,0x158)[0];index=data[0x163]
+        pickup_flags=struct.unpack_from('<H',data,0x160)[0]
         row=dict(address=hex(node),name=name,position=list(position),native_type=kind,
                  instance_flags=hex(object_flags),type_flags=hex(flags),local_index=index,
-                 collection_bit=None,status='not_in_verified_city_save_branch')
+                 collection_bit=None,tile_name=scene_name,pickup_flags=hex(pickup_flags),
+                 native_collected=bool(pickup_flags&2),status='not_in_verified_city_save_branch')
         if flags&0x4000000 and not object_flags&0x200 and index!=0xff:
             level_owner=pointer(read,owner+0x20)
             tile=pointer(read,level_owner+0xB18)
@@ -124,9 +129,11 @@ class PickupMemory:
 def attach_source_identities(state,sources):
     lookup={}
     for row in sources:
-        lookup.setdefault((row['tile_name'],row['name']),set()).add(row['source_key'])
+        lookup.setdefault((row['tile_name'].lower().removesuffix('_tech'),row['name']),[]).append(row)
     for row in state.get('objects',[]):
-        matches=lookup.get((row.get('tile_name','').lower(),row['name']),set())
+        candidates=lookup.get((row.get('tile_name','').lower().removesuffix('_tech'),row['name']),[])
+        matches={source['source_key'] for source in candidates
+                 if source.get('native_type') in (None,row.get('native_type'))}
         row['source_candidates']=sorted(matches)
         row['source_key']=next(iter(matches)) if len(matches)==1 else None
         row['source_identity_evidence']='unique native tile/name match' if len(matches)==1 else 'unresolved'

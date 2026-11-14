@@ -12,8 +12,12 @@ import threading
 import time
 
 import diagnose
-from inventory_reader import pointer, read_stats, read_characters
+from inventory_reader import pointer, read_stats, read_characters, read_mission_tokens
 from objective_reader import read_objectives
+from mission_checks import read_mission_shield,read_mission_hero
+from superbuild_reader import read_superbuilds
+from level_progress import read_level_progress
+from cheat_reader import read_cheats
 from monitor_events import EventTracker
 from monitor_report import event_evidence, export_report
 from location_reader import read_location
@@ -97,7 +101,23 @@ class Session:
             native_pickups=dict(status='unresolved',reason=str(error))
         attach_source_identities(native_pickups,self.pickup_sources)
         pickup_memory=self.pickup_memory.update(native_pickups)
+        mission_shield=read_mission_shield(self.read,self.base)
+        try:cheats=read_cheats(self.read,self.base)
+        except (OSError,ValueError,RuntimeError,struct.error) as error:
+            cheats=dict(status='unresolved',reason=str(error),records=[])
+        try:level_progress=read_level_progress(self.read,self.base)
+        except (OSError,ValueError,RuntimeError,struct.error) as error:
+            level_progress=dict(status='unresolved',reason=str(error),records=[])
+        try:superbuilds=read_superbuilds(self.read,self.base,mission_shield.get('mission'))
+        except (OSError,ValueError,RuntimeError,struct.error) as error:
+            superbuilds=dict(status='unresolved',reason=str(error),records=[])
+        try:mission_hero=read_mission_hero(self.read,self.base,mission_shield)
+        except (OSError,ValueError,RuntimeError,struct.error) as error:
+            mission_hero=dict(status='unresolved',reason=str(error),complete=False)
         return dict(objectives=objectives, stats=stats, location=location, interaction=interaction,
+                    mission_tokens=read_mission_tokens(self.read,self.base),
+                    mission_shield=mission_shield,mission_hero=mission_hero,superbuilds=superbuilds,
+                    level_progress=level_progress,cheats=cheats,
                     scene_fields=scene_fields, auras=auras,native_pickups=native_pickups,
                     pickup_memory=pickup_memory,
                     actor=read_actor(self.read, self.base),

@@ -1,86 +1,51 @@
 # LEGO City Undercover experimental APWorld
 
-Native research update: the collector's city bit formula is identified, 20 loaded
-pickup identities have been matched to source objects, and those bindings are
-enabled in the experimental client's pickup-bit detector. Monitor v13 merges
-these with prior isolated observations into 25 labels and records native pickup
-observations where the active scene supports them. Static mappings for all 471
-city Super Brick rows remain candidates, with three colliding IDs isolated.
-79 tests pass; the updated seed generates and the v13 window smoke test passes.
-See docs/research/native_pickup_and_grant_paths.md for code evidence and limits.
+Experimental Steam/Windows DX11 integration for Archipelago 0.6.8. The source client detects city and mission checks and can apply native AP items with explicit opt-in. Story/area entrance gates, open-world initialization and complete access logic remain unfinished.
 
-The native navigation index now covers 57,043 unwind function ranges, 2,771,524
-decoded instructions and 143,419 direct call edges. This is not a complete semantic
-analysis; unresolved indirect calls and compiler fragments remain explicit.
+Native delivery now includes character/disguise/vehicle ownership, bound abilities, Red Brick cheat ownership, Studs packages and building-brick packages. AP models do not require purchasing and do not consume their original world token. The user confirmed Magician selection after the booth navigation correction. Currency and reward suppression are built and await their first live effect tests.
 
-This is an incomplete integration under development for Archipelago 0.6.8.
-There is now an experimental generation APWorld, example YAML and source AP
-client. This is NOT a complete playable native randomizer: item grants, reward
-suppression, story/area/tool gates and open-world initialization are unavailable.
-The client journals received items without applying them. No native client EXE
-is shipped; the existing monitor EXE remains read-only.
+The client requests native autosave after grants and verifies models, abilities, cheat ownership and currency receipt markers in the actual save file. A receipt is not marked applied merely because it arrived or a DLL call returned. Currency markers prevent repeat credits after reconnect, lost responses and older-save recovery. A bound slot backup is created automatically before the first mutation.
 
-Current builds:
-- `build/lego_city_undercover/lego_city_undercover_experimental.apworld`
-- `build/lego_city_undercover/ap_test/AP_43086033641415968754.zip`
-- YAML: `example.yaml` beside this file.
+With native items enabled, check detection and durable queuing precede suppression of unreceived vanilla model/tool/cheat rewards. Equipped locked models first use the native switch to the starting civilian. This is a polling implementation that waits for ordinary gameplay, not an instantaneous interception of every reward animation. Discovery, objectives, source flags and ordinary resource pickups are retained.
 
-The default YAML generates 1,006 locations. `include_unverified: true` opts into
-raw prerequisite clues and unidentified pickups, often not independent checks.
-The full catalogue contains 8,235 location candidates and 509 derived items,
-plus a synthetic completion token item. IDs are deterministic; full native
-bit-to-source bindings do not exist for most pickup records. No item logic is
-claimed: all selected checks are reachable in AP generation. The experimental
-goal is receipt of the configured number of City Completion Tokens, not a native
-story-ending detector.
+## Start and build
 
-Run from repository root (the repo Python dependencies are required):
+Current artifacts:
+
+- build/lego_city_undercover/lego_city_undercover_experimental.apworld
+- build/lego_city_undercover/LCUItemBridge.dll
+- build/lego_city_undercover/StartLCUNativeClient.cmd (local Luma test starter)
+
+From the repository root:
 
 ```
-.venv/Scripts/python.exe worlds/lego_city_undercover/Client.py --connect localhost:38281 --name LCU_Test
+.venv/Scripts/python.exe worlds/lego_city_undercover/tools/start_native_client.py --connect HOST:PORT --name SLOT
 ```
 
-Host the generated seed using the normal AP server. Native objective false->true
-changes after the client's first stable snapshot can send source checks. The
-client does not replay old progress from an existing save. Unbound checks can be
-submitted explicitly with `/check LOCATION_ID`; active IDs/bindings are in slot
-data and the catalogue CSV. Received character/tool/vehicle/access items remain
-journal-only. These checks do not suppress their vanilla game rewards.
+The starter enables native items and the existing N0CUT5 permission option. Without arguments it asks for server and slot. The current native save is automatically identified when exactly one Steam save matches; otherwise use --native-save-file with the loaded slot's gameN.legocityundercoversavegamedata. Keep that native slot bound to the AP seed. Close the prior source client before starting another native client.
 
-Optional `--enable-cutscene-skip`, together with YAML `cutscene_skip: true`, enables
-only the verified N0CUT5 runtime permission. This is the sole implemented native
-write path; it validates the EXE hash and setter signature, writes one byte, and
-reads it back. The writer has not yet been exercised live. It is not part of the
-read-only monitor and does not automatically advance story sequences.
+To rebuild the DLL (ziglang is required only for building):
 
-`story_mode`, area-pass items and story-access items currently express requested
-configuration/items only: native enforcement is NOT implemented. The generator
-and slot data disclose this limitation. The world must not be presented as a
-finished open-world or story-lock integration.
+```
+.venv/Scripts/python.exe worlds/lego_city_undercover/tools/build_item_bridge.py
+```
 
-Research exports in ignored `notes/analysis/`:
-- `ap_location_catalogue.csv`: all candidate checks, categories, source positions,
-  districts where known, runtime status; unknown coordinates stay blank.
-- `ap_item_catalogue.csv`: character, vehicle, ability and access items.
-- `runtime_models.csv`: 1,002 registered model IDs and internal names.
-- `runtime_contexts.csv`: 254 registered contexts.
-- `city_superbricks.csv`: 471 city-source Super Bricks.
+Direct Client.py use remains read-only for items unless --enable-native-items is supplied. The existing monitor EXE is a separate read-only diagnostic tool. A standalone native networking EXE is not provided.
 
-Source positions may require resource transforms; they are not all verified world
-coordinates. Character names do not provide physical token spawn coordinates.
-Tests: 77 unit tests passed; default restrictive fill is beatable; whole-shield
-and quarter options are exclusive; genuine Generate.py output succeeded. Client
-CLI startup was tested; no AP server/client roundtrip or native grant test has
-been performed. The full research pipeline was rerun with full-file hashes.
+These delivery changes work with an existing compatible seed. Regeneration is needed only to change the generated item pool, options or available locations. Generate YAML through Archipelago's template generation; the user's existing Luma.yaml is unchanged.
 
-The supplied files stay at `notes/gamefiles/`. Nothing modifies those files or game saves.
-Research tools implement full-file SHA-256 inventory, PE inspection, CRC-verified CC4 v2 archive indexing,
-ZIPX/DFLT extraction, and reproducible candidate mapping. The Windows bridge currently provides read-only diagnostics.
+## Item pool and coverage
 
-The offline pipeline now also parses all 662 JobDataMap jobs with a byte-exact round-trip, indexes 745 scripts,
-and inspects all 957 extracted GIZ resource headers. Twenty tests pass.
-It builds `build/lego_city_undercover/LegoCityUndercoverDiagnostics.pyz`, a standalone Python research diagnostic.
-This is not a playable randomizer or the requested Windows AP client executable.
+The requested default pool contains 20 useful Super Bricks 1,000 packages and 5 useful Super Bricks 10,000 packages, configurable with super_brick_1000_count / super_brick_10000_count. Character skins are useful; primary disguises/abilities are progression. There are 40 native cheat definitions. Filler includes Studs 1,000 / 10,000 / rare 100,000 and Super Bricks 100 / 250, weighted 80 / 18 / 1 / 30 / 15.
 
-See [development](docs/development.md), [progress](docs/progress.md), and
-[research findings](docs/research/reverse_engineering_findings.md).
+Native bindings do not yet cover every symbolic ability. Carry Objects, Climbing, Crowbar, Fishing, Stethoscope and Rex Fury currently remain queued with explicit unbound-effect logging. Bound Scanner, SuperBuild and other native tools use the actual ability system.
+
+Supported offline progress is reconciled with the AP server and outgoing checks persist until acknowledged. Character token collection differs from ownership; purchasing or equipping creates no token check. Mission checks include completion, shields/quarters, Hero, red bricks, bound pickups and the researched native superbuild path. Ambiguous pickup identities remain excluded. include_unverified opts into additional candidates that are not all proven independent checks.
+
+All generated locations are connected in the experimental region graph. This does not establish that native gameplay can reach them with the generated item placement. The current goal is receipt of City Completion Tokens.
+
+131 tests pass. The latest read-only native preview preserved inventory/ability bytes and verified all 51 serialized ability bits against the running game. See [native delivery status](docs/research/native_item_delivery_status.md) for implementation evidence, live test boundaries and exact persistence bindings.
+
+Research assets and gamefiles stay in ignored notes/. They are not packaged into the APWorld.
+
+Currency backlog optimization: up to 24 ordered packages are credited in one native command, with one combined autosave. The native watermark skips previously credited indices before summing amounts; both balances and the final receipt marker are updated before requesting save.

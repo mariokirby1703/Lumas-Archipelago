@@ -1,0 +1,242 @@
+[
+  {
+    "index": 0,
+    "native_name": "CHEAT_RINGTONE_HONK",
+    "price": 10000,
+    "level_index": -1
+  },
+  {
+    "index": 1,
+    "native_name": "CHEAT_RINGTONE_DONKEY",
+    "price": 10000,
+    "level_index": -1
+  },
+  {
+    "index": 2,
+    "native_name": "CHEAT_RINGTONE_BURP",
+    "price": 10000,
+    "level_index": -1
+  },
+  {
+    "index": 3,
+    "native_name": "CHEAT_RINGTONE_FART",
+    "price": 10000,
+    "level_index": -1
+  },
+  {
+    "index": 4,
+    "native_name": "CHEAT_RINGTONE_MARIO",
+    "price": 10000,
+    "level_index": -1
+  },
+  {
+    "index": 5,
+    "native_name": "CHEAT_WONDER_WHISTLE",
+    "price": 20000,
+    "level_index": -1
+  },
+  {
+    "index": 6,
+    "native_name": "CHEAT_SCAN_CITY_CHALLENGE",
+    "price": 15000,
+    "level_index": -1
+  },
+  {
+    "index": 7,
+    "native_name": "CHEAT_SCAN_CHAR_CHALLENGE",
+    "price": 15000,
+    "level_index": -1
+  },
+  {
+    "index": 8,
+    "native_name": "CHEAT_SCAN_REDBRICKS",
+    "price": 15000,
+    "level_index": -1
+  },
+  {
+    "index": 9,
+    "native_name": "CHEAT_SCAN_POINT_OF_INTEREST",
+    "price": 15000,
+    "level_index": -1
+  },
+  {
+    "index": 10,
+    "native_name": "CHEAT_SCAN_TOKENS",
+    "price": 15000,
+    "level_index": -1
+  },
+  {
+    "index": 11,
+    "native_name": "CHEAT_SCOREX2",
+    "price": 200000,
+    "level_index": 2
+  },
+  {
+    "index": 12,
+    "native_name": "CHEAT_SCOREX4",
+    "price": 400000,
+    "level_index": 6
+  },
+  {
+    "index": 13,
+    "native_name": "CHEAT_SCOREX6",
+    "price": 600000,
+    "level_index": 13
+  },
+  {
+    "index": 14,
+    "native_name": "CHEAT_SCOREX8",
+    "price": 800000,
+    "level_index": 14
+  },
+  {
+    "index": 15,
+    "native_name": "CHEAT_SCOREX10",
+    "price": 1000000,
+    "level_index": 16
+  },
+  {
+    "index": 16,
+    "native_name": "CHEAT_STUD_MAGNET",
+    "price": 50000,
+    "level_index": 11
+  },
+  {
+    "index": 17,
+    "native_name": "CHEAT_BRICK_MAGNET",
+    "price": 30000,
+    "level_index": 15
+  },
+  {
+    "index": 18,
+    "native_name": "CHEAT_COLLECTGHOSTSTUDS",
+    "price": 60000,
+    "level_index": -1
+  },
+  {
+    "index": 19,
+    "native_name": "CHEAT_FASTFAST_TRAVEL",
+    "price": 100000,
+    "level_index": -1
+  },
+  {
+    "index": 20,
+    "native_name": "CHEAT_SUPER_THROW",
+    "price": 15000,
+    "level_index": 5
+  },
+  {
+    "index": 21,
+    "native_name": "CHEAT_SUPERBLASTERS",
+    "price": 20000,
+    "level_index": -1
+  },
+  {
+    "index": 22,
+    "native_name": "CHEAT_SIREN_HAT",
+    "price": 20000,
+    "level_index": -1
+  },
+  {
+    "index": 23,
+    "native_name": "CHEAT_VEHICLE_NITROS",
+    "price": 50000,
+    "level_index": -1
+  },
+  {
+    "index": 24,
+    "native_name": "CHEAT_SPAWN_VEHICLES",
+    "price": 250000,
+    "level_index": -1
+  },
+  {
+    "index": 25,
+    "native_name": "CHEAT_VEHICLE_RAM",
+    "price": 50000,
+    "level_index": -1
+  },
+  {
+    "index": 26,
+    "native_name": "CHEAT_EXTRAHEARTS",
+    "price": 10000,
+    "level_index": 12
+  },
+  {
+    "index": 27,
+    "native_name": "CHEAT_INVINCIBILITY",
+    "price": 500000,
+    "level_index": -1
+  },
+  {
+    "index": 28,
+    "native_name": "CHEAT_FASTBUILD",
+    "price": 40000,
+    "level_index": 1
+  },
+  {
+    "index": 29,
+    "native_name": "CHEAT_FAST_BREAKENTER",
+    "price": 30000,
+    "level_index": 9
+  },
+  {
+    "index": 30,
+    "native_name": "CHEAT_FAST_AXESMASH",
+    "price": 30000,
+    "level_index": -1
+  },
+  {
+    "index": 31,
+    "native_name": "CHEAT_FAST_ASTROCRATE",
+    "price": 30000,
+    "level_index": 7
+  },
+  {
+    "index": 32,
+    "native_name": "CHEAT_FAST_DRILL",
+    "price": 50000,
+    "level_index": -1
+  },
+  {
+    "index": 33,
+    "native_name": "CHEAT_FAST_SAFECRACK",
+    "price": 30000,
+    "level_index": 8
+  },
+  {
+    "index": 34,
+    "native_name": "CHEAT_UNLIMITED_DYNAMITE",
+    "price": 100000,
+    "level_index": 4
+  },
+  {
+    "index": 35,
+    "native_name": "CHEAT_SUPER_COLOUR_GUN",
+    "price": 250000,
+    "level_index": -1
+  },
+  {
+    "index": 36,
+    "native_name": "CHEAT_FALL_RESCUE",
+    "price": 400000,
+    "level_index": -1
+  },
+  {
+    "index": 37,
+    "native_name": "CHEAT_BOOST",
+    "price": 50000,
+    "level_index": -1
+  },
+  {
+    "index": 38,
+    "native_name": "CHEAT_FANCYDRESS",
+    "price": 20000,
+    "level_index": 10
+  },
+  {
+    "index": 39,
+    "native_name": "CHEAT_GAME_COMPLETE",
+    "price": 999,
+    "level_index": -1
+  }
+]

@@ -867,6 +867,7 @@ async def server_loop(ctx: CommonContext, address: typing.Optional[str] = None) 
         return ", type /connect to reconnect" if ctx.server_address else ""
 
     logger.info(f'Connecting to Archipelago server at {address}')
+    delegated_cleanup = False
     try:
         port = server_url.port or 38281  # raises ValueError if invalid
         socket = await websockets.connect(address, port=port, ping_timeout=None, ping_interval=None,
@@ -886,7 +887,10 @@ async def server_loop(ctx: CommonContext, address: typing.Optional[str] = None) 
     except websockets.InvalidMessage:
         # probably encrypted
         if address.startswith("ws://"):
-            # try wss
+            # The TLS retry owns cleanup and reconnect scheduling. Running
+            # both finally blocks resets the session twice and asserts on the
+            # reconnect task already created by the inner loop.
+            delegated_cleanup = True
             await server_loop(ctx, "ws" + address[1:])
         else:
             ctx.handle_connection_loss(f"Lost connection to the multiworld server due to InvalidMessage"
@@ -903,12 +907,13 @@ async def server_loop(ctx: CommonContext, address: typing.Optional[str] = None) 
     except Exception:
         ctx.handle_connection_loss(f"Lost connection to the multiworld server{reconnect_hint()}")
     finally:
-        await ctx.connection_closed()
-        if ctx.server_address and ctx.username and not ctx.disconnected_intentionally:
-            logger.info(f"... automatically reconnecting in {ctx.current_reconnect_delay} seconds")
-            assert ctx.autoreconnect_task is None
-            ctx.autoreconnect_task = asyncio.create_task(server_autoreconnect(ctx), name="server auto reconnect")
-        ctx.current_reconnect_delay *= 2
+        if not delegated_cleanup:
+            await ctx.connection_closed()
+            if ctx.server_address and ctx.username and not ctx.disconnected_intentionally:
+                logger.info(f"... automatically reconnecting in {ctx.current_reconnect_delay} seconds")
+                assert ctx.autoreconnect_task is None
+                ctx.autoreconnect_task = asyncio.create_task(server_autoreconnect(ctx), name="server auto reconnect")
+            ctx.current_reconnect_delay *= 2
 
 
 async def server_autoreconnect(ctx: CommonContext):

@@ -1,5 +1,25 @@
 # Special Assignment collectible research
 
+## 2026-11-13: native current-mission mask connected
+
+The descriptors for TL/TR/BL/BR all point to pickup callback RVA 0x6a110.
+Its UI-arrival callback RVA 0x6d980 compares descriptor IDs 0x18c, 0x18e,
+0x190, 0x192 and ORs 1, 2, 4, 8 into byte +0x50 of the manager referenced
+by RVA 0x11754b0. A read-only live sample after the user's upper-right pickup
+returned mask 2 and native scene Mine_Tunnel. Source resource scene names map
+that scene to mission mine; the existing seed contains mission:mine:TR,
+location 1313869694. A read-only client dry run matched exactly that quarter.
+No validation tool sent server checks or wrote game memory.
+
+The client now reconciles this current-mission mask, logs individual quarters,
+and sends only active quarter/whole locations. Whole requires all four bits.
+This supports the existing generated quarter IDs without a new seed. Other
+quarters use the statically decoded mapping, pending separate live tests.
+Past-mission persistent shield storage remains unresolved; this byte alone
+does not backfill every previous mission after leaving it.
+
+The sections below describe the earlier investigation and its limitations.
+
 User requirement: mutually exclusive shield-check option `whole` (one per complete
 four-part shield) or `quarters` (one per distinct quarter). Both modes require
 independent native part detection. Never add a whole-shield check on top of four

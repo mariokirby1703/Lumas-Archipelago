@@ -5448,8 +5448,19 @@
       "evidence": "user-confirmed display name"
     },
     "409": {
-      "display_name": "Häftling",
+      "display_name": "HÃƒÂ¤ftling",
       "evidence": "user-confirmed display name"
+    },
+    "386": {
+      "display_name": "Guy Newbery",
+      "internal_name": "NPC_CitizenMale06",
+      "evidence": "user reports Guy Newbery pickup; live mission queue contains sole model 386 at token position"
+    }
+  },
+  "red_bricks": {
+    "CHEAT_SCAN_POINT_OF_INTEREST": {
+      "display_name": "Datenscan-Upgrade: Hinweise",
+      "evidence": "user-confirmed pickup; live native type 7 and collected flag"
     }
   }
 }
