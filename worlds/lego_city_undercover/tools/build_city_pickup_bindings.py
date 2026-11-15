@@ -32,10 +32,19 @@ def main():
         if counts[r['bit']]>1:r['status']='collision'
     # Production mapping deliberately only includes identities observed in live instances.
     verified={str(r['bit']):r for r in rows if r['status']=='candidate' and r['evidence']=='live_instance_match'}
+    target=WORLD/'bridge/city_pickup_bindings.json'
+    previous=json.loads(target.read_text()) if target.exists() else {}
+    for bit,row in previous.items():
+        if row.get('status')!='native_writer_two_snapshot_identity':continue
+        if bit in verified and verified[bit]['source_key']!=row['source_key']:
+            raise ValueError('Static ranking conflicts with two-snapshot native binding at '+bit)
+        verified[bit]=row
     (WORLD/'bridge/city_pickup_bindings.json').write_text(json.dumps(verified,indent=2),encoding='utf-8')
     (analysis/'city_pickup_binding_candidates.json').write_text(json.dumps(rows,indent=2),encoding='utf-8')
+    source_types={row['source_key']:row['type_code'] for row in json.loads((analysis/'pickup_catalogue.json').read_text())}
     sources=[
         dict(source_key=r['source_key'],name=r['name'],
+             native_type={80:12,106:29}[source_types[r['source_key']]],
              tile_name=Path(r['resource']).stem.removesuffix('_tech').lower()) for r in rows
     ]
     for obj in json.loads((analysis/'pickup_catalogue.json').read_text()):

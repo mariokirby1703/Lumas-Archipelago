@@ -1,0 +1,25 @@
+name: Luma
+game: LEGO City Undercover
+description: Experimental near-boundary area rollback test. Ingame movement unverified; not a full playthrough guarantee.
+LEGO City Undercover:
+  story_mode: linear
+  goal: final_assignment
+  area_pass_items: true
+  experimental_area_restrictions: true
+  # Do not enable unrelated unbound items or story tickets for this test.
+  experimental_items: false
+  story_access_items: false
+  progressive_astronaut: true
+  separate_class_unlocks: true
+  detective_scan_lock: true
+  early_criminal_scan: true
+  early_detective_scan: true
+  cutscene_skip: true
+  super_bricks: true
+  disguise_booths: true
+  ability_items: true
+  character_items: true
+  vehicle_items: true
+  cheat_items: true
+  police_shields: quarters
+  include_unverified: false

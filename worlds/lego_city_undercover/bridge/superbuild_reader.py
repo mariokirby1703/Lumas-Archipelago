@@ -16,8 +16,15 @@ def parse_superbuild(data,base):
     if not all(math.isfinite(v) for v in position):raise ValueError('Invalid Super Build position')
     state=struct.unpack_from('<H',data,0x1E2)[0]
     flags=struct.unpack_from('<I',data,0x1E4)[0]
+    value=struct.unpack_from('<f',data,0x1D4)[0]
+    # Same scalar returned by script GetSuperBuildValue (0x116990) and
+    # consumed by the build UI branch at 0x73326. Keep the observation separate
+    # from guide quotes and from an unproven affordability rule.
+    native_value=int(value) if math.isfinite(value) and 0<=value<=100000000 and value.is_integer() else None
     return dict(name=data[0x58:0x78].split(b'\0')[0].decode('ascii'),position=position,
-                state=state,completion_flags=flags,complete=bool(state==5 and flags&4))
+                state=state,completion_flags=flags,complete=bool(state==5 and flags&4),
+                native_build_value=native_value,build_value_evidence='GetSuperBuildValue 0x116990; compare against native cost popup',
+                cost_logic_verified=False)
 
 
 def read_superbuilds(read,base,mission):

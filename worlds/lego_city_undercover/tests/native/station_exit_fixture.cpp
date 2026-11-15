@@ -20,6 +20,13 @@ static std::uint32_t Hash(const char* text) {
     return 0;
 }
 #include "../../bridge/native/detective_gate.h"
+#include "../../bridge/native/area_return.h"
+extern "C" __declspec(dllexport) DWORD TestAreaReturn(std::uintptr_t base,std::uintptr_t actor,unsigned opcode,int context,unsigned district) {
+    if(!opcode) {area_checkpoint={};return 0;}
+    Command c{};c.opcode=opcode;c.model=district;c.binding[0]=c.binding[1]=c.binding[2]=c.binding[3]=1;
+    c.name_hash=Hash(opcode==21 ? "AREA_CHECKPOINT" : "AREA_RETURN");
+    return AreaReturnCommand(base,actor,context,&c);
+}
 extern "C" __declspec(dllexport) DWORD TestDetectiveGate(std::uintptr_t base,unsigned mode) {
     const unsigned char prefix[]={0x40,0x57,0x48,0x83,0xec,0x50,0x48,0xc7,0x44,0x24,0x20,0xfe,0xff,0xff,0xff};
     auto entry=reinterpret_cast<unsigned char*>(base+0x649a0);

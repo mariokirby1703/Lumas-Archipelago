@@ -154,6 +154,8 @@ class App:
         self.item_category = tk.StringVar(value='Alle Item-Kategorien')
         self.ap_status = tk.StringVar(value='Archipelago: Nicht verbunden')
         self.game_status = tk.StringVar(value='Spiel: Nicht geladen')
+        self.area_status = tk.StringVar(value='Gebietssperre: nicht aktiv')
+        self.area_evidence={}
         self.save_status = tk.StringVar(value='Save: Nicht gebunden')
         self.progress = tk.StringVar(value='Checks: 0 · AP-Items: 0')
         self.item_info = tk.StringVar(value='Item suchen oder auswählen.')
@@ -218,6 +220,8 @@ class App:
         bottom.pack(fill='x', pady=(5, 0))
         ttk.Label(bottom, textvariable=self.save_status).pack(side='left')
         ttk.Label(bottom, textvariable=self.progress).pack(side='right')
+        ttk.Label(status,textvariable=self.area_status).pack(anchor='w',pady=(5,0))
+        ttk.Button(status,text='Gebiet-Diagnose kopieren',command=self.copy_area_evidence).pack(anchor='e')
 
         panes = ttk.Panedwindow(main, orient='horizontal')
         panes.pack(fill='both', expand=True)
@@ -553,6 +557,11 @@ class App:
         else:
             self.root.destroy()
 
+    def copy_area_evidence(self):
+        self.root.clipboard_clear()
+        self.root.clipboard_append(json.dumps(self.area_evidence,indent=2,ensure_ascii=False))
+        self.append_log('Gebietsdiagnose kopiert (begrenzte Ereignishistorie; keine Save-Datei).')
+
     def pump(self):
         for _ in range(300):
             try:
@@ -567,6 +576,18 @@ class App:
                 self.ap_connected = bool(value)
             elif kind == 'game':
                 self.game_status.set(value)
+            elif kind == 'area_gate':
+                labels={'waiting_for_save_backup':'warte auf Save-Zuordnung und Backup',
+                    'checkpoint_recorded':'Rückkehrpunkt gespeichert','allowed':'Gebiet freigeschaltet',
+                    'locked_area_without_checkpoint':'gesperrtes Gebiet, aber kein sicherer Rückkehrpunkt',
+                    'checkpoint_unavailable':'Rückkehrpunkt nicht verifiziert; Diagnose prüfen',
+                    'return_requested':'Rücksetzung angefordert; Positionsbeobachtung ausstehend',
+                    'return_waiting_for_observation':'warte auf Positionsbeobachtung; keine erneute Teleportation',
+                    'return_uncertain':'Rücksetzung unklar; automatische Wiederholung gestoppt',
+                    'deferred_scene_or_context':'ruht während Szene oder Interaktion','deferred_player_busy':'Spieler beschäftigt'}
+                self.area_status.set('Gebietssperre (experimentell): '+labels.get(value,str(value)))
+            elif kind == 'area_evidence':
+                self.area_evidence=value
             elif kind == 'game_loaded':
                 self.game_connected = bool(value)
             elif kind == 'save':
@@ -583,6 +604,7 @@ class App:
             elif kind=='item_states':
                 self.item_states=value;self.show_item_info()
             elif kind == 'stopped':
+                self.area_status.set('Gebietssperre: nicht aktiv (Client gestoppt)')
                 self.worker = None
                 self.stopping = False
                 self.ap_connected = self.game_connected = self.native_ready = False

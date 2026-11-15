@@ -16,6 +16,7 @@ from red_bricks import redbrick_location_key
 from activity_rewards import ACTIVITY_REWARDS
 from story_arrests import ARRESTS
 from opening_logic import NO_POLICE_KEYS
+from area_passes import DISTRICTS
 from station_rewards import GRACE_REWARD_KEY,grace_reward_metadata
 
 
@@ -82,6 +83,8 @@ def main():
                             coordinates=p['resource_xyz'],coordinate_space='resource; transforms may apply',
                             source=resource,native_type=kind,source_index=p['index'],runtime=None,
                             status='static_candidate_unbound')
+        locations[key]['source_type_code']=p['type_code']
+        if p['type_code'] in (80,106):locations[key]['superbrick_size']='2x2' if p['type_code']==80 else '4x2'
         if p['source_key'] in source_bits:
             locations[key].update(runtime=dict(kind='pickup',bit=source_bits[p['source_key']]),status='native_pickup')
         native_name=p['name'].upper()
@@ -116,7 +119,8 @@ def main():
                 key=f'mission:{level}:{suffix}'
                 locations[key]=dict(name=f'{level}: {suffix}',category=category,district=None,coordinates=None,
                                     coordinate_space=None,source=level,runtime=dict(kind='level_progress',mission=level,reward=suffix),
-                                    status='native_level_progress',legacy_aggregate=level=='blackwells_mansion')
+                                    status='native_level_progress',legacy_aggregate=level=='blackwells_mansion',
+                                    legacy_non_assignment_hub=level=='police_station')
     # Red Brick locations are backed by actual source records, never one synthetic
     # entry per resource (Police Station contains no Red Brick pickup).
     red_groups={}
@@ -165,6 +169,9 @@ def main():
     for level in levels:items[f'Story Access: {level}']=dict(category='story_access',classification='useful')
     for district in sorted({r['district'] for r in locations.values() if r['district']}):
         items[f'Area Pass: {district}']=dict(category='area_pass',classification='useful')
+    for district in DISTRICTS:
+        items['Area Pass: '+district]=dict(category='area_pass',classification='progression',native_name=district,
+                                         effect='area_access',native_status='experimental_near_boundary_return')
     items['Studs 1,000']=dict(category='filler',classification='filler')
     for amount in (1000,10000,100000):
         items[f'Studs {amount:,}']=dict(category='filler',classification='filler',effect='add_studs',amount=amount)

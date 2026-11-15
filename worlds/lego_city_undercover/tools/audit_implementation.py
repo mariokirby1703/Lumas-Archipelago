@@ -11,6 +11,7 @@ WORLD=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(WORLD/'bridge'))
 from capabilities import supported_effect
 from source_logic import source_requirement
+from location_design import enrich_catalogue
 
 
 def write_csv(path,rows):
@@ -21,6 +22,7 @@ def write_csv(path,rows):
 def main():
     out=WORLD/'docs/research';out.mkdir(exist_ok=True)
     catalogue=json.loads((WORLD/'catalogue.json').read_text())
+    enrich_catalogue(catalogue)
     locations=catalogue['locations'];items=catalogue['items']
     for field,rows in [('location',locations),('item',items)]:
         ids=[r['id'] for r in rows.values()]
@@ -30,6 +32,10 @@ def main():
         runtime=row.get('runtime') or {}
         mission=key.startswith('mission:')
         coverage.append(dict(key=key,id=row['id'],name=row['name'],category=row['category'],district=row.get('district'),
+            display_name=row.get('display_name'),display_area=row.get('display_area'),
+            design_requirements=json.dumps(row.get('design_requirements'),ensure_ascii=False),
+            token_relationship=json.dumps(row.get('token_relationship'),ensure_ascii=False),source_type_code=row.get('source_type_code'),
+            superbrick_size=row.get('superbrick_size'),
             source_status=row['status'],detector='persistent_level_progress' if mission else runtime.get('kind','unbound'),
             requirement=source_requirement(row),coordinates_known=row.get('coordinates') is not None,
             coordinate_space=row.get('coordinate_space'),live_confirmed=row['status'] in ('verified_activity_reward','native_story_flag'),

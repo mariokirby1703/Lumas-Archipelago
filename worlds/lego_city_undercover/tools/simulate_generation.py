@@ -25,6 +25,8 @@ PROFILES=(
     ('no_cosmetics',dict(character_items=False,separate_class_unlocks=False)),
     ('no_vehicles',dict(vehicle_items=False)),
     ('multiworld',dict(early_criminal_scan=True,early_detective_scan=True)),
+    ('area_rollback_test',dict(area_pass_items=True,experimental_area_restrictions=True,early_criminal_scan=True,early_detective_scan=True)),
+    ('area_multiworld',dict(area_pass_items=True,experimental_area_restrictions=True)),
 )
 
 
@@ -58,7 +60,7 @@ def main():
     args=parser.parse_args();logging.getLogger().setLevel(logging.ERROR);rows=[];start=time.monotonic()
     for i in range(args.count):
         name,changes=PROFILES[i%len(PROFILES)]
-        try:row=simulate(10000+i,changes,2 if name=='multiworld' else 1)
+        try:row=simulate(10000+i,changes,2 if name in ('multiworld','area_multiworld') else 1)
         except Exception as error:row=dict(seed=10000+i,error=str(error),beatable=False)
         row['profile']=name;rows.append(row)
     report=dict(count=len(rows),passed=sum(r['beatable'] for r in rows),elapsed_seconds=time.monotonic()-start,

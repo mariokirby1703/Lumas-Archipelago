@@ -22,6 +22,9 @@ class NativeStationExitTests(unittest.TestCase):
             capture_output=True,text=True,env=dict(os.environ,ZIG_GLOBAL_CACHE_DIR=str(out/'zig-cache'),ZIG_LOCAL_CACHE_DIR=str(out/'zig-local-cache')))
         if result.returncode:raise RuntimeError(result.stderr)
         cls.dll=ctypes.WinDLL(str(dll));cls.invoke=cls.dll.TestStationExit
+        cls.area_return=cls.dll.TestAreaReturn
+        cls.area_return.argtypes=[ctypes.c_size_t,ctypes.c_size_t,ctypes.c_uint,ctypes.c_int,ctypes.c_uint]
+        cls.area_return.restype=ctypes.c_uint
         cls.invoke.argtypes=[ctypes.c_size_t,ctypes.c_size_t,ctypes.POINTER(ctypes.c_uint32)]
         cls.invoke.restype=ctypes.c_uint32
         cls.lift=cls.dll.TestLobbyLift
@@ -134,6 +137,84 @@ class NativeStationExitTests(unittest.TestCase):
     def call(self):
         triggered=ctypes.c_uint32();code=self.invoke(self.base,self.actor,ctypes.byref(triggered))
         return code,triggered.value
+    def area_fixture(self,vehicle=False):
+        from research_profile import symbol_hash
+        self.area_return(self.base,self.actor,0,46,0)
+        ctypes.memmove(self.scene_name,b'Lego_City\0',10)
+        profile=self.actor+0x10000;world=self.actor+0x40000;scene=world+0x1000;entity=world+0x2000
+        grid=world+0x3000;table=world+0x4000;vt=world+0x5000
+        for address,value in [(self.base+0x1c7f160,profile),(self.base+0x1c7cbb8,profile+0x122e0),
+            (self.base+0x1c6a768,world),(world+0x178,scene),(scene+0x98,entity),(entity,vt),
+            (vt,self.base+0x3be70),(entity+0xd0,grid),(grid+0xf0,table)]:
+            ctypes.c_uint64.from_address(address).value=value
+        ctypes.memmove(profile+0x122e0+0x80+1002,b'AP'+struct.pack('<4I',1,1,1,1)+bytes(4),22)
+        ctypes.c_int.from_address(self.base+0x17ebc30).value=0
+        ctypes.c_int.from_address(self.base+0x1165910).value=4;ctypes.c_int.from_address(self.base+0x1165914).value=4
+        ctypes.c_float.from_address(grid+0x110).value=30;ctypes.c_float.from_address(self.base+0xc0fe1c).value=1
+        for i,name in enumerate((b'SF_Docks_0000\0',b'SF_Residential_0100\0',b'NY_Uptown_0200\0',b'NY_Uptown_0300\0')):
+            cell=world+0x6000+i*0x200;tile=cell+0x80;text=cell+0x100
+            ctypes.c_uint64.from_address(table+i*8).value=cell;ctypes.c_uint64.from_address(cell+0x58).value=tile
+            ctypes.c_uint64.from_address(tile+0x68).value=text;ctypes.memmove(text,name,len(name))
+        matrix=[1.,0,0,0,0,1.,0,0,0,0,1.,0,5.,1.,5.,1.]
+        position=self.actor+0x1c0
+        self.context=46
+        if vehicle:
+            ride=world+0x8000;weak=ride+0x2000;control=ride+0x2100;vtable=ride+0x2200
+            for address,value in [(self.actor+0x428,weak),(self.actor+0x430,control),(weak,ride),(ride,vtable),
+                                  (vtable+0xf0,self.base+0x506fe0)]:ctypes.c_uint64.from_address(address).value=value
+            ctypes.c_int.from_address(control+4).value=1;position=ride+0x50;self.context=157
+            body=bytearray(bytes.fromhex('48895c24084889742410574883ec20'))
+            for offset in (0,16,32,48):
+                body.extend(bytes.fromhex('f30f6f42')+bytes([offset])+bytes.fromhex('f30f7f81')+struct.pack('<I',0x50+offset))
+            body.extend(bytes.fromhex('4883c4205fc3'));ctypes.memmove(self.base+0x4abe70,bytes(body),len(body))
+        else:
+            ctypes.memmove(self.base+0x6709f0,bytes.fromhex('4533c0e908020000'),8)
+            code=bytes.fromhex('f30f6f02f30f7f81f001000033c0c3');ctypes.memmove(self.base+0x670c00,code,len(code))
+        ctypes.memmove(position,struct.pack('<16f',*matrix),64)
+        self.area_pos=position+48
+        self.auburn=symbol_hash('SF_Docks');self.cherry=symbol_hash('SF_Residential')
+    def test_area_return_foot_and_same_vehicle_use_native_teleport_paths(self):
+        for vehicle in (False,True):
+            self.area_fixture(vehicle)
+            self.assertEqual(self.area_return(self.base,self.actor,21,self.context,self.auburn),0)
+            ctypes.c_float.from_address(self.area_pos).value=35
+            self.assertEqual(self.area_return(self.base,self.actor,22,self.context,self.cherry),0)
+            self.assertEqual(ctypes.c_float.from_address(self.area_pos).value,5)
+            ctypes.c_uint64.from_address(self.actor+0x428).value=0
+            ctypes.c_uint64.from_address(self.actor+0x430).value=0
+    def test_area_return_rejects_no_checkpoint_wrong_area_seed_and_vehicle(self):
+        self.area_fixture(True)
+        self.assertEqual(self.area_return(self.base,self.actor,22,157,self.auburn),21)
+        self.assertEqual(self.area_return(self.base,self.actor,21,157,self.cherry),20)
+        self.assertEqual(self.area_return(self.base,self.actor,21,157,self.auburn),0)
+        ctypes.c_float.from_address(self.area_pos).value=35
+        ctypes.c_uint64.from_address(self.actor+0x428).value=0
+        self.assertEqual(self.area_return(self.base,self.actor,22,157,self.cherry),3)
+        ctypes.memmove(self.actor+0x10000+0x122e0+0x80+1002,b'AP'+b'b'*16+bytes(4),22)
+        self.assertEqual(self.area_return(self.base,self.actor,22,157,self.cherry),13)
+    def test_area_return_distance_signature_and_nonfinite_pose_fail_closed(self):
+        from research_profile import symbol_hash
+        self.area_fixture()
+        self.assertEqual(self.area_return(self.base,self.actor,21,46,self.auburn),0)
+        ctypes.c_float.from_address(self.area_pos).value=100
+        self.assertEqual(self.area_return(self.base,self.actor,22,46,symbol_hash('NY_Uptown')),22)
+        ctypes.c_float.from_address(self.area_pos).value=35
+        ctypes.c_ubyte.from_address(self.base+0x6709f0).value=0x90
+        self.assertEqual(self.area_return(self.base,self.actor,22,46,self.cherry),1)
+        self.assertEqual(ctypes.c_float.from_address(self.area_pos).value,35)
+        ctypes.c_float.from_address(self.area_pos).value=float('nan')
+        self.assertEqual(self.area_return(self.base,self.actor,22,46,self.cherry),5)
+    def test_area_return_refuses_standalone_interior_with_resident_city_grid(self):
+        self.area_fixture()
+        ctypes.memmove(self.scene_name,b'Police_Station_Lobby\0',21)
+        self.assertEqual(self.area_return(self.base,self.actor,21,46,self.auburn),20)
+    def test_fresh_slot_area_checkpoint_does_not_require_or_write_currency_marker(self):
+        self.area_fixture();marker=self.actor+0x10000+0x122e0+0x80+1002
+        ctypes.memset(marker,0,22)
+        self.assertEqual(self.area_return(self.base,self.actor,21,46,self.auburn),0)
+        ctypes.c_float.from_address(self.area_pos).value=35
+        self.assertEqual(self.area_return(self.base,self.actor,22,46,self.cherry),0)
+        self.assertEqual(ctypes.string_at(marker,22),bytes(22))
     def test_valid_lobby_calls_exact_existing_door_trigger(self):
         self.assertEqual(self.call(),(0,1));self.assertEqual(self.counter.value,1)
     def test_other_scene_or_distant_actor_cannot_trigger(self):

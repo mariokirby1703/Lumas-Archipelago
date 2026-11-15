@@ -1,0 +1,1055 @@
+{
+  "columns": [
+    "Token",
+    "Typ",
+    "Area (zuvor)",
+    "Weshalb kein eigener Token-Check?",
+    "Aufgabe / Belohnungsquelle",
+    "Evidenz / Details",
+    "Ehemalige Nummer",
+    "Quellenlink"
+  ],
+  "rows": [
+    [
+      "Frank Honey (Police)",
+      "Charaktertoken",
+      "Heritage Bridge",
+      "Super Build",
+      "The Model Citizen",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      633,
+      "https://primagames.com/eguides/lego-city-undercover-eguide/lego-city-tour/heritage-bridge"
+    ],
+    [
+      "Ranger Barber (Police)",
+      "Charaktertoken",
+      "Bluebell National Park",
+      "Verkleidekabine",
+      "Disguise Booth (Bluebell National Park)",
+      "Ranger Barber (Police)",
+      639,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Frank Poolside (Police)",
+      "Charaktertoken",
+      "Paradise Sands",
+      "Freerun",
+      "Free Run (Paradise Sands)",
+      "Frank Poolside (Police).",
+      641,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Brickett (Police)",
+      "Charaktertoken",
+      "Bluebell National Park",
+      "Freerun",
+      "Free Run (Bluebell National Park)",
+      "Brickett (Police).",
+      644,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Prison Guard (Police)",
+      "Charaktertoken",
+      "Albatross Island",
+      "Verkleidekabine",
+      "Disguise Booth (Albatross Island)",
+      "Prison Guard (Police)",
+      646,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Horace Cone (Police)",
+      "Charaktertoken",
+      "King's Court",
+      "Verkleidekabine",
+      "Disguise Booth (Kings Court)",
+      "Horace Cone (Police)",
+      653,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Security Supervisor (Police)",
+      "Charaktertoken",
+      "Lady Liberty Island",
+      "Verkleidekabine",
+      "Disguise Booth (Lady Liberty Island)",
+      "Security Supervisor (Police)",
+      654,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Chase Suit (Police)",
+      "Charaktertoken",
+      "Bright Lights Plaza",
+      "Story-Mission",
+      "Chan's Scrapard",
+      "Chase Suit (Police), Studski (Police), Schmoozer (Compact), Jalopy (Compact), Super Safe Crack (Red Brick)",
+      656,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Duke Huckleberry (Police)",
+      "Charaktertoken",
+      "Bluebell National Park",
+      "Super Build",
+      "Stunt Ramp",
+      "Duke Huckleberry (Police)",
+      657,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Warden Stonewall (Robber)",
+      "Charaktertoken",
+      "Albatross Island",
+      "Freerun",
+      "Free Run (Albatross Island)",
+      "Warden Stonewall (Robber).",
+      671,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Oscar Steel (Robber)",
+      "Charaktertoken",
+      "Apollo Island",
+      "Freerun",
+      "Apollo Island (Remaster); im alten Kartenmaterial fälschlich Astronaut-Kategorie erwartet",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      684,
+      "https://brickettegames.com/all-19-free-runs-in-lego-city-undercover/"
+    ],
+    [
+      "Mikey Spoilers (Robber)",
+      "Charaktertoken",
+      "Fresco",
+      "Super Build",
+      "Stunt Ramp",
+      "Mikey Spoilers (Robber)",
+      690,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Gangster (Robber)",
+      "Charaktertoken",
+      "Fresco",
+      "Verkleidekabine",
+      "Disguise Booth (Fresco)",
+      "Gangster (Robber)",
+      694,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Brantford Cubbery (Astronaut)",
+      "Charaktertoken",
+      "Apollo Island",
+      "Verkleidekabine",
+      "Disguise Booth (Apollo Island)",
+      "Brantford Cubbery (Astronaut)",
+      705,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Classic Alien (Astronaut)",
+      "Charaktertoken",
+      "Apollo Island",
+      "Super Build",
+      "Super Satellite (Apollo Island)",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      706,
+      "https://brickettegames.com/super-builds/"
+    ],
+    [
+      "Dutch Danish (Astronaut)",
+      "Charaktertoken",
+      "Apollo Island",
+      "Super Build",
+      "The Spinning Shuttle Program",
+      "Dutch Danish (Astronaut)",
+      708,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Docks Foreman (Construction)",
+      "Charaktertoken",
+      "Auburn",
+      "Freerun",
+      "Free Run (Auburn)",
+      "Docks Foreman (Construction).",
+      727,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Hugh Hunter (Resident)",
+      "Charaktertoken",
+      "Downtown",
+      "Verkleidekabine",
+      "Disguise Booth (Downtown)",
+      "Hugh Hunter (Resident)",
+      732,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Karate Guy (Resident)",
+      "Charaktertoken",
+      "Bluebell National Park",
+      "Super Build",
+      "Serenity Bridge",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      737,
+      "https://primagames.com/eguides/lego-city-undercover-eguide/lego-city-tour/bluebell-national-park"
+    ],
+    [
+      "Pilot (Special 1)",
+      "Charaktertoken",
+      "LEGO City Airport",
+      "Super Build",
+      "Stunt Ramp",
+      "Pilot (Special 1)",
+      766,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Cheerleader (Special 1)",
+      "Charaktertoken",
+      "Bright Lights Plaza",
+      "Freerun",
+      "Free Run (Bright Lights Plaza)",
+      "Cheerleader (Special 1).",
+      768,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Skater (Special 1)",
+      "Charaktertoken",
+      "Crescent Park",
+      "Freerun",
+      "Free Run (Crescent Park)",
+      "Skater (Special 1).",
+      769,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Race Car Driver (Special 1)",
+      "Charaktertoken",
+      "Auburn",
+      "Super Build",
+      "Stunt Ramp",
+      "Race Car Driver (Special 1)",
+      776,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Demolition Dummy (Special 1)",
+      "Charaktertoken",
+      "Cherry Tree Hills",
+      "Verkleidekabine",
+      "Disguise Booth (Cherry Tree Hills)",
+      "Demolition Dummy (Special 1)",
+      785,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Cowboy (Special 1)",
+      "Charaktertoken",
+      "Uptown",
+      "Freerun",
+      "Free Run (Uptown)",
+      "Cowboy (Special 1).",
+      786,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Vampire (Special 1)",
+      "Charaktertoken",
+      "Fort Meadows",
+      "Freerun",
+      "Free Run (Fort Meadows)",
+      "Vampire (Special 1).",
+      787,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Ice Skater (Special 2)",
+      "Charaktertoken",
+      "Cherry Tree Hills",
+      "Super Build",
+      "Wishing Fountain",
+      "Ice Skater (Special 2)",
+      796,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Hockey Player (Special 2)",
+      "Charaktertoken",
+      "Lady Liberty Island",
+      "Freerun",
+      "Free Run (Lady Liberty Island)",
+      "Hockey Player (Special 2).",
+      802,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Ice Fisherman (Special 2)",
+      "Charaktertoken",
+      "Paradise Sands",
+      "Super Build",
+      "Stunt Ramp",
+      "Ice Fisherman (special 2)",
+      805,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Lumberjack (Special 2)",
+      "Charaktertoken",
+      "Fort Meadows",
+      "Super Build",
+      "Lumberjack's Log Cabin",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      806,
+      "https://primagames.com/eguides/lego-city-undercover-eguide/lego-city-tour/fort-meadows"
+    ],
+    [
+      "Sleepyhead (Special 2)",
+      "Charaktertoken",
+      "Auburn",
+      "Super Build",
+      "Hillside House",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      807,
+      "https://primagames.com/eguides/lego-city-undercover-eguide/characters-and-vehicles/characters"
+    ],
+    [
+      "Fitness Instructor (Special 2)",
+      "Charaktertoken",
+      "Auburn Bay Bridge",
+      "Freerun",
+      "Free Run (Auburn Bay Bridge)",
+      "Fitness Instructor (Special 2).",
+      813,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Snowboarder Guy (Special 2)",
+      "Charaktertoken",
+      "Fresco",
+      "Freerun",
+      "Free Run (Fresco)",
+      "Snowboarder Guy (Special 2).",
+      814,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Mechanic (Special 2)",
+      "Charaktertoken",
+      "Auburn",
+      "Verkleidekabine",
+      "Disguise Booth (Auburn)",
+      "Mechanic (Special 2)",
+      816,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Skater Girl (Special 2)",
+      "Charaktertoken",
+      "LEGO City Airport",
+      "Freerun",
+      "Free Run (Lego City Airport)",
+      "Skater Girl (Special 2).",
+      823,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Bus Driver (Service)",
+      "Charaktertoken",
+      "Uptown",
+      "Verkleidekabine",
+      "Disguise Booth (Uptown)",
+      "Bus Driver (Service)",
+      833,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Coastguard (Service)",
+      "Charaktertoken",
+      "Paradise Sands",
+      "Verkleidekabine",
+      "Disguise Booth (Paradise Sands)",
+      "Coastguard (Service)",
+      839,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Airline Attendant 1 (Service)",
+      "Charaktertoken",
+      "LEGO City Airport",
+      "Verkleidekabine",
+      "Disguise Booth (LEGO City Airport)",
+      "Airline Attendant 1 (Service)",
+      840,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Train Driver Bob (Service)",
+      "Charaktertoken",
+      "Fort Meadows",
+      "Super Build",
+      "Fort Meadows Train Station",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      841,
+      "https://primagames.com/eguides/lego-city-undercover-eguide/lego-city-tour/fort-meadows"
+    ],
+    [
+      "Waitress (Service)",
+      "Charaktertoken",
+      "Crescent Park",
+      "Verkleidekabine",
+      "Disguise Booth (Crescent Park)",
+      "Waitress (Service)",
+      842,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Chat Show Host (Service)",
+      "Charaktertoken",
+      "Apollo Island",
+      "Super Build",
+      "Stunt Ramp",
+      "Chat Show Host (Service)",
+      844,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Paparazzo (Service)",
+      "Charaktertoken",
+      "Bright Lights Plaza",
+      "Verkleidekabine",
+      "Disguise Booth (Bright Lights Plaza)",
+      "Paparazzo (Service)",
+      845,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Gas Station Manager (Service)",
+      "Charaktertoken",
+      "Fort Meadows",
+      "Verkleidekabine",
+      "Disguise Booth (Fort Meadows)",
+      "Gas Station Manager (Service)",
+      853,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Bearer",
+      "Fahrzeugtoken",
+      "Downtown",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Downtown)",
+      "Bearer (Performance)",
+      857,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Slicker",
+      "Fahrzeugtoken",
+      "Fort Meadows",
+      "Super Build",
+      "Emergency Crash Mat",
+      "Slicker (Worker)",
+      858,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Torsion",
+      "Fahrzeugtoken",
+      "Bluebell National Park",
+      "Super Build",
+      "Call-in Point",
+      "Torsion (Heavy)",
+      859,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Armadillo",
+      "Fahrzeugtoken",
+      "Bluebell National Park",
+      "Zeitrennen",
+      "Time Trial (Fort Meadows)",
+      "Armadillo (Worker)",
+      860,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Oldster",
+      "Fahrzeugtoken",
+      "Bluebell National Park",
+      "Zeitrennen",
+      "Time Trial (Bluebell National Park)",
+      "Oldster (Heavy)",
+      861,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Hero",
+      "Fahrzeugtoken",
+      "Bluebell National Park",
+      "Fahrzeugräuber festnehmen",
+      "Vehicle Robber (Bluebell National Park)",
+      "Hero (Emergency)",
+      862,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Tracker",
+      "Fahrzeugtoken",
+      "Bluebell National Park",
+      "Zeitrennen",
+      "Time Trial (Bluebell National Park)",
+      "Tracker (Emergency)",
+      863,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Chan's Ironback",
+      "Fahrzeugtoken",
+      "Bluebell National Park",
+      "Zeitrennen",
+      "Time Trial (Bluebell National Park)",
+      "Chan's Ironback (Heavy)",
+      864,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Trooper",
+      "Fahrzeugtoken",
+      "Fort Meadows",
+      "Super Build",
+      "Call-in Point",
+      "Other Super Builds, Trooper (Emergency)",
+      865,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Smallisimo (Compact)",
+      "Fahrzeugtoken",
+      "Uptown",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Uptown)",
+      "Smallisimo (Compact)",
+      867,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Flare",
+      "Fahrzeugtoken",
+      "Uptown",
+      "Fahrzeugräuber festnehmen",
+      "Vehicle Robber (Uptown)",
+      "Flare (Compact)",
+      868,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Hestia",
+      "Fahrzeugtoken",
+      "Uptown",
+      "Super Build",
+      "Call-in Point",
+      "Hestia (Compact)",
+      869,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Hazard",
+      "Fahrzeugtoken",
+      "Uptown",
+      "Super Build",
+      "Call-in Point",
+      "Hazard (Worker)",
+      870,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "M.O.V.",
+      "Fahrzeugtoken",
+      "LEGO City Airport",
+      "Super Build",
+      "Flughafen Call-in Point",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      871,
+      "https://primagames.com/eguides/lego-city-undercover-eguide/lego-city-tour/lego-city-airport"
+    ],
+    [
+      "Shifter",
+      "Fahrzeugtoken",
+      "LEGO City Airport",
+      "Fahrzeugräuber festnehmen",
+      "Vehicle Robber (Lego City Airport)",
+      "Shifter (Worker)",
+      872,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Rugged (Heavy)",
+      "Fahrzeugtoken",
+      "LEGO City Airport",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Lego City Airport)",
+      "Rugged (Heavy)",
+      873,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Vor",
+      "Fahrzeugtoken",
+      "LEGO City Airport",
+      "Zeitrennen",
+      "Time Trial (Lego City Airport)",
+      "Vor (Bikes)",
+      874,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Protector",
+      "Fahrzeugtoken",
+      "LEGO City Airport",
+      "Super Build",
+      "Call-in Point",
+      "Protector (Worker)",
+      876,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "T.R.E.V.",
+      "Fahrzeugtoken",
+      "Crescent Park",
+      "Fahrzeugdiebstahl",
+      "Crescent Park",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      878,
+      "https://legogames.fandom.com/wiki/Purchasable_Vehicle/LCU"
+    ],
+    [
+      "Douser",
+      "Fahrzeugtoken",
+      "Festival Square",
+      "Super Build",
+      "Call-in Point",
+      "Douser (Emergency)",
+      880,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Vigilante",
+      "Fahrzeugtoken",
+      "Bluebell National Park",
+      "Super Build",
+      "Bluebell National Park Call-in Point (Vigilant)",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      881,
+      "https://primagames.com/eguides/lego-city-undercover-eguide/lego-city-tour/bluebell-national-park"
+    ],
+    [
+      "Atlas",
+      "Fahrzeugtoken",
+      "Apollo Island",
+      "Zeitrennen",
+      "Time Trial (Apollo Island)",
+      "Atlas (Worker)",
+      882,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Cocoon",
+      "Fahrzeugtoken",
+      "Apollo Island",
+      "Zeitrennen",
+      "Time Trial (Apollo Island)",
+      "Cocoon (Heavy)",
+      883,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Wanderer",
+      "Fahrzeugtoken",
+      "Apollo Island",
+      "Super Build",
+      "Call-in Point",
+      "Wanderer (Heavy)",
+      884,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Wrath",
+      "Fahrzeugtoken",
+      "Fort Meadows",
+      "Zeitrennen",
+      "Time Trial (Auburn Bay Bridge)",
+      "Wrath (Performance)",
+      887,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Pursuer",
+      "Fahrzeugtoken",
+      "Cherry Tree Hills",
+      "Bonusmission",
+      "Polizeistation nach dem Story-Ende (Remaster)",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      888,
+      "https://legogames.fandom.com/wiki/Purchasable_Vehicle/LCU"
+    ],
+    [
+      "Rebellion",
+      "Fahrzeugtoken",
+      "Cherry Tree Hills",
+      "Bonusmission",
+      "Polizeistation nach dem Story-Ende (Remaster)",
+      "Manuell anhand der Guide-Zuordnung abgeglichen",
+      889,
+      "https://legogames.fandom.com/wiki/Vehicle_Token"
+    ],
+    [
+      "Imprisoner",
+      "Fahrzeugtoken",
+      "Cherry Tree Hills",
+      "Super Build",
+      "Call-in Point",
+      "Imprisoner (Emergency)",
+      890,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Lantos",
+      "Fahrzeugtoken",
+      "Cherry Tree Hills",
+      "Zeitrennen",
+      "Time Trial (Cherry Tree Hills)",
+      "Lantos (Performance)",
+      891,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Valkyrie",
+      "Fahrzeugtoken",
+      "Cherry Tree Hills",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Cherry Tree Hills)",
+      "Valkyrie (Performance)",
+      892,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Revolver",
+      "Fahrzeugtoken",
+      "Auburn",
+      "Super Build",
+      "Emergency Crash Mat",
+      "Revolver (Bikes)",
+      893,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Trasher",
+      "Fahrzeugtoken",
+      "Auburn",
+      "Super Build",
+      "Call-in Point",
+      "Trasher (Worker)",
+      894,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Enberg",
+      "Fahrzeugtoken",
+      "Auburn",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Auburn)",
+      "Enberg (Performance)",
+      895,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Dragger",
+      "Fahrzeugtoken",
+      "Auburn",
+      "Super Build",
+      "Call-in Point",
+      "Dragger (Worker)",
+      896,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Brawn",
+      "Fahrzeugtoken",
+      "Auburn",
+      "Zeitrennen",
+      "Time Trial (Auburn)",
+      "Brawn (Worker)",
+      897,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Rex's Riot",
+      "Fahrzeugtoken",
+      "Auburn",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Auburn)",
+      "Rex's Riot (Heavy)",
+      898,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Redeemer",
+      "Fahrzeugtoken",
+      "Lady Liberty Island",
+      "Zeitrennen",
+      "Time Trial (Lady Liberty Island)",
+      "Redeemer (Bikes)",
+      899,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Cabrakan",
+      "Fahrzeugtoken",
+      "Lady Liberty Island",
+      "Super Build",
+      "Ferry",
+      "Transport to Crescent Park, Cabrakan (Compact)",
+      900,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Squeaky (Compact)",
+      "Fahrzeugtoken",
+      "King's Court",
+      "Super Build",
+      "Call-in Point",
+      "Squeaky (Compact)",
+      901,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Muncher",
+      "Fahrzeugtoken",
+      "King's Court",
+      "Zeitrennen",
+      "Time Trial (Fresco)",
+      "Muncher (Heavy)",
+      902,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Squadmobile (Emergency)",
+      "Fahrzeugtoken",
+      "Fresco",
+      "Zeitrennen",
+      "Time Trial (Fresco)",
+      "Squadmobile (Emergency)",
+      903,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Transter (Heavy)",
+      "Fahrzeugtoken",
+      "Fresco",
+      "Fahrzeugräuber festnehmen",
+      "Vehicle Robber (Fresco)",
+      "Transter (Heavy)",
+      904,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Falchion GT (Performance)",
+      "Fahrzeugtoken",
+      "Fresco",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Fresco)",
+      "Falchion GT (Performance)",
+      905,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Crater (Compact)",
+      "Fahrzeugtoken",
+      "Fresco",
+      "Super Build",
+      "Call-in Point",
+      "Crater (Compact)",
+      907,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Wii U: Epona; All others: Traveller (Worker)",
+      "Fahrzeugtoken",
+      "Paradise Sands",
+      "Super Build",
+      "Call-in Point",
+      "Wii U: Epona; All others: Traveller (Worker)",
+      909,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Lusca",
+      "Fahrzeugtoken",
+      "Paradise Sands",
+      "Fahrzeugräuber festnehmen",
+      "Vehicle Robber (Paradise Sands)",
+      "Lusca (Performance)",
+      910,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Galleon",
+      "Fahrzeugtoken",
+      "Paradise Sands",
+      "Zeitrennen",
+      "Time Trial (Paradise Sands)",
+      "Galleon (Heavy)",
+      911,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Athena (Performance)",
+      "Fahrzeugtoken",
+      "Paradise Sands",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Paradise Sands)",
+      "Athena (Performance)",
+      912,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Chaser",
+      "Fahrzeugtoken",
+      "Bright Lights Plaza",
+      "Super Build",
+      "Call-in Point",
+      "Chaser (Emergency)",
+      914,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Gersemi",
+      "Fahrzeugtoken",
+      "Bright Lights Plaza",
+      "Fahrzeugräuber festnehmen",
+      "Vehicle Robber (Bright Lights Plaza)",
+      "Gersemi (Performance)",
+      915,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Cetan",
+      "Fahrzeugtoken",
+      "Bright Lights Plaza",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Bright Lights Plaza)",
+      "Cetan (Performance)",
+      916,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Indulga",
+      "Fahrzeugtoken",
+      "Pagoda",
+      "Super Build",
+      "Call-in Point",
+      "Indulga (Worker)",
+      917,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Tigerella",
+      "Fahrzeugtoken",
+      "Pagoda",
+      "Fahrzeugräuber festnehmen",
+      "Vehicle Robber (Pagoda)",
+      "Tigerella (Performance)",
+      918,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Chan's Drakonas",
+      "Fahrzeugtoken",
+      "Pagoda",
+      "Fahrzeugdiebstahl",
+      "Vehicle Robbery (Pagoda)",
+      "Chan's Drakonas (Performance)",
+      919,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Bristler",
+      "Fahrzeugtoken",
+      "King's Court",
+      "Super Build",
+      "Call-in Point",
+      "Bristler (Worker)",
+      922,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Camel (Aircraft)",
+      "Fahrzeugtoken",
+      "LEGO City Airport",
+      "Super Build",
+      "Helipad",
+      "Camel (Aircraft)",
+      924,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Skybringer (Aircraft)",
+      "Fahrzeugtoken",
+      "Bluebell National Park",
+      "Super Build",
+      "Helicopter Platform",
+      "Skybringer (Aircraft)",
+      925,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "UFO (Aircraft)",
+      "Fahrzeugtoken",
+      "Apollo Island",
+      "Super Build",
+      "Helipad",
+      "UFO (Aircraft)",
+      926,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Chopper (Aircraft)",
+      "Fahrzeugtoken",
+      "Albatross Island",
+      "Super Build",
+      "Helipad",
+      "Chopper (Aircraft)",
+      927,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Responder (Aircraft)",
+      "Fahrzeugtoken",
+      "Cherry Tree Hills",
+      "Super Build",
+      "Helipad",
+      "Responder (Aircraft)",
+      928,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ],
+    [
+      "Hera (Aircraft)",
+      "Fahrzeugtoken",
+      "Auburn",
+      "Super Build",
+      "Helipad",
+      "Hera (Aircraft)",
+      929,
+      "https://github.com/meeuw/legocityundercovermap/blob/main/markers.json"
+    ]
+  ],
+  "native_mapping_status": "guide display names are not treated as native model IDs"
+}

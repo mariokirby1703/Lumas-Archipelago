@@ -1,0 +1,93 @@
+[
+  {
+    "objective": "objective:SF_DO_0918_CarTheft",
+    "model": "MUSCLECARS_ENBERG",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:SF_DO_0717_CarTheft",
+    "model": "UBER_RIOT",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:SF_RD_1121_CarTheft",
+    "model": "SPORTSCARS_VALKYRIE",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_DT_1924_CarTheft",
+    "model": "MUSCLECARS_BEARER",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_CT_1818_CarTheft",
+    "model": "CHANS_DRAKONAS",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_TS_1613_CarTheft",
+    "model": "SPORTSCARS_CETAN",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_CP_1711_CarTheft",
+    "model": "POLICE_TREV",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_UT_1604_CarTheft",
+    "model": "SMALLCARS_SMALLISIMO",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_DTW_1821_CarTheft",
+    "model": "HOSPITAL_PANACEA",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_DTE_2319_CarTheft",
+    "model": "SALOONCARS_DOWNFORCE",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_LI_2418_CarTheft",
+    "model": "MUSCLECARS_FALCHIONGT",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_BE_2310_CarTheft",
+    "model": "MUSCLECARS_ATHENA",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  },
+  {
+    "objective": "objective:NY_LCX_1903_CarTheft",
+    "model": "SUV_RUGGED",
+    "classification": "activity_reward",
+    "evidence": "same tDataNode completion and SuperCounterUIAndAnim tAward in native vehicle_thefts.sf",
+    "source_sha256": "0f931b7f1fc92b397a49303ad3fca686a917289e02c75402b295c8eb4e3e9d96"
+  }
+]

@@ -36,6 +36,7 @@ static std::uint32_t Hash(const char* value) {
 #include "chief_key.h"
 #include "test_items.h"
 #include "item_popups.h"
+#include "area_return.h"
 static bool WriteCode(unsigned char* code,const unsigned char* replacement,std::size_t size) {
     if(!std::memcmp(code,replacement,size))return true;
     DWORD previous=0;
@@ -90,6 +91,7 @@ static DWORD Execute(Command* c) {
         if(c->opcode==18)return TestRemove(base,actor,c);
         if(c->opcode==19)return ShowItemPopup(base,c);
         if(c->opcode==20)return DetectiveGateCommand(base,actor,c);
+        if(c->opcode==21 || c->opcode==22)return AreaReturnCommand(base,actor,context,c);
         if(c->opcode==13)return OpenLobbyLift(base,actor,c);
         if(c->opcode==12)return TriggerStationExit(base,actor,c);
         if(c->opcode==8 || c->opcode==9)return EnforceRewards(base,actor,c,c->opcode==9);

@@ -8,6 +8,8 @@ CLASS_MODELS={'Police':'COP','Robber':'ROBBER','Miner':'MINER','Astronaut':'ASTR
 def effect_plan(item):
     if item.get('effect')=='progressive_complete':return dict(kind='noop',reason='Progressive stages already entitled')
     category=item.get('category')
+    if category=='area_pass' and item.get('effect')=='area_access':
+        return dict(kind='area_access',district=item['native_name'])
     if item.get('effect') in ('add_studs','add_bricks'):
         amount=item.get('amount')
         if type(amount) is not int or not 0<amount<=100000:raise ValueError('Invalid currency amount')

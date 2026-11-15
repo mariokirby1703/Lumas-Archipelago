@@ -6,6 +6,20 @@ from Fill import distribute_items_restrictive
 
 
 class GenerationTests(unittest.TestCase):
+    def test_experimental_area_seed_starts_auburn_and_places_first_pass_there(self):
+        multi,world=self.build(dict(area_pass_items=True,experimental_area_restrictions=True,
+                                    early_criminal_scan=True,early_detective_scan=True))
+        state=CollectionState(multi)
+        self.assertTrue(multi.get_region('District: SF_Docks',1).can_reach(state))
+        self.assertFalse(multi.get_region('District: SF_Residential',1).can_reach(state))
+        passes=[l for l in multi.get_locations(1) if l.item and l.item.name=='Area Pass: SF_Residential']
+        self.assertEqual(len(passes),1);self.assertTrue(passes[0].can_reach(state))
+        state.collect(passes[0].item,True)
+        self.assertTrue(multi.get_region('District: SF_Residential',1).can_reach(state))
+        self.assertFalse(any(i.name=='Area Pass: SF_Docks' for i in multi.itempool))
+        self.assertTrue(world.fill_slot_data()['native_area_rollback'])
+        distribute_items_restrictive(multi);self.assertTrue(multi.can_beat_game())
+
     def test_chronological_test_yaml_places_criminal_scan_before_police_gate(self):
         import yaml
         from pathlib import Path
@@ -77,7 +91,7 @@ class GenerationTests(unittest.TestCase):
 
     def test_unverified_opt_in_and_ids(self):
         _,world=self.build({'include_unverified':True})
-        expected={k for k,r in CATALOGUE['locations'].items() if r['category']!='whole_shields' and not r.get('legacy_aggregate')}
+        expected={k for k,r in CATALOGUE['locations'].items() if r['category']!='whole_shields' and not r.get('legacy_aggregate') and not r.get('legacy_non_assignment_hub') and not r.get('token_relationship',{}).get('exclude_from_new_generation')}
         self.assertEqual(set(world.active_catalogue),expected)
         self.assertEqual(len(LCUWorld.item_name_to_id),len(set(LCUWorld.item_name_to_id.values())))
     def test_linear_police_is_guaranteed_on_an_opening_check(self):

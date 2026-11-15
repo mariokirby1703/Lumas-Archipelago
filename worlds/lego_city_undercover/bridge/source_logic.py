@@ -22,4 +22,10 @@ def source_requirement(row):
 
 def source_rule(row,player,enabled=True):
     requirement=source_requirement(row)
-    return (lambda state:has_capability(state,player,requirement)) if enabled and requirement else (lambda state:True)
+    requirements=[requirement] if requirement else []
+    kind=row.get('native_type')
+    if kind=='COP_CriminalScan':requirements.extend(('Police','Scanner'))
+    elif kind=='COP_AudioScan':requirements.extend(('Police','Wiretap'))
+    # A source's route lock can add another class, but never substitutes a
+    # different scan mechanic. Aura presence itself is not a completion check.
+    return (lambda state:all(has_capability(state,player,name) for name in requirements)) if enabled else (lambda state:True)

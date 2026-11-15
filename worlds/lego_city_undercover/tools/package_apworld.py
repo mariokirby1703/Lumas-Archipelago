@@ -42,6 +42,9 @@ def main():
                 common_client_sha256=hashlib.sha256((ROOT/'CommonClient.py').read_bytes()).hexdigest(),
                 progressive_astronaut=True,source_requirement_logic=True,native_goal_modes=True,
                 native_story_tickets=False,native_district_gates=False,native_open_world_setup=False)
+    data.update(native_near_boundary_area_return='experimental; native calls and synthetic fixtures; live movement unverified',
+                native_area_return_max_distance=90,area_start='SF_Docks',area_first_pass='SF_Residential',
+                sheet_design_requirements_verified=False)
     manifest.write_text(json.dumps(data,indent=2,sort_keys=True),encoding='utf-8')
     print(f'{target}: {len(names)} entries, SHA256 {data["apworld_sha256"]}')
 

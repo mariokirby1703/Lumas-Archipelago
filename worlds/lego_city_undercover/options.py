@@ -134,8 +134,15 @@ class AbilityItems(DefaultOnToggle):
 
 
 class AreaPassItems(Toggle):
-    """Add experimental area-pass items. Native district gating is unavailable."""
+    """Area passes require experimental_area_restrictions. Auburn is always open."""
     display_name='Area Pass Items'
+
+
+class ExperimentalAreaRestrictions(Toggle):
+    """EXPERIMENTAL: return to a native checkpoint on nearby locked city boundaries.
+    No distant Fast Travel/reload recovery. Requires native client and live testing.
+    Checkpoints are actor/vehicle/seed specific, within 90m, and never written to saves."""
+    display_name='Experimental Native Area Rollback'
 
 
 class StoryAccessItems(Toggle):
@@ -181,6 +188,7 @@ class SuperBrick10000Count(Range):
 
 @dataclass
 class LCUOptions(PerGameCommonOptions):
+    experimental_area_restrictions: ExperimentalAreaRestrictions
     goal: Goal
     experimental_items: ExperimentalItems
     progressive_astronaut: ProgressiveAstronaut

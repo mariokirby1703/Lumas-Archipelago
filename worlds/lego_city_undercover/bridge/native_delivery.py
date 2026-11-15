@@ -97,6 +97,10 @@ class NativeDeliveryEngine:
         for delivery in deliveries:
             index=delivery['index'];plan=delivery['plan'];kind=plan['kind']
             if overrides and overrides.blocks(plan):continue
+            if kind=='area_access':
+                if delivery['state']!='runtime_verified':journal.record_runtime_verification(index,
+                    dict(verified=True,native_save_flag=False,reason='Area policy entitlement is journal-backed; not a native ability bit'))
+                continue
             if kind=='noop':
                 if delivery['state']!='runtime_verified':journal.record_runtime_verification(index,
                     dict(verified=True,native_save_flag=False,reason=plan['reason']))

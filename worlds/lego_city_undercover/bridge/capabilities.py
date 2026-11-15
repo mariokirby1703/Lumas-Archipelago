@@ -20,7 +20,7 @@ def supported_effect(effect):
     if effect.get('name')==PROGRESSIVE_ASTRONAUT:return True
     plan=effect_plan(effect)
     if plan['kind']=='ability_unlock':return plan['ability'] in NATIVE_TOOL_NAMES
-    return plan['kind'] in ('model_unlock','cheat_unlock','runtime_unlock','add_studs','add_bricks','noop')
+    return plan['kind'] in ('model_unlock','cheat_unlock','runtime_unlock','add_studs','add_bricks','noop','area_access')
 
 
 def effect_identity(effect):
@@ -41,6 +41,9 @@ def pool_candidates(items,allowed,experimental=False,progressive_astronaut=True)
         category=row['category']
         if not allowed.get('ability' if category=='progressive' else category,False):continue
         effect=dict(row,name=name)
+        if category=='area_pass':
+            # Keep every old alias ID readable but only emit canonical passes.
+            if not experimental or name!='Area Pass: '+row.get('native_name','') or row.get('native_name')=='SF_Docks':continue
         if not experimental and not supported_effect(effect):continue
         if category=='character' and allowed.get('ability') and row.get('native_name') in set(CLASS_MODELS.values()):
             continue

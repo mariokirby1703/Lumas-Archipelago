@@ -27,6 +27,8 @@ from delivery_marker import check_snapshot_binding
 from red_bricks import redbrick_location_key
 from item_delivery import register_delivery
 from native_delivery import NativeDeliveryEngine
+from area_passes import AreaGate
+from pickup_binding_catalogue import detection_catalogue
 from item_popups import ItemPopupQueue
 from progressive_items import resolve_receipts
 from notification_messages import receipt_message, sent_message
@@ -102,7 +104,7 @@ class Context(CommonContext):
         self.journal.queue(locations)
         for location in locations:
             row = self.catalogue.get(str(location), {})
-            logging.info('CHECK queued: %s | ID %s | %s', row.get('name', location),
+            logging.info('CHECK queued: %s | ID %s | %s', row.get('display_name') or row.get('name', location),
                          location, row.get('status', 'manual'))
         await self.send_msgs([dict(cmd='LocationChecks', locations=locations)])
 
@@ -129,7 +131,7 @@ class Context(CommonContext):
                 logging.info('Legacy seed has no Detective Scan item: automatic detective locking stays disabled. '
                              'Use Ability: Detective Scan in the test UI or generate a new seed for AP delivery.')
             logging.warning('Native grants, autosave and reward suppression: %s. '
-                            'Story/area entrance gates remain unavailable.',
+                            'Story entrance gates remain unavailable; area rollback is explicitly experimental.',
                             'EXPERIMENTAL, enabled' if self.enable_native_models else 'disabled')
 
 
@@ -146,6 +148,7 @@ def notify_game(ctx, loaded, detail=None):
 async def watcher(ctx):
     native_delivery = NativeDeliveryEngine(bridge_path(ROOT), ctx.native_save_file)
     exit_gate = StationExitGate()
+    area_gate = AreaGate()
     opened_lift = None
     tutorial_timing = TutorialFieldTiming()
     session = None
@@ -186,6 +189,7 @@ async def watcher(ctx):
                         ctx.journal = Journal(ctx.state_dir, dict(seed=ctx.seed_name, team=ctx.team,
                             slot=ctx.slot, catalogue=ctx.catalogue, detection_policy=2))
                         journal_binding = current_binding
+                        ctx.detection_catalogue=detection_catalogue(ctx.catalogue)
                     resolved=resolve_receipts(ctx.items_received,getattr(ctx,'item_effects',{}))
                     resolved_by_index={i:effect for i,_,effect in resolved}
                     ctx.resolved_received_effects=[effect for _,_,effect in resolved]
@@ -323,7 +327,7 @@ async def watcher(ctx):
                                 'check location active' if arrest['key'] in active_keys else
                                 'location absent from current seed; enable story_missions in a newly generated seed')
                     seen_arrests.update(arrests)
-                    checks, previous = changed_checks(ctx.catalogue, previous,
+                    checks, previous = changed_checks(getattr(ctx,'detection_catalogue',ctx.catalogue), previous,
                         ctx.test_overrides.mask_snapshot(snapshot),
                         set(ctx.checked_locations) | set(ctx.journal.pending()))
                     if checks:
@@ -332,6 +336,14 @@ async def watcher(ctx):
                         received = ctx.resolved_received_effects
                         await native_delivery.poll(session, snapshot, ctx.journal,
                             ctx.item_effects.values(), received, ctx.slot_options, ctx.test_overrides)
+                        if ctx.slot_options.get('experimental_area_restrictions') and ctx.slot_options.get('area_pass_items'):
+                            status=await area_gate.poll(session,snapshot,ctx.journal,received,native_delivery.dll,
+                                backup_ready=native_delivery.path is not None and not (native_delivery.last_problem or '').startswith('Loaded native save is bound'))
+                            if status!=area_gate.last_status:
+                                ctx.notify('area_gate',status);logging.info('AREA policy: %s',status);area_gate.last_status=status
+                            report=area_gate.report()
+                            if report['events'] and report['events'][-1]['timestamp']!=area_gate.last_reported_event:
+                                ctx.notify('area_evidence',report);area_gate.last_reported_event=report['events'][-1]['timestamp']
                         if not (native_delivery.last_problem or '').startswith(
                                 'Loaded native save is bound'):
                             await ctx.item_popups.poll(session, snapshot, ctx.journal,

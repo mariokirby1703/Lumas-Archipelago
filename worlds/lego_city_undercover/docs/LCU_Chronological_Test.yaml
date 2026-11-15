@@ -17,6 +17,8 @@ LEGO City Undercover:
   vehicle_items: true
   cheat_items: true
   area_pass_items: false
+  experimental_area_restrictions: false
+  # See LCU_Area_Rollback_Test.yaml for the separate native boundary test.
   story_access_items: false
   cutscene_skip: true
   super_bricks: true

@@ -14,6 +14,11 @@ class NativePlayerBusy(RuntimeError):
     """The game rejected a command before mutation; retry a later snapshot."""
 
 
+def area_command(pid,district,binding,dll,restore=False):
+    result=_command(pid,symbol_hash(district),'AREA_RETURN' if restore else 'AREA_CHECKPOINT',dll,22 if restore else 21,0,binding)
+    return dict(accepted=bool(result['owned']),target_hash=result['found'],position_verified=False,save_written=False)
+
+
 PACKET=struct.Struct('<16I')
 
 
@@ -195,7 +200,10 @@ def _command(pid,model,name,dll,opcode,receipt_index=0,binding=bytes(16)):
                         9:'unbound index or package',10:'unexpected booth navigation code',11:'native autosave is disabled',
                         12:'currency balance would overflow',13:'native save belongs to another AP binding',
                         14:'native autosave is busy',15:'reward policy mapping unavailable',16:'police lobby re-entry phase is unsupported; exit not triggered',
-                        19:'Select a different outfit before removing this model; starting civilians cannot be removed'}
+                        19:'Select a different outfit before removing this model; starting civilians cannot be removed',
+                        20:'Area identity/target tile could not be verified; no teleport performed',
+                        21:'No matching checkpoint for this actor/vehicle/save; no teleport performed',
+                        22:'Checkpoint is too distant or in the current area; no teleport performed'}
                     raise RuntimeError(f"Native command rejected ({result[6]}): {reasons.get(result[6],'unknown native error')}")
                 return dict(model=model,found=result[9],owned=result[10],verified=bool(result[10]),save_confirmed=False)
             time.sleep(.01)

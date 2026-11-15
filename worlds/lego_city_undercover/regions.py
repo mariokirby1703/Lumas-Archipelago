@@ -12,6 +12,8 @@ from .bridge.capabilities import has_capability
 from .bridge.opening_logic import NO_POLICE_KEYS
 from .bridge.source_logic import source_rule
 from .bridge.research_profile import ABILITY_NAMES
+from .bridge.area_passes import canonical,has_area,START
+from .bridge.location_design import data
 
 STORY_TOOLS=(('Police','Scanner','Detective Scan','GrappleGun','SuperBuild'),('Parkour',),('Robber','Miner'),(),
              (),('Astronaut',),('Color Gun',),(),('Farmer','Firefighter','FireAxe'),(),(),
@@ -34,8 +36,14 @@ def create_regions(world,location_type,item_type):
     menu=region('Menu');opening=region('Opening before Police');city=region('LEGO City')
     menu.connect(opening);opening.connect(city)
     station=region('Police Station');city.connect(station)
+    area_enabled=bool(world.options.area_pass_items.value)
+    areas=data('area_names.json');display_to_native={display:native for native,display in areas.items()}
+    def row_district(row):
+        if '/police_station/' in str(row.get('source')) or row.get('source')=='police_station':return START
+        return canonical(row.get('district')) or canonical(display_to_native.get(row.get('display_area')))
     for name in ABILITY_NAMES:
-        if district_name(name)==name:city.connect(region('District: '+name))
+        if district_name(name)==name:city.connect(region('District: '+name),
+            rule=lambda state,name=name:not area_enabled or has_area(state,player,name))
     requirements=[];prior=city
     for index,assignment in enumerate(ASSIGNMENTS):
         target=region(f'Assignment {index+1}: {assignment}')
@@ -45,8 +53,11 @@ def create_regions(world,location_type,item_type):
         # Tools supplied by vanilla when their AP pool is disabled must not
         # become requirements for absent items. Class aliases remain usable.
         enabled=bool(world.options.ability_items.value)
-        (prior if linear else city).connect(target,rule=lambda state,needed=needed,enabled=enabled:
-            not enabled or all(has_capability(state,player,name) for name in needed))
+        entry=world.active_catalogue.get('mission:'+assignment+':Complete',{})
+        area=row_district(entry)
+        (prior if linear else city).connect(target,rule=lambda state,needed=needed,enabled=enabled,area=area:
+            (not area_enabled or area is None or has_area(state,player,area)) and
+            (not enabled or all(has_capability(state,player,name) for name in needed)))
         prior=target
     scenes=json.loads(pkgutil.get_data(__package__,'bridge/mission_scene_names.json'))
     sections={}
@@ -56,7 +67,7 @@ def create_regions(world,location_type,item_type):
         if parent is not None:
             section=region('Section: '+scene);parent.connect(section);sections[scene]=section
     for key,row in world.active_catalogue.items():
-        if key in NO_POLICE_KEYS:parent=opening
+        if key in NO_POLICE_KEYS and (not area_enabled or row_district(row) in (None,START)):parent=opening
         elif key.startswith('mission:'):
             mission=key.split(':')[1]
             if mission=='police_station':parent=station
@@ -69,7 +80,7 @@ def create_regions(world,location_type,item_type):
                 mission=source.split('/standalones/')[1].split('/')[0]
                 scene=PurePosixPath(source).stem.removesuffix('_tech')
                 parent=sections.get(scene,next((r for name,r in regions.items() if name.endswith(': '+mission)),city))
-            elif district:=district_name(row.get('district')):
+            elif district:=row_district(row):
                 name='District: '+district
                 if name not in regions:city.connect(region(name))
                 parent=region(name)
@@ -77,6 +88,8 @@ def create_regions(world,location_type,item_type):
         if parent.name=='City: unresolved source' and not parent.entrances:city.connect(parent)
         location=location_type(player,row['name'],row['id'],parent)
         location.access_rule=source_rule(row,player,bool(world.options.ability_items.value) and key not in NO_POLICE_KEYS)
+        if area_enabled and row_district(row) is None and parent.name=='City: unresolved source':
+            location.item_rule=lambda item:not item.advancement
         parent.locations.append(location)
     if world.options.goal.value==2:
         from . import TOKEN

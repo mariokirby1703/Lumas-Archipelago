@@ -1,6 +1,6 @@
 {
   "locations": 8753,
-  "items": 557,
+  "items": 558,
   "categories": {
     "shield_quarters": 68,
     "story_missions": 20,
@@ -24,14 +24,14 @@
     "native_objective": 400,
     "unverified_prerequisite": 645,
     "experimental_model_found": 267,
-    "static_candidate_unbound": 7261,
+    "static_candidate_unbound": 7241,
     "ambiguous_model_source": 13,
-    "native_pickup": 20,
+    "native_pickup": 40,
     "verified_activity_reward": 3,
     "static_activity_reward": 7,
     "native_story_flag": 3
   },
-  "supported_items": 491,
+  "supported_items": 536,
   "source_requirements": 685,
   "presets": 213,
   "transition_scripts": 11

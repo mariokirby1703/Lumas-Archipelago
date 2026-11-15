@@ -1,0 +1,1966 @@
+{
+  "source_pickup:GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1222/br_brooklyn_bridge_1222.giz:641:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1322/br_brooklyn_bridge_1322_tech.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0714/br_golden_gate_0714.giz:1849:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/br_twin_bridge/br_twin_bridge_1203/br_twin_bridge_1203.giz:1572:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_liberty_island/is_liberty_island_1213/is_liberty_island_1213.giz:100:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_liberty_island/is_liberty_island_1213/is_liberty_island_1213.giz:100:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_liberty_island/is_liberty_island_1213/is_liberty_island_1213.giz:100:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_liberty_island/is_liberty_island_1213/is_liberty_island_1213.giz:100:3": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_liberty_island/is_liberty_island_1213/is_liberty_island_1213.giz:100:4": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1426/is_prison_island_1426.giz:108:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1426/is_prison_island_1426.giz:108:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1525/is_prison_island_1525.giz:1438:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1525/is_prison_island_1525.giz:1438:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1525/is_prison_island_1525.giz:1438:3": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1525/is_prison_island_1525.giz:1438:4": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1525/is_prison_island_1525.giz:1438:8": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1526/is_prison_island_1526.giz:835:4": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3321/is_space_centre_3321.giz:490:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3321/is_space_centre_3321.giz:490:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3321/is_space_centre_3321.giz:490:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3322/is_space_centre_3322.giz:100:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3323/is_space_centre_3323.giz:290:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3323/is_space_centre_3323.giz:290:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3324/is_space_centre_3324.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3422/is_space_centre_3422.giz:1972:37": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3424/is_space_centre_3424.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_1904/ny_airport_1904.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_1904/ny_airport_1904.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_1905/ny_airport_1905.giz:213:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2003/ny_airport_2003.giz:452:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ny_airport_2004.giz:770:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2005/ny_airport_2005.giz:27:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2006/ny_airport_2006.giz:208:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2209/ny_beach_2209.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2209/ny_beach_2209.giz:27:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2210/ny_beach_2210.giz:1113:56": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2210/ny_beach_2210.giz:1113:57": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2210/ny_beach_2210.giz:1113:58": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2211/ny_beach_2211.giz:1558:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2212/ny_beach_2212.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2212/ny_beach_2212.giz:27:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2309/ny_beach_2309.giz:1169:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2310/ny_beach_2310.giz:3770:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2312/ny_beach_2312.giz:2255:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2408/ny_beach_2408.giz:1187:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2408/ny_beach_2408.giz:1187:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2409/ny_beach_2409.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2410/ny_beach_2410.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2506/ny_beach_2506.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_canal/ny_canal_2017/ny_canal_2017.giz:152:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1507/ny_central_park_1507.giz:371:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1607/ny_central_park_1607.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1608/ny_central_park_1608.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1608/ny_central_park_1608.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1608/ny_central_park_1608.giz:27:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1609/ny_central_park_1609_tech.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1609/ny_central_park_1609_tech.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1610/ny_central_park_1610.giz:27:4": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1708/ny_central_park_1708.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1708/ny_central_park_1708.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1710/ny_central_park_1710_tech.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1710/ny_central_park_1710_tech.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_central_park/ny_central_park_1711/ny_central_park_1711.giz:152:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1615/ny_chinatown_1615.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1715/ny_chinatown_1715.giz:694:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1716/ny_chinatown_1716.giz:1678:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1716/ny_chinatown_1716.giz:1678:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1717/ny_chinatown_1717.giz:844:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1718/ny_chinatown_1718.giz:649:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1815/ny_chinatown_1815.giz:666:5": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1816/ny_chinatown_1816.giz:541:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1816/ny_chinatown_1816.giz:541:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1817/ny_chinatown_1817.giz:2211:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1817/ny_chinatown_1817.giz:2211:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1818/ny_chinatown_1818.giz:742:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1818/ny_chinatown_1818.giz:742:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_1924/ny_downtown_1924.giz:2780:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_1926/ny_downtown_1926.giz:204:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2023/ny_downtown_2023.giz:448:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2023/ny_downtown_2023.giz:448:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_downtown_2024.giz:256:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_downtown_2024.giz:256:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_downtown_2024.giz:256:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2025/ny_downtown_2025.giz:508:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2125/ny_downtown_2125.giz:100:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2223/ny_downtown_2223.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2121/ny_downtown_east_2121.giz:781:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2121/ny_downtown_east_2121.giz:781:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2220/ny_downtown_east_2220.giz:1577:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2221/ny_downtown_east_2221.giz:485:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2319/ny_downtown_east_2319.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2320/ny_downtown_east_2320.giz:340:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2320/ny_downtown_east_2320.giz:340:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2320/ny_downtown_east_2320.giz:340:8": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1719/ny_downtown_west_1719.giz:420:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1719/ny_downtown_west_1719.giz:420:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1721/ny_downtown_west_1721.giz:939:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1819/ny_downtown_west_1819.giz:279:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1819/ny_downtown_west_1819.giz:279:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1820/ny_downtown_west_1820.giz:389:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1820/ny_downtown_west_1820.giz:389:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1821/ny_downtown_west_1821.giz:1919:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1821/ny_downtown_west_1821.giz:1919:4": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1920/ny_downtown_west_1920.giz:895:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_2021/ny_downtown_west_2021_tech.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2315/ny_little_italy_2315.giz:215:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2317/ny_little_italy_2317.giz:527:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2318/ny_little_italy_2318.giz:363:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2318/ny_little_italy_2318.giz:363:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ny_little_italy_2415.giz:1401:8": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2416/ny_little_italy_2416.giz:1208:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2416/ny_little_italy_2416.giz:1208:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2417/ny_little_italy_2417.giz:443:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_monaco_tunnel/ny_monaco_tunnel_2413/ny_monaco_tunnel_2413.giz:607:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1611/ny_times_square_1611.giz:240:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1611/ny_times_square_1611.giz:240:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1612/ny_times_square_1612.giz:1544:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1613/ny_times_square_1613.giz:953:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1613/ny_times_square_1613.giz:953:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1613/ny_times_square_1613.giz:953:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1613/ny_times_square_1613.giz:953:4": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1614/ny_times_square_1614.giz:100:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1712/ny_times_square_1712_tech.giz:27:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1713/ny_times_square_1713.giz:3407:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1713/ny_times_square_1713.giz:3407:3": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1714/ny_times_square_1714.giz:373:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1714/ny_times_square_1714.giz:373:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_tunnel/ny_tunnel_2010/ny_tunnel_2010.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1505/ny_uptown_1505.giz:100:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1603/ny_uptown_1603.giz:100:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1604/ny_uptown_1604.giz:1066:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1604/ny_uptown_1604.giz:1066:1": {
+    "automatic_reward_sources": [
+      "objective:NY_UT_1604_CarTheft"
+    ],
+    "classification": "ambiguous",
+    "exclude_from_new_generation": true,
+    "independent_source_binding": false,
+    "reason": "Global model-found detector also set by an automatic native activity reward; no independent pickup-bit detector"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1604/ny_uptown_1604.giz:1066:3": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1605/ny_uptown_1605.giz:830:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1606/ny_uptown_1606.giz:100:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1704/ny_uptown_1704.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1704/ny_uptown_1704.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1705/ny_uptown_1705.giz:877:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1804/ny_uptown_1804.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1805/ny_uptown_1805.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/plantpot/plantpot01_gen/plantpot01_gen.giz:251:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/plantpot/plantpot01_nx/plantpot01_nx.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0717/sf_docks_0717.giz:217:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:5": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:6": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz:1009:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz:1009:6": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:3": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:5": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:9": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0914/sf_docks_0914.giz:502:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0915/sf_docks_0915.giz:11605:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:6": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:9": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1016/sf_docks_1016.giz:333:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz:722:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:23": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:24": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0823/sf_residential_0823_tech.giz:11554:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919.giz:208:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919.giz:208:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919.giz:208:4": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0920/sf_residential_0920.giz:1596:11": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz:454:26": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz:454:27": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz:454:29": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0923/sf_residential_0923_tech.giz:256:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1019/sf_residential_1019.giz:213:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1019/sf_residential_1019.giz:213:2": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1019/sf_residential_1019.giz:213:3": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz:288:3": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1023/sf_residential_1023_tech.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1120/sf_residential_1120.giz:152:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1122/sf_residential_1122.giz:519:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1122/sf_residential_1122.giz:519:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0505/wi_farmlands_0505.giz:392:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0506/wi_farmlands_0506.giz:1074:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0507/wi_farmlands_0507.giz:27:15": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0605/wi_farmlands_0605.giz:27:33": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0606/wi_farmlands_0606.giz:27:39": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/sb_log/wi_farmlands_0607_sb_log.giz:27:24": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:42": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:43": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:44": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:45": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/wi_farmlands_0705.giz:1801:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0706/wi_farmlands_0706_tech.giz:213:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0806/wi_farmlands_0806.giz:1522:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0601/wi_forest_0601.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0702/wi_forest_0702.giz:100:6": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0704/wi_forest_0704.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0802/wi_forest_0802.giz:980:7": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0802/wi_forest_0802.giz:980:8": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0803/wi_forest_0803.giz:208:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0803/wi_forest_0803.giz:208:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1002/wi_forest_1002.giz:27:1": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1004/wi_forest_1004.giz:27:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/lego_city/lego_city/lego_city.giz:3765:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/bank/bank_connection/bank_connection_tech.giz:4257:17": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/bank/bank_interior/bank_interior_tech.giz:5389:173": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/bank/bank_sewer/bank_sewer_tech.giz:2776:17": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/bank/bank_sewer_02/bank_sewer_02_tech.giz:5151:53": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/blackwells_mansion/mansion1_cave/mansion1_cave_tech.giz:9747:157": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/blackwells_mansion/mansion1_cave/mansion1_cave_tech.giz:9747:158": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/blackwells_mansion/mansion1_cavetunnel/mansion1_cavetunnel_tech.giz:5327:111": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/blackwells_mansion/mansion1_lounge/mansion1_lounge_tech.giz:8353:104": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/blackwells_mansion/mansion1_lounge/mansion1_lounge_tech.giz:8353:105": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/blackwells_mansion/mansion2_exterior/mansion2_exterior_tech.giz:5941:365": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/blackwells_mansion/mansion2_exterior/mansion2_exterior_tech.giz:5941:366": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/blackwells_mansion/mansion2_exterior/mansion2_exterior_tech.giz:5941:368": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/blackwells_mansion/mansion2_exterior/mansion2_exterior_tech.giz:5941:372": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/construction_site/construction_site_01/construction_site_01.giz:6213:159": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02_tech.giz:2176:80": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02_tech.giz:2176:81": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/fire_station/fire_station_interior/fire_station_interior_tech.giz:1087:135": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/fire_station/fire_station_training_area/fire_station_training_area_tech.giz:4815:235": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/fire_station/fire_station_training_area/fire_station_training_area_tech.giz:4815:236": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/icecream_parlour/icecream01_parlour/icecream01_parlour.giz:11387:126": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/icecream_parlour/icecream01_parlour/icecream01_parlour.giz:11387:142": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/icecream_parlour/icecream01_parlour/icecream01_parlour.giz:11387:143": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/icecream_parlour/icecream_office/icecream_office_tech.giz:6503:55": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz:20544:190": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/mine/mine_tunnel/mine_tunnel.giz:10125:70": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/mine/mine_tunnel/mine_tunnel.giz:10125:77": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/mine/mine_tunnel/mine_tunnel.giz:10125:94": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/moon_base/moonbase1_crater/moonbase1_crater.giz:8582:117": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/moon_base/moonbase3_rocketloadingbay/moonbase3_rocketloadingbay_tech.giz:678:31": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/moon_base/moonbase_finalbattle/moonbase_finalbattle_tech.giz:7012:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME6/levels/standalones/moon_base/moonbase_spacedive/moonbase_spacedive_tech.giz:1994:0": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/museum/museum_room01/museum_room01_tech.giz:12726:59": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/museum/museum_room01/museum_room01_tech.giz:12726:88": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/museum/museum_room02/museum_room02_tech.giz:10506:118": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/museum/museum_room02/museum_room02_tech.giz:10506:189": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/police_station/police_station_garage/police_station_garage.giz:9843:0": {
+    "automatic_reward_sources": [
+      "story_disguise:COP"
+    ],
+    "classification": "story_reward",
+    "exclude_from_new_generation": true,
+    "independent_source_binding": false,
+    "reason": "Native collection default links Grace to the same original COP wardrobe activation; no separate player interaction"
+  },
+  "source_pickup:GAME7/levels/standalones/prison/prison_maincells/prison_maincells.giz:5246:123": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/prison/prison_rex_furys_cell/prison_rex_furys_cell.giz:4479:90": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/prison/prison_rex_furys_cell/prison_rex_furys_cell.giz:4479:93": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/prison/prison_wardens_office/prison_wardens_office.giz:7390:21": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/prison/prison_workshop/prison_workshop_tech.giz:920:33": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/rooftops/sf_rooftop.giz:7793:113": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/rooftops/sf_rooftop.giz:7793:129": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/rooftops/sf_rooftop.giz:7793:205": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/rooftops/sf_rooftop.giz:7793:206": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/scrapyard/scrapyard_arena/scrapyard_arena_tech.giz:2532:148": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/scrapyard/scrapyard_arena/scrapyard_arena_tech.giz:2532:23": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/scrapyard/scrapyard_entrance/scrapyard_entrance_tech.giz:15266:54": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/scrapyard/scrapyard_entrance/scrapyard_entrance_tech.giz:15266:58": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/secretbase/secretbase01a_entrance/secretbase01a_entrance_tech.giz:25173:106": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/secretbase/secretbase02_laboratory/secretbase02_laboratory_tech.giz:11719:246": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/secretbase/secretbase03_hangar/secretbase03_hangar_tech.giz:6971:142": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/secretbase/secretbase03_hangar/secretbase03_hangar_tech.giz:6971:143": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/space_centre/spacecentre_controlroom/spacecentre_controlroom_tech.giz:4899:126": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/space_centre/spacecentre_controlroom/spacecentre_controlroom_tech.giz:4899:67": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/space_centre/spacecentre_shuttlehangar/spacecentre_shuttlehangar_tech.giz:7084:115": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/space_centre/spacecentre_shuttlehangar/spacecentre_shuttlehangar_tech.giz:7084:116": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/temple/temple_courtyard/temple_courtyard.giz:8390:73": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/temple/temple_courtyard/temple_courtyard.giz:8390:82": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/temple/temple_dojo/temple_dojo.giz:245:25": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "source_pickup:GAME7/levels/standalones/temple/temple_dojo/temple_dojo.giz:245:73": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "story_disguise:ASTRONAUT": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "story_disguise:CONSTRUCTION_LEGOCITYCONSTRUCTIONWORKER": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "story_disguise:COP": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "story_disguise:FARMER": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "story_disguise:FIREMAN": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "story_disguise:MINER": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  },
+  "story_disguise:ROBBER": {
+    "automatic_reward_sources": [],
+    "classification": "unverified_source",
+    "exclude_from_new_generation": false,
+    "independent_source_binding": false,
+    "reason": "A model found flag alone does not prove a separately collectible token"
+  }
+}
