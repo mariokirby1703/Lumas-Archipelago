@@ -21,7 +21,7 @@ class BindingObserverTests(unittest.TestCase):
         self.snapshot=dict(process=dict(pid=1,sha256=HASH),native_binding=dict(bank='0x12345'),pickup_bits=[],
             native_pickups=dict(status='read',objects=[dict(collection_bit=96,local_index=0,native_type=12,
             source_key=self.source,source_candidates=[self.source],status='native_writer_derived_binding',
-            address='0x123456',tile_name='SF_Docks_0012',name='small',position=[1,2,3])]))
+            address='0x123456',tile_name='SF_Docks_0012',name='small',position=[1,2,3],writer_enabled=True)]))
 
     def test_two_observations_survive_reopen_and_tile_unload_without_rebinding_seed(self):
         before=self.journal.binding_token

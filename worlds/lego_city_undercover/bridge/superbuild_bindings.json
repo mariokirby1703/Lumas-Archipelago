@@ -3,5 +3,15 @@
     "mission": "mine",
     "native_name": "#cg_641_CableCar_SB",
     "objective": "Mine_CableCar"
+  },
+  {
+    "native_name": "#cg_70_VEHICLE_DROP_GSB",
+    "objective": "SF_DO_0815_VehDrop",
+    "position": [
+      -183.20028686523438,
+      1.0569602251052856,
+      -19.791704177856445
+    ],
+    "evidence": "live completed city instance; exact source tile SF_Docks_0815 and world position"
   }
 ]

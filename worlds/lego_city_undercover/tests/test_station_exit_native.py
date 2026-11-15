@@ -22,6 +22,9 @@ class NativeStationExitTests(unittest.TestCase):
             capture_output=True,text=True,env=dict(os.environ,ZIG_GLOBAL_CACHE_DIR=str(out/'zig-cache'),ZIG_LOCAL_CACHE_DIR=str(out/'zig-local-cache')))
         if result.returncode:raise RuntimeError(result.stderr)
         cls.dll=ctypes.WinDLL(str(dll));cls.invoke=cls.dll.TestStationExit
+        cls.superbuild=cls.dll.TestSuperbuildJobs
+        cls.superbuild.argtypes=[ctypes.c_size_t,ctypes.POINTER(ctypes.c_uint32)]
+        cls.superbuild.restype=ctypes.c_uint32
         cls.area_return=cls.dll.TestAreaReturn
         cls.area_return.argtypes=[ctypes.c_size_t,ctypes.c_size_t,ctypes.c_uint,ctypes.c_int,ctypes.c_uint]
         cls.area_return.restype=ctypes.c_uint
@@ -673,3 +676,30 @@ class NativeStationExitTests(unittest.TestCase):
         self.assertEqual(owned.value,0)
         self.assertEqual(ctypes.c_ubyte.from_address(bank+227//8).value,0)
         self.assertEqual(ctypes.c_int16.from_address(controller+0x16a).value,-1)
+
+    def test_superbuild_job_setup_is_idempotent_and_rejects_foreign_save(self):
+        from research_profile import symbol_hash
+        system=self.actor+0xc000;job_table=self.actor+0xd000
+        array=self.actor+0x18000;field=self.actor+0x18100;maximum=self.actor+0x18200
+        record=struct.pack('<I4xQH6x',symbol_hash('SuperBuild_Saves'),array,2)
+        ctypes.memmove(job_table+4*24,record,len(record))
+        ctypes.c_uint32.from_address(system+0xe8).value=5
+        for i,(obj,name,kind,value) in enumerate(((field,'SuperBuildsActive',0xc46bb8,0),(maximum,'Max_Completed',0xc46b38,65))):
+            ctypes.c_uint64.from_address(array+i*8).value=obj
+            ctypes.c_uint64.from_address(obj).value=self.base+kind
+            ctypes.c_uint32.from_address(obj+12).value=symbol_hash(name)
+            ctypes.c_uint32.from_address(obj+16).value=value
+        profile=self.actor+0x30000;bank=profile+0x122e0;abilities=self.actor+0x50000
+        for rva,value in ((0x1c7f160,profile),(0x1c7cbb8,bank),(0x17ebd48,abilities)):
+            ctypes.c_uint64.from_address(self.base+rva).value=value
+        changed=ctypes.c_uint32()
+        self.assertEqual(self.superbuild(self.base,ctypes.byref(changed)),0)
+        self.assertEqual(changed.value,0);self.assertEqual(ctypes.c_ubyte.from_address(field+16).value,0)
+        ctypes.c_ubyte.from_address(abilities+0xd8+2).value=1
+        self.assertEqual(self.superbuild(self.base,ctypes.byref(changed)),0)
+        self.assertEqual(changed.value,1);self.assertEqual(ctypes.c_ubyte.from_address(field+16).value,1)
+        self.assertEqual(self.superbuild(self.base,ctypes.byref(changed)),0);self.assertEqual(changed.value,0)
+        ctypes.c_ubyte.from_address(field+16).value=0
+        ctypes.memmove(bank+0x80+1002,b'AP'+b'x'*20,22)
+        self.assertEqual(self.superbuild(self.base,ctypes.byref(changed)),13)
+        self.assertEqual(ctypes.c_ubyte.from_address(field+16).value,0)

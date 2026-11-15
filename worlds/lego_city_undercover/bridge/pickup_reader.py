@@ -26,6 +26,10 @@ def read_loaded_pickups(read,base,scene=None):
         raise ValueError('Unsupported pickup scene component')
     manager=pointer(read,base+0x17EC808)
     bank=read(manager+0x120,1600)
+    stats=pointer(read,base+0x1C7A830)
+    if not stats:raise ValueError('Pickup writer mode is not initialized')
+    writer_mode=read(stats+0x335d,1)
+    writer_enabled=writer_mode!=b'\0'
     width=struct.unpack('<I',read(base+0x1165910,4))[0]
     definitions=pointer(read,pointer(read,base+0x1C9DF10))
     head=pointer(read,component+0xE0)
@@ -50,23 +54,25 @@ def read_loaded_pickups(read,base,scene=None):
                  instance_flags=hex(object_flags),type_flags=hex(flags),local_index=index,
                  collection_bit=None,tile_name=scene_name,pickup_flags=hex(pickup_flags),
                  native_collected=bool(pickup_flags&2),status='not_in_verified_city_save_branch')
-        if flags&0x4000000 and not object_flags&0x200 and index!=0xff:
+        row['writer_enabled']=writer_enabled
+        if writer_enabled and flags&0x4000000 and not object_flags&0x200 and index!=0xff:
             level_owner=pointer(read,owner+0x20)
             tile=pointer(read,level_owner+0xB18)
             x,y=read(tile+0x208,2)
             if x<width and y<38 and index<8:
                 bit=pickup_bit(x,y,width,index)
-                row.update(collection_bit=bit,tile_xy=[x,y],collected=bool(bank[bit//8]&(1<<(bit%8))),
+                row.update(collection_bit=bit,tile_xy=[x,y],grid_width=width,collected=bool(bank[bit//8]&(1<<(bit%8))),
                            tile_name=cstring(read,pointer(read,tile+0x68)),
                            status='native_writer_derived_binding')
         rows.append(row)
         next_node=struct.unpack_from('<Q',data,0x28)[0]
-        links.append((node,next_node));node=next_node
+        links.append((node,next_node,data[0x160:0x162]));node=next_node
     if ((own_scene and player_scene(read,base)!=scene) or pointer(read,component+0xE0)!=head or
-            any(pointer(read,a+0x28)!=n for a,n in links) or read(manager+0x120,1600)!=bank):
+            any(pointer(read,a+0x28)!=n or read(a+0x160,2)!=flags for a,n,flags in links) or read(manager+0x120,1600)!=bank or
+            pointer(read,base+0x1C7A830)!=stats or read(stats+0x335d,1)!=writer_mode):
         raise RuntimeError('Pickup state changed; retry')
     return dict(status='read',objects=rows,source='native writer 0x9a68d0',
-                instance_positions_are_resource_space=True)
+                writer_enabled=writer_enabled,instance_positions_are_resource_space=True)
 
 
 def read_city_pickups(read,base):

@@ -250,3 +250,10 @@ def unlock_chief_key(pid,dll):
 def reveal_chief_radio(pid,dll):
     """Enable the original radio parts in the waiting-for-build tutorial stage."""
     return bool(_command(pid,0,'CHIEF_RADIO',dll,16)['found'])
+
+
+def enable_superbuild_jobs(pid,binding,dll):
+    """Enable the vanilla city job tree; original scripts own counters/rewards."""
+    if len(binding)!=16 or not any(binding):raise ValueError('Missing AP binding')
+    result=_command(pid,0,'SUPERBUILD_JOBS',dll,24,0,binding)
+    return dict(changed=bool(result['found']),enabled=bool(result['owned']))

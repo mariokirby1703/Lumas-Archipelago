@@ -33,6 +33,7 @@ def derive_bindings(snapshots,existing,catalogue):
         if not location or location['category']!='super_bricks':continue
         expected={'Gold Plate':12,'SuperBrick4X2':29}.get(location.get('native_type'))
         if any(r[0].get('status')!='native_writer_derived_binding' for r in all_rows) or expected!=row.get('native_type'):continue
+        if any(r[0].get('writer_enabled') is not True for r in all_rows):continue
         if row.get('address') and any(r[0].get('address')!=row['address'] for r in all_rows):continue
         prior=existing.get(str(bit))
         if prior:

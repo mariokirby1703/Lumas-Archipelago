@@ -83,9 +83,18 @@ class Journal:
         if bit in self.pickup_conflicts():return False
         if existing:
             old=json.loads(existing[0][2])
-            if proof.get('collection_transition_observed') and not old.get('collection_transition_observed'):
-                with self.db:self.db.execute('UPDATE pickup_bindings SET proof=? WHERE source=?',(json.dumps(proof,sort_keys=True),source))
-            return False
+            upgrade=proof.get('proof_version',1)>old.get('proof_version',1)
+            upgrade=upgrade or (proof.get('writer_enabled') is True and old.get('writer_enabled') is not True)
+            transition=proof.get('collection_transition_observed') and not old.get('collection_transition_observed')
+            if upgrade or transition:
+                # Preserve actual collection evidence when refreshing metadata.
+                refreshed=dict(proof)
+                if old.get('collection_transition_observed'):
+                    refreshed.update(collection_transition_observed=True,before_collected=old.get('before_collected'),
+                                     after_collected=old.get('after_collected'))
+                with self.db:self.db.execute('UPDATE pickup_bindings SET proof=? WHERE source=?',(json.dumps(refreshed,sort_keys=True),source))
+                self.diagnostic(dict(kind='pickup_binding_refresh',verification='native_binding_verified',mutation=False,proof=refreshed))
+            return bool(upgrade or transition)
         with self.db:self.db.execute('INSERT INTO pickup_bindings VALUES (?,?,?)',(source,bit,json.dumps(proof,sort_keys=True)))
         self.diagnostic(dict(kind='pickup_binding',verification='native_binding_verified',mutation=False,proof=proof))
         return True

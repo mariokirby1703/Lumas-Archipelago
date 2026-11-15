@@ -13,7 +13,7 @@ from delivery_marker import binding_token
 class NewBindingTests(unittest.TestCase):
     def fixture(self):
         row=dict(collection_bit=100,source_key='city.giz:20:0',native_type=12,
-            status='native_writer_derived_binding',name='small',position=[1,2,3],local_index=0,tile_xy=[1,2])
+            status='native_writer_derived_binding',name='small',position=[1,2,3],local_index=0,tile_xy=[1,2],writer_enabled=True)
         snap=dict(process=dict(pid=123,sha256=HASH),native_binding=dict(status='bound',marker=dict(binding='abc')),
                   native_pickups=dict(status='read',objects=[row]))
         catalogue=dict(locations={'source_pickup:city.giz:20:0':dict(category='super_bricks',native_type='Gold Plate',source='city.giz')})

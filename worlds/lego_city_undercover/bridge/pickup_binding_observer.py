@@ -16,7 +16,9 @@ class BindingObserver:
 
     def observe(self,snapshot,journal):
         process=snapshot.get('process') or {};binding=snapshot.get('native_binding') or {}
-        identity=(journal.binding_token,process.get('pid'),process.get('sha256'),binding.get('bank'))
+        identity=(journal.binding_token,process.get('pid'),process.get('sha256'),binding.get('bank'),
+                  process.get('profile'),(snapshot.get('actor') or {}).get('address'),
+                  (binding.get('marker') or {}).get('binding'))
         if identity!=self.identity:
             self.identity=identity;self.previous={}
         if process.get('sha256')!=HASH or not process.get('pid'):
@@ -40,9 +42,11 @@ class BindingObserver:
                 location.get('category')!='super_bricks' or
                 TYPES.get(location.get('source_type_code'))!=row.get('native_type') or
                 row.get('status')!='native_writer_derived_binding' or
+                row.get('writer_enabled') is not True or
                 row.get('local_index')!=bit%8 or not row.get('address') or
                 row.get('source_candidates')!=[source]):continue
-            signature=(source,row['native_type'],row['address'],row.get('tile_name'),bit,row.get('local_index'))
+            signature=(source,row['native_type'],row['address'],row.get('tile_name'),bit,row.get('local_index'),
+                       row.get('grid_width'),tuple(row.get('tile_xy') or ()),row.get('type_flags'),row.get('instance_flags'))
             current[bit]=(signature,deepcopy(row),bit in set(snapshot.get('pickup_bits',())))
             prior=self.previous.get(bit)
             if not prior or prior[0]!=signature:continue
@@ -55,7 +59,13 @@ class BindingObserver:
                 before_collected=prior[2],after_collected=current[bit][2],game_mutated=False)
             proof.update(process=dict(pid=process['pid'],sha256=process['sha256']),native_bank=binding.get('bank'),
                 journal_binding=journal.binding_token.hex(),tile_xy=row.get('tile_xy'),
-                native_flags=dict(type_flags=row.get('type_flags'),instance_flags=row.get('instance_flags')))
+                native_flags=dict(type_flags=row.get('type_flags'),instance_flags=row.get('instance_flags')),
+                proof_version=2,observation_count=2,grid_width=row.get('grid_width'),writer_enabled=row.get('writer_enabled'),
+                observations=[dict(address=value['address'],source_key=value['source_key'],native_type=value['native_type'],
+                    bit=value['collection_bit'],local_index=value['local_index'],tile_name=value.get('tile_name'),
+                    grid_width=value.get('grid_width'),tile_xy=value.get('tile_xy'),status=value.get('status'),
+                    type_flags=value.get('type_flags'),instance_flags=value.get('instance_flags'),
+                    writer_enabled=value.get('writer_enabled')) for value in (prior[1],row)])
             known=self.static.get(str(bit))
             other=[int(b) for b,r in self.static.items() if r.get('source_key')==source and int(b)!=bit]
             if known and known.get('source_key')!=source or other:

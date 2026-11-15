@@ -125,3 +125,9 @@ extern "C" __declspec(dllexport) DWORD TestTutorialFields(std::uintptr_t base,st
     Command c{};c.name_hash=Hash("TUTORIAL_FIELDS");
     DWORD result=RelaxTutorialFields(base,actor,&c);*changed=c.found;return result;
 }
+
+#include "../../bridge/native/superbuild_setup.h"
+extern "C" __declspec(dllexport) DWORD TestSuperbuildJobs(std::uintptr_t base,std::uint32_t* changed) {
+    Command c{};c.name_hash=Hash("SUPERBUILD_JOBS");c.binding[0]=1;
+    auto error=EnableSuperbuildJobs(base,&c);*changed=c.found;return error;
+}

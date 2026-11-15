@@ -37,6 +37,7 @@ static std::uint32_t Hash(const char* value) {
 #include "test_items.h"
 #include "item_popups.h"
 #include "area_return.h"
+#include "superbuild_setup.h"
 static bool WriteCode(unsigned char* code,const unsigned char* replacement,std::size_t size) {
     if(!std::memcmp(code,replacement,size))return true;
     DWORD previous=0;
@@ -84,6 +85,7 @@ static DWORD Execute(Command* c) {
         if(!action)return 3;
         const int context=current==secondary ? *reinterpret_cast<short*>(action+0x11e) : current;
         if(!AllowsNativeCommand(context,c->opcode,*reinterpret_cast<unsigned char*>(actor+0x943)!=0))return 3;
+        if(c->opcode==24)return EnableSuperbuildJobs(base,c);
         if(c->opcode==14)return RelaxTutorialFields(base,actor,c);
         if(c->opcode==15)return UnlockChiefKey(base,actor,c);
         if(c->opcode==16)return RevealChiefRadio(base,actor,c);

@@ -4,7 +4,7 @@ import logging
 from delivery_marker import MARKER_OFFSET,MARKER_SIZE,parse_marker,receipt_saved,marker_from_save
 from inventory_reader import pointer,read_model_ids
 from model_selection import ownership_selection_supported,model_delivery_ready
-from native_model_transport import NativePlayerBusy,grant_model,grant_ability,grant_cheat,grant_currency_batch,request_save,enforce_rewards,configure_detective_scan
+from native_model_transport import NativePlayerBusy,grant_model,grant_ability,grant_cheat,grant_currency_batch,request_save,enforce_rewards,configure_detective_scan,enable_superbuild_jobs
 from reward_policy import reward_masks,encode_policy
 from native_save import resolve_save,read_save,model_saved,cheat_saved,ability_saved,save_evidence,ensure_backup
 from research_profile import ABILITY_NAMES
@@ -112,6 +112,17 @@ class NativeDeliveryEngine:
         if enforced['changes']:
             logging.info('Vanilla rewards suppressed after check reconciliation: %s native changes',enforced['changes'])
             return  # All inventory/ability observations must now be refreshed.
+        # AP SuperBuild precedes the vanilla tutorial in non-linear seeds.
+        # Enable its original job-tree branch, then let tile scripts award/save
+        # each finished build exactly once. Never fabricate counters or gold.
+        superbuild=snapshot.get('story',{}).get('jobs',{}).get('SuperBuild_Saves',{})
+        if (context==46 and snapshot.get('abilities',{}).get('SuperBuild') and
+                superbuild.get('SuperBuildsActive') is False):
+            result=await asyncio.to_thread(enable_superbuild_jobs,session.pid,journal.binding_token,self.dll)
+            if result['changed']:
+                logging.info('Native Superbuild jobs enabled; original completion scripts resumed')
+                await self._save(session,'SuperBuild jobs')
+                return
         inventory={r['model_id']:r for r in snapshot['characters']}
         selection_supported=ownership_selection_supported(session.read,session.base)
         deliveries=journal.reconciliation_deliveries()
