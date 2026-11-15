@@ -23,3 +23,5 @@ Hook version ownership preflight,Implementiert aber nur synthetisch getestet,Rev
 Executable hashing cache,Implementiert aber nur synthetisch getestet,TTL and changed-file tests,Long-running live performance trace
 Safe versioned DLL rebuild,Implementiert aber nur synthetisch getestet,Verified existing DLL and non-overwrite selection,Rebuild while older bridge is pinned
 Full chronological playthrough,Fehlend,Generation model passes but traversal is incomplete,Complete fresh-save run without debug grants
+Four progressive class-tool families,Implementiert aber nur synthetisch getestet,Ordered receipt and legacy alias tests plus generation profiles,Live two-stage receipt and reload
+Nearby area return,Experimenteller Prototyp,Native foot and vehicle synthetic fixtures with identity and district guards,Live boundary physics and recovery

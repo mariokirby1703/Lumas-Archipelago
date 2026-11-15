@@ -30,6 +30,7 @@ from native_bridge_path import bridge_path
 from native_build_integrity import bridge_health
 from test_overrides import supported
 from test_catalogue import test_catalogue,normalize_search
+from capabilities import ITEM_ALIASES
 
 
 def connection_address(address: str, port: str | int) -> str:
@@ -379,6 +380,9 @@ class App:
         if name=='Ability: Detective Scan':
             lines[-1]='Persistenz: AP-Empfangsjournal; kein natives Save-Flag'
             lines.append('Nach Geben die Detektiv-Aura einmal verlassen und erneut betreten.')
+        if name=='Ability: Criminal Scan':
+            lines.append('Kriminellen-/Personenscan an Scanpunkten; benötigt Police Stufe 1.')
+            lines.append('Interner Spielname: Scanner. Kein Detektivscan und kein DataScanner.')
         if state.get('index') is not None:lines.append('Native ID: '+str(state['index']))
         if state.get('found') is not None:lines.append('Originalfund registriert: '+flag(state['found']))
         if state.get('saved_found') is not None:lines.append('Originalfund im Save: '+flag(state['saved_found']))
@@ -391,6 +395,7 @@ class App:
         stored={row['ui_id']:row for row in self.history_rows}
         for row in rows:
             row=dict(row,ui_id=self.history_session+':'+str(row['id']))
+            row['item']=ITEM_ALIASES.get(row.get('item'),row.get('item',''))
             stored[row['ui_id']]=row
         self.history_rows=list(stored.values())[-1000:]
         visible={row['ui_id'] for row in self.history_rows}
@@ -578,12 +583,15 @@ class App:
                 self.game_status.set(value)
             elif kind == 'area_gate':
                 labels={'waiting_for_save_backup':'warte auf Save-Zuordnung und Backup',
+                    'disembark_requested':'Ausstieg angefordert; warte auf freie Spielfigur',
+                    'locked_area_without_foot_checkpoint':'kein erlaubter Fußgänger-Checkpoint; erst dort zu Fuß stehen',
                     'checkpoint_recorded':'Rückkehrpunkt gespeichert','allowed':'Gebiet freigeschaltet',
                     'locked_area_without_checkpoint':'gesperrtes Gebiet, aber kein sicherer Rückkehrpunkt',
                     'checkpoint_unavailable':'Rückkehrpunkt nicht verifiziert; Diagnose prüfen',
                     'return_requested':'Rücksetzung angefordert; Positionsbeobachtung ausstehend',
                     'return_waiting_for_observation':'warte auf Positionsbeobachtung; keine erneute Teleportation',
                     'return_uncertain':'Rücksetzung unklar; automatische Wiederholung gestoppt',
+                    'return_rejected_safe':'Rücksetzung sicher abgelehnt; keine automatische Wiederholung',
                     'deferred_scene_or_context':'ruht während Szene oder Interaktion','deferred_player_busy':'Spieler beschäftigt'}
                 self.area_status.set('Gebietssperre (experimentell): '+labels.get(value,str(value)))
             elif kind == 'area_evidence':

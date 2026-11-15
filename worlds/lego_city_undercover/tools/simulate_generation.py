@@ -27,6 +27,10 @@ PROFILES=(
     ('multiworld',dict(early_criminal_scan=True,early_detective_scan=True)),
     ('area_rollback_test',dict(area_pass_items=True,experimental_area_restrictions=True,early_criminal_scan=True,early_detective_scan=True)),
     ('area_multiworld',dict(area_pass_items=True,experimental_area_restrictions=True)),
+    ('legacy_police',dict(progressive_police=False)),
+    ('legacy_robber_firefighter',dict(progressive_robber=False,progressive_firefighter=False)),
+    ('starting_progressive_police',dict(start_inventory={'Progressive Police':1})),
+    ('starting_grapple',dict(start_inventory={'Ability: GrappleGun':1})),
 )
 
 

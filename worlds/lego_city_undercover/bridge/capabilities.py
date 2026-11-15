@@ -9,15 +9,21 @@ try:
 except ImportError:
     from item_delivery import CLASS_MODELS,effect_plan
     from research_profile import ABILITY_NAMES
+try:
+    from .progressive_items import PROGRESSIVE_FAMILIES
+except ImportError:
+    from progressive_items import PROGRESSIVE_FAMILIES
 
 PROGRESSIVE_ASTRONAUT='Progressive Astronaut'
+ITEM_ALIASES={'Ability: Scanner':'Ability: Criminal Scan'}
+RETIRED_POOL_ITEMS=frozenset(('Ability: Surveillance','Ability: Carry Objects','Ability: Climbing'))
 UNSUPPORTED_ABILITIES=frozenset(('Carry Objects','Climbing','Crowbar','Fishing','Stethoscope'))
 NATIVE_TOOL_NAMES=frozenset(ABILITY_NAMES)
 CLASS_CATEGORIES={1:'Police',2:'Robber',3:'Miner',4:'Astronaut',5:'Farmer',6:'Firefighter',7:'Construction Worker'}
 
 
 def supported_effect(effect):
-    if effect.get('name')==PROGRESSIVE_ASTRONAUT:return True
+    if effect.get('name') in PROGRESSIVE_FAMILIES:return True
     plan=effect_plan(effect)
     if plan['kind']=='ability_unlock':return plan['ability'] in NATIVE_TOOL_NAMES
     return plan['kind'] in ('model_unlock','cheat_unlock','runtime_unlock','add_studs','add_bricks','noop','area_access')
@@ -34,10 +40,14 @@ def primary_class_for_model(native_name):
     return next((name for name,model in CLASS_MODELS.items() if model==native_name),None)
 
 
-def pool_candidates(items,allowed,experimental=False,progressive_astronaut=True):
+def pool_candidates(items,allowed,experimental=False,progressive_astronaut=True,progressive_options=None):
     """Keep old IDs/effects for receipts, but emit one native class entitlement."""
     result=[]
+    enabled={'Progressive Astronaut':progressive_astronaut,'Progressive Robber':True,'Progressive Firefighter':True,'Progressive Police':True}
+    if progressive_options is not None:enabled.update(progressive_options)
+    identities={effect_identity(stage) for family in PROGRESSIVE_FAMILIES if enabled[family] for stage in PROGRESSIVE_FAMILIES[family]}
     for name,row in items.items():
+        if name in RETIRED_POOL_ITEMS or name in ITEM_ALIASES:continue
         category=row['category']
         if not allowed.get('ability' if category=='progressive' else category,False):continue
         effect=dict(row,name=name)
@@ -48,9 +58,9 @@ def pool_candidates(items,allowed,experimental=False,progressive_astronaut=True)
         if category=='character' and allowed.get('ability') and row.get('native_name') in set(CLASS_MODELS.values()):
             continue
         if allowed.get('ability') and category=='character' and row.get('native_name')=='ROBBER_REXFURY':continue
-        if progressive_astronaut and allowed.get('ability'):
-            if name in ('Ability: Astronaut','Ability: Jetpack','Character: ASTRONAUT'):continue
-        elif name==PROGRESSIVE_ASTRONAUT:continue
+        if name in PROGRESSIVE_FAMILIES:
+            if not enabled[name]:continue
+        elif allowed.get('ability') and effect_identity(effect) in identities:continue
         result.append(name)
     return result
 
@@ -60,15 +70,23 @@ def has_capability(state,player,name):
     # world-region counters. Alias support keeps existing start inventories valid.
     if name in CLASS_MODELS:
         if state.has('Ability: '+name,player) or state.has('Character: '+CLASS_MODELS[name],player):return True
-        if name=='Astronaut':return state.has(PROGRESSIVE_ASTRONAUT,player)
+        family='Progressive '+name
+        if family in PROGRESSIVE_FAMILIES and state.has(family,player):return True
         if name=='Robber':return state.has('Ability: Rex Fury',player) or state.has('Character: ROBBER_REXFURY',player)
         return False
-    if name=='Jetpack':
-        legacy_class=state.has('Ability: Astronaut',player) or state.has('Character: ASTRONAUT',player)
-        return state.has('Ability: Jetpack',player) or state.has(PROGRESSIVE_ASTRONAUT,player,2) or (
-            legacy_class and state.has(PROGRESSIVE_ASTRONAUT,player))
-    if name=='Color Gun':return state.has('Ability: Color Gun',player) or state.has('Ability: EnergyGun',player)
-    if name=='Detective Scan':return state.has('Ability: Detective Scan',player)
+    tools={'Jetpack':('Astronaut','Progressive Astronaut'),'Color Gun':('Robber','Progressive Robber'),
+           'EnergyGun':('Robber','Progressive Robber'),'FireAxe':('Firefighter','Progressive Firefighter'),
+           'GrappleGun':('Police','Progressive Police')}
+    if name in tools:
+        base,family=tools[name]
+        exact_base=state.has('Ability: '+base,player) or state.has('Character: '+CLASS_MODELS[base],player)
+        legacy=state.has('Ability: '+name,player)
+        if name in ('Color Gun','EnergyGun'):legacy=state.has('Ability: Color Gun',player) or state.has('Ability: EnergyGun',player)
+        return has_capability(state,player,base) and (legacy or state.has(family,player,2) or (exact_base and state.has(family,player)))
+    if name in ('Scanner','Criminal Scan'):
+        return has_capability(state,player,'Police') and (state.has('Ability: Criminal Scan',player) or state.has('Ability: Scanner',player))
+    if name in ('Detective Scan','Wiretap','Surveillance'):
+        return has_capability(state,player,'Police') and state.has('Ability: '+name,player)
     if name=='Rex Fury':return state.has('Ability: Rex Fury',player) or state.has('Character: ROBBER_REXFURY',player)
     return state.has('Ability: '+name,player)
 

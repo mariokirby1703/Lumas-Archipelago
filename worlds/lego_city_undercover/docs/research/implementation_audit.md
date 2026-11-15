@@ -1,5 +1,7 @@
 # Implementation audit — 2026-11-14
 
+The [15 November development report](next_major_pass_2026_11_15.md) supersedes the feature status below where changed, including progressive families and the experimental boundary return.
+
 This document supersedes older completion/logic statements in chronological_test_status.md and the historical native_item_delivery_status.md. This is still an experimental integration, not a complete or proven softlock-free randomizer.
 
 Baseline: branch Lego-City-Undercover-AP, dcd83c4531a741622e62c9273dddf6f739ca0e1d. Baseline tests: 273, 265 passed, eight environment skips. Existing station-gold research was retained. No live game/save mutation, seed rewrite, commit or push was performed for this task.

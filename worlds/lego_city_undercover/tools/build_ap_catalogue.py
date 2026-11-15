@@ -156,9 +156,11 @@ def main():
         items[f'{prefix}: {name}']=dict(category=row['kind'],classification='progression' if name in primary else 'useful' if row['kind']=='character' else 'filler',native_name=name)
     for tool in ('Police','Robber','Miner','Astronaut','Farmer','Firefighter','Construction Worker',
                  'Rex Fury','Stethoscope','Crowbar','GrappleGun','EnergyGun','Scanner','Surveillance',
-                 'Wiretap','Jetpack','FireAxe','SuperBuild','Parkour','Fishing','Carry Objects','Climbing','Detective Scan'):
+                 'Wiretap','Jetpack','FireAxe','SuperBuild','Parkour','Fishing','Carry Objects','Climbing','Detective Scan','Criminal Scan'):
         items[f'Ability: {tool}']=dict(category='ability',classification='progression')
     items['Progressive Astronaut']=dict(category='progressive',classification='progression')
+    for family in ('Progressive Robber','Progressive Firefighter','Progressive Police'):
+        items[family]=dict(category='progressive',classification='progression')
     cheat_names={r['native_name'] for r in json.loads((WORLD/'bridge/cheat_manifest.json').read_text())}
     for name in sorted(cheat_names):
         if name.startswith('CHEAT_SCOREX'):continue

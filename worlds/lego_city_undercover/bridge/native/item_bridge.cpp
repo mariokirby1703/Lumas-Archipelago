@@ -91,7 +91,7 @@ static DWORD Execute(Command* c) {
         if(c->opcode==18)return TestRemove(base,actor,c);
         if(c->opcode==19)return ShowItemPopup(base,c);
         if(c->opcode==20)return DetectiveGateCommand(base,actor,c);
-        if(c->opcode==21 || c->opcode==22)return AreaReturnCommand(base,actor,context,c);
+        if(c->opcode==21 || c->opcode==22 || c->opcode==23)return AreaReturnCommand(base,actor,context,c);
         if(c->opcode==13)return OpenLobbyLift(base,actor,c);
         if(c->opcode==12)return TriggerStationExit(base,actor,c);
         if(c->opcode==8 || c->opcode==9)return EnforceRewards(base,actor,c,c->opcode==9);

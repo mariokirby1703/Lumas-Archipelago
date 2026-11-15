@@ -1,6 +1,10 @@
 """All classified native outfits/vehicles, including non-progression test models."""
 def test_catalogue(catalogue,roster):
-    effects={name:dict(row,name=name) for name,row in catalogue['items'].items()}
+    try:
+        from .capabilities import RETIRED_POOL_ITEMS,ITEM_ALIASES
+    except ImportError:
+        from capabilities import RETIRED_POOL_ITEMS,ITEM_ALIASES
+    effects={name:dict(row,name=name) for name,row in catalogue['items'].items() if name not in RETIRED_POOL_ITEMS and name not in ITEM_ALIASES}
     for native,row in roster['entries'].items():
         if row['kind'] not in ('character','vehicle'):continue
         prefix='Character' if row['kind']=='character' else 'Vehicle'
@@ -10,7 +14,10 @@ def test_catalogue(catalogue,roster):
 
 
 def normalize_search(text):
-    return text.casefold().replace('_',' ').replace(':',' ').replace('-',' ')
+    text=text.casefold().replace('_',' ').replace(':',' ').replace('-',' ')
+    if text.strip() in ('scanner','ability  scanner','kriminellenscan','personenscan'):
+        return 'criminal scan'
+    return text
 
 
 def item_states(effects,snapshot,models,data=None,runtime=None):

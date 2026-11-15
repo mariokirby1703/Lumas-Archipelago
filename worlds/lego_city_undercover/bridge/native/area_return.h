@@ -3,10 +3,13 @@
 struct AreaPose { alignas(16) float matrix[16]; };
 struct AreaCheckpoint {
     std::uintptr_t profile=0,world=0,actor=0,ride=0,ride_control=0;
+    unsigned ride_kind=0;
     std::uint32_t binding[4]{},district=0;
     AreaPose pose{};bool valid=false;
 };
 static AreaCheckpoint area_checkpoint;
+static AreaCheckpoint area_foot_checkpoint;
+static bool area_disembark_pending=false;
 static std::uintptr_t AreaPointer(std::uintptr_t p) { return *reinterpret_cast<std::uintptr_t*>(p); }
 static bool AreaCityActor(std::uintptr_t base,std::uintptr_t actor) {
     auto registry=AreaPointer(base+0x1c402d8);auto index=*reinterpret_cast<unsigned short*>(actor+0x28);
@@ -57,27 +60,56 @@ static std::uint32_t AreaDistrict(std::uintptr_t base,const float* pos) {
     if(Hash(prefix)==Hash("NY_Monaco_Tunnel"))return Hash("NY_Tunnel");
     return 0;
 }
-static bool AreaCurrentPose(std::uintptr_t base,std::uintptr_t actor,int context,AreaPose& pose,std::uintptr_t& ride,std::uintptr_t& control,DWORD& failure) {
+static std::uintptr_t AreaRidden(std::uintptr_t base,std::uintptr_t actor) {
+    // Character_GetRidden (112ba0): brain+88 virtual 240 -> base interface target.
+    // Only the reviewed MechCharacterBaseInterface getter 1f8830 is accepted.
+    auto component=AreaPointer(actor+0x340);if(!component)return 0;
+    auto controller=AreaPointer(component+0x88);if(!controller)return 0;
+    auto getter=AreaPointer(AreaPointer(controller)+0x240);
+    const unsigned char prefix[]={0x48,0x8b,0x41,0x20,0xc3};
+    if(getter!=base+0x1f8830 || std::memcmp(reinterpret_cast<void*>(getter),prefix,sizeof(prefix)))return 0;
+    return AreaPointer(controller+0x20);
+}
+static bool AreaCurrentPose(std::uintptr_t base,std::uintptr_t actor,int context,AreaPose& pose,std::uintptr_t& ride,std::uintptr_t& control,DWORD& failure,unsigned& kind) {
     failure=3;
-    ride=0;control=0;
+    ride=0;control=0;kind=0;
+    auto weak_vehicle=AreaPointer(actor+0x428),vehicle_counter=AreaPointer(actor+0x430);
+    if(!weak_vehicle || (vehicle_counter && *reinterpret_cast<int*>(vehicle_counter+4)<=0)) {
+        auto creature=AreaRidden(base,actor);
+        if(creature && creature!=actor && (context==46 || context==152 || context==124 || context==157)) {
+            if(!AreaCityActor(base,creature) || AreaPointer(AreaPointer(creature+0x10)+0xf0)!=base+0x49ecf0) {failure=5;return false;}
+            ride=creature;kind=2;
+            std::memcpy(pose.matrix,reinterpret_cast<void*>(creature+0x1c0),64);
+            if(!AreaFinite(pose)) {failure=5;return false;}return true;
+        }
+    }
     if(context==46) {
         auto weak=AreaPointer(actor+0x428),counter=AreaPointer(actor+0x430);
         if(weak && (!counter || *reinterpret_cast<int*>(counter+4)>0))return false; // never detach a mounted character
         if(AreaPointer(AreaPointer(actor+0x10)+0xf0)!=base+0x49ecf0) {failure=5;return false;}
         // Translation is actor+0x1f0; retain orientation from the accessor matrix.
         std::memcpy(pose.matrix,reinterpret_cast<void*>(actor+0x1c0),64);
-    } else if(context==157) {
+    } else if(context==157 || context==11) {
         auto weak=AreaPointer(actor+0x428);control=AreaPointer(actor+0x430);
         if(!weak || !control || *reinterpret_cast<int*>(control+4)<=0)return false;
         ride=AreaPointer(weak);if(!ride)return false;
+        kind=1;
         auto getter=AreaPointer(AreaPointer(ride)+0xf0);
-        if(getter!=base+0x506fe0) {failure=5;return false;} // reviewed base-vehicle transform getter
-        std::memcpy(pose.matrix,reinterpret_cast<void*>(ride+0x50),64);
+        if(getter==base+0x506fe0) {
+            std::memcpy(pose.matrix,reinterpret_cast<void*>(ride+0x50),64);
+        } else if(getter==base+0x4a9370) {
+            // Reviewed getter: vehicle+348 owns physics transform at +60.
+            const unsigned char prefix[]={0x4c,0x8b,0x81,0x48,0x03,0,0};
+            if(std::memcmp(reinterpret_cast<void*>(getter),prefix,sizeof(prefix))) {failure=1;return false;}
+            auto physics=AreaPointer(ride+0x348);
+            if(!physics) {failure=3;return false;}
+            std::memcpy(pose.matrix,reinterpret_cast<void*>(physics+0x60),64);
+        } else {failure=5;return false;}
     } else return false;
     if(!AreaFinite(pose)) {failure=5;return false;}return true;
 }
 static DWORD AreaReturnCommand(std::uintptr_t base,std::uintptr_t actor,int context,Command* c) {
-    if(c->name_hash!=Hash(c->opcode==21 ? "AREA_CHECKPOINT" : "AREA_RETURN"))return 6;
+    if(c->name_hash!=Hash(c->opcode==21 ? "AREA_CHECKPOINT" : c->opcode==23 ? "AREA_DISEMBARK" : "AREA_RETURN"))return 6;
     if(!(c->binding[0]|c->binding[1]|c->binding[2]|c->binding[3]))return 6;
     if(!AreaCityActor(base,actor))return 20;
     auto profile=AreaPointer(base+0x1c7f160),world=AreaPointer(base+0x1c6a768),bank=AreaPointer(base+0x1c7cbb8);
@@ -89,28 +121,57 @@ static DWORD AreaReturnCommand(std::uintptr_t base,std::uintptr_t actor,int cont
     // Do not manufacture that persisted marker just to capture a position.
     if(!empty && (marker[0]!='A' || marker[1]!='P' || std::memcmp(marker+2,c->binding,16)))return 13;
     AreaPose current{};std::uintptr_t ride=0,control=0;
-    DWORD pose_failure=3;
-    if(!AreaCurrentPose(base,actor,context,current,ride,control,pose_failure))return pose_failure;
+    DWORD pose_failure=3;unsigned ride_kind=0;
+    if(!AreaCurrentPose(base,actor,context,current,ride,control,pose_failure,ride_kind))return pose_failure;
     auto district=AreaDistrict(base,current.matrix+12);
     if(!district || district!=c->model)return 20;
+    if(c->opcode==23) {
+        if(ride_kind==2)return 3; // creatures keep their rider relationship
+        const auto& saved=area_foot_checkpoint;
+        if(!saved.valid || saved.profile!=profile || saved.world!=world || saved.actor!=actor ||
+           std::memcmp(saved.binding,c->binding,16))return 21;
+        if(AreaDistrict(base,saved.pose.matrix+12)!=saved.district || saved.district==district)return 20;
+        float distance=0;for(unsigned i=12;i<15;++i) {float d=current.matrix[i]-saved.pose.matrix[i];distance+=d*d;}
+        if(distance>90.f*90.f)return 22;
+        const unsigned char teleport[]={0x45,0x33,0xc0,0xe9,0x08,0x02,0,0};
+        const unsigned char clear[]={0x48,0x83,0xec,0x58};
+        if(std::memcmp(reinterpret_cast<void*>(base+0x6709f0),teleport,sizeof(teleport)) ||
+           std::memcmp(reinterpret_cast<void*>(base+0x1105d0),clear,sizeof(clear)))return 1;
+        if(ride) {
+            if(!area_disembark_pending) {
+                if(!AreaPointer(actor+0x340))return 3;
+                // Exact Character_ClearVehicle script body; uses only the character argument.
+                using Clear=unsigned(__fastcall*)(void*,std::uintptr_t,void*);
+                reinterpret_cast<Clear>(base+0x1105d0)(nullptr,actor+0x10,nullptr);
+                area_disembark_pending=true;
+            }
+            c->owned=1;c->found=0;return 0; // wait for a fresh unmounted observation
+        }
+        if(context!=46)return 3;
+        using Teleport=unsigned(__fastcall*)(std::uintptr_t,const float*);
+        if(reinterpret_cast<Teleport>(base+0x6709f0)(actor,saved.pose.matrix+12))return 3;
+        area_disembark_pending=false;c->owned=1;c->found=1;return 0;
+    }
     if(c->opcode==21) {
         HMODULE module=nullptr;
         if(!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_PIN,
             reinterpret_cast<LPCWSTR>(&AreaReturnCommand),&module))return 5;
         area_checkpoint={};area_checkpoint.profile=profile;area_checkpoint.world=world;area_checkpoint.actor=actor;
         area_checkpoint.ride=ride;area_checkpoint.ride_control=control;area_checkpoint.district=district;
+        area_checkpoint.ride_kind=ride_kind;
         area_checkpoint.pose=current;std::memcpy(area_checkpoint.binding,c->binding,16);area_checkpoint.valid=true;
+        if(!ride && context==46) {area_foot_checkpoint=area_checkpoint;area_disembark_pending=false;}
         c->found=district;c->owned=1;return 0;
     }
     const auto& saved=area_checkpoint;
     if(!saved.valid || saved.profile!=profile || saved.world!=world || saved.actor!=actor || saved.ride!=ride ||
-       saved.ride_control!=control || std::memcmp(saved.binding,c->binding,16))return 21;
+       saved.ride_control!=control || saved.ride_kind!=ride_kind || std::memcmp(saved.binding,c->binding,16))return 21;
     if(AreaDistrict(base,saved.pose.matrix+12)!=saved.district)return 20;
     float distance=0;
     for(unsigned i=12;i<15;++i) {float delta=current.matrix[i]-saved.pose.matrix[i];distance+=delta*delta;}
     // A nearby boundary rollback is reviewed here, not cross-map fast travel.
     if(distance>90.f*90.f || saved.district==district)return 22;
-    if(ride) {
+    if(ride && ride_kind==1) {
         const unsigned char prefix[]={0x48,0x89,0x5c,0x24,8,0x48,0x89,0x74,0x24,0x10,0x57,0x48,0x83,0xec,0x20};
         if(std::memcmp(reinterpret_cast<void*>(base+0x4abe70),prefix,sizeof(prefix)))return 1;
         using Fn=void(__fastcall*)(std::uintptr_t,const AreaPose*);
@@ -120,7 +181,7 @@ static DWORD AreaReturnCommand(std::uintptr_t base,std::uintptr_t actor,int cont
         // Encoding is taken from the supported EXE; unknown code is refused.
         if(std::memcmp(reinterpret_cast<void*>(base+0x6709f0),prefix,sizeof(prefix)))return 1;
         using Fn=unsigned(__fastcall*)(std::uintptr_t,const float*);
-        if(reinterpret_cast<Fn>(base+0x6709f0)(actor,saved.pose.matrix+12))return 3;
+        if(reinterpret_cast<Fn>(base+0x6709f0)(ride_kind==2 ? ride : actor,saved.pose.matrix+12))return 3;
     }
     c->found=saved.district;c->owned=1;return 0;
 }

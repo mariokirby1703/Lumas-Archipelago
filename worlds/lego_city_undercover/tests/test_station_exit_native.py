@@ -161,11 +161,15 @@ class NativeStationExitTests(unittest.TestCase):
         if vehicle:
             ride=world+0x8000;weak=ride+0x2000;control=ride+0x2100;vtable=ride+0x2200
             for address,value in [(self.actor+0x428,weak),(self.actor+0x430,control),(weak,ride),(ride,vtable),
-                                  (vtable+0xf0,self.base+0x506fe0)]:ctypes.c_uint64.from_address(address).value=value
-            ctypes.c_int.from_address(control+4).value=1;position=ride+0x50;self.context=157
+                                  (vtable+0xf0,self.base+(0x4a9370 if vehicle=='physics' else 0x506fe0))]:ctypes.c_uint64.from_address(address).value=value
+            transform_offset=0x60 if vehicle=='physics' else 0x50
+            if vehicle=='physics':
+                ctypes.c_uint64.from_address(ride+0x348).value=ride
+                ctypes.memmove(self.base+0x4a9370,bytes.fromhex('4c8b8148030000'),7)
+            ctypes.c_int.from_address(control+4).value=1;position=ride+transform_offset;self.context=157
             body=bytearray(bytes.fromhex('48895c24084889742410574883ec20'))
             for offset in (0,16,32,48):
-                body.extend(bytes.fromhex('f30f6f42')+bytes([offset])+bytes.fromhex('f30f7f81')+struct.pack('<I',0x50+offset))
+                body.extend(bytes.fromhex('f30f6f42')+bytes([offset])+bytes.fromhex('f30f7f81')+struct.pack('<I',transform_offset+offset))
             body.extend(bytes.fromhex('4883c4205fc3'));ctypes.memmove(self.base+0x4abe70,bytes(body),len(body))
         else:
             ctypes.memmove(self.base+0x6709f0,bytes.fromhex('4533c0e908020000'),8)
@@ -174,7 +178,7 @@ class NativeStationExitTests(unittest.TestCase):
         self.area_pos=position+48
         self.auburn=symbol_hash('SF_Docks');self.cherry=symbol_hash('SF_Residential')
     def test_area_return_foot_and_same_vehicle_use_native_teleport_paths(self):
-        for vehicle in (False,True):
+        for vehicle in (False,True,'physics'):
             self.area_fixture(vehicle)
             self.assertEqual(self.area_return(self.base,self.actor,21,self.context,self.auburn),0)
             ctypes.c_float.from_address(self.area_pos).value=35
@@ -182,6 +186,60 @@ class NativeStationExitTests(unittest.TestCase):
             self.assertEqual(ctypes.c_float.from_address(self.area_pos).value,5)
             ctypes.c_uint64.from_address(self.actor+0x428).value=0
             ctypes.c_uint64.from_address(self.actor+0x430).value=0
+    def test_passenger_return_requires_actual_vehicle_and_uses_same_native_path(self):
+        self.area_fixture(False)
+        self.assertEqual(self.area_return(self.base,self.actor,21,11,self.auburn),3)
+        self.area_fixture('physics')
+        self.assertEqual(self.area_return(self.base,self.actor,21,11,self.auburn),0)
+        ctypes.c_float.from_address(self.area_pos).value=35
+        self.assertEqual(self.area_return(self.base,self.actor,22,11,self.cherry),0)
+        self.assertEqual(ctypes.c_float.from_address(self.area_pos).value,5)
+        ctypes.c_uint64.from_address(self.actor+0x428).value=0
+        ctypes.c_uint64.from_address(self.actor+0x430).value=0
+
+    def test_passenger_disembarks_then_returns_to_separate_foot_checkpoint(self):
+        self.area_fixture('physics')
+        pair=ctypes.string_at(self.actor+0x428,16)
+        ctypes.memset(self.actor+0x428,0,16)
+        ctypes.memmove(self.actor+0x1c0,struct.pack('<16f',1,0,0,0,0,1,0,0,0,0,1,0,5,1,5,1),64)
+        ctypes.memmove(self.base+0x6709f0,bytes.fromhex('4533c0e908020000'),8)
+        code=bytes.fromhex('f30f6f02f30f7f81f001000033c0c3')
+        ctypes.memmove(self.base+0x670c00,code,len(code))
+        self.assertEqual(self.area_return(self.base,self.actor,21,46,self.auburn),0)
+        ctypes.memmove(self.actor+0x428,pair,16)
+        self.assertEqual(self.area_return(self.base,self.actor,21,157,self.auburn),0)
+        ctypes.c_float.from_address(self.area_pos).value=35
+        ctypes.c_uint64.from_address(self.actor+0x340).value=self.actor+0x6000
+        clear=bytes.fromhex('4883ec584883c458b801000000c3')
+        ctypes.memmove(self.base+0x1105d0,clear,len(clear))
+        self.assertEqual(self.area_return(self.base,self.actor,23,11,self.cherry),0)
+        self.assertEqual(self.area_return(self.base,self.actor,23,11,self.cherry),0)
+        ctypes.memset(self.actor+0x428,0,16)
+        ctypes.c_float.from_address(self.actor+0x1f0).value=35
+        self.assertEqual(self.area_return(self.base,self.actor,23,46,self.cherry),0)
+        self.assertEqual(ctypes.c_float.from_address(self.actor+0x1f0).value,5)
+        self.assertEqual(ctypes.c_float.from_address(self.area_pos).value,35,'vehicle must stay behind')
+
+    def test_creature_return_preserves_rider_and_moves_actual_ridden_actor(self):
+        self.area_fixture(False)
+        creature=self.actor+0x90000;component=self.actor+0xa0000
+        controller=self.actor+0xa1000;vtable=self.actor+0xa2000
+        ctypes.memmove(creature,ctypes.string_at(self.actor,0x220),0x220)
+        for address,value in [(self.actor+0x340,component),(component+0x88,controller),
+                              (controller,vtable),(vtable+0x240,self.base+0x1f8830),(controller+0x20,creature)]:
+            ctypes.c_uint64.from_address(address).value=value
+        ctypes.memmove(self.base+0x1f8830,bytes.fromhex('488b4120c3'),5)
+        for context in (46,124,152,157):
+            with self.subTest(context=context):
+                ctypes.c_float.from_address(creature+0x1f0).value=5
+                self.assertEqual(self.area_return(self.base,self.actor,21,context,self.auburn),0)
+                ctypes.c_float.from_address(creature+0x1f0).value=35
+                self.assertEqual(self.area_return(self.base,self.actor,22,context,self.cherry),0)
+                self.assertEqual(ctypes.c_float.from_address(creature+0x1f0).value,5)
+                self.assertEqual(ctypes.c_uint64.from_address(controller+0x20).value,creature)
+        ctypes.c_uint64.from_address(controller+0x20).value=0
+        self.assertNotEqual(self.area_return(self.base,self.actor,22,152,self.cherry),0)
+
     def test_area_return_rejects_no_checkpoint_wrong_area_seed_and_vehicle(self):
         self.area_fixture(True)
         self.assertEqual(self.area_return(self.base,self.actor,22,157,self.auburn),21)

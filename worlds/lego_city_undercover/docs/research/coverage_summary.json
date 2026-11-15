@@ -1,6 +1,6 @@
 {
   "locations": 8753,
-  "items": 558,
+  "items": 562,
   "categories": {
     "shield_quarters": 68,
     "story_missions": 20,
@@ -31,7 +31,7 @@
     "static_activity_reward": 7,
     "native_story_flag": 3
   },
-  "supported_items": 536,
+  "supported_items": 540,
   "source_requirements": 685,
   "presets": 213,
   "transition_scripts": 11

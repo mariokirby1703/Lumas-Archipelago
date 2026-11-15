@@ -1,0 +1,492 @@
+{
+  "version": 1,
+  "exe_sha256": "624fed07274bbd105d1d571ecb97a290df6f6f0aff76898c516890da6d136f76",
+  "vtables": [
+    {
+      "vtable_rva": "0xcde7a8",
+      "rtti": ".?AVDummyPlaceable@@",
+      "getter_rva": "0x506fe0",
+      "setter_rva": "0x4b5d10",
+      "getter_prefix": "488b4150488902",
+      "actual_vehicle": false,
+      "transform": "placeable+50"
+    },
+    {
+      "vtable_rva": "0xce9168",
+      "rtti": ".?AVPlaceableStub@@",
+      "getter_rva": "0x506fe0",
+      "setter_rva": "0x4b5d10",
+      "getter_prefix": "488b4150488902",
+      "actual_vehicle": false,
+      "transform": "placeable+50"
+    },
+    {
+      "vtable_rva": "0xcdd188",
+      "rtti": ".?AVApiVehicle@@",
+      "getter_rva": "0x4a9370",
+      "setter_rva": "0x4abb60",
+      "getter_prefix": "4c8b8148030000",
+      "actual_vehicle": true,
+      "transform": "vehicle+348 -> physics+60"
+    },
+    {
+      "vtable_rva": "0xcdd638",
+      "rtti": ".?AVApiVehicleHover@@",
+      "getter_rva": "0x4a9370",
+      "setter_rva": "0x4abb60",
+      "getter_prefix": "4c8b8148030000",
+      "actual_vehicle": true,
+      "transform": "vehicle+348 -> physics+60"
+    },
+    {
+      "vtable_rva": "0xce3368",
+      "rtti": ".?AVApiVehicleCar@@",
+      "getter_rva": "0x4a9370",
+      "setter_rva": "0x4abb60",
+      "getter_prefix": "4c8b8148030000",
+      "actual_vehicle": true,
+      "transform": "vehicle+348 -> physics+60"
+    },
+    {
+      "vtable_rva": "0xce51d8",
+      "rtti": ".?AVApiVehicleBike@@",
+      "getter_rva": "0x4a9370",
+      "setter_rva": "0x4abb60",
+      "getter_prefix": "4c8b8148030000",
+      "actual_vehicle": true,
+      "transform": "vehicle+348 -> physics+60"
+    },
+    {
+      "vtable_rva": "0xce55b8",
+      "rtti": ".?AVApiVehicleStatic@@",
+      "getter_rva": "0x4a9370",
+      "setter_rva": "0x4abb60",
+      "getter_prefix": "4c8b8148030000",
+      "actual_vehicle": true,
+      "transform": "vehicle+348 -> physics+60"
+    },
+    {
+      "vtable_rva": "0xce5a08",
+      "rtti": ".?AVApiVehicleBoat@@",
+      "getter_rva": "0x4a9370",
+      "setter_rva": "0x4abb60",
+      "getter_prefix": "4c8b8148030000",
+      "actual_vehicle": true,
+      "transform": "vehicle+348 -> physics+60"
+    },
+    {
+      "vtable_rva": "0xce5e38",
+      "rtti": ".?AVApiVehicleAircraft@@",
+      "getter_rva": "0x4a9370",
+      "setter_rva": "0x4abb60",
+      "getter_prefix": "4c8b8148030000",
+      "actual_vehicle": true,
+      "transform": "vehicle+348 -> physics+60"
+    }
+  ],
+  "rail_scripts": [
+    {
+      "source": "GAME4/jobs/scripts/city_setup/general/sf_trams/sf_trams.sf",
+      "sha256": "310ff8628f747464581496957f282808a12fc27137b1509597f5a8c1064a6136",
+      "evidence": [
+        {
+          "line": 94,
+          "text": "bAttached = vTram.AttachToSpline_YFree(tTramSpline);"
+        },
+        {
+          "line": 160,
+          "text": "if(vTram.GetDriver() == cPlayer OR vTram.GetOccupant(#Passenger1) == cPlayer)"
+        },
+        {
+          "line": 186,
+          "text": "if(vTram.GetDriver() != cPlayer AND vTram.GetOccupant(#Passenger1) != cPlayer)"
+        },
+        {
+          "line": 233,
+          "text": "if(vTram.GetDriver() == cPlayer OR vTram.GetOccupant(#Passenger1) == cPlayer)"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/general/train_setup/teleportplayer.sf",
+      "sha256": "daa06e905f29607aaeddbb62c022240f8b2d591b3dd263ebe4bb371f58f4c636",
+      "evidence": [
+        {
+          "line": 110,
+          "text": "v1.DisableManualAIControl(true);"
+        },
+        {
+          "line": 132,
+          "text": "v1.Teleport( lTeleportTo, nDirection );"
+        },
+        {
+          "line": 138,
+          "text": "v1.Teleport( lTeleportTo, nDirection );"
+        },
+        {
+          "line": 148,
+          "text": "cTarget.Teleport( lTeleportTo, nDirection );"
+        },
+        {
+          "line": 164,
+          "text": "cTarget.Teleport( lTeleportTo, nDirection );"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/general/train_setup/trackpump.sf",
+      "sha256": "5219af77b1c09932a572a880b5f79ccbcdd2c03a9240b70d143a5af8666bbaeb",
+      "evidence": [
+        {
+          "line": 134,
+          "text": "if ( vPump )\t{\tvPump.AttachToSpline_YFree(tSpline);\t};"
+        },
+        {
+          "line": 190,
+          "text": "Function fnStartTeleport(Character cRiding)"
+        },
+        {
+          "line": 245,
+          "text": "vPump.DisableManualAIControl(true);"
+        },
+        {
+          "line": 256,
+          "text": "vPump.AttachToSpline_YFree(\"\");"
+        },
+        {
+          "line": 262,
+          "text": "vPump.Teleport( lTeleportTo, nDirection );"
+        },
+        {
+          "line": 268,
+          "text": "cActive.Teleport( lTeleportTo, nDirection );"
+        },
+        {
+          "line": 277,
+          "text": "vPump.Teleport( lTeleportTo, nDirection );"
+        },
+        {
+          "line": 279,
+          "text": "vPump.AttachToSpline_YFree(tSpline);"
+        },
+        {
+          "line": 284,
+          "text": "cActive.Teleport( lTeleportTo, nDirection );"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/general/train_setup/train_control.sf",
+      "sha256": "b79dae06dcd622d46138c6ce27b5021f468359ebecdf803e4a1ed78bcdf097e4",
+      "evidence": [
+        {
+          "line": 408,
+          "text": "vTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 409,
+          "text": "vTrain.DisableManualAIControl(true);"
+        },
+        {
+          "line": 410,
+          "text": "if ( !vTrain.GetDriver() )\t{\tvTrain.CreateKrawlieDriver(\"TrainDriver\", \"TrainWorkers\");\t};"
+        },
+        {
+          "line": 425,
+          "text": "vCarriage.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 426,
+          "text": "vCarriage.DisableManualAIControl(true);"
+        },
+        {
+          "line": 427,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger1) )\t{\tvCarriage.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 428,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger2) )\t{\tvCarriage.AddKrawliePassenger(#Passenger2);\t};"
+        },
+        {
+          "line": 429,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger4) )\t{\tvCarriage.AddKrawliePassenger(#Passenger3);\t};"
+        },
+        {
+          "line": 437,
+          "text": "vRearTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 438,
+          "text": "vRearTrain.DisableManualAIControl(true);"
+        },
+        {
+          "line": 439,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger1) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 440,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger4) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger4);\t};"
+        },
+        {
+          "line": 532,
+          "text": "if ( vTrain )\t\t{\tvTrain.AttachToSpline_YFree(\"\");\t\tvTrain.DisableManualAIControl(true);\t};"
+        },
+        {
+          "line": 533,
+          "text": "if ( vCarriage )\t{\tvCarriage.AttachToSpline_YFree(\"\");\t\tvCarriage.DisableManualAIControl(true);\t\t};"
+        },
+        {
+          "line": 534,
+          "text": "if ( vRearTrain )\t{\tvRearTrain.AttachToSpline_YFree(\"\");\tvRearTrain.DisableManualAIControl(true);\t};"
+        },
+        {
+          "line": 574,
+          "text": "vTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 575,
+          "text": "vTrain.DisableManualAIControl(true);"
+        },
+        {
+          "line": 577,
+          "text": "if ( !vTrain.GetDriver() )\t{\tvTrain.CreateKrawlieDriver(\"TrainDriver\", \"TrainWorkers\");\t};"
+        },
+        {
+          "line": 590,
+          "text": "vCarriage.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 591,
+          "text": "vCarriage.DisableManualAIControl(true);"
+        },
+        {
+          "line": 593,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger1) )\t{\tvCarriage.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 594,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger2) )\t{\tvCarriage.AddKrawliePassenger(#Passenger2);\t};"
+        },
+        {
+          "line": 595,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger4) )\t{\tvCarriage.AddKrawliePassenger(#Passenger3);\t};"
+        },
+        {
+          "line": 602,
+          "text": "vRearTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 603,
+          "text": "vRearTrain.DisableManualAIControl(true);"
+        },
+        {
+          "line": 605,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger1) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 606,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger4) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger4);\t};"
+        },
+        {
+          "line": 816,
+          "text": "if ( cPlayer1 == vTrain.GetDriver() )"
+        },
+        {
+          "line": 821,
+          "text": "elseif ( cPlayer2 == vTrain.GetDriver() )"
+        },
+        {
+          "line": 841,
+          "text": "if ( cPlayer1 == vTrain.GetDriver() )"
+        },
+        {
+          "line": 934,
+          "text": "if ( cPlayer1 == vTrain.GetDriver() )"
+        },
+        {
+          "line": 968,
+          "text": "if ( cPlayer2 == vTrain.GetDriver() )"
+        },
+        {
+          "line": 1008,
+          "text": "cPlayer1.Teleport(lPlayerTeleportTo);"
+        },
+        {
+          "line": 1013,
+          "text": "cPlayer2.Teleport(lPlayerTeleportTo);"
+        },
+        {
+          "line": 1021,
+          "text": "cPlayer1.Teleport(lPlayerTeleportTo);"
+        },
+        {
+          "line": 1027,
+          "text": "cPlayer2.Teleport(lPlayerTeleportTo);"
+        },
+        {
+          "line": 1034,
+          "text": "vTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1047,
+          "text": "vCarriage.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1048,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger1) )\t{\tvCarriage.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 1049,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger2) )\t{\tvCarriage.AddKrawliePassenger(#Passenger2);\t};"
+        },
+        {
+          "line": 1050,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger4) )\t{\tvCarriage.AddKrawliePassenger(#Passenger3);\t};"
+        },
+        {
+          "line": 1055,
+          "text": "vRearTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1056,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger1) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 1057,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger4) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger4);\t};"
+        },
+        {
+          "line": 1699,
+          "text": "vTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1700,
+          "text": "if ( !vTrain.GetDriver() )\t{\tvTrain.CreateKrawlieDriver(\"TrainDriver\", \"TrainWorkers\");\t};"
+        },
+        {
+          "line": 1712,
+          "text": "vCarriage.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1713,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger1) )\t{\tvCarriage.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 1714,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger2) )\t{\tvCarriage.AddKrawliePassenger(#Passenger2);\t};"
+        },
+        {
+          "line": 1715,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger4) )\t{\tvCarriage.AddKrawliePassenger(#Passenger3);\t};"
+        },
+        {
+          "line": 1720,
+          "text": "vRearTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1721,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger1) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 1722,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger4) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger4);\t};"
+        },
+        {
+          "line": 1805,
+          "text": "vTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1806,
+          "text": "if ( !vTrain.GetDriver() )\t{\tvTrain.CreateKrawlieDriver(\"TrainDriver\", \"TrainWorkers\");\t};"
+        },
+        {
+          "line": 1818,
+          "text": "vCarriage.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1824,
+          "text": "vRearTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1911,
+          "text": "vTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1912,
+          "text": "// if ( !vTrain.GetDriver() )\t{\tvTrain.CreateKrawlieDriver(\"TrainDriver\", \"TrainWorkers\");\t};"
+        },
+        {
+          "line": 1924,
+          "text": "vCarriage.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 1930,
+          "text": "vRearTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 2096,
+          "text": "vTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 2097,
+          "text": "if ( !vTrain.GetDriver() )\t{\tvTrain.CreateKrawlieDriver(\"TrainDriver\", \"TrainWorkers\");\t};"
+        },
+        {
+          "line": 2112,
+          "text": "vCarriage.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 2113,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger1) )\t{\tvCarriage.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 2114,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger2) )\t{\tvCarriage.AddKrawliePassenger(#Passenger2);\t};"
+        },
+        {
+          "line": 2115,
+          "text": "if ( !vCarriage.GetOccupant(#Passenger4) )\t{\tvCarriage.AddKrawliePassenger(#Passenger3);\t};"
+        },
+        {
+          "line": 2124,
+          "text": "vRearTrain.AttachToSpline_YFree(tLine);"
+        },
+        {
+          "line": 2125,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger1) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger1);\t};"
+        },
+        {
+          "line": 2126,
+          "text": "if ( !vRearTrain.GetOccupant(#Passenger4) )\t{\tvRearTrain.AddKrawliePassenger(#Passenger4);\t};"
+        }
+      ]
+    },
+    {
+      "source": "GAME4/jobs/scripts/city_setup/general/train_setup/train_setup.sf",
+      "sha256": "4edb37d9faedb02d358070c1f8612c525aa8f4b24f5c9252ae807014f7aca21b",
+      "evidence": [
+        {
+          "line": 97,
+          "text": "goto StartAndWaitForTeleport();"
+        },
+        {
+          "line": 102,
+          "text": "goto StartAndWaitForTeleport();"
+        },
+        {
+          "line": 156,
+          "text": "goto StartAndWaitForTeleport();"
+        },
+        {
+          "line": 161,
+          "text": "goto StartAndWaitForTeleport();"
+        },
+        {
+          "line": 169,
+          "text": "State StartAndWaitForTeleport( )"
+        }
+      ]
+    }
+  ],
+  "limitation": "RTTI proves shared getter/setter dispatch, not physics or rail rollback correctness in gameplay"
+}

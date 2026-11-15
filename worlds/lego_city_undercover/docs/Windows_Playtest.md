@@ -14,6 +14,10 @@ Use a new seed for the new item pool and goal. Keep the old game slot; do not de
 10. Disconnect AP, complete a check, reconnect. It must be reported once. Restart the client and game; saved currency must not be credited again. Switch to a differently bound slot; checks/goals/native writes must stop with the binding error.
 11. Finish the final assignment to test the default goal. For all_assignments, verify all 15 named descriptor completions are required. Token receipts alone must not goal these new seeds.
 
-Known limits: full city traversal logic and native ticket/district gates are unfinished. The open_world option changes AP order only. Do not use it expecting a postgame native world. This procedure is targeted validation, not a claim that the fresh story can already be completed without discovering missing logic.
+For the 15 November build, generate a fresh seed using LCU_Chronological_Test.yaml. Give each progressive family twice: Police then Grapple Gun; Robber then Color Gun; Firefighter then Fire Axe; Astronaut then Jetpack. Receive Detective Scan or Criminal Scan before Police and confirm it waits; after Police stage 1, confirm the received scan works without granting Grapple Gun. The third clown requires Detective Scan, and the gas-station call-in requires SuperBuild.
+
+Use LCU_Area_Rollback_Test.yaml separately for boundary tests. Begin in Auburn, approach Cherry Tree Hills slowly on foot without its pass, and inspect the copied area diagnostics. Repeat with a supported ground vehicle only after the foot test succeeds. Then receive the pass and confirm entry is allowed. Avoid using fast travel as the first test: distant returns and reload recovery are not supported. No live movement confirmation exists yet.
+
+Known limits: full city traversal logic and native story gates are unfinished; district return is an experimental nearby-boundary prototype. Open-world initialization is unavailable and cannot be combined with area restrictions. This procedure is targeted validation, not a claim that the fresh story can already be completed without discovering missing logic.
 
 Attach the GUI log export, exact seed, game slot, location IDs and the first failed step when a discrepancy occurs. Test grants remain local test overrides; they are not AP receipts.

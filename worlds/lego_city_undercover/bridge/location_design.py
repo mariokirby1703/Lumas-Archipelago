@@ -29,7 +29,7 @@ def enrich_catalogue(catalogue):
     except ImportError:
         from area_passes import canonical
     area_names=data('area_names.json')
-    labels={'Ability: EnergyGun':'Color Gun','Ability: GrappleGun':'Grapple Gun','Ability: Scanner':'Criminal Scan',
+    labels={'Ability: EnergyGun':'Color Gun','Ability: GrappleGun':'Grapple Gun','Ability: Scanner':'Criminal Scan','Ability: Criminal Scan':'Criminal Scan',
             'Ability: Wiretap':'Listening Scan / Wiretap','Ability: FireAxe':'Fire Axe'}
     for name,row in catalogue['items'].items():
         if name in labels:row['display_name']=labels[name]

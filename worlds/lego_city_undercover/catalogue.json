@@ -21,6 +21,11 @@
       "classification": "progression",
       "id": 2400677615
     },
+    "Ability: Criminal Scan": {
+      "category": "ability",
+      "classification": "progression",
+      "id": 2519055141
+    },
     "Ability: Crowbar": {
       "category": "ability",
       "classification": "progression",
@@ -2251,6 +2256,21 @@
       "category": "progressive",
       "classification": "progression",
       "id": 2821594283
+    },
+    "Progressive Firefighter": {
+      "category": "progressive",
+      "classification": "progression",
+      "id": 2542902498
+    },
+    "Progressive Police": {
+      "category": "progressive",
+      "classification": "progression",
+      "id": 2638225210
+    },
+    "Progressive Robber": {
+      "category": "progressive",
+      "classification": "progression",
+      "id": 2539068895
     },
     "Red Brick Cheat: CHEAT_BOOST": {
       "category": "cheat",

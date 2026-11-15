@@ -19,6 +19,11 @@ def area_command(pid,district,binding,dll,restore=False):
     return dict(accepted=bool(result['owned']),target_hash=result['found'],position_verified=False,save_written=False)
 
 
+def area_disembark(pid,district,binding,dll):
+    result=_command(pid,symbol_hash(district),'AREA_DISEMBARK',dll,23,0,binding)
+    return dict(accepted=bool(result['owned']),foot_return_requested=bool(result['found']),save_written=False)
+
+
 PACKET=struct.Struct('<16I')
 
 

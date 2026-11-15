@@ -51,7 +51,7 @@ Hero,Vehicle Robber (Bluebell National Park),POLICE_HERO,,,already_absent_as_glo
 Tracker,Time Trial (Bluebell National Park),FIRE_TRACKER;POLICE_TRACKER,source_pickup:GAME6/levels/standalones/fire_station/fire_station_training_area/fire_station_training_area_tech.giz:4815:235,objective:WI_FO_0702_Race,name_hint_unresolved
 Chan's Ironback,Time Trial (Bluebell National Park),CHANS_IRONBACK,,objective:BR_TB_1002_Race;objective:NY_DTW_1821_CarTheft,already_absent_as_global_found_check
 Trooper,Call-in Point,POLICE_TROOPER,,,already_absent_as_global_found_check
-Smallisimo (Compact),Vehicle Robbery (Uptown),SMALLCARS_SMALLISIMO,source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1604/ny_uptown_1604.giz:1066:1,objective:NY_UT_1604_CarTheft,inspect_native_reward_relationship; display-name similarity never deletes a check
+Smallisimo (Compact),Vehicle Robbery (Uptown),SMALLCARS_SMALLISIMO,source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1604/ny_uptown_1604.giz:1066:1,objective:NY_UT_1604_CarTheft,native_duplicate_retired_for_new_seeds
 Flare,Vehicle Robber (Uptown),SALOONCARS_FLARE,,,already_absent_as_global_found_check
 Hestia,Call-in Point,SALOONCARS_HESTIA,,,already_absent_as_global_found_check
 Hazard,Call-in Point,CIVIC_HAZARD,,,already_absent_as_global_found_check

@@ -30,13 +30,33 @@ class ProgressiveAstronaut(DefaultOnToggle):
     display_name='Progressive Astronaut'
 
 
+class ProgressiveRobber(DefaultOnToggle):
+    """First copy unlocks Robber; second unlocks Color Gun. Scans remain separate."""
+    display_name='Progressive Robber'
+
+
+class ProgressiveFirefighter(DefaultOnToggle):
+    """First copy unlocks Firefighter; second unlocks Fire Axe."""
+    display_name='Progressive Firefighter'
+
+
+class ProgressivePolice(DefaultOnToggle):
+    """First copy unlocks Police; second unlocks Grapple Gun. Scans are independent items requiring Police."""
+    display_name='Progressive Police'
+
+
+class ClassToolPrerequisites(DefaultOnToggle):
+    """Hold AP tools/scans until their base class is received; entitlement remains journal-backed."""
+    display_name='Class Prerequisites for Tools and Scans'
+
+
 class SeparateClassUnlocks(DefaultOnToggle):
     """Hold class-specific cosmetic skins until their main class is received. Special civilian categories are unaffected."""
     display_name='Separate Class and Cosmetic Unlocks'
 
 
 class EarlyCriminalScan(Toggle):
-    """In linear mode, place Scanner (criminal/person scan) locally on an opening check.
+    """In linear mode, place Criminal Scan (criminal/person scan) locally on an opening check.
     This is a test safeguard, not a complete chronological story logic or a detective-scan item."""
     display_name='Early Criminal Scan (linear test safeguard)'
 
@@ -48,7 +68,8 @@ class DetectiveScanLock(DefaultOnToggle):
 
 
 class EarlyDetectiveScan(Toggle):
-    """Place Detective Scan locally on an observed opening check in linear mode."""
+    """Explicit early-scan safeguard. Linear seeds with randomized abilities always
+    place it early for the mandatory third clown, even when this toggle is off."""
     display_name='Early Detective Scan (linear test safeguard)'
 
 
@@ -188,6 +209,10 @@ class SuperBrick10000Count(Range):
 
 @dataclass
 class LCUOptions(PerGameCommonOptions):
+    progressive_robber: ProgressiveRobber
+    progressive_firefighter: ProgressiveFirefighter
+    progressive_police: ProgressivePolice
+    class_tool_prerequisites: ClassToolPrerequisites
     experimental_area_restrictions: ExperimentalAreaRestrictions
     goal: Goal
     experimental_items: ExperimentalItems

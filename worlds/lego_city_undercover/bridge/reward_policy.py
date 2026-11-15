@@ -3,7 +3,7 @@ import struct
 from item_delivery import effect_plan
 from research_profile import ABILITY_NAMES
 from progressive_items import managed_effects
-from class_entitlements import model_class_ready
+from class_entitlements import model_class_ready,tool_class_ready
 
 POLICY=struct.Struct('<4I32I32I4Q4I')
 assert POLICY.size==320
@@ -24,6 +24,7 @@ def reward_masks(effects,received,models,cheats,options):
         category=effect.get('category')
         if not entitled and not options.get({'character':'character_items','vehicle':'vehicle_items','ability':'ability_items','progressive':'ability_items','cheat':'cheat_items'}.get(category,''),False):return
         plan=effect_plan(effect)
+        if entitled and not tool_class_ready(plan,received,options):return
         if plan['kind']=='runtime_unlock' and plan['ability']=='DetectiveScan':
             if options.get('detective_scan_lock',False):
                 (entitled_runtime if entitled else managed_runtime).add(0)

@@ -31,6 +31,7 @@ from floor_markers import read_class_availability
 from pickup_reader import read_city_pickups, PickupMemory, attach_source_identities
 from actor_reader import read_context, read_actor, PLAYER_RVA
 from vehicle_reader import read_ride
+from ridden_reader import read_ridden
 from object_activity import ObjectActivityTracker
 
 
@@ -121,7 +122,9 @@ class Session:
         except (OSError,ValueError,RuntimeError,struct.error) as error:ride=dict(status='unresolved',reason=str(error))
         if read_marker(self.read,self.base)!=native_binding:
             raise RuntimeError('Native save binding changed during snapshot')
-        return dict(native_binding=native_binding,ride=ride,objectives=objectives, stats=stats, location=location, interaction=interaction,
+        try:ridden=read_ridden(self.read,self.base)
+        except (OSError,ValueError,RuntimeError,struct.error) as error:ridden=dict(status='unresolved',reason=str(error))
+        return dict(native_binding=native_binding,ride=ride,ridden=ridden,objectives=objectives, stats=stats, location=location, interaction=interaction,
                     mission_tokens=read_mission_tokens(self.read,self.base),
                     mission_shield=mission_shield,mission_hero=mission_hero,superbuilds=superbuilds,
                     level_progress=level_progress,cheats=cheats,
@@ -148,7 +151,7 @@ def main():
             report = json.dumps(dict(pid=session.pid, stats=snapshot['stats'], pickup_bits=snapshot['pickup_bits'],
                                     native_binding=snapshot['native_binding'],level_progress=snapshot['level_progress'],
                                     location=snapshot['location'],actor=snapshot['actor'],superbuilds=snapshot['superbuilds'],
-                                    ride=snapshot['ride'],
+                                    ride=snapshot['ride'],ridden=snapshot['ridden'],
                                     objectives=len(snapshot['objectives']['records']),
                                     interaction=snapshot['interaction'], scene_fields=snapshot['scene_fields'],
                                     auras=snapshot['auras'],native_pickups=snapshot['native_pickups'],

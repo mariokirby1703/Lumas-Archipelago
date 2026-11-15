@@ -17,7 +17,8 @@ class AreaIdentityTests(unittest.TestCase):
         self.assertEqual(allowed_districts([dict(category='area_pass',name='Area Pass: sf_residential')]),{'SF_Docks','SF_Residential'})
         from native_context_policy import allows_native_command
         self.assertTrue(allows_native_command(157,22))
-        for context in (11,27,2):self.assertFalse(allows_native_command(context,22))
+        self.assertTrue(allows_native_command(11,22))
+        for context in (27,2):self.assertFalse(allows_native_command(context,22))
         self.assertFalse(allows_native_command(46,22,False))
 
 
@@ -42,7 +43,7 @@ class AreaControllerTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_cutscene_unknown_area_and_missing_anchor_never_teleport(self):
         gate=AreaGate();session=SimpleNamespace(pid=1);journal=SimpleNamespace(binding_token=b'a'*16)
-        for tile,context,expected in [('SF_Residential_1022',11,'deferred_scene_or_context'),
+        for tile,context,expected in [('SF_Residential_1022',27,'deferred_scene_or_context'),
             ('Police_Station_Lobby',46,'deferred_scene_or_context'),('SF_Residential_1022',46,'locked_area_without_checkpoint')]:
             with patch('native_model_transport.area_command') as command:
                 state=dict(actor=dict(status='read',context=dict(index=context)),location=dict(native_tile=tile))

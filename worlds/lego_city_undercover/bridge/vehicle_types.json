@@ -1,0 +1,37 @@
+{
+  "0xcdd188": {
+    "native_class": "ApiVehicle",
+    "getter_rva": "0x4a9370",
+    "setter_rva": "0x4abb60"
+  },
+  "0xcdd638": {
+    "native_class": "ApiVehicleHover",
+    "getter_rva": "0x4a9370",
+    "setter_rva": "0x4abb60"
+  },
+  "0xce3368": {
+    "native_class": "ApiVehicleCar",
+    "getter_rva": "0x4a9370",
+    "setter_rva": "0x4abb60"
+  },
+  "0xce51d8": {
+    "native_class": "ApiVehicleBike",
+    "getter_rva": "0x4a9370",
+    "setter_rva": "0x4abb60"
+  },
+  "0xce55b8": {
+    "native_class": "ApiVehicleStatic",
+    "getter_rva": "0x4a9370",
+    "setter_rva": "0x4abb60"
+  },
+  "0xce5a08": {
+    "native_class": "ApiVehicleBoat",
+    "getter_rva": "0x4a9370",
+    "setter_rva": "0x4abb60"
+  },
+  "0xce5e38": {
+    "native_class": "ApiVehicleAircraft",
+    "getter_rva": "0x4a9370",
+    "setter_rva": "0x4abb60"
+  }
+}

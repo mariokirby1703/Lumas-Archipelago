@@ -3,6 +3,7 @@ Ability: Astronaut,2209631047,ability,progression,True
 Ability: Carry Objects,2543849170,ability,progression,False
 Ability: Climbing,2370905134,ability,progression,False
 Ability: Construction Worker,2400677615,ability,progression,True
+Ability: Criminal Scan,2519055141,ability,progression,True
 Ability: Crowbar,2010966013,ability,progression,False
 Ability: Detective Scan,2213734077,ability,progression,True
 Ability: EnergyGun,2696931570,ability,progression,True
@@ -375,6 +376,9 @@ Character: ROBBER_VINNIEPAPPALARDO,2550435308,character,useful,True
 Character: ROBBER_VINNIEPAPPALARDOTRACKSUIT,2389904098,character,useful,True
 Character: ROBBER_VINNIEPAPPALARDO_CLOWN,2053954312,character,useful,True
 Progressive Astronaut,2821594283,progressive,progression,True
+Progressive Firefighter,2542902498,progressive,progression,True
+Progressive Police,2638225210,progressive,progression,True
+Progressive Robber,2539068895,progressive,progression,True
 Red Brick Cheat: CHEAT_BOOST,2807458702,cheat,useful,True
 Red Brick Cheat: CHEAT_BRICK_MAGNET,2230097685,cheat,useful,True
 Red Brick Cheat: CHEAT_COLLECTGHOSTSTUDS,2818198648,cheat,useful,True

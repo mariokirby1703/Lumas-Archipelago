@@ -40,7 +40,8 @@ def main():
                 apworld_compatibility_filename=alias.name,apworld_compatibility_sha256=hashlib.sha256(alias.read_bytes()).hexdigest())
     data.update(source_client_sha256=hashlib.sha256((WORLD/'Client.py').read_bytes()).hexdigest(),
                 common_client_sha256=hashlib.sha256((ROOT/'CommonClient.py').read_bytes()).hexdigest(),
-                progressive_astronaut=True,source_requirement_logic=True,native_goal_modes=True,
+                progressive_astronaut=True,progressive_robber=True,progressive_firefighter=True,
+                progressive_police=True,class_tool_prerequisites=True,source_requirement_logic=True,native_goal_modes=True,
                 native_story_tickets=False,native_district_gates=False,native_open_world_setup=False)
     data.update(native_near_boundary_area_return='experimental; native calls and synthetic fixtures; live movement unverified',
                 native_area_return_max_distance=90,area_start='SF_Docks',area_first_pass='SF_Residential',

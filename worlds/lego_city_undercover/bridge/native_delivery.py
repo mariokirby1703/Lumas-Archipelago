@@ -10,7 +10,7 @@ from native_save import resolve_save,read_save,model_saved,cheat_saved,ability_s
 from research_profile import ABILITY_NAMES
 from save_reader import read_save_controller
 from native_context_policy import PASSIVE_CONTEXTS
-from class_entitlements import model_class_ready
+from class_entitlements import model_class_ready,tool_class_ready
 
 
 class NativeDeliveryEngine:
@@ -97,6 +97,7 @@ class NativeDeliveryEngine:
         for delivery in deliveries:
             index=delivery['index'];plan=delivery['plan'];kind=plan['kind']
             if overrides and overrides.blocks(plan):continue
+            if kind in ('ability_unlock','runtime_unlock') and not tool_class_ready(plan,received,options or {}):continue
             if kind=='area_access':
                 if delivery['state']!='runtime_verified':journal.record_runtime_verification(index,
                     dict(verified=True,native_save_flag=False,reason='Area policy entitlement is journal-backed; not a native ability bit'))

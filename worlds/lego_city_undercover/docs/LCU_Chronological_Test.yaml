@@ -4,11 +4,15 @@ description: Chronological integration test with an early criminal scan. Partial
 LEGO City Undercover:
   goal: final_assignment
   progressive_astronaut: true
+  progressive_robber: true
+  progressive_firefighter: true
+  progressive_police: true
+  class_tool_prerequisites: true
   separate_class_unlocks: true
   experimental_items: false
   story_mode: linear
-  # Police is guaranteed by the world on an observed opening check.
-  # Scanner means criminal/person scan, not detective scan.
+  # Police stage 1, SuperBuild and Detective Scan have early local safeguards.
+  # Criminal Scan is the criminal/person scan, not Detective Scan.
   early_criminal_scan: true
   detective_scan_lock: true
   early_detective_scan: true
@@ -16,9 +20,9 @@ LEGO City Undercover:
   character_items: true
   vehicle_items: true
   cheat_items: true
-  area_pass_items: false
-  experimental_area_restrictions: false
-  # See LCU_Area_Rollback_Test.yaml for the separate native boundary test.
+  area_pass_items: true
+  experimental_area_restrictions: true
+  # Experimental nearby-boundary return; Auburn is always allowed.
   story_access_items: false
   cutscene_skip: true
   super_bricks: true
