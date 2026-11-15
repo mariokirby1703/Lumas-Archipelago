@@ -10,6 +10,20 @@ from client_checks import changed_checks
 
 
 class MissionShieldTests(unittest.TestCase):
+    def test_live_mansion_shield_and_hero_use_descriptor_assignment_not_shared_scene(self):
+        from mission_checks import assignment_from_descriptor
+        catalog={'1':dict(key='mission:blackwells_mansion_1:TR'),'2':dict(key='mission:blackwells_mansion_2:TR'),
+                 '3':dict(key='mission:blackwells_mansion_2:LEGO City Hero')}
+        def descriptor(name):return b'standalones/blackwells_mansion'.ljust(64,b'\0')+name.encode().ljust(64,b'\0')
+        self.assertEqual(assignment_from_descriptor('blackwells_mansion',descriptor('blackwells_mansion_2')),'blackwells_mansion_2')
+        self.assertIsNone(assignment_from_descriptor('blackwells_mansion',descriptor('unknown')))
+        snapshot=dict(objectives=dict(records=[]),pickup_bits=[],mission_shield=dict(status='read',
+            mission='blackwells_mansion',assignment='blackwells_mansion_2',parts=['TR']),
+            mission_hero=dict(status='read',mission='blackwells_mansion',assignment='blackwells_mansion_2',complete=True))
+        self.assertEqual(changed_checks(catalog,None,snapshot)[0],[2,3])
+        snapshot['mission_shield']['assignment']=None;snapshot['mission_hero']['assignment']=None
+        self.assertEqual(changed_checks(catalog,None,snapshot)[0],[])
+
     def test_city_hero_uses_native_latch_and_level_target(self):
         self.assertTrue(hero_complete(90000,90000,1))
         self.assertFalse(hero_complete(90000,90000,0))

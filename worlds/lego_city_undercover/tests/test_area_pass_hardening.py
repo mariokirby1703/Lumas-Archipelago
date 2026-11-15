@@ -179,6 +179,38 @@ class ControllerTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(await self.poll(self.locked),'return_waiting_for_observation')
             command.assert_not_called()
 
+    async def test_vehicle_changed_while_locked_uses_separate_foot_anchor(self):
+        await self.poll(self.good)
+        vehicle=_snap('SF_Docks_0918',context=157);vehicle['ride']=dict(vehicle_interface='old',status='native_physics_vehicle_transform')
+        await self.poll(vehicle)
+        changed=_snap('SF_Residential_1022',context=157);changed['ride']=dict(vehicle_interface='new',player_role='driver')
+        with patch('native_model_transport.area_disembark',return_value=dict(accepted=True,foot_return_requested=False)) as command:
+            self.assertEqual(await self.poll(changed),'disembark_requested');command.assert_called_once()
+
+    async def test_receiving_pass_while_return_pending_immediately_allows_district(self):
+        await self.poll(self.good);await self.poll(self.locked)
+        self.assertEqual(await self.poll(self.locked,received=[dict(category='area_pass',native_name=FIRST)]),'checkpoint_recorded')
+        self.assertIsNone(self.gate.pending)
+
+    async def test_locked_load_exposes_manual_recovery_without_teleport(self):
+        self.assertEqual(await self.poll(self.locked),'locked_area_without_checkpoint')
+        self.command.assert_not_called()
+        event=self.gate.report()['events'][-1]
+        self.assertIn('Auburn',event['recovery']);self.assertEqual(event['verification'],'unsupported')
+
+    async def test_native_reply_kind_prevents_creature_becoming_foot_anchor(self):
+        self.command.return_value=dict(accepted=True,movement_kind=2,target_position=[1,2,3])
+        await self.poll(self.good)
+        self.assertIsNone(self.gate.foot_checkpoint)
+        self.assertEqual(self.gate.checkpoint_position,[1,2,3])
+
+    async def test_native_bank_switch_resets_anchor_even_before_backup_ready(self):
+        one=dict(self.good,native_binding=dict(bank='old'))
+        two=dict(self.locked,native_binding=dict(bank='new'))
+        await self.poll(one)
+        self.assertEqual(await self.poll(two,backup=False),'waiting_for_save_backup')
+        self.assertIsNone(self.gate.checkpoint)
+
     async def test_known_refusal_is_not_uncertain_and_never_auto_retried(self):
         await self.poll(self.good)
         self.command.side_effect = RuntimeError(

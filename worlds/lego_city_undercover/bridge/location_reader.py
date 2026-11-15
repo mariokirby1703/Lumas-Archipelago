@@ -31,10 +31,11 @@ def read_location(read, base):
         return result
     f32 = lambda v: struct.unpack('<f', struct.pack('<f', v))[0]
     inverse = f32(1.0 / size)
-    x = int(f32(f32(pos[0] - origin[0]) * inverse))
-    z = int(f32(f32(f32(pos[2] - origin[2]) * factor) * inverse))
-    if not (0 <= x < width <= 256 and 0 <= z < height <= 256):
+    fx=f32(f32(pos[0] - origin[0]) * inverse)
+    fz=f32(f32(f32(pos[2] - origin[2]) * factor) * inverse)
+    if not (0 <= fx < width <= 256 and 0 <= fz < height <= 256):
         return result
+    x,z=int(fx),int(fz)
     cell = pointer(read, pointer(read, grid + 0xF0) + (z*width+x)*8)
     tile = pointer(read, cell + 0x58)
     name = cstring(read, pointer(read, tile + 0x68))

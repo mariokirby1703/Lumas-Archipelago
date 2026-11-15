@@ -1,5 +1,7 @@
 # LEGO City Undercover experimental APWorld
 
+Latest pass: [native reliability completion report](docs/research/reliability/completion_report.md) and [remaining TODOs](docs/research/reliability/TODO.md). Version **0.0.1** is intentional. The latest build has 374 passing test executions; new native movement still needs live validation. Use LCU_Chronological_Reliability_Test.yaml for the normal no-area-gate test profile.
+
 Update (2026-11-15): four two-stage progressive class/tool families, independent Police-dependent scans, mandatory early SuperBuild/Detective Scan safeguards, 40 exact city pickup bindings and an opt-in near-boundary area-return prototype. See the [current development report](docs/research/next_major_pass_2026_11_15.md) for validation and remaining limits. Area return has synthetic tests, not a live movement confirmation.
 
 Current status (2026-11-14): new seeds use native final-assignment completion, Progressive Astronaut and source-based district/assignment/section regions. Class-specific cosmetic skins can wait for their base class. Normal pools exclude unbound symbolic effects. Existing receipt IDs and legacy token-goal seeds remain supported.

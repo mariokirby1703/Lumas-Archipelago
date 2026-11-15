@@ -32,7 +32,8 @@ def derive_bindings(snapshots,existing,catalogue):
         location=catalogue['locations'].get('source_pickup:'+source)
         if not location or location['category']!='super_bricks':continue
         expected={'Gold Plate':12,'SuperBrick4X2':29}.get(location.get('native_type'))
-        if row.get('status')!='native_writer_derived_binding' or expected!=row.get('native_type'):continue
+        if any(r[0].get('status')!='native_writer_derived_binding' for r in all_rows) or expected!=row.get('native_type'):continue
+        if row.get('address') and any(r[0].get('address')!=row['address'] for r in all_rows):continue
         prior=existing.get(str(bit))
         if prior:
             if prior.get('source_key')!=source:conflicts.append(dict(bit=bit,reason='existing source differs',source=source))
@@ -50,6 +51,7 @@ def derive_bindings(snapshots,existing,catalogue):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--capture',action='store_true')
+    parser.add_argument('--output',type=Path,default=ROOT/'build/lego_city_undercover/next_pass/latest_pickup_binding_observation.json')
     parser.add_argument('--register',action='store_true');args=parser.parse_args()
     path=ROOT/'build/lego_city_undercover/next_pass/pickup_binding_snapshots.json'
     if args.capture:
@@ -63,7 +65,8 @@ def main():
     catalogue=json.loads((WORLD/'catalogue.json').read_text())
     added,conflicts=derive_bindings(snapshots,existing,catalogue)
     report=dict(writes_to_game=False,added=added,conflicts=conflicts,scope='native structural bindings; collection itself not live tested for every object')
-    (WORLD/'docs/research/pickup_binding_pass_2026_11_15.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+    args.output.parent.mkdir(parents=True,exist_ok=True)
+    args.output.write_text(json.dumps(report,indent=2),encoding='utf-8')
     if args.register:
         existing.update({str(r['bit']):r for r in added});target.write_text(json.dumps(existing,indent=2),encoding='utf-8')
     print(f'{len(added)} new unique source/bit bindings; {len(conflicts)} conflicts; registered={args.register}')

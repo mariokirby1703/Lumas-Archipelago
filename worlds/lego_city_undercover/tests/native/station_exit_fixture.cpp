@@ -22,7 +22,8 @@ static std::uint32_t Hash(const char* text) {
 #include "../../bridge/native/detective_gate.h"
 #include "../../bridge/native/area_return.h"
 extern "C" __declspec(dllexport) DWORD TestAreaReturn(std::uintptr_t base,std::uintptr_t actor,unsigned opcode,int context,unsigned district) {
-    if(!opcode) {area_checkpoint={};area_foot_checkpoint={};area_disembark_pending=false;return 0;}
+    if(!opcode) {area_checkpoint={};area_foot_checkpoint={};area_disembark_pending=false;
+        for(auto& entry:area_history)entry={};area_history_cursor=0;return 0;}
     Command c{};c.opcode=opcode;c.model=district;c.binding[0]=c.binding[1]=c.binding[2]=c.binding[3]=1;
     c.name_hash=Hash(opcode==21 ? "AREA_CHECKPOINT" : opcode==23 ? "AREA_DISEMBARK" : "AREA_RETURN");
     return AreaReturnCommand(base,actor,context,&c);

@@ -88,7 +88,7 @@ def read_actor(read: Read, base: int) -> dict:
             or (items and pointer(read, items + 0x90) != head)
             or any(read(address, 0x18) != data for address, data in links)):
         raise RuntimeError("Actor/item state changed during snapshot; retry")
-    return dict(status="read", equipped_model_id=model_id, equipped_internal_name=name,
+    return dict(status="read", address=hex(actor), equipped_model_id=model_id, equipped_internal_name=name,
                 attached_item_definitions=rows,
                 chief_office_key_present=any(row["definition_name"] == CHIEF_KEY for row in rows),
                 held_in_hand_independently_verified=False, context=read_context(read, base, actor))

@@ -14,14 +14,17 @@ class NativePlayerBusy(RuntimeError):
     """The game rejected a command before mutation; retry a later snapshot."""
 
 
-def area_command(pid,district,binding,dll,restore=False):
-    result=_command(pid,symbol_hash(district),'AREA_RETURN' if restore else 'AREA_CHECKPOINT',dll,22 if restore else 21,0,binding)
-    return dict(accepted=bool(result['owned']),target_hash=result['found'],position_verified=False,save_written=False)
+def area_command(pid,district,binding,dll,restore=False,fresh=False):
+    result=_command(pid,symbol_hash(district),'AREA_RETURN' if restore else 'AREA_CHECKPOINT',dll,22 if restore else 21,
+                    0xffffffff if fresh and not restore else 0,binding)
+    return dict(accepted=bool(result['owned']),target_hash=result['found'],position_verified=False,save_written=False,
+                target_position=result.get('native_position'),movement_kind=result.get('movement_kind'))
 
 
 def area_disembark(pid,district,binding,dll):
     result=_command(pid,symbol_hash(district),'AREA_DISEMBARK',dll,23,0,binding)
-    return dict(accepted=bool(result['owned']),foot_return_requested=bool(result['found']),save_written=False)
+    return dict(accepted=bool(result['owned']),foot_return_requested=bool(result['found']),save_written=False,
+                target_position=result.get('native_position') if result['found'] else None)
 
 
 PACKET=struct.Struct('<16I')
@@ -210,7 +213,10 @@ def _command(pid,model,name,dll,opcode,receipt_index=0,binding=bytes(16)):
                         21:'No matching checkpoint for this actor/vehicle/save; no teleport performed',
                         22:'Checkpoint is too distant or in the current area; no teleport performed'}
                     raise RuntimeError(f"Native command rejected ({result[6]}): {reasons.get(result[6],'unknown native error')}")
-                return dict(model=model,found=result[9],owned=result[10],verified=bool(result[10]),save_confirmed=False)
+                reply=dict(model=model,found=result[9],owned=result[10],verified=bool(result[10]),save_confirmed=False)
+                if opcode in (21,22,23) and result[10] and (opcode!=23 or result[9]):
+                    reply.update(native_position=list(struct.unpack('<3f',struct.pack('<3I',*result[12:15]))),movement_kind=result[11])
+                return reply
             time.sleep(.01)
         raise RuntimeError(f'Native command {opcode} ({name}) timed out; outcome uncertain, inspect memory before retry')
     finally:

@@ -240,6 +240,15 @@ class NativeStationExitTests(unittest.TestCase):
         ctypes.c_uint64.from_address(controller+0x20).value=0
         self.assertNotEqual(self.area_return(self.base,self.actor,22,152,self.cherry),0)
 
+    def test_area_return_prefers_older_allowed_pose_inside_same_district(self):
+        self.area_fixture(False)
+        self.assertEqual(self.area_return(self.base,self.actor,21,46,self.auburn),0)
+        ctypes.c_float.from_address(self.area_pos).value=28
+        self.assertEqual(self.area_return(self.base,self.actor,21,46,self.auburn),0)
+        ctypes.c_float.from_address(self.area_pos).value=35
+        self.assertEqual(self.area_return(self.base,self.actor,22,46,self.cherry),0)
+        self.assertEqual(ctypes.c_float.from_address(self.area_pos).value,5,'use historical pose, not boundary pose')
+
     def test_area_return_rejects_no_checkpoint_wrong_area_seed_and_vehicle(self):
         self.area_fixture(True)
         self.assertEqual(self.area_return(self.base,self.actor,22,157,self.auburn),21)

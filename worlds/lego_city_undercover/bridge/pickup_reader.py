@@ -119,7 +119,7 @@ class PickupMemory:
             for row in state.get('objects',[]):
                 bit=row.get('collection_bit')
                 if bit is None:continue
-                identity=(row.get('tile_name'),row['name'])
+                identity=(row.get('tile_name'),row['name'],row.get('native_type'))
                 self.bindings.setdefault(bit,{})[identity]=dict(deepcopy(row),last_seen_sample=self.tick)
         return dict(status='cached',objects=[deepcopy(row) for group in self.bindings.values() for row in group.values()],
                     conflicts=sorted(bit for bit,group in self.bindings.items() if len(group)>1),

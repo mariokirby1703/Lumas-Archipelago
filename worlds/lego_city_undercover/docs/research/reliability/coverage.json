@@ -1,0 +1,18 @@
+{
+  "baseline": "e9247703c",
+  "legacy_ids_changed": 0,
+  "playable_sources": 512,
+  "additional_sources": 38,
+  "packaged_bindings_before": 40,
+  "packaged_bindings_after": 40,
+  "new_packaged_bindings": 0,
+  "unresolved_city_sources": 431,
+  "live_gameplay_tests_this_pass": 0,
+  "game_running_during_probe": false,
+  "source_types": {
+    "80": 375,
+    "106": 137
+  },
+  "sheet_rows": 1337,
+  "limitation": "Structural registration proofs do not establish physics or a successful live pickup for every source"
+}

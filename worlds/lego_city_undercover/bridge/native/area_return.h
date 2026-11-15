@@ -3,6 +3,7 @@
 struct AreaPose { alignas(16) float matrix[16]; };
 struct AreaCheckpoint {
     std::uintptr_t profile=0,world=0,actor=0,ride=0,ride_control=0;
+    std::uintptr_t ride_model=0;
     unsigned ride_kind=0;
     std::uint32_t binding[4]{},district=0;
     AreaPose pose{};bool valid=false;
@@ -10,6 +11,17 @@ struct AreaCheckpoint {
 static AreaCheckpoint area_checkpoint;
 static AreaCheckpoint area_foot_checkpoint;
 static bool area_disembark_pending=false;
+static AreaCheckpoint area_history[16];
+static unsigned area_history_cursor=0;
+static bool AreaSameIdentity(const AreaCheckpoint& a,const AreaCheckpoint& b) {
+    return a.profile==b.profile && a.world==b.world && a.actor==b.actor && a.ride==b.ride &&
+           a.ride_control==b.ride_control && a.ride_model==b.ride_model && a.ride_kind==b.ride_kind && a.district==b.district &&
+           !std::memcmp(a.binding,b.binding,16);
+}
+static void AreaReplyPose(Command* c,const AreaCheckpoint& point) {
+    c->receipt=point.ride_kind;
+    std::memcpy(c->binding,point.pose.matrix+12,12); // reply only, after all binding validation
+}
 static std::uintptr_t AreaPointer(std::uintptr_t p) { return *reinterpret_cast<std::uintptr_t*>(p); }
 static bool AreaCityActor(std::uintptr_t base,std::uintptr_t actor) {
     auto registry=AreaPointer(base+0x1c402d8);auto index=*reinterpret_cast<unsigned short*>(actor+0x28);
@@ -78,7 +90,7 @@ static bool AreaCurrentPose(std::uintptr_t base,std::uintptr_t actor,int context
         auto creature=AreaRidden(base,actor);
         if(creature && creature!=actor && (context==46 || context==152 || context==124 || context==157)) {
             if(!AreaCityActor(base,creature) || AreaPointer(AreaPointer(creature+0x10)+0xf0)!=base+0x49ecf0) {failure=5;return false;}
-            ride=creature;kind=2;
+            ride=creature;kind=2;control=AreaPointer(AreaPointer(actor+0x340)+0x88);
             std::memcpy(pose.matrix,reinterpret_cast<void*>(creature+0x1c0),64);
             if(!AreaFinite(pose)) {failure=5;return false;}return true;
         }
@@ -127,9 +139,15 @@ static DWORD AreaReturnCommand(std::uintptr_t base,std::uintptr_t actor,int cont
     if(!district || district!=c->model)return 20;
     if(c->opcode==23) {
         if(ride_kind==2)return 3; // creatures keep their rider relationship
-        const auto& saved=area_foot_checkpoint;
+        AreaCheckpoint saved=area_foot_checkpoint;
         if(!saved.valid || saved.profile!=profile || saved.world!=world || saved.actor!=actor ||
            std::memcmp(saved.binding,c->binding,16))return 21;
+        for(unsigned age=16;age>1;--age) {
+            const auto& candidate=area_history[(area_history_cursor+16-age)%16];
+            if(!candidate.valid || !AreaSameIdentity(candidate,saved))continue;
+            float d=0;for(unsigned i=12;i<15;++i) {float v=current.matrix[i]-candidate.pose.matrix[i];d+=v*v;}
+            if(d<=90.f*90.f && AreaDistrict(base,candidate.pose.matrix+12)==candidate.district) {saved=candidate;break;}
+        }
         if(AreaDistrict(base,saved.pose.matrix+12)!=saved.district || saved.district==district)return 20;
         float distance=0;for(unsigned i=12;i<15;++i) {float d=current.matrix[i]-saved.pose.matrix[i];distance+=d*d;}
         if(distance>90.f*90.f)return 22;
@@ -150,22 +168,38 @@ static DWORD AreaReturnCommand(std::uintptr_t base,std::uintptr_t actor,int cont
         if(context!=46)return 3;
         using Teleport=unsigned(__fastcall*)(std::uintptr_t,const float*);
         if(reinterpret_cast<Teleport>(base+0x6709f0)(actor,saved.pose.matrix+12))return 3;
-        area_disembark_pending=false;c->owned=1;c->found=1;return 0;
+        area_disembark_pending=false;AreaReplyPose(c,saved);c->owned=1;c->found=1;return 0;
     }
     if(c->opcode==21) {
         HMODULE module=nullptr;
         if(!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_PIN,
             reinterpret_cast<LPCWSTR>(&AreaReturnCommand),&module))return 5;
+        if(c->receipt==0xffffffffu) {
+            for(auto& point:area_history)point={};area_history_cursor=0;
+            area_foot_checkpoint={};area_disembark_pending=false;
+        }
         area_checkpoint={};area_checkpoint.profile=profile;area_checkpoint.world=world;area_checkpoint.actor=actor;
         area_checkpoint.ride=ride;area_checkpoint.ride_control=control;area_checkpoint.district=district;
         area_checkpoint.ride_kind=ride_kind;
+        area_checkpoint.ride_model=ride_kind==2 ? AreaPointer(ride+0x650) : 0;
         area_checkpoint.pose=current;std::memcpy(area_checkpoint.binding,c->binding,16);area_checkpoint.valid=true;
+        area_history[area_history_cursor++%16]=area_checkpoint;
         if(!ride && context==46) {area_foot_checkpoint=area_checkpoint;area_disembark_pending=false;}
-        c->found=district;c->owned=1;return 0;
+        AreaReplyPose(c,area_checkpoint);c->found=district;c->owned=1;return 0;
     }
-    const auto& saved=area_checkpoint;
+    AreaCheckpoint saved=area_checkpoint;
     if(!saved.valid || saved.profile!=profile || saved.world!=world || saved.actor!=actor || saved.ride!=ride ||
-       saved.ride_control!=control || saved.ride_kind!=ride_kind || std::memcmp(saved.binding,c->binding,16))return 21;
+       saved.ride_control!=control || saved.ride_kind!=ride_kind ||
+       (ride_kind==2 && saved.ride_model!=AreaPointer(ride+0x650)) || std::memcmp(saved.binding,c->binding,16))return 21;
+    // Prefer an older, actually captured pose of the SAME allowed district and
+    // SAME actor/ride. No synthetic ground coordinate and no cross-world reuse.
+    // Every candidate is still subject to the existing distance/tile guards.
+    for(unsigned age=16;age>1;--age) {
+        const auto& candidate=area_history[(area_history_cursor+16-age)%16];
+        if(!candidate.valid || !AreaSameIdentity(candidate,saved))continue;
+        float d=0;for(unsigned i=12;i<15;++i) {float v=current.matrix[i]-candidate.pose.matrix[i];d+=v*v;}
+        if(d<=90.f*90.f && AreaDistrict(base,candidate.pose.matrix+12)==candidate.district) {saved=candidate;break;}
+    }
     if(AreaDistrict(base,saved.pose.matrix+12)!=saved.district)return 20;
     float distance=0;
     for(unsigned i=12;i<15;++i) {float delta=current.matrix[i]-saved.pose.matrix[i];distance+=delta*delta;}
@@ -183,5 +217,5 @@ static DWORD AreaReturnCommand(std::uintptr_t base,std::uintptr_t actor,int cont
         using Fn=unsigned(__fastcall*)(std::uintptr_t,const float*);
         if(reinterpret_cast<Fn>(base+0x6709f0)(ride_kind==2 ? ride : actor,saved.pose.matrix+12))return 3;
     }
-    c->found=saved.district;c->owned=1;return 0;
+    AreaReplyPose(c,saved);c->found=saved.district;c->owned=1;return 0;
 }

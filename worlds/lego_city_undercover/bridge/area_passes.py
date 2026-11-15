@@ -169,6 +169,9 @@ class AreaGate:
         self.checkpoint_position = None
         self.checkpoint_context = None
         self.foot_checkpoint = None
+        self.checkpoint_ride = None
+        self.last_return_observation = None
+        self.test_blocked=[]
         self.pending = None
         self.problem = None
         self.last_capture = 0.0
@@ -185,6 +188,9 @@ class AreaGate:
 
     async def poll(self, session, snapshot, journal, received, dll, backup_ready=False):
         identity = (session.pid, journal.binding_token)
+        if (snapshot.get('native_binding') or {}).get('bank'):
+            identity += ((snapshot['native_binding']['bank'],snapshot.get('process',{}).get('profile'),
+                          snapshot.get('actor',{}).get('address')),)
         if identity != self.identity:
             self._reset_for_binding(identity)
         status = await self._poll(session, snapshot, journal, received, dll, backup_ready)
@@ -206,13 +212,18 @@ class AreaGate:
                 checkpoint=self.checkpoint,
                 checkpoint_position=self.checkpoint_position,
                 checkpoint_context=self.checkpoint_context,
-                position_write_requested=status in ('return_requested', 'return_uncertain'),
-                native_save_written=False, error=self.problem))
+                position_write_requested=status in ('return_requested', 'disembark_requested','return_uncertain'),
+                native_save_written=False, error=self.problem,
+                verification='native_binding_verified' if status=='checkpoint_recorded' else 'unsupported' if status in
+                    ('locked_area_without_checkpoint','locked_area_without_foot_checkpoint','disembark_not_observed') else 'observation',
+                return_observation=self.last_return_observation,
+                recovery=('Kehre nach Auburn zurück oder lade einen dort gespeicherten Teststand. Kein automatischer Fernteleport.'
+                          if status in ('locked_area_without_checkpoint','locked_area_without_foot_checkpoint') else None)))
         return status
 
     def report(self):
         return dict(format='LCU area rollback evidence', version=2,
-                    experimental=True, events=list(self.events))
+                    experimental=True, test_blocked=self.test_blocked,events=list(self.events))
 
     async def _poll(self, session, snapshot, journal, received, dll, backup_ready):
         if not backup_ready:
@@ -228,9 +239,16 @@ class AreaGate:
             return 'deferred_scene_or_context'
 
         allowed = apply_test_restrictions(allowed_districts(received), journal)
+        self.test_blocked=sorted(allowed_districts(received)-allowed)
         if district in allowed:
             had_pending = self.pending is not None
             if had_pending:
+                target=self.pending.get('target_position');observed=location.get('player_position')
+                distance=(sum((float(a)-float(b))**2 for a,b in zip(target,observed))**.5
+                          if target and observed and len(target)==len(observed)==3 else None)
+                self.last_return_observation=dict(allowed_area_observed=True,distance_to_requested_pose=distance,
+                    pose_observed=distance is not None and distance<=3.0,
+                    controls_physics_and_save_verified=False,verification='observation')
                 logging.info('AREA returned to an allowed district; exact native return pose is not independently proven')
                 self.pending = None
             now = time.monotonic()
@@ -240,7 +258,7 @@ class AreaGate:
             from native_model_transport import area_command
             try:
                 result = await asyncio.to_thread(
-                    area_command, session.pid, district, journal.binding_token, dll)
+                    area_command, session.pid, district, journal.binding_token, dll, fresh=self.checkpoint is None)
             except Exception as error:
                 self.problem = str(error)
                 logging.warning('AREA checkpoint not captured: %s', error)
@@ -250,8 +268,9 @@ class AreaGate:
                 return 'checkpoint_unconfirmed'
             self.checkpoint = district
             self.checkpoint_context = context
-            self.checkpoint_position = location.get('player_position')
-            if context==46 and (snapshot.get('ride') or {}).get('status') in (None,'not_mounted','expired_weak_reference'):
+            self.checkpoint_position = result.get('target_position') or location.get('player_position')
+            self.checkpoint_ride=(snapshot.get('ride') or {}).get('vehicle_interface')
+            if context==46 and result.get('movement_kind',0)==0 and (snapshot.get('ridden') or {}).get('status')!='native_ridden_character' and (snapshot.get('ride') or {}).get('status') in (None,'not_mounted','expired_weak_reference'):
                 self.foot_checkpoint=district
             self.problem = None
             self.last_capture = now
@@ -264,13 +283,15 @@ class AreaGate:
             return 'locked_area_without_checkpoint'
         passenger = (context==11 or (snapshot.get('ride') or {}).get('player_role')=='passenger'
                      or bool((snapshot.get('ride') or {}).get('rail_transport')))
+        changed_vehicle=(self.checkpoint_ride and (snapshot.get('ride') or {}).get('vehicle_interface') and
+                         self.checkpoint_ride!=(snapshot.get('ride') or {})['vehicle_interface'])
         # An exit can occur entirely between polls while still on locked land.
         # The vehicle checkpoint then cannot be used by the unmounted actor.
         foot_after_vehicle=(context==46 and self.checkpoint_context!=46 and self.foot_checkpoint
                             and (snapshot.get('ride') or {}).get('status') in (None,'not_mounted','expired_weak_reference'))
         disembarking = self.pending is not None and self.pending.get('mode')=='disembark'
-        if passenger or disembarking or foot_after_vehicle:
-            if not self.foot_checkpoint:
+        if passenger or disembarking or foot_after_vehicle or changed_vehicle:
+            if not self.foot_checkpoint or self.foot_checkpoint not in allowed:
                 return 'locked_area_without_foot_checkpoint'
             if foot_after_vehicle and self.pending and self.pending.get('state')=='rejected' and self.pending.get('code')==21:
                 # Confirmed no-op: vehicle identity changed. A separately
@@ -280,6 +301,9 @@ class AreaGate:
                 return 'return_waiting_for_observation'
             if self.pending and self.pending.get('state')=='accepted' and time.monotonic()-self.pending['issued_at']<RETURN_RECHECK_SECONDS:
                 return 'return_waiting_for_observation'
+            started=(self.pending or {}).get('started_at',time.monotonic())
+            if disembarking and context!=46 and time.monotonic()-started>5.0:
+                return 'disembark_not_observed'
             from native_model_transport import area_disembark, NativePlayerBusy
             try:
                 result=await asyncio.to_thread(area_disembark,session.pid,district,journal.binding_token,dll)
@@ -293,7 +317,8 @@ class AreaGate:
                 self.pending=dict(state='uncertain',district=district)
                 return 'return_uncertain'
             self.pending=dict(state='accepted' if result.get('foot_return_requested') else 'disembarking',
-                              district=district,mode='disembark',issued_at=time.monotonic())
+                              district=district,mode='disembark',issued_at=time.monotonic(),started_at=started,
+                              target_position=result.get('target_position'))
             return 'return_requested' if result.get('foot_return_requested') else 'disembark_requested'
         if self.pending is not None:
             if self.pending.get('state') == 'accepted':
@@ -335,7 +360,7 @@ class AreaGate:
             return 'return_uncertain'
         self.problem = None
         self.pending = dict(state='accepted', district=district,
-                            checkpoint=self.checkpoint, issued_at=time.monotonic())
+                            checkpoint=self.checkpoint, issued_at=time.monotonic(),target_position=result.get('target_position'))
         logging.info('AREA return requested: from %s to %s; awaiting fresh native observation',
                      district, self.checkpoint)
         return 'return_requested'

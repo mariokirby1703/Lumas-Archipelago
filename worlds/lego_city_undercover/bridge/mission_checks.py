@@ -3,6 +3,35 @@ PARTS = ('TL', 'TR', 'BL', 'BR')
 PICKUP_TYPES = {119: 'TL', 120: 'TR', 121: 'BL', 101: 'BR'}
 
 
+def assignment_from_descriptor(mission,descriptor):
+    if mission!='blackwells_mansion':return mission
+    if len(descriptor)!=128:raise ValueError('Incomplete assignment descriptor')
+    path=descriptor[:64].split(b'\0')[0].decode('ascii').replace('\\','/').lower()
+    name=descriptor[64:128].split(b'\0')[0].decode('ascii').lower()
+    if path!='standalones/blackwells_mansion':return None
+    return name if name in ('blackwells_mansion_1','blackwells_mansion_2') else None
+
+
+def current_assignment(read,base,mission):
+    if mission!='blackwells_mansion':return mission
+    import struct
+    from inventory_reader import pointer
+    from scene_reader import player_scene
+    scene=player_scene(read,base);meta=pointer(read,scene['level']+0x18)
+    if not meta:return None
+    index=struct.unpack('<b',read(meta+0xab,1))[0]
+    count=struct.unpack('<i',read(base+0x1c7d438,4))[0]
+    if not 0<=index<count<=256:return None
+    table=pointer(read,base+0x1c7d430)
+    if not table:return None
+    descriptor=read(table+index*0x350,128)
+    result=assignment_from_descriptor(mission,descriptor)
+    if (read(meta+0xab,1)!=bytes([index]) or pointer(read,base+0x1c7d430)!=table or
+            player_scene(read,base)['level']!=scene['level']):
+        raise RuntimeError('Assignment changed during collectible read')
+    return result
+
+
 def hero_complete(total,threshold,latch):
     if any(type(v) is not int for v in (total,threshold,latch)) or total<0 or threshold<0 or latch not in (0,1):
         raise ValueError('Invalid native hero state')
@@ -35,7 +64,7 @@ def read_mission_hero(read,base,shield):
     complete=hero_complete(total,threshold,latch)
     if read(base+0x1C7E6E0,12)!=raw or player_scene(read,base)['level']!=level:
         raise RuntimeError('Hero state changed during snapshot')
-    return dict(status='read',mission=shield['mission'],scene=shield['scene'],
+    return dict(status='read',mission=shield['mission'],assignment=shield.get('assignment',shield['mission']),scene=shield['scene'],
                 studs=total,threshold=threshold,latch=latch,complete=complete,
                 evidence='0xa12257 native threshold/latch; mine live validated')
 
@@ -66,7 +95,7 @@ def read_mission_shield(read,base):
     if (pointer(read,base+MISSION_TOKENS_RVA)!=manager or read(manager+0x50,1)[0]!=mask
             or pointer(read,base+0x1C7D3E0)!=actor or struct.unpack('<H',read(actor+0x28,2))[0]!=index):
         raise RuntimeError('Mission shield changed during snapshot')
-    return dict(status='read' if mission else 'unresolved_scene',mission=mission,scene=name,
+    return dict(status='read' if mission else 'unresolved_scene',mission=mission,assignment=current_assignment(read,base,mission),scene=name,
                 mask=mask,parts=parts,evidence='native callback 0x6d980; TR live validated')
 
 

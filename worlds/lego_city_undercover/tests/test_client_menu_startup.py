@@ -52,6 +52,7 @@ class MenuStartupTests(unittest.IsolatedAsyncioTestCase):
             skip.assert_not_called()
     async def test_vehicle_check_is_queued_and_sent_before_native_delivery(self):
         journal=Mock();journal.pending.return_value=[]
+        journal.pickup_bindings.return_value=[];journal.pickup_conflicts.return_value=set()
         ctx=make_context(native_save_file=None,enable_skip=False,skip_slot=False,
             slot=1,team=0,seed_name='vehicle-seed',catalogue={'123':{'name':'Vehicle pickup'}},
             journal=None,state_dir=Path('unused'),items_received=[],checked_locations=set(),

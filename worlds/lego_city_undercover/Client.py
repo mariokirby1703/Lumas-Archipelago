@@ -28,6 +28,8 @@ from red_bricks import redbrick_location_key
 from item_delivery import register_delivery
 from native_delivery import NativeDeliveryEngine
 from area_passes import AreaGate
+from pickup_binding_observer import BindingObserver,binding_overlay
+from gameplay_diagnostics import GameplayDiagnostics
 from pickup_binding_catalogue import detection_catalogue
 from item_popups import ItemPopupQueue
 from progressive_items import resolve_receipts
@@ -155,6 +157,12 @@ async def watcher(ctx):
     previous = None
     binding = None
     journal_binding = None
+    binding_observer = None
+    gameplay_diagnostics=GameplayDiagnostics()
+    pickup_ui_signature=None
+    evidence_ui_revision=None
+    static_bindings=json.loads((Path(__file__).parent/'bridge/city_pickup_bindings.json').read_text())
+    source_locations=json.loads((Path(__file__).parent/'catalogue.json').read_text())['locations']
     seen_models = set()
     seen_arrests = set()
     skip_pid = None
@@ -189,7 +197,9 @@ async def watcher(ctx):
                         ctx.journal = Journal(ctx.state_dir, dict(seed=ctx.seed_name, team=ctx.team,
                             slot=ctx.slot, catalogue=ctx.catalogue, detection_policy=2))
                         journal_binding = current_binding
+                        ctx.notify('seed',str(ctx.seed_name))
                         ctx.detection_catalogue=detection_catalogue(ctx.catalogue)
+                        binding_observer=BindingObserver(source_locations,static_bindings)
                     resolved=resolve_receipts(ctx.items_received,getattr(ctx,'item_effects',{}))
                     resolved_by_index={i:effect for i,_,effect in resolved}
                     ctx.resolved_received_effects=[effect for _,_,effect in resolved]
@@ -217,12 +227,34 @@ async def watcher(ctx):
                     if snapshot.get('actor', {}).get('status') != 'read':
                         # Stale inventory from the game menu must never create AP checks.
                         previous = None
+                        area_gate._reset_for_binding(None)
                         seen_models.clear()
                         notify_game(ctx, False)
                         await asyncio.sleep(1)
                         continue
                     notify_game(ctx, True, snapshot['actor'].get('equipped_internal_name', 'Spieler geladen'))
                     check_snapshot_binding(snapshot,ctx.journal.binding_token)
+                    if ctx.enable_native_models:
+                        if not await native_delivery.prepare_binding(session,snapshot,ctx.journal):
+                            ctx.native_ready=False;ctx.notify('ready',False)
+                            ctx.notify('save','Save: warte auf eindeutige Zuordnung vor Check-Abgleich')
+                            await asyncio.sleep(.25)
+                            continue
+                    if binding_observer is not None:
+                        binding_observer.observe(snapshot,ctx.journal)
+                        bound_pickups,blocked_bits=binding_overlay(ctx.journal,static_bindings)
+                        ctx.detection_catalogue=detection_catalogue(ctx.catalogue,bound_pickups)
+                        snapshot.update(source_binding_policy='two_snapshot',binding_conflicts=sorted(blocked_bits),
+                                        verified_source_keys=[r['source_key'] for r in bound_pickups.values()])
+                        gameplay_diagnostics.observe(snapshot,ctx.journal)
+                        signature=(len(bound_pickups),tuple(sorted(blocked_bits)),len(ctx.journal.pickup_bindings()))
+                        if signature!=pickup_ui_signature:
+                            ctx.notify('pickup_binding_status',dict(verified=len(bound_pickups),blocked=len(blocked_bits)))
+                            pickup_ui_signature=signature
+                        if ctx.ui_events is not None:
+                            revision=(current_binding,ctx.journal.diagnostic_revision())
+                            if revision!=evidence_ui_revision:
+                                ctx.notify('collectible_evidence',ctx.journal.collectible_report());evidence_ui_revision=revision
                     if not ctx.finished_game and native_goal_complete(snapshot,getattr(ctx,'slot_options',{}).get('goal',2)):
                         await ctx.send_msgs([dict(cmd='StatusUpdate',status=ClientStatus.CLIENT_GOAL)])
                         ctx.finished_game=True
@@ -334,16 +366,20 @@ async def watcher(ctx):
                         await ctx.report_checks(checks)
                     if ctx.enable_native_models:
                         received = ctx.resolved_received_effects
-                        await native_delivery.poll(session, snapshot, ctx.journal,
-                            ctx.item_effects.values(), received, ctx.slot_options, ctx.test_overrides)
                         if ctx.slot_options.get('experimental_area_restrictions') and ctx.slot_options.get('area_pass_items'):
                             status=await area_gate.poll(session,snapshot,ctx.journal,received,native_delivery.dll,
-                                backup_ready=native_delivery.path is not None and not (native_delivery.last_problem or '').startswith('Loaded native save is bound'))
+                                backup_ready=native_delivery.binding_ready)
                             if status!=area_gate.last_status:
                                 ctx.notify('area_gate',status);logging.info('AREA policy: %s',status);area_gate.last_status=status
                             report=area_gate.report()
                             if report['events'] and report['events'][-1]['timestamp']!=area_gate.last_reported_event:
                                 ctx.notify('area_evidence',report);area_gate.last_reported_event=report['events'][-1]['timestamp']
+                            if status in ('return_requested','disembark_requested','return_uncertain'):
+                                # Do not apply a grant/policy to a pre-teleport snapshot.
+                                await asyncio.sleep(.2)
+                                continue
+                        await native_delivery.poll(session, snapshot, ctx.journal,
+                            ctx.item_effects.values(), received, ctx.slot_options, ctx.test_overrides)
                         if not (native_delivery.last_problem or '').startswith(
                                 'Loaded native save is bound'):
                             await ctx.item_popups.poll(session, snapshot, ctx.journal,
@@ -362,7 +398,7 @@ async def watcher(ctx):
                             not problem.startswith(('Loaded native save is bound',
                                                     'No unique matching native save')))
                         ctx.notify('ready', ctx.native_ready)
-                        ctx.notify('save', 'Save: ' + native_delivery.path.name if bound else
+                        ctx.notify('save', 'Save: ' + native_delivery.path.parent.name+'/'+native_delivery.path.name if bound else
                                    'Save: Noch nicht eindeutig zugeordnet')
                         fields_ready = tutorial_timing.ready(session.pid, snapshot.get('scene_fields', {}))
                         if fields_ready and safe_context:
@@ -397,7 +433,7 @@ async def watcher(ctx):
                         ctx.notify('save', 'Save: Native Modus deaktiviert')
                 else:
                     notify_game(ctx, False)
-                await asyncio.sleep(1)
+                await asyncio.sleep(.25 if getattr(ctx,'slot_options',{}).get('experimental_area_restrictions') else 1)
             except NativePlayerBusy:
                 # Busy is normal during animations or interactions. The process
                 # and save identity are not invalidated by this safe rejection.

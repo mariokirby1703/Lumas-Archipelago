@@ -1,0 +1,43 @@
+name: Luma
+game: LEGO City Undercover
+description: Chronological reliability profile. Area rollback disabled; gameplay logic remains partial.
+LEGO City Undercover:
+  goal: final_assignment
+  progressive_astronaut: true
+  progressive_robber: true
+  progressive_firefighter: true
+  progressive_police: true
+  class_tool_prerequisites: true
+  separate_class_unlocks: true
+  experimental_items: false
+  story_mode: linear
+  # Police stage 1, SuperBuild and Detective Scan have early local safeguards.
+  # Criminal Scan is the criminal/person scan, not Detective Scan.
+  early_criminal_scan: true
+  detective_scan_lock: true
+  early_detective_scan: true
+  ability_items: true
+  character_items: true
+  vehicle_items: true
+  cheat_items: true
+  area_pass_items: false
+  experimental_area_restrictions: false
+  # Use LCU_Area_Rollback_Test.yaml for opt-in boundary tests.
+  story_access_items: false
+  cutscene_skip: true
+  super_bricks: true
+  super_builds: true
+  disguise_booths: true
+  atms: true
+  train_stations: true
+  city_activities: true
+  story_missions: true
+  character_tokens: true
+  vehicle_tokens: true
+  red_bricks: true
+  city_hero: true
+  police_shields: quarters
+  include_unverified: false
+  goal_tokens: 20
+  super_brick_1000_count: 20
+  super_brick_10000_count: 5

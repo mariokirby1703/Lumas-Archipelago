@@ -26,9 +26,11 @@ def changed_checks(catalogue,previous,snapshot,checked_locations=()):
     # records loaded after connection. The server acknowledgement is authoritative.
     acknowledged=set(checked_locations)
     memory=snapshot.get('pickup_memory',{})
-    conflicts=set(memory.get('conflicts',[])) | KNOWN_AMBIGUOUS_PICKUP_BITS
+    conflicts=set(memory.get('conflicts',[])) | set(snapshot.get('binding_conflicts',[])) | KNOWN_AMBIGUOUS_PICKUP_BITS
     source_keys={r['source_key'] for r in memory.get('objects',[])
                  if r.get('collection_bit') in bits-conflicts and r.get('source_key')}
+    if snapshot.get('source_binding_policy')=='two_snapshot':
+        source_keys.intersection_update(snapshot.get('verified_source_keys',()))
     native=snapshot.get('native_pickups',{})
     red_brick_missions=set()
     if native.get('status')=='read':
@@ -58,12 +60,14 @@ def changed_checks(catalogue,previous,snapshot,checked_locations=()):
             checks.append(int(key))
         runtime=row.get('runtime') or {}
         hero=snapshot.get('mission_hero',{})
-        if (hero.get('status')=='read' and hero.get('complete') and hero.get('mission')
-            and row.get('key')=='mission:'+hero['mission']+':LEGO City Hero'):
+        hero_mission=hero.get('assignment',hero.get('mission'))
+        if (hero.get('status')=='read' and hero.get('complete') and hero_mission
+            and row.get('key')=='mission:'+hero_mission+':LEGO City Hero'):
             checks.append(int(key))
         shield=snapshot.get('mission_shield',{})
-        if shield.get('status')=='read' and shield.get('mission'):
-            prefix='mission:'+shield['mission']+':'
+        shield_mission=shield.get('assignment',shield.get('mission'))
+        if shield.get('status')=='read' and shield_mission:
+            prefix='mission:'+shield_mission+':'
             location_key=row.get('key','')
             if location_key.startswith(prefix):
                 part=location_key[len(prefix):]

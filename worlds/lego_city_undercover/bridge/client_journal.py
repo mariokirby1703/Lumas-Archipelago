@@ -27,6 +27,9 @@ class Journal:
                 text TEXT NOT NULL, progression INTEGER NOT NULL, state TEXT NOT NULL DEFAULT 'queued');
             CREATE TABLE IF NOT EXISTS sent_popups (event_key TEXT PRIMARY KEY,
                 text TEXT NOT NULL, classification TEXT NOT NULL, state TEXT NOT NULL DEFAULT 'queued');
+            CREATE TABLE IF NOT EXISTS pickup_bindings (source TEXT PRIMARY KEY, bit INTEGER UNIQUE NOT NULL, proof TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS pickup_conflicts (bit INTEGER PRIMARY KEY, evidence TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS diagnostic_events (id INTEGER PRIMARY KEY AUTOINCREMENT, payload TEXT NOT NULL);
         ''')
         columns={row[1] for row in self.db.execute('PRAGMA table_info(item_popups)')}
         if 'classification' not in columns:
@@ -40,6 +43,52 @@ class Journal:
     def queue(self, locations):
         with self.db:
             self.db.executemany('INSERT OR IGNORE INTO outgoing(location) VALUES (?)', ((int(x),) for x in locations))
+
+    def pickup_conflict(self,bit,sources,reason):
+        evidence=json.dumps(dict(sources=sorted(sources),reason=reason,verification='unsupported',mutation=False),sort_keys=True)
+        with self.db:self.db.execute('INSERT OR IGNORE INTO pickup_conflicts VALUES (?,?)',(bit,evidence))
+
+    def diagnostic(self,event):
+        from datetime import datetime,timezone
+        event=dict(event,timestamp=datetime.now(timezone.utc).isoformat())
+        with self.db:
+            self.db.execute('INSERT INTO diagnostic_events(payload) VALUES (?)',(json.dumps(event,sort_keys=True),))
+            self.db.execute('DELETE FROM diagnostic_events WHERE id <= (SELECT COALESCE(MAX(id),0)-1000 FROM diagnostic_events)')
+
+    def diagnostics(self,limit=200):
+        return [json.loads(row[0]) for row in self.db.execute('SELECT payload FROM diagnostic_events ORDER BY id DESC LIMIT ?',
+                                                           (max(0,min(int(limit),1000)),))]
+
+    def diagnostic_revision(self):
+        return self.db.execute('SELECT COALESCE(MAX(id),0) FROM diagnostic_events').fetchone()[0]
+
+    def collectible_report(self):
+        return dict(format='LCU collectible evidence',version=1,game_writes=False,
+                    bindings=self.pickup_bindings(),blocked_bits=sorted(self.pickup_conflicts()),events=self.diagnostics())
+
+    def pickup_conflicts(self):
+        return {row[0] for row in self.db.execute('SELECT bit FROM pickup_conflicts')}
+
+    def pickup_bindings(self):
+        return [json.loads(row[0]) for row in self.db.execute('SELECT proof FROM pickup_bindings ORDER BY source')]
+
+    def store_pickup_binding(self,proof):
+        source=proof['source_key'];bit=proof['bit']
+        if proof.get('verification')!='native_binding_verified':raise ValueError('Verified structural proof required')
+        existing=self.db.execute('SELECT source,bit,proof FROM pickup_bindings WHERE source=? OR bit=?',(source,bit)).fetchall()
+        if any(s!=source or b!=bit for s,b,_ in existing):
+            self.pickup_conflict(bit,{source,*(r[0] for r in existing)},'journal source/bit collision')
+            for _,old_bit,_ in existing:self.pickup_conflict(old_bit,{source},'journal source/bit collision')
+            return True
+        if bit in self.pickup_conflicts():return False
+        if existing:
+            old=json.loads(existing[0][2])
+            if proof.get('collection_transition_observed') and not old.get('collection_transition_observed'):
+                with self.db:self.db.execute('UPDATE pickup_bindings SET proof=? WHERE source=?',(json.dumps(proof,sort_keys=True),source))
+            return False
+        with self.db:self.db.execute('INSERT INTO pickup_bindings VALUES (?,?,?)',(source,bit,json.dumps(proof,sort_keys=True)))
+        self.diagnostic(dict(kind='pickup_binding',verification='native_binding_verified',mutation=False,proof=proof))
+        return True
 
     def acknowledge(self, locations):
         with self.db:
@@ -141,6 +190,8 @@ class Journal:
                             (json.dumps(evidence,sort_keys=True),index))
             self.db.execute("UPDATE receipts SET native_state='applied' WHERE server_index=?",(index,))
         logging.info('Native save verified on disk: AP receipt %s',index)
+        self.diagnostic(dict(kind='native_save_confirmation',receipt=index,verification='native_binding_verified',
+                             mutation=False,proof=evidence))
 
     def record_memory_verification(self,index,evidence):
         if not (evidence.get('verified') or (evidence.get('found') and evidence.get('owned'))):
@@ -149,6 +200,8 @@ class Journal:
             self.db.execute("UPDATE deliveries SET state='memory_verified',evidence=? WHERE server_index=?",
                             (json.dumps(evidence,sort_keys=True),index))
             self.db.execute("UPDATE receipts SET native_state='not_applied' WHERE server_index=?",(index,))
+        self.diagnostic(dict(kind='native_grant_observed',receipt=index,verification='native_binding_verified',
+                             mutation=False,save_confirmed=False,proof=evidence))
 
     def record_runtime_verification(self,index,evidence):
         if not evidence.get('verified') or evidence.get('native_save_flag') is not False:

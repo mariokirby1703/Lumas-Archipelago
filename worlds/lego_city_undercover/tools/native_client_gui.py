@@ -156,6 +156,9 @@ class App:
         self.ap_status = tk.StringVar(value='Archipelago: Nicht verbunden')
         self.game_status = tk.StringVar(value='Spiel: Nicht geladen')
         self.area_status = tk.StringVar(value='Gebietssperre: nicht aktiv')
+        self.pickup_binding_status=tk.StringVar(value='Supersteine: noch keine Aufnahme')
+        self.seed_status=tk.StringVar(value='Seed: nicht verbunden')
+        self.collectible_evidence={}
         self.area_evidence={}
         self.save_status = tk.StringVar(value='Save: Nicht gebunden')
         self.progress = tk.StringVar(value='Checks: 0 · AP-Items: 0')
@@ -165,7 +168,8 @@ class App:
         self.effects = test_catalogue(catalogue,json.loads((WORLD/'bridge/collection_manifest.json').read_text(encoding='utf-8')))
         self.names = sorted(self.effects, key=str.casefold)
 
-        root.title('LEGO City Undercover | Archipelago Client')
+        version=json.loads((WORLD/'archipelago.json').read_text(encoding='utf-8'))['world_version']
+        root.title(f'LEGO City Undercover | Archipelago Client {version}')
         root.geometry('1380x920')
         root.minsize(1080, 780)
         style = ttk.Style()
@@ -223,6 +227,9 @@ class App:
         ttk.Label(bottom, textvariable=self.progress).pack(side='right')
         ttk.Label(status,textvariable=self.area_status).pack(anchor='w',pady=(5,0))
         ttk.Button(status,text='Gebiet-Diagnose kopieren',command=self.copy_area_evidence).pack(anchor='e')
+        ttk.Label(status,textvariable=self.pickup_binding_status).pack(anchor='w')
+        ttk.Label(status,textvariable=self.seed_status).pack(anchor='w')
+        ttk.Button(status,text='Sammeldiagnose kopieren',command=self.copy_collectible_evidence).pack(anchor='e')
 
         panes = ttk.Panedwindow(main, orient='horizontal')
         panes.pack(fill='both', expand=True)
@@ -565,6 +572,10 @@ class App:
     def copy_area_evidence(self):
         self.root.clipboard_clear()
         self.root.clipboard_append(json.dumps(self.area_evidence,indent=2,ensure_ascii=False))
+
+    def copy_collectible_evidence(self):
+        self.root.clipboard_clear()
+        self.root.clipboard_append(json.dumps(self.collectible_evidence,indent=2,ensure_ascii=False))
         self.append_log('Gebietsdiagnose kopiert (begrenzte Ereignishistorie; keine Save-Datei).')
 
     def pump(self):
@@ -585,6 +596,7 @@ class App:
                 labels={'waiting_for_save_backup':'warte auf Save-Zuordnung und Backup',
                     'disembark_requested':'Ausstieg angefordert; warte auf freie Spielfigur',
                     'locked_area_without_foot_checkpoint':'kein erlaubter Fußgänger-Checkpoint; erst dort zu Fuß stehen',
+                    'disembark_not_observed':'Ausstieg nicht bestätigt; manuell aussteigen und Gebiet-Diagnose kopieren',
                     'checkpoint_recorded':'Rückkehrpunkt gespeichert','allowed':'Gebiet freigeschaltet',
                     'locked_area_without_checkpoint':'gesperrtes Gebiet, aber kein sicherer Rückkehrpunkt',
                     'checkpoint_unavailable':'Rückkehrpunkt nicht verifiziert; Diagnose prüfen',
@@ -596,6 +608,12 @@ class App:
                 self.area_status.set('Gebietssperre (experimentell): '+labels.get(value,str(value)))
             elif kind == 'area_evidence':
                 self.area_evidence=value
+            elif kind == 'pickup_binding_status':
+                self.pickup_binding_status.set(f"Supersteine: {value['verified']} genaue Zuordnungen · {value['blocked']} gesperrte Bit-Konflikte")
+            elif kind == 'seed':
+                self.seed_status.set('Seed: '+value)
+            elif kind == 'collectible_evidence':
+                self.collectible_evidence=value
             elif kind == 'game_loaded':
                 self.game_connected = bool(value)
             elif kind == 'save':

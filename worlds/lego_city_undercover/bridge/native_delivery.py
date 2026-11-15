@@ -19,6 +19,7 @@ class NativeDeliveryEngine:
         self.path=None;self.models=None;self.requested=set();self.last_problem=None;self.unbound=set()
         self.last_save_data=None
         self.runtime_states={}
+        self.binding_ready=False
 
     async def _save(self,session,index):
         status=read_save_controller(session.read,session.base)
@@ -37,10 +38,13 @@ class NativeDeliveryEngine:
             # session, previous check snapshot and durable delivery queue.
             logging.debug('Native delivery deferred until ordinary gameplay')
 
-    async def _poll(self,session,snapshot,journal,effects=(),received=(),options=None,overrides=None):
+    async def prepare_binding(self,session,snapshot,journal):
+        """Bind/backup before check reconciliation; never grant or revoke rewards."""
         context=snapshot['actor'].get('context',{}).get('index')
-        if context not in PASSIVE_CONTEXTS:return
+        self.binding_ready=False
         identity=(session.pid,journal.binding_token,pointer(session.read,session.base+0x1c7f160))
+        if snapshot.get('actor',{}).get('address'):
+            identity+=(snapshot['actor']['address'],(snapshot.get('native_binding',{}).get('marker') or {}).get('binding'))
         if identity!=self.identity:
             self.identity=identity;self.path=None;self.models=None;self.requested.clear()
             self.last_save_data=None
@@ -53,15 +57,32 @@ class NativeDeliveryEngine:
                 self.path=path
             except (OSError,ValueError,RuntimeError) as error:
                 if str(error)!=self.last_problem:logging.warning('Native delivery waiting: %s',error);self.last_problem=str(error)
-                if str(error).startswith('No unique matching native save') and 'identity' not in self.requested:
+                if context in PASSIVE_CONTEXTS and str(error).startswith('No unique matching native save') and 'identity' not in self.requested:
                     await self._save(session,'identity')
-                return
+                return False
             logging.info('Native save bound for disk verification: %s',self.path)
             self.last_problem=None
         try:
             data=await asyncio.to_thread(read_save,self.path)
+            disk_marker=parse_marker(marker_from_save(data))
+            if disk_marker and disk_marker['binding']!=journal.binding_token.hex():
+                problem='Native save file is bound to another AP seed/slot; possible Cloud/file replacement; native writes stopped'
+                if self.last_problem!=problem:logging.error(problem)
+                self.last_problem=problem
+                return False
             self.last_save_data=data
-        except (OSError,ValueError,RuntimeError):return  # Native writer may be replacing the file.
+        except (OSError,ValueError,RuntimeError) as error:
+            self.last_problem='Native save file not stable: '+str(error)
+            return False
+        if (self.last_problem or '').startswith('Native save file'):self.last_problem=None
+        self.binding_ready=True
+        return True
+
+    async def _poll(self,session,snapshot,journal,effects=(),received=(),options=None,overrides=None):
+        if not await self.prepare_binding(session,snapshot,journal):return
+        context=snapshot['actor'].get('context',{}).get('index')
+        if context not in PASSIVE_CONTEXTS:return
+        data=self.last_save_data
         if self.models is None:self.models=await asyncio.to_thread(read_model_ids,session.read,session.base)
         bank=pointer(session.read,session.base+0x1c7cbb8)
         marker=session.read(bank+MARKER_OFFSET,MARKER_SIZE)

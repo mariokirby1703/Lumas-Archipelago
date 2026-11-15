@@ -135,7 +135,8 @@ class Session:
                     characters=inventory['characters'] + inventory['auxiliary_states'],
                     pickup_bits=bits, pickup_bytes=list(payload), pickup_address=hex(manager+0x120),
                     abilities=abilities, ability_raw=ability_state.get('named_candidate_state', {}),
-                    process=dict(pid=self.pid, module_base=hex(self.base), sha256=diagnose.RESEARCH_HASH))
+                    process=dict(pid=self.pid, module_base=hex(self.base), sha256=diagnose.RESEARCH_HASH,
+                                 profile=hex(pointer(self.read,self.base+0x1c7f160))))
 
 
 def main():

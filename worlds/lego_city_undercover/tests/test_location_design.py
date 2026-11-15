@@ -11,9 +11,9 @@ from worlds.lego_city_undercover.bridge.research_profile import symbol_hash
 
 class DesignTests(unittest.TestCase):
     def test_all_sheet_rows_preserved_without_claiming_native_requirements(self):
-        design=data('location_design.json');self.assertEqual(len(design['rows']),866)
+        design=data('location_design.json');self.assertEqual(len(design['rows']),1337)
         self.assertFalse(design['requirements_verified'])
-        self.assertEqual(sum(r['native_match']=='exact_key' for r in design['rows']),597)
+        self.assertEqual(sum(r['native_match']=='exact_key' for r in design['rows']),1068)
         for r in design['rows']:self.assertIn('unverified_user_design',r['design']['evidence'])
 
     def test_cop_wardrobe_reward_is_retired_only_for_new_generation(self):
