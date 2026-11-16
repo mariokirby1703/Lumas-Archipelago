@@ -121,8 +121,20 @@ class NativeDeliveryEngine:
             result=await asyncio.to_thread(enable_superbuild_jobs,session.pid,journal.binding_token,self.dll)
             if result['changed']:
                 logging.info('Native Superbuild jobs enabled; original completion scripts resumed')
-                await self._save(session,'SuperBuild jobs')
+                # A busy native save controller must not silently lose this
+                # flag. Retry the save on a later safe poll when necessary.
+                self.runtime_states['SuperBuildJobsNeedSave']=True
+                if await self._save(session,'SuperBuild jobs'):
+                    self.runtime_states.pop('SuperBuildJobsNeedSave',None)
                 return
+            if not result['enabled'] and not self.runtime_states.get('SuperBuildJobsWarned'):
+                logging.warning('SuperBuild native job is still inactive despite unlocked ability; will retry')
+                self.runtime_states['SuperBuildJobsWarned']=True
+        if (context==46 and superbuild.get('SuperBuildsActive') is True and
+                self.runtime_states.get('SuperBuildJobsNeedSave')):
+            if await self._save(session,'SuperBuild jobs'):
+                self.runtime_states.pop('SuperBuildJobsNeedSave',None)
+            return
         inventory={r['model_id']:r for r in snapshot['characters']}
         selection_supported=ownership_selection_supported(session.read,session.base)
         deliveries=journal.reconciliation_deliveries()
@@ -191,6 +203,19 @@ class NativeDeliveryEngine:
                     else:await self._save(session,index)
                     continue
                 evidence=await asyncio.to_thread(grant_ability,session.pid,name,self.dll)
+                if name=='SuperBuild':
+                    # Keep the native ability grant and the vanilla city-job
+                    # activation in the same delivery cycle, before autosave.
+                    # Otherwise an AP player could build during the next poll
+                    # while the vanilla counter/gold-brick script is dormant.
+                    # The native command checks the AP binding and job layout;
+                    # it never fabricates Completed, nState or rewards.
+                    setup=await asyncio.to_thread(
+                        enable_superbuild_jobs,session.pid,journal.binding_token,self.dll)
+                    if setup['changed']:
+                        logging.info('Native Superbuild jobs enabled with the AP ability grant')
+                    elif not setup['enabled']:
+                        logging.warning('SuperBuild ability granted but native job activation was not confirmed; will retry after a fresh snapshot')
             elif kind=='cheat_unlock' and snapshot.get('cheats',{}).get('status')=='read':
                 matches=[r for r in snapshot['cheats']['records'] if r['native_name']==plan.get('native_name')]
                 if len(matches)!=1:continue
