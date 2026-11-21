@@ -22,6 +22,9 @@ class NativeStationExitTests(unittest.TestCase):
             capture_output=True,text=True,env=dict(os.environ,ZIG_GLOBAL_CACHE_DIR=str(out/'zig-cache'),ZIG_LOCAL_CACHE_DIR=str(out/'zig-local-cache')))
         if result.returncode:raise RuntimeError(result.stderr)
         cls.dll=ctypes.WinDLL(str(dll));cls.invoke=cls.dll.TestStationExit
+        cls.grant_identity=cls.dll.TestGrantIdentity
+        cls.grant_identity.argtypes=[ctypes.c_size_t,ctypes.c_size_t]
+        cls.grant_identity.restype=ctypes.c_uint32
         cls.superbuild=cls.dll.TestSuperbuildJobs
         cls.superbuild.argtypes=[ctypes.c_size_t,ctypes.POINTER(ctypes.c_uint32)]
         cls.superbuild.restype=ctypes.c_uint32
@@ -703,3 +706,17 @@ class NativeStationExitTests(unittest.TestCase):
         ctypes.memmove(bank+0x80+1002,b'AP'+b'x'*20,22)
         self.assertEqual(self.superbuild(self.base,ctypes.byref(changed)),13)
         self.assertEqual(ctypes.c_ubyte.from_address(field+16).value,0)
+
+    def test_grant_identity_rechecks_profile_and_seed_on_game_thread(self):
+        profile=self.actor+0x30000;bank=profile+0x122e0
+        ctypes.c_uint64.from_address(self.base+0x1c7f160).value=profile
+        ctypes.c_uint64.from_address(self.base+0x1c7cbb8).value=bank
+        self.assertEqual(self.grant_identity(self.base,profile),0)
+        self.assertEqual(self.grant_identity(self.base,profile+8),13)
+        ctypes.memmove(bank+0x80+1002,b'AP'+b'x'*20,22)
+        self.assertEqual(self.grant_identity(self.base,profile),13)
+        marker=b'AP'+struct.pack('<4I',1,0,0,0)+struct.pack('<I',22)
+        ctypes.memmove(bank+0x80+1002,marker,22)
+        self.assertEqual(self.grant_identity(self.base,profile),0)
+        ctypes.c_uint64.from_address(self.base+0x1c7cbb8).value=bank+8
+        self.assertEqual(self.grant_identity(self.base,profile),13)

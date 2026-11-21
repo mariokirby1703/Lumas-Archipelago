@@ -5293,24 +5293,28 @@
   },
   "superbricks": {
     "2490": {
-      "resource": "wi_farmlands_0708.giz",
-      "index": 36,
-      "name": "j_pup"
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz:486:36",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
     },
     "2488": {
-      "resource": "wi_farmlands_0708.giz",
-      "index": 34,
-      "name": "Diner_2x2_01_PU"
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz",
+      "name": "Diner_2x2_01_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz:486:34",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
     },
     "2489": {
-      "resource": "wi_farmlands_0708.giz",
-      "index": 35,
-      "name": "Diner_2x2_02_PU"
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz",
+      "name": "Diner_2x2_02_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz:486:35",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
     },
     "2491": {
-      "resource": "wi_farmlands_0708.giz",
-      "index": 37,
-      "name": "Brickup_01"
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz",
+      "name": "Brickup_01",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0708/wi_farmlands_0708.giz:486:37",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
     },
     "7072": {
       "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1023/sf_residential_1023_tech.giz",
@@ -5319,9 +5323,10 @@
       "evidence": "live_instance_match"
     },
     "968": {
-      "resource": "wi_forest_0703.giz",
-      "index": 0,
-      "name": "P_pup"
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0703/wi_forest_0703.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0703/wi_forest_0703.giz:27:0",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
     },
     "6768": {
       "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1022/sf_residential_1022.giz",
@@ -5436,6 +5441,900 @@
       "name": "P_pup",
       "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0804/wi_forest_0804.giz:27:0",
       "evidence": "live_instance_match"
+    },
+    "672": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0802/wi_forest_0802.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0802/wi_forest_0802.giz:980:9",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "680": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz",
+      "name": "CAFE_CRABNET_01_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:0",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "681": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz",
+      "name": "BIN_4x2_SBRICK_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:1",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "682": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:3",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "683": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz",
+      "name": "CAFE_SBRICK_01_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:4",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "684": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz",
+      "name": "CAFE_LIFE_PRES_SBRICK_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:5",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "685": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:6",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "686": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz",
+      "name": "j_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:7",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "687": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/wi_forest_0902.giz:215:8",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "969": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0703/wi_forest_0703.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0703/wi_forest_0703.giz:27:1",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "970": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0703/wi_forest_0703.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0703/wi_forest_0703.giz:27:2",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "976": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0803/wi_forest_0803.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0803/wi_forest_0803.giz:208:2",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "984": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:1",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "985": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:2",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "986": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz",
+      "name": "P_pup3",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:3",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "987": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz",
+      "name": "P_pup5",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:4",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "988": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz",
+      "name": "P_pup6",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:5",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "989": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz",
+      "name": "P_pup4",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:6",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "990": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0903/wi_forest_0903.giz:27:7",
+      "evidence": "unique native tile/name/type + writer-derived packed bit; two stable hash-gated snapshots; no proximity heuristic"
+    },
+    "6784": {
+      "resource": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1222/br_brooklyn_bridge_1222.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1222/br_brooklyn_bridge_1222.giz:641:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6785": {
+      "resource": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1222/br_brooklyn_bridge_1222.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1222/br_brooklyn_bridge_1222.giz:641:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4304": {
+      "resource": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0614/br_golden_gate_0614.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0614/br_golden_gate_0614.giz:204:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "3400": {
+      "resource": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0711/br_golden_gate_0711.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0711/br_golden_gate_0711.giz:489:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4312": {
+      "resource": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0714/br_golden_gate_0714.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0714/br_golden_gate_0714.giz:1849:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4313": {
+      "resource": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0714/br_golden_gate_0714.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/br_golden_gate/br_golden_gate_0714/br_golden_gate_0714.giz:1849:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "704": {
+      "resource": "GAME5/levels/lego_city/lego_city/br_twin_bridge/br_twin_bridge_1202/br_twin_bridge_1202.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/br_twin_bridge/br_twin_bridge_1202/br_twin_bridge_1202.giz:257:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4621": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz",
+      "name": "P_pup4",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:10",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4616": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:5",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4617": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:6",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4618": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:7",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4619": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:8",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4620": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz",
+      "name": "P_pup3",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0715/sf_docks_0715.giz:27:9",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4920": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0716/sf_docks_0716.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0716/sf_docks_0716.giz:318:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4921": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0716/sf_docks_0716.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0716/sf_docks_0716.giz:318:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5224": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0717/sf_docks_0717.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0717/sf_docks_0717.giz:217:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5528": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0718/sf_docks_0718.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0718/sf_docks_0718.giz:363:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5529": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0718/sf_docks_0718.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0718/sf_docks_0718.giz:363:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5530": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0718/sf_docks_0718.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0718/sf_docks_0718.giz:363:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4624": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz",
+      "name": "0815_RAINBOWBRICK",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4625": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4626": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4627": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/sf_docks_0815.giz:1235:7",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4928": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz:1009:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4929": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz:1009:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4930": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0816/sf_docks_0816.giz:1009:5",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5232": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5233": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5234": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5235": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
+      "name": "P_pup3",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5236": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
+      "name": "P_pup4",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:5",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5237": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
+      "name": "P_pup5",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:6",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5238": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:7",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5239": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz",
+      "name": "Safe_Brick",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0817/sf_docks_0817.giz:1174:8",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5540": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:10",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5536": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5537": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:6",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5538": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:7",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5539": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz",
+      "name": "RC_Pickup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/sf_docks_0818.giz:2034:8",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4328": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0914/sf_docks_0914.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0914/sf_docks_0914.giz:502:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4632": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0915/sf_docks_0915.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0915/sf_docks_0915.giz:11605:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4936": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4937": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4938": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz",
+      "name": "j_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/sf_docks_0916.giz:497:5",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5240": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5244": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz",
+      "name": "P_pup3",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:10",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5241": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:6",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5242": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:7",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5243": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/sf_docks_0917.giz:727:8",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5544": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0918/sf_docks_0918.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0918/sf_docks_0918.giz:152:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "4944": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1016/sf_docks_1016.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1016/sf_docks_1016.giz:333:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5248": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1017/sf_docks_1017.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1017/sf_docks_1017.giz:1057:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5249": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1017/sf_docks_1017.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1017/sf_docks_1017.giz:1057:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5552": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz:722:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5553": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz:722:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5554": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_1018/sf_docks_1018.giz:722:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6136": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0720/sf_residential_0720.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0720/sf_residential_0720.giz:27:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6137": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0720/sf_residential_0720.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0720/sf_residential_0720.giz:27:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5840": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0819/sf_residential_0819.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0819/sf_residential_0819.giz:675:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5841": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0819/sf_residential_0819.giz",
+      "name": "Pool_Brick",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0819/sf_residential_0819.giz:675:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6144": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0820/sf_residential_0820.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0820/sf_residential_0820.giz:27:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6145": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0820/sf_residential_0820.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0820/sf_residential_0820.giz:27:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6448": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0821/sf_residential_0821.giz",
+      "name": "superbrick",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0821/sf_residential_0821.giz:463:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6449": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0821/sf_residential_0821.giz",
+      "name": "Park_SuperBrick",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0821/sf_residential_0821.giz:463:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6752": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6753": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz",
+      "name": "Brick2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:17",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6754": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz",
+      "name": "Brick1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:18",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6755": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz",
+      "name": "P_pup3",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:19",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6756": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz",
+      "name": "Brick3",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:20",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6757": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:22",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6758": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:26",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6759": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz",
+      "name": "P_pup4",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/sf_residential_0822.giz:2157:27",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6456": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0921/sf_residential_0921.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0921/sf_residential_0921.giz:9409:15",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6760": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz",
+      "name": "Groom_Brick",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz:454:28",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6761": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/sf_residential_0922.giz:454:30",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5856": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1019/sf_residential_1019.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1019/sf_residential_1019.giz:213:5",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "5857": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1019/sf_residential_1019.giz",
+      "name": "j_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1019/sf_residential_1019.giz:213:6",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6160": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1020/sf_residential_1020.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1020/sf_residential_1020.giz:2305:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6161": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1020/sf_residential_1020.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1020/sf_residential_1020.giz:2305:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6464": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6465": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6466": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6467": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:5",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6468": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz",
+      "name": "j_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:6",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6469": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz",
+      "name": "j_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1021/sf_residential_1021.giz:1074:7",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6472": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1121/sf_residential_1121.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1121/sf_residential_1121.giz:27:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6776": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1122/sf_residential_1122.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1122/sf_residential_1122.giz:519:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "6777": {
+      "resource": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1122/sf_residential_1122.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_1122/sf_residential_1122.giz:519:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "1560": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0505/wi_farmlands_0505.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0505/wi_farmlands_0505.giz:392:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "1561": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0505/wi_farmlands_0505.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0505/wi_farmlands_0505.giz:392:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "1864": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0506/wi_farmlands_0506.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0506/wi_farmlands_0506.giz:1074:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "2168": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0507/wi_farmlands_0507.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0507/wi_farmlands_0507.giz:27:16",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "2472": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0508/wi_farmlands_0508_tech.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0508/wi_farmlands_0508_tech.giz:261:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "2176": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz",
+      "name": "safebrick",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:46",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "2177": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz",
+      "name": "station_brick2",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:47",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "2178": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz",
+      "name": "station_brick1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/wi_farmlands_0607.giz:27:48",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "2184": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0707/wi_farmlands_0707.giz",
+      "name": "Diner_2x2_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0707/wi_farmlands_0707.giz:27:15",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "2185": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0707/wi_farmlands_0707.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0707/wi_farmlands_0707.giz:27:16",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "2792": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0709/wi_farmlands_0709.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0709/wi_farmlands_0709.giz:27:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "2192": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0807/wi_farmlands_0807.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0807/wi_farmlands_0807.giz:3047:12",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "648": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0502/wi_forest_0502.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0502/wi_forest_0502.giz:584:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "352": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0601/wi_forest_0601.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0601/wi_forest_0601.giz:27:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "656": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0602/wi_forest_0602.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0602/wi_forest_0602.giz:9827:14",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "657": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0602/wi_forest_0602.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0602/wi_forest_0602.giz:9827:15",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "960": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0603/wi_forest_0603.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0603/wi_forest_0603.giz:27:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "360": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz",
+      "name": "SILVER_BOULDER_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "361": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "362": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "363": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:5",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "364": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz",
+      "name": "j_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:6",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "365": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:7",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "366": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz",
+      "name": "P_pup3",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:8",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "367": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz",
+      "name": "P_pup4",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0701/wi_forest_0701.giz:1018:9",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "368": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz",
+      "name": "j_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "369": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz",
+      "name": "CHERRYTREE01_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:1",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "370": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz",
+      "name": "BOULDER_01_PU",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "371": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "372": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz",
+      "name": "P_pup3",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "373": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz",
+      "name": "P_pup4",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:5",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "374": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:6",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "375": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0801/wi_forest_0801.giz:95:7",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "376": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz",
+      "name": "j_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "377": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "378": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:3",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "379": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz",
+      "name": "P_pup4",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:4",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "380": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz",
+      "name": "P_pup2",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:5",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "381": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz",
+      "name": "P_pup5",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:6",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "382": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz",
+      "name": "P_pup3",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0901/wi_forest_0901.giz:1020:7",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "688": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1002/wi_forest_1002.giz",
+      "name": "P_pup",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1002/wi_forest_1002.giz:27:0",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
+    },
+    "689": {
+      "resource": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1002/wi_forest_1002.giz",
+      "name": "P_pup1",
+      "source_key": "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1002/wi_forest_1002.giz:27:2",
+      "evidence": "validated journal proof v2; original writer flags and bit formula; not a live gameplay verdict"
     }
   },
   "models": {
@@ -5448,19 +6347,8 @@
       "evidence": "user-confirmed display name"
     },
     "409": {
-      "display_name": "HÃƒÂ¤ftling",
+      "display_name": "Häftling",
       "evidence": "user-confirmed display name"
-    },
-    "386": {
-      "display_name": "Guy Newbery",
-      "internal_name": "NPC_CitizenMale06",
-      "evidence": "user reports Guy Newbery pickup; live mission queue contains sole model 386 at token position"
-    }
-  },
-  "red_bricks": {
-    "CHEAT_SCAN_POINT_OF_INTEREST": {
-      "display_name": "Datenscan-Upgrade: Hinweise",
-      "evidence": "user-confirmed pickup; live native type 7 and collected flag"
     }
   }
 }

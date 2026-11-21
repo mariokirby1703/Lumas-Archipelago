@@ -1,5 +1,7 @@
 # LEGO City Undercover experimental APWorld
 
+Current pass (2026-11-21): [completion report](docs/research/reliability/completion_report_2026_11_21.md). 174/471 exact city pickup bindings, 65 persistent city Superbuild job bindings, native profile/seed grant guards and 1,421 read-only Sheet design rows. 405 test executions (7 skipped) and 180/180 fill simulations; vehicle/creature gameplay validation and destination/story/open-world gates remain incomplete.
+
 Latest follow-up: [pickup proof review and writer guard](docs/research/reliability/pickup_binding_review.md), with 386 passing test executions. Shared binding coverage remains 40/471 until new native observations are available.
 
 Latest pass: [native reliability completion report](docs/research/reliability/completion_report.md) and [remaining TODOs](docs/research/reliability/TODO.md). Version **0.0.1** is intentional. The latest build has 374 passing test executions; new native movement still needs live validation. Use LCU_Chronological_Reliability_Test.yaml for the normal no-area-gate test profile.

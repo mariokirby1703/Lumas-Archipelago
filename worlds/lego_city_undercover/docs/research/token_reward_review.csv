@@ -85,7 +85,7 @@ source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_d
 source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_downtown_2024.giz:256:1,unverified_source,False,,A model found flag alone does not prove a separately collectible token
 source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2024/ny_downtown_2024.giz:256:2,unverified_source,False,,A model found flag alone does not prove a separately collectible token
 source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2025/ny_downtown_2025.giz:508:0,unverified_source,False,,A model found flag alone does not prove a separately collectible token
-source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:0,unverified_source,False,,A model found flag alone does not prove a separately collectible token
+source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:0,ambiguous,True,objective:NY_DT_1924_VehDrop,Global model-found detector also set by an automatic native activity reward; no independent pickup-bit detector
 source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2125/ny_downtown_2125.giz:100:0,unverified_source,False,,A model found flag alone does not prove a separately collectible token
 source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2223/ny_downtown_2223.giz:27:0,unverified_source,False,,A model found flag alone does not prove a separately collectible token
 source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2121/ny_downtown_east_2121.giz:781:0,unverified_source,False,,A model found flag alone does not prove a separately collectible token

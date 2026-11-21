@@ -5,6 +5,7 @@ from level_progress import completed_level_keys
 from red_bricks import redbrick_location_key
 from story_arrests import completed_story_arrests
 from station_rewards import completed_station_rewards
+from superbuild_progress import reconcile_superbuild_objectives
 
 # These source tiles alias the same native bits. Block them before either tile
 # has been observed; runtime conflict detection alone is too late.
@@ -16,6 +17,7 @@ def changed_checks(catalogue,previous,snapshot,checked_locations=()):
         # An incomplete read cannot establish that any location is complete.
         return [],None
     objectives={r['name_hash'] for r in snapshot['objectives']['records'] if r['candidate_complete']}
+    objectives=reconcile_superbuild_objectives(objectives,snapshot.get('story',{}))
     builds=snapshot.get('superbuilds',{})
     if builds.get('status')=='read':
         objectives.update(symbol_hash(r['objective_name']) for r in builds.get('records',[])

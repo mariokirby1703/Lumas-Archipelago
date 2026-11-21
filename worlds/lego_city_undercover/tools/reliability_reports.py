@@ -1,4 +1,5 @@
 """Reproducible Source_Key merge and coverage export; never edit the Google Sheet."""
+import argparse
 import csv
 import hashlib
 import json
@@ -15,15 +16,20 @@ def write_csv(path,rows,columns):
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--baseline',default='13d2bed57')
+    parser.add_argument('--game-probe',type=Path)
+    args=parser.parse_args()
+    probe=json.loads(args.game_probe.read_text()) if args.game_probe else {}
     output=WORLD/'docs/research/reliability';output.mkdir(parents=True,exist_ok=True)
     catalogue=json.loads((WORLD/'catalogue.json').read_text())
-    baseline=json.loads(subprocess.check_output(['git','show','e9247703c:worlds/lego_city_undercover/catalogue.json'],cwd=ROOT))
+    baseline=json.loads(subprocess.check_output(['git','show',args.baseline+':worlds/lego_city_undercover/catalogue.json'],cwd=ROOT))
     for group in ('locations','items'):
         for key,row in baseline[group].items():
             if catalogue[group].get(key,{}).get('id')!=row['id']:raise ValueError('Changed legacy ID: '+key)
     raw=json.loads((WORLD/'notes/analysis/pickup_catalogue.json').read_text())
     bindings=json.loads((WORLD/'bridge/city_pickup_bindings.json').read_text())
-    before=json.loads(subprocess.check_output(['git','show','e9247703c:worlds/lego_city_undercover/bridge/city_pickup_bindings.json'],cwd=ROOT))
+    before=json.loads(subprocess.check_output(['git','show',args.baseline+':worlds/lego_city_undercover/bridge/city_pickup_bindings.json'],cwd=ROOT))
     by_source={r['source_key']:(bit,r) for bit,r in bindings.items()}
     areas=json.loads((WORLD/'bridge/area_names.json').read_text());area_case={k.casefold():v for k,v in areas.items()}
     sources=json.loads((WORLD/'bridge/city_pickup_sources.json').read_text());signatures=Counter(
@@ -60,10 +66,10 @@ def main():
     write_csv(output/'newly_verified_pickups.csv',new,columns)
     # This is a non-destructive review for the human Sheet, keyed by Source_Key.
     write_csv(output/'sheet_superbrick_merge_review.csv',rows,columns)
-    summary=dict(baseline='e9247703c',legacy_ids_changed=0,playable_sources=len(rows),additional_sources=len(extras),
+    summary=dict(baseline=args.baseline,legacy_ids_changed=0,playable_sources=len(rows),additional_sources=len(extras),
         packaged_bindings_before=len(before),packaged_bindings_after=len(bindings),new_packaged_bindings=len(new),
         unresolved_city_sources=sum(r['scope']=='city' and r['pickup_bit']=='' for r in rows),
-        live_gameplay_tests_this_pass=0,game_running_during_probe=False,
+        live_gameplay_tests_this_pass=0,game_running_during_probe=bool(probe.get('process',{}).get('pid')),
         source_types=dict(Counter(str(r['source_type']) for r in rows)),
         sheet_rows=len(json.loads((WORLD/'bridge/location_design.json').read_text())['rows']),
         limitation='Structural registration proofs do not establish physics or a successful live pickup for every source')

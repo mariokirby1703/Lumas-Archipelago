@@ -246,7 +246,9 @@ class AreaGate:
                 target=self.pending.get('target_position');observed=location.get('player_position')
                 distance=(sum((float(a)-float(b))**2 for a,b in zip(target,observed))**.5
                           if target and observed and len(target)==len(observed)==3 else None)
-                self.last_return_observation=dict(allowed_area_observed=True,distance_to_requested_pose=distance,
+                permission_received=self.pending.get('district')==district
+                self.last_return_observation=dict(allowed_area_observed=True,permission_received=permission_received,
+                    returned_from_denied_district=not permission_received,distance_to_requested_pose=distance,
                     pose_observed=distance is not None and distance<=3.0,
                     controls_physics_and_save_verified=False,verification='observation')
                 logging.info('AREA returned to an allowed district; exact native return pose is not independently proven')
@@ -279,7 +281,8 @@ class AreaGate:
         # The current snapshot belongs to a forbidden district. We do not
         # calculate or write coordinates in Python; native rechecks the actor,
         # ride, exact tile, maximum distance and bound save atomically.
-        if not self.checkpoint:
+        if not self.checkpoint or self.checkpoint not in allowed:
+            if self.checkpoint:self.problem='Recorded checkpoint district no longer has an Area Pass'
             return 'locked_area_without_checkpoint'
         passenger = (context==11 or (snapshot.get('ride') or {}).get('player_role')=='passenger'
                      or bool((snapshot.get('ride') or {}).get('rail_transport')))

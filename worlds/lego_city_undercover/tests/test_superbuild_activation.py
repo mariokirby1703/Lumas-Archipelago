@@ -19,6 +19,7 @@ class SuperbuildActivationTests(unittest.IsolatedAsyncioTestCase):
         events = []
         engine = NativeDeliveryEngine(Path('test.dll'))
         engine.models = {}
+        engine.identity=(17,b'x'*16,0x400000)
         engine.last_save_data = b'synthetic save'
         journal = SimpleNamespace(binding_token=b'x' * 16)
         journal.reconciliation_deliveries = Mock(return_value=[] if already_unlocked else [
@@ -34,14 +35,15 @@ class SuperbuildActivationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_new_ability_activates_vanilla_jobs_before_receipt_and_save(self):
         events, engine, session, snapshot, journal = self.setup_case()
-        def grant(*args):
+        def grant(*args, **kwargs):
             events.append('grant')
+            self.assertEqual(kwargs,dict(binding=journal.binding_token,expected_profile=0x400000))
             return dict(verified=True)
         def enable(*args):
             events.append('enable')
             self.assertEqual(args[1], journal.binding_token)
             return dict(changed=True, enabled=True)
-        def save(*args):
+        def save(*args,**kwargs):
             events.append('save')
             return dict(requested=True)
         with patch.object(engine, 'prepare_binding', new_callable=AsyncMock, return_value=True), \
@@ -64,7 +66,7 @@ class SuperbuildActivationTests(unittest.IsolatedAsyncioTestCase):
         def enable(*args):
             events.append('enable')
             return dict(changed=True, enabled=True)
-        def save(*args):
+        def save(*args,**kwargs):
             events.append('save')
             return dict(requested=True)
         with patch.object(engine, 'prepare_binding', new_callable=AsyncMock, return_value=True), \
@@ -87,7 +89,7 @@ class SuperbuildActivationTests(unittest.IsolatedAsyncioTestCase):
         def enable(*_):
             events.append('enable')
             return dict(changed=True, enabled=True)
-        def save(*_):
+        def save(*_,**kwargs):
             events.append('save')
             return dict(requested=True)
         with patch.object(engine, 'prepare_binding', new_callable=AsyncMock, return_value=True), \
@@ -108,13 +110,13 @@ class SuperbuildActivationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_inactive_job_is_not_falsely_reported_as_confirmed(self):
         events, engine, session, snapshot, journal = self.setup_case()
-        def grant(*_):
+        def grant(*_, **kwargs):
             events.append('grant')
             return dict(verified=True)
         def enable(*_):
             events.append('enable')
             return dict(changed=False, enabled=False)
-        def save(*_):
+        def save(*_,**kwargs):
             events.append('save')
             return dict(requested=True)
         with patch.object(engine, 'prepare_binding', new_callable=AsyncMock, return_value=True), \

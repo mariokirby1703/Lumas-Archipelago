@@ -48,3 +48,15 @@ See native_playtest_matrix.md for the controlled live-test sequence and required
 - This is an exact instance/world-position binding, not a nearest-object inference or a generic binding for all 65 builds. Extend verified city mappings from resource/instance evidence.
 - Native job-tree activation implemented: opcode 24 enables only SuperBuild_Saves.SuperBuildsActive after native ability, typed registry, AP save binding and Max_Completed=65 checks. The original city tile scripts (verified SF_Docks_0815/ai/level10.sf) own CityObjective_SetComplete, nState=2, UpdatePin/autosave, Completed increment and SuperCounterUI. No story mission selector is advanced. Delivery invokes this after save binding/backup and requests native save. Native synthetic tests cover no ability, idempotence and foreign-save rejection.
 - Live completion/counter/gold verification remains pending: the existing detective hook belongs to the prior DLL, so the new native command was rejected before mutation. Backup of bound slot3 exists under build/lego_city_undercover/native_backups/early_superbuild_20261115/slot3. Restart is required. Determine whether the already-built but unrecorded gizmo survives reload; if not, a separate reviewed native recovery transaction is still needed. Do not label this case recovered without readback.
+
+## Follow-up, 21 November 2026
+
+See completion_report_2026_11_21.md for the current evidence. Earlier counts above are historical.
+
+- Implemented/promoted: 134 additional structural city proofs, 174/471 total; 297 remain unbound. Bits 5848?5850 remain quarantined.
+- Implemented: persistent source-derived job/objective bindings for all 65 city builds; typed live reader found all 65 and seven complete. Original Auburn call-in nState=2 is observed; original reward animation/gold save is not retroactively verified.
+- Implemented: game-thread expected-profile/seed guards for ordinary AP grants, currency batches and saves; loading-safe location/diagnostic handling; revoked-anchor rejection; pass receipt versus physical-return evidence.
+- Implemented: English/German header-based Sheet importer, 1,421 current design rows / 1,068 exact keys; 42 original Superbuild automatic reward witnesses and one further overlapping Earwig found detector excluded from new seeds only.
+- Native save request accepted in backed-up slot3; new disk rewrite still pending at readback. Do not repeat uncertain mutations or claim disk success from the RPC.
+- Next live action: operator moves to safe Auburn ground, ordinary client closed, then controlled tools/live_area_trial.py. No real boundary/vehicle/creature controls/physics trial completed in this pass yet.
+- Remaining native story entrances, Open World, distant travel/reload recovery, incomplete names/relationships and gameplay logic retain the unsupported/experimental status above.

@@ -1,0 +1,848 @@
+[
+  {
+    "job": "SuperBuild_Saves.BR_Brooklyn_Bridge.1222_Statue",
+    "objective": "BR_BB_1222_Statue",
+    "native_id": 3,
+    "completed_state": 2,
+    "ap_id": 1470800984,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/br_brooklyn_bridge/br_brooklyn_bridge_1222/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.IS_Liberty_Island.1113_Ferry",
+    "objective": "IS_LI_1113_Ferry",
+    "native_id": 65,
+    "completed_state": 2,
+    "ap_id": 1036273665,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/is_liberty_island/is_liberty_island_1113/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SALOONCARS_CABRAKAN"
+  },
+  {
+    "job": "SuperBuild_Saves.IS_Prison_Island.1426_HP",
+    "objective": "IS_PI_1426_HeliPad",
+    "native_id": 23,
+    "completed_state": 2,
+    "ap_id": 1135185631,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/is_prison_island/is_prison_island_1426/ai/level5.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "POLICE_CHOPPER"
+  },
+  {
+    "job": "SuperBuild_Saves.IS_Space_Centre_Island.3222_VD",
+    "objective": "IS_SC_3222_VehDrop",
+    "native_id": 62,
+    "completed_state": 2,
+    "ap_id": 1506638835,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3222/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "VAN_WANDERER"
+  },
+  {
+    "job": "SuperBuild_Saves.IS_Space_Centre_Island.3321_Satellite",
+    "objective": "IS_SC_3321_Satellite",
+    "native_id": 59,
+    "completed_state": 2,
+    "ap_id": 1721736039,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3321/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.IS_Space_Centre_Island.3323_Loop",
+    "objective": "IS_SC_3323_Loop",
+    "native_id": 60,
+    "completed_state": 2,
+    "ap_id": 1547384021,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3323/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.IS_Space_Centre_Island.3323_Shuttle",
+    "objective": "IS_SC_3323_SpaceShuttle",
+    "native_id": 57,
+    "completed_state": 2,
+    "ap_id": 1348012208,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3223/ai/level.sf",
+      "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3323/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "COLLECT_1-13_SPACEMAN"
+  },
+  {
+    "job": "SuperBuild_Saves.IS_Space_Centre_Island.3422_ShuttleRide",
+    "objective": "IS_SC_3422_ShuttleRide",
+    "native_id": 58,
+    "completed_state": 2,
+    "ap_id": 1622191737,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3422/ai/level7.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.IS_Space_Centre_Island.3423_HP",
+    "objective": "IS_SC_3423_HeliPad",
+    "native_id": 63,
+    "completed_state": 2,
+    "ap_id": 1608044257,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3423/ai/level3.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "AIRCRAFT_UFO"
+  },
+  {
+    "job": "SuperBuild_Saves.IS_Space_Centre_Island.3423_RMP",
+    "objective": "IS_SC_3423_Ramp",
+    "native_id": 61,
+    "completed_state": 2,
+    "ap_id": 1133886958,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/is_space_centre/is_space_centre_3423/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "NPC_RADIODJ02"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Airport.1803_RMP",
+    "objective": "NY_LCX_1803_Ramp",
+    "native_id": 53,
+    "completed_state": 2,
+    "ap_id": 1382226347,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1803/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "COLLECT_3-03_PILOT"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Airport.1805_VD",
+    "objective": "NY_LCX_1805_VehDrop",
+    "native_id": 54,
+    "completed_state": 2,
+    "ap_id": 1209173931,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1805/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "POLICE_MOV_CAB"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Airport.1903_HP",
+    "objective": "NY_LCX_1903_HeliPad",
+    "native_id": 56,
+    "completed_state": 2,
+    "ap_id": 1374923847,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_1903/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "FIRE_CAMEL"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Airport.2004_ControlTower",
+    "objective": "NY_LCX_2004_Tower",
+    "native_id": 51,
+    "completed_state": 2,
+    "ap_id": 1646160165,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ai/level5.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Airport.2004_Loop",
+    "objective": "NY_LCX_2004_Loop",
+    "native_id": 52,
+    "completed_state": 2,
+    "ap_id": 1575238901,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2004/ai/level6.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Airport.2103_VD",
+    "objective": "NY_LCX_2103_Vehdrop",
+    "native_id": 55,
+    "completed_state": 2,
+    "ap_id": 1657821470,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_airport/ny_airport_2103/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "INDUSTRIAL_PROTECTOR"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Beach.2309_Loop",
+    "objective": "NY_BE_2309_Loop",
+    "native_id": 48,
+    "completed_state": 2,
+    "ap_id": 1566515995,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2410/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Beach.2310_SwimPool",
+    "objective": "NY_BE_2310_SwimPool",
+    "native_id": 47,
+    "completed_state": 2,
+    "ap_id": 1274514692,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2310/ai/level4.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SMALLCARS_TALOS"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Beach.2310_VD",
+    "objective": "NY_BE_2310_VehDrop",
+    "native_id": 50,
+    "completed_state": 2,
+    "ap_id": 1359413160,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2310/ai/level5.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "CIVIC_EPONA"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Beach.2312_RMP",
+    "objective": "NY_BE_2312_Ramp",
+    "native_id": 49,
+    "completed_state": 2,
+    "ap_id": 1124884335,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2312/ai/level5.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "COLLECT_5-07_ESKIMO"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Beach.2408_RollerCoast",
+    "objective": "NY_BE_2408_RollerCoast",
+    "native_id": 44,
+    "completed_state": 2,
+    "ap_id": 1050856853,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2408/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Beach.2410_SandCastle",
+    "objective": "NY_BE_2410_SandCastle",
+    "native_id": 46,
+    "completed_state": 2,
+    "ap_id": 1215531423,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2409/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Beach.2506_Lighthouse",
+    "objective": "NY_BE_2506_Lighthouse",
+    "native_id": 45,
+    "completed_state": 2,
+    "ap_id": 1720228914,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_beach/ny_beach_2506/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Chinatown.1716_Arch01",
+    "objective": "NY_CT_1716_Arch01",
+    "native_id": 28,
+    "completed_state": 2,
+    "ap_id": 1360499127,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1716/ai/level3.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Chinatown.1716_Arch02",
+    "objective": "NY_CT_1716_Arch02",
+    "native_id": 29,
+    "completed_state": 2,
+    "ap_id": 1686220919,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1716/ai/level4.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Chinatown.1717_VD",
+    "objective": "NY_CT_1717_VehDrop",
+    "native_id": 30,
+    "completed_state": 2,
+    "ap_id": 1275651472,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1717/ai/level6.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SALOONCARS_INDULGA"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Chinatown.1718_RMP",
+    "objective": "NY_CT_1718_Ramp",
+    "native_id": 31,
+    "completed_state": 2,
+    "ap_id": 1780002517,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1718/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "COP_LAGNEY"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown.1924_VD",
+    "objective": "NY_DT_1924_VehDrop",
+    "native_id": 36,
+    "completed_state": 2,
+    "ap_id": 1212767390,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_1924/ai/level4.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SMALLCARS_EARWIG"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown.2124_VD",
+    "objective": "NY_DT_2124_VehDrop",
+    "native_id": 37,
+    "completed_state": 2,
+    "ap_id": 1308988230,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "POLICE_DUNBYPATROLLO"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown.2125_FerrisWheel",
+    "objective": "NY_DT_2125_FerrisWheel",
+    "native_id": 35,
+    "completed_state": 2,
+    "ap_id": 1081077186,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2125/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown_East.2121_Crash",
+    "objective": "NY_DTE_2121_CrashMat",
+    "native_id": 39,
+    "completed_state": 2,
+    "ap_id": 1463691039,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2120/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "INDUSTRIAL_PKML"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown_East.2320_Ferry",
+    "objective": "NY_DTE_2320_Ferry",
+    "native_id": 64,
+    "completed_state": 2,
+    "ap_id": 1453504831,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2320/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SMALLCARS_SEVILA"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown_East.2321_VD",
+    "objective": "NY_DTE_2321_VehDrop",
+    "native_id": 38,
+    "completed_state": 2,
+    "ap_id": 1471347791,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_downtown_east/ny_downtown_east_2321/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "CIVIC_BRISTLER"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown_West.1722_HP",
+    "objective": "NY_DTW_1722_HeliPad",
+    "native_id": 27,
+    "completed_state": 2,
+    "ap_id": 1443205581,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1722/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "HOSPITAL_SWOOPER"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown_West.1819_Octopus",
+    "objective": "NY_DTW_1819_Octopus",
+    "native_id": 25,
+    "completed_state": 2,
+    "ap_id": 1480076707,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1819/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown_West.1819_Tower",
+    "objective": "NY_DTW_1819_DropRide",
+    "native_id": 24,
+    "completed_state": 2,
+    "ap_id": 1806515619,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_chinatown/ny_chinatown_1718/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Downtown_West.1820_VD",
+    "objective": "NY_DTW_1820_VehDrop",
+    "native_id": 26,
+    "completed_state": 2,
+    "ap_id": 1219063967,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_downtown_west/ny_downtown_west_1820/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "FIRE_DOUSER"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Little_Italy.2315_VD",
+    "objective": "NY_LI_2315_VehDrop",
+    "native_id": 41,
+    "completed_state": 2,
+    "ap_id": 1589703278,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2315/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SMALLCARS_CRATER"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Little_Italy.2318_VD",
+    "objective": "NY_LI_2318_VehDrop",
+    "native_id": 40,
+    "completed_state": 2,
+    "ap_id": 1332274579,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2318/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SMALLCARS_SQUEAKY"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Little_Italy.2415_RMP",
+    "objective": "NY_LI_2415_Ramp",
+    "native_id": 43,
+    "completed_state": 2,
+    "ap_id": 1007534844,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_little_italy/ny_little_italy_2415/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "NPC_MIKEYSPOILERS"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Times_Square.1712_VD",
+    "objective": "NY_TS_1712_VehDrop",
+    "native_id": 32,
+    "completed_state": 2,
+    "ap_id": 1226309512,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_times_square/ny_times_square_1712/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "POLICE_CHASER"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Uptown.1503_VD",
+    "objective": "NY_UT_1503_VehDrop",
+    "native_id": 34,
+    "completed_state": 2,
+    "ap_id": 1273252855,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1503/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SALOONCARS_HESTIA"
+  },
+  {
+    "job": "SuperBuild_Saves.NY_Uptown.1606_VD",
+    "objective": "NY_UT_1606_VehDrop",
+    "native_id": 33,
+    "completed_state": 2,
+    "ap_id": 1370727271,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1606/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "CIVIC_HAZARD"
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Docks.0815_VD",
+    "objective": "SF_DO_0815_VehDrop",
+    "native_id": 11,
+    "completed_state": 2,
+    "ap_id": 1167252269,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0815/ai/level10.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "INDUSTRIAL_DRAGGER"
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Docks.0818_Fan",
+    "objective": "SF_DO_0818_Fan",
+    "native_id": 7,
+    "completed_state": 2,
+    "ap_id": 1499680831,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0818/ai/level3.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Docks.0916_Chimney",
+    "objective": "SF_DO_0916_Chimney",
+    "native_id": 8,
+    "completed_state": 2,
+    "ap_id": 1292968698,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0916/ai/level4.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Docks.0917_HP",
+    "objective": "SF_DO_0917_HeliPad",
+    "native_id": 12,
+    "completed_state": 2,
+    "ap_id": 1038982587,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0917/ai/level3.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "AIRCRAFT_HERA"
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Docks.0918_RMP",
+    "objective": "SF_DO_0918_Ramp",
+    "native_id": 9,
+    "completed_state": 2,
+    "ap_id": 1381691470,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0918/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "COLLECT_3-08_RACECARDRIVER"
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Docks.0918_VD",
+    "objective": "SF_DO_0918_VehDrop",
+    "native_id": 10,
+    "completed_state": 2,
+    "ap_id": 1138173473,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_docks/sf_docks_0918/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "CIVIC_TRASHER"
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Residential.0822_HP",
+    "objective": "SF_RD_0822_HeliPad",
+    "native_id": 6,
+    "completed_state": 2,
+    "ap_id": 1704838692,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0822/ai/level7.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "POLICE_RESPONDER"
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Residential.0823_Ferry",
+    "objective": "SF_RD_0823_Ferry",
+    "native_id": 4,
+    "completed_state": 2,
+    "ap_id": 1639479762,
+    "evidence": [
+      "GAME4/jobs/scripts/find_ferry/superbuild_watch.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SMALLCARS_PUMPKIN"
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Residential.0916_CrashMat",
+    "objective": "SF_RD_0916_CrashMat",
+    "native_id": 42,
+    "completed_state": 2,
+    "ap_id": 1060577786,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/ai/level8.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "MOTORCYCLES_REVOLVER"
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Residential.0919_House",
+    "objective": "SF_RD_0919_House",
+    "native_id": 1,
+    "completed_state": 2,
+    "ap_id": 1033955301,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/ai/level6.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Residential.0922_VD",
+    "objective": "SF_RD_0922_VehDrop",
+    "native_id": 5,
+    "completed_state": 2,
+    "ap_id": 1827104653,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0922/ai/level9.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "POLICE_IMPRISONER"
+  },
+  {
+    "job": "SuperBuild_Saves.SF_Residential.0923_Fountain",
+    "objective": "SF_RD_0923_Fountain",
+    "native_id": 2,
+    "completed_state": 2,
+    "ap_id": 1749851487,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0923/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Farmlands.0607_Cabin",
+    "objective": "WI_FL_0607_Cabin",
+    "native_id": 13,
+    "completed_state": 2,
+    "ap_id": 1217456354,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/ai/level3.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Farmlands.0608_CrashMat",
+    "objective": "WI_FL_0608_CrashMat",
+    "native_id": 17,
+    "completed_state": 2,
+    "ap_id": 1597287686,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0608/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "INDUSTRIAL_SLICKER"
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Farmlands.0608_Station",
+    "objective": "WI_FL_0608_Station",
+    "native_id": 14,
+    "completed_state": 2,
+    "ap_id": 1480367442,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0607/ai/level4.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Farmlands.0705_VD",
+    "objective": "WI_FL_0705_VehDrop",
+    "native_id": 16,
+    "completed_state": 2,
+    "ap_id": 1302137116,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/wi_farmlands/wi_farmlands_0705/ai/level6.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "SUV_TORSION"
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Farmlands.0708_VD",
+    "objective": "WI_FL_0708_VehDrop",
+    "native_id": 15,
+    "completed_state": 2,
+    "ap_id": 1398371327,
+    "evidence": [
+      "GAME4/jobs/scripts/vehicle_drop_info/vehicledrop_intro.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "POLICE_TROOPER"
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Forest.0802_Tree",
+    "objective": "WI_FO_0802_Tree",
+    "native_id": 19,
+    "completed_state": 2,
+    "ap_id": 1050768769,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0802/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Forest.0803_HP",
+    "objective": "WI_FO_0803_HeliPad",
+    "native_id": 21,
+    "completed_state": 2,
+    "ap_id": 1402269925,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0803/ai/level2.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "POLICE_SKYBRINGER"
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Forest.0902_RMP",
+    "objective": "WI_FO_0902_Ramp",
+    "native_id": 22,
+    "completed_state": 2,
+    "ap_id": 1531099295,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "COP_DUKEHUCKLEBERRY"
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Forest.0902_VD",
+    "objective": "WI_FO_0902_VehDrop",
+    "native_id": 20,
+    "completed_state": 2,
+    "ap_id": 1223224457,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_0902/ai/level.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": "POLICE_VIGILANT"
+  },
+  {
+    "job": "SuperBuild_Saves.WI_Forest.1002_Bridge",
+    "objective": "WI_FO_1002_Bridge",
+    "native_id": 18,
+    "completed_state": 2,
+    "ap_id": 1827864586,
+    "evidence": [
+      "GAME5/levels/lego_city/lego_city/wi_forest/wi_forest_1002/ai/level1.sf"
+    ],
+    "verification": "native_binding_verified",
+    "live_gameplay_verified": false,
+    "reward_model": null
+  }
+]

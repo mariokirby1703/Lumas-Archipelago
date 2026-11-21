@@ -127,10 +127,11 @@ class ReconciliationTests(unittest.TestCase):
                 if crash_first and not game.crashed:
                     game.crashed=True;raise RuntimeError('Lost response after native credit')
                 return dict(verified=True,save_requested=True,save_confirmed=False)
-            def save(pid,dll):
+            def save(pid,dll,**kwargs):
                 game.disk=blank_save(game.marker)
                 return dict(requested=True,save_confirmed=False)
-            def batch_credit(pid,rows,token,dll):
+            def batch_credit(pid,rows,token,dll,**kwargs):
+                self.assertEqual(kwargs.get("expected_profile"),0x20000)
                 game.batches.append([r['index'] for r in rows])
                 for row in rows:credit(pid,row['plan']['kind'],row['plan']['amount'],dll,row['index'],token)
                 return dict(verified=True,credited=len(rows),save_confirmed=False)

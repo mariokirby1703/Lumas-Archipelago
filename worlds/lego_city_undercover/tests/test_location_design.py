@@ -11,7 +11,7 @@ from worlds.lego_city_undercover.bridge.research_profile import symbol_hash
 
 class DesignTests(unittest.TestCase):
     def test_all_sheet_rows_preserved_without_claiming_native_requirements(self):
-        design=data('location_design.json');self.assertEqual(len(design['rows']),1337)
+        design=data('location_design.json');self.assertEqual(len(design['rows']),1421)
         self.assertFalse(design['requirements_verified'])
         self.assertEqual(sum(r['native_match']=='exact_key' for r in design['rows']),1068)
         for r in design['rows']:self.assertIn('unverified_user_design',r['design']['evidence'])
@@ -53,3 +53,17 @@ class DesignTests(unittest.TestCase):
             def has(self,*args):return False
         self.assertTrue(source_rule(dict(category='super_builds',native_type='SuperBuild'),1)(EmptyState()))
         self.assertTrue(source_rule(dict(design_requirements=dict(classes='Construction Worker')),1)(EmptyState()))
+
+    def test_earwig_automatic_superbuild_reward_does_not_duplicate_a_global_found_check(self):
+        from worlds.lego_city_undercover.tests.test_generation import GenerationTests
+        from worlds.lego_city_undercover.bridge.client_checks import changed_checks
+        _,world=GenerationTests().build()
+        key='source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:0'
+        self.assertIn(key,CATALOGUE['locations']);self.assertNotIn(key,world.active_catalogue)
+        relation=CATALOGUE['locations'][key]['token_relationship']
+        self.assertEqual(relation['automatic_reward_sources'],['objective:NY_DT_1924_VehDrop'])
+        self.assertEqual(relation['classification'],'ambiguous')
+        catalogue={str(r['id']):dict(key=k,**r) for k,r in world.active_catalogue.items()}
+        snapshot=dict(objectives=dict(records=[dict(name_hash=symbol_hash('NY_DT_1924_VehDrop'),candidate_complete=True)]),
+            pickup_bits=[],characters=[dict(internal_name='SMALLCARS_EARWIG',group='vehicle',found_bit=True)])
+        self.assertEqual(changed_checks(catalogue,None,snapshot)[0],[CATALOGUE['locations']['objective:NY_DT_1924_VehDrop']['id']])

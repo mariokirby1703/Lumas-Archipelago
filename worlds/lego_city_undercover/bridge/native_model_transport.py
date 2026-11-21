@@ -30,8 +30,8 @@ def area_disembark(pid,district,binding,dll):
 PACKET=struct.Struct('<16I')
 
 
-def grant_model(pid,model,name,dll):
-    return _command(pid,model,name,dll,1)
+def grant_model(pid,model,name,dll,*,binding=bytes(16),expected_profile=0):
+    return _command(pid,model,name,dll,1,binding=binding,expected_profile=expected_profile)
 
 
 def configure_detective_scan(pid,enabled,dll):
@@ -52,8 +52,8 @@ def test_currency(pid,kind,amount,enabled,dll):
     return _command(pid,amount,name,dll,17)
 
 
-def request_save(pid,dll):
-    result=_command(pid,0,'AUTOSAVE',dll,5)
+def request_save(pid,dll,*,binding=bytes(16),expected_profile=0):
+    result=_command(pid,0,'AUTOSAVE',dll,5,binding=binding,expected_profile=expected_profile)
     return dict(requested=bool(result['found']),save_confirmed=False)
 
 
@@ -75,7 +75,7 @@ def preview_rewards(pid,policy,binding,dll):
     return _policy_command(pid,policy,binding,dll,9)
 
 
-def grant_currency_batch(pid,deliveries,binding,dll):
+def grant_currency_batch(pid,deliveries,binding,dll,*,expected_profile=0):
     if not 0<len(deliveries)<=24 or len(binding)!=16:raise ValueError('Invalid currency batch')
     data=bytearray(320);struct.pack_into('<4I',data,0,0x4c435542,1,pid,len(deliveries));data[16:32]=binding
     previous=-1
@@ -84,11 +84,11 @@ def grant_currency_batch(pid,deliveries,binding,dll):
         allowed={'add_studs':(1000,10000,100000),'add_bricks':(100,250,1000,10000)}
         if kind not in allowed or amount not in allowed[kind] or not previous<index<0xffffffff:raise ValueError('Invalid ordered currency batch')
         struct.pack_into('<3I',data,32+i*12,index,6 if kind=='add_studs' else 7,amount);previous=index
-    result=_policy_command(pid,bytes(data),binding,dll,10)
+    result=_policy_command(pid,bytes(data),binding,dll,10,expected_profile=expected_profile)
     return dict(verified=True,credited=result['changes'],save_confirmed=False)
 
 
-def _policy_command(pid,policy,binding,dll,opcode):
+def _policy_command(pid,policy,binding,dll,opcode,*,expected_profile=0):
     from reward_policy import POLICY
     if len(policy)!=POLICY.size or len(binding)!=16:raise ValueError('Invalid native policy packet')
     kernel=ctypes.WinDLL('kernel32',use_last_error=True)
@@ -107,7 +107,7 @@ def _policy_command(pid,policy,binding,dll,opcode):
         if not view:raise ctypes.WinError(ctypes.get_last_error())
         ctypes.memmove(view,policy,len(policy))
         name={10:'CURRENCY_BATCH',19:'ITEM_POPUP'}.get(opcode,'ENFORCE_POLICY')
-        result=_command(pid,0,name,dll,opcode,0,binding)
+        result=_command(pid,0,name,dll,opcode,0,binding,expected_profile=expected_profile)
         reply=dict(changes=result['found'],switch_requested=result['owned']==2,dry_run=opcode==9,save_confirmed=False)
         if opcode==19:reply['tinted']=result['owned']==1
         return reply
@@ -122,20 +122,23 @@ def probe_model(pid,model,name,dll):
     return dict(model=model,found=result['found'],availability=result['owned'])
 
 
-def grant_ability(pid,name,dll):
+def grant_ability(pid,name,dll,*,binding=bytes(16),expected_profile=0):
     from research_profile import ABILITY_NAMES
     if name not in ABILITY_NAMES:raise ValueError('Unbound native ability: '+name)
-    result=_command(pid,ABILITY_NAMES.index(name),name,dll,2)
+    result=_command(pid,ABILITY_NAMES.index(name),name,dll,2,binding=binding,expected_profile=expected_profile)
     return dict(ability=name,enabled=result['found']==1,verified=result['found']==1,save_confirmed=False)
 
 
-def grant_cheat(pid,index,name,dll):
-    result=_command(pid,index,name,dll,3)
+def grant_cheat(pid,index,name,dll,*,binding=bytes(16),expected_profile=0):
+    result=_command(pid,index,name,dll,3,binding=binding,expected_profile=expected_profile)
     return dict(cheat=name,found=result['found'],effect_flag=result['owned'],
                 verified=result['owned']==1,save_confirmed=False)
 
 
-def _command(pid,model,name,dll,opcode,receipt_index=0,binding=bytes(16)):
+def _command(pid,model,name,dll,opcode,receipt_index=0,binding=bytes(16),expected_profile=0):
+    if (type(expected_profile) is not int or not 0<=expected_profile<0x800000000000 or
+            (expected_profile and (expected_profile<0x10000 or len(binding)!=16 or not any(binding)))):
+        raise ValueError("Invalid native grant identity")
     from native_context_policy import NATIVE_OPCODES
     if opcode not in NATIVE_OPCODES:raise ValueError('Unknown native opcode')
     report=diagnose.diagnose()
@@ -184,7 +187,7 @@ def _command(pid,model,name,dll,opcode,receipt_index=0,binding=bytes(16)):
         view=kernel.MapViewOfFile(mapping,0xf001f,0,0,PACKET.size)
         if not view:raise ctypes.WinError(ctypes.get_last_error())
         # Initial state is idle. Publish pending only after the hook is installed.
-        packet=PACKET.pack(0x4c435549,2,0,opcode,pid,thread,0,model,symbol_hash(name),0,0,
+        packet=PACKET.pack(0x4c435549,2,0,opcode,pid,thread,0,model,symbol_hash(name),expected_profile&0xffffffff,expected_profile>>32,
                            receipt_index,*struct.unpack('<4I',binding))
         ctypes.memmove(view,packet,len(packet))
         library=kernel.LoadLibraryExW(str(dll),None,1)  # DONT_RESOLVE_DLL_REFERENCES in host

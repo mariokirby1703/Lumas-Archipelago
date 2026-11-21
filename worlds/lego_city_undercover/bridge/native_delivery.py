@@ -24,7 +24,7 @@ class NativeDeliveryEngine:
     async def _save(self,session,index):
         status=read_save_controller(session.read,session.base)
         if not status.get('enabled') or status.get('requested'):return False
-        await asyncio.to_thread(request_save,session.pid,self.dll)
+        await asyncio.to_thread(request_save,session.pid,self.dll,binding=self.identity[1],expected_profile=self.identity[2])
         self.requested.add(index)
         logging.info('Native autosave requested for AP receipt %s',index)
         return True
@@ -173,7 +173,7 @@ class NativeDeliveryEngine:
                 # previous process died between the native call and SQLite commit.
                 batch=[r for r in deliveries if r['plan']['kind'] in ('add_studs','add_bricks')
                        and not receipt_saved(marker,journal.binding_token,r['index'])][:24]
-                evidence=await asyncio.to_thread(grant_currency_batch,session.pid,batch,journal.binding_token,self.dll)
+                evidence=await asyncio.to_thread(grant_currency_batch,session.pid,batch,journal.binding_token,self.dll,expected_profile=self.identity[2])
                 for row in batch:journal.record_memory_verification(row['index'],evidence)
                 logging.info('AP currency batch credited: %s packages; Studs +%s, bricks +%s; one native save',
                     len(batch),sum(r['plan']['amount'] for r in batch if r['plan']['kind']=='add_studs'),
@@ -194,7 +194,7 @@ class NativeDeliveryEngine:
                         if delivery['state']!='applied':journal.record_saved(index,save_evidence(self.path,data))
                     else:await self._save(session,index)
                     continue
-                evidence=await asyncio.to_thread(grant_model,session.pid,model,name,self.dll)
+                evidence=await asyncio.to_thread(grant_model,session.pid,model,name,self.dll,binding=journal.binding_token,expected_profile=self.identity[2])
             elif kind=='ability_unlock' and plan['ability'] in ABILITY_NAMES:
                 name=plan['ability']
                 if snapshot.get('ability_raw',{}).get(name,{}).get('existing')==1:
@@ -202,7 +202,7 @@ class NativeDeliveryEngine:
                         if delivery['state']!='applied':journal.record_saved(index,save_evidence(self.path,data))
                     else:await self._save(session,index)
                     continue
-                evidence=await asyncio.to_thread(grant_ability,session.pid,name,self.dll)
+                evidence=await asyncio.to_thread(grant_ability,session.pid,name,self.dll,binding=journal.binding_token,expected_profile=self.identity[2])
                 if name=='SuperBuild':
                     # Keep the native ability grant and the vanilla city-job
                     # activation in the same delivery cycle, before autosave.
@@ -225,7 +225,7 @@ class NativeDeliveryEngine:
                         if delivery['state']!='applied':journal.record_saved(index,save_evidence(self.path,data))
                     else:await self._save(session,index)
                     continue
-                evidence=await asyncio.to_thread(grant_cheat,session.pid,cheat['index'],cheat['native_name'],self.dll)
+                evidence=await asyncio.to_thread(grant_cheat,session.pid,cheat['index'],cheat['native_name'],self.dll,binding=journal.binding_token,expected_profile=self.identity[2])
             else:
                 key=(journal.binding_token,index)
                 if key not in self.unbound and (kind=='unbound' or kind=='ability_unlock'):

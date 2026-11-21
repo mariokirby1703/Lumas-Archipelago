@@ -602,11 +602,13 @@
     "reason": "A model found flag alone does not prove a separately collectible token"
   },
   "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2124/ny_downtown_2124.giz:100:0": {
-    "automatic_reward_sources": [],
-    "classification": "unverified_source",
-    "exclude_from_new_generation": false,
+    "automatic_reward_sources": [
+      "objective:NY_DT_1924_VehDrop"
+    ],
+    "classification": "ambiguous",
+    "exclude_from_new_generation": true,
     "independent_source_binding": false,
-    "reason": "A model found flag alone does not prove a separately collectible token"
+    "reason": "Global model-found detector also set by an automatic native activity reward; no independent pickup-bit detector"
   },
   "source_pickup:GAME5/levels/lego_city/lego_city/ny_downtown/ny_downtown_2125/ny_downtown_2125.giz:100:0": {
     "automatic_reward_sources": [],

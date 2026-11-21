@@ -7,10 +7,10 @@ Prison Guard (Police),Disguise Booth (Albatross Island),COP_PRISONGUARD,,,alread
 Horace Cone (Police),Disguise Booth (Kings Court),COP_HORACECONE,,,already_absent_as_global_found_check
 Security Supervisor (Police),Disguise Booth (Lady Liberty Island),,,,name_hint_unresolved
 Chase Suit (Police),Chan's Scrapard,,,,name_hint_unresolved
-Duke Huckleberry (Police),Stunt Ramp,COP_DUKEHUCKLEBERRY,,,already_absent_as_global_found_check
+Duke Huckleberry (Police),Stunt Ramp,COP_DUKEHUCKLEBERRY,,objective:WI_FO_0902_Ramp,already_absent_as_global_found_check
 Warden Stonewall (Robber),Free Run (Albatross Island),,,,name_hint_unresolved
 Oscar Steel (Robber),Apollo Island (Remaster); im alten Kartenmaterial fälschlich Astronaut-Kategorie erwartet,,,,name_hint_unresolved
-Mikey Spoilers (Robber),Stunt Ramp,NPC_MIKEYSPOILERS,,,already_absent_as_global_found_check
+Mikey Spoilers (Robber),Stunt Ramp,NPC_MIKEYSPOILERS,,objective:NY_LI_2415_Ramp,already_absent_as_global_found_check
 Gangster (Robber),Disguise Booth (Fresco),COLLECT_5-08_GANGSTER,,,already_absent_as_global_found_check
 Brantford Cubbery (Astronaut),Disguise Booth (Apollo Island),,,,name_hint_unresolved
 Classic Alien (Astronaut),Super Satellite (Apollo Island),,,,name_hint_unresolved
@@ -18,10 +18,10 @@ Dutch Danish (Astronaut),The Spinning Shuttle Program,,,,name_hint_unresolved
 Docks Foreman (Construction),Free Run (Auburn),CIVILIAN_DOCKSFOREMAN,,objective:SF_DO_0916_Parkour,already_absent_as_global_found_check
 Hugh Hunter (Resident),Disguise Booth (Downtown),,,,name_hint_unresolved
 Karate Guy (Resident),Serenity Bridge,,,,name_hint_unresolved
-Pilot (Special 1),Stunt Ramp,COLLECT_3-03_PILOT,,,already_absent_as_global_found_check
+Pilot (Special 1),Stunt Ramp,COLLECT_3-03_PILOT,,objective:NY_LCX_1803_Ramp,already_absent_as_global_found_check
 Cheerleader (Special 1),Free Run (Bright Lights Plaza),COLLECT_1-02_CHEERLEADER,,objective:NY_TS_1713_Parkour,already_absent_as_global_found_check
 Skater (Special 1),Free Run (Crescent Park),COLLECT_1-06_SKATER,,objective:NY_CP_1707_Parkour,already_absent_as_global_found_check
-Race Car Driver (Special 1),Stunt Ramp,COLLECT_3-08_RACECARDRIVER,,,already_absent_as_global_found_check
+Race Car Driver (Special 1),Stunt Ramp,COLLECT_3-08_RACECARDRIVER,,objective:SF_DO_0918_Ramp,already_absent_as_global_found_check
 Demolition Dummy (Special 1),Disguise Booth (Cherry Tree Hills),COLLECT_1-08_DEMOLITIONDUMMY,,,already_absent_as_global_found_check
 Cowboy (Special 1),Free Run (Uptown),COLLECT_1-16_COWBOY,,objective:NY_UT_1605_Parkour,already_absent_as_global_found_check
 Vampire (Special 1),Free Run (Fort Meadows),COLLECT_2-11_VAMPIRE,,objective:WI_FL_0705_Parkour,already_absent_as_global_found_check
@@ -43,63 +43,63 @@ Chat Show Host (Service),Stunt Ramp,,,,name_hint_unresolved
 Paparazzo (Service),Disguise Booth (Bright Lights Plaza),,,,name_hint_unresolved
 Gas Station Manager (Service),Disguise Booth (Fort Meadows),,,,name_hint_unresolved
 Bearer,Vehicle Robbery (Downtown),MUSCLECARS_BEARER,,objective:NY_DT_1924_CarTheft,already_absent_as_global_found_check
-Slicker,Emergency Crash Mat,INDUSTRIAL_SLICKER,,,already_absent_as_global_found_check
-Torsion,Call-in Point,SUV_TORSION,,objective:SF_DO_0717_CarTheft,already_absent_as_global_found_check
+Slicker,Emergency Crash Mat,INDUSTRIAL_SLICKER,,objective:WI_FL_0608_CrashMat,already_absent_as_global_found_check
+Torsion,Call-in Point,SUV_TORSION,,objective:SF_DO_0717_CarTheft;objective:WI_FL_0705_VehDrop,already_absent_as_global_found_check
 Armadillo,Time Trial (Fort Meadows),FARM_ARMADILLO,,objective:WI_FL_0505_Race,already_absent_as_global_found_check
 Oldster,Time Trial (Bluebell National Park),VAN_OLDSTER,,objective:NY_LCX_1903_CarTheft;objective:WI_FO_0802_BoatRace,already_absent_as_global_found_check
 Hero,Vehicle Robber (Bluebell National Park),POLICE_HERO,,,already_absent_as_global_found_check
 Tracker,Time Trial (Bluebell National Park),FIRE_TRACKER;POLICE_TRACKER,source_pickup:GAME6/levels/standalones/fire_station/fire_station_training_area/fire_station_training_area_tech.giz:4815:235,objective:WI_FO_0702_Race,name_hint_unresolved
 Chan's Ironback,Time Trial (Bluebell National Park),CHANS_IRONBACK,,objective:BR_TB_1002_Race;objective:NY_DTW_1821_CarTheft,already_absent_as_global_found_check
-Trooper,Call-in Point,POLICE_TROOPER,,,already_absent_as_global_found_check
+Trooper,Call-in Point,POLICE_TROOPER,,objective:WI_FL_0708_VehDrop,already_absent_as_global_found_check
 Smallisimo (Compact),Vehicle Robbery (Uptown),SMALLCARS_SMALLISIMO,source_pickup:GAME5/levels/lego_city/lego_city/ny_uptown/ny_uptown_1604/ny_uptown_1604.giz:1066:1,objective:NY_UT_1604_CarTheft,native_duplicate_retired_for_new_seeds
 Flare,Vehicle Robber (Uptown),SALOONCARS_FLARE,,,already_absent_as_global_found_check
-Hestia,Call-in Point,SALOONCARS_HESTIA,,,already_absent_as_global_found_check
-Hazard,Call-in Point,CIVIC_HAZARD,,,already_absent_as_global_found_check
+Hestia,Call-in Point,SALOONCARS_HESTIA,,objective:NY_UT_1503_VehDrop,already_absent_as_global_found_check
+Hazard,Call-in Point,CIVIC_HAZARD,,objective:NY_UT_1606_VehDrop,already_absent_as_global_found_check
 M.O.V.,Flughafen Call-in Point,,,,name_hint_unresolved
 Shifter,Vehicle Robber (Lego City Airport),INDUSTRIAL_SHIFTER,,,already_absent_as_global_found_check
 Rugged (Heavy),Vehicle Robbery (Lego City Airport),SUV_RUGGED,,objective:NY_LCX_1903_CarTheft,already_absent_as_global_found_check
 Vor,Time Trial (Lego City Airport),MOTORCYCLES_VOR,,objective:NY_DT_1924_CarTheft;objective:NY_LCX_2004_Race,already_absent_as_global_found_check
-Protector,Call-in Point,INDUSTRIAL_PROTECTOR,,,already_absent_as_global_found_check
+Protector,Call-in Point,INDUSTRIAL_PROTECTOR,,objective:NY_LCX_2103_Vehdrop,already_absent_as_global_found_check
 T.R.E.V.,Crescent Park,POLICE_TREV,,objective:NY_CP_1711_CarTheft,already_absent_as_global_found_check
-Douser,Call-in Point,FIRE_DOUSER,,,already_absent_as_global_found_check
+Douser,Call-in Point,FIRE_DOUSER,,objective:NY_DTW_1820_VehDrop,already_absent_as_global_found_check
 Vigilante,Bluebell National Park Call-in Point (Vigilant),,,,name_hint_unresolved
 Atlas,Time Trial (Apollo Island),INDUSTRIAL_ATLAS,,objective:IS_SC_3022_BoatRace,already_absent_as_global_found_check
 Cocoon,Time Trial (Apollo Island),SPACE_COCOON,,objective:IS_SC_3122_Race;objective:NY_TS_1613_CarTheft,already_absent_as_global_found_check
-Wanderer,Call-in Point,VAN_WANDERER,,,already_absent_as_global_found_check
+Wanderer,Call-in Point,VAN_WANDERER,,objective:IS_SC_3222_VehDrop,already_absent_as_global_found_check
 Wrath,Time Trial (Auburn Bay Bridge),SPORTSCARS_WRATH,,objective:BR_GG_0709_Race;objective:NY_UT_1604_CarTheft,already_absent_as_global_found_check
 Pursuer,Polizeistation nach dem Story-Ende (Remaster),,,,name_hint_unresolved
 Rebellion,Polizeistation nach dem Story-Ende (Remaster),,,,name_hint_unresolved
-Imprisoner,Call-in Point,POLICE_IMPRISONER,,,already_absent_as_global_found_check
+Imprisoner,Call-in Point,POLICE_IMPRISONER,,objective:SF_RD_0922_VehDrop,already_absent_as_global_found_check
 Lantos,Time Trial (Cherry Tree Hills),SPORTSCARS_LANTOS,,objective:NY_LI_2418_CarTheft;objective:SF_RD_0822_Race,already_absent_as_global_found_check
 Valkyrie,Vehicle Robbery (Cherry Tree Hills),SPORTSCARS_VALKYRIE,,objective:SF_RD_1121_CarTheft,already_absent_as_global_found_check
-Revolver,Emergency Crash Mat,MOTORCYCLES_REVOLVER,,,already_absent_as_global_found_check
-Trasher,Call-in Point,CIVIC_TRASHER,,,already_absent_as_global_found_check
+Revolver,Emergency Crash Mat,MOTORCYCLES_REVOLVER,,objective:SF_RD_0916_CrashMat,already_absent_as_global_found_check
+Trasher,Call-in Point,CIVIC_TRASHER,,objective:SF_DO_0918_VehDrop,already_absent_as_global_found_check
 Enberg,Vehicle Robbery (Auburn),MUSCLECARS_ENBERG,,objective:SF_DO_0918_CarTheft,already_absent_as_global_found_check
-Dragger,Call-in Point,INDUSTRIAL_DRAGGER,,,already_absent_as_global_found_check
+Dragger,Call-in Point,INDUSTRIAL_DRAGGER,,objective:SF_DO_0815_VehDrop,already_absent_as_global_found_check
 Brawn,Time Trial (Auburn),INDUSTRIAL_BRAWN,,objective:SF_DO_1016_BoatRace,already_absent_as_global_found_check
 Rex's Riot,Vehicle Robbery (Auburn),,,,name_hint_unresolved
 Redeemer,Time Trial (Lady Liberty Island),MOTORCYCLES_REDEEMER,,objective:IS_LI_1213_Race;objective:NY_CP_1711_CarTheft,already_absent_as_global_found_check
-Cabrakan,Ferry,SALOONCARS_CABRAKAN,,,already_absent_as_global_found_check
-Squeaky (Compact),Call-in Point,SMALLCARS_SQUEAKY,,,already_absent_as_global_found_check
+Cabrakan,Ferry,SALOONCARS_CABRAKAN,,objective:IS_LI_1113_Ferry,already_absent_as_global_found_check
+Squeaky (Compact),Call-in Point,SMALLCARS_SQUEAKY,,objective:NY_LI_2318_VehDrop,already_absent_as_global_found_check
 Muncher,Time Trial (Fresco),VAN_MUNCHER,,objective:NY_LI_2418_Race;objective:SF_DO_0918_CarTheft,already_absent_as_global_found_check
 Squadmobile (Emergency),Time Trial (Fresco),VAN_SQUADMOBILE,,objective:NY_BE_2310_CarTheft;objective:NY_LI_2418_BoatRace,already_absent_as_global_found_check
 Transter (Heavy),Vehicle Robber (Fresco),SUV_TRANSTER,,,already_absent_as_global_found_check
 Falchion GT (Performance),Vehicle Robbery (Fresco),MUSCLECARS_FALCHIONGT,,objective:NY_LI_2418_CarTheft,already_absent_as_global_found_check
-Crater (Compact),Call-in Point,SMALLCARS_CRATER,,,already_absent_as_global_found_check
+Crater (Compact),Call-in Point,SMALLCARS_CRATER,,objective:NY_LI_2315_VehDrop,already_absent_as_global_found_check
 Wii U: Epona; All others: Traveller (Worker),Call-in Point,,,,name_hint_unresolved
 Lusca,Vehicle Robber (Paradise Sands),SPORTSCARS_LUSCA,,,already_absent_as_global_found_check
 Galleon,Time Trial (Paradise Sands),SUV_GALLEON,,objective:NY_BE_2412_BoatRace,already_absent_as_global_found_check
 Athena (Performance),Vehicle Robbery (Paradise Sands),MUSCLECARS_ATHENA,,objective:NY_BE_2310_CarTheft,already_absent_as_global_found_check
-Chaser,Call-in Point,POLICE_CHASER,,,already_absent_as_global_found_check
+Chaser,Call-in Point,POLICE_CHASER,,objective:NY_TS_1712_VehDrop,already_absent_as_global_found_check
 Gersemi,Vehicle Robber (Bright Lights Plaza),SPORTSCARS_GERSEMI,,,already_absent_as_global_found_check
 Cetan,Vehicle Robbery (Bright Lights Plaza),SPORTSCARS_CETAN,,objective:NY_TS_1613_CarTheft,already_absent_as_global_found_check
-Indulga,Call-in Point,SALOONCARS_INDULGA,,,already_absent_as_global_found_check
+Indulga,Call-in Point,SALOONCARS_INDULGA,,objective:NY_CT_1717_VehDrop,already_absent_as_global_found_check
 Tigerella,Vehicle Robber (Pagoda),MUSCLECARS_TIGERELLA,,,already_absent_as_global_found_check
 Chan's Drakonas,Vehicle Robbery (Pagoda),CHANS_DRAKONAS,,objective:NY_CT_1818_CarTheft,already_absent_as_global_found_check
-Bristler,Call-in Point,CIVIC_BRISTLER,,,already_absent_as_global_found_check
-Camel (Aircraft),Helipad,FIRE_CAMEL,,,already_absent_as_global_found_check
-Skybringer (Aircraft),Helicopter Platform,POLICE_SKYBRINGER,,,already_absent_as_global_found_check
-UFO (Aircraft),Helipad,AIRCRAFT_UFO,,,already_absent_as_global_found_check
-Chopper (Aircraft),Helipad,POLICE_CHOPPER,,,already_absent_as_global_found_check
-Responder (Aircraft),Helipad,POLICE_RESPONDER,,,already_absent_as_global_found_check
-Hera (Aircraft),Helipad,AIRCRAFT_HERA,,,already_absent_as_global_found_check
+Bristler,Call-in Point,CIVIC_BRISTLER,,objective:NY_DTE_2321_VehDrop,already_absent_as_global_found_check
+Camel (Aircraft),Helipad,FIRE_CAMEL,,objective:NY_LCX_1903_HeliPad,already_absent_as_global_found_check
+Skybringer (Aircraft),Helicopter Platform,POLICE_SKYBRINGER,,objective:WI_FO_0803_HeliPad,already_absent_as_global_found_check
+UFO (Aircraft),Helipad,AIRCRAFT_UFO,,objective:IS_SC_3423_HeliPad,already_absent_as_global_found_check
+Chopper (Aircraft),Helipad,POLICE_CHOPPER,,objective:IS_PI_1426_HeliPad,already_absent_as_global_found_check
+Responder (Aircraft),Helipad,POLICE_RESPONDER,,objective:SF_RD_0822_HeliPad,already_absent_as_global_found_check
+Hera (Aircraft),Helipad,AIRCRAFT_HERA,,objective:SF_DO_0917_HeliPad,already_absent_as_global_found_check

@@ -1,0 +1,4 @@
+﻿bit,sources,reason,verification,mutation
+5848,GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919.giz:208:2,multiple registrations or known ambiguous native bit,unsupported,False
+5849,,multiple registrations or known ambiguous native bit,unsupported,False
+5850,GAME5/levels/lego_city/lego_city/sf_residential/sf_residential_0919/sf_residential_0919.giz:208:5,multiple registrations or known ambiguous native bit,unsupported,False

@@ -8,6 +8,7 @@ import struct
 
 from inventory_reader import Read, pointer
 from research_profile import symbol_hash
+from superbuild_progress import BINDINGS as SUPERBUILD_JOBS
 
 JOB_MANAGER_RVA = 0x17ECA08
 VALUE_VTABLES = {0xC46B38: "Int", 0xC46BB8: "Bool"}
@@ -33,6 +34,9 @@ QUERIES = {
     "Flow_Saves.Act_1.Fix_Road_Block": {"RoadBlockFlowObjects": "Bool"},
     "Standalones.MoonBase": {"Finished": "Int", "CutsceneStage": "Int"},
 }
+
+for _build in SUPERBUILD_JOBS:
+    QUERIES[_build['job']]={'nState':'Int','nID':'Int'}
 
 
 def parse_job_registry(data: bytes) -> dict[int, tuple[int, int]]:

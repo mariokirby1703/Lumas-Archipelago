@@ -131,3 +131,9 @@ extern "C" __declspec(dllexport) DWORD TestSuperbuildJobs(std::uintptr_t base,st
     Command c{};c.name_hash=Hash("SUPERBUILD_JOBS");c.binding[0]=1;
     auto error=EnableSuperbuildJobs(base,&c);*changed=c.found;return error;
 }
+
+#include "../../bridge/native/grant_identity.h"
+extern "C" __declspec(dllexport) DWORD TestGrantIdentity(std::uintptr_t base,std::uintptr_t expected) {
+    Command c{};c.found=unsigned(expected);c.owned=unsigned(expected>>32);c.binding[0]=1;
+    return ValidateGrantIdentity(base,&c);
+}
