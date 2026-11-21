@@ -15,10 +15,11 @@ from Fill import distribute_items_restrictive
 PROFILES=(
     ('chronological',dict(early_criminal_scan=True,early_detective_scan=True)),
     ('whole_shields',dict(police_shields='whole')),
+    ('no_story_milestones',dict(story_milestones=False)),
     ('no_shields',dict(police_shields='off')),
     ('all_assignments',dict(goal='all_assignments')),
     ('legacy_debug_goal',dict(goal='debug_tokens')),
-    ('unrestricted_story_order',dict(story_mode='open_world')),
+    ('symbolic_story_order_research',dict(story_mode='open_world',experimental_items=True)),
     ('starting_police',dict(start_inventory={'Ability: Police':1})),
     ('starting_astronaut',dict(start_inventory={'Ability: Astronaut':1})),
     ('legacy_astronaut',dict(progressive_astronaut=False)),

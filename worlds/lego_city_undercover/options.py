@@ -4,7 +4,8 @@ from Options import Choice, Toggle, DefaultOnToggle, Range, PerGameCommonOptions
 
 class StoryMode(Choice):
     """Linear uses the assignment sequence and source lock requirements. Open world removes
-    assignment ordering in AP logic only; it does not bootstrap a postgame native save."""
+    assignment ordering in AP logic only and requires experimental_items. Native Open World
+    initialization and chapter selection are unavailable; ordinary seeds reject this mode."""
     display_name='Story Order (native open-world setup unavailable)'
     option_linear=0
     option_open_world=1
@@ -124,6 +125,11 @@ class CityActivities(DefaultOnToggle):
     display_name='City Activities'
 
 
+class StoryMilestones(DefaultOnToggle):
+    """Include source-bound individual city story milestones; unverified events remain excluded."""
+    display_name='Individual Story Milestones'
+
+
 class StoryMissions(DefaultOnToggle):
     """Include story mission completions and the three opening clown-robber arrests."""
     display_name='Story Missions'
@@ -234,6 +240,7 @@ class LCUOptions(PerGameCommonOptions):
     train_stations: TrainStations
     city_activities: CityActivities
     story_missions: StoryMissions
+    story_milestones: StoryMilestones
     red_bricks: RedBricks
     city_hero: CityHero
     police_shields: ShieldChecks
@@ -249,7 +256,7 @@ class LCUOptions(PerGameCommonOptions):
 
 def enabled_categories(options):
     categories={name for name in ('super_bricks','super_builds','disguise_booths','atms',
-                'train_stations','city_activities','story_missions','red_bricks','city_hero','character_tokens','vehicle_tokens')
+                'train_stations','city_activities','story_missions','story_milestones','red_bricks','city_hero','character_tokens','vehicle_tokens')
                 if getattr(options,name).value}
     if options.police_shields.value==1:categories.add('whole_shields')
     if options.police_shields.value==2:categories.add('shield_quarters')

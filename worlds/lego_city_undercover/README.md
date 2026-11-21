@@ -1,5 +1,7 @@
 # LEGO City Undercover experimental APWorld
 
+Latest story pass (2026-11-21): [implementation and validation](docs/research/story_control/completion_report.md), [remaining work](docs/research/story_control/TODO.md). All 150 Story Progression Sheet points reviewed; 14 new source-bound milestone checks, 35 existing locations reused, seven existing mission Super Builds receive scene-specific bindings. 419 test executions (7 skipped), 180/180 logical fills. Native Open World initialization and an original pause-menu chapter selector are **not implemented**. Version remains **0.0.1**.
+
 Current pass (2026-11-21): [completion report](docs/research/reliability/completion_report_2026_11_21.md). 174/471 exact city pickup bindings, 65 persistent city Superbuild job bindings, native profile/seed grant guards and 1,421 read-only Sheet design rows. 405 test executions (7 skipped) and 180/180 fill simulations; vehicle/creature gameplay validation and destination/story/open-world gates remain incomplete.
 
 Latest follow-up: [pickup proof review and writer guard](docs/research/reliability/pickup_binding_review.md), with 386 passing test executions. Shared binding coverage remains 40/471 until new native observations are available.

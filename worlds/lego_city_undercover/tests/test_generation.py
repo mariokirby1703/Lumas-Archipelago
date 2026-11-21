@@ -166,7 +166,7 @@ class GenerationTests(unittest.TestCase):
             if item.advancement:state.collect(item,True)
         self.assertTrue(all(loc.can_reach(state) for loc in multi.get_locations(1)))
     def test_open_world_keeps_source_requirements_without_local_police_placement(self):
-        multi,world=self.build({'story_mode':'open_world'})
+        multi,world=self.build({'story_mode':'open_world','experimental_items':True})
         self.assertIsNone(world.early_police_location)
         state=CollectionState(multi)
         self.assertTrue(multi.get_region('LEGO City',1).can_reach(state))

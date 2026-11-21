@@ -114,6 +114,10 @@ def create_regions(world, location_type, item_type):
         # gating, only the genuinely reachable Auburn subset is in Opening.
         if key in NO_POLICE_KEYS and (not area_enabled or auburn_opening_key(key, row)):
             parent = opening
+        elif row.get('category')=='story_milestones':
+            name='Story Chapter '+str(row['chapter'])
+            if name not in regions:city.connect(region(name))
+            parent=region(name)
         elif key == 'story_disguise:COP' and area_enabled:
             parent = station
         elif key.startswith('mission:'):
@@ -153,6 +157,10 @@ def create_regions(world, location_type, item_type):
             # Unresolved geography must not hide progression in an unreachable
             # area. Leave these candidates as non-progression while researching.
             location.item_rule = lambda item: not item.advancement
+        if row.get('category')=='story_milestones' and row.get('logic_verified') is False:
+            # Native completion is known; traversal requirements are not yet
+            # proven. Do not strand progression on provisional story logic.
+            location.item_rule=lambda item:not item.advancement
         parent.locations.append(location)
 
     if world.options.goal.value == 2:

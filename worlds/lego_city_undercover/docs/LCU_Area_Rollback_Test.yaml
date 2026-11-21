@@ -27,3 +27,6 @@ LEGO City Undercover:
   cheat_items: true
   police_shields: quarters
   include_unverified: false
+
+  # Individual native story actions; new locations require a newly generated seed.
+  story_milestones: true

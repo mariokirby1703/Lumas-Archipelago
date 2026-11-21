@@ -15,6 +15,7 @@ sys.path.insert(0,str(WORLD/'bridge'))
 from red_bricks import redbrick_location_key
 from activity_rewards import ACTIVITY_REWARDS
 from story_arrests import ARRESTS
+from story_points import catalogue_rows as story_point_rows
 from opening_logic import NO_POLICE_KEYS
 from area_passes import DISTRICTS
 from station_rewards import GRACE_REWARD_KEY,grace_reward_metadata
@@ -180,6 +181,17 @@ def main():
     for amount in (100,250,1000,10000):
         items[f'Super Bricks {amount:,}']=dict(category='building_bricks' if amount>=1000 else 'filler',
             classification='useful' if amount>=1000 else 'filler',effect='add_bricks',amount=amount)
+    locations.update(story_point_rows())
+    # Keep reviewed mission identities when rebuilding the source catalogue.
+    for binding in json.loads((WORLD/'bridge/mission_superbuild_bindings.json').read_text()):
+        row=locations['objective:'+binding['objective']]
+        source=Path(binding['script']).parent.parent/(binding['scene']+'.giz')
+        row.update(source=source.as_posix(),mission=binding['mission'],section=binding['scene'],
+                   mission_superbuild=True,
+                   building_brick_cost=dict(amount=binding['build_cost'],
+                       evidence='original script/template agreement',logic_enforced=False),
+                   native_build_identity=dict(scene=binding['scene'],name=binding['native_suffix'],template=binding['source']),
+                   completion_evidence='native state 5 / completion flag 4; original scanner flag may remain unset')
     for k,r in locations.items():
         r['id']=ident(k,1_000_000_000)
         if k in NO_POLICE_KEYS:

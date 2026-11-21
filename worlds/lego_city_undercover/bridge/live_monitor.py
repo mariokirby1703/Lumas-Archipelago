@@ -22,6 +22,8 @@ from monitor_events import EventTracker
 from monitor_report import event_evidence, export_report
 from location_reader import read_location
 from story_reader import read_story
+from chapter_reader import read_chapter_events
+from snapshot_guard import snapshot_identity,verify_snapshot_identity
 from monitor_sections import SectionTracker, location_heading, story_heading
 from monitor_context import ContextTracker
 from interaction_reader import (read_interaction, interaction_text, InteractionTracker,
@@ -65,7 +67,8 @@ class Session:
 
     def snapshot(self):
         from delivery_marker import read_marker
-        native_binding=read_marker(self.read,self.base)
+        identity=snapshot_identity(self.read,self.base)
+        native_binding=identity[3]
         objectives = read_objectives(self.read, self.base)
         stats = read_stats(self.read, self.base)
         inventory = read_characters(self.read, self.base)
@@ -112,6 +115,9 @@ class Session:
         try:level_progress=read_level_progress(self.read,self.base)
         except (OSError,ValueError,RuntimeError,struct.error) as error:
             level_progress=dict(status='unresolved',reason=str(error),records=[])
+        try:chapter_events=read_chapter_events(self.read,self.base)
+        except (OSError,ValueError,RuntimeError,struct.error) as error:
+            chapter_events=dict(status='unresolved',reason=str(error),check_eligible=False)
         try:superbuilds=read_superbuilds(self.read,self.base,mission_shield.get('mission'))
         except (OSError,ValueError,RuntimeError,struct.error) as error:
             superbuilds=dict(status='unresolved',reason=str(error),records=[])
@@ -124,19 +130,21 @@ class Session:
             raise RuntimeError('Native save binding changed during snapshot')
         try:ridden=read_ridden(self.read,self.base)
         except (OSError,ValueError,RuntimeError,struct.error) as error:ridden=dict(status='unresolved',reason=str(error))
-        return dict(native_binding=native_binding,ride=ride,ridden=ridden,objectives=objectives, stats=stats, location=location, interaction=interaction,
+        result=dict(native_binding=native_binding,ride=ride,ridden=ridden,objectives=objectives, stats=stats, location=location, interaction=interaction,
                     mission_tokens=read_mission_tokens(self.read,self.base),
                     mission_shield=mission_shield,mission_hero=mission_hero,superbuilds=superbuilds,
                     level_progress=level_progress,cheats=cheats,
                     scene_fields=scene_fields, auras=auras,native_pickups=native_pickups,
                     pickup_memory=pickup_memory,
                     actor=read_actor(self.read, self.base),
-                    story=read_story(self.read, self.base),
+                    story=read_story(self.read, self.base),chapter_events=chapter_events,
                     characters=inventory['characters'] + inventory['auxiliary_states'],
                     pickup_bits=bits, pickup_bytes=list(payload), pickup_address=hex(manager+0x120),
                     abilities=abilities, ability_raw=ability_state.get('named_candidate_state', {}),
                     process=dict(pid=self.pid, module_base=hex(self.base), sha256=diagnose.RESEARCH_HASH,
                                  profile=hex(pointer(self.read,self.base+0x1c7f160))))
+        verify_snapshot_identity(identity,self.read,self.base)
+        return result
 
 
 def main():

@@ -4,6 +4,7 @@ from activity_rewards import completed_activity_rewards
 from level_progress import completed_level_keys
 from red_bricks import redbrick_location_key
 from story_arrests import completed_story_arrests
+from story_points import completed_story_points
 from station_rewards import completed_station_rewards
 from superbuild_progress import reconcile_superbuild_objectives
 
@@ -50,6 +51,7 @@ def changed_checks(catalogue,previous,snapshot,checked_locations=()):
     checks=[]
     persistent_keys=completed_level_keys(snapshot.get('level_progress',{}))
     persistent_keys.update(completed_station_rewards(snapshot.get('story',{})))
+    persistent_keys.update(completed_story_points(snapshot.get('story',{})))
     persistent_keys.update(red_brick_missions)
     arrests=completed_story_arrests(snapshot.get('story',{}))
     found_models={r['internal_name'].upper() for r in snapshot.get('characters',[])

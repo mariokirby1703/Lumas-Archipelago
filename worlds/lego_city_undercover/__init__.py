@@ -50,6 +50,8 @@ class LCUWorld(World):
             raise ValueError('LCU: area passes require experimental_area_restrictions; distant travel/reload remains unsupported')
         if self.options.area_pass_items.value and self.options.story_mode.value != 0:
             raise ValueError('LCU: native area rollback currently requires linear story mode; open_world has no safe native save bootstrap')
+        if self.options.story_mode.value != 0 and not self.options.experimental_items.value:
+            raise ValueError('LCU: native Open World bootstrap and pause-menu chapter selection are not implemented; use linear mode. experimental_items permits symbolic AP-graph research only')
         if not self.options.experimental_items.value and self.options.story_access_items.value:
             raise ValueError('LCU: story tickets lack safe native entrance gates; enable experimental_items only for symbolic research seeds')
         self.active_catalogue = {
@@ -254,6 +256,8 @@ class LCUWorld(World):
                                 auburn_start_always_open=True,
                                 police_station_requires_cherry_pass=bool(self.options.area_pass_items.value)),
             native_grants=True, native_locks=False, native_open_world_setup=False,
+            native_story_point_bindings=1, native_chapter_selection=False,
+            native_story_entrance_gates=False,
             native_area_rollback=bool(self.options.area_pass_items.value
                                       and self.options.experimental_area_restrictions.value),
             native_detective_scan_lock=bool(self.options.detective_scan_lock.value

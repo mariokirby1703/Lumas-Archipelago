@@ -1,9 +1,11 @@
 """Read loaded SuperBuildGizmo completion; no native calls or writes."""
 import json
 import math
+import re
+from collections import Counter
 from pathlib import Path
 import struct
-from inventory_reader import pointer
+from inventory_reader import pointer,cstring
 from scene_reader import player_scene,scene_component
 
 MANAGER_RVA=0x17EC978
@@ -31,10 +33,18 @@ def bind_superbuild(row, bindings, mission):
     """Use exact instance identity; city observations additionally pin world position."""
     matches=set()
     for binding in bindings:
-        if binding['native_name']!=row['name']:continue
-        if 'position' in binding:
-            if any(abs(a-b)>0.05 for a,b in zip(row['position'],binding['position'])):continue
-        elif binding.get('mission')!=mission:continue
+        if binding.get('native_suffix'):
+            if (binding['mission']!=mission or row.get('scene_conflict') or
+                    str(row.get('scene_name','')).casefold()!=binding['scene'].casefold()):continue
+            if row.get('native_build_value')!=binding['build_cost']:continue
+            suffix=binding['native_suffix']
+            if not (row['name'] in (suffix,binding['native_alias']) or
+                    re.fullmatch(r'#cg_[0-9]+_'+re.escape(suffix),row['name'])):continue
+        else:
+            if binding['native_name']!=row['name']:continue
+            if 'position' in binding:
+                if any(abs(a-b)>0.05 for a,b in zip(row['position'],binding['position'])):continue
+            elif binding.get('mission')!=mission:continue
         matches.add(binding['objective'])
     return next(iter(matches)) if len(matches)==1 else None
 
@@ -43,10 +53,18 @@ def read_superbuilds(read,base,mission):
     scene=player_scene(read,base)
     primary=scene_component(read,base,scene,MANAGER_RVA)
     bindings=json.loads((Path(__file__).parent/'superbuild_bindings.json').read_text())
+    bindings+=json.loads((Path(__file__).parent/'mission_superbuild_bindings.json').read_text())
     components=set();rows=[]
 
-    def collect(component):
-        if not component or component in components:return
+    def collect(component,scene_name=None):
+        if not component:return
+        if component in components:
+            if scene_name:
+                for row in rows:
+                    if row['_component']!=component:continue
+                    if row.get('scene_name') and row['scene_name']!=scene_name:row['scene_conflict']=True
+                    else:row['scene_name']=scene_name
+            return
         if pointer(read,component)!=base+0xC30608:raise ValueError('Unknown Super Build component')
         components.add(component)
         head=pointer(read,component+0xE0);node=head;seen=set();pending=[]
@@ -55,6 +73,7 @@ def read_superbuilds(read,base,mission):
             seen.add(node);data=read(node,0x1E8)
             if struct.unpack_from('<Q',data,0x48)[0]!=component:raise ValueError('Invalid Super Build owner')
             row=parse_superbuild(data,base);row['address']=hex(node)
+            row.update(_component=component,scene_name=scene_name)
             row['objective_name']=bind_superbuild(row,bindings,mission)
             row['binding_evidence']='exact instance binding' if row['objective_name'] else 'unmapped'
             pending.append(row);node=struct.unpack_from('<Q',data,0x28)[0]
@@ -80,13 +99,23 @@ def read_superbuilds(read,base,mission):
             level=pointer(read,owner+0xBB0)
             table=pointer(read,pointer(read,level+0xA0)+0xC0)
             component=scene_component(read,base,dict(table=table),MANAGER_RVA)
-            collect(component)
+            tile=pointer(read,owner+0xB18);name_pointer=pointer(read,tile+0x68)
+            scene_name=cstring(read,name_pointer) if name_pointer else None
+            collect(component,scene_name)
         except (OSError,ValueError,RuntimeError,struct.error):
             skipped+=1
     if (player_scene(read,base)['level']!=scene['level'] or
             pointer(read,base+0x1C402D8)!=registry or
             b''.join(read(registry+0x18+offset,4096) for offset in range(0,16384,4096))!=raw):
         raise RuntimeError('Super Build scene registry changed during snapshot')
+    for row in rows:
+        row.pop('_component',None)
+        row['objective_name']=bind_superbuild(row,bindings,mission)
+        row['binding_evidence']='exact source/mission/scene identity' if row['objective_name'] else 'unmapped'
+    counts=Counter(row['objective_name'] for row in rows if row['objective_name'])
+    for row in rows:
+        if row['objective_name'] and counts[row['objective_name']]>1:
+            row['objective_name']=None;row['binding_evidence']='ambiguous duplicate loaded build instances'
     return dict(status='read',records=rows,components=len(components),skipped=skipped,
                 coverage='player scene and bounded registered city scenes',
                 evidence='state setter 0x73140; state 5 / flag 4')

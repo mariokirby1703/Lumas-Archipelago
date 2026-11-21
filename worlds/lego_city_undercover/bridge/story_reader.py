@@ -9,6 +9,7 @@ import struct
 from inventory_reader import Read, pointer
 from research_profile import symbol_hash
 from superbuild_progress import BINDINGS as SUPERBUILD_JOBS
+from story_points import COMPLETIONS as STORY_COMPLETIONS
 
 JOB_MANAGER_RVA = 0x17ECA08
 VALUE_VTABLES = {0xC46B38: "Int", 0xC46BB8: "Bool"}
@@ -35,6 +36,8 @@ QUERIES = {
     "Standalones.MoonBase": {"Finished": "Int", "CutsceneStage": "Int"},
 }
 
+for _point in STORY_COMPLETIONS:
+    QUERIES.setdefault(_point['job'],{})[_point['field']]='Bool'
 for _build in SUPERBUILD_JOBS:
     QUERIES[_build['job']]={'nState':'Int','nID':'Int'}
 

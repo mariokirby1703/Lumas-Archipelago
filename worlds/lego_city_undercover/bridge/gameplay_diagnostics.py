@@ -1,4 +1,5 @@
 """Bounded, change-only observed gameplay evidence; never emits AP checks."""
+from story_points import completed_story_points
 class GameplayDiagnostics:
     def __init__(self):self.identity=None;self.previous=None
 
@@ -26,6 +27,7 @@ class GameplayDiagnostics:
         if pickups.get('status')=='read':
             state['collections']={r['source_key'] for r in pickups.get('objects',[])
                                   if r.get('source_key') and r.get('native_collected')}
+        if snapshot.get('story',{}).get('status')=='read':state['story_points']=completed_story_points(snapshot['story'])
         actor=snapshot.get('actor') or {}
         if actor.get('status')=='read':state['context']=(actor.get('context') or {}).get('name')
         details=dict(position=location.get('player_position'),area=state.get('area'),scene=state.get('scene'),
@@ -48,6 +50,9 @@ class GameplayDiagnostics:
                 for source in sorted(state['collections']-old['collections']):
                     rows=[r for r in pickups.get('objects',[]) if r.get('source_key')==source]
                     journal.diagnostic(dict(details,kind='native_pickup_collection',source_key=source,objects=rows[:2]))
+            if 'story_points' in old and 'story_points' in state:
+                for key in sorted(state['story_points']-old['story_points']):
+                    journal.diagnostic(dict(details,kind='story_point_complete',key=key,verification='native_binding_verified'))
             if 'models' in old and 'models' in state:
                 for name,flags in state['models'].items():
                     if old['models'].get(name)!=flags:

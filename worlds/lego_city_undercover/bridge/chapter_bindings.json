@@ -1,0 +1,320 @@
+{
+  "version": 1,
+  "executable_sha256": "624fed07274bbd105d1d571ecb97a290df6f6f0aff76898c516890da6d136f76",
+  "runtime": {
+    "start_action_rva": "0x84f0",
+    "complete_action_rva": "0x84b0",
+    "complete_engine_rva": "0x7cf0",
+    "manager_rva": "0x17ebd00",
+    "manager_vtable_rva": "0xc10988",
+    "player1_mask_offset": "0x110",
+    "player_stride": "0x78",
+    "check_eligible": false,
+    "write_safe": false
+  },
+  "chapters": [
+    {
+      "number": 1,
+      "label_en": "Chapter 1",
+      "label_de": "Kapitel 1",
+      "events": [
+        {
+          "chapter": 1,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/catch_bank_robbers/search_areas_for_robbers.sf",
+          "state": "CelebrateTheEnd",
+          "line": 800
+        },
+        {
+          "chapter": 1,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/catch_bank_robbers/search_areas_for_robbers.sf",
+          "state": "JobStop",
+          "line": 827
+        },
+        {
+          "chapter": 1,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/lcpd/goto_lcpd.sf",
+          "state": "HeadToLCPD",
+          "line": 273
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 2,
+      "label_en": "Chapter 2",
+      "label_de": "Kapitel 2",
+      "events": [
+        {
+          "chapter": 2,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/vehicle_drop_info/vehicledrop_intro.sf",
+          "state": "StartingCall_VehicleUnlock",
+          "line": 581
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 3,
+      "label_en": "Chapter 3",
+      "label_de": "Kapitel 3",
+      "events": [
+        {
+          "chapter": 3,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/find_ferry/build_ferry.sf",
+          "state": "BluffBeard",
+          "line": 331
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 4,
+      "label_en": "Chapter 4",
+      "label_de": "Kapitel 4",
+      "events": [
+        {
+          "chapter": 4,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/crabby_bottom_bay/rescue_frank.sf",
+          "state": "InMOV",
+          "line": 1023
+        },
+        {
+          "chapter": 4,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/temple/goto_temple.sf",
+          "state": "BridgeBuilt",
+          "line": 504
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 5,
+      "label_en": "Chapter 5",
+      "label_de": "Kapitel 5",
+      "events": [
+        {
+          "chapter": 5,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/act_2/investigate_alarm/goto_chans_limos.sf",
+          "state": "NextFlowStage",
+          "line": 681
+        },
+        {
+          "chapter": 5,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_2/scan_chan/goto_chanscrapyard.sf",
+          "state": "AfterVehicleExit",
+          "line": 490
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 6,
+      "label_en": "Chapter 6",
+      "label_de": "Kapitel 6",
+      "events": [
+        {
+          "chapter": 6,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_2/acquire_prison_truck/rebuildbike.sf",
+          "state": "ApproachChuck",
+          "line": 324
+        },
+        {
+          "chapter": 6,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/act_2/photograph_chans_men/goto_pagoda.sf",
+          "state": "NextFlowStage",
+          "line": 837
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 7,
+      "label_en": "Chapter 7",
+      "label_de": "Kapitel 7",
+      "events": [
+        {
+          "chapter": 7,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/act_2/space_island_escape/door_transition.sf",
+          "state": "NextStage",
+          "line": 148
+        },
+        {
+          "chapter": 7,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_2/space_island_intro/goto_island.sf",
+          "state": "Island_DCAM",
+          "line": 279
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 8,
+      "label_en": "Chapter 8",
+      "label_de": "Kapitel 8",
+      "events": [
+        {
+          "chapter": 8,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_2/save_forest_blackwell/save_forest_blackwell.sf",
+          "state": "ArrivedAtStart",
+          "line": 450
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 9,
+      "label_en": "Chapter 9",
+      "label_de": "Kapitel 9",
+      "events": [
+        {
+          "chapter": 9,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_3/go_to_sherriff_huckleberry/goto_forest.sf",
+          "state": "Arrived_ReadyCutscene",
+          "line": 340
+        },
+        {
+          "chapter": 9,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/act_3/round_up_the_pigs/find_pigs.sf",
+          "state": "NextFlowStage",
+          "line": 1312
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 10,
+      "label_en": "Chapter 10",
+      "label_de": "Kapitel 10",
+      "events": [
+        {
+          "chapter": 10,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/act_3/fly_to_ellie/fly_to_ellie.sf",
+          "state": "NextStage",
+          "line": 692
+        },
+        {
+          "chapter": 10,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_3/goto_museum/goto_museum.sf",
+          "state": "NextStage",
+          "line": 365
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 11,
+      "label_en": "Chapter 11",
+      "label_de": "Kapitel 11",
+      "events": [
+        {
+          "chapter": 11,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_3/goto_blackwells01/goto_pappalardos.sf",
+          "state": "PlayMoeMiniCut",
+          "line": 229
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 12,
+      "label_en": "Chapter 12",
+      "label_de": "Kapitel 12",
+      "events": [
+        {
+          "chapter": 12,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_4/goto_constructionsite/goto_constructionsite.sf",
+          "state": "NextStage",
+          "line": 263
+        },
+        {
+          "chapter": 12,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/act_4/goto_observatory/steal_telescope.sf",
+          "state": "NextStage",
+          "line": 1564
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 13,
+      "label_en": "Chapter 13",
+      "label_de": "Kapitel 13",
+      "events": [
+        {
+          "chapter": 13,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_4/goto_observatory/driveto_meeting.sf",
+          "state": "ShowTitle",
+          "line": 988
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 14,
+      "label_en": "Chapter 14",
+      "label_de": "Kapitel 14",
+      "events": [
+        {
+          "chapter": 14,
+          "event": "Complete",
+          "resource": "GAME4/jobs/scripts/act_4/blackwell_tower/goto_blackwell_tower.sf",
+          "state": "StartCutscene",
+          "line": 1615
+        },
+        {
+          "chapter": 14,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_4/goto_kowalskilab/goto_kowalskilab.sf",
+          "state": "ArrivedAtLab",
+          "line": 936
+        }
+      ],
+      "native_activation_supported": false
+    },
+    {
+      "number": 15,
+      "label_en": "Chapter 15",
+      "label_de": "Kapitel 15",
+      "events": [
+        {
+          "chapter": 15,
+          "event": "Start",
+          "resource": "GAME4/jobs/scripts/act_4/goto_shuttlepad/goto_shuttlepad.sf",
+          "state": "NextStage",
+          "line": 576
+        }
+      ],
+      "native_activation_supported": false
+    }
+  ],
+  "pause_menu": {
+    "resource": "GAME7/gui/blend/frontend/frontendmain.baml",
+    "drawer": "PauseMenuDrawer",
+    "lookup_call_rva": "0x79377",
+    "factory_callback_lifetime_verified": false,
+    "new_button_implemented": false,
+    "reason": "Root drawer lookup is not a validated menu-entry factory, input callback or submenu ownership contract"
+  }
+}

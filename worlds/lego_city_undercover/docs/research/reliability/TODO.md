@@ -1,5 +1,7 @@
 # Remaining native work
 
+Current follow-up (21 November 2026): [story control TODO](../story_control/TODO.md), including the original pause-menu chapter selector, native Open World bootstrap, entrance gates and the individual outstanding Sheet points. Older coverage figures below are historical.
+
 Historical TODO baseline from the previous closed pass. Follow-up work is recorded below; unverified native behavior is not implied complete.
 
 Follow-up (15 November 2026): the proof review/import pipeline and missing native city-writer guard are now implemented. See pickup_binding_review.md. Live coverage remains 40/471; no new bindings were fabricated or promoted without evidence.

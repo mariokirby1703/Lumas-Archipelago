@@ -41,3 +41,6 @@ LEGO City Undercover:
   goal_tokens: 20
   super_brick_1000_count: 20
   super_brick_10000_count: 5
+
+  # Individual native story actions; new locations require a newly generated seed.
+  story_milestones: true

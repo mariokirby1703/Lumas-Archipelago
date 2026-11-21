@@ -7210,18 +7210,32 @@
       "status": "native_objective"
     },
     "objective:Bank_Truck": {
+      "building_brick_cost": {
+        "amount": 30000,
+        "evidence": "original script/template agreement",
+        "logic_enforced": false
+      },
       "category": "super_builds",
+      "completion_evidence": "native state 5 / completion flag 4; original scanner flag may remain unset",
       "coordinate_space": null,
       "coordinates": null,
       "district": null,
       "id": 1226540359,
+      "mission": "bank",
+      "mission_superbuild": true,
       "name": "SuperBuild_Level: Bank_Truck",
+      "native_build_identity": {
+        "name": "SB_Truck",
+        "scene": "bank_interior",
+        "template": "GAME4/levels/builder/builder_sb_truck/builder_sb_truck.giz"
+      },
       "native_type": "SuperBuild_Level",
       "runtime": {
         "kind": "objective",
         "name": "Bank_Truck"
       },
-      "source": "Bank_Truck",
+      "section": "bank_interior",
+      "source": "GAME6/levels/standalones/bank/bank_interior/bank_interior.giz",
       "source_requirements": {
         "instanceName": "Bank_Truck",
         "objectiveTypeId": "SuperBuild_Level"
@@ -7669,18 +7683,32 @@
       "status": "unverified_prerequisite"
     },
     "objective:Construction_Crane": {
+      "building_brick_cost": {
+        "amount": 40000,
+        "evidence": "original script/template agreement",
+        "logic_enforced": false
+      },
       "category": "super_builds",
+      "completion_evidence": "native state 5 / completion flag 4; original scanner flag may remain unset",
       "coordinate_space": null,
       "coordinates": null,
       "district": null,
       "id": 1042084677,
+      "mission": "construction_site",
+      "mission_superbuild": true,
       "name": "SuperBuild_Level: Construction_Crane",
+      "native_build_identity": {
+        "name": "SB_Crane",
+        "scene": "construction_site_02",
+        "template": "GAME4/levels/builder/builder_sb_crane/builder_sb_crane.giz"
+      },
       "native_type": "SuperBuild_Level",
       "runtime": {
         "kind": "objective",
         "name": "Construction_Crane"
       },
-      "source": "Construction_Crane",
+      "section": "construction_site_02",
+      "source": "GAME6/levels/standalones/construction_site/construction_site_02/construction_site_02.giz",
       "source_requirements": {
         "instanceName": "Construction_Crane",
         "objectiveTypeId": "SuperBuild_Level"
@@ -12378,18 +12406,32 @@
       "status": "unverified_prerequisite"
     },
     "objective:Mine_CableCar": {
+      "building_brick_cost": {
+        "amount": 22000,
+        "evidence": "original script/template agreement",
+        "logic_enforced": false
+      },
       "category": "super_builds",
+      "completion_evidence": "native state 5 / completion flag 4; original scanner flag may remain unset",
       "coordinate_space": null,
       "coordinates": null,
       "district": null,
       "id": 1374214294,
+      "mission": "mine",
+      "mission_superbuild": true,
       "name": "SuperBuild_Level: Mine_CableCar",
+      "native_build_identity": {
+        "name": "CableCar_SB",
+        "scene": "mine_cavern",
+        "template": "GAME4/levels/builder/builder_sb_cablecar/builder_sb_cablecar.giz"
+      },
       "native_type": "SuperBuild_Level",
       "runtime": {
         "kind": "objective",
         "name": "Mine_CableCar"
       },
-      "source": "Mine_CableCar",
+      "section": "mine_cavern",
+      "source": "GAME6/levels/standalones/mine/mine_cavern/mine_cavern.giz",
       "source_requirements": {
         "instanceName": "Mine_CableCar",
         "objectiveTypeId": "SuperBuild_Level"
@@ -12397,18 +12439,32 @@
       "status": "native_objective"
     },
     "objective:Museum_Dinosaur": {
+      "building_brick_cost": {
+        "amount": 30000,
+        "evidence": "original script/template agreement",
+        "logic_enforced": false
+      },
       "category": "super_builds",
+      "completion_evidence": "native state 5 / completion flag 4; original scanner flag may remain unset",
       "coordinate_space": null,
       "coordinates": null,
       "district": null,
       "id": 1207457336,
+      "mission": "museum",
+      "mission_superbuild": true,
       "name": "SuperBuild_Level: Museum_Dinosaur",
+      "native_build_identity": {
+        "name": "T-Rex_SuperBuild",
+        "scene": "museum_room02",
+        "template": "GAME4/levels/builder/builder_sb_t_rex/builder_sb_t_rex.giz"
+      },
       "native_type": "SuperBuild_Level",
       "runtime": {
         "kind": "objective",
         "name": "Museum_Dinosaur"
       },
-      "source": "Museum_Dinosaur",
+      "section": "museum_room02",
+      "source": "GAME7/levels/standalones/museum/museum_room02/museum_room02.giz",
       "source_requirements": {
         "instanceName": "Museum_Dinosaur",
         "objectiveTypeId": "SuperBuild_Level"
@@ -12416,18 +12472,32 @@
       "status": "native_objective"
     },
     "objective:Museum_Plane": {
+      "building_brick_cost": {
+        "amount": 21000,
+        "evidence": "original script/template agreement",
+        "logic_enforced": false
+      },
       "category": "super_builds",
+      "completion_evidence": "native state 5 / completion flag 4; original scanner flag may remain unset",
       "coordinate_space": null,
       "coordinates": null,
       "district": null,
       "id": 1162404778,
+      "mission": "museum",
+      "mission_superbuild": true,
       "name": "SuperBuild_Level: Museum_Plane",
+      "native_build_identity": {
+        "name": "Yellow_Devil_SuperBuild",
+        "scene": "museum_room01",
+        "template": "GAME4/levels/builder/builder_sb_yellow_devil/builder_sb_yellow_devil.giz"
+      },
       "native_type": "SuperBuild_Level",
       "runtime": {
         "kind": "objective",
         "name": "Museum_Plane"
       },
-      "source": "Museum_Plane",
+      "section": "museum_room01",
+      "source": "GAME6/levels/standalones/museum/museum_room01/museum_room01.giz",
       "source_requirements": {
         "instanceName": "Museum_Plane",
         "objectiveTypeId": "SuperBuild_Level"
@@ -25398,18 +25468,32 @@
       "status": "unverified_prerequisite"
     },
     "objective:Scrapyard_Crusher": {
+      "building_brick_cost": {
+        "amount": 21000,
+        "evidence": "original script/template agreement",
+        "logic_enforced": false
+      },
       "category": "super_builds",
+      "completion_evidence": "native state 5 / completion flag 4; original scanner flag may remain unset",
       "coordinate_space": null,
       "coordinates": null,
       "district": null,
       "id": 1891356993,
+      "mission": "scrapyard",
+      "mission_superbuild": true,
       "name": "SuperBuild_Level: Scrapyard_Crusher",
+      "native_build_identity": {
+        "name": "Car_Crusher",
+        "scene": "scrapyard_entrance",
+        "template": "GAME4/levels/builder/builder_sb_carcrusher/builder_sb_carcrusher.giz"
+      },
       "native_type": "SuperBuild_Level",
       "runtime": {
         "kind": "objective",
         "name": "Scrapyard_Crusher"
       },
-      "source": "Scrapyard_Crusher",
+      "section": "scrapyard_entrance",
+      "source": "GAME7/levels/standalones/scrapyard/scrapyard_entrance/scrapyard_entrance.giz",
       "source_requirements": {
         "instanceName": "Scrapyard_Crusher",
         "objectiveTypeId": "SuperBuild_Level"
@@ -26213,18 +26297,32 @@
       "status": "unverified_prerequisite"
     },
     "objective:Temple_Dragon": {
+      "building_brick_cost": {
+        "amount": 40000,
+        "evidence": "original script/template agreement",
+        "logic_enforced": false
+      },
       "category": "super_builds",
+      "completion_evidence": "native state 5 / completion flag 4; original scanner flag may remain unset",
       "coordinate_space": null,
       "coordinates": null,
       "district": null,
       "id": 1323592467,
+      "mission": "temple",
+      "mission_superbuild": true,
       "name": "SuperBuild_Level: Temple_Dragon",
+      "native_build_identity": {
+        "name": "Super_Build_Dragon",
+        "scene": "temple_courtyard",
+        "template": "GAME4/levels/builder/builder_sb_dragon/builder_sb_dragon.giz"
+      },
       "native_type": "SuperBuild_Level",
       "runtime": {
         "kind": "objective",
         "name": "Temple_Dragon"
       },
-      "source": "Temple_Dragon",
+      "section": "temple_courtyard",
+      "source": "GAME7/levels/standalones/temple/temple_courtyard/temple_courtyard.giz",
       "source_requirements": {
         "instanceName": "Temple_Dragon",
         "objectiveTypeId": "SuperBuild_Level"
@@ -166256,6 +166354,412 @@
       },
       "source": "primary class default; native pending/found model state",
       "status": "experimental_model_found"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_1_GetGrappleGun": {
+      "category": "story_milestones",
+      "chapter": 2,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Grapple Gun",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1677002747,
+      "logic_verified": false,
+      "name": "Story: Grapple Gun",
+      "runtime": {
+        "expected": true,
+        "field": "Act_1_GetGrappleGun",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/get_grapple_gun/goto_forest.sf",
+      "source_evidence": [
+        {
+          "line": 439,
+          "resource": "GAME4/jobs/scripts/get_grapple_gun/goto_forest.sf",
+          "source_sha256": "5e5cec088a86eebd3093ccc9aa2da2498400ec068820f87e8d7164829ff65e1c",
+          "state": "StartNextMission",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_1_RoadBlockRemoved": {
+      "category": "story_milestones",
+      "chapter": 2,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Auburn Bay Bridge Chaos Resolved",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1881394068,
+      "logic_verified": false,
+      "name": "Story: Auburn Bay Bridge Chaos Resolved",
+      "runtime": {
+        "expected": true,
+        "field": "Act_1_RoadBlockRemoved",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/road_block_removal/road_block_removal.sf",
+      "source_evidence": [
+        {
+          "line": 485,
+          "resource": "GAME4/jobs/scripts/road_block_removal/road_block_removal.sf",
+          "source_sha256": "2f630e8045f1250a2479e990883216602aad16222c0c77cfaf5093708179c0ee",
+          "state": "Cutscene",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_2_DeliveryTruck_2": {
+      "category": "story_milestones",
+      "chapter": 6,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Stop the Delivery Truck and bring it to Vinnie's Restaurant",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1029796904,
+      "logic_verified": false,
+      "name": "Story: Stop the Delivery Truck and bring it to Vinnie's Restaurant",
+      "runtime": {
+        "expected": true,
+        "field": "Act_2_DeliveryTruck_2",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_2/pursue_delivery_truck/drop_off_truck.sf",
+      "source_evidence": [
+        {
+          "line": 551,
+          "resource": "GAME4/jobs/scripts/act_2/pursue_delivery_truck/drop_off_truck.sf",
+          "source_sha256": "de567aa78730a6ec0d2d73f2b242afd0f0c6b0eb7a92004b9a7b26720880ca78",
+          "state": "NextFlowStage",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_2_DropOffEmerald": {
+      "category": "story_milestones",
+      "chapter": 6,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Deliver the Bell Pepper Emerald to the Drop-off Location",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1636897651,
+      "logic_verified": false,
+      "name": "Story: Deliver the Bell Pepper Emerald to the Drop-off Location",
+      "runtime": {
+        "expected": true,
+        "field": "Act_2_DropOffEmerald",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_2/deliver_emerald/drop_off_emerald.sf",
+      "source_evidence": [
+        {
+          "line": 1121,
+          "resource": "GAME4/jobs/scripts/act_2/deliver_emerald/drop_off_emerald.sf",
+          "source_sha256": "ca4ce50ccc6155577cfde5e895c63144eeaaf5e9938235866916350091a452cc",
+          "state": "DeliverEmerald",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_2_PhotographChansMen_2": {
+      "category": "story_milestones",
+      "chapter": 6,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Take all Photos of Chan's Gang Members and arrest them",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1586708003,
+      "logic_verified": false,
+      "name": "Story: Take all Photos of Chan's Gang Members and arrest them",
+      "runtime": {
+        "expected": true,
+        "field": "Act_2_PhotographChansMen_2",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_2/photograph_chans_men/goto_pagoda.sf",
+      "source_evidence": [
+        {
+          "line": 826,
+          "resource": "GAME4/jobs/scripts/act_2/photograph_chans_men/goto_pagoda.sf",
+          "source_sha256": "564d3c849da2901244e156845eab6319bb45614ed36ec0e0ed82dffc2a86129e",
+          "state": "NextFlowStage",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_2_SaveForestBlackwell_2": {
+      "category": "story_milestones",
+      "chapter": 8,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Drive Forrest Blackwell to the Police Station",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1139795436,
+      "logic_verified": false,
+      "name": "Story: Drive Forrest Blackwell to the Police Station",
+      "runtime": {
+        "expected": true,
+        "field": "Act_2_SaveForestBlackwell_2",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_2/save_forest_blackwell/save_forest_blackwell.sf",
+      "source_evidence": [
+        {
+          "line": 1037,
+          "resource": "GAME4/jobs/scripts/act_2/save_forest_blackwell/save_forest_blackwell.sf",
+          "source_sha256": "d8241c17f76ef880faf53d0f3a42320f09d26961f69d7de5db380c82d103864f",
+          "state": "EndMission",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_2_SpaceIslandEscape": {
+      "category": "story_milestones",
+      "chapter": 7,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Avoid Apollo Island Security",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1310568862,
+      "logic_verified": false,
+      "name": "Story: Avoid Apollo Island Security",
+      "runtime": {
+        "expected": true,
+        "field": "Act_2_SpaceIslandEscape",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_2/space_island_escape/door_transition.sf",
+      "source_evidence": [
+        {
+          "line": 138,
+          "resource": "GAME4/jobs/scripts/act_2/space_island_escape/door_transition.sf",
+          "source_sha256": "eecbe6788d7682c9433c9b3f8fb3587f9138dba9a019acca2a53d34abf711f6c",
+          "state": "NextStage",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_2_StealACar_4": {
+      "category": "story_milestones",
+      "chapter": 5,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Steal the Car for Chan Chuang",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1699126757,
+      "logic_verified": false,
+      "name": "Story: Steal the Car for Chan Chuang",
+      "runtime": {
+        "expected": true,
+        "field": "Act_2_StealACar_4",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_2/steal_a_car/acquire_car.sf",
+      "source_evidence": [
+        {
+          "line": 898,
+          "resource": "GAME4/jobs/scripts/act_2/steal_a_car/acquire_car.sf",
+          "source_sha256": "5b9fe040bb93969fe435705305564d737d00ba993441c18650c7780b9f1720e8",
+          "state": "NextFlowStage",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_3_DeliverT-Rex": {
+      "category": "story_milestones",
+      "chapter": 10,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Drop the T-Rex off at the Airport",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1897648290,
+      "logic_verified": false,
+      "name": "Story: Drop the T-Rex off at the Airport",
+      "runtime": {
+        "expected": true,
+        "field": "Act_3_DeliverT-Rex",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_3/trex_chase/trex_chase.sf",
+      "source_evidence": [
+        {
+          "line": 666,
+          "resource": "GAME4/jobs/scripts/act_3/trex_chase/trex_chase.sf",
+          "source_sha256": "c1a9b94305bb7a63cb415b256f53d5351242456d2a01d5a55b258e097a275daa",
+          "state": "NextStage",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_3_FlyEllie": {
+      "category": "story_milestones",
+      "chapter": 10,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Fly Natalia to Safety",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1823053053,
+      "logic_verified": false,
+      "name": "Story: Fly Natalia to Safety",
+      "runtime": {
+        "expected": true,
+        "field": "Act_3_FlyEllie",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_3/fly_to_ellie/fly_to_ellie.sf",
+      "source_evidence": [
+        {
+          "line": 681,
+          "resource": "GAME4/jobs/scripts/act_3/fly_to_ellie/fly_to_ellie.sf",
+          "source_sha256": "885a6c92662458679a329c087b6984187ebf6324c09f4e4ec2c845315ff7bfe1",
+          "state": "NextStage",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_3_Hospital_2": {
+      "category": "story_milestones",
+      "chapter": 10,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Rescue Natalia from the Hospital Rooftop",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1141124510,
+      "logic_verified": false,
+      "name": "Story: Rescue Natalia from the Hospital Rooftop",
+      "runtime": {
+        "expected": true,
+        "field": "Act_3_Hospital_2",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_3/goto_hospital/goto_hospital.sf",
+      "source_evidence": [
+        {
+          "line": 1278,
+          "resource": "GAME4/jobs/scripts/act_3/goto_hospital/goto_hospital.sf",
+          "source_sha256": "add9df97f7c10bc9236579c5d71f565ebe32708cbb59d105d98d205c1135efd3",
+          "state": "NextStage",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_4_BlackwellTowerSaveCity_2": {
+      "category": "story_milestones",
+      "chapter": 14,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Assemble the Shield Generators around Blackwell Tower",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1307534125,
+      "logic_verified": false,
+      "name": "Story: Assemble the Shield Generators around Blackwell Tower",
+      "runtime": {
+        "expected": true,
+        "field": "Act_4_BlackwellTowerSaveCity_2",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_4/blackwell_tower/goto_blackwell_tower.sf",
+      "source_evidence": [
+        {
+          "line": 1603,
+          "resource": "GAME4/jobs/scripts/act_4/blackwell_tower/goto_blackwell_tower.sf",
+          "source_sha256": "5a80fd9ae1a5017186638408eabb2e986bd445c7eda7f5e121cc7155e6499fe3",
+          "state": "StartCutscene",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_4_DriveToKowalski": {
+      "category": "story_milestones",
+      "chapter": 14,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Reach Professor Kowalski's Lab",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1067174117,
+      "logic_verified": false,
+      "name": "Story: Reach Professor Kowalski's Lab",
+      "runtime": {
+        "expected": true,
+        "field": "Act_4_DriveToKowalski",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_4/goto_kowalskilab/goto_kowalskilab.sf",
+      "source_evidence": [
+        {
+          "line": 1216,
+          "resource": "GAME4/jobs/scripts/act_4/goto_kowalskilab/goto_kowalskilab.sf",
+          "source_sha256": "5ea19b673d509fec251b08391bf71aad3e02421bcfbdcbdd86450627ed513638",
+          "state": "NextStage",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
+    },
+    "story_point:Flow_Setup.Flow_Completed:Act_4_StealTelescope_3": {
+      "category": "story_milestones",
+      "chapter": 12,
+      "coordinate_space": null,
+      "coordinates": null,
+      "display_name": "Drive the Telescope to the Drop-off Point",
+      "district": null,
+      "evidence": "Explicit original end-of-action JobValue write; not current chapter, ability ownership or mission completion inference",
+      "id": 1460405431,
+      "logic_verified": false,
+      "name": "Story: Drive the Telescope to the Drop-off Point",
+      "runtime": {
+        "expected": true,
+        "field": "Act_4_StealTelescope_3",
+        "job": "Flow_Setup.Flow_Completed",
+        "kind": "story_point"
+      },
+      "source": "GAME4/jobs/scripts/act_4/goto_observatory/driveto_meeting.sf",
+      "source_evidence": [
+        {
+          "line": 1017,
+          "resource": "GAME4/jobs/scripts/act_4/goto_observatory/driveto_meeting.sf",
+          "source_sha256": "4a476bb23150139d631621f5cd8a87f511e0066a679bd7994d5040f049f218e2",
+          "state": "NextStage",
+          "value": true
+        }
+      ],
+      "status": "native_story_point"
     }
   },
   "runtime_bindings_are_partial": true,
