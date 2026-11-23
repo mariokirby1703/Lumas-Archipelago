@@ -39,6 +39,33 @@ def log_diagnostic(value):
 
 
 class SonicCommands(ClientCommandProcessor):
+    @mark_raw
+    def _cmd_sonicfps(self, raw=''):
+        """Use /sonicfps off for 30 FPS, or /sonicfps on to restore 60 FPS."""
+        runtime = self.ctx.runtime
+        if not runtime or not self.ctx.authenticated_identity:
+            logger.info('Connect to your AP slot first.')
+            return
+        if not runtime.slot_data['options'].get('sixty_fps'):
+            logger.info('This seed does not have the 60 FPS patch enabled.')
+            return
+        native = getattr(self.ctx.memory, 'native_patch', None)
+        if native is not None and not native.get('fps_control'):
+            logger.info('Repatch this seed with the current APWorld to use /sonicfps.')
+            return
+        action = raw.strip().lower()
+        if action not in ('on', 'off'):
+            logger.info('Use /sonicfps off (30 FPS) or /sonicfps on (60 FPS).')
+            return
+        if action == 'off' and native is not None and not native.get('correct_fps_setter'):
+            logger.info('Repatch this ISO first: the old 30 FPS switch slows gameplay.')
+            return
+        runtime.fps_interval = 2 if action == 'off' else 1
+        runtime._fps_message = None
+        runtime._fps_native_restore_done = False
+        logger.info('Requested %s FPS; waiting for confirmation from Dolphin.',
+                    30 if action == 'off' else 60)
+
     def _test_inventory_base(self):
         """True server receipts, including uncommitted permission history."""
         if not self.ctx.runtime or not self.ctx.authenticated_identity:

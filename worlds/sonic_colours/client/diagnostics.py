@@ -59,6 +59,7 @@ def diagnostic(ctx, memory=None):
         result['red_ring_colors'] = (colors.status(runtime.snapshot.actual_mission if runtime.snapshot else None)
                                      if colors is not None else {'enabled': False, 'native_rendering': False})
         result['native_events']=getattr(runtime,'native_event_status',{})
+        result['fps_control']=getattr(runtime,'fps_status',{})
         result['temporary_traps']=getattr(runtime,'temporary_trap_status',{})
         result['music_popup']=getattr(runtime,'music_popup_status',{})
         result['deathlink']=ctx.deathlink.status() if ctx.deathlink else {'status':'disabled'}

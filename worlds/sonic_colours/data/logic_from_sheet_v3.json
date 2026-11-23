@@ -239,13 +239,26 @@
       "movement": [
         [
           "crouch:2",
-          "stomp"
+          "stomp",
+          "homing_attack"
+        ],
+        [
+          "crouch:2",
+          "laser",
+          "double_jump",
+          "homing_attack"
+        ],
+        [
+          "crouch:2",
+          "laser",
+          "mid_air_boost",
+          "homing_attack"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Crouch Lv2 + Stomp",
+      "raw_movement": "Progressive Crouch Lv2 + Stomp + Homing Attack or Progressive Crouch Lv2 + Laser + Double Jump + Homing Attack or Progressive Crouch Lv2 + Laser + Mid-Air Boost + Homing Attack",
       "world": "Tropical Resort",
       "row": 18
     },
@@ -330,18 +343,20 @@
         [
           "crouch:2",
           "laser",
-          "double_jump"
+          "double_jump",
+          "homing_attack"
         ],
         [
           "crouch:2",
           "laser",
-          "mid_air_boost"
+          "mid_air_boost",
+          "homing_attack"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "Laser",
-      "raw_movement": "Progressive Crouch Lv2 + Laser + Double Jump or Progressive Crouch Lv2 + Laser + Mid-Air Boost",
+      "raw_movement": "Progressive Crouch Lv2 + Laser + Double Jump + Homing Attack or Progressive Crouch Lv2 + Laser + Mid-Air Boost + Homing Attack",
       "world": "Tropical Resort",
       "row": 23
     },
@@ -1166,13 +1181,13 @@
       ],
       "movement": [
         [
-          "rail"
+          "rail:2"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Rail Lv1",
+      "raw_movement": "Progressive Rail Lv2",
       "world": "Sweet Mountain",
       "row": 23
     },
@@ -1750,13 +1765,14 @@
       "movement": [
         [
           "cube",
-          "homing_attack"
+          "homing_attack",
+          "double_jump"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "Cube",
-      "raw_movement": "Cube + Homing Attack",
+      "raw_movement": "Cube + Homing Attack + Double Jump",
       "world": "Starlight Carnival",
       "row": 8
     },
@@ -2062,12 +2078,15 @@
       "movement": [
         [
           "stomp"
+        ],
+        [
+          "mid_air_boost"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Stomp",
+      "raw_movement": "Stomp or Mid-Air Boost",
       "world": "Starlight Carnival",
       "row": 24
     },
@@ -2749,13 +2768,14 @@
       ],
       "movement": [
         [
-          "frenzy"
+          "frenzy",
+          "stomp"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "Frenzy",
-      "raw_movement": "Frenzy",
+      "raw_movement": "Frenzy + Stomp",
       "world": "Planet Wisp",
       "row": 15
     },
@@ -3438,12 +3458,17 @@
         [
           "breathing:2",
           "drill"
+        ],
+        [
+          "swim",
+          "breathing",
+          "drill"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Breathing Lv2 + Swim + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv2 + Drill Lv1",
+      "raw_movement": "Progressive Breathing Lv2 + Swim + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv2 + Drill Lv1 or Swim + Progressive Breathing Lv1 + Drill Lv1",
       "world": "Aquarium Park",
       "row": 4
     },
@@ -3473,12 +3498,17 @@
         [
           "breathing:2",
           "swim"
+        ],
+        [
+          "swim",
+          "breathing",
+          "drill"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Breathing Lv2 + Drill Lv1 or Progressive Breathing Lv2 + Swim",
+      "raw_movement": "Progressive Breathing Lv2 + Drill Lv1 or Progressive Breathing Lv2 + Swim or Swim + Progressive Breathing Lv1 + Drill Lv1",
       "world": "Aquarium Park",
       "row": 6
     },
@@ -3492,12 +3522,17 @@
         [
           "breathing:2",
           "drill"
+        ],
+        [
+          "swim",
+          "breathing",
+          "drill"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "Drill",
-      "raw_movement": "Progressive Breathing Lv2 + Drill Lv1  ",
+      "raw_movement": "Progressive Breathing Lv2 + Drill Lv1 or Swim + Progressive Breathing Lv1 + Drill Lv1",
       "world": "Aquarium Park",
       "row": 7
     },
@@ -3556,12 +3591,17 @@
         [
           "breathing:2",
           "drill"
+        ],
+        [
+          "swim",
+          "breathing",
+          "drill"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Breathing Lv2 + Swim + Progressive Crouch Lv2 + Stomp + Double Jump or Progressive Breathing Lv2 + Drill Lv1",
+      "raw_movement": "Progressive Breathing Lv2 + Swim + Progressive Crouch Lv2 + Stomp + Double Jump or Progressive Breathing Lv2 + Drill Lv1 or Swim + Progressive Breathing Lv1 + Drill Lv1",
       "world": "Aquarium Park",
       "row": 9
     },
@@ -3579,12 +3619,17 @@
         [
           "breathing:2",
           "drill"
+        ],
+        [
+          "swim",
+          "breathing",
+          "drill"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Breathing Lv2 + Swim + Progressive Crouch Lv2 + Stomp  or Progressive Breathing Lv2 + Drill Lv1",
+      "raw_movement": "Progressive Breathing Lv2 + Swim + Progressive Crouch Lv2 + Stomp or Progressive Breathing Lv2 + Drill Lv1 or Swim + Progressive Breathing Lv1 + Drill Lv1",
       "world": "Aquarium Park",
       "row": 10
     },
@@ -4344,7 +4389,25 @@
       ],
       "movement": [
         [
-          "breathing",
+          "breathing:3",
+          "crouch:2",
+          "hover:2",
+          "mid_air_boost"
+        ],
+        [
+          "breathing:2",
+          "drill",
+          "hover:2"
+        ],
+        [
+          "breathing:3",
+          "crouch:2",
+          "hover",
+          "stunts",
+          "mid_air_boost"
+        ],
+        [
+          "breathing:2",
           "drill",
           "hover",
           "stunts",
@@ -4355,11 +4418,6 @@
           "crouch:2",
           "hover:2",
           "swim"
-        ],
-        [
-          "breathing",
-          "drill",
-          "hover:2"
         ],
         [
           "breathing:3",
@@ -4384,7 +4442,7 @@
         ]
       ],
       "raw_normal": "Hover",
-      "raw_movement": "Breathing Lv1 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Crouch Lv2 or Breathing Lv3 + Crouch Lv2 + Hover Lv2 + Swim or Breathing Lv1 + Drill Lv1 + Hover Lv2 or Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 + Swim or Breathing Lv1 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Crouch Lv2 (or for Advanced Logic: Breathing Lv3 + Crouch Lv2 + Hover Lv1 + Stunts Lv1 or Breathing Lv3 + Crouch Lv2 + Hover Lv2)",
+      "raw_movement": "Progressive Breathing Lv3 + Progressive Crouch Lv2 + Hover Lv2 + Mid-Air Boost or Progressive Breathing Lv2 + Drill Lv1 + Hover Lv2 or Progressive Breathing Lv3 + Progressive Crouch Lv2 + Hover Lv1 + Stunts Lv1 + Mid-Air Boost or Progressive Breathing Lv2 + Drill Lv1 + Hover Lv1 + Stunts Lv1 + Progressive Crouch Lv2 or Progressive Breathing Lv3 + Progressive Crouch Lv2 + Hover Lv2 + Swim or Progressive Breathing Lv3 + Progressive Crouch Lv2 + Hover Lv1 + Stunts Lv1 + Swim",
       "world": "Aquarium Park",
       "row": 42
     },
@@ -5890,18 +5948,18 @@
           "homing_attack",
           "stomp",
           "crouch:2",
-          "rail"
+          "rail:2"
         ],
         [
           "homing_attack",
           "drill",
-          "rail"
+          "rail:2"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Homing Attack + Stomp + Progressive Crouch Lv2 + Rail Lv1 or Homing Attack + Drill Lv1 + Rail Lv1",
+      "raw_movement": "Homing Attack + Stomp + Progressive Crouch Lv2 + Progressive Rail Lv2 or Homing Attack + Drill Lv1 + Progressive Rail Lv2",
       "world": "Game Land",
       "row": 30
     },

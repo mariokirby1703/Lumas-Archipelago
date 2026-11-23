@@ -6,7 +6,9 @@ from ..world_constants import BY_MISSION
 from . import generate
 
 
-def test_tropical_resort_3_and_later_acts_wait_for_stomp():
+@pytest.mark.parametrize('route', [('Stomp',), ('Cyan Laser Wisp','Double Jump'),
+                                 ('Cyan Laser Wisp','Mid-Air Boost')])
+def test_tropical_resort_3_and_later_acts_require_homing_and_a_clear_route(route):
     multi=generate({'movement_unlocks':True,'world_progression':0})
     world=multi.worlds[1];state=multi.state
     for _ in range(2):state.collect(world.create_item('Progressive Crouch'),prevent_sweep=True)
@@ -15,7 +17,10 @@ def test_tropical_resort_3_and_later_acts_wait_for_stomp():
     following=world.get_region('Map Slot '+act4['stage_slot_id'])
     assert not clear.can_reach(state)
     assert not following.can_reach(state)
-    state.collect(world.create_item('Stomp'),prevent_sweep=True)
+    for item in route:state.collect(world.create_item(item),prevent_sweep=True)
+    assert not clear.can_reach(state)
+    assert not following.can_reach(state)
+    state.collect(world.create_item('Homing Attack'),prevent_sweep=True)
     assert clear.can_reach(state)
     assert following.can_reach(state)
 

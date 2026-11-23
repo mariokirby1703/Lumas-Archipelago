@@ -119,7 +119,7 @@ def test_aquarium_one_drill_pickups_require_breathing_two(key):
     assert logic.check(world(), State(*items, 'Progressive Breathing', 'Progressive Breathing'), MANIFEST, key)
 
 
-def test_all_aquarium_one_breathing_routes_require_at_least_two():
+def test_aquarium_one_low_air_routes_require_swim_and_drill():
     for key, entry in MANIFEST['locations'].items():
         if key.split(':', 1)[0] != 'stg510':
             continue
@@ -128,4 +128,7 @@ def test_all_aquarium_one_breathing_routes_require_at_least_two():
                 for token in route:
                     name, count = logic.token_parts(token)
                     if name == 'breathing':
-                        assert count >= 2, (key, mode, route)
+                        if count == 1:
+                            assert mode == 'movement' and {'swim','drill'} <= set(route), (key,mode,route)
+                        else:
+                            assert count >= 2, (key,mode,route)

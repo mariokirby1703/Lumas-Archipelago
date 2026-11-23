@@ -2,7 +2,7 @@
 from collections import Counter
 import struct
 
-VERSION = 1
+VERSION = 2
 
 
 def validate_items(items):
@@ -17,7 +17,7 @@ def validate_items(items):
 def initialize(payload, hooks, options, initial_items=()):
     from ..Items import ITEM_TABLE, MOVEMENT_ITEMS
     from ..wisps import project_inventory, wisp_level
-    from . import movement_gate, capsule_refresh, quick_step, skydiving, stunts
+    from . import movement_gate, capsule_refresh, quick_step, skydiving, stunts, progression_hook
     from . import drill_turbo, hover_ring_dash, gameplay_controls, player_switch
     from .native_dol import ARENA
     from .test_inventory import MAXIMUM
@@ -58,6 +58,12 @@ def initialize(payload, hooks, options, initial_items=()):
         (hover_ring_dash, int(wisp_level(owned, 'Green Hover') >= 2)),
     ):
         write(module.HOOK, module.payload()[1], value)
+
+    from . import oneup_hook
+    write(oneup_hook.HOOK, oneup_hook.payload()[1], int(bool(options.get('one_up_sanity', False))))
+
+    super_allowed = project_inventory({'counts': counts}, options)['super_sonic_allowed']
+    write(progression_hook.HOOK, progression_hook.payload()[1] + 8, int(super_allowed) << 7)
 
     white = int(not options.get('boost_lock', True) or owned['White Boost Wisp'] > 0)
     random = int(not options.get('game_land_checks', True) or owned['Random Capsules'] > 0)

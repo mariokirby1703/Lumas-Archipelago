@@ -96,13 +96,13 @@ def test_tropical_resort_3_clear_needs_slide_and_stomp_with_ability_locks():
     slide=('Progressive Crouch',)*2
     assert not logic.check(world(),State(*slide),MANIFEST,'stg120')
     assert not logic.check(world(),State('Progressive Crouch','Stomp'),MANIFEST,'stg120')
-    assert logic.check(world(),State(*slide,'Stomp'),MANIFEST,'stg120')
+    assert logic.check(world(),State(*slide,'Stomp','Homing Attack'),MANIFEST,'stg120')
     assert logic.check(world(movement=False),State(),MANIFEST,'stg120')
 
 
 @pytest.mark.parametrize('ability',['Double Jump','Mid-Air Boost'])
 def test_tropical_resort_3_ring_5_needs_an_aerial_ability(ability):
-    base=('Progressive Crouch','Progressive Crouch','Cyan Laser Wisp')
+    base=('Progressive Crouch','Progressive Crouch','Cyan Laser Wisp','Homing Attack')
     assert not logic.check(world(),State(*base),MANIFEST,'stg120:ring:5')
     assert logic.check(world(),State(*base,ability),MANIFEST,'stg120:ring:5')
     assert logic.check(world(movement=False),State('Cyan Laser Wisp'),MANIFEST,'stg120:ring:5')

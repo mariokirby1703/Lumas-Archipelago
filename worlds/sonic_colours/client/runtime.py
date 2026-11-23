@@ -201,11 +201,9 @@ def detect_checks(slot_data, snapshot, owned_wisps=frozenset()):
                 or data.kind == 'rings' and frozenset(range(1, 6)) <= rings
                 or data.kind == 'rank' and data.mission in snapshot.awarded_ranks
                    and 0 <= snapshot.awarded_ranks[data.mission] <= data.index
-                or data.kind == 'emerald' and data.index in snapshot.emerald_rewards
-                   and snapshot.evidence.get('native_data',{}).get('progression_events',{}).get('game_land_clears',0)
-                       & (7 << ((data.index-1)*3))
-                   and all(s['mission_id'] in snapshot.persisted_clears for s in STAGES
-                           if s['zone_index'] == data.index + 6)
+                or data.kind == 'emerald' and all(
+                    s['mission_id'] in snapshot.persisted_clears for s in STAGES
+                    if s['zone_index'] == data.index + 6)
                 or data.kind == 'capsule' and capsule_check_allowed(slot_data, data, snapshot, owned_wisps)
                 or data.kind == 'wisp' and data.index in snapshot.discovered_wisps):
             checks.add(code)
@@ -516,6 +514,20 @@ class Runtime:
         self.observe_results()
         self.recover_intro_clear()
         if getattr(memory,'native_patch',None):
+            if getattr(self, 'fps_interval', None) is not None:
+                try:
+                    from .fps_control import apply as apply_fps
+                    self.fps_status = apply_fps(self, memory)
+                except MemoryUnavailable as error:
+                    self.fps_status = {'applied': False, 'status': str(error)}
+                if self.fps_status['applied']:
+                    message = ('60 FPS override disabled; native game timing active.'
+                               if self.fps_status.get('native_timing') else f'{60 // self.fps_interval} FPS active.')
+                else:
+                    message = 'FPS switch pending: ' + self.fps_status['status']
+                if message != getattr(self, '_fps_message', None):
+                    logging.getLogger('Client').info(message)
+                    self._fps_message = message
             try:
                 from .capsule_capture import configure as arm_capture
                 arm_capture(memory,self.snapshot,self.guard,self.journal)

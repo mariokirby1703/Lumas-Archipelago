@@ -327,8 +327,12 @@ class WritePolicy:
         self.memory, self.guard, self.snapshot_reader = memory, guard, snapshot_reader
 
     def __call__(self, operation, address, size):
-        if not VERSION['capabilities'].get(operation, False) and operation not in ('ring_material_test', 'red_ring_material','red_ring_spawn','physical_ring_restore'):
+        if not VERSION['capabilities'].get(operation, False) and operation not in ('ring_material_test', 'red_ring_material','red_ring_spawn','physical_ring_restore','fps_control','fps_native_restore'):
             raise MemoryUnavailable(f'WRITE_BLOCKED: requires_verified_hook: {operation}')
+        if operation in ('fps_control','fps_native_restore'):
+            self.memory.verify_revision()
+            from .fps_control import authorize
+            return authorize(self.memory, self.guard, address, size,restore=operation=='fps_native_restore')
         if operation=='red_ring_spawn':
             self.memory.verify_for_write(operation)
             from .red_ring_spawn import authorize

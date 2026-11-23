@@ -81,11 +81,17 @@ def get_wit(explicit=None,progress=lambda s:None):
     return executable
 
 def command(wit,args,progress,cancel=None):
+    from .wit_paths import arguments
+    with arguments(wit, args) as argv:
+        return _command(argv, args[0], progress, cancel)
+
+
+def _command(argv,action,progress,cancel=None):
     import queue
     import threading
     from collections import deque
     flags={'creationflags':subprocess.CREATE_NO_WINDOW} if os.name=='nt' else {}
-    process=subprocess.Popen([str(wit),*map(str,args)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
+    process=subprocess.Popen(argv,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
                              text=True,encoding='utf-8',errors='replace',**flags)
     messages=queue.Queue();tail=deque(maxlen=80)
     def read_output():
@@ -102,13 +108,13 @@ def command(wit,args,progress,cancel=None):
             if line is None:break
             tail.append(line)
             if line and time.monotonic()-last>=.25:
-                progress(f'WIT {args[0]}: {line[-240:]}');last=time.monotonic()
+                progress(f'WIT {action}: {line[-240:]}');last=time.monotonic()
         while process.poll() is None:
             check_cancel(cancel)
             try:process.wait(timeout=.1)
             except subprocess.TimeoutExpired:pass
         output='\n'.join(tail)
-        if process.returncode:raise RuntimeError(f'WIT {args[0]} failed ({process.returncode}):\n{output[-6000:]}')
+        if process.returncode:raise RuntimeError(f'WIT {action} failed ({process.returncode}):\n{output[-6000:]}')
         logger.info('%s',output.strip())
     finally:
         if process.poll() is None:process.kill();process.wait()

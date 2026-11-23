@@ -363,6 +363,12 @@ class SonicMemory:
             raise MemoryUnavailable('WRITE_BLOCKED: map availability only permits locked-to-available')
         if operation == 'progression_reset' and data != bytes(4):
             raise MemoryUnavailable('WRITE_BLOCKED: disabled progression events may only reset to zero')
+        if operation == 'fps_control' and (len(data) != 4 or int.from_bytes(data,'big') not in (1,2)
+                                           or int.from_bytes(data,'big') != getattr(self,'_fps_interval',None)):
+            raise MemoryUnavailable('WRITE_BLOCKED: FPS control only accepts the requested frame interval')
+        if operation=='fps_native_restore' and (data!=bytes.fromhex('00000002')
+                                                or getattr(self,'_fps_interval',None)!=2):
+            raise MemoryUnavailable('WRITE_BLOCKED: native FPS restoration only permits interval 2')
         if operation == 'map_lock' and (data != (1).to_bytes(4,'big') or int.from_bytes(expected,'big') not in (2,3,4)):
             raise MemoryUnavailable('WRITE_BLOCKED: map lock only permits available/entered/cleared-to-locked cache')
         if operation == 'intro_box_placement':
@@ -474,7 +480,10 @@ class SonicMemory:
             request=int.from_bytes(data,'big')>>16
             score_acknowledged=(len(data)==4 and request>0 and address==event_address(self)+SCORE_RESET
                                 and readback==((request<<16)|request).to_bytes(4,'big'))
-        if readback != data and not consumed and not oxygen_advanced and not score_acknowledged:
+        fps_acknowledged=(operation=='fps_control' and len(data)==4
+                          and (getattr(self,'native_patch',None) or {}).get('native_fps_switch')
+                          and int.from_bytes(readback,'big')==(int.from_bytes(data,'big')|0x10000))
+        if readback != data and not consumed and not oxygen_advanced and not score_acknowledged and not fps_acknowledged:
             raise MemoryUnavailable('WRITE_UNCERTAIN: readback_mismatch')
         try:
             final_token = self.write_guard(operation, address, len(data))

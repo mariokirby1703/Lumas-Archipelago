@@ -116,7 +116,7 @@ def test_native_migration_full_revision_handshake_and_returns(disc_id):
     image=Dol(patched)
     assert image.read(SIGNATURE,8)==b'SCAPNAT1'
     for hook in registry['hooks']:
-        assert image.read(hook['hook'],4)==branch(hook['hook'],hook['target']).to_bytes(4,'big')
+        assert image.read(hook['hook'],4)==branch(hook['hook'],hook.get('entry',hook['target'])).to_bytes(4,'big')
         assert image.read(hook['target']+hook['size']-4,4)==branch(hook['target']+hook['size']-4,hook['return']).to_bytes(4,'big')
     class Backend:
         def read_bytes(self,a,n):

@@ -57,10 +57,16 @@ class Dol:
         self.sections.append((slot,offset,address,len(blob)))
 
 @lru_cache(maxsize=128)
-def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False,legacy_fps_word_write=False,legacy_wisp_slots=False,include_physical_restore=True,include_score_reset=True,include_super_guard=True,include_spring_guard=True):
+def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards=True,include_accessible_colors=True,include_sixty_fps=False,include_luma_colors=False,legacy_fps_word_write=False,legacy_wisp_slots=False,include_physical_restore=True,include_score_reset=True,include_super_guard=True,include_spring_guard=True,include_super_permission=True,include_fps_control=True,correct_fps_setter=True,native_fps_switch=True,quick_step_forward=True,quick_step_edges=True):
     """Rebuild every C2 payload as initialized native code, without C2 headers."""
     include_score_reset=bool(include_score_reset and include_physical_restore)
     include_super_guard=bool(include_super_guard and include_score_reset)
+    include_super_permission=bool(include_super_permission and include_super_guard)
+    include_fps_control=bool(include_fps_control and include_sixty_fps and not legacy_fps_word_write and include_super_permission)
+    correct_fps_setter=bool(correct_fps_setter and include_fps_control)
+    native_fps_switch=bool(native_fps_switch and correct_fps_setter)
+    quick_step_forward=bool(quick_step_forward and include_super_permission)
+    quick_step_edges=bool(quick_step_edges and quick_step_forward)
     include_spring_guard=bool(include_spring_guard and include_super_guard and include_sixty_fps and not legacy_fps_word_write)
     from .native_hook_table import hook_rows
     from .ap_hud_publisher import patches as hud
@@ -158,19 +164,38 @@ def plan(include_ring_materials=True,include_ring_spawn=True,include_boot_guards
         patches.extend(boost_patches)
     if include_sixty_fps:
         from .sixty_fps import patches as fps_patches
-        patches.extend(fps_patches(patches,legacy_fps_word_write))
+        from . import oneup_hook
+        oneup=next(h for h in hooks if h['hook']==oneup_hook.HOOK)
+        fps_control=oneup['target']+oneup_hook.payload()[1]+8
+        patches.extend(fps_patches(patches,legacy_fps_word_write,fps_control if include_fps_control else None,correct_fps_setter,native_fps_switch))
     if include_super_guard:
         from .super_sonic import patches as super_patches
-        patches.extend(super_patches())
+        patches.extend(super_patches(story_control if include_super_permission else None,patches))
     if include_spring_guard:
         from .spring_retrigger import patches as spring_patches
         patches.extend(spring_patches(patches))
+    if include_super_permission:
+        from . import oneup_hook,oneup_capture
+        oneup=next(h for h in hooks if h['hook']==oneup_hook.HOOK)
+        control=oneup['target']+oneup_hook.payload()[1]
+        capture=oneup_capture.patches(control,patches)
+        patches=[row for row in patches if row[0]!=oneup_hook.HOOK]
+        patches.extend(capture)
+        delta=int.from_bytes(capture[-1][2],'big') & 0x3fffffc
+        if delta & 0x2000000:delta-=0x4000000
+        oneup['entry']=oneup_hook.HOOK+delta
+    if quick_step_forward:
+        from . import quick_step,quick_step_forward as forward
+        if quick_step_edges:
+            from . import quick_step_edges as forward
+        quick=next(h for h in hooks if h['hook']==quick_step.HOOK)
+        patches.extend(forward.patches(quick['target']+quick_step.payload()[1],patches))
     ownership=[]
     for address,old,new in patches:
         if any(address<end and start<address+len(new) for start,end in ownership):raise ValueError(f'native hook collision at {address:#x}')
         ownership.append((address,address+len(new)))
     digest=hashlib.sha256(bytes(payload)+b''.join(struct.pack('>I',a)+n for a,o,n in patches)).digest()
-    _PLAN_FEATURES[digest.hex()]={'physical_ring_restore':include_physical_restore,'native_score_reset':include_score_reset,'super_sonic_guard':include_super_guard,'spring_retrigger_guard':include_spring_guard}
+    _PLAN_FEATURES[digest.hex()]={'physical_ring_restore':include_physical_restore,'native_score_reset':include_score_reset,'super_sonic_guard':include_super_guard,'spring_retrigger_guard':include_spring_guard,'super_permission_reader':include_super_permission,'fps_control':include_fps_control,'oneup_capture':include_super_permission,'correct_fps_setter':correct_fps_setter,'native_fps_switch':native_fps_switch,'quick_step_forward':quick_step_forward,'quick_step_edges':quick_step_edges}
     return patches,bytes(payload),digest,hooks
 
 def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
@@ -198,6 +223,55 @@ def patch_dol(original,seed,ring_colors=None,options=None,initial_items=()):
 
 @lru_cache(maxsize=64)
 def plan_for_digest(digest):
+    if not isinstance(digest,str) or len(digest)!=64 or any(c not in '0123456789abcdef' for c in digest) or digest=='0'*64:
+        raise ValueError('incompatible native AP hook ABI/signature')
+    previous_forward = {
+        '8021e1e7e0d0277d6b78ad9977fbec189c8dfd3d6d6e904045ddc1f417ed8494': (False,False),
+        '41c5d0deebd61e6a69aa86fe2e1e3a681fd825c2e13dfebf724ba0eed6a96e39': (False,True),
+        '9685768dabf8c628fbbd0e12481d589ee53248da0914a715b7860826edc3e587': (True,False),
+        '180133002c2cf87c6d3b2ab89b3bd472f840f3cfd3ff38c255e2752843e514cc': (True,True),
+    }
+    if digest in previous_forward:
+        fps,luma=previous_forward[digest]
+        candidate=plan(include_sixty_fps=fps,include_luma_colors=luma,quick_step_edges=False)
+        if candidate[2].hex()==digest:return candidate
+    # Earlier runtime FPS controls changed only the getter. Keep their exact
+    # signatures recognizable, but do not expose their broken 30-FPS mode.
+    previous_diagonal = {
+        '0a1db47682b42bb2363e33f7416691b1e9313605c972e2382f89fcd73e459908': (False,False),
+        'd41930d8c8e2eab3411c3ac172e3fde0734711728f8f4006562c6ad3ec694f0c': (False,True),
+        'd20f7959bddeeb63fdad3d10ed250b148e78f932389cf86d1eec733e516d396a': (True,False),
+        'd70633184499bde4761722b08945f0bc14a3a0c84a98cef1c5f3e0d3765c3d6a': (True,True),
+    }
+    if digest in previous_diagonal:
+        fps,luma=previous_diagonal[digest]
+        candidate=plan(include_sixty_fps=fps,include_luma_colors=luma,quick_step_forward=False)
+        if candidate[2].hex()==digest:return candidate
+    previous_fixed_fps = {
+        '4f5c50c95f1192625f286d425df6df137865473687cad02aaab7b4bf23f052be': False,
+        '9bd6302e6ad879bf19ce6c47797298fd55933962e04ef1d9bd2d6a0c3d8b98ee': True,
+    }
+    if digest in previous_fixed_fps:
+        candidate=plan(include_sixty_fps=True,include_luma_colors=previous_fixed_fps[digest],native_fps_switch=False,quick_step_forward=False)
+        if candidate[2].hex()==digest:return candidate
+    previous_fps = {
+        '188a39ce96a6fa1f28285bcc31676600c3d13c0d5ce71b778c4c2ee4675b0ae1': True,
+        'ac231428009752066851b95795d88149493ca5bee190fff671e99f5a3e7b6ff2': False,
+    }
+    if digest in previous_fps:
+        candidate=plan(include_sixty_fps=True,include_luma_colors=previous_fps[digest],correct_fps_setter=False,quick_step_forward=False)
+        if candidate[2].hex()==digest:return candidate
+    previous = {
+        'f4b4e8348d666551a31b914be52a88a961f37bbcd52dc7c8770230a667215773': (False,False),
+        '8d1d89543e33cf56ff2d3ebfe213bf43d7cdb65c58acec34cb13afb5e173ba72': (False,True),
+        'd55a72331fae006d6a375a8ee09fba0a814c9793990065e22b042994bceaf12f': (True,False),
+        'fc2d71ca46ea23435954ff2f207cb7c447186cdf438393e3236a1af4a5a7c62d': (True,True),
+    }
+    if digest in previous:
+        fps,luma=previous[digest]
+        candidate=plan(include_sixty_fps=fps,include_luma_colors=luma,
+                       include_super_permission=False,include_fps_control=False)
+        if candidate[2].hex()==digest:return candidate
     released={
         'c93c8e318a2b66d0f09716d0b9628d42027ebe94c733914dc348355b62c3cfa6':True,
         'bfd736d810b914c5981f55ef34ecef905e4c349a1543331fd413a5228e5ca395':False,
@@ -213,11 +287,13 @@ def plan_for_digest(digest):
                 {'include_boot_guards':False,'include_accessible_colors':False},
                 {'include_ring_spawn':False,'include_boot_guards':False,'include_accessible_colors':False},
                 {'include_ring_materials':False,'include_boot_guards':False,'include_accessible_colors':False})
-    for restore,score,super_guard,spring_guard in ((True,True,True,True),(True,True,True,False),(True,True,False,False),(True,False,False,False),(False,False,False,False)):
+    for fps,permission,restore,score,super_guard,spring_guard in ((True,True,True,True,True,True),(False,True,True,True,True,True),(True,True,True,True,True,False),(False,False,True,True,True,True),(False,False,True,True,True,False),(False,False,True,True,False,False),(False,False,True,False,False,False),(False,False,False,False,False,False)):
         for legacy in (False,True):
             for options in variants:
-                candidate=plan(**options,legacy_wisp_slots=legacy,include_physical_restore=restore,include_score_reset=score,include_super_guard=super_guard,include_spring_guard=spring_guard)
-                if candidate[2].hex()==digest:return candidate
+                for forward in ((True,False) if permission else (False,)):
+                    for edges in ((True,False) if forward else (False,)):
+                        candidate=plan(**options,legacy_wisp_slots=legacy,include_physical_restore=restore,include_score_reset=score,include_super_guard=super_guard,include_spring_guard=spring_guard,include_super_permission=permission,include_fps_control=fps,quick_step_forward=forward,quick_step_edges=edges)
+                        if candidate[2].hex()==digest:return candidate
     raise ValueError('incompatible native AP hook ABI/signature')
 
 

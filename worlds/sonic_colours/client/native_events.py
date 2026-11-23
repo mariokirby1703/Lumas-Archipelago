@@ -255,9 +255,9 @@ def scatter(words,sites,return_to,compact=False):
     return result
 
 
-def scatter_mixed(words,sites,return_to,pool=False):
+def scatter_mixed(words,sites,return_to,pool=False,returns=None):
     from .native_dol import branch
-    packets=[];addresses={};i=0;slot=0;available=list(sites)
+    packets=[];addresses={};i=0;slot=0;available=list(sites);returns=returns or {}
     while i<len(words):
         conditional=words[i]>>26==16
         if pool:
@@ -271,7 +271,7 @@ def scatter_mixed(words,sites,return_to,pool=False):
             if slot>=len(sites):raise ValueError('native event padding exhausted')
             site=sites[slot]
         size=site.get('size',12)
-        pair=(size>=12 and i+1<len(words)-1 and words[i]>>26 not in (16,18)
+        pair=(size>=12 and i not in returns and i+1 not in returns and i+1<len(words)-1 and words[i]>>26 not in (16,18)
               and words[i+1]>>26 not in (16,18))
         count=2 if pair else 1
         packets.append((i,count,site))
@@ -282,7 +282,8 @@ def scatter_mixed(words,sites,return_to,pool=False):
         a=site['address'];size=site.get('size',12)
         following=packets[k+1][2]['address'] if k+1<len(packets) else return_to
         word=words[i];op=word>>26
-        if i==len(words)-1:chunk=[branch(a,return_to)]
+        if i in returns:chunk=[branch(a,returns[i])]
+        elif i==len(words)-1:chunk=[branch(a,return_to)]
         elif op in (16,18):
             mask,sign=(0xfffc,0x8000) if op==16 else (0x3fffffc,0x2000000)
             delta=word&mask

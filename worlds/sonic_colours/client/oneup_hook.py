@@ -26,6 +26,11 @@ def payload():
     return a.finish(),offset
 
 def installed_data(memory):
+    if (getattr(memory,'native_patch',None) or {}).get('oneup_capture'):
+        from .native_dol import plan_for_digest
+        selected=plan_for_digest(memory.native_patch['code_sha256'])
+        hook=next(h for h in selected[3] if h['hook']==HOOK)
+        return hook['target']+payload()[1]
     words,offset=payload();r=inspect_c2(memory,HOOK,ORIGINAL,{'one_up':words},((offset,24),),'1-Up capture')
     return r['target']+offset if r['installed'] else None
 
@@ -47,28 +52,32 @@ def configure(memory,snapshot,guard,slot):
     journal=guard.journal;tag=identity_tag(journal.identity)
     old=struct.unpack('>6I',memory.read_bytes(data,24))
     from ..oneups import ONEUPS
-    if old[5]==tag and old[3]:
+    capture=bool((getattr(memory,'native_patch',None) or {}).get('oneup_capture'))
+    if (old[5]==tag or capture and old[5]==0) and old[3]:
         if not guard.can_record_pickups(snapshot):guard.check(snapshot)
         rows=[r for i,r in enumerate(ONEUPS.values()) if old[3]&(1<<i) and r['location_name'] in slot['locations']]
         checks={r['code'] for r in rows}-set(journal.data['pickup_checks'])
         if checks:journal.record_pickups([{'kind':'one_up','mission':r['mission_id'],'instance_key':r['key'],'provenance':'PAL_8021227C_native_contact_success'} for r in rows if r['code'] in checks],{},checks)
     row=None
-    if slot['options'].get('one_up_sanity') and snapshot.scene=='gameplay' and snapshot.scene_verified and guard.can_record_pickups(snapshot):
+    if not capture and slot['options'].get('one_up_sanity') and snapshot.scene=='gameplay' and snapshot.scene_verified and guard.can_record_pickups(snapshot):
         from .native_read import read_oneups,read_actors
         stage=next(iter(snapshot.evidence.get('native_data',{}).get('stage_objects',[])),{})
         if stage.get('mission')==snapshot.actual_mission:
             rows=read_oneups(memory,stage['stage'],snapshot.actual_mission,read_actors(memory,stage['stage']))
             row=rows[0] if len(rows)==1 else None
-    mask=old[3] if old[5]==tag else 0
+    mask=old[3] if old[5]==tag or capture and old[5]==0 else 0
     index=next((i for i,r in enumerate(ONEUPS.values()) if row and r['key']==row['key']),None)
-    values=(row['actor'] if row else 0,row['actor_id'] if row else 0,row['record'] if row else 0,mask,1<<index if index is not None else 0,tag)
+    values=(row['actor'] if row else 0,row['actor_id'] if row else 0,old[2] if (getattr(memory,'native_patch',None) or {}).get('fps_control') else row['record'] if row else 0,mask,1<<index if index is not None else 0,tag)
+    if capture:
+        values=(int(bool(slot['options'].get('one_up_sanity'))),0,old[2],mask,0,tag)
     if old!=values:
         memory._oneup_allowed=data
         try:
             if old[0]:memory.write_u32(data,0,expected=old[0],operation='one_up_controls')
             for i in (1,2,3,4,5):
+                if capture and i==3 and old[5] in (0,tag):continue
                 before=memory.read_u32(data+i*4)
                 if before!=values[i]:memory.write_u32(data+i*4,values[i],expected=before,operation='one_up_controls')
             if values[0]:memory.write_u32(data,values[0],expected=0,operation='one_up_controls')
         finally:memory._oneup_allowed=None
-    return {'installed':True,'armed':bool(row),'pickup_latch':mask,'mission':snapshot.actual_mission,'status':'native 1-Up capture active','live_hook_verified':False}
+    return {'installed':True,'armed':bool(values[0]),'pickup_latch':mask,'mission':snapshot.actual_mission,'status':'native 1-Up capture active','live_hook_verified':False}
