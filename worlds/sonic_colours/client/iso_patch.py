@@ -127,7 +127,39 @@ def find_disc_tree(root):
     if not (tree/'files/sonic2010_0.cpk').is_file():raise ValueError('DATA partition lacks sonic2010_0.cpk')
     return tree
 
+def find_generated_iso(patch,source=None,target=None,progress=None,cancel=None):
+    from . import generated_iso as generated
+    from ..patch import resource_component_id,EQUIVALENT_RESOURCES,EQUIVALENT_RESOURCE_TARGET
+    if patch.slot_data is None:patch.read()
+    if source is None:source=str(settings_group().iso_file)
+    target=Path(target or Path(patch.path).with_suffix('.iso')).resolve()
+    if target==Path(source).resolve():raise ValueError('The original ISO must never be the output')
+    resources=resource_component_id()
+    compatible={resources}
+    if resources==EQUIVALENT_RESOURCE_TARGET:compatible.update(EQUIVALENT_RESOURCES)
+    native=plan(include_sixty_fps=bool(patch.slot_data.get('options',{}).get('sixty_fps',0)),
+                include_luma_colors=bool(patch.slot_data.get('options',{}).get('luma',0)))[2].hex()
+    return generated.find(patch,source,target,native,compatible,
+        lambda p:sha(p,progress,cancel),disc_header,
+        progress or (lambda text:logger.info('Sonic ISO: %s',text)))
+
+
 def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cache_dir=None):
+    from . import generated_iso as generated
+    if patch.slot_data is None:patch.read()
+    with generated.lock(generated.seed_identity(generated.seed_data(patch))):
+        return _install(patch,source=source,target=target,wit=wit,progress=progress,
+                        cancel=cancel,cache_dir=cache_dir)
+
+
+def reuse_before_install(patch,source=None,target=None):
+    from . import generated_iso as generated
+    if patch.slot_data is None:patch.read()
+    with generated.lock(generated.seed_identity(generated.seed_data(patch))):
+        return find_generated_iso(patch,source,target)
+
+
+def _install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cache_dir=None):
     from ..patch import resource_component_id,EQUIVALENT_RESOURCES,EQUIVALENT_RESOURCE_TARGET
     progress=progress or (lambda text:logger.info('Sonic ISO: %s',text))
     started=time.monotonic();phase_started=started;current_phase=None;timings={}
@@ -146,6 +178,8 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
     target=Path(target or Path(patch.path).with_suffix('.iso')).resolve()
     if target==source:raise ValueError('The original ISO must never be the output')
     if target.suffix.lower()!='.iso':raise ValueError('Output must be a separate .iso')
+    reused=find_generated_iso(patch,source,target,progress,cancel)
+    if reused is not None:return reused
     target.parent.mkdir(parents=True,exist_ok=True)
     receipt=Path(str(target)+'.sonic.json')
     seed_data={'game':patch.game,'player':patch.player,'player_name':patch.player_name,'slot_data':patch.slot_data}
@@ -160,14 +194,16 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
     compatible_resources={resources}
     if resources==EQUIVALENT_RESOURCE_TARGET:compatible_resources.update(EQUIVALENT_RESOURCES)
     phase('Validating original ISO and cached output')
-    source_hash=sha(source,progress,cancel)
+    from . import generated_iso as generated
+    source_hash=generated.source_hash(source,lambda p:sha(p,progress,cancel))
     if target.exists() or receipt.exists():
         if target.is_file() and receipt.is_file():
-            record=json.loads(receipt.read_text(encoding='utf-8'))
+            record=generated.read(receipt)
             if (record.get('identity')==identity and record.get('source_iso_sha256')==source_hash
-                    and record.get('native_component_sha256')==native_component and record.get('pipeline_version')==1
+                    and record.get('native_component_sha256')==native_component and record.get('pipeline_version')==generated.PIPELINE_VERSION
                     and record.get('resource_component_sha256') in compatible_resources
                     and record.get('output_iso_sha256')==sha(target,progress,cancel)):
+                generated.register(target,{**seed_data,**record},source,source_hash)
                 progress('Reusing verified ISO for this seed');return target
         if default_target:
             # Keep an old ABI/resource build intact. A component-specific name
@@ -178,7 +214,11 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
                 suffix=hashlib.sha256((suffix+json.dumps(patch.ring_colors,sort_keys=True)).encode()).hexdigest()[:10]
             upgraded=target.with_name(target.stem+'-ap-'+suffix+'.iso')
             progress('Keeping existing ISO; building/reusing updated components at '+str(upgraded))
-            return install(patch,source=source,target=upgraded,wit=wit,progress=progress,cancel=cancel,cache_dir=cache_dir)
+            if upgraded.exists() or Path(str(upgraded)+'.sonic.json').exists():
+                index=1
+                while upgraded.exists() or Path(str(upgraded)+'.sonic.json').exists():
+                    upgraded=target.with_name(target.stem+'-ap-'+suffix+f'-{index}.iso');index+=1
+            return _install(patch,source=source,target=upgraded,wit=wit,progress=progress,cancel=cancel,cache_dir=cache_dir)
         raise FileExistsError('Output already exists and is not a verified cache match; choose another output path')
     # Extraction, a separate CPK and the output image coexist during validation.
     required=source.stat().st_size*3+2*1024**3
@@ -239,7 +279,7 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
         phase('Final source and output checksums')
         if sha(source,progress,cancel)!=source_hash:raise ValueError('Source ISO changed during build; refusing finalization')
         if cancel and cancel.is_set():raise InterruptedError('ISO build cancelled')
-        record={**seed_data,'identity':identity,'pipeline_version':1,'native_component_sha256':native_component,
+        record={**seed_data,'identity':identity,'pipeline_version':generated.PIPELINE_VERSION,'native_component_sha256':native_component,
                 'resource_component_sha256':resource_component_id(),
                 'source_iso_sha256':source_hash,'output_iso_sha256':sha(output,progress,cancel),
                 'patched_dol_sha256':sha(dol),'patched_cpk_sha256':sha(cpk),
@@ -254,6 +294,7 @@ def install(patch,source=None,target=None,wit=None,progress=None,cancel=None,cac
         try:
             with receipt.open('x',encoding='utf-8') as f:f.write(meta.read_text(encoding='utf-8'))
         except BaseException:target.unlink();raise
+    generated.register(target,record,source,source_hash)
     if group:
         group.iso_file=type(group.iso_file)(str(source))
         from settings import get_settings
@@ -282,6 +323,13 @@ def install_with_progress(patch,**kwargs):
             disc_header(selected)
         kwargs['source']=selected
         if not kwargs.get('wit'):kwargs['wit']=str(vars(group).get('wit_path','')) or None
+    reused=reuse_before_install(patch,kwargs.get('source'),kwargs.get('target'))
+    if reused is not None:
+        if group:
+            group.iso_file=type(group.iso_file)(kwargs['source'])
+            from settings import get_settings
+            get_settings().save()
+        return reused
     root=None
     try:
         import tkinter as tk

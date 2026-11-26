@@ -6,6 +6,7 @@ def test_progress_window_initializes_and_uses_worker_instead_of_silent_fallback(
     import threading
     from types import SimpleNamespace
     from ..client import iso_patch
+    monkeypatch.setattr(iso_patch,'reuse_before_install',lambda *args:None)
     widgets=[];roots=[];calls=[]
     class Widget:
         def __init__(self,*args,**kwargs):self.values=kwargs;widgets.append(self)
@@ -55,6 +56,7 @@ def test_gui_reuses_valid_original_and_replaces_unusable_path(monkeypatch,tmp_pa
     import settings
     from types import SimpleNamespace
     from ..client import iso_patch
+    monkeypatch.setattr(iso_patch,'reuse_before_install',lambda *args:None)
     from .test_regions import header
     pal=tmp_path/'pal.iso';pal.write_bytes(header('SNCP8P'))
     us=tmp_path/'us.iso';us.write_bytes(header('SNCE8P'))

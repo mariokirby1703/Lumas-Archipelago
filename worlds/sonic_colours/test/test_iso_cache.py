@@ -152,6 +152,8 @@ def test_installer_warm_build_skips_source_verify_and_extraction_but_verifies_ou
     monkeypatch.setattr(iso_patch,'command',tool)
     cache=tmp_path/'cache'
     for name in ('cold','warm','repaired'):
+        # Different seed builds still share the original partition cache.
+        patch.slot_data['seed_name']='partition-cache-'+name
         if damage and name=='warm':
             (cache/sha(source)/'manifest.json').write_text('{bad')
         cached=name!='cold' and not (damage and name=='warm')
@@ -162,5 +164,8 @@ def test_installer_warm_build_skips_source_verify_and_extraction_but_verifies_ou
         assert sum(verb=='VERIFY' for verb,_ in calls)==(1 if cached else 2)
         record=json.loads(Path(str(target)+'.sonic.json').read_text())
         assert record['original_cache_used']==cached
+        calls.clear()
+        assert iso_patch.install(patch,source,target)==target.resolve()
+        assert not calls  # reopening this build must not even start WIT
     assert (tmp_path/'cold.iso').read_bytes()==(tmp_path/'warm.iso').read_bytes()
     assert source.read_bytes()==header

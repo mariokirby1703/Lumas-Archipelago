@@ -13,6 +13,8 @@ Other regions and revisions are not supported. The installer verifies the origin
 The same player patch works with either supported region, including existing PAL-generated patches. The installer keeps the region of your original ISO; no region option or new seed is needed. Dolphin stores PAL and NTSC-U saves separately.
 The installer remembers your original ISO and reuses it automatically. If the saved file is missing or invalid, it asks you to select it again. Command-line launches can provide a different path with `--original-iso`.
 
+Reopening the same player patch reuses its verified generated ISO, even if the patch was renamed, moved or downloaded again. The client remembers the generated ISO's absolute path and the room address separately. Keep the `.iso.sonic.json` receipt next to the ISO so older builds can also be recognized. A different seed, player, original disc or required game patch update may require a new ISO; existing images are kept intact.
+
 ## Installing the APWorld
 
 1. Install Archipelago and download `sonic_colours_wii.apworld`.

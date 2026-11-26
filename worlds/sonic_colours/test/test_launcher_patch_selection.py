@@ -42,11 +42,13 @@ def test_explicit_client_invocations_do_not_open_picker(monkeypatch,kw):
 
 
 def test_patch_endpoint_is_used_and_missing_address_never_reuses_last_room():
-    patch=SimpleNamespace(server='archipelago.gg:38281')
+    patch=SimpleNamespace(server='archipelago.gg:38281',game='Sonic Colours (Wii)',player=1,
+                          player_name='Test',slot_data={'seed_name':'first'})
     assert patch_server_address(patch,gui=False)=='archipelago.gg:38281'
     assert patch_server_address(patch,'localhost:12345',gui=False)=='localhost:12345'
     with pytest.raises(ValueError,match='no server address'):
-        patch_server_address(SimpleNamespace(server=None),gui=False)
+        patch_server_address(SimpleNamespace(server=None,game=patch.game,player=1,
+            player_name='Test',slot_data={'seed_name':'different-room'}),gui=False)
 
 
 @pytest.mark.parametrize('address',['archipelago.gg','http://example.org:80','host:0/no','user:password@host:38281'])

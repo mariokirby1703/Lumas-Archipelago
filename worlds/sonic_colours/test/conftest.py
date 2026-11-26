@@ -3,6 +3,12 @@ import pytest
 from ..tools.private_assets import reference_root
 
 
+@pytest.fixture(autouse=True)
+def isolated_generated_iso_registry(tmp_path, monkeypatch):
+    from ..client import generated_iso
+    monkeypatch.setattr(generated_iso, 'root', lambda: tmp_path / 'generated-registry')
+
+
 @pytest.fixture
 def pal_dol_bytes():
     path=reference_root()/'memdumps_and_more/main.dol'
