@@ -210,6 +210,8 @@ async def watcher(ctx):
                             register_delivery(ctx.journal, i, effect)
                             ctx.journal.queue_popup(i, effect,
                                 receipt_message(effect.get('display_name',effect['name']),item.player,ctx.slot,ctx.player_names))
+                    ctx.notify('assignment_policy',ctx.journal.assignment_policy(dict(
+                        options=getattr(ctx,'slot_options',{}),item_effects=getattr(ctx,'item_effects',{}))))
                     while ctx.pending_sent_popups:
                         event_binding,event=ctx.pending_sent_popups.pop(0)
                         if event_binding==current_binding:ctx.journal.queue_sent_popup(event)

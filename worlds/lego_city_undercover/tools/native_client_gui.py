@@ -241,6 +241,13 @@ class App:
         history_page=ttk.Frame(logs,padding=8)
         log_page=ttk.Frame(logs,padding=8)
         logs.add(history_page,text='Test-Historie');logs.add(log_page,text='Client-Log und Fehler')
+        missions=ttk.Frame(logs,padding=8)
+        logs.add(missions,text='Missionszugang')
+        ttk.Label(missions,text='AP-Berechtigungen aus gespeicherten Receipts. Native Eintrittssperre noch nicht implementiert.',wraplength=700).pack(anchor='w',pady=(0,8))
+        self.assignment_view=ttk.Treeview(missions,columns=('mission','policy','received','native'),show='headings',height=15)
+        for key,label,width in (('mission','Mission',200),('policy','Verwaltung',120),('received','AP-Item',120),('native','Native Sperre',160)):
+            self.assignment_view.heading(key,text=label);self.assignment_view.column(key,width=width)
+        self.assignment_view.pack(fill='both',expand=True)
         filters=ttk.Frame(history_page);filters.pack(fill='x',pady=(0,8))
         ttk.Label(filters,text='Anforderung → Spiel-RAM → Save-Datei').pack(side='left')
         ttk.Button(filters,text='Historie exportieren',command=self.export_history).pack(side='right')
@@ -612,6 +619,14 @@ class App:
                 self.pickup_binding_status.set(f"Supersteine: {value['verified']} genaue Zuordnungen · {value['blocked']} gesperrte Bit-Konflikte")
             elif kind == 'seed':
                 self.seed_status.set('Seed: '+value)
+                self.assignment_view.delete(*self.assignment_view.get_children())
+            elif kind == 'assignment_policy':
+                self.assignment_view.delete(*self.assignment_view.get_children())
+                for row in value['entries']:
+                    self.assignment_view.insert('','end',values=(row['assignment'],
+                        'Archipelago' if row['managed'] else 'Vanilla',
+                        'Empfangen' if row['received'] else 'Nicht empfangen',
+                        'Nicht implementiert'))
             elif kind == 'collectible_evidence':
                 self.collectible_evidence=value
             elif kind == 'game_loaded':
@@ -630,6 +645,7 @@ class App:
             elif kind=='item_states':
                 self.item_states=value;self.show_item_info()
             elif kind == 'stopped':
+                self.assignment_view.delete(*self.assignment_view.get_children())
                 self.area_status.set('Gebietssperre: nicht aktiv (Client gestoppt)')
                 self.worker = None
                 self.stopping = False
