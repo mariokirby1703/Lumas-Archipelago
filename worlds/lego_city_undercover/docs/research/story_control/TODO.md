@@ -1,5 +1,7 @@
 # Remaining story control work
 
+26 November follow-up: all 15 replay identities and receipt-derived entitlement decisions are implemented ([report](assignment_pass_2026_11_26.md)). The two previously absent canonical Blackwell access items now exist. These do not install native admission hooks; every native-menu/activation/gating task below remains open.
+
 This list is explicit unfinished implementation, not a claim that native Open World or a pause-menu chapter selector exists.
 
 ## P0: original pause menu and independent chapters

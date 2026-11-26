@@ -16,6 +16,7 @@ from red_bricks import redbrick_location_key
 from activity_rewards import ACTIVITY_REWARDS
 from story_arrests import ARRESTS
 from story_points import catalogue_rows as story_point_rows
+from goals import ASSIGNMENTS
 from opening_logic import NO_POLICE_KEYS
 from area_passes import DISTRICTS
 from station_rewards import GRACE_REWARD_KEY,grace_reward_metadata
@@ -170,6 +171,8 @@ def main():
         items[f'Red Brick Cheat: Studs x{multiplier}']=dict(category='cheat',classification='useful',
             effect='stud_multiplier',multiplier=multiplier,native_name=f'CHEAT_SCOREX{multiplier}')
     for level in levels:items[f'Story Access: {level}']=dict(category='story_access',classification='useful')
+    for assignment in ASSIGNMENTS:
+        items.setdefault('Story Access: '+assignment,dict(category='story_access',classification='useful'))
     for district in sorted({r['district'] for r in locations.values() if r['district']}):
         items[f'Area Pass: {district}']=dict(category='area_pass',classification='useful')
     for district in DISTRICTS:

@@ -7,5 +7,5 @@ def native_goal_complete(snapshot,goal):
     progress=snapshot.get('level_progress',{})
     if progress.get('status')!='read':return False
     records=progress.get('records',[])
-    complete={r.get('assignment',r['mission']) for r in records if r.get('complete')}
+    complete={r.get('assignment') or r.get('mission') for r in records if r.get('complete')}
     return ('moon_base' in complete if goal==0 else set(ASSIGNMENTS)<=complete if goal==1 else False)

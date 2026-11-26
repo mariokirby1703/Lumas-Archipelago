@@ -118,6 +118,12 @@ class Journal:
     def close(self):
         self.db.close()
 
+    def assignment_policy(self,slot_data):
+        """Reconstruct diagnostic permissions across reconnect; not native enforcement."""
+        from assignment_policy import build_policy
+        receipts=[json.loads(row[0]) for row in self.db.execute('SELECT payload FROM receipts ORDER BY server_index')]
+        return build_policy(slot_data,receipts,self.binding_token.hex())
+
     def queue_popup(self,index,effect,text=None):
         # Existing saved receipts are history, not a new flood on first upgrade.
         # Already queued notifications survive reconnects and process restarts.
