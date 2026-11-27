@@ -1,6 +1,8 @@
 # LEGO City Undercover experimental APWorld
 
-Latest story pass (2026-11-21): [implementation and validation](docs/research/story_control/completion_report.md), [remaining work](docs/research/story_control/TODO.md). All 150 Story Progression Sheet points reviewed; 14 new source-bound milestone checks, 35 existing locations reused, seven existing mission Super Builds receive scene-specific bindings. 419 test executions (7 skipped), 180/180 logical fills. Native Open World initialization and an original pause-menu chapter selector are **not implemented**. Version remains **0.0.1**.
+Pause-menu update (2026-11-27): the native client automatically installs **Chapter Select** above the police-station return entry. Its fifteen English chapter entries use Extras-style scrolling; Esc/controller Back returns to the pause menu. The GUI shows installation status, and transient installation failures retry without blocking checks or save delivery. Chapter activation, chapter access items and native Open World initialization remain unfinished; see the [menu report](docs/research/story_control/pause_list_2026_11_27.md) and [TODOs](docs/research/story_control/TODO.md). Version remains **0.0.1**.
+
+Latest story pass (2026-11-21): [implementation and validation](docs/research/story_control/completion_report.md), [remaining work](docs/research/story_control/TODO.md). All 150 Story Progression Sheet points reviewed; 14 new source-bound milestone checks, 35 existing locations reused, seven existing mission Super Builds receive scene-specific bindings. 419 test executions (7 skipped), 180/180 logical fills. Native Open World initialization and chapter activation are **not implemented**.
 
 Current pass (2026-11-21): [completion report](docs/research/reliability/completion_report_2026_11_21.md). 174/471 exact city pickup bindings, 65 persistent city Superbuild job bindings, native profile/seed grant guards and 1,421 read-only Sheet design rows. 405 test executions (7 skipped) and 180/180 fill simulations; vehicle/creature gameplay validation and destination/story/open-world gates remain incomplete.
 
@@ -36,7 +38,7 @@ From the repository root:
 .venv/Scripts/python.exe worlds/lego_city_undercover/tools/start_native_client.py --connect HOST:PORT --name SLOT
 ```
 
-The starter enables native items and the existing N0CUT5 permission option. Without arguments it asks for server and slot. The current native save is automatically identified when exactly one Steam save matches; otherwise use --native-save-file with the loaded slot's gameN.legocityundercoversavegamedata. Keep that native slot bound to the AP seed. Close the prior source client before starting another native client.
+The starter enables native items, the pause-menu extension and the existing N0CUT5 permission option. The GUI starter is `worlds/lego_city_undercover/tools/StartLCUNativeClient.cmd`; the console command above asks for server and slot when arguments are omitted. After connecting and loading the game, the menu installs independently of native save binding; no separate menu tool or new seed is required. The current native save is automatically identified when exactly one Steam save matches; otherwise use --native-save-file with the loaded slot's gameN.legocityundercoversavegamedata. Keep that native slot bound to the AP seed. Close the prior source client before starting another native client.
 
 To rebuild the DLL (ziglang is required only for building):
 

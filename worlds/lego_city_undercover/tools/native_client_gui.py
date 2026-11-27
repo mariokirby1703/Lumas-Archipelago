@@ -161,6 +161,7 @@ class App:
         self.collectible_evidence={}
         self.area_evidence={}
         self.save_status = tk.StringVar(value='Save: Nicht gebunden')
+        self.pause_menu_status = tk.StringVar(value='Pausemenü: warte auf Verbindung und geladenes Spiel')
         self.progress = tk.StringVar(value='Checks: 0 · AP-Items: 0')
         self.item_info = tk.StringVar(value='Item suchen oder auswählen.')
 
@@ -229,6 +230,7 @@ class App:
         ttk.Button(status,text='Gebiet-Diagnose kopieren',command=self.copy_area_evidence).pack(anchor='e')
         ttk.Label(status,textvariable=self.pickup_binding_status).pack(anchor='w')
         ttk.Label(status,textvariable=self.seed_status).pack(anchor='w')
+        ttk.Label(status,textvariable=self.pause_menu_status).pack(anchor='w')
         ttk.Button(status,text='Sammeldiagnose kopieren',command=self.copy_collectible_evidence).pack(anchor='e')
 
         panes = ttk.Panedwindow(main, orient='horizontal')
@@ -631,8 +633,12 @@ class App:
                 self.collectible_evidence=value
             elif kind == 'game_loaded':
                 self.game_connected = bool(value)
+                if not self.game_connected:
+                    self.pause_menu_status.set('Pausemenü: warte auf geladenes Spiel')
             elif kind == 'save':
                 self.save_status.set(value)
+            elif kind == 'pause_menu':
+                self.pause_menu_status.set(value)
             elif kind == 'ready':
                 self.native_ready = bool(value)
             elif kind == 'progress':
@@ -653,6 +659,7 @@ class App:
                 self.ap_status.set('Archipelago: Nicht verbunden')
                 self.game_status.set('Spiel: Nicht geladen')
                 self.save_status.set('Save: Nicht gebunden')
+                self.pause_menu_status.set('Pausemenü: Client getrennt · Installation nicht geprüft')
                 self.connect_button.configure(state='normal')
                 self.disconnect_button.configure(state='disabled')
                 self.update_buttons()

@@ -85,8 +85,11 @@ Run `tools/configure_pause_menu.py` with the repository Python to install,
 the root pause menu. The tool uses the manifest-pinned native bridge and never
 attaches a debugger. `tools/probe_pause_list.py` is read-only.
 
-The connected native client installs the menu once per loaded process after
-save binding. Failure is logged without stopping checks or deliveries. This
+The connected native client installs the menu once per loaded process before
+save binding, so pending autosave/delivery cannot delay this UI-only setup.
+Transient failures retry after a delay; successful setup is not repeatedly
+installed. The GUI displays waiting/error and active states. Failure is logged
+without stopping checks or deliveries. This
 does not enable chapter-start options in seeds. For development handoffs only,
 `--replace-build <previous-manifest.json>` verifies the old DLL hash, loaded
 module and all four callback owners, disables its UI, and requires the root
