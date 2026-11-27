@@ -27,7 +27,8 @@ class SonicColoursWorld(World):
     item_name_groups = {'Wisps': set(Items.ALL_WISP_ITEMS), 'World Access': set(Items.WORLD_ITEMS),
                         'Chaos Emeralds': set(Items.EMERALDS), 'Red Rings': set(Items.RING_VALUES),
                         'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS),
-                        **{name: {name, 'Progressive '+name} for name in Items.NORMAL_WISP_ITEMS},
+                        **{alias: {name, 'Progressive '+name} for name in Items.NORMAL_WISP_ITEMS
+                           for alias in (name.removesuffix(' Wisp'), name.split()[1])},
                         'Game Land Speed': {'Progressive Game Land Speed'},
                         'Crouch': {'Progressive Crouch'},
                         'Slide': {'Progressive Crouch'},

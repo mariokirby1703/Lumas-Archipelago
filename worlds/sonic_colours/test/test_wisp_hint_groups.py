@@ -11,12 +11,17 @@ from .test_logic_v3 import MANIFEST, State, world
 @pytest.mark.parametrize('movement', [False, True])
 def test_wisp_hint_alias_matches_the_item_in_either_pool(name, movement):
     multiworld = generate({'movement_unlocks': movement})
-    alias = SonicColoursWorld.item_name_groups[name]
-    assert alias == {name, 'Progressive '+name}
-    assert alias <= ITEM_TABLE.keys()
     present = {item.name for item in multiworld.itempool if item.player == 1}
-    assert alias & present == {('Progressive ' if movement else '')+name}
-    assert multiworld.worlds[1].get_data_package_data()['item_name_groups'][name] == sorted(alias)
+    for alias_name in (name.removesuffix(' Wisp'), name.split()[1]):
+        alias = SonicColoursWorld.item_name_groups[alias_name]
+        assert alias == {name, 'Progressive '+name}
+        assert alias <= ITEM_TABLE.keys()
+        assert alias & present == {('Progressive ' if movement else '')+name}
+        assert multiworld.worlds[1].get_data_package_data()['item_name_groups'][alias_name] == sorted(alias)
+
+
+def test_hint_group_names_never_conflict_with_item_names():
+    assert not SonicColoursWorld.item_name_groups.keys() & ITEM_TABLE.keys()
 
 
 def test_game_land_two_one_heart_speed_route_requires_level_three():
