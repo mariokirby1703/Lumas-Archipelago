@@ -37,7 +37,8 @@ from notification_messages import receipt_message, sent_message
 from native_bridge_path import bridge_path
 from station_exit import StationExitGate, read_station_exit, can_resume_first_lobby, read_lobby_lift
 from native_model_transport import (trigger_station_exit, open_lobby_lift,
-                                    relax_tutorial_fields, unlock_chief_key, reveal_chief_radio)
+                                    relax_tutorial_fields, unlock_chief_key, reveal_chief_radio,
+                                    configure_pause_menu)
 from activity_rewards import completed_activity_rewards
 from tutorial_field_timing import TutorialFieldTiming
 from story_arrests import ARRESTS, completed_story_arrests
@@ -166,6 +167,7 @@ async def watcher(ctx):
     seen_models = set()
     seen_arrests = set()
     skip_pid = None
+    pause_menu_pid = None
     try:
         while not ctx.exit_event.is_set():
             try:
@@ -242,6 +244,15 @@ async def watcher(ctx):
                             ctx.notify('save','Save: warte auf eindeutige Zuordnung vor Check-Abgleich')
                             await asyncio.sleep(.25)
                             continue
+                        if pause_menu_pid != session.pid:
+                            try:
+                                menu=await asyncio.to_thread(configure_pause_menu,session.pid,native_delivery.dll)
+                                logging.info('Native pause menu: Chapter Select installed=%s; '
+                                             '15 chapter entries visible; chapter activation unavailable',menu['installed'])
+                            except (OSError,RuntimeError,ValueError) as error:
+                                # UI failure must not stop location checks or item delivery.
+                                logging.warning('Native pause-menu extension unavailable: %s',error)
+                            pause_menu_pid=session.pid
                     if binding_observer is not None:
                         binding_observer.observe(snapshot,ctx.journal)
                         bound_pickups,blocked_bits=binding_overlay(ctx.journal,static_bindings)

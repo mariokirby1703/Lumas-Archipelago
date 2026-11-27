@@ -2,12 +2,15 @@
 
 26 November follow-up: all 15 replay identities and receipt-derived entitlement decisions are implemented ([report](assignment_pass_2026_11_26.md)). The two previously absent canonical Blackwell access items now exist. These do not install native admission hooks; every native-menu/activation/gating task below remains open.
 
-This list is explicit unfinished implementation, not a claim that native Open World or a pause-menu chapter selector exists.
+This list is explicit unfinished implementation. Native Open World and chapter activation remain unavailable. The original pause-list extension is now implemented separately; see [the current report](pause_list_2026_11_27.md).
 
 ## P0: original pause menu and independent chapters
 
-- [ ] Implement the actual native pause-menu entry factory and submenu lifecycle: frontendmain.baml nodes, PauseMenuDrawer ownership, input/controller focus, activation callback and teardown. Root drawer lookup at 0x79377 is NOT an entry-creation API. No external chapter window is a substitute.
+- [x] Identify and extend the actual immediate-mode pause list (`0x80b090` / `0x80ab60`, runtime record 7), append an entry and register a native submenu. BAML nodes and PauseMenuDrawer were the wrong path. User confirmed visibility, opening, returning and the scrolling layout. All fifteen English chapter rows use normal font and Extras-style scrolling/fading. The redundant Back row is removed; Esc/controller Back remains native. Isolated tests pass.
+- [ ] Confirm controller navigation, Options/Extras, close/reopen, disconnect/reconnect and level-transition reinitialization in the live game. Chapter rows remain disabled until activation transactions exist.
 - [ ] Implement all 15 chapter activation transactions using original flow transitions. Achievements_MarkChapterStart (0x84f0) records event flags; it does not select/start a chapter. Preserve permanent Flow_Completed, assignment completion, shield/Hero/token states and AP outgoing checks.
+- [ ] Add a requirements panel beside the chapter list for the highlighted chapter. List every required disguise/ability and clearly distinguish owned requirements from missing ones. Keep the panel synchronized with AP entitlements and the chapter's actual access logic.
+- [ ] Implement mode-specific chapter admission: Open World requires the corresponding AP Chapter Access item for each chapter; linear mode unlocks the next chapter by completing the previous chapter and requires no Chapter Access item. Chapter 1 is the initial chapter in linear mode. Required disguises/abilities remain separate prerequisites in both modes. Reflect the same rules in native entry checks, the chapter requirements panel, AP logic and item-pool generation.
 - [ ] Establish an isolated per-save chapter model. Achievements complete (0x84b0 -> 0x7cf0) writes LegoAchievements +0x110 / +0x188, but per-save/Steam isolation is not verified. The event reader never queues chapter-completion checks or infers an active chapter.
 - [ ] Validate abort/resume/replay and Chapter 6 -> 3 -> 6, then Chapters 12?15, including both mansion assignments and timed/automatic transitions. Do not erase story history or bulk-apply developer presets.
 

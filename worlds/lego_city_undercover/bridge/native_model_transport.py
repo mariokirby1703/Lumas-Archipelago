@@ -30,6 +30,42 @@ def area_disembark(pid,district,binding,dll):
 PACKET=struct.Struct('<16I')
 
 
+def configure_pause_menu(pid,dll,enabled=True,*,query=False):
+    """Install the original pause-list extension. Chapter activation is unavailable."""
+    result=_command(pid,2 if query else int(bool(enabled)),'PAUSE_CHAPTER_MENU',dll,26)
+    return dict(installed=bool(result['owned']&1),enabled=bool(result['owned']&2),
+                draw_calls=result['found'],chapter_activation_supported=False)
+
+
+def replace_pause_menu(pid,dll,previous_dll,previous_sha256):
+    """Explicit, hash-checked UI-only handoff from a disabled earlier bridge."""
+    from file_identity import file_digest
+    from live_monitor import Session
+    previous=Path(previous_dll).resolve()
+    if previous==Path(dll).resolve() or file_digest(previous)!=previous_sha256:
+        raise RuntimeError('Previous pause bridge identity mismatch')
+    session=Session()
+    try:
+        if session.pid!=pid:raise RuntimeError('Game process changed before menu handoff')
+        modules=list(diagnose.snapshot_entries(session.kernel,24,pid,diagnose.ModuleEntry,'Module32'))
+        owners=[m for m in modules if Path(m.szExePath).resolve()==previous]
+        if len(owners)!=1:raise RuntimeError('Previous pause bridge is not uniquely loaded')
+        owner=owners[0]
+        base=session.base
+        root=struct.unpack('<2Q',session.read(base+0x115d7c0+7*0x30+16,16))
+        child=struct.unpack('<2Q',session.read(base+0x115d7c0+47*0x30+16,16))
+        if any(not owner.modBaseAddr<=address<owner.modBaseAddr+owner.modBaseSize for address in (*root,*child)):
+            raise RuntimeError('Pause callbacks do not belong to the verified previous DLL')
+        # Old version rejects disabling while its submenu is open.
+        disabled=configure_pause_menu(pid,previous,False)
+        if not disabled['installed'] or disabled['enabled']:
+            raise RuntimeError('Previous pause-menu extension did not disable')
+        result=_command(pid,3,'PAUSE_CHAPTER_MENU',dll,26,47,struct.pack('<2Q',*root))
+        return dict(installed=bool(result['owned']&1),enabled=bool(result['owned']&2),
+                    draw_calls=result['found'],chapter_activation_supported=False)
+    finally:session.close()
+
+
 def grant_model(pid,model,name,dll,*,binding=bytes(16),expected_profile=0):
     return _command(pid,model,name,dll,1,binding=binding,expected_profile=expected_profile)
 

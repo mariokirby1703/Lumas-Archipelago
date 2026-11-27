@@ -39,6 +39,7 @@ static std::uint32_t Hash(const char* value) {
 #include "area_return.h"
 #include "superbuild_setup.h"
 #include "grant_identity.h"
+#include "pause_menu.h"
 static bool WriteCode(unsigned char* code,const unsigned char* replacement,std::size_t size) {
     if(!std::memcmp(code,replacement,size))return true;
     DWORD previous=0;
@@ -78,6 +79,9 @@ static DWORD Execute(Command* c) {
         if(std::memcmp(reinterpret_cast<void*>(base+0x88a290),owned_prefix,sizeof(owned_prefix)) ||
            std::memcmp(reinterpret_cast<void*>(base+0x88a2b0),found_prefix,sizeof(found_prefix)))return 1;
         if(const auto error=ValidateGrantIdentity(base,c))return error;
+        // Menu-table installation is independent of the suspended actor context.
+        // Its own signatures/layout guards run on the same native window thread.
+        if(c->opcode==26)return lcu_pause::Configure(base,c);
         auto actor=*reinterpret_cast<std::uintptr_t*>(base+0x1c7d3e0);
         if(!actor || !(*reinterpret_cast<std::uint32_t*>(actor+0xd4)&0x1000))return 2;
         // Vehicle contexts permit passive receipts; reward revocation remains Default-only.
