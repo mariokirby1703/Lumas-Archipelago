@@ -5383,7 +5383,7 @@
       ],
       "movement": [
         [
-          "land_speed"
+          "land_speed:2"
         ],
         [
           "homing_attack"
@@ -5395,7 +5395,7 @@
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Game Land Speed Lv2 or Homing Attack or Double Jump",
+      "raw_movement": "Progressive Game Land Speed Lv3 or Homing Attack or Double Jump",
       "world": "Game Land",
       "row": 4
     },
@@ -5405,7 +5405,7 @@
       ],
       "movement": [
         [
-          "land_speed"
+          "land_speed:2"
         ],
         [
           "homing_attack"
@@ -5417,7 +5417,7 @@
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Progressive Game Land Speed Lv2 or Homing Attack or Double Jump",
+      "raw_movement": "Progressive Game Land Speed Lv3 or Homing Attack or Double Jump",
       "world": "Game Land",
       "row": 5
     },
@@ -5448,14 +5448,14 @@
           "wall_jump"
         ],
         [
-          "land_speed",
+          "land_speed:2",
           "mid_air_boost"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Laser or Double Jump + Wall Jump or Game Land Speed Lv2 + Mid-Air Boost",
+      "raw_movement": "Laser or Double Jump + Wall Jump or Game Land Speed Lv3 + Mid-Air Boost",
       "world": "Game Land",
       "row": 7
     },
@@ -5521,13 +5521,13 @@
           "mid_air_boost"
         ],
         [
-          "land_speed"
+          "land_speed:2"
         ]
       ],
       "advanced_normal": [],
       "advanced_movement": [],
       "raw_normal": "None",
-      "raw_movement": "Double Jump or Mid-Air Boost or Progressive Game Land Speed Lv2",
+      "raw_movement": "Double Jump or Mid-Air Boost or Progressive Game Land Speed Lv3",
       "world": "Game Land",
       "row": 11
     },

@@ -26,7 +26,12 @@ class SonicColoursWorld(World):
     location_name_to_id = {n: d.code for n, d in Locations.LOCATION_TABLE.items()}
     item_name_groups = {'Wisps': set(Items.ALL_WISP_ITEMS), 'World Access': set(Items.WORLD_ITEMS),
                         'Chaos Emeralds': set(Items.EMERALDS), 'Red Rings': set(Items.RING_VALUES),
-                        'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS)}
+                        'Traps': set(Items.TRAPS), 'Movement': set(Items.MOVEMENT_ITEMS),
+                        **{name: {name, 'Progressive '+name} for name in Items.NORMAL_WISP_ITEMS},
+                        'Game Land Speed': {'Progressive Game Land Speed'},
+                        'Crouch': {'Progressive Crouch'},
+                        'Slide': {'Progressive Crouch'},
+                        'Sliding': {'Progressive Crouch'}}
 
     def generate_early(self):
         if 'luma' in self.multiworld.get_player_name(self.player).casefold():

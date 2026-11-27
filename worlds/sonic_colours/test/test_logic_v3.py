@@ -88,8 +88,21 @@ def test_all_five_ring_location_checks_the_last_ring_route():
 
 def test_game_land_first_stage_has_three_movement_alternatives():
     assert not logic.check(world(),State(),MANIFEST,'stgD10')
-    for item in ('Progressive Game Land Speed','Homing Attack','Double Jump'):
+    speed='Progressive Game Land Speed'
+    assert not logic.check(world(),State(speed),MANIFEST,'stgD10')
+    assert logic.check(world(),State(speed,speed),MANIFEST,'stgD10')
+    for item in ('Homing Attack','Double Jump'):
         assert logic.check(world(),State(item),MANIFEST,'stgD10')
+
+
+@pytest.mark.parametrize('key,extra', [
+    ('stgD10', ()), ('stgD10:eggman_heart', ()),
+    ('stgB20:eggman_heart', ('Mid-Air Boost',)),
+])
+def test_game_land_speed_routes_require_level_three(key,extra):
+    speed='Progressive Game Land Speed'
+    assert not logic.check(world(),State(speed,*extra),MANIFEST,key)
+    assert logic.check(world(),State(speed,speed,*extra),MANIFEST,key)
 
 
 def test_tropical_resort_3_clear_needs_slide_and_stomp_with_ability_locks():
